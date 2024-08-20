@@ -50,7 +50,7 @@
   },
   "package": {
    "name": "torchmd-net",
-   "version": "2.3.0"
+   "version": "2.4.0"
   },
   "requirements": {
    "build": [
@@ -86,8 +86,8 @@
    ]
   },
   "source": {
-   "sha256": "dc79c7696ff2cf1e6ece24d8dc4311e9827c974d1c1773a49a0b14bf8c906efe",
-   "url": "https://github.com/torchmd/torchmd-net/archive/2.3.0.tar.gz"
+   "sha256": "a54f4135af744fa768120dc19bcc3b6749732e2d2124a997f25eda9c8ca030d3",
+   "url": "https://github.com/torchmd/torchmd-net/archive/2.4.0.tar.gz"
   },
   "test": {
    "commands": [
@@ -184,7 +184,7 @@
   },
   "package": {
    "name": "torchmd-net",
-   "version": "2.3.0"
+   "version": "2.4.0"
   },
   "requirements": {
    "build": [
@@ -220,8 +220,8 @@
    ]
   },
   "source": {
-   "sha256": "dc79c7696ff2cf1e6ece24d8dc4311e9827c974d1c1773a49a0b14bf8c906efe",
-   "url": "https://github.com/torchmd/torchmd-net/archive/2.3.0.tar.gz"
+   "sha256": "a54f4135af744fa768120dc19bcc3b6749732e2d2124a997f25eda9c8ca030d3",
+   "url": "https://github.com/torchmd/torchmd-net/archive/2.4.0.tar.gz"
   },
   "test": {
    "commands": [
@@ -276,7 +276,7 @@
   },
   "package": {
    "name": "torchmd-net",
-   "version": "2.3.0"
+   "version": "2.4.0"
   },
   "requirements": {
    "build": [
@@ -307,8 +307,8 @@
    ]
   },
   "source": {
-   "sha256": "dc79c7696ff2cf1e6ece24d8dc4311e9827c974d1c1773a49a0b14bf8c906efe",
-   "url": "https://github.com/torchmd/torchmd-net/archive/2.3.0.tar.gz"
+   "sha256": "a54f4135af744fa768120dc19bcc3b6749732e2d2124a997f25eda9c8ca030d3",
+   "url": "https://github.com/torchmd/torchmd-net/archive/2.4.0.tar.gz"
   },
   "test": {
    "commands": [
@@ -386,7 +386,7 @@
  "pr_info": {
   "__lazy_json__": "pr_info/torchmd-net.json"
  },
- "raw_meta_yaml": "{% set name = \"torchmd-net\" %}\n{% set version = \"2.3.0\" %}\n# see github.com/conda-forge/conda-forge.github.io/issues/1059 for naming discussion\n{% set torch_proc_type = \"cuda\" if cuda_compiler_version != \"None\" else \"cpu\" %}\n\n{% if cuda_compiler_version in (None, \"None\", True, False) %}\n{% set cuda_major = 0 %}\n{% else %}\n{% set cuda_major = environ.get(\"cuda_compiler_version\", \"11.8\").split(\".\")[0] | int %}\n{% endif %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://github.com/torchmd/torchmd-net/archive/{{ version }}.tar.gz\n  sha256: dc79c7696ff2cf1e6ece24d8dc4311e9827c974d1c1773a49a0b14bf8c906efe\n\nbuild:\n  entry_points:\n    - torchmd-train = torchmdnet.scripts.train:main\n  number: 0\n  string: cuda{{ cuda_compiler_version | replace('.', '') }}py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version != \"None\"]\n  string: cpu_py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version == \"None\"]\n# Mainly due to NNPOps not having a windows package\n  skip: true  # [win]\n  rpaths:\n    - lib/\n    - {{ SP_DIR }}/torch/lib\nrequirements:\n  build:\n    - python                                 # [build_platform != target_platform]\n    - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n    - {{ compiler('cxx') }}\n    - {{ stdlib(\"c\") }}\n    - {{ compiler('cuda') }}  # [cuda_compiler_version not in (undefined, 'None')]\n    - cuda-version {{ cuda_compiler_version }}  # [cuda_compiler_version not in (undefined, 'None')]\n    {% if cuda_major >= 12 %}\n    - cuda-cudart-dev\n    # No cuda-driver-dev in windows\n    - cuda-driver-dev  # [linux]\n    - libcufft-dev\n    - libcurand-dev\n    - libcublas-dev\n    - cuda-nvrtc-dev\n    - cuda-nvtx-dev\n    - cuda-profiler-api\n    - cuda-nvrtc-dev\n    - libcusparse-dev\n    - libcusolver-dev\n    {% endif %}\n  host:\n    - python\n    # Only needed for Python 3.8 and below\n    # xref: https://github.com/conda-forge/linux-sysroot-feedstock/issues/52\n    - libxcrypt  # [py <= 38]\n    - pip\n    - pytorch =*={{ torch_proc_type }}*\n    - setuptools <70\n  run:\n    - python\n    # Also needed by pytorch for the compile functionality\n    - libxcrypt  # [py <= 38]\n    - h5py\n    - matplotlib-base\n    - nnpops\n    - pytorch_geometric\n    - lightning\n    - pydantic <2\n    - torchmetrics\n    # This is a dependency coming from torchmetrics\n    - pretty_errors\n    - tqdm\n    - aiohttp\n    {% if cuda_major >= 12 %}\n    - cuda-cudart\n    {% endif %}\n  run_constrained:\n    # additional run constraint to the one from the (version-only) run_export;\n    # constraining the CPU builds to CPU pytorch isn't 100% necessary, but cleaner\n    - pytorch =*={{ torch_proc_type }}*\n\ntest:\n  imports:\n    - torchmdnet\n  commands:\n    - pip check\n    - torchmd-train --help\n    - pytest -v -s tests  # [py<3.12]\n    # Pytorch compile does not support 3.12\n    - pytest -v -k \"not compile\" -s tests  # [py>=3.12]\n  requires:\n    - pip\n    - pytest\n    # Needed by pytorch for the compile functionality\n    - gxx  # [linux]\n    - clang  # [osx]\n    - libxcrypt  # [py <= 38]\n  source_files:\n    - tests\n    - examples\n\nabout:\n  home: https://github.com/torchmd/torchmd-net\n  license: MIT\n  license_family: MIT\n  license_file: README.md\n  summary: 'State of the art Pytorch Neural Network Potentials (NNPs)'\n  description: |\n    TorchMD-NET provides state-of-the-art neural networks potentials (NNPs) and a mechanism to train them. It offers efficient and fast implementations of several NNPs and it is integrated in GPU-accelerated molecular dynamics code like ACEMD, OpenMM and TorchMD. TorchMD-NET exposes its NNPs as PyTorch modules.\n  doc_url: https://github.com/torchmd/torchmd-net\n  dev_url: https://github.com/torchmd/torchmd-net\n\nextra:\n  recipe-maintainers:\n    - RaulPPelaez\n    - raimis\n    - giadefa\n",
+ "raw_meta_yaml": "{% set name = \"torchmd-net\" %}\n{% set version = \"2.4.0\" %}\n# see github.com/conda-forge/conda-forge.github.io/issues/1059 for naming discussion\n{% set torch_proc_type = \"cuda\" if cuda_compiler_version != \"None\" else \"cpu\" %}\n\n{% if cuda_compiler_version in (None, \"None\", True, False) %}\n{% set cuda_major = 0 %}\n{% else %}\n{% set cuda_major = environ.get(\"cuda_compiler_version\", \"11.8\").split(\".\")[0] | int %}\n{% endif %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://github.com/torchmd/torchmd-net/archive/{{ version }}.tar.gz\n  sha256: a54f4135af744fa768120dc19bcc3b6749732e2d2124a997f25eda9c8ca030d3\n\nbuild:\n  entry_points:\n    - torchmd-train = torchmdnet.scripts.train:main\n  number: 0\n  string: cuda{{ cuda_compiler_version | replace('.', '') }}py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version != \"None\"]\n  string: cpu_py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version == \"None\"]\n# Mainly due to NNPOps not having a windows package\n  skip: true  # [win]\n  rpaths:\n    - lib/\n    - {{ SP_DIR }}/torch/lib\nrequirements:\n  build:\n    - python                                 # [build_platform != target_platform]\n    - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n    - {{ compiler('cxx') }}\n    - {{ stdlib(\"c\") }}\n    - {{ compiler('cuda') }}  # [cuda_compiler_version not in (undefined, 'None')]\n    - cuda-version {{ cuda_compiler_version }}  # [cuda_compiler_version not in (undefined, 'None')]\n    {% if cuda_major >= 12 %}\n    - cuda-cudart-dev\n    # No cuda-driver-dev in windows\n    - cuda-driver-dev  # [linux]\n    - libcufft-dev\n    - libcurand-dev\n    - libcublas-dev\n    - cuda-nvrtc-dev\n    - cuda-nvtx-dev\n    - cuda-profiler-api\n    - cuda-nvrtc-dev\n    - libcusparse-dev\n    - libcusolver-dev\n    {% endif %}\n  host:\n    - python\n    # Only needed for Python 3.8 and below\n    # xref: https://github.com/conda-forge/linux-sysroot-feedstock/issues/52\n    - libxcrypt  # [py <= 38]\n    - pip\n    - pytorch =*={{ torch_proc_type }}*\n    - setuptools <70\n  run:\n    - python\n    # Also needed by pytorch for the compile functionality\n    - libxcrypt  # [py <= 38]\n    - h5py\n    - matplotlib-base\n    - nnpops\n    - pytorch_geometric\n    - lightning\n    - pydantic <2\n    - torchmetrics\n    # This is a dependency coming from torchmetrics\n    - pretty_errors\n    - tqdm\n    - aiohttp\n    {% if cuda_major >= 12 %}\n    - cuda-cudart\n    {% endif %}\n  run_constrained:\n    # additional run constraint to the one from the (version-only) run_export;\n    # constraining the CPU builds to CPU pytorch isn't 100% necessary, but cleaner\n    - pytorch =*={{ torch_proc_type }}*\n\ntest:\n  imports:\n    - torchmdnet\n  commands:\n    - pip check\n    - torchmd-train --help\n    - pytest -v -s tests  # [py<3.12]\n    # Pytorch compile does not support 3.12\n    - pytest -v -k \"not compile\" -s tests  # [py>=3.12]\n  requires:\n    - pip\n    - pytest\n    # Needed by pytorch for the compile functionality\n    - gxx  # [linux]\n    - clang  # [osx]\n    - libxcrypt  # [py <= 38]\n  source_files:\n    - tests\n    - examples\n\nabout:\n  home: https://github.com/torchmd/torchmd-net\n  license: MIT\n  license_family: MIT\n  license_file: README.md\n  summary: 'State of the art Pytorch Neural Network Potentials (NNPs)'\n  description: |\n    TorchMD-NET provides state-of-the-art neural networks potentials (NNPs) and a mechanism to train them. It offers efficient and fast implementations of several NNPs and it is integrated in GPU-accelerated molecular dynamics code like ACEMD, OpenMM and TorchMD. TorchMD-NET exposes its NNPs as PyTorch modules.\n  doc_url: https://github.com/torchmd/torchmd-net\n  dev_url: https://github.com/torchmd/torchmd-net\n\nextra:\n  recipe-maintainers:\n    - RaulPPelaez\n    - raimis\n    - giadefa\n",
  "req": {
   "__set__": true,
   "elements": [
@@ -511,8 +511,8 @@
    ]
   }
  },
- "url": "https://github.com/torchmd/torchmd-net/archive/2.3.0.tar.gz",
- "version": "2.3.0",
+ "url": "https://github.com/torchmd/torchmd-net/archive/2.4.0.tar.gz",
+ "version": "2.4.0",
  "version_pr_info": {
   "__lazy_json__": "version_pr_info/torchmd-net.json"
  }
