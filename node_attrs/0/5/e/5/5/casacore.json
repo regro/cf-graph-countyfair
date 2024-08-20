@@ -25,12 +25,12 @@
    "summary": "Core libraries for the Common Astronomical Software Applications (CASA)"
   },
   "build": {
-   "number": "19",
+   "number": "20",
    "run_exports": [
     "casacore",
     "casacore * mpi_openmpi_*"
    ],
-   "string": "mpi_openmpi_pyh1234567_19"
+   "string": "mpi_openmpi_pyh1234567_20"
   },
   "extra": {
    "recipe-maintainers": [
@@ -80,7 +80,8 @@
     "ncursesw.patch",
     "default-root.patch",
     "ignore-build-env-prefix.patch",
-    "boost-python-cmake.patch"
+    "boost-python-cmake.patch",
+    "1350.patch"
    ],
    "sha256": "63f1c8eff932b0fcbd38c598a5811e6e5397b72835b637d6f426105a183b3f91",
    "url": "https://github.com/casacore/casacore/archive/v3.5.0.tar.gz"
@@ -151,12 +152,12 @@
    "summary": "Core libraries for the Common Astronomical Software Applications (CASA)"
   },
   "build": {
-   "number": "19",
+   "number": "20",
    "run_exports": [
     "casacore",
     "casacore * mpi_openmpi_*"
    ],
-   "string": "mpi_openmpi_pyh1234567_19"
+   "string": "mpi_openmpi_pyh1234567_20"
   },
   "extra": {
    "recipe-maintainers": [
@@ -207,6 +208,7 @@
     "default-root.patch",
     "ignore-build-env-prefix.patch",
     "boost-python-cmake.patch",
+    "1350.patch",
     "clang-link.patch",
     "darwin-gettimeofday.patch",
     "libadios2-macos.patch"
@@ -235,12 +237,12 @@
    "summary": "Core libraries for the Common Astronomical Software Applications (CASA)"
   },
   "build": {
-   "number": "19",
+   "number": "20",
    "run_exports": [
     "casacore",
     "casacore * mpi_openmpi_*"
    ],
-   "string": "mpi_openmpi_pyh1234567_19"
+   "string": "mpi_openmpi_pyh1234567_20"
   },
   "extra": {
    "recipe-maintainers": [
@@ -291,6 +293,7 @@
     "default-root.patch",
     "ignore-build-env-prefix.patch",
     "boost-python-cmake.patch",
+    "1350.patch",
     "clang-link.patch",
     "darwin-gettimeofday.patch",
     "libadios2-macos.patch"
@@ -365,12 +368,12 @@
    "summary": "Core libraries for the Common Astronomical Software Applications (CASA)"
   },
   "build": {
-   "number": "19",
+   "number": "20",
    "run_exports": [
     "casacore",
     "casacore * mpi_openmpi_*"
    ],
-   "string": "mpi_openmpi_pyh1234567_19"
+   "string": "mpi_openmpi_pyh1234567_20"
   },
   "extra": {
    "recipe-maintainers": [
@@ -421,6 +424,7 @@
     "default-root.patch",
     "ignore-build-env-prefix.patch",
     "boost-python-cmake.patch",
+    "1350.patch",
     "clang-link.patch",
     "darwin-gettimeofday.patch",
     "libadios2-macos.patch"
@@ -502,7 +506,7 @@
  "pr_info": {
   "__lazy_json__": "pr_info/casacore.json"
  },
- "raw_meta_yaml": "{% set name = \"casacore\" %}\n{% set version = \"3.5.0\" %}\n{% set build = 19 %}\n{% set mpi = mpi or \"nompi\" %}\n\n{% if mpi == \"nompi\" %}\n{% set build = build + 100 %}\n{% set mpi_prefix = \"nompi\" %}\n{% else %}\n{% set mpi_prefix = \"mpi_\" + mpi %}\n{% endif %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://github.com/casacore/{{ name }}/archive/v{{ version }}.tar.gz\n  sha256: 63f1c8eff932b0fcbd38c598a5811e6e5397b72835b637d6f426105a183b3f91\n  patches:\n    - ncursesw.patch\n    - default-root.patch\n    - ignore-build-env-prefix.patch\n    - boost-python-cmake.patch\n    - clang-link.patch  # [osx]\n    - darwin-gettimeofday.patch  # [osx]\n    - libadios2-macos.patch  # [osx]\n\nbuild:\n  number: {{ build }}\n  skip: true  # [win]\n  string: {{ mpi_prefix }}_py{{ py }}h{{ PKG_HASH }}_{{ build }}\n  run_exports:\n    - {{ pin_subpackage('casacore', max_pin='x.x') }}\n    - {{ name }} * {{ mpi_prefix }}_*  # [mpi != \"nompi\"]\n\nrequirements:\n  build:\n    - python                                 # [build_platform != target_platform]\n    - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n    - numpy                                  # [build_platform != target_platform]\n    - bison\n    - cmake\n    - flex\n    - make\n    - m4\n    - {{ mpi }}  # [mpi == \"openmpi\" and build_platform != target_platform]\n    - {{ compiler('fortran') }}\n    - {{ compiler('c') }}\n    - {{ stdlib(\"c\") }}\n    - {{ compiler('cxx') }}\n  host:\n    - libblas\n    - libcblas\n    - liblapack\n    - libboost-python-devel\n    - cfitsio\n    - fftw\n    - gsl\n    - hdf5\n    - ncurses\n    - numpy\n    - python\n    - readline\n    - wcslib\n    - libadios2 2.10 {{ mpi_prefix }}_*  # [mpi != \"nompi\"]\n    - {{ mpi }}  # [mpi != \"nompi\"]\n  run:\n    - python\n    - {{ mpi }}  # [mpi != \"nompi\"]\n\ntest:\n  commands:\n    - casahdf5support\n    - findmeastable --help\n    - lsmf\n    - measuresdata\n    - taql --help\n    - tomf --help\n\n    # Make sure that libcasa_python doesn't link to libpython on macOS, since\n    # then the python-casacore modules will crash -- if binary modules on macOS\n    # link to libpython, symbols are duplicated.\n    - bash -c \"! otool -L $PREFIX/lib/libcasa_python*.5.dylib |grep /libpython\"  # [osx]\n\nabout:\n  home: https://casacore.github.io/casacore/\n  license: GPL-2.0-or-later\n  license_file: COPYING\n  summary: Core libraries for the Common Astronomical Software Applications (CASA)\n\nextra:\n  recipe-maintainers:\n    - pkgw\n",
+ "raw_meta_yaml": "{% set name = \"casacore\" %}\n{% set version = \"3.5.0\" %}\n{% set build = 20 %}\n{% set mpi = mpi or \"nompi\" %}\n\n{% if mpi == \"nompi\" %}\n{% set build = build + 100 %}\n{% set mpi_prefix = \"nompi\" %}\n{% else %}\n{% set mpi_prefix = \"mpi_\" + mpi %}\n{% endif %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://github.com/casacore/{{ name }}/archive/v{{ version }}.tar.gz\n  sha256: 63f1c8eff932b0fcbd38c598a5811e6e5397b72835b637d6f426105a183b3f91\n  patches:\n    - ncursesw.patch\n    - default-root.patch\n    - ignore-build-env-prefix.patch\n    - boost-python-cmake.patch\n    - 1350.patch  # backport of GitHub #1350 to solve #1348\n    - clang-link.patch  # [osx]\n    - darwin-gettimeofday.patch  # [osx]\n    - libadios2-macos.patch  # [osx]\n\nbuild:\n  number: {{ build }}\n  skip: true  # [win]\n  string: {{ mpi_prefix }}_py{{ py }}h{{ PKG_HASH }}_{{ build }}\n  run_exports:\n    - {{ pin_subpackage('casacore', max_pin='x.x') }}\n    - {{ name }} * {{ mpi_prefix }}_*  # [mpi != \"nompi\"]\n\nrequirements:\n  build:\n    - python                                 # [build_platform != target_platform]\n    - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n    - numpy                                  # [build_platform != target_platform]\n    - bison\n    - cmake\n    - flex\n    - make\n    - m4\n    - {{ mpi }}  # [mpi == \"openmpi\" and build_platform != target_platform]\n    - {{ compiler('fortran') }}\n    - {{ compiler('c') }}\n    - {{ stdlib(\"c\") }}\n    - {{ compiler('cxx') }}\n  host:\n    - libblas\n    - libcblas\n    - liblapack\n    - libboost-python-devel\n    - cfitsio\n    - fftw\n    - gsl\n    - hdf5\n    - ncurses\n    - numpy\n    - python\n    - readline\n    - wcslib\n    - libadios2 2.10 {{ mpi_prefix }}_*  # [mpi != \"nompi\"]\n    - {{ mpi }}  # [mpi != \"nompi\"]\n  run:\n    - python\n    - {{ mpi }}  # [mpi != \"nompi\"]\n\ntest:\n  commands:\n    - casahdf5support\n    - findmeastable --help\n    - lsmf\n    - measuresdata\n    - taql --help\n    - tomf --help\n\n    # Make sure that libcasa_python doesn't link to libpython on macOS, since\n    # then the python-casacore modules will crash -- if binary modules on macOS\n    # link to libpython, symbols are duplicated.\n    - bash -c \"! otool -L $PREFIX/lib/libcasa_python*.5.dylib |grep /libpython\"  # [osx]\n\nabout:\n  home: https://casacore.github.io/casacore/\n  license: GPL-2.0-or-later\n  license_file: COPYING\n  summary: Core libraries for the Common Astronomical Software Applications (CASA)\n\nextra:\n  recipe-maintainers:\n    - pkgw\n",
  "req": {
   "__set__": true,
   "elements": [
