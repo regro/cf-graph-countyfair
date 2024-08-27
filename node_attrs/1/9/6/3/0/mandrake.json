@@ -40,11 +40,12 @@
    "missing_dso_whitelist": [
     "*/libcuda.*"
    ],
-   "number": "9",
+   "number": "10",
    "script": [
     "export SCE_BUILD_ENV=\"conda_forge_cuda\"",
     "export GENARCH=\"-gencode arch=compute_80,code=sm_80 -gencode arch=compute_86,code=sm_86\"",
     "PYTHON -m pip install . -vv",
+    "export GENARCH=\"$GENARCH -gencode arch=compute_90,code=sm_90\"",
     "export SCE_BUILD_ENV=\"conda_forge\""
    ]
   },
@@ -70,11 +71,14 @@
    "host": [
     "cuda-version 11.8",
     "python",
+    "setuptools",
     "pip",
     "pybind11",
     "zlib",
     "libboost-headers",
-    "libgomp"
+    "libgomp",
+    "cuda-version 12.0",
+    "cuda-profiler-api"
    ],
    "run": [
     "python",
@@ -121,12 +125,14 @@
   "host": {
    "__set__": true,
    "elements": [
+    "cuda-profiler-api",
     "cuda-version",
     "libboost-headers",
     "libgomp",
     "pip",
     "pybind11",
     "python",
+    "setuptools",
     "zlib"
    ]
   },
@@ -177,11 +183,12 @@
    "missing_dso_whitelist": [
     "*/libcuda.*"
    ],
-   "number": "9",
+   "number": "10",
    "script": [
     "export SCE_BUILD_ENV=\"conda_forge_cuda\"",
     "export GENARCH=\"-gencode arch=compute_80,code=sm_80 -gencode arch=compute_86,code=sm_86\"",
     "PYTHON -m pip install . -vv",
+    "export GENARCH=\"$GENARCH -gencode arch=compute_90,code=sm_90\"",
     "export SCE_BUILD_ENV=\"conda_forge\""
    ]
   },
@@ -207,11 +214,14 @@
    "host": [
     "cuda-version 11.8",
     "python",
+    "setuptools",
     "pip",
     "pybind11",
     "zlib",
     "libboost-headers",
     "libgomp",
+    "cuda-version 12.0",
+    "cuda-profiler-api",
     "llvm-openmp"
    ],
    "run": [
@@ -268,7 +278,7 @@
    "missing_dso_whitelist": [
     "*/libcuda.*"
    ],
-   "number": "9",
+   "number": "10",
    "script": [
     "export SCE_BUILD_ENV=\"conda_forge\"",
     "PYTHON -m pip install . -vv"
@@ -294,6 +304,7 @@
    ],
    "host": [
     "python",
+    "setuptools",
     "pip",
     "pybind11",
     "zlib",
@@ -349,6 +360,7 @@
     "pip",
     "pybind11",
     "python",
+    "setuptools",
     "zlib"
    ]
   },
@@ -399,7 +411,7 @@
    "missing_dso_whitelist": [
     "*/libcuda.*"
    ],
-   "number": "9",
+   "number": "10",
    "script": [
     "export SCE_BUILD_ENV=\"conda_forge\"",
     "PYTHON -m pip install . -vv"
@@ -425,6 +437,7 @@
    ],
    "host": [
     "python",
+    "setuptools",
     "pip",
     "pybind11",
     "zlib",
@@ -480,6 +493,7 @@
     "pip",
     "pybind11",
     "python",
+    "setuptools",
     "zlib"
    ]
   },
@@ -522,13 +536,14 @@
  "pr_info": {
   "__lazy_json__": "pr_info/mandrake.json"
  },
- "raw_meta_yaml": "{% set name = \"mandrake\" %}\n{% set version = \"1.2.2\" %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://github.com/bacpop/{{ name|lower }}/archive/v{{ version }}.tar.gz\n  sha256: 5bbdde903252e2812d4ba484ae474ccc75efbaaf0ace7fe6f37a90e44fe3f0e5\n\nbuild:\n  number: 9\n  skip: true  # [py<38 or win or cuda_compiler_version in (\"9.2\", \"10.0\", \"10.1\", \"10.2\", \"11.0\")]\n  script:\n    - export SCE_BUILD_ENV=\"conda_forge\"  # [cuda_compiler_version == \"None\"]\n    - export SCE_BUILD_ENV=\"conda_forge_cuda\"  # [linux64 and cuda_compiler_version != \"None\"]\n    - export GENARCH=\"-gencode arch=compute_80,code=sm_80 -gencode arch=compute_86,code=sm_86\"  # [cuda_compiler_version != \"None\"]\n    - export GENARCH=\"$GENARCH -gencode arch=compute_90,code=sm_90\"  # [(cuda_compiler_version or \"\").startswith(\"12\")]\n    - {{ PYTHON }} -m pip install . -vv\n  missing_dso_whitelist:\n    - '*/libcuda.*'\n  ignore_run_exports:\n    - cudatoolkit\n  entry_points:\n    - mandrake = mandrake.__main__:main\n\nrequirements:\n  build:\n    - {{ stdlib('c') }}\n    - {{ compiler('c') }}\n    - {{ compiler('cxx') }}\n    - {{ compiler('cuda') }}  # [linux64 and cuda_compiler_version != \"None\"]\n    - python                                 # [build_platform != target_platform]\n    - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n    - pybind11                               # [build_platform != target_platform]\n    - cmake >=3.19\n    - make\n  host:\n    - cuda-version {{ cuda_compiler_version }}  # [(cuda_compiler_version or \"None\") != \"None\"]\n    - python\n    - pip\n    - pybind11\n    - zlib\n    - libboost-headers\n    - cuda-profiler-api  # [(cuda_compiler_version or \"\").startswith(\"12\")]\n    - llvm-openmp        # [osx]\n    - libgomp            # [linux64]\n  run:\n    - python\n    - zlib\n    - numpy\n    - scipy\n    - scikit-learn\n    - pandas\n    - plotly\n    - matplotlib-base\n    - hdbscan\n    - pp-sketchlib >=2.0.0\n    - hdf5\n    - h5py\n    - tqdm\n    - ffmpeg\n\ntest:\n  imports:\n    - SCE\n  commands:\n    - mandrake --version\n\nabout:\n  home: https://github.com/bacpop/mandrake\n  license: Apache-2.0 AND MIT\n  license_file:\n    - NOTICE\n    - LICENSE\n    - LICENSE_kseq\n  summary: Stochastic cluster embedding with genetic distances\n  doc_url: https://mandrake.readthedocs.io/en/latest\n  dev_url: https://github.com/bacpop/mandrake\n\nextra:\n  recipe-maintainers:\n    - johnlees\n    - gtonkinhill\n",
+ "raw_meta_yaml": "{% set name = \"mandrake\" %}\n{% set version = \"1.2.2\" %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://github.com/bacpop/{{ name|lower }}/archive/v{{ version }}.tar.gz\n  sha256: 5bbdde903252e2812d4ba484ae474ccc75efbaaf0ace7fe6f37a90e44fe3f0e5\n\nbuild:\n  number: 10\n  skip: true  # [py<38 or win or cuda_compiler_version in (\"9.2\", \"10.0\", \"10.1\", \"10.2\", \"11.0\")]\n  script:\n    - export SCE_BUILD_ENV=\"conda_forge\"  # [cuda_compiler_version == \"None\"]\n    - export SCE_BUILD_ENV=\"conda_forge_cuda\"  # [linux64 and cuda_compiler_version != \"None\"]\n    - export GENARCH=\"-gencode arch=compute_80,code=sm_80 -gencode arch=compute_86,code=sm_86\"  # [cuda_compiler_version != \"None\"]\n    - export GENARCH=\"$GENARCH -gencode arch=compute_90,code=sm_90\"  # [(cuda_compiler_version or \"\").startswith(\"12\")]\n    - {{ PYTHON }} -m pip install . -vv\n  missing_dso_whitelist:\n    - '*/libcuda.*'\n  ignore_run_exports:\n    - cudatoolkit\n  entry_points:\n    - mandrake = mandrake.__main__:main\n\nrequirements:\n  build:\n    - {{ stdlib('c') }}\n    - {{ compiler('c') }}\n    - {{ compiler('cxx') }}\n    - {{ compiler('cuda') }}  # [linux64 and cuda_compiler_version != \"None\"]\n    - python                                 # [build_platform != target_platform]\n    - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n    - pybind11 >=2.12.0                      # [build_platform != target_platform]\n    - cmake >=3.19\n    - make\n  host:\n    - cuda-version {{ cuda_compiler_version }}  # [(cuda_compiler_version or \"None\") != \"None\"]\n    - python\n    - setuptools\n    - pip\n    - pybind11\n    - zlib\n    - libboost-headers\n    - cuda-profiler-api  # [(cuda_compiler_version or \"\").startswith(\"12\")]\n    - llvm-openmp        # [osx]\n    - libgomp            # [linux64]\n  run:\n    - python\n    - zlib\n    - numpy\n    - scipy\n    - scikit-learn\n    - pandas\n    - plotly\n    - matplotlib-base\n    - hdbscan\n    - pp-sketchlib >=2.0.0\n    - hdf5\n    - h5py\n    - tqdm\n    - ffmpeg\n\ntest:\n  imports:\n    - SCE\n  commands:\n    - mandrake --version\n\nabout:\n  home: https://github.com/bacpop/mandrake\n  license: Apache-2.0 AND MIT\n  license_file:\n    - NOTICE\n    - LICENSE\n    - LICENSE_kseq\n  summary: Stochastic cluster embedding with genetic distances\n  doc_url: https://mandrake.readthedocs.io/en/latest\n  dev_url: https://github.com/bacpop/mandrake\n\nextra:\n  recipe-maintainers:\n    - johnlees\n    - gtonkinhill\n",
  "req": {
   "__set__": true,
   "elements": [
    "c_compiler_stub",
    "c_stdlib_stub",
    "cmake",
+   "cuda-profiler-api",
    "cuda-version",
    "cuda_compiler_stub",
    "cxx_compiler_stub",
@@ -550,6 +565,7 @@
    "python",
    "scikit-learn",
    "scipy",
+   "setuptools",
    "tqdm",
    "zlib"
   ]
@@ -572,6 +588,7 @@
     "c_compiler_stub",
     "c_stdlib_stub",
     "ctng-compilers",
+    "cuda-profiler-api",
     "cuda-version",
     "cuda_compiler_stub",
     "cxx_compiler_stub",
@@ -582,6 +599,7 @@
     "pip",
     "pybind11",
     "python",
+    "setuptools",
     "zlib"
    ]
   },
@@ -631,13 +649,16 @@
   "host": {
    "__set__": true,
    "elements": [
+    "cuda-profiler-api",
     "cuda-version 11.8",
+    "cuda-version 12.0",
     "libboost-headers",
     "libgomp",
     "llvm-openmp",
     "pip",
     "pybind11",
     "python",
+    "setuptools",
     "zlib"
    ]
   },
