@@ -38,7 +38,7 @@
    "summary": "Panorama photo stitcher"
   },
   "build": {
-   "number": "3"
+   "number": "4"
   },
   "extra": {
    "recipe-maintainers": [
@@ -239,7 +239,7 @@
    "summary": "Panorama photo stitcher"
   },
   "build": {
-   "number": "3"
+   "number": "4"
   },
   "extra": {
    "recipe-maintainers": [
@@ -440,7 +440,7 @@
    "summary": "Panorama photo stitcher"
   },
   "build": {
-   "number": "3"
+   "number": "4"
   },
   "extra": {
    "recipe-maintainers": [
@@ -641,7 +641,7 @@
    "summary": "Panorama photo stitcher"
   },
   "build": {
-   "number": "3"
+   "number": "4"
   },
   "extra": {
    "recipe-maintainers": [
@@ -1048,7 +1048,7 @@
    "summary": "Panorama photo stitcher"
   },
   "build": {
-   "number": "3"
+   "number": "4"
   },
   "extra": {
    "recipe-maintainers": [
@@ -1228,7 +1228,7 @@
    "summary": "Panorama photo stitcher"
   },
   "build": {
-   "number": "3"
+   "number": "4"
   },
   "extra": {
    "recipe-maintainers": [
@@ -1415,7 +1415,7 @@
  "pr_info": {
   "__lazy_json__": "pr_info/hugin.json"
  },
- "raw_meta_yaml": "{% set version = \"2023.0.0\" %}\n{% set version_major_minor = \".\".join(version.split('.')[:2]) %}\n\npackage:\n  name: hugin-base\n  version: {{ version }}\n\nsource:\n  # url: https://iweb.dl.sourceforge.net/project/hugin/hugin/hugin-{{ version_major_minor }}/hugin-{{ version }}.tar.bz2\n  url: https://sourceforge.net/projects/hugin/files/hugin/hugin-{{ version_major_minor }}/hugin-{{ version }}.tar.bz2\n  sha256: 04a39fccc6017e0544c639bd22309472c574d35b3455cbade1fc3870e631632b\n  patches:\n    - hugin-openexr3.patch\n  # Line endings frustrate me. So I've just vendored the files but documented the patch.\n  #   - windows_unbundle.patch\n  #   - windows_unified_manifest.patch\n    - link_to_shared_getopt_win.patch\n    # finite keyword deprecated in C99\n    - isfinite.patch\n    # Backport of \n    # https://sourceforge.net/p/hugin/hugin/ci/4d081490b48aaff820cee7601b8624b37b652c06/\n    # for boost 1.86\n    - fix_deprecated_boost_copy_option.diff\n\nbuild:\n  number: 3\n\nrequirements:\n  build:\n    - {{ compiler('cxx') }}\n    - {{ compiler('c') }}\n    - {{ stdlib('c') }}\n    - gettext\n    - libgomp      # [linux]\n    - make   # [unix]\n    - ninja  # [win]\n    - cmake\n    - binutils  # [linux]\n    - pkg-config  # [unix]\n    - {{ cdt('mesa-libgl-devel') }}  # [linux]\n    - {{ cdt('mesa-dri-drivers') }}  # [linux]\n    - {{ cdt('mesa-libEGL-devel') }}  # [linux]\n    - {{ cdt('mesa-libGL-devel') }}  # [linux]\n  host:\n    - xorg-libxfixes           # [linux]\n    - xorg-libsm               # [linux]\n    - pango\n    - pip\n    - libtiff\n    - libpano13\n    - libjpeg-turbo\n    - libpng\n    - imath\n    - zlib\n    - openexr\n    - libvigra\n    - exiv2\n    - glew\n    - libsqlite\n    - lcms2\n    - perl\n    - libboost-devel\n    - fftw\n    - libglu           # [linux]\n    # For some reason these are requried by the windows\n    # build system\n    - enblend\n    - pthreads-win32  # [win]\n    - getopt-win32    # [win]\n  run:\n    - pthreads-win32  # [win]\n    # not sure why run exports isn't working\n    - exiftool\n    - enblend\n    - xorg-libx11  # [linux]\n    - xorg-libsm   # [linux]\n\ntest:\n  commands:\n    - nona -help\n    - cpfind -help\n    - autooptimiser -help\n    - pano_modify -help\n\noutputs:\n  - name: hugin-base\n    script: build_base.sh  # [unix]\n    script: bld_base.bat  # [win]\n\n  - name: hugin\n    build:\n      skip: true  # [osx]\n      ignore_run_exports_from:\n        - libboost-devel\n    script: build_gui.sh  # [unix]\n    script: bld_gui.bat  # [win]\n    requirements:\n      build:\n        - {{ compiler('cxx') }}\n        - {{ compiler('c') }}\n        - {{ stdlib('c') }}\n        - gettext\n        - libgomp      # [linux]\n        - make   # [unix]\n        - ninja  # [win]\n        - cmake\n        - binutils  # [linux]\n        - pkg-config  # [unix]\n        - {{ cdt('mesa-libgl-devel') }}  # [linux]\n        - {{ cdt('mesa-dri-drivers') }}  # [linux]\n        - {{ cdt('mesa-libEGL-devel') }}  # [linux]\n        - {{ cdt('mesa-libGL-devel') }}  # [linux]\n      host:\n        - {{ pin_subpackage('hugin-base', exact=True) }}\n        - xorg-libxfixes           # [linux]\n        - xorg-libsm               # [linux]\n        - pango\n        - pip\n        - libtiff\n        - libpano13\n        - libjpeg-turbo\n        - libpng\n        - imath\n        - zlib\n        - openexr\n        - libvigra\n        - exiv2\n        - glew\n        - libsqlite\n        - lcms2\n        - perl\n        # build complains on windows if we don't have the libs, as it's in the link interface of hugin-base;\n        # no selector because we also ignore run-export everywhere\n        - libboost-devel\n        - fftw\n        - libglu           # [linux]\n        # For some reason these are requried by the windows\n        # build system\n        - enblend\n        - pthreads-win32  # [win]\n        - getopt-win32    # [win]\n        # Warning: With vanially conda, wxwidgets will not work on linux since they\n        # internally code strings as UTF-16 strings on windows\n        # conda-forge has patched conda: https://github.com/conda-forge/conda-feedstock/pull/117\n        # But upstream has rejected a similar patch:\n        # https://github.com/conda/conda/pull/9946\n        # In favor of more time to work on a longer term fix\n        # https://github.com/conda/conda-build/blob/master/tests/test_api_build.py#L240\n        - wxwidgets\n        - libglu  # [linux]\n      run:\n        - {{ pin_subpackage('hugin-base', exact=True) }}\n\nabout:\n  home: http://hugin.sourceforge.net/\n  license: GPL-2.0-only\n  license_family: GPL\n  license_file: COPYING.txt\n  summary: Panorama photo stitcher\n\n  description: |\n    An easy to use cross-platform panoramic imaging toolchain based on Panorama Tools.\n\n    With Hugin you can assemble a mosaic of photographs into a complete\n    immersive panorama, stitch any series of overlapping pictures and much\n    more.\n\n  doc_url: http://hugin.sourceforge.net/docs/\n  dev_url: https://sourceforge.net/projects/hugin/\n\nextra:\n  recipe-maintainers:\n    - hmaarrfk\n",
+ "raw_meta_yaml": "{% set version = \"2023.0.0\" %}\n{% set version_major_minor = \".\".join(version.split('.')[:2]) %}\n\npackage:\n  name: hugin-base\n  version: {{ version }}\n\nsource:\n  # url: https://iweb.dl.sourceforge.net/project/hugin/hugin/hugin-{{ version_major_minor }}/hugin-{{ version }}.tar.bz2\n  url: https://sourceforge.net/projects/hugin/files/hugin/hugin-{{ version_major_minor }}/hugin-{{ version }}.tar.bz2\n  sha256: 04a39fccc6017e0544c639bd22309472c574d35b3455cbade1fc3870e631632b\n  patches:\n    - hugin-openexr3.patch\n  # Line endings frustrate me. So I've just vendored the files but documented the patch.\n  #   - windows_unbundle.patch\n  #   - windows_unified_manifest.patch\n    - link_to_shared_getopt_win.patch\n    # finite keyword deprecated in C99\n    - isfinite.patch\n    # Backport of\n    # https://sourceforge.net/p/hugin/hugin/ci/4d081490b48aaff820cee7601b8624b37b652c06/\n    # for boost 1.86\n    - fix_deprecated_boost_copy_option.diff\n\nbuild:\n  number: 4\n\nrequirements:\n  build:\n    - {{ compiler('cxx') }}\n    - {{ compiler('c') }}\n    - {{ stdlib('c') }}\n    - gettext\n    - libgomp      # [linux]\n    - make   # [unix]\n    - ninja  # [win]\n    - cmake\n    - binutils  # [linux]\n    - pkg-config  # [unix]\n    - {{ cdt('mesa-libgl-devel') }}  # [linux]\n    - {{ cdt('mesa-dri-drivers') }}  # [linux]\n    - {{ cdt('mesa-libEGL-devel') }}  # [linux]\n    - {{ cdt('mesa-libGL-devel') }}  # [linux]\n  host:\n    - xorg-libxfixes           # [linux]\n    - xorg-libsm               # [linux]\n    - pango\n    - pip\n    - libtiff\n    - libpano13\n    - libjpeg-turbo\n    - libpng\n    - imath\n    - zlib\n    - openexr\n    - libvigra\n    - exiv2\n    - glew\n    - libsqlite\n    - lcms2\n    - perl\n    - libboost-devel\n    - fftw\n    - libglu           # [linux]\n    # For some reason these are requried by the windows\n    # build system\n    - enblend\n    - pthreads-win32  # [win]\n    - getopt-win32    # [win]\n  run:\n    - pthreads-win32  # [win]\n    # not sure why run exports isn't working\n    - exiftool\n    - enblend\n    - xorg-libx11  # [linux]\n    - xorg-libsm   # [linux]\n\ntest:\n  commands:\n    - nona -help\n    - cpfind -help\n    - autooptimiser -help\n    - pano_modify -help\n\noutputs:\n  - name: hugin-base\n    script: build_base.sh  # [unix]\n    script: bld_base.bat  # [win]\n\n  - name: hugin\n    build:\n      skip: true  # [osx]\n      ignore_run_exports_from:\n        - libboost-devel\n    script: build_gui.sh  # [unix]\n    script: bld_gui.bat  # [win]\n    requirements:\n      build:\n        - {{ compiler('cxx') }}\n        - {{ compiler('c') }}\n        - {{ stdlib('c') }}\n        - gettext\n        - libgomp      # [linux]\n        - make   # [unix]\n        - ninja  # [win]\n        - cmake\n        - binutils  # [linux]\n        - pkg-config  # [unix]\n        - {{ cdt('mesa-libgl-devel') }}  # [linux]\n        - {{ cdt('mesa-dri-drivers') }}  # [linux]\n        - {{ cdt('mesa-libEGL-devel') }}  # [linux]\n        - {{ cdt('mesa-libGL-devel') }}  # [linux]\n      host:\n        - {{ pin_subpackage('hugin-base', exact=True) }}\n        - xorg-libxfixes           # [linux]\n        - xorg-libsm               # [linux]\n        - pango\n        - pip\n        - libtiff\n        - libpano13\n        - libjpeg-turbo\n        - libpng\n        - imath\n        - zlib\n        - openexr\n        - libvigra\n        - exiv2\n        - glew\n        - libsqlite\n        - lcms2\n        - perl\n        # build complains on windows if we don't have the libs, as it's in the link interface of hugin-base;\n        # no selector because we also ignore run-export everywhere\n        - libboost-devel\n        - fftw\n        - libglu           # [linux]\n        # For some reason these are requried by the windows\n        # build system\n        - enblend\n        - pthreads-win32  # [win]\n        - getopt-win32    # [win]\n        # Warning: With vanially conda, wxwidgets will not work on linux since they\n        # internally code strings as UTF-16 strings on windows\n        # conda-forge has patched conda: https://github.com/conda-forge/conda-feedstock/pull/117\n        # But upstream has rejected a similar patch:\n        # https://github.com/conda/conda/pull/9946\n        # In favor of more time to work on a longer term fix\n        # https://github.com/conda/conda-build/blob/master/tests/test_api_build.py#L240\n        - wxwidgets\n        - libglu  # [linux]\n      run:\n        - {{ pin_subpackage('hugin-base', exact=True) }}\n\nabout:\n  home: http://hugin.sourceforge.net/\n  license: GPL-2.0-only\n  license_family: GPL\n  license_file: COPYING.txt\n  summary: Panorama photo stitcher\n\n  description: |\n    An easy to use cross-platform panoramic imaging toolchain based on Panorama Tools.\n\n    With Hugin you can assemble a mosaic of photographs into a complete\n    immersive panorama, stitch any series of overlapping pictures and much\n    more.\n\n  doc_url: http://hugin.sourceforge.net/docs/\n  dev_url: https://sourceforge.net/projects/hugin/\n\nextra:\n  recipe-maintainers:\n    - hmaarrfk\n",
  "req": {
   "__set__": true,
   "elements": [
@@ -1611,7 +1611,7 @@
    "summary": "Panorama photo stitcher"
   },
   "build": {
-   "number": "3"
+   "number": "4"
   },
   "extra": {
    "recipe-maintainers": [
