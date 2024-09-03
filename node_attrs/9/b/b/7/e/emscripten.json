@@ -22,11 +22,11 @@
    "summary": "Emscripten compiles C and C++ to WebAssembly using LLVM and Binaryen. Emscripten output can run on the Web, in Node.js, and in wasm runtimes."
   },
   "build": {
-   "ignore_run_exports_from": [
+   "ignore_run_exports": [
     "python",
     "nodejs"
    ],
-   "number": "1"
+   "number": "2"
   },
   "extra": {
    "recipe-maintainers": [
@@ -136,11 +136,11 @@
    "summary": "Emscripten compiles C and C++ to WebAssembly using LLVM and Binaryen. Emscripten output can run on the Web, in Node.js, and in wasm runtimes."
   },
   "build": {
-   "ignore_run_exports_from": [
+   "ignore_run_exports": [
     "python",
     "nodejs"
    ],
-   "number": "1"
+   "number": "2"
   },
   "extra": {
    "recipe-maintainers": [
@@ -213,11 +213,11 @@
    "summary": "Emscripten compiles C and C++ to WebAssembly using LLVM and Binaryen. Emscripten output can run on the Web, in Node.js, and in wasm runtimes."
   },
   "build": {
-   "ignore_run_exports_from": [
+   "ignore_run_exports": [
     "python",
     "nodejs"
    ],
-   "number": "1"
+   "number": "2"
   },
   "extra": {
    "recipe-maintainers": [
@@ -333,7 +333,7 @@
  "pr_info": {
   "__lazy_json__": "pr_info/emscripten.json"
  },
- "raw_meta_yaml": "{% set version = \"3.1.58\" %}\n\n# we only want a single python, but not make the package noarch\n{% set min_python = \"3.9\" %}\n# we just use a version here; doesn't seem to have much impact\n{% set min_nodejs = \"18\" %}\n# smithy will pick up `- python` and think we're doing multiple builds,\n# even if it occurs only under `ignore_run_exports_from:`\n{% set nameless_python = \"python\" %}\n{% set nameless_nodejs = \"nodejs\" %}\n\npackage:\n  name: emscripten\n  version: {{ version }}\n\nsource:\n  url: https://github.com/emscripten-core/emscripten/archive/{{ version }}.tar.gz\n  sha256: 45a6536b25df8f3bf62e0f415e389671108b02a49b33bd91134b2da7e87bab65\n  patches:\n    # from https://github.com/pyodide/pyodide/tree/main/emsdk/patches\n    - patches/0001-Add-back-fs.findObject-and-fs.readFile-in-loadLibDat.patch\n    - patches/0002-Add-useful-error-when-symbol-resolution-fails.patch\n    - patches/0003-Changes-for-JSPI.patch\n    - patches/0004-Upstream-PR-https-github.com-emscripten-core-emscrip.patch\n    - patches/0005-Raise-when-no-argument-is-given.patch\n    - patches/0006-Make-RTLD_LOCAL-work-correctly-for-preloaded-DSOs-21.patch\n\nbuild:\n  number: 1\n  ignore_run_exports_from:\n    # needs indirection, otherwise smithy thinks \"multiple python\"\n    - {{ nameless_python }}\n    # same for nodejs\n    - {{ nameless_nodejs }}\n\nrequirements:\n  build:\n    - {{ compiler('cxx') }}  # node modules need to compile native extensions\n    - {{ stdlib(\"c\") }}\n  host:\n    - python {{ min_python }}\n    - binaryen\n    - nodejs {{ min_nodejs }}\n    - lld\n    - clang\n    - clangxx\n    - llvm-tools\n  run:\n    - python *\n    - {{ pin_compatible(\"binaryen\", max_pin=\"x\") }}\n    - nodejs >={{ min_nodejs }}\n    - lld\n    - clang\n    - clangxx\n    - llvm-tools\n    # for google closure compiler\n    - zlib\n  run_constrained:\n    # otherwise linter complains (no py-constraints on non-noarch)\n    - python >={{ min_python }}\n\ntest:\n  files:\n    - testfile.c\n  commands:\n    - emcc --help\n    - emcc ./testfile.c\n    - node a.out.js\n\nabout:\n  home: https://emscripten.org/\n  license: MIT OR NCSA OR MPL-2.0\n  license_file: LICENSE\n  summary: Emscripten compiles C and C++ to WebAssembly using LLVM and Binaryen. Emscripten output can run on the Web, in Node.js, and in wasm runtimes.\n  dev_url: https://github.com/emscripten-core/emscripten\n\nextra:\n  recipe-maintainers:\n    - wolfv\n    - h-vetinari\n",
+ "raw_meta_yaml": "{% set version = \"3.1.58\" %}\n\n# we only want a single python, but not make the package noarch\n{% set min_python = \"3.9\" %}\n# we just use a version here; doesn't seem to have much impact\n{% set min_nodejs = \"18\" %}\n# smithy will pick up `- python` and think we're doing multiple builds,\n# even if it occurs only under `ignore_run_exports_from:`\n{% set nameless_python = \"python\" %}\n{% set nameless_nodejs = \"nodejs\" %}\n\npackage:\n  name: emscripten\n  version: {{ version }}\n\nsource:\n  url: https://github.com/emscripten-core/emscripten/archive/{{ version }}.tar.gz\n  sha256: 45a6536b25df8f3bf62e0f415e389671108b02a49b33bd91134b2da7e87bab65\n  patches:\n    # from https://github.com/pyodide/pyodide/tree/main/emsdk/patches\n    - patches/0001-Add-back-fs.findObject-and-fs.readFile-in-loadLibDat.patch\n    - patches/0002-Add-useful-error-when-symbol-resolution-fails.patch\n    - patches/0003-Changes-for-JSPI.patch\n    - patches/0004-Upstream-PR-https-github.com-emscripten-core-emscrip.patch\n    - patches/0005-Raise-when-no-argument-is-given.patch\n    - patches/0006-Make-RTLD_LOCAL-work-correctly-for-preloaded-DSOs-21.patch\n\nbuild:\n  number: 2\n  ignore_run_exports:\n    # needs indirection, otherwise smithy thinks \"multiple python\"\n    - {{ nameless_python }}\n    # same for nodejs\n    - {{ nameless_nodejs }}\n\nrequirements:\n  build:\n    - {{ compiler('cxx') }}  # node modules need to compile native extensions\n    - {{ stdlib(\"c\") }}\n  host:\n    - python {{ min_python }}\n    - binaryen\n    - nodejs {{ min_nodejs }}\n    - lld\n    - clang\n    - clangxx\n    - llvm-tools\n  run:\n    - python *\n    - {{ pin_compatible(\"binaryen\", max_pin=\"x\") }}\n    - nodejs >={{ min_nodejs }}\n    - lld\n    - clang\n    - clangxx\n    - llvm-tools\n    # for google closure compiler\n    - zlib\n  run_constrained:\n    # otherwise linter complains (no py-constraints on non-noarch)\n    - python >={{ min_python }}\n\ntest:\n  files:\n    - testfile.c\n  commands:\n    - emcc --help\n    - emcc ./testfile.c\n    - node a.out.js\n\nabout:\n  home: https://emscripten.org/\n  license: MIT OR NCSA OR MPL-2.0\n  license_file: LICENSE\n  summary: Emscripten compiles C and C++ to WebAssembly using LLVM and Binaryen. Emscripten output can run on the Web, in Node.js, and in wasm runtimes.\n  dev_url: https://github.com/emscripten-core/emscripten\n\nextra:\n  recipe-maintainers:\n    - wolfv\n    - h-vetinari\n",
  "req": {
   "__set__": true,
   "elements": [
@@ -444,11 +444,11 @@
    "summary": "Emscripten compiles C and C++ to WebAssembly using LLVM and Binaryen. Emscripten output can run on the Web, in Node.js, and in wasm runtimes."
   },
   "build": {
-   "ignore_run_exports_from": [
+   "ignore_run_exports": [
     "python",
     "nodejs"
    ],
-   "number": "1"
+   "number": "2"
   },
   "extra": {
    "recipe-maintainers": [
