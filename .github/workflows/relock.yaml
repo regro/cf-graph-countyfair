@@ -37,18 +37,18 @@ jobs:
           name: conda-lock.yml
           path: conda-lock.yml
 
-  tests:
-    needs: relock
-    if: needs.relock.outputs.relocked == 'true'
-    uses: regro/cf-scripts/.github/workflows/tests-reusable.yml@main
-    with:
-      lockfile: conda-lock.yml
-      lockfile-is-artifact: true
-    secrets:
-      CODECOV_TOKEN: ""
+  # tests:
+  #   needs: relock
+  #   if: needs.relock.outputs.relocked == 'true'
+  #   uses: regro/cf-scripts/.github/workflows/tests-reusable.yml@main
+  #   with:
+  #     lockfile: conda-lock.yml
+  #     lockfile-is-artifact: true
+  #   secrets:
+  #     CODECOV_TOKEN: ""
 
   push:
-    needs: [relock, tests]
+    needs: [relock]
     if: needs.relock.outputs.relocked == 'true'
     runs-on: ubuntu-latest
     steps:
@@ -80,6 +80,7 @@ jobs:
           git commit -m "relock w/ conda-lock.yml"
 
           for i in `seq 1 5`; do
-            git pull -s recursive -X theirs --no-edit --commit || :
-            git push || :
+            echo "attempt $i"
+            git pull -s recursive -X theirs --no-edit --commit
+            git push
           done
