@@ -11,6 +11,8 @@ jobs:
   relock:
     name: relock
     runs-on: "ubuntu-latest"
+    outputs:
+      relocked: ${{ steps.relock.outputs.relocked }}
     steps:
       # - uses: actions/checkout@v4
 
@@ -20,12 +22,14 @@ jobs:
           wget https://raw.githubusercontent.com/regro/cf-scripts/main/conda-lock.yml
 
       - name: relock env
+        id: relock
         uses: beckermr/relock-conda@v5
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           action: file
 
       - name: upload conda-lock.yml to artifact
+        if: steps.relock.outputs.relocked == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: conda-lock.yml
@@ -33,9 +37,19 @@ jobs:
 
   tests:
     needs: relock
+    if: needs.relock.outputs.relocked == 'true'
     uses: regro/cf-scripts/.github/workflows/tests-reusable.yml@main
     with:
       lockfile: conda-lock.yml
       lockfile-is-artifact: true
     secrets:
       CODECOV_TOKEN: ""
+
+  push:
+    needs: [relock, tests]
+    if: needs.relock.outputs.relocked == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: push changes
+        run:
+          echo "Pushing changes"
