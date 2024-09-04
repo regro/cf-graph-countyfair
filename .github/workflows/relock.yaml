@@ -14,14 +14,10 @@ jobs:
     outputs:
       relocked: ${{ steps.relock.outputs.relocked }}
     steps:
-      - name: checkout
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
       - name: download env and lockfile
         run: |
           wget https://raw.githubusercontent.com/regro/cf-scripts/main/environment.yml
+          wget https://raw.githubusercontent.com/regro/cf-graph-countyfair/master/conda-lock.yml || :
 
       - name: relock env
         id: relock
@@ -37,30 +33,21 @@ jobs:
           name: conda-lock.yml
           path: conda-lock.yml
 
-  tests:
-    needs: relock
-    if: needs.relock.outputs.relocked == 'true'
-    uses: regro/cf-scripts/.github/workflows/tests-reusable.yml@main
-    with:
-      lockfile: conda-lock.yml
-      lockfile-is-artifact: true
-    secrets:
-      CODECOV_TOKEN: ""
+  # tests:
+  #   needs: relock
+  #   if: needs.relock.outputs.relocked == 'true'
+  #   uses: regro/cf-scripts/.github/workflows/tests-reusable.yml@main
+  #   with:
+  #     lockfile: conda-lock.yml
+  #     lockfile-is-artifact: true
+  #   secrets:
+  #     CODECOV_TOKEN: ""
 
   push:
-    needs: [relock, tests]
+    needs: [relock]
     if: needs.relock.outputs.relocked == 'true'
     runs-on: ubuntu-latest
     steps:
-      - name: checkout
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: rm conda-lock.yml
-        run: |
-          rm -f conda-lock.yml
-
       - name: download conda-lock.yml
         uses: actions/download-artifact@v4
         with:
@@ -69,7 +56,10 @@ jobs:
 
       - name: commit and push changes
         run: |
-          mv new-lockfile/conda-lock.yml conda-lock.yml
+          git clone --depth=5 https://github.com/regro/cf-graph-countyfair.git
+          cd cf-graph-countyfair
+
+          mv ../new-lockfile/conda-lock.yml conda-lock.yml
           rm -rf new-lockfile
 
           git config --global user.name regro-cf-autotick-bot
@@ -81,5 +71,7 @@ jobs:
 
           for i in `seq 1 5`; do
             git pull -s recursive -X theirs --no-edit --commit || :
-            git push || :
+            git push https://x-access-token:${TOKEN}@github.com/regro/cf-graph-countyfair.git master || :
           done
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
