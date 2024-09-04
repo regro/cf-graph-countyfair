@@ -8,69 +8,72 @@ on:
 concurrency: relock
 
 jobs:
-  relock:
-    name: relock
-    runs-on: "ubuntu-latest"
-    outputs:
-      relocked: ${{ steps.relock.outputs.relocked }}
-    steps:
-      - name: checkout
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+  # relock:
+  #   name: relock
+  #   runs-on: "ubuntu-latest"
+  #   outputs:
+  #     relocked: ${{ steps.relock.outputs.relocked }}
+  #   steps:
+  #     - name: checkout
+  #       uses: actions/checkout@v4
+  #       with:
+  #         token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: download env and lockfile
-        run: |
-          wget https://raw.githubusercontent.com/regro/cf-scripts/main/environment.yml
+  #     - name: download env and lockfile
+  #       run: |
+  #         wget https://raw.githubusercontent.com/regro/cf-scripts/main/environment.yml
 
-      - name: relock env
-        id: relock
-        uses: beckermr/relock-conda@v5
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          action: file
+  #     - name: relock env
+  #       id: relock
+  #       uses: beckermr/relock-conda@v5
+  #       with:
+  #         github-token: ${{ secrets.GITHUB_TOKEN }}
+  #         action: file
 
-      - name: upload conda-lock.yml to artifact
-        if: steps.relock.outputs.relocked == 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: conda-lock.yml
-          path: conda-lock.yml
+  #     - name: upload conda-lock.yml to artifact
+  #       if: steps.relock.outputs.relocked == 'true'
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: conda-lock.yml
+  #         path: conda-lock.yml
 
-  tests:
-    needs: relock
-    if: needs.relock.outputs.relocked == 'true'
-    uses: regro/cf-scripts/.github/workflows/tests-reusable.yml@main
-    with:
-      lockfile: conda-lock.yml
-      lockfile-is-artifact: true
-    secrets:
-      CODECOV_TOKEN: ""
+  # tests:
+  #   needs: relock
+  #   if: needs.relock.outputs.relocked == 'true'
+  #   uses: regro/cf-scripts/.github/workflows/tests-reusable.yml@main
+  #   with:
+  #     lockfile: conda-lock.yml
+  #     lockfile-is-artifact: true
+  #   secrets:
+  #     CODECOV_TOKEN: ""
 
   push:
-    needs: [relock, tests]
-    if: needs.relock.outputs.relocked == 'true'
+    # needs: [relock]
+    # if: needs.relock.outputs.relocked == 'true'
     runs-on: ubuntu-latest
     steps:
-      - name: checkout
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+      # - name: checkout
+      #   uses: actions/checkout@v4
 
-      - name: rm conda-lock.yml
-        run: |
-          rm -f conda-lock.yml
+      # - name: rm conda-lock.yml
+      #   run: |
+      #     rm -f conda-lock.yml
 
-      - name: download conda-lock.yml
-        uses: actions/download-artifact@v4
-        with:
-          name: conda-lock.yml
-          path: new-lockfile
+      # - name: download conda-lock.yml
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: conda-lock.yml
+      #     path: new-lockfile
 
       - name: commit and push changes
         run: |
-          mv new-lockfile/conda-lock.yml conda-lock.yml
-          rm -rf new-lockfile
+          # mv new-lockfile/conda-lock.yml conda-lock.yml
+          # rm -rf new-lockfile
+
+          git clone --depth=5 https://github.com/regro/cf-graph-countyfair.git
+          cd cf-graph-countyfair
+
+          echo "blah blah blah" > conda-lock.yml
 
           git config --global user.name regro-cf-autotick-bot
           git config --global user.email 36490558+regro-cf-autotick-bot@users.noreply.github.com
@@ -79,7 +82,13 @@ jobs:
           git add conda-lock.yml
           git commit -m "relock w/ conda-lock.yml"
 
-          for i in `seq 1 5`; do
-            git pull -s recursive -X theirs || :
-            git push || :
-          done
+          git pull -s recursive -X theirs --no-edit --commit
+          git push https://x-access-token:${TOKEN}@github.com/regro/cf-graph-countyfair.git master
+
+          # for i in `seq 1 5`; do
+          #   echo "attempt $i"
+          #   git pull -s recursive -X theirs --no-edit --commit
+          #   git push
+          # done
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
