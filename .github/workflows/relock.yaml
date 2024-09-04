@@ -52,8 +52,8 @@ jobs:
     # if: needs.relock.outputs.relocked == 'true'
     runs-on: ubuntu-latest
     steps:
-      - name: checkout
-        uses: actions/checkout@v4
+      # - name: checkout
+      #   uses: actions/checkout@v4
 
       # - name: rm conda-lock.yml
       #   run: |
@@ -70,7 +70,10 @@ jobs:
           # mv new-lockfile/conda-lock.yml conda-lock.yml
           # rm -rf new-lockfile
 
-          echo "blah blah" > conda-lock.yml
+          git clone --depth=5 https://github.com/regro/cf-graph-countyfair.git
+          cd cf-graph-countyfair
+
+          echo "blah blah blah" > conda-lock.yml
 
           git config --global user.name regro-cf-autotick-bot
           git config --global user.email 36490558+regro-cf-autotick-bot@users.noreply.github.com
@@ -79,11 +82,13 @@ jobs:
           git add conda-lock.yml
           git commit -m "relock w/ conda-lock.yml"
 
-          git pull --no-edit --commit
-          git push
+          git pull -s recursive -X theirs --no-edit --commit
+          git push https://${TOKEN}@github.com/regro/cf-graph-countyfair.git
 
           # for i in `seq 1 5`; do
           #   echo "attempt $i"
           #   git pull -s recursive -X theirs --no-edit --commit
           #   git push
           # done
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
