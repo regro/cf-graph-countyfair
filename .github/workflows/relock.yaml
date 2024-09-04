@@ -1,0 +1,38 @@
+name: relock
+
+on:
+  workflow_dispatch: null
+  schedule:
+    - cron: '*/30 * * * *'
+
+concurrency: relock
+
+jobs:
+  relock:
+    name: relock
+    runs-on: "ubuntu-latest"
+    steps:
+      # - uses: actions/checkout@v4
+
+      - name: download env and lockfile
+        run: |
+          wget https://raw.githubusercontent.com/regro/cf-scripts/main/environment.yml
+          wget https://raw.githubusercontent.com/regro/cf-scripts/main/conda-forge.yml
+
+      - name: relock env
+        uses: beckermr/relock-conda@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          action: file
+
+      - name: upload conda-lock.yml to artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: conda-lock.yml
+          path: conda-lock.yml
+
+      - name: run tests
+        uses: regro/cf-scripts/.github/workflows/tests-reusable.yml@main
+        with:
+          lockfile: conda-lock.yml
+          lockfile-is-artifact: true
