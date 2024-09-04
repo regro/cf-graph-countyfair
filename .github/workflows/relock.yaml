@@ -21,7 +21,7 @@ jobs:
 
       - name: relock env
         id: relock
-        uses: beckermr/relock-conda@v5
+        uses: beckermr/relock-conda@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           action: file
@@ -33,18 +33,18 @@ jobs:
           name: conda-lock.yml
           path: conda-lock.yml
 
-  # tests:
-  #   needs: relock
-  #   if: needs.relock.outputs.relocked == 'true'
-  #   uses: regro/cf-scripts/.github/workflows/tests-reusable.yml@main
-  #   with:
-  #     lockfile: conda-lock.yml
-  #     lockfile-is-artifact: true
-  #   secrets:
-  #     CODECOV_TOKEN: ""
+  tests:
+    needs: relock
+    if: needs.relock.outputs.relocked == 'true'
+    uses: regro/cf-scripts/.github/workflows/tests-reusable.yml@main
+    with:
+      lockfile: conda-lock.yml
+      lockfile-is-artifact: true
+    secrets:
+      CODECOV_TOKEN: ""
 
   push:
-    needs: [relock]
+    needs: [relock, tests]
     if: needs.relock.outputs.relocked == 'true'
     runs-on: ubuntu-latest
     steps:
@@ -59,7 +59,7 @@ jobs:
           git clone --depth=5 https://github.com/regro/cf-graph-countyfair.git
           cd cf-graph-countyfair
 
-          mv new-lockfile/conda-lock.yml conda-lock.yml
+          mv ../new-lockfile/conda-lock.yml conda-lock.yml
           rm -rf new-lockfile
 
           git config --global user.name regro-cf-autotick-bot
