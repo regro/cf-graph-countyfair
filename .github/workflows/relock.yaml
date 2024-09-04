@@ -14,12 +14,14 @@ jobs:
     outputs:
       relocked: ${{ steps.relock.outputs.relocked }}
     steps:
-      # - uses: actions/checkout@v4
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: download env and lockfile
         run: |
           wget https://raw.githubusercontent.com/regro/cf-scripts/main/environment.yml
-          wget https://raw.githubusercontent.com/regro/cf-scripts/main/conda-lock.yml
 
       - name: relock env
         id: relock
@@ -50,6 +52,34 @@ jobs:
     if: needs.relock.outputs.relocked == 'true'
     runs-on: ubuntu-latest
     steps:
-      - name: push changes
-        run:
-          echo "Pushing changes"
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: rm conda-lock.yml
+        run: |
+          rm -f conda-lock.yml
+
+      - name: download conda-lock.yml
+        uses: actions/download-artifact@v4
+        with:
+          name: conda-lock.yml
+          path: new-lockfile
+
+      - name: commit and push changes
+        run: |
+          mv new-lockfile/conda-lock.yml conda-lock.yml
+          rm -rf new-lockfile
+
+          git config --global user.name regro-cf-autotick-bot
+          git config --global user.email 36490558+regro-cf-autotick-bot@users.noreply.github.com
+          git config --global pull.rebase false
+
+          git add conda-lock.yml
+          git commit -m "relock w/ conda-lock.yml"
+
+          for i in `seq 1 5`; do
+            git pull || :
+            git push || :
+          done
