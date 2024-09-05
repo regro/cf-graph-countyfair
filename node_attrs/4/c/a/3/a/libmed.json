@@ -31,13 +31,13 @@
    "summary": "MED : interoperable format for data interchange between mesh based solvers."
   },
   "build": {
-   "number": "13",
+   "number": "14",
    "run_exports": [
     "libmed mpi_mpich_*",
     "libmed nompi_*",
     "libmed mpi_openmpi_*"
    ],
-   "string": "mpi_openmpi_h1234567_13"
+   "string": "mpi_openmpi_h1234567_14"
   },
   "extra": {
    "recipe-maintainers": [
@@ -158,13 +158,13 @@
    "summary": "MED : interoperable format for data interchange between mesh based solvers."
   },
   "build": {
-   "number": "13",
+   "number": "14",
    "run_exports": [
     "libmed mpi_mpich_*",
     "libmed nompi_*",
     "libmed mpi_openmpi_*"
    ],
-   "string": "mpi_openmpi_h1234567_13"
+   "string": "mpi_openmpi_h1234567_14"
   },
   "extra": {
    "recipe-maintainers": [
@@ -285,13 +285,13 @@
    "summary": "MED : interoperable format for data interchange between mesh based solvers."
   },
   "build": {
-   "number": "13",
+   "number": "14",
    "run_exports": [
     "libmed mpi_mpich_*",
     "libmed nompi_*",
     "libmed mpi_openmpi_*"
    ],
-   "string": "mpi_openmpi_h1234567_13"
+   "string": "mpi_openmpi_h1234567_14"
   },
   "extra": {
    "recipe-maintainers": [
@@ -412,13 +412,13 @@
    "summary": "MED : interoperable format for data interchange between mesh based solvers."
   },
   "build": {
-   "number": "113",
+   "number": "114",
    "run_exports": [
     "libmed mpi_mpich_*",
     "libmed nompi_*",
     "libmed mpi_openmpi_*"
    ],
-   "string": "nompi_h1234567_113"
+   "string": "nompi_h1234567_114"
   },
   "extra": {
    "recipe-maintainers": [
@@ -500,11 +500,11 @@
    "summary": "MED : interoperable format for data interchange between mesh based solvers."
   },
   "build": {
-   "number": "113",
+   "number": "114",
    "run_exports": [
     "libmed nompi_*"
    ],
-   "string": "nompi_h1234567_113"
+   "string": "nompi_h1234567_114"
   },
   "extra": {
    "recipe-maintainers": [
@@ -614,11 +614,11 @@
    "summary": "MED : interoperable format for data interchange between mesh based solvers."
   },
   "build": {
-   "number": "113",
+   "number": "114",
    "run_exports": [
     "libmed nompi_*"
    ],
-   "string": "nompi_h1234567_113"
+   "string": "nompi_h1234567_114"
   },
   "extra": {
    "recipe-maintainers": [
@@ -734,7 +734,7 @@
  "pr_info": {
   "__lazy_json__": "pr_info/libmed.json"
  },
- "raw_meta_yaml": "{% set name = \"libmed\" %}\n{% set version = \"4.1.1\" %}\n{% set build = 13 %}\n{% set sha256 = \"fe1e80c836150ff27049b291fe2f9a11eda9ef9831311df9e39ba16a63c392a0\" %}\n\n# ensure mpi is defined (needed for conda-smithy recipe-lint)\n{% set mpi = mpi or 'nompi' %}\n\n{% if mpi == 'nompi' %}\n# prioritize nompi variant via build number\n{% set build = build + 100 %}\n{% endif %}\n\npackage:\n  name: {{ name }}\n  version: {{ version }}\n\nsource:\n # url: https://files.salome-platform.org/Salome/medfile/med-{{ version }}.tar.gz # blacklisting conda forge\n  url: https://github.com/Krande/med-copy/archive/refs/tags/{{ version }}.tar.gz\n  sha256: {{ sha256 }}\n  patches:\n    # Part of this patch is required to add a few system definitions which\n    # should indicate that they are using the 1.10 API not the 1.6 API\n    # https://github.com/HDFGroup/hdf5/issues/3797\n    - patches/ignore-hdf5-bounds-check-cmake.patch\n    - patches/ignore-hdf5-bounds-check-source.patch\n    - patches/disable-fortran.patch  # [win]\n    - patches/do_not_modify_windows_path.patch\n    - patches/install-in-runtime-and_archive.patch\n    # without this patch, OSX finds the system python since it is a newer version\n    # I (hmaarrfk) am about 90% sure it is because SWIG + CMake 3.12 FindPython + OSX\n    # has some bugs... so for OSX (and linux), we just fallback to the standard\n    # build process\n    - patches/cmake-modern-python.patch  # [win]\n    - patches/do-not-make-symlinks-on-windows.patch\n    - patches/link-privately.patch\n\nbuild:\n  number: {{ build }}\n  skip: true  # [(osx or win) and mpi != \"nompi\"]\n  # Per https://conda-forge.org/docs/maintainer/knowledge_base.html#preferring-a-provider-usually-nompi\n  # add build string so packages can depend on\n  # mpi or nompi variants explicitly:\n  # `pkg * mpi_mpich_*` for mpich\n  # `pkg * mpi_*` for any mpi\n  # `pkg * nompi_*` for no mpi\n\n  {% if mpi != 'nompi' %}\n  {% set mpi_prefix = \"mpi_\" + mpi %}\n  {% else %}\n  {% set mpi_prefix = \"nompi\" %}\n  {% endif %}\n  string: \"{{ mpi_prefix }}_h{{ PKG_HASH }}_{{ build }}\"  \n  run_exports:\n    - {{ pin_subpackage(name, 'x.x') }} {{ mpi_prefix }}_*\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ stdlib(\"c\") }}\n    - {{ compiler('cxx') }}\n    - {{ compiler('fortran') }}           # [not win]\n    - swig >=4.0.2\n    - cmake\n    - ninja                               # [win]\n    - make                                # [unix]\n    - python                              # [build_platform != target_platform]\n    - cross-python_{{ target_platform }}  # [build_platform != target_platform]\n  host:\n    - python\n    - hdf5 * {{ mpi_prefix }}_*  # [mpi != \"nompi\"]\n    - hdf5 * nompi_*  # [mpi == \"nompi\"]\n    - zlib\n    - {{ mpi }}  # [mpi != \"nompi\"]\n  run:\n    - python\n    - {{ mpi }}  # [mpi != \"nompi\"]\n    - {{ pin_compatible('hdf5', max_pin='x.x') }}\n\ntest:\n  requires:\n    - {{ compiler('c') }}\n    - {{ compiler('cxx') }}\n  files:\n    - tests\n  imports:\n    - med\n  commands:\n    - test -f ${PREFIX}/lib/libmed${SHLIB_EXT}                   # [unix]\n    - nm ${PREFIX}/lib/libmedC.so | grep MEDlibraryNumVersion    # [linux]\n\nabout:\n  home: https://www.salome-platform.org/user-section/about/med\n  license: LGPL-3.0-only\n  license_family: LGPL\n  license_file: COPYING\n  summary: 'MED : interoperable format for data interchange between mesh based solvers.'\n  description: |\n    The purpose of the MED module is to provide a standard for storing and recovering computer data associated to numerical meshes and fields, and to facilitate the exchange between codes and solvers.\n  doc_url: http://www.salome-platform.org/\n  dev_url: https://git.salome-platform.org/gitweb/?p=modules/med.git;a=summary\n\nextra:\n  recipe-maintainers:\n    - Krande\n    - ldallolio\n    - looooo\n    - ldallolio-irt\n",
+ "raw_meta_yaml": "{% set name = \"libmed\" %}\n{% set version = \"4.1.1\" %}\n{% set build = 14 %}\n{% set sha256 = \"fe1e80c836150ff27049b291fe2f9a11eda9ef9831311df9e39ba16a63c392a0\" %}\n\n# ensure mpi is defined (needed for conda-smithy recipe-lint)\n{% set mpi = mpi or 'nompi' %}\n\n{% if mpi == 'nompi' %}\n# prioritize nompi variant via build number\n{% set build = build + 100 %}\n{% endif %}\n\npackage:\n  name: {{ name }}\n  version: {{ version }}\n\nsource:\n # url: https://files.salome-platform.org/Salome/medfile/med-{{ version }}.tar.gz # blacklisting conda forge\n  url: https://github.com/Krande/med-copy/archive/refs/tags/{{ version }}.tar.gz\n  sha256: {{ sha256 }}\n  patches:\n    # Part of this patch is required to add a few system definitions which\n    # should indicate that they are using the 1.10 API not the 1.6 API\n    # https://github.com/HDFGroup/hdf5/issues/3797\n    - patches/ignore-hdf5-bounds-check-cmake.patch\n    - patches/ignore-hdf5-bounds-check-source.patch\n    - patches/disable-fortran.patch  # [win]\n    - patches/do_not_modify_windows_path.patch\n    - patches/install-in-runtime-and_archive.patch\n    # without this patch, OSX finds the system python since it is a newer version\n    # I (hmaarrfk) am about 90% sure it is because SWIG + CMake 3.12 FindPython + OSX\n    # has some bugs... so for OSX (and linux), we just fallback to the standard\n    # build process\n    - patches/cmake-modern-python.patch  # [win]\n    - patches/do-not-make-symlinks-on-windows.patch\n    - patches/link-privately.patch\n\nbuild:\n  number: {{ build }}\n  skip: true  # [(osx or win) and mpi != \"nompi\"]\n  # Per https://conda-forge.org/docs/maintainer/knowledge_base.html#preferring-a-provider-usually-nompi\n  # add build string so packages can depend on\n  # mpi or nompi variants explicitly:\n  # `pkg * mpi_mpich_*` for mpich\n  # `pkg * mpi_*` for any mpi\n  # `pkg * nompi_*` for no mpi\n\n  {% if mpi != 'nompi' %}\n  {% set mpi_prefix = \"mpi_\" + mpi %}\n  {% else %}\n  {% set mpi_prefix = \"nompi\" %}\n  {% endif %}\n  string: \"{{ mpi_prefix }}_h{{ PKG_HASH }}_{{ build }}\"  \n  run_exports:\n    - {{ pin_subpackage(name, 'x.x') }} {{ mpi_prefix }}_*\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ stdlib(\"c\") }}\n    - {{ compiler('cxx') }}\n    - {{ compiler('fortran') }}           # [not win]\n    - swig >=4.0.2\n    - cmake\n    - ninja                               # [win]\n    - make                                # [unix]\n    - python                              # [build_platform != target_platform]\n    - cross-python_{{ target_platform }}  # [build_platform != target_platform]\n  host:\n    - python\n    - hdf5 * {{ mpi_prefix }}_*  # [mpi != \"nompi\"]\n    - hdf5 * nompi_*  # [mpi == \"nompi\"]\n    - zlib\n    - {{ mpi }}  # [mpi != \"nompi\"]\n  run:\n    - python\n    - {{ mpi }}  # [mpi != \"nompi\"]\n    - {{ pin_compatible('hdf5', max_pin='x.x') }}\n\ntest:\n  requires:\n    - {{ compiler('c') }}\n    - {{ compiler('cxx') }}\n  files:\n    - tests\n  imports:\n    - med\n  commands:\n    - test -f ${PREFIX}/lib/libmed${SHLIB_EXT}                   # [unix]\n    - nm ${PREFIX}/lib/libmedC.so | grep MEDlibraryNumVersion    # [linux]\n\nabout:\n  home: https://www.salome-platform.org/user-section/about/med\n  license: LGPL-3.0-only\n  license_family: LGPL\n  license_file: COPYING\n  summary: 'MED : interoperable format for data interchange between mesh based solvers.'\n  description: |\n    The purpose of the MED module is to provide a standard for storing and recovering computer data associated to numerical meshes and fields, and to facilitate the exchange between codes and solvers.\n  doc_url: http://www.salome-platform.org/\n  dev_url: https://git.salome-platform.org/gitweb/?p=modules/med.git;a=summary\n\nextra:\n  recipe-maintainers:\n    - Krande\n    - ldallolio\n    - looooo\n    - ldallolio-irt\n",
  "req": {
   "__set__": true,
   "elements": [
@@ -863,11 +863,11 @@
    "summary": "MED : interoperable format for data interchange between mesh based solvers."
   },
   "build": {
-   "number": "113",
+   "number": "114",
    "run_exports": [
     "libmed nompi_*"
    ],
-   "string": "nompi_h1234567_113"
+   "string": "nompi_h1234567_114"
   },
   "extra": {
    "recipe-maintainers": [
