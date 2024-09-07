@@ -38,7 +38,7 @@
    "summary": "CPU kernels and compiled extensions for Awkward Array"
   },
   "build": {
-   "number": "1",
+   "number": "302",
    "script": [
     "PYTHON -m pip install . -vv"
    ]
@@ -56,10 +56,12 @@
   },
   "requirements": {
    "build": [
+    "x86_64-microarch-level 1",
     "cxx_compiler_stub",
     "c_stdlib_stub",
     "cmake >=3.15",
-    "make"
+    "make",
+    "x86_64-microarch-level 3"
    ],
    "host": [
     "python",
@@ -95,7 +97,8 @@
     "c_stdlib_stub",
     "cmake",
     "cxx_compiler_stub",
-    "make"
+    "make",
+    "x86_64-microarch-level"
    ]
   },
   "host": {
@@ -133,7 +136,7 @@
    "summary": "CPU kernels and compiled extensions for Awkward Array"
   },
   "build": {
-   "number": "1",
+   "number": "2",
    "script": [
     "PYTHON -m pip install . -vv"
    ]
@@ -228,7 +231,7 @@
    "summary": "CPU kernels and compiled extensions for Awkward Array"
   },
   "build": {
-   "number": "1",
+   "number": "2",
    "script": [
     "PYTHON -m pip install . -vv"
    ]
@@ -323,7 +326,7 @@
    "summary": "CPU kernels and compiled extensions for Awkward Array"
   },
   "build": {
-   "number": "1",
+   "number": "2",
    "script": [
     "PYTHON -m pip install . -vv"
    ]
@@ -341,10 +344,12 @@
   },
   "requirements": {
    "build": [
+    "x86_64-microarch-level 1",
     "cxx_compiler_stub",
     "c_stdlib_stub",
     "cmake >=3.15",
-    "make"
+    "make",
+    "x86_64-microarch-level 3"
    ],
    "host": [
     "python",
@@ -386,7 +391,7 @@
    "summary": "CPU kernels and compiled extensions for Awkward Array"
   },
   "build": {
-   "number": "1",
+   "number": "302",
    "script": [
     "PYTHON -m pip install . -vv"
    ]
@@ -404,10 +409,12 @@
   },
   "requirements": {
    "build": [
+    "x86_64-microarch-level 1",
     "cxx_compiler_stub",
     "c_stdlib_stub",
     "cmake >=3.15",
-    "make"
+    "make",
+    "x86_64-microarch-level 3"
    ],
    "host": [
     "python",
@@ -443,7 +450,8 @@
     "c_stdlib_stub",
     "cmake",
     "cxx_compiler_stub",
-    "make"
+    "make",
+    "x86_64-microarch-level"
    ]
   },
   "host": {
@@ -481,7 +489,7 @@
    "summary": "CPU kernels and compiled extensions for Awkward Array"
   },
   "build": {
-   "number": "1",
+   "number": "2",
    "script": [
     "PYTHON -m pip install . -vv"
    ]
@@ -582,7 +590,7 @@
  "pr_info": {
   "__lazy_json__": "pr_info/awkward-cpp.json"
  },
- "raw_meta_yaml": "{% set name = \"awkward-cpp\" %}\n{% set version = \"37\" %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name.replace('-', '_') }}-{{ version }}.tar.gz\n  sha256: 6dff5fce4afcadb492bbf7cb20908572d99bdc32aa2bea8681bacfb69b2aa86d\n\nbuild:\n  script:\n    - {{ PYTHON }} -m pip install . -vv\n  number: 1\n\nrequirements:\n  build:\n    - python                                 # [build_platform != target_platform]\n    - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n    - {{ compiler('cxx') }}\n    - {{ stdlib(\"c\") }}\n    - cmake >=3.15\n    - make\n  host:\n    - python\n    - pip\n    - scikit-build-core >=0.2.0\n    - pybind11\n  run:\n    - python\n    - importlib-resources  # [py<39]\n    - numpy >=1.18.0\n\ntest:\n  imports:\n    - awkward_cpp\n  commands:\n    - pip check\n  requires:\n    - pip\n\nabout:\n  home: https://pypi.org/project/awkward-cpp/\n  summary: CPU kernels and compiled extensions for Awkward Array\n  license: BSD-3-Clause\n  license_file:\n    - LICENSE\n    - rapidjson/license.txt\n    - rapidjson/bin/jsonschema/LICENSE\n\nextra:\n  recipe-maintainers:\n    - henryiii\n    - conda-forge/awkward\n    - conda-forge/scikit-hep\n",
+ "raw_meta_yaml": "{% set name = \"awkward-cpp\" %}\n{% set version = \"37\" %}\n{% set build = 2 %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name.replace('-', '_') }}-{{ version }}.tar.gz\n  sha256: 6dff5fce4afcadb492bbf7cb20908572d99bdc32aa2bea8681bacfb69b2aa86d\n\nbuild:\n  # Prioritize builds with a higher microarch level.\n  # microarch_level 4 not supported yet.\n  # c.f. https://github.com/conda-forge/microarch-level-feedstock/issues/5\n  number: {{ build }}          # [not (unix and x86_64)]\n  number: {{ build + 100 }}    # [unix and x86_64 and microarch_level == 1]\n  number: {{ build + 300 }}    # [unix and x86_64 and microarch_level == 3]\n  script:\n    - {{ PYTHON }} -m pip install . -vv\n\nrequirements:\n  build:\n    - python                                 # [build_platform != target_platform]\n    - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n    - x86_64-microarch-level {{ microarch_level }}  # [unix and x86_64]\n    - {{ compiler('cxx') }}\n    - {{ stdlib(\"c\") }}\n    - cmake >=3.15\n    - make\n  host:\n    - python\n    - pip\n    - scikit-build-core >=0.2.0\n    - pybind11\n  run:\n    - python\n    - importlib-resources  # [py<39]\n    - numpy >=1.18.0\n\ntest:\n  imports:\n    - awkward_cpp\n  commands:\n    - pip check\n  requires:\n    - pip\n\nabout:\n  home: https://pypi.org/project/awkward-cpp/\n  summary: CPU kernels and compiled extensions for Awkward Array\n  license: BSD-3-Clause\n  license_file:\n    - LICENSE\n    - rapidjson/license.txt\n    - rapidjson/bin/jsonschema/LICENSE\n\nextra:\n  recipe-maintainers:\n    - henryiii\n    - conda-forge/awkward\n    - conda-forge/scikit-hep\n",
  "req": {
   "__set__": true,
   "elements": [
@@ -594,7 +602,8 @@
    "pip",
    "pybind11",
    "python",
-   "scikit-build-core"
+   "scikit-build-core",
+   "x86_64-microarch-level"
   ]
  },
  "requirements": {
@@ -604,7 +613,8 @@
     "c_stdlib_stub",
     "cmake",
     "cxx_compiler_stub",
-    "make"
+    "make",
+    "x86_64-microarch-level"
    ]
   },
   "host": {
@@ -612,6 +622,7 @@
    "elements": [
     "c_stdlib_stub",
     "cxx_compiler_stub",
+    "microarch-level",
     "pip",
     "pybind11",
     "python",
@@ -623,6 +634,7 @@
    "elements": [
     "c_stdlib_stub",
     "cxx_compiler_stub",
+    "microarch-level",
     "numpy",
     "python"
    ]
@@ -642,7 +654,9 @@
     "c_stdlib_stub",
     "cmake >=3.15",
     "cxx_compiler_stub",
-    "make"
+    "make",
+    "x86_64-microarch-level 1",
+    "x86_64-microarch-level 3"
    ]
   },
   "host": {
@@ -685,7 +699,7 @@
    "summary": "CPU kernels and compiled extensions for Awkward Array"
   },
   "build": {
-   "number": "1",
+   "number": "2",
    "script": [
     "PYTHON -m pip install . -vv"
    ]
