@@ -22,7 +22,7 @@
    "summary": "DSPSR is a library for digital signal processing of pulsar astronomical timeseries."
   },
   "build": {
-   "number": "0",
+   "number": "1",
    "run_exports": [
     "dspsr"
    ]
@@ -68,7 +68,8 @@
   "source": {
    "patches": [
     "test_util.patch",
-    "shell_for_flags.patch"
+    "shell_for_flags.patch",
+    "python_iomanager.patch"
    ],
    "sha256": "7db30c9e8c95e496b83210275c178d54027f605bf0c29db43cb74a599e9563b5",
    "url": "https://sourceforge.net/projects/dspsr/files/dspsr/2024-08-01/dspsr-2024-08-01.tar.gz"
@@ -99,7 +100,11 @@
     "test -f $PREFIX/lib/libdspsrmore$SHLIB_EXT",
     "test -f $PREFIX/lib/libdspsr$SHLIB_EXT",
     "test -f $PREFIX/lib/libdspstats$SHLIB_EXT",
-    "test -f $PREFIX/include/dspsr/dsp/dsp.h"
+    "test -f $PREFIX/include/dspsr/dsp/dsp.h",
+    "python test/test_python.py"
+   ],
+   "files": [
+    "test/test_python.py"
    ],
    "imports": [
     "dspsr"
@@ -156,7 +161,7 @@
    "summary": "DSPSR is a library for digital signal processing of pulsar astronomical timeseries."
   },
   "build": {
-   "number": "0",
+   "number": "1",
    "run_exports": [
     "dspsr"
    ]
@@ -203,6 +208,7 @@
    "patches": [
     "test_util.patch",
     "shell_for_flags.patch",
+    "python_iomanager.patch",
     "strip_emutls_w.patch",
     "macos_fmemopen.patch",
     "dmsmear.patch"
@@ -236,8 +242,10 @@
     "test -f $PREFIX/lib/libdspsrmore$SHLIB_EXT",
     "test -f $PREFIX/lib/libdspsr$SHLIB_EXT",
     "test -f $PREFIX/lib/libdspstats$SHLIB_EXT",
-    "test -f $PREFIX/include/dspsr/dsp/dsp.h"
+    "test -f $PREFIX/include/dspsr/dsp/dsp.h",
+    "python test/test_python.py"
    ],
+   "files": null,
    "imports": null
   }
  },
@@ -251,7 +259,7 @@
    "summary": "DSPSR is a library for digital signal processing of pulsar astronomical timeseries."
   },
   "build": {
-   "number": "0",
+   "number": "1",
    "run_exports": [
     "dspsr"
    ]
@@ -295,7 +303,8 @@
     "macos_fmemopen.patch",
     "dmsmear.patch",
     "test_util.patch",
-    "shell_for_flags.patch"
+    "shell_for_flags.patch",
+    "python_iomanager.patch"
    ],
    "sha256": "7db30c9e8c95e496b83210275c178d54027f605bf0c29db43cb74a599e9563b5",
    "url": "https://sourceforge.net/projects/dspsr/files/dspsr/2024-08-01/dspsr-2024-08-01.tar.gz"
@@ -327,6 +336,7 @@
     "test -f $PREFIX/lib/libdspstats$SHLIB_EXT",
     "test -f $PREFIX/include/dspsr/dsp/dsp.h"
    ],
+   "files": null,
    "imports": null
   }
  },
@@ -380,7 +390,7 @@
  "pr_info": {
   "__lazy_json__": "pr_info/dspsr.json"
  },
- "raw_meta_yaml": "{% set name = \"dspsr\" %}\n{% set version = \"2024-08-01\" %}\n{% set sha256 = \"7db30c9e8c95e496b83210275c178d54027f605bf0c29db43cb74a599e9563b5\" %}\n\npackage:\n    name: \"{{ name | lower }}\"\n    version: \"{{ version | replace('-','.') }}\"\n\nsource:\n    url: https://sourceforge.net/projects/{{ name }}/files/{{ name }}/{{ version }}/{{ name }}-{{ version }}.tar.gz\n    sha256: {{ sha256 }}\n    patches:\n        - strip_emutls_w.patch  # [osx]\n        - macos_fmemopen.patch  # [osx]\n        - dmsmear.patch  # [osx]\n        - test_util.patch\n        - shell_for_flags.patch\n        \nbuild:\n    number: 0\n    skip: true  # [win or (python_impl == 'pypy')]\n    run_exports:\n      - {{ pin_subpackage('dspsr', exact=True) }}\n\nrequirements:\n    build:\n        - {{ compiler('cxx') }}\n        - {{ compiler('c') }}\n        - {{ stdlib(\"c\") }}\n        - make\n        - perl\n        - autoconf\n        - automake\n        - libtool\n        - pkg-config\n        - swig  # [linux]\n    host:\n        - psrchive\n        - cfitsio\n        - pgplot\n        - python {{ python }}  # [linux]\n        - numpy  # [linux]\n    run:\n        - {{ pin_compatible('psrchive', exact=True) }}\n        - cfitsio\n        - {{ pin_compatible('pgplot') }}\n        - python  # [linux]\n        - {{ pin_compatible('numpy') }}  # [linux]\n\ntest:\n    commands:\n        - digifil -h\n        - digifits -h\n        - digihdr -h\n        - digihist -h\n        - digimon -h\n        - digistat -h\n        - digitxt -h\n        - dmsmear -h  # [not osx]\n        - dspsr -h\n        - dspsr_cflags\n        - dspsr_ldflags\n        - filterbank_speed -h\n        - load_bits -h\n        - passband -h\n        - searchplot -h\n        - sk_distrib_plot -h\n        - sklimit -h\n        - sk_limit_plot -h\n        - t2pred -h\n        - test -f $PREFIX/lib/libdspbase$SHLIB_EXT\n        - test -f $PREFIX/lib/libdspdsp$SHLIB_EXT\n        - test -f $PREFIX/lib/libdspsrmore$SHLIB_EXT\n        - test -f $PREFIX/lib/libdspsr$SHLIB_EXT\n        - test -f $PREFIX/lib/libdspstats$SHLIB_EXT\n        - test -f $PREFIX/include/dspsr/dsp/dsp.h\n    imports:\n        - dspsr  # [linux]\n\nabout:\n    home: http://dspsr.sourceforge.net/\n    license: AFL-2.1\n    license_file: LICENSE\n    summary: DSPSR is a library for digital signal processing of pulsar astronomical timeseries.\n    dev_url: http://sourceforge.net/projects/dspsr/\n\nextra:\n    recipe-maintainers:\n        - demorest\n        - straten\n",
+ "raw_meta_yaml": "{% set name = \"dspsr\" %}\n{% set version = \"2024-08-01\" %}\n{% set sha256 = \"7db30c9e8c95e496b83210275c178d54027f605bf0c29db43cb74a599e9563b5\" %}\n\npackage:\n    name: \"{{ name | lower }}\"\n    version: \"{{ version | replace('-','.') }}\"\n\nsource:\n    url: https://sourceforge.net/projects/{{ name }}/files/{{ name }}/{{ version }}/{{ name }}-{{ version }}.tar.gz\n    sha256: {{ sha256 }}\n    patches:\n        - strip_emutls_w.patch  # [osx]\n        - macos_fmemopen.patch  # [osx]\n        - dmsmear.patch  # [osx]\n        - test_util.patch\n        - shell_for_flags.patch\n        - python_iomanager.patch\n        \nbuild:\n    number: 1\n    skip: true  # [win or (python_impl == 'pypy')]\n    run_exports:\n      - {{ pin_subpackage('dspsr', exact=True) }}\n\nrequirements:\n    build:\n        - {{ compiler('cxx') }}\n        - {{ compiler('c') }}\n        - {{ stdlib(\"c\") }}\n        - make\n        - perl\n        - autoconf\n        - automake\n        - libtool\n        - pkg-config\n        - swig  # [linux]\n    host:\n        - psrchive\n        - cfitsio\n        - pgplot\n        - python {{ python }}  # [linux]\n        - numpy  # [linux]\n    run:\n        - {{ pin_compatible('psrchive', exact=True) }}\n        - cfitsio\n        - {{ pin_compatible('pgplot') }}\n        - python  # [linux]\n        - {{ pin_compatible('numpy') }}  # [linux]\n\ntest:\n    imports:\n        - dspsr  # [linux]\n    files:\n        - test/test_python.py  # [linux]\n    commands:\n        - digifil -h\n        - digifits -h\n        - digihdr -h\n        - digihist -h\n        - digimon -h\n        - digistat -h\n        - digitxt -h\n        - dmsmear -h  # [not osx]\n        - dspsr -h\n        - dspsr_cflags\n        - dspsr_ldflags\n        - filterbank_speed -h\n        - load_bits -h\n        - passband -h\n        - searchplot -h\n        - sk_distrib_plot -h\n        - sklimit -h\n        - sk_limit_plot -h\n        - t2pred -h\n        - test -f $PREFIX/lib/libdspbase$SHLIB_EXT\n        - test -f $PREFIX/lib/libdspdsp$SHLIB_EXT\n        - test -f $PREFIX/lib/libdspsrmore$SHLIB_EXT\n        - test -f $PREFIX/lib/libdspsr$SHLIB_EXT\n        - test -f $PREFIX/lib/libdspstats$SHLIB_EXT\n        - test -f $PREFIX/include/dspsr/dsp/dsp.h\n        - python test/test_python.py  # [linux]\n\nabout:\n    home: http://dspsr.sourceforge.net/\n    license: AFL-2.1\n    license_file: LICENSE\n    summary: DSPSR is a library for digital signal processing of pulsar astronomical timeseries.\n    dev_url: http://sourceforge.net/projects/dspsr/\n\nextra:\n    recipe-maintainers:\n        - demorest\n        - straten\n",
  "req": {
   "__set__": true,
   "elements": [
