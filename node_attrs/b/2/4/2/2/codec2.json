@@ -33,7 +33,7 @@
    "summary": "An open source low bit rate speech codec"
   },
   "build": {
-   "number": "1"
+   "number": "2"
   },
   "extra": {
    "feedstock-name": "codec2",
@@ -185,7 +185,7 @@
    "summary": "An open source low bit rate speech codec"
   },
   "build": {
-   "number": "1"
+   "number": "2"
   },
   "extra": {
    "feedstock-name": "codec2",
@@ -337,7 +337,7 @@
    "summary": "An open source low bit rate speech codec"
   },
   "build": {
-   "number": "1"
+   "number": "2"
   },
   "extra": {
    "feedstock-name": "codec2",
@@ -489,7 +489,7 @@
    "summary": "An open source low bit rate speech codec"
   },
   "build": {
-   "number": "1"
+   "number": "2"
   },
   "extra": {
    "feedstock-name": "codec2",
@@ -1031,7 +1031,7 @@
    "summary": "An open source low bit rate speech codec"
   },
   "build": {
-   "number": "1"
+   "number": "2"
   },
   "extra": {
    "feedstock-name": "codec2",
@@ -1183,7 +1183,7 @@
    "summary": "An open source low bit rate speech codec"
   },
   "build": {
-   "number": "1"
+   "number": "2"
   },
   "extra": {
    "feedstock-name": "codec2",
@@ -1343,7 +1343,7 @@
  "pr_info": {
   "__lazy_json__": "pr_info/codec2.json"
  },
- "raw_meta_yaml": "{% set version = \"1.2.0\" %}\n\npackage:\n  name: codec2-split\n  version: {{ version }}\n\nsource:\n  url: https://github.com/drowe67/codec2/archive/refs/tags/{{ version }}.tar.gz\n  sha256: cbccae52b2c2ecc5d2757e407da567eb681241ff8dadce39d779a7219dbcf449\n  patches:\n    - 0001-Fix-CMake-include-of-GetPrerequisites.patch\n    - 0002-Add-optional-installation-of-command-line-programs.patch\n\nbuild:\n  number: 1\n\nrequirements:\n  build:\n    - {{ compiler('c') }}  # [not win]\n    - {{ stdlib('c') }}  # [not win]\n    # upstream does not support compiling with MSVC\n    - {{ compiler('m2w64_c') }}  # [win]\n    - cmake\n    - ninja\n\noutputs:\n  - name: libcodec2\n    script: install_libcodec2.bat  # [win]\n    script: install_libcodec2.sh  # [not win]\n    build:\n      run_exports:\n        - {{ pin_subpackage('libcodec2', max_pin='x.x') }}\n    requirements:\n      build:\n        - {{ compiler('c') }}  # [not win]\n        - {{ stdlib('c') }}  # [not win]\n        - {{ compiler('m2w64_c') }}  # [win]\n        - cmake\n        - ninja\n    test:\n      commands:\n        # verify that (some) headers get installed\n        - test -f $PREFIX/include/codec2/codec2.h  # [not win]\n        - test -f $PREFIX/include/codec2/version.h  # [not win]\n        - if not exist %PREFIX%\\\\Library\\\\include\\\\codec2\\\\codec2.h exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\include\\\\codec2\\\\version.h exit 1  # [win]\n\n        # verify that libraries get installed\n        - test -f $PREFIX/lib/libcodec2${SHLIB_EXT}  # [not win]\n        - if not exist %PREFIX%\\\\Library\\\\bin\\\\libcodec2.dll exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\lib\\\\libcodec2.dll.a exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\lib\\\\libcodec2.lib exit 1  # [win]\n\n  - name: codec2\n    script: install_codec2.bat  # [win]\n    script: install_codec2.sh  # [not win]\n    build:\n      run_exports:\n        - {{ pin_subpackage('libcodec2', max_pin='x.x') }}\n    requirements:\n      build:\n        - {{ compiler('c') }}  # [not win]\n        - {{ stdlib('c') }}  # [not win]\n        - {{ compiler('m2w64_c') }}  # [win]\n        - cmake\n        - ninja\n      host:\n        - libcodec2\n      run:\n        - {{ pin_subpackage('libcodec2', exact=True) }}\n    test:\n      commands:\n        # verify that executables can be run\n        # don't test ofdm_demod, ofdm_mod, and tollr\n        # because they don't conform to the pattern (print usage, return 1)\n        {% set cmds = [\"c2dec\", \"c2enc\", \"c2sim\", \"cohpsk_demod\"] %}\n        {% set cmds = cmds + [\"cohpsk_get_test_bits\", \"cohpsk_mod\", \"cohpsk_put_test_bits\"] %}\n        {% set cmds = cmds + [\"deframer\", \"fdmdv_demod\"] %}\n        {% set cmds = cmds + [\"fdmdv_get_test_bits\", \"fdmdv_mod\", \"fdmdv_put_test_bits\"] %}\n        {% set cmds = cmds + [\"framer\"] %}\n        {% set cmds = cmds + [\"freedv_data_raw_rx\", \"freedv_data_raw_tx\"] %}\n        {% set cmds = cmds + [\"freedv_data_rx\", \"freedv_data_tx\"] %}\n        {% set cmds = cmds + [\"freedv_mixed_rx\", \"freedv_mixed_tx\"] %}\n        {% set cmds = cmds + [\"freedv_rx\", \"freedv_tx\"] %}\n        {% set cmds = cmds + [\"fsk_demod\", \"fsk_get_test_bits\", \"fsk_mod\"] %}\n        {% set cmds = cmds + [\"fsk_put_test_bits\"] %}\n        {% set cmds = cmds + [\"ldpc_dec\", \"ldpc_enc\", \"ldpc_noise\"] %}\n        {% set cmds = cmds + [\"ofdm_get_test_bits\", \"ofdm_put_test_bits\"] %}\n        {% set cmds = cmds + [\"vhf_deframe_c2\", \"vhf_frame_c2\"] %}\n        {% for cmd in cmds %}\n        - {{ cmd }} || ec=$?; if [ $ec -gt 1 ]; then exit $ec; fi  # [not win]\n        - {{ cmd }} || if !ERRORLEVEL! LEQ 1 cmd /c \"exit /b 0\"  # [win]\n        {% endfor %}\n\nabout:\n  home: http://www.rowetel.com/codec2.html\n  license: LGPL-2.1-or-later\n  license_family: LGPL\n  license_file: COPYING\n  summary: An open source low bit rate speech codec\n  description: |\n    Open source speech codec designed for communications quality speech between 450\n    and 3200 bit/s. The main application is low bandwidth HF/VHF digital radio.\n  dev_url: https://github.com/drowe67/codec2\n\nextra:\n  feedstock-name: codec2\n  recipe-maintainers:\n    - ryanvolz\n",
+ "raw_meta_yaml": "{% set version = \"1.2.0\" %}\n\npackage:\n  name: codec2-split\n  version: {{ version }}\n\nsource:\n  url: https://github.com/drowe67/codec2/archive/refs/tags/{{ version }}.tar.gz\n  sha256: cbccae52b2c2ecc5d2757e407da567eb681241ff8dadce39d779a7219dbcf449\n  patches:\n    - 0001-Fix-CMake-include-of-GetPrerequisites.patch\n    - 0002-Add-optional-installation-of-command-line-programs.patch\n\nbuild:\n  number: 2\n\nrequirements:\n  build:\n    - {{ compiler('c') }}  # [not win]\n    - {{ stdlib('c') }}  # [not win]\n    # upstream does not support compiling with MSVC\n    - {{ compiler('m2w64_c') }}  # [win]\n    - cmake\n    - ninja\n\noutputs:\n  - name: libcodec2\n    script: install_libcodec2.bat  # [win]\n    script: install_libcodec2.sh  # [not win]\n    build:\n      run_exports:\n        - {{ pin_subpackage('libcodec2', max_pin='x.x') }}\n    requirements:\n      build:\n        - {{ compiler('c') }}  # [not win]\n        - {{ stdlib('c') }}  # [not win]\n        - {{ compiler('m2w64_c') }}  # [win]\n        - cmake\n        - ninja\n    test:\n      commands:\n        # verify that (some) headers get installed\n        - test -f $PREFIX/include/codec2/codec2.h  # [not win]\n        - test -f $PREFIX/include/codec2/version.h  # [not win]\n        - if not exist %PREFIX%\\\\Library\\\\include\\\\codec2\\\\codec2.h exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\include\\\\codec2\\\\version.h exit 1  # [win]\n\n        # verify that libraries get installed\n        - test -f $PREFIX/lib/libcodec2${SHLIB_EXT}  # [not win]\n        - if not exist %PREFIX%\\\\Library\\\\bin\\\\libcodec2.dll exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\lib\\\\libcodec2.dll.a exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\lib\\\\libcodec2.lib exit 1  # [win]\n\n  - name: codec2\n    script: install_codec2.bat  # [win]\n    script: install_codec2.sh  # [not win]\n    build:\n      run_exports:\n        - {{ pin_subpackage('libcodec2', max_pin='x.x') }}\n    requirements:\n      build:\n        - {{ compiler('c') }}  # [not win]\n        - {{ stdlib('c') }}  # [not win]\n        - {{ compiler('m2w64_c') }}  # [win]\n        - cmake\n        - ninja\n      host:\n        - libcodec2\n      run:\n        - {{ pin_subpackage('libcodec2', exact=True) }}\n    test:\n      commands:\n        # verify that executables can be run\n        # don't test ofdm_demod, ofdm_mod, and tollr\n        # because they don't conform to the pattern (print usage, return 1)\n        {% set cmds = [\"c2dec\", \"c2enc\", \"c2sim\", \"cohpsk_demod\"] %}\n        {% set cmds = cmds + [\"cohpsk_get_test_bits\", \"cohpsk_mod\", \"cohpsk_put_test_bits\"] %}\n        {% set cmds = cmds + [\"deframer\", \"fdmdv_demod\"] %}\n        {% set cmds = cmds + [\"fdmdv_get_test_bits\", \"fdmdv_mod\", \"fdmdv_put_test_bits\"] %}\n        {% set cmds = cmds + [\"framer\"] %}\n        {% set cmds = cmds + [\"freedv_data_raw_rx\", \"freedv_data_raw_tx\"] %}\n        {% set cmds = cmds + [\"freedv_data_rx\", \"freedv_data_tx\"] %}\n        {% set cmds = cmds + [\"freedv_mixed_rx\", \"freedv_mixed_tx\"] %}\n        {% set cmds = cmds + [\"freedv_rx\", \"freedv_tx\"] %}\n        {% set cmds = cmds + [\"fsk_demod\", \"fsk_get_test_bits\", \"fsk_mod\"] %}\n        {% set cmds = cmds + [\"fsk_put_test_bits\"] %}\n        {% set cmds = cmds + [\"ldpc_dec\", \"ldpc_enc\", \"ldpc_noise\"] %}\n        {% set cmds = cmds + [\"ofdm_get_test_bits\", \"ofdm_put_test_bits\"] %}\n        {% set cmds = cmds + [\"vhf_deframe_c2\", \"vhf_frame_c2\"] %}\n        {% for cmd in cmds %}\n        - {{ cmd }} || ec=$?; if [ $ec -gt 1 ]; then exit $ec; fi  # [not win]\n        - {{ cmd }} || if !ERRORLEVEL! LEQ 1 cmd /c \"exit /b 0\"  # [win]\n        {% endfor %}\n\nabout:\n  home: http://www.rowetel.com/codec2.html\n  license: LGPL-2.1-or-later\n  license_family: LGPL\n  license_file: COPYING\n  summary: An open source low bit rate speech codec\n  description: |\n    Open source speech codec designed for communications quality speech between 450\n    and 3200 bit/s. The main application is low bandwidth HF/VHF digital radio.\n  dev_url: https://github.com/drowe67/codec2\n\nextra:\n  feedstock-name: codec2\n  recipe-maintainers:\n    - ryanvolz\n",
  "req": {
   "__set__": true,
   "elements": [
@@ -1432,7 +1432,7 @@
    "summary": "An open source low bit rate speech codec"
   },
   "build": {
-   "number": "1"
+   "number": "2"
   },
   "extra": {
    "feedstock-name": "codec2",
