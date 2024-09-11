@@ -18,7 +18,8 @@
  "hash_type": "sha256",
  "linux_64_meta_yaml": {
   "about": {
-   "home": "https://klmr.me/box/, https://github.com/klmr/box",
+   "dev_url": "https://github.com/klmr/box",
+   "home": "https://klmr.me/box/",
    "license": "MIT",
    "license_family": "MIT",
    "license_file": [
@@ -28,7 +29,8 @@
    "summary": "A modern module system for R. Organise code into hierarchical, composable, reusable modules, and use it effortlessly across projects via a flexible, declarative dependency loading syntax."
   },
   "build": {
-   "number": "0",
+   "missing_dso_whitelist": null,
+   "number": "1",
    "rpaths": [
     "lib/R/lib/",
     "lib/"
@@ -46,6 +48,7 @@
   "requirements": {
    "build": [
     "c_compiler_stub",
+    "c_stdlib_stub",
     "make"
    ],
    "host": [
@@ -76,6 +79,7 @@
    "__set__": true,
    "elements": [
     "c_compiler_stub",
+    "c_stdlib_stub",
     "make"
    ]
   },
@@ -100,7 +104,8 @@
  },
  "meta_yaml": {
   "about": {
-   "home": "https://klmr.me/box/, https://github.com/klmr/box",
+   "dev_url": "https://github.com/klmr/box",
+   "home": "https://klmr.me/box/",
    "license": "MIT",
    "license_family": "MIT",
    "license_file": [
@@ -110,7 +115,12 @@
    "summary": "A modern module system for R. Organise code into hierarchical, composable, reusable modules, and use it effortlessly across projects via a flexible, declarative dependency loading syntax."
   },
   "build": {
-   "number": "0",
+   "missing_dso_whitelist": [
+    "*/R.dll",
+    "*/Rblas.dll",
+    "*/Rlapack.dll"
+   ],
+   "number": "1",
    "rpaths": [
     "lib/R/lib/",
     "lib/"
@@ -128,7 +138,14 @@
   "requirements": {
    "build": [
     "c_compiler_stub",
-    "make"
+    "c_stdlib_stub",
+    "make",
+    "m2w64_c_compiler_stub",
+    "m2w64_c_stdlib_stub",
+    "filesystem",
+    "sed",
+    "coreutils",
+    "zip"
    ],
    "host": [
     "r-base"
@@ -146,7 +163,8 @@
   },
   "test": {
    "commands": [
-    "$R -e \"testthat::test_package('box')\""
+    "$R -e \"testthat::test_package('box')\"",
+    "\"%R%\" -e \"testthat::test_package('box')\""
    ],
    "requires": [
     "r-testthat"
@@ -156,7 +174,8 @@
  "name": "r-box",
  "osx_64_meta_yaml": {
   "about": {
-   "home": "https://klmr.me/box/, https://github.com/klmr/box",
+   "dev_url": "https://github.com/klmr/box",
+   "home": "https://klmr.me/box/",
    "license": "MIT",
    "license_family": "MIT",
    "license_file": [
@@ -166,7 +185,8 @@
    "summary": "A modern module system for R. Organise code into hierarchical, composable, reusable modules, and use it effortlessly across projects via a flexible, declarative dependency loading syntax."
   },
   "build": {
-   "number": "0",
+   "missing_dso_whitelist": null,
+   "number": "1",
    "rpaths": [
     "lib/R/lib/",
     "lib/"
@@ -184,6 +204,7 @@
   "requirements": {
    "build": [
     "c_compiler_stub",
+    "c_stdlib_stub",
     "make"
    ],
    "host": [
@@ -214,6 +235,7 @@
    "__set__": true,
    "elements": [
     "c_compiler_stub",
+    "c_stdlib_stub",
     "make"
    ]
   },
@@ -245,18 +267,26 @@
  "parsing_error": false,
  "platforms": [
   "linux_64",
-  "osx_64"
+  "osx_64",
+  "win_64"
  ],
  "pr_info": {
   "__lazy_json__": "pr_info/r-box.json"
  },
- "raw_meta_yaml": "{% set version = \"1.2.0\" %}\n{% set posix = 'm2-' if win else '' %}\n{% set native = 'm2w64-' if win else '' %}\n\npackage:\n  name: r-box\n  version: {{ version|replace(\"-\", \"_\") }}\n\nsource:\n  url:\n    - {{ cran_mirror }}/src/contrib/box_{{ version }}.tar.gz\n    - {{ cran_mirror }}/src/contrib/Archive/box/box_{{ version }}.tar.gz\n  sha256: 96d6df097a175e6368a61a9fccdbafc757e62dd264222ad1a8c008e3c68ce501\n\nbuild:\n  merge_build_host: true  # [win]\n  skip: true  # [win]\n  number: 0\n  rpaths:\n    - lib/R/lib/\n    - lib/\n\nrequirements:\n  build:\n    - {{ compiler('c') }}              # [not win]\n    - {{ compiler('m2w64_c') }}        # [win]\n    - {{ posix }}filesystem        # [win]\n    - {{ posix }}make\n    - {{ posix }}sed               # [win]\n    - {{ posix }}coreutils         # [win]\n    - {{ posix }}zip               # [win]\n    - cross-r-base {{ r_base }}    # [build_platform != target_platform]\n  host:\n    - r-base\n  run:\n    - r-base\n    - {{ native }}gcc-libs         # [win]\n\ntest:\n  requires:\n    - r-testthat\n  commands:\n    # package is not supposed to be imported, hence no library('box') test\n    - $R -e \"testthat::test_package('box')\"           # [not win]\n    - \"\\\"%R%\\\" -e \\\"testthat::test_package('box')\\\"\"  # [win]\n\nabout:\n  home: https://klmr.me/box/, https://github.com/klmr/box\n  license: MIT\n  summary: A modern module system for R. Organise code into hierarchical, composable, reusable modules, and use it effortlessly across projects via a flexible, declarative dependency loading syntax.\n  license_family: MIT\n  license_file:\n    - {{ environ[\"PREFIX\"] }}/lib/R/share/licenses/MIT\n    - LICENSE\n\nextra:\n  recipe-maintainers:\n    - conda-forge/r\n",
+ "raw_meta_yaml": "{% set version = \"1.2.0\" %}\n{% set posix = 'm2-' if win else '' %}\n\npackage:\n  name: r-box\n  version: {{ version|replace(\"-\", \"_\") }}\n\nsource:\n  url:\n    - {{ cran_mirror }}/src/contrib/box_{{ version }}.tar.gz\n    - {{ cran_mirror }}/src/contrib/Archive/box/box_{{ version }}.tar.gz\n  sha256: 96d6df097a175e6368a61a9fccdbafc757e62dd264222ad1a8c008e3c68ce501\n\nbuild:\n  number: 1\n  rpaths:\n    - lib/R/lib/\n    - lib/\n  missing_dso_whitelist:\n    - '*/R.dll'        # [win]\n    - '*/Rblas.dll'    # [win]\n    - '*/Rlapack.dll'  # [win]\n\nrequirements:\n  build:\n    - cross-r-base {{ r_base }}    # [build_platform != target_platform]\n    - {{ compiler('c') }}          # [not win]\n    - {{ stdlib(\"c\") }}            # [not win]\n    - {{ compiler('m2w64_c') }}    # [win]\n    - {{ stdlib(\"m2w64_c\") }}      # [win]\n    - {{ posix }}filesystem        # [win]\n    - {{ posix }}make\n    - {{ posix }}sed               # [win]\n    - {{ posix }}coreutils         # [win]\n    - {{ posix }}zip               # [win]\n  host:\n    - r-base\n  run:\n    - r-base\n\ntest:\n  requires:\n    - r-testthat\n  commands:\n    # package is not supposed to be imported, hence no library('box') test\n    - $R -e \"testthat::test_package('box')\"           # [not win]\n    - \"\\\"%R%\\\" -e \\\"testthat::test_package('box')\\\"\"  # [win]\n\nabout:\n  home: https://klmr.me/box/\n  dev_url: https://github.com/klmr/box\n  license: MIT\n  summary: A modern module system for R. Organise code into hierarchical, composable, reusable modules, and use it effortlessly across projects via a flexible, declarative dependency loading syntax.\n  license_family: MIT\n  license_file:\n    - {{ environ[\"PREFIX\"] }}/lib/R/share/licenses/MIT\n    - LICENSE\n\nextra:\n  recipe-maintainers:\n    - conda-forge/r\n",
  "req": {
   "__set__": true,
   "elements": [
    "c_compiler_stub",
+   "c_stdlib_stub",
+   "coreutils",
+   "filesystem",
+   "m2w64_c_compiler_stub",
+   "m2w64_c_stdlib_stub",
    "make",
-   "r-base"
+   "r-base",
+   "sed",
+   "zip"
   ]
  },
  "requirements": {
@@ -264,13 +294,21 @@
    "__set__": true,
    "elements": [
     "c_compiler_stub",
-    "make"
+    "c_stdlib_stub",
+    "coreutils",
+    "filesystem",
+    "m2w64_c_compiler_stub",
+    "m2w64_c_stdlib_stub",
+    "make",
+    "sed",
+    "zip"
    ]
   },
   "host": {
    "__set__": true,
    "elements": [
     "c_compiler_stub",
+    "c_stdlib_stub",
     "r-base"
    ]
   },
@@ -278,6 +316,7 @@
    "__set__": true,
    "elements": [
     "c_compiler_stub",
+    "c_stdlib_stub",
     "r-base"
    ]
   },
@@ -294,7 +333,14 @@
    "__set__": true,
    "elements": [
     "c_compiler_stub",
-    "make"
+    "c_stdlib_stub",
+    "coreutils",
+    "filesystem",
+    "m2w64_c_compiler_stub",
+    "m2w64_c_stdlib_stub",
+    "make",
+    "sed",
+    "zip"
    ]
   },
   "host": {
@@ -320,10 +366,110 @@
   "https://cran.r-project.org/src/contrib/box_1.2.0.tar.gz",
   "https://cran.r-project.org/src/contrib/Archive/box/box_1.2.0.tar.gz",
   "https://cran.r-project.org/src/contrib/box_1.2.0.tar.gz",
+  "https://cran.r-project.org/src/contrib/Archive/box/box_1.2.0.tar.gz",
+  "https://cran.r-project.org/src/contrib/box_1.2.0.tar.gz",
   "https://cran.r-project.org/src/contrib/Archive/box/box_1.2.0.tar.gz"
  ],
  "version": "1.2.0",
  "version_pr_info": {
   "__lazy_json__": "version_pr_info/r-box.json"
+ },
+ "win_64_meta_yaml": {
+  "about": {
+   "dev_url": "https://github.com/klmr/box",
+   "home": "https://klmr.me/box/",
+   "license": "MIT",
+   "license_family": "MIT",
+   "license_file": [
+    "/lib/R/share/licenses/MIT",
+    "LICENSE"
+   ],
+   "summary": "A modern module system for R. Organise code into hierarchical, composable, reusable modules, and use it effortlessly across projects via a flexible, declarative dependency loading syntax."
+  },
+  "build": {
+   "missing_dso_whitelist": [
+    "*/R.dll",
+    "*/Rblas.dll",
+    "*/Rlapack.dll"
+   ],
+   "number": "1",
+   "rpaths": [
+    "lib/R/lib/",
+    "lib/"
+   ]
+  },
+  "extra": {
+   "recipe-maintainers": [
+    "conda-forge/r"
+   ]
+  },
+  "package": {
+   "name": "r-box",
+   "version": "1.2.0"
+  },
+  "requirements": {
+   "build": [
+    "m2w64_c_compiler_stub",
+    "m2w64_c_stdlib_stub",
+    "filesystem",
+    "make",
+    "sed",
+    "coreutils",
+    "zip"
+   ],
+   "host": [
+    "r-base"
+   ],
+   "run": [
+    "r-base"
+   ]
+  },
+  "source": {
+   "sha256": "96d6df097a175e6368a61a9fccdbafc757e62dd264222ad1a8c008e3c68ce501",
+   "url": [
+    "https://cran.r-project.org/src/contrib/box_1.2.0.tar.gz",
+    "https://cran.r-project.org/src/contrib/Archive/box/box_1.2.0.tar.gz"
+   ]
+  },
+  "test": {
+   "commands": [
+    "\"%R%\" -e \"testthat::test_package('box')\""
+   ],
+   "requires": [
+    "r-testthat"
+   ]
+  }
+ },
+ "win_64_requirements": {
+  "build": {
+   "__set__": true,
+   "elements": [
+    "coreutils",
+    "filesystem",
+    "m2w64_c_compiler_stub",
+    "m2w64_c_stdlib_stub",
+    "make",
+    "sed",
+    "zip"
+   ]
+  },
+  "host": {
+   "__set__": true,
+   "elements": [
+    "r-base"
+   ]
+  },
+  "run": {
+   "__set__": true,
+   "elements": [
+    "r-base"
+   ]
+  },
+  "test": {
+   "__set__": true,
+   "elements": [
+    "r-testthat"
+   ]
+  }
  }
 }
