@@ -32,12 +32,12 @@
    "missing_dso_whitelist": [
     "*/libcuda.*"
    ],
-   "number": "10",
+   "number": "11",
    "rpaths": [
     "lib/",
     "SP_DIR/torch/lib"
    ],
-   "string": "cuda118py312h1234567_10"
+   "string": "cuda118py312h1234567_11"
   },
   "extra": {
    "recipe-maintainers": [
@@ -142,12 +142,12 @@
   },
   "build": {
    "missing_dso_whitelist": null,
-   "number": "10",
+   "number": "11",
    "rpaths": [
     "lib/",
     "SP_DIR/torch/lib"
    ],
-   "string": "cpu_py312h1234567_10"
+   "string": "cpu_py312h1234567_11"
   },
   "extra": {
    "recipe-maintainers": [
@@ -218,12 +218,12 @@
   },
   "build": {
    "missing_dso_whitelist": null,
-   "number": "10",
+   "number": "11",
    "rpaths": [
     "lib/",
     "SP_DIR/torch/lib"
    ],
-   "string": "cpu_py312h1234567_10"
+   "string": "cpu_py312h1234567_11"
   },
   "extra": {
    "recipe-maintainers": [
@@ -320,12 +320,12 @@
   },
   "build": {
    "missing_dso_whitelist": null,
-   "number": "10",
+   "number": "11",
    "rpaths": [
     "lib/",
     "SP_DIR/torch/lib"
    ],
-   "string": "cpu_py312h1234567_10"
+   "string": "cpu_py312h1234567_11"
   },
   "extra": {
    "recipe-maintainers": [
@@ -427,7 +427,7 @@
  "pr_info": {
   "__lazy_json__": "pr_info/nnpops.json"
  },
- "raw_meta_yaml": "{% set name = \"nnpops\" %}\n{% set version = \"0.6\" %}\n# see github.com/conda-forge/conda-forge.github.io/issues/1059 for naming discussion\n{% set torch_proc_type = \"cuda\" if cuda_compiler_version != \"None\" else \"cpu\" %}\n\n{% if cuda_compiler_version in (None, \"None\", True, False) %}\n{% set cuda_major = 0 %}\n{% else %}\n{% set cuda_major = environ.get(\"cuda_compiler_version\", \"11.8\").split(\".\")[0] | int %}\n{% endif %}\n\npackage:\n  name: {{ name }}\n  version: {{ version }}\n\nsource:\n  url: https://github.com/openmm/NNPOps/archive/refs/tags/v{{ version }}.tar.gz\n  sha256: d7854a3506720aa7536ce64ea9b8d621cad5c024ba4979f2156afcc88b2117a3\n  patches:\n      - patches/fix-osx-lib-loading.patch  # [osx]\n      - patches/cpp17.patch\nbuild:\n  skip: true  # [win]\n  number: 10\n  rpaths:\n    - lib/\n    - {{ SP_DIR }}/torch/lib\n  missing_dso_whitelist:\n    - '*/libcuda.*'  # [linux64]\n  string: cuda{{ cuda_compiler_version | replace('.', '') }}py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version != \"None\"]\n  string: cpu_py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version == \"None\"]\n\nrequirements:\n  build:\n    - python                                 # [build_platform != target_platform]\n    - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n    - {{ compiler('cxx') }}\n    - {{ stdlib(\"c\") }}\n    - {{ compiler('cuda') }}  # [cuda_compiler_version != 'None']\n    - cuda-version {{ cuda_compiler_version }}  # [cuda_compiler_version not in (undefined, 'None')]\n    {% if cuda_major >= 12 %}\n    - cuda-cudart-dev\n    # No cuda-driver-dev in windows\n    - cuda-driver-dev  # [linux]\n    - libcufft-dev\n    - libcurand-dev\n    - libcublas-dev\n    - cuda-nvrtc-dev\n    - cuda-nvtx-dev\n    - cuda-profiler-api\n    - cuda-nvrtc-dev\n    - libcusparse-dev\n    - libcusolver-dev\n    {% endif %}\n    - make\n    - cmake\n  host:\n    - python\n    - pytorch =*={{ torch_proc_type }}*\n  run:\n    - python\n    - torchani\n    - cuda-version  # [cuda_compiler_version not in (undefined, 'None')]\n  run_constrained:\n    # additional run constraint to the one from the (version-only) run_export;\n    # constraining the CPU builds to CPU pytorch isn't 100% necessary, but cleaner\n    - pytorch =*={{ torch_proc_type }}*\n\ntest:\n  requires:\n    - mdtraj\n    - pytest\n    - numpy\n  imports:\n    - NNPOps\n    - NNPOps.OptimizedTorchANI\n  commands: |\n    cd ${CONDA_PREFIX}/share/{{ name }}/tests\n    ls -al\n    set +e\n    summary=\"\"\n    exitcode=0\n    for f in Test*.py; do\n      if [[ $f == *Cuda* || $f == *OpenCL* ]]; then\n        continue\n      fi\n      echo \"Running $f...\"\n      pytest -v ./${f}\n      thisexitcode=$?\n      summary+=\"\\n${f}: \"\n      if [[ $thisexitcode == 0 ]]; then summary+=\"OK\"; else summary+=\"FAILED\"; fi\n      ((exitcode+=$thisexitcode))\n    done\n    echo \"-------\"\n    echo \"Summary\"\n    echo \"-------\"\n    echo -e \"${summary}\"\n    exit $exitcode\n\nabout:\n  home: https://github.com/openmm/NNPOps\n  license: MIT\n  license_family: MIT\n  license_file: LICENSE\n  summary: High performance implementations of operations used in Neural Network Potentials\n\nextra:\n  recipe-maintainers:\n    - raimis\n    - mikemhenry\n    - h-vetinari\n    - RaulPPelaez\n",
+ "raw_meta_yaml": "{% set name = \"nnpops\" %}\n{% set version = \"0.6\" %}\n# see github.com/conda-forge/conda-forge.github.io/issues/1059 for naming discussion\n{% set torch_proc_type = \"cuda\" if cuda_compiler_version != \"None\" else \"cpu\" %}\n\n{% if cuda_compiler_version in (None, \"None\", True, False) %}\n{% set cuda_major = 0 %}\n{% else %}\n{% set cuda_major = environ.get(\"cuda_compiler_version\", \"11.8\").split(\".\")[0] | int %}\n{% endif %}\n\npackage:\n  name: {{ name }}\n  version: {{ version }}\n\nsource:\n  url: https://github.com/openmm/NNPOps/archive/refs/tags/v{{ version }}.tar.gz\n  sha256: d7854a3506720aa7536ce64ea9b8d621cad5c024ba4979f2156afcc88b2117a3\n  patches:\n      - patches/fix-osx-lib-loading.patch  # [osx]\n      - patches/cpp17.patch\nbuild:\n  skip: true  # [win]\n  number: 11\n  rpaths:\n    - lib/\n    - {{ SP_DIR }}/torch/lib\n  missing_dso_whitelist:\n    - '*/libcuda.*'  # [linux64]\n  string: cuda{{ cuda_compiler_version | replace('.', '') }}py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version != \"None\"]\n  string: cpu_py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version == \"None\"]\n\nrequirements:\n  build:\n    - python                                 # [build_platform != target_platform]\n    - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n    - {{ compiler('cxx') }}\n    - {{ stdlib(\"c\") }}\n    - {{ compiler('cuda') }}  # [cuda_compiler_version != 'None']\n    - cuda-version {{ cuda_compiler_version }}  # [cuda_compiler_version not in (undefined, 'None')]\n    {% if cuda_major >= 12 %}\n    - cuda-cudart-dev\n    # No cuda-driver-dev in windows\n    - cuda-driver-dev  # [linux]\n    - libcufft-dev\n    - libcurand-dev\n    - libcublas-dev\n    - cuda-nvrtc-dev\n    - cuda-nvtx-dev\n    - cuda-profiler-api\n    - cuda-nvrtc-dev\n    - libcusparse-dev\n    - libcusolver-dev\n    {% endif %}\n    - make\n    - cmake\n  host:\n    - python\n    - pytorch =*={{ torch_proc_type }}*\n  run:\n    - python\n    - torchani\n    - cuda-version  # [cuda_compiler_version not in (undefined, 'None')]\n  run_constrained:\n    # additional run constraint to the one from the (version-only) run_export;\n    # constraining the CPU builds to CPU pytorch isn't 100% necessary, but cleaner\n    - pytorch =*={{ torch_proc_type }}*\n\ntest:\n  requires:\n    - mdtraj\n    - pytest\n    - numpy\n  imports:\n    - NNPOps\n    - NNPOps.OptimizedTorchANI\n  commands: |\n    cd ${CONDA_PREFIX}/share/{{ name }}/tests\n    ls -al\n    set +e\n    summary=\"\"\n    exitcode=0\n    for f in Test*.py; do\n      if [[ $f == *Cuda* || $f == *OpenCL* ]]; then\n        continue\n      fi\n      echo \"Running $f...\"\n      pytest -v ./${f}\n      thisexitcode=$?\n      summary+=\"\\n${f}: \"\n      if [[ $thisexitcode == 0 ]]; then summary+=\"OK\"; else summary+=\"FAILED\"; fi\n      ((exitcode+=$thisexitcode))\n    done\n    echo \"-------\"\n    echo \"Summary\"\n    echo \"-------\"\n    echo -e \"${summary}\"\n    exit $exitcode\n\nabout:\n  home: https://github.com/openmm/NNPOps\n  license: MIT\n  license_family: MIT\n  license_file: LICENSE\n  summary: High performance implementations of operations used in Neural Network Potentials\n\nextra:\n  recipe-maintainers:\n    - raimis\n    - mikemhenry\n    - h-vetinari\n    - RaulPPelaez\n",
  "req": {
   "__set__": true,
   "elements": [
