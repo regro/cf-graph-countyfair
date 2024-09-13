@@ -120,7 +120,9 @@
       "pip check"
      ],
      "imports": [
-      "stanza"
+      "stanza",
+      "stanza.utils.visualization.semgrex_app",
+      "stanza.utils.visualization.semgrex_visualizer"
      ],
      "requires": [
       "pip"
@@ -130,7 +132,7 @@
   ],
   "package": {
    "name": "stanza",
-   "version": "1.9.0"
+   "version": "1.9.2"
   },
   "requirements": {
    "host": [
@@ -155,8 +157,8 @@
    ]
   },
   "source": {
-   "sha256": "0740bd9305151312726866c1207b74d405b89c47cbf99dbf8a86d30ce20cb81e",
-   "url": "https://pypi.io/packages/source/s/stanza/stanza-1.9.0.tar.gz"
+   "sha256": "36a93f60bf470e6026122eacab291751ad401fe3279e2d022fffef5cb35903e5",
+   "url": "https://pypi.io/packages/source/s/stanza/stanza-1.9.2.tar.gz"
   },
   "test": {
    "commands": [
@@ -319,7 +321,9 @@
       "pip check"
      ],
      "imports": [
-      "stanza"
+      "stanza",
+      "stanza.utils.visualization.semgrex_app",
+      "stanza.utils.visualization.semgrex_visualizer"
      ],
      "requires": [
       "pip"
@@ -329,7 +333,7 @@
   ],
   "package": {
    "name": "stanza",
-   "version": "1.9.0"
+   "version": "1.9.2"
   },
   "requirements": {
    "host": [
@@ -354,8 +358,8 @@
    ]
   },
   "source": {
-   "sha256": "0740bd9305151312726866c1207b74d405b89c47cbf99dbf8a86d30ce20cb81e",
-   "url": "https://pypi.io/packages/source/s/stanza/stanza-1.9.0.tar.gz"
+   "sha256": "36a93f60bf470e6026122eacab291751ad401fe3279e2d022fffef5cb35903e5",
+   "url": "https://pypi.io/packages/source/s/stanza/stanza-1.9.2.tar.gz"
   },
   "test": {
    "commands": [
@@ -389,7 +393,7 @@
  "pr_info": {
   "__lazy_json__": "pr_info/stanza.json"
  },
- "raw_meta_yaml": "{% set version = \"1.9.0\" %}\n\n# handle undefined PYTHON in `noarch: generic` outputs\n{% if PYTHON is not defined %}{% set PYTHON = \"$PYTHON\" %}{% endif %}\n\npackage:\n  name: stanza\n  version: {{ version }}\n\nsource:\n  url: https://pypi.io/packages/source/s/stanza/stanza-{{ version }}.tar.gz\n  sha256: 0740bd9305151312726866c1207b74d405b89c47cbf99dbf8a86d30ce20cb81e\n\nbuild:\n  number: 0\n  noarch: python\n  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation\n\nrequirements:\n  host:\n    - pip\n    - python >=3.8\n    - setuptools\n  run:\n    - emoji\n    - networkx\n    - numpy\n    - protobuf >=3.15.0\n    - python >=3.8\n    - pytorch >=1.3.0\n    - requests\n    - tomli\n    - tqdm\n  run_constrained:\n    # actual `run` dependency in stanza-with-transformers\n    - peft >=0.6.1\n    - transformers >=3.0.0\n\ntest:\n  imports:\n    - stanza\n    - stanza.models\n    # check for missing `nn` members\n    - stanza.models.constituency.utils\n  commands:\n    - pip check\n  requires:\n    - pip\n      # test with oldest compatible version on conda-forge\n    - pytorch 1.6.*\n\noutputs:\n  - name: stanza\n\n  - name: stanza-with-datasets\n    build:\n      noarch: generic\n    requirements:\n      run:\n        - {{ pin_subpackage(\"stanza\", max_pin=\"x.x.x\") }}\n        - datasets\n    test:\n      imports:\n        - stanza\n        # imports `datasets`\n        - stanza.utils.charlm.dump_oscar\n      commands:\n        - pip check\n      requires:\n        - pip\n    about:\n      summary: (with datasets) A Python NLP Library for Many Human Languages, by the Stanford NLP Group\n\n  # see https://github.com/conda-forge/stanza-feedstock/issues/21\n  #\n  # - name: stanza-with-tokenizers\n  #   build:\n  #     noarch: generic\n  #   requirements:\n  #     run:\n  #       - {{ pin_subpackage(\"stanza\", max_pin=\"x.x.x\") }}\n  #       - jieba\n  #       - pythainlp           # missing from conda-forge\n  #       - python-crfsuite\n  #       - spacy\n  #       - sudachidict-core    # missing from conda-forge\n  #       - sudachipy           # missing from conda-forge\n  #   test:\n  #     imports:\n  #       - stanza\n  #       - echo \"TODO test improts for tokenizers\"\n  #     commands:\n  #       - pip check\n  #     requires:\n  #       - pip\n  #   about:\n  #     summary: (with tokenizers) A Python NLP Library for Many Human Languages, by the Stanford NLP Group\n\n  - name: stanza-with-transformers\n    build:\n      noarch: generic\n    requirements:\n      run:\n        - {{ pin_subpackage(\"stanza\", max_pin=\"x.x.x\") }}\n        - peft\n        - transformers\n    test:\n      imports:\n        - stanza\n        - stanza.models\n        # for transformers\n        - stanza.models.common.bert_embedding\n      commands:\n        - pip check\n        - python -c \"import stanza; nl = stanza.models.constituency.utils.NONLINEARITY; print(nl); assert 'mish' in nl\"\n      requires:\n        - pip\n        # minimum with `nn.Mish`\n        - pytorch >=1.9.0\n    about:\n      summary: (with transformers) A Python NLP Library for Many Human Languages, by the Stanford NLP Group\n\n  - name: stanza-with-visualization\n    build:\n      noarch: generic\n    requirements:\n      run:\n        - {{ pin_subpackage(\"stanza\", max_pin=\"x.x.x\") }}\n        - spacy\n        - streamlit\n        - ipython\n    test:\n      imports:\n        - stanza\n        # see https://github.com/stanfordnlp/stanza/issues/1421\n        # # imports `streamlit`\n        # - stanza.utils.visualization.semgrex_app\n        # # imports `IPython`\n        # - stanza.utils.visualization.semgrex_visualizer\n      commands:\n        - pip check\n      requires:\n        - pip\n    about:\n      summary: (with visualization) A Python NLP Library for Many Human Languages, by the Stanford NLP Group\n\nabout:\n  home: https://github.com/stanfordnlp/stanza\n  summary: A Python NLP Library for Many Human Languages, by the Stanford NLP Group\n  license: Apache-2.0\n  license_file: LICENSE\n  doc_url: https://stanfordnlp.github.io/stanza\n\nextra:\n  feedstock-name: stanza\n  recipe-maintainers:\n    - AngledLuffa\n    - FernandezMathieu\n    - bollwyvl\n",
+ "raw_meta_yaml": "{% set version = \"1.9.2\" %}\n\n# handle undefined PYTHON in `noarch: generic` outputs\n{% if PYTHON is not defined %}{% set PYTHON = \"$PYTHON\" %}{% endif %}\n\npackage:\n  name: stanza\n  version: {{ version }}\n\nsource:\n  url: https://pypi.io/packages/source/s/stanza/stanza-{{ version }}.tar.gz\n  sha256: 36a93f60bf470e6026122eacab291751ad401fe3279e2d022fffef5cb35903e5\n\nbuild:\n  number: 0\n  noarch: python\n  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation\n\nrequirements:\n  host:\n    - pip\n    - python >=3.8\n    - setuptools\n  run:\n    - emoji\n    - networkx\n    - numpy\n    - protobuf >=3.15.0\n    - python >=3.8\n    - pytorch >=1.3.0\n    - requests\n    - tomli\n    - tqdm\n  run_constrained:\n    # actual `run` dependency in stanza-with-transformers\n    - peft >=0.6.1\n    - transformers >=3.0.0\n\ntest:\n  imports:\n    - stanza\n    - stanza.models\n    # check for missing `nn` members\n    - stanza.models.constituency.utils\n  commands:\n    - pip check\n  requires:\n    - pip\n      # test with oldest compatible version on conda-forge\n    - pytorch 1.6.*\n\noutputs:\n  - name: stanza\n\n  - name: stanza-with-datasets\n    build:\n      noarch: generic\n    requirements:\n      run:\n        - {{ pin_subpackage(\"stanza\", max_pin=\"x.x.x\") }}\n        - datasets\n    test:\n      imports:\n        - stanza\n        # imports `datasets`\n        - stanza.utils.charlm.dump_oscar\n      commands:\n        - pip check\n      requires:\n        - pip\n    about:\n      summary: (with datasets) A Python NLP Library for Many Human Languages, by the Stanford NLP Group\n\n  # see https://github.com/conda-forge/stanza-feedstock/issues/21\n  #\n  # - name: stanza-with-tokenizers\n  #   build:\n  #     noarch: generic\n  #   requirements:\n  #     run:\n  #       - {{ pin_subpackage(\"stanza\", max_pin=\"x.x.x\") }}\n  #       - jieba\n  #       - pythainlp           # missing from conda-forge\n  #       - python-crfsuite\n  #       - spacy\n  #       - sudachidict-core    # missing from conda-forge\n  #       - sudachipy           # missing from conda-forge\n  #   test:\n  #     imports:\n  #       - stanza\n  #       - echo \"TODO test improts for tokenizers\"\n  #     commands:\n  #       - pip check\n  #     requires:\n  #       - pip\n  #   about:\n  #     summary: (with tokenizers) A Python NLP Library for Many Human Languages, by the Stanford NLP Group\n\n  - name: stanza-with-transformers\n    build:\n      noarch: generic\n    requirements:\n      run:\n        - {{ pin_subpackage(\"stanza\", max_pin=\"x.x.x\") }}\n        - peft\n        - transformers\n    test:\n      imports:\n        - stanza\n        - stanza.models\n        # for transformers\n        - stanza.models.common.bert_embedding\n      commands:\n        - pip check\n        - python -c \"import stanza; nl = stanza.models.constituency.utils.NONLINEARITY; print(nl); assert 'mish' in nl\"\n      requires:\n        - pip\n        # minimum with `nn.Mish`\n        - pytorch >=1.9.0\n    about:\n      summary: (with transformers) A Python NLP Library for Many Human Languages, by the Stanford NLP Group\n\n  - name: stanza-with-visualization\n    build:\n      noarch: generic\n    requirements:\n      run:\n        - {{ pin_subpackage(\"stanza\", max_pin=\"x.x.x\") }}\n        - spacy\n        - streamlit\n        - ipython\n    test:\n      imports:\n        - stanza\n        # imports `streamlit`\n        - stanza.utils.visualization.semgrex_app\n        # imports `IPython`, `spacy`\n        - stanza.utils.visualization.semgrex_visualizer\n      commands:\n        - pip check\n      requires:\n        - pip\n    about:\n      summary: (with visualization) A Python NLP Library for Many Human Languages, by the Stanford NLP Group\n\nabout:\n  home: https://github.com/stanfordnlp/stanza\n  summary: A Python NLP Library for Many Human Languages, by the Stanford NLP Group\n  license: Apache-2.0\n  license_file: LICENSE\n  doc_url: https://stanfordnlp.github.io/stanza\n\nextra:\n  feedstock-name: stanza\n  recipe-maintainers:\n    - AngledLuffa\n    - FernandezMathieu\n    - bollwyvl\n",
  "req": {
   "__set__": true,
   "elements": [
@@ -499,8 +503,8 @@
    ]
   }
  },
- "url": "https://pypi.io/packages/source/s/stanza/stanza-1.9.0.tar.gz",
- "version": "1.9.0",
+ "url": "https://pypi.io/packages/source/s/stanza/stanza-1.9.2.tar.gz",
+ "version": "1.9.2",
  "version_pr_info": {
   "__lazy_json__": "version_pr_info/stanza.json"
  }
