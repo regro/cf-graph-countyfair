@@ -27,7 +27,7 @@
    "summary": "TMSU lets you tags your files and then access them through a nifty virtual filesystem from any other application."
   },
   "build": {
-   "number": "0",
+   "number": "1",
    "script": [
     "pushd src/github.com/oniony/TMSU",
     "cp $RECIPE_DIR/go.* .",
@@ -50,7 +50,9 @@
   },
   "requirements": {
    "build": [
-    "go_compiler_stub",
+    "c_stdlib_stub",
+    "c_compiler_stub",
+    "go-cgo_compiler_stub",
     "go-licenses"
    ]
   },
@@ -62,6 +64,7 @@
   "test": {
    "commands": [
     "tmsu -V",
+    "tmsu init",
     "which mount.tmsu",
     "which tmsu-fs-merge",
     "which tmsu-fs-mv",
@@ -73,8 +76,10 @@
   "build": {
    "__set__": true,
    "elements": [
-    "go-licenses",
-    "go_compiler_stub"
+    "c_compiler_stub",
+    "c_stdlib_stub",
+    "go-cgo_compiler_stub",
+    "go-licenses"
    ]
   },
   "host": {
@@ -104,7 +109,7 @@
    "summary": "TMSU lets you tags your files and then access them through a nifty virtual filesystem from any other application."
   },
   "build": {
-   "number": "0",
+   "number": "1",
    "script": [
     "pushd src/github.com/oniony/TMSU",
     "cp $RECIPE_DIR/go.* .",
@@ -131,8 +136,12 @@
   },
   "requirements": {
    "build": [
-    "go_compiler_stub",
-    "go-licenses"
+    "c_stdlib_stub",
+    "c_compiler_stub",
+    "go-cgo_compiler_stub",
+    "go-licenses",
+    "m2w64_c_stdlib_stub",
+    "m2w64_c_compiler_stub"
    ]
   },
   "schema_version": 0,
@@ -143,6 +152,7 @@
   "test": {
    "commands": [
     "tmsu -V",
+    "tmsu init",
     "which mount.tmsu",
     "which tmsu-fs-merge",
     "which tmsu-fs-mv",
@@ -165,7 +175,7 @@
    "summary": "TMSU lets you tags your files and then access them through a nifty virtual filesystem from any other application."
   },
   "build": {
-   "number": "0",
+   "number": "1",
    "script": [
     "pushd src/github.com/oniony/TMSU",
     "cp $RECIPE_DIR/go.* .",
@@ -188,7 +198,9 @@
   },
   "requirements": {
    "build": [
-    "go_compiler_stub",
+    "c_stdlib_stub",
+    "c_compiler_stub",
+    "go-cgo_compiler_stub",
     "go-licenses"
    ]
   },
@@ -200,6 +212,7 @@
   "test": {
    "commands": [
     "tmsu -V",
+    "tmsu init",
     "which mount.tmsu",
     "which tmsu-fs-merge",
     "which tmsu-fs-mv",
@@ -211,8 +224,10 @@
   "build": {
    "__set__": true,
    "elements": [
-    "go-licenses",
-    "go_compiler_stub"
+    "c_compiler_stub",
+    "c_stdlib_stub",
+    "go-cgo_compiler_stub",
+    "go-licenses"
    ]
   },
   "host": {
@@ -243,29 +258,43 @@
  "pr_info": {
   "__lazy_json__": "pr_info/tmsu.json"
  },
- "raw_meta_yaml": "{% set goname = 'github.com/oniony/TMSU' %}\n{% set version = '0.7.5' %}\n\n{% set name = goname.split('/')[-1].lower() %}\n{% set pkg_src = ('src/' + goname).replace('/', os.sep) %}\n\npackage:\n  name: {{ name }}\n  version: {{ version }}\n\nsource:\n  url: https://{{ goname }}/archive/v{{ version }}.tar.gz\n  sha256: 0ac7f09336aaedf73623c4f486c05137c024a726c16dd32525463aee9d70b46a\n\nbuild:\n  script:\n    - pushd {{ pkg_src }}\n    - cp $RECIPE_DIR/go.* .  # [unix]\n    - xcopy %RECIPE_DIR%\\go.* .  # [win]\n    - go build -trimpath -ldflags \"-s -w\" -o $PREFIX/bin/{{ name }}  # [unix]\n    - go build -trimpath -ldflags \"-s -w\" -o %LIBRARY_BIN%/{{ name }}.exe  # [win]\n    - cp $SRC_DIR/COPYING.md .  # [unix]\n    - xcopy %SRC_DIR%\\COPYING.md .  # [win]\n    - go-licenses save . --save_path=\"$SRC_DIR/license-files/\"  # [unix]\n    - go-licenses save . --save_path=\"%SRC_DIR%/license-files/\"  # [win]\n    - popd\n    - cp -r ./misc/bin/. $PREFIX/bin/  # [unix]\n    - chmod -R u+w $(go env GOPATH) && rm -r $(go env GOPATH)  # [unix]\n  number: 0\n\nrequirements:\n  build:\n    - {{ compiler('go') }}\n    - go-licenses\n\ntest:\n  commands:\n    - {{ name }} -V\n    - which mount.{{ name }}  # [unix]\n    - which {{ name }}-fs-merge  # [unix]\n    - which {{ name }}-fs-mv  # [unix]\n    - which {{ name }}-fs-rm  # [unix]\n\nabout:\n  home: https://tmsu.org/\n  summary: TMSU lets you tags your files and then access them through a nifty virtual filesystem from any other application.\n  description: |\n    TMSU is a tool for tagging your files. It provides a simple command-line utility for applying\n    tags and a virtual filesystem to give you a tag-based view of your files from any other program.\n  license: GPL-3.0-only\n  license_family: GPL\n  license_file:\n    - COPYING.md\n    - license-files/\n  dev_url: https://{{ goname }}\n\nextra:\n  recipe-maintainers:\n    - seowalex\n",
+ "raw_meta_yaml": "{% set goname = 'github.com/oniony/TMSU' %}\n{% set version = '0.7.5' %}\n\n{% set name = goname.split('/')[-1].lower() %}\n{% set pkg_src = ('src/' + goname).replace('/', os.sep) %}\n\npackage:\n  name: {{ name }}\n  version: {{ version }}\n\nsource:\n  url: https://{{ goname }}/archive/v{{ version }}.tar.gz\n  sha256: 0ac7f09336aaedf73623c4f486c05137c024a726c16dd32525463aee9d70b46a\n\nbuild:\n  script:\n    - pushd {{ pkg_src }}\n    - cp $RECIPE_DIR/go.* .  # [unix]\n    - xcopy %RECIPE_DIR%\\go.* .  # [win]\n    - go build -trimpath -ldflags \"-s -w\" -o $PREFIX/bin/{{ name }}  # [unix]\n    - go build -trimpath -ldflags \"-s -w\" -o %LIBRARY_BIN%/{{ name }}.exe  # [win]\n    - cp $SRC_DIR/COPYING.md .  # [unix]\n    - xcopy %SRC_DIR%\\COPYING.md .  # [win]\n    - go-licenses save . --save_path=\"$SRC_DIR/license-files/\"  # [unix]\n    - go-licenses save . --save_path=\"%SRC_DIR%/license-files/\"  # [win]\n    - popd\n    - cp -r ./misc/bin/. $PREFIX/bin/  # [unix]\n    - chmod -R u+w $(go env GOPATH) && rm -r $(go env GOPATH)  # [unix]\n  number: 1\n\nrequirements:\n  build:\n    - {{ stdlib('c') }}  # [unix]\n    - {{ compiler('c') }}  # [unix]\n    - {{ stdlib('m2w64_c') }}  # [win]\n    - {{ compiler('m2w64_c') }}  # [win]\n    - {{ compiler('go-cgo') }}\n    - go-licenses\n\ntest:\n  commands:\n    - {{ name }} -V\n    - {{ name }} init\n    - which mount.{{ name }}  # [unix]\n    - which {{ name }}-fs-merge  # [unix]\n    - which {{ name }}-fs-mv  # [unix]\n    - which {{ name }}-fs-rm  # [unix]\n\nabout:\n  home: https://tmsu.org/\n  summary: TMSU lets you tags your files and then access them through a nifty virtual filesystem from any other application.\n  description: |\n    TMSU is a tool for tagging your files. It provides a simple command-line utility for applying\n    tags and a virtual filesystem to give you a tag-based view of your files from any other program.\n  license: GPL-3.0-only\n  license_family: GPL\n  license_file:\n    - COPYING.md\n    - license-files/\n  dev_url: https://{{ goname }}\n\nextra:\n  recipe-maintainers:\n    - seowalex\n",
  "req": {
   "__set__": true,
   "elements": [
+   "c_compiler_stub",
+   "c_stdlib_stub",
+   "go-cgo_compiler_stub",
    "go-licenses",
-   "go_compiler_stub"
+   "m2w64_c_compiler_stub",
+   "m2w64_c_stdlib_stub"
   ]
  },
  "requirements": {
   "build": {
    "__set__": true,
    "elements": [
+    "c_compiler_stub",
+    "c_stdlib_stub",
+    "go-cgo_compiler_stub",
     "go-licenses",
-    "go_compiler_stub"
+    "m2w64_c_compiler_stub",
+    "m2w64_c_stdlib_stub"
    ]
   },
   "host": {
    "__set__": true,
-   "elements": []
+   "elements": [
+    "c_compiler_stub",
+    "c_stdlib_stub"
+   ]
   },
   "run": {
    "__set__": true,
-   "elements": []
+   "elements": [
+    "c_compiler_stub",
+    "c_stdlib_stub"
+   ]
   },
   "test": {
    "__set__": true,
@@ -277,8 +306,12 @@
   "build": {
    "__set__": true,
    "elements": [
+    "c_compiler_stub",
+    "c_stdlib_stub",
+    "go-cgo_compiler_stub",
     "go-licenses",
-    "go_compiler_stub"
+    "m2w64_c_compiler_stub",
+    "m2w64_c_stdlib_stub"
    ]
   },
   "host": {
@@ -313,7 +346,7 @@
    "summary": "TMSU lets you tags your files and then access them through a nifty virtual filesystem from any other application."
   },
   "build": {
-   "number": "0",
+   "number": "1",
    "script": [
     "pushd src/github.com/oniony/TMSU",
     "xcopy %RECIPE_DIR%\\go.* .",
@@ -334,7 +367,9 @@
   },
   "requirements": {
    "build": [
-    "go_compiler_stub",
+    "m2w64_c_stdlib_stub",
+    "m2w64_c_compiler_stub",
+    "go-cgo_compiler_stub",
     "go-licenses"
    ]
   },
@@ -345,7 +380,8 @@
   },
   "test": {
    "commands": [
-    "tmsu -V"
+    "tmsu -V",
+    "tmsu init"
    ]
   }
  },
@@ -353,8 +389,10 @@
   "build": {
    "__set__": true,
    "elements": [
+    "go-cgo_compiler_stub",
     "go-licenses",
-    "go_compiler_stub"
+    "m2w64_c_compiler_stub",
+    "m2w64_c_stdlib_stub"
    ]
   },
   "host": {
