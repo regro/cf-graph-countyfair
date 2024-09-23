@@ -36,9 +36,9 @@
     "mkl",
     "openblas"
    ],
-   "number": "101",
+   "number": "102",
    "script": "PYTHON -m pip install . -vv --global-option=build_ext --global-option=\"--mkl=no\" --global-option=\"--conda-forge\"",
-   "string": "py39h1234567_101"
+   "string": "py39h1234567_102"
   },
   "extra": {
    "recipe-maintainers": [
@@ -150,9 +150,9 @@
     "mkl",
     "openblas"
    ],
-   "number": "101",
+   "number": "102",
    "script": "PYTHON -m pip install . -vv --global-option=build_ext --global-option=\"--mkl=no\" --global-option=\"--conda-forge\" --global-option=\"--generator=Visual Studio 17 2022\"",
-   "string": "py39h1234567_101"
+   "string": "py39h1234567_102"
   },
   "extra": {
    "recipe-maintainers": [
@@ -219,9 +219,9 @@
   },
   "build": {
    "ignore_run_exports": null,
-   "number": "101",
+   "number": "102",
    "script": "PYTHON -m pip install . -vv --global-option=build_ext --global-option=\"--mkl=no\" --global-option=\"--conda-forge\"",
-   "string": "py39h1234567_101"
+   "string": "py39h1234567_102"
   },
   "extra": {
    "recipe-maintainers": [
@@ -324,9 +324,9 @@
   },
   "build": {
    "ignore_run_exports": null,
-   "number": "101",
+   "number": "102",
    "script": "PYTHON -m pip install . -vv --global-option=build_ext --global-option=\"--mkl=no\" --global-option=\"--conda-forge\"",
-   "string": "py39h1234567_101"
+   "string": "py39h1234567_102"
   },
   "extra": {
    "recipe-maintainers": [
@@ -428,7 +428,7 @@
  "pr_info": {
   "__lazy_json__": "pr_info/pyinterp.json"
  },
- "raw_meta_yaml": "{% set name = \"pyinterp\" %}\n{% set version = \"2024.6.0\" %}\n{% set sha256 = \"95b5accbd73846a9d3e819bf1d9a9c875030fe291271279fd2068be2c2929f4d\" %}\n{% set build = 1 %}\n\n# recipe-lint fails if blas is undefined\n{% set blas = blas or \"openblas\" %}\n{% if blas == \"openblas\" %}\n# prioritize openblas via build number\n{% set build = build + 100 %}\n{% endif %}\n\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://github.com/CNES/pangeo-{{ name }}/releases/download/{{ version }}/{{ name }}-{{ version }}.tar.gz\n  sha256: {{ sha256 }}\n\nbuild:\n  {% if blas == \"openblas\" %}\n  {% set mkl_option = \"no\" %}\n  {% else %}\n  {% set mkl_option = \"yes\" %}\n  {% endif %}\n  number: {{ build }}\n  {% if target_platform == \"win-64\" %}\n  script: {{ PYTHON }} -m pip install . -vv --global-option=build_ext --global-option=\"--mkl={{ mkl_option }}\" --global-option=\"--conda-forge\" --global-option=\"--generator=Visual Studio 17 2022\"\n  {% else %}\n  script: {{ PYTHON }} -m pip install . -vv --global-option=build_ext --global-option=\"--mkl={{ mkl_option }}\" --global-option=\"--conda-forge\"\n  {% endif %}\n  skip: true  # [linux32 or win32 or py<36 or (arm64 and blas != \"openblas\")]\n\n  {% if blas == \"openblas\" %}\n  {% if win or linux %}\n  {% set blas_prefix = \"openblas_\" %}\n  {% else %}\n  {% set blas_prefix = \"\" %}  # For osx, dot not use a prefix, because we use the system blas (accelerate)\n  {% endif %}\n  {% else %}\n  {% set blas_prefix = \"mkl_\" %}\n  {% endif %}\n  string: {{ blas_prefix }}py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ build }}\n\n  ignore_run_exports:\n    - mkl                                 # [blas == \"mkl\"]\n    - openblas                            # [(blas == \"openblas\") and (win or linux)]\n\nrequirements:\n  build:\n    - python                              # [build_platform != target_platform]\n    - cross-python_{{ target_platform }}  # [build_platform != target_platform]\n    - setuptools                          # [build_platform != target_platform]\n    - {{ compiler('cxx') }}\n    - {{ stdlib(\"c\") }}\n    - cmake\n    - make                                # [linux]\n  host:\n    - dask\n    - eigen\n    - libboost-devel >=1.79.0\n    - mkl-devel                           # [blas == \"mkl\"]\n    - openblas                            # [(blas == \"openblas\") and (win or linux)]\n    - numpy\n    - pip\n    - pytest\n    - python\n    - setuptools\n    - xarray\n  run:\n    - dask *\n    - mkl *                               # [blas == \"mkl\"]\n    - openblas *                          # [(blas == \"openblas\") and (win or linux)]\n    - python\n    - xarray >=0.13\n\ntest:\n  requires:\n    - pytest\n  commands:\n    - pytest --pyargs pyinterp\n\nabout:\n  home: https://github.com/CNES/pangeo-pyinterp\n  license: BSD-3-Clause\n  license_family: BSD\n  license_file: LICENSE\n  summary: Python library for optimized geo-referenced interpolation\n\n  description: |\n    Tools for interpolating geo-referenced data used in the field of\n    geosciences. There are other libraries that cover this problem, but written\n    entirely in Python, the performance of these projects was not quite\n    sufficient for our needs. That is why this project was created.\n  doc_url: https://pangeo-pyinterp.readthedocs.io/\n  dev_url: https://github.com/CNES/pangeo-pyinterp\n\nextra:\n  recipe-maintainers:\n    - fbriol\n",
+ "raw_meta_yaml": "{% set name = \"pyinterp\" %}\n{% set version = \"2024.6.0\" %}\n{% set sha256 = \"95b5accbd73846a9d3e819bf1d9a9c875030fe291271279fd2068be2c2929f4d\" %}\n{% set build = 2 %}\n\n# recipe-lint fails if blas is undefined\n{% set blas = blas or \"openblas\" %}\n{% if blas == \"openblas\" %}\n# prioritize openblas via build number\n{% set build = build + 100 %}\n{% endif %}\n\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://github.com/CNES/pangeo-{{ name }}/releases/download/{{ version }}/{{ name }}-{{ version }}.tar.gz\n  sha256: {{ sha256 }}\n\nbuild:\n  {% if blas == \"openblas\" %}\n  {% set mkl_option = \"no\" %}\n  {% else %}\n  {% set mkl_option = \"yes\" %}\n  {% endif %}\n  number: {{ build }}\n  {% if target_platform == \"win-64\" %}\n  script: {{ PYTHON }} -m pip install . -vv --global-option=build_ext --global-option=\"--mkl={{ mkl_option }}\" --global-option=\"--conda-forge\" --global-option=\"--generator=Visual Studio 17 2022\"\n  {% else %}\n  script: {{ PYTHON }} -m pip install . -vv --global-option=build_ext --global-option=\"--mkl={{ mkl_option }}\" --global-option=\"--conda-forge\"\n  {% endif %}\n  skip: true  # [linux32 or win32 or py<36 or (arm64 and blas != \"openblas\")]\n\n  {% if blas == \"openblas\" %}\n  {% if win or linux %}\n  {% set blas_prefix = \"openblas_\" %}\n  {% else %}\n  {% set blas_prefix = \"\" %}  # For osx, dot not use a prefix, because we use the system blas (accelerate)\n  {% endif %}\n  {% else %}\n  {% set blas_prefix = \"mkl_\" %}\n  {% endif %}\n  string: {{ blas_prefix }}py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ build }}\n\n  ignore_run_exports:\n    - mkl                                 # [blas == \"mkl\"]\n    - openblas                            # [(blas == \"openblas\") and (win or linux)]\n\nrequirements:\n  build:\n    - python                              # [build_platform != target_platform]\n    - cross-python_{{ target_platform }}  # [build_platform != target_platform]\n    - setuptools                          # [build_platform != target_platform]\n    - {{ compiler('cxx') }}\n    - {{ stdlib(\"c\") }}\n    - cmake\n    - make                                # [linux]\n  host:\n    - dask\n    - eigen\n    - libboost-devel >=1.79.0\n    - mkl-devel                           # [blas == \"mkl\"]\n    - openblas                            # [(blas == \"openblas\") and (win or linux)]\n    - numpy\n    - pip\n    - pytest\n    - python\n    - setuptools\n    - xarray\n  run:\n    - dask *\n    - mkl *                               # [blas == \"mkl\"]\n    - openblas *                          # [(blas == \"openblas\") and (win or linux)]\n    - python\n    - xarray >=0.13\n\ntest:\n  requires:\n    - pytest\n  commands:\n    - pytest --pyargs pyinterp\n\nabout:\n  home: https://github.com/CNES/pangeo-pyinterp\n  license: BSD-3-Clause\n  license_family: BSD\n  license_file: LICENSE\n  summary: Python library for optimized geo-referenced interpolation\n\n  description: |\n    Tools for interpolating geo-referenced data used in the field of\n    geosciences. There are other libraries that cover this problem, but written\n    entirely in Python, the performance of these projects was not quite\n    sufficient for our needs. That is why this project was created.\n  doc_url: https://pangeo-pyinterp.readthedocs.io/\n  dev_url: https://github.com/CNES/pangeo-pyinterp\n\nextra:\n  recipe-maintainers:\n    - fbriol\n",
  "req": {
   "__set__": true,
   "elements": [
@@ -562,9 +562,9 @@
     "mkl",
     "openblas"
    ],
-   "number": "101",
+   "number": "102",
    "script": "PYTHON -m pip install . -vv --global-option=build_ext --global-option=\"--mkl=no\" --global-option=\"--conda-forge\" --global-option=\"--generator=Visual Studio 17 2022\"",
-   "string": "py39h1234567_101"
+   "string": "py39h1234567_102"
   },
   "extra": {
    "recipe-maintainers": [
