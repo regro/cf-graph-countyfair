@@ -28,7 +28,7 @@
    "summary": "Implementation of the Spline-Based Convolution Operator of SplineCNN in PyTorch"
   },
   "build": {
-   "number": "4",
+   "number": "5",
    "script": [
     "export FORCE_CUDA=\"1\"",
     "export CC=\"$GCC -I$PREFIX/include\"",
@@ -37,7 +37,7 @@
     "PYTHON -m pip install . -vv",
     "export TORCH_CUDA_ARCH_LIST=\"5.0;6.0;6.1;7.0;7.5;8.0;8.6;8.9;9.0+PTX\""
    ],
-   "string": "cuda120py39h1234567_4"
+   "string": "cpu_py39h1234567_5"
   },
   "extra": {
    "recipe-maintainers": [
@@ -65,10 +65,10 @@
     "setuptools",
     "pytest-runner",
     "pip",
-    "pytorch =*=cpu*",
     "libcublas-dev",
     "libcusolver-dev",
-    "libcusparse-dev"
+    "libcusparse-dev",
+    "pytorch =*=cpu*"
    ],
    "run": [
     "python"
@@ -131,7 +131,7 @@
    "summary": "Implementation of the Spline-Based Convolution Operator of SplineCNN in PyTorch"
   },
   "build": {
-   "number": "4",
+   "number": "5",
    "script": [
     "export FORCE_CUDA=\"1\"",
     "export CC=\"$GCC -I$PREFIX/include\"",
@@ -140,7 +140,7 @@
     "PYTHON -m pip install . -vv",
     "export TORCH_CUDA_ARCH_LIST=\"5.0;6.0;6.1;7.0;7.5;8.0;8.6;8.9;9.0+PTX\""
    ],
-   "string": "cpu_py39h1234567_4"
+   "string": "cpu_py39h1234567_5"
   },
   "extra": {
    "recipe-maintainers": [
@@ -168,10 +168,10 @@
     "setuptools",
     "pytest-runner",
     "pip",
-    "pytorch =*=cpu*",
     "libcublas-dev",
     "libcusolver-dev",
-    "libcusparse-dev"
+    "libcusparse-dev",
+    "pytorch =*=cpu*"
    ],
    "run": [
     "python"
@@ -201,11 +201,11 @@
    "summary": "Implementation of the Spline-Based Convolution Operator of SplineCNN in PyTorch"
   },
   "build": {
-   "number": "4",
+   "number": "5",
    "script": [
     "PYTHON -m pip install . -vv"
    ],
-   "string": "cpu_py39h1234567_4"
+   "string": "cpu_py39h1234567_5"
   },
   "extra": {
    "recipe-maintainers": [
@@ -289,11 +289,11 @@
    "summary": "Implementation of the Spline-Based Convolution Operator of SplineCNN in PyTorch"
   },
   "build": {
-   "number": "4",
+   "number": "5",
    "script": [
     "PYTHON -m pip install . -vv"
    ],
-   "string": "cpu_py39h1234567_4"
+   "string": "cpu_py39h1234567_5"
   },
   "extra": {
    "recipe-maintainers": [
@@ -384,7 +384,7 @@
  "pr_info": {
   "__lazy_json__": "pr_info/pytorch_spline_conv.json"
  },
- "raw_meta_yaml": "{% set version = \"1.2.2\" %}\n# see github.com/conda-forge/conda-forge.github.io/issues/1059 for naming discussion\n{% set torch_proc_type = \"cuda\" if cuda_compiler_version != \"None\" else \"cpu\" %}\n\npackage:\n  name: pytorch_spline_conv\n  version: {{ version }}\n\nsource:\n  url: https://pypi.io/packages/source/t/torch_spline_conv/torch_spline_conv-{{ version }}.tar.gz\n  sha256: ed45a81da29f774665dbdd4709d7e534cdf16d2e7006dbd06957f35bd09661b2\n\nbuild:\n  number: 4\n  skip: true  # [win]\n  string: cpu_py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version == \"None\"]\n  string: cuda{{ cuda_compiler_version | replace('.', '') }}py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version != \"None\"]\n  script:\n    - export FORCE_CUDA=\"1\"                         # [linux64 and cuda_compiler_version != 'None']\n    - export CC=\"$GCC -I$PREFIX/include\"            # [linux64 and cuda_compiler_version != 'None']\n    - export NVCC_FLAGS=\"--compiler-bindir=${CC}\"   # [linux64 and cuda_compiler_version != 'None']\n    # needs to be set or builds fails because _get_cuda_arch_flags from\n    # https://github.com/pytorch/pytorch/blob/v2.0.0/torch/utils/cpp_extension.py#L1710\n    # will try to determine the arches based on the non-existent-in-CI CUDA drivers\n    - export TORCH_CUDA_ARCH_LIST=\"3.5;5.0;6.0;6.1;7.0;7.5;8.0;8.6;8.9+PTX\"  # [linux and cuda_compiler_version == \"11.8\"]\n    - export TORCH_CUDA_ARCH_LIST=\"5.0;6.0;6.1;7.0;7.5;8.0;8.6;8.9;9.0+PTX\"  # [linux and (cuda_compiler_version or \"\").startswith(\"12\")]\n    - {{ PYTHON }} -m pip install . -vv\n\nrequirements:\n  build:\n    - python                                 # [build_platform != target_platform]\n    - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n    - pytorch                                # [build_platform != target_platform]\n    - {{ compiler('c') }}\n    - {{ stdlib(\"c\") }}\n    - {{ compiler('cxx') }}\n    - {{ compiler('cuda') }}  # [cuda_compiler_version != \"None\"]\n  host:\n    - python\n    - pytorch\n    - pytorch =*={{ torch_proc_type }}*\n    - setuptools\n    - pytest-runner\n    - pip\n    - libcublas-dev           # [(cuda_compiler_version or \"\").startswith(\"12\")]\n    - libcusolver-dev         # [(cuda_compiler_version or \"\").startswith(\"12\")]\n    - libcusparse-dev         # [(cuda_compiler_version or \"\").startswith(\"12\")]\n    - libxcrypt               # [linux and py<39]\n  run:\n    - python\n  run_constrained:\n    # additional run constraint to the one from the (version-only) run_export;\n    # constraining the CPU builds to CPU pytorch isn't 100% necessary, but cleaner\n    - pytorch =*={{ torch_proc_type }}*\n\ntest:\n  imports:\n    - torch_spline_conv\n\nabout:\n  home: https://github.com/rusty1s/pytorch_spline_conv\n  summary: Implementation of the Spline-Based Convolution Operator of SplineCNN in PyTorch\n  license: MIT\n  license_file: LICENSE\n\nextra:\n  recipe-maintainers:\n    - h-vetinari\n    - rluria14\n    - oblute\n    - ndmaxar\n",
+ "raw_meta_yaml": "{% set version = \"1.2.2\" %}\n# see github.com/conda-forge/conda-forge.github.io/issues/1059 for naming discussion\n{% set torch_proc_type = \"cuda\" if cuda_compiler_version != \"None\" else \"cpu\" %}\n\npackage:\n  name: pytorch_spline_conv\n  version: {{ version }}\n\nsource:\n  url: https://pypi.io/packages/source/t/torch_spline_conv/torch_spline_conv-{{ version }}.tar.gz\n  sha256: ed45a81da29f774665dbdd4709d7e534cdf16d2e7006dbd06957f35bd09661b2\n\nbuild:\n  number: 5\n  skip: true  # [win]\n  string: cpu_py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version == \"None\"]\n  string: cuda{{ cuda_compiler_version | replace('.', '') }}py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version != \"None\"]\n  script:\n    - export FORCE_CUDA=\"1\"                         # [linux64 and cuda_compiler_version != 'None']\n    - export CC=\"$GCC -I$PREFIX/include\"            # [linux64 and cuda_compiler_version != 'None']\n    - export NVCC_FLAGS=\"--compiler-bindir=${CC}\"   # [linux64 and cuda_compiler_version != 'None']\n    # needs to be set or builds fails because _get_cuda_arch_flags from\n    # https://github.com/pytorch/pytorch/blob/v2.0.0/torch/utils/cpp_extension.py#L1710\n    # will try to determine the arches based on the non-existent-in-CI CUDA drivers\n    - export TORCH_CUDA_ARCH_LIST=\"3.5;5.0;6.0;6.1;7.0;7.5;8.0;8.6;8.9+PTX\"  # [linux and cuda_compiler_version == \"11.8\"]\n    - export TORCH_CUDA_ARCH_LIST=\"5.0;6.0;6.1;7.0;7.5;8.0;8.6;8.9;9.0+PTX\"  # [linux and (cuda_compiler_version or \"\").startswith(\"12\")]\n    - {{ PYTHON }} -m pip install . -vv\n\nrequirements:\n  build:\n    - python                                 # [build_platform != target_platform]\n    - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n    - pytorch                                # [build_platform != target_platform]\n    - {{ compiler('c') }}\n    - {{ stdlib(\"c\") }}\n    - {{ compiler('cxx') }}\n    - {{ compiler('cuda') }}  # [cuda_compiler_version != \"None\"]\n  host:\n    - python\n    - pytorch\n    - pytorch =*={{ torch_proc_type }}*\n    - setuptools\n    - pytest-runner\n    - pip\n    - libcublas-dev           # [(cuda_compiler_version or \"\").startswith(\"12\")]\n    - libcusolver-dev         # [(cuda_compiler_version or \"\").startswith(\"12\")]\n    - libcusparse-dev         # [(cuda_compiler_version or \"\").startswith(\"12\")]\n    - libxcrypt               # [linux and py<39]\n  run:\n    - python\n  run_constrained:\n    # additional run constraint to the one from the (version-only) run_export;\n    # constraining the CPU builds to CPU pytorch isn't 100% necessary, but cleaner\n    - pytorch =*={{ torch_proc_type }}*\n\ntest:\n  imports:\n    - torch_spline_conv\n\nabout:\n  home: https://github.com/rusty1s/pytorch_spline_conv\n  summary: Implementation of the Spline-Based Convolution Operator of SplineCNN in PyTorch\n  license: MIT\n  license_file: LICENSE\n\nextra:\n  recipe-maintainers:\n    - h-vetinari\n    - rluria14\n    - oblute\n    - ndmaxar\n",
  "req": {
   "__set__": true,
   "elements": [
