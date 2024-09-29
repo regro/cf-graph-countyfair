@@ -47,7 +47,7 @@
    "summary": "An open source Message Passing Interface implementation."
   },
   "build": {
-   "number": "1"
+   "number": "2"
   },
   "extra": {
    "recipe-maintainers": [
@@ -193,7 +193,7 @@
      "ignore_run_exports_from": [
       "cuda_compiler_stub"
      ],
-     "string": "external_h1234567_1",
+     "string": "external_h1234567_2",
      "track_features": [
       "openmpi_external"
      ]
@@ -299,7 +299,7 @@
    "summary": "An open source Message Passing Interface implementation."
   },
   "build": {
-   "number": "1"
+   "number": "2"
   },
   "extra": {
    "recipe-maintainers": [
@@ -445,7 +445,7 @@
      "ignore_run_exports_from": [
       "cuda_compiler_stub"
      ],
-     "string": "external_h1234567_1",
+     "string": "external_h1234567_2",
      "track_features": [
       "openmpi_external"
      ]
@@ -551,7 +551,7 @@
    "summary": "An open source Message Passing Interface implementation."
   },
   "build": {
-   "number": "1"
+   "number": "2"
   },
   "extra": {
    "recipe-maintainers": [
@@ -693,7 +693,7 @@
      "ignore_run_exports_from": [
       "cuda_compiler_stub"
      ],
-     "string": "external_h1234567_1",
+     "string": "external_h1234567_2",
      "track_features": [
       "openmpi_external"
      ]
@@ -793,7 +793,7 @@
    "summary": "An open source Message Passing Interface implementation."
   },
   "build": {
-   "number": "101"
+   "number": "102"
   },
   "extra": {
    "recipe-maintainers": [
@@ -939,7 +939,7 @@
      "ignore_run_exports_from": [
       "cuda_compiler_stub"
      ],
-     "string": "external_h1234567_1",
+     "string": "external_h1234567_2",
      "track_features": [
       "openmpi_external"
      ]
@@ -1110,7 +1110,7 @@
      "ignore_run_exports_from": [
       "cuda_compiler_stub"
      ],
-     "string": "external_h1234567_1",
+     "string": "external_h1234567_2",
      "track_features": [
       "openmpi_external"
      ]
@@ -1277,7 +1277,7 @@
      "ignore_run_exports_from": [
       "cuda_compiler_stub"
      ],
-     "string": "external_h1234567_1",
+     "string": "external_h1234567_2",
      "track_features": [
       "openmpi_external"
      ]
@@ -1560,7 +1560,7 @@
    "summary": "An open source Message Passing Interface implementation."
   },
   "build": {
-   "number": "101"
+   "number": "102"
   },
   "extra": {
    "recipe-maintainers": [
@@ -1750,7 +1750,7 @@
    "summary": "An open source Message Passing Interface implementation."
   },
   "build": {
-   "number": "101"
+   "number": "102"
   },
   "extra": {
    "recipe-maintainers": [
@@ -1948,7 +1948,7 @@
  "pr_info": {
   "__lazy_json__": "pr_info/openmpi.json"
  },
- "raw_meta_yaml": "{% set version = \"5.0.5\" %}\n{% set major = version.rpartition('.')[0] %}\n{% set cuda_major = (cuda_compiler_version|default(\"11.8\")).rpartition('.')[0] %}\n{% set build = 1 %}\n\n# give conda package a higher build number\n{% if mpi_type == 'conda' %}\n{% set build = build + 100 %}\n{% endif %}\n\npackage:\n  # must not match any outputs for requirements to be handled correctly\n  name: openmpi-mpi\n  version: {{ version }}\n\nsource:\n  fn: openmpi-{{ version }}.tar.bz2\n  url: https://www.open-mpi.org/software/ompi/v{{ major }}/downloads/openmpi-{{ version }}.tar.bz2\n  sha256: 6588d57c0a4bd299a24103f4e196051b29e8b55fbda49e11d5b3d32030a32776\n  patches:\n    - ldflags-mac.patch  # [osx]\n\nbuild:\n  number: {{ build }}\n  skip: true  # [win]\n  skip: true  # [linux and cuda_compiler_version != \"11.8\"]\n\noutputs:\n  - name: openmpi\n    {% if mpi_type == 'conda' %}\n    script: build-mpi.sh\n    {% endif %}\n    build:\n      {% if mpi_type == 'conda' %}\n      run_exports:\n        - {{ pin_subpackage('openmpi', min_pin='x.x.x', max_pin='x') }}\n      {% else %}\n      string: {{ mpi_type }}_h{{ PKG_HASH }}_{{ build }}\n      track_features:\n        - openmpi_{{ mpi_type }}\n      {% endif %}\n      ignore_run_exports:\n        - ucx  # [linux]\n        - ucc  # [linux]\n      ignore_run_exports_from:\n        - {{ compiler('cuda') }}   # [cuda_compiler != \"None\"]\n    requirements:\n      build:\n        - {{ compiler('c') }}\n        - {{ compiler('cxx') }}\n        - {{ compiler('cuda') }}     # [cuda_compiler != \"None\"]\n        - {{ compiler('fortran') }}\n        - {{ stdlib('c') }}\n        # FIXME: autotools, perl required for ldflags-mac.patch\n        - perl  # [osx]\n        - autoconf  # [osx]\n        - automake  # [osx]\n        - libtool  # [unix]\n        - make  # [unix]\n      host:\n        #- openpmix\n        #- prrte\n        - libevent\n        - libhwloc\n        - libnl  # [linux]\n        - zlib\n        - ucc  # [linux and not ppc64le]\n        - ucx  # [linux and not ppc64le]\n        - cuda-version {{ cuda_compiler_version }}  # [cuda_compiler != \"None\"]\n      run:\n        - mpi 1.0 openmpi\n        #- openpmix\n        #- prrte\n      run_constrained:\n        - {{ pin_compatible(\"ucx\", max_pin=\"x.x\") }}  # [linux and not ppc64le]\n        - {{ pin_compatible(\"ucc\", max_pin=\"x.x\") }}  # [linux and not ppc64le]\n        # Open MPI only uses CUDA Driver APIs, set the minimal driver version\n        - __cuda  >= {{ cuda_major ~ \".0\" }}  # [cuda_compiler != \"None\"]\n        # Ensure a consistent CUDA environment\n        - cuda-version  >= {{ cuda_major ~ \".0\" }}  # [cuda_compiler != \"None\"]\n    test:\n      {% if mpi_type == 'conda' %}\n      script: run_test.sh\n      files:\n        - tests/helloworld.sh\n      {% else %}\n      commands:\n        - echo \"It works!\"\n      {% endif %}\n\n  {% if mpi_type == 'conda' %}\n  - name: openmpi-mpicc\n    build:\n      script:\n        - echo 'ok'\n    requirements:\n      build:\n        - {{ stdlib('c') }}\n      run:\n        - {{ pin_subpackage('openmpi', exact=True) }}\n        # host C compilers work fine (better) on mac\n        - {{ compiler('c') }}\n    test:\n      script: run_test.sh\n      files:\n        - tests/helloworld.c\n\n  - name: openmpi-mpicxx\n    build:\n      script:\n        - echo 'ok'\n    requirements:\n      build:\n        - {{ stdlib('c') }}\n      run:\n        - {{ pin_subpackage('openmpi', exact=True) }}\n        # host C compilers work fine (better) on mac\n        - {{ compiler('cxx') }}\n    test:\n      script: run_test.sh\n      files:\n        - tests/helloworld.cxx\n\n  - name: openmpi-mpifort\n    build:\n      script:\n        - echo 'ok'\n    requirements:\n      build:\n        - {{ stdlib('c') }}\n      run:\n        - {{ pin_subpackage('openmpi', exact=True) }}\n        - {{ compiler('fortran') }}\n    test:\n      script: run_test.sh\n      files:\n        - tests/helloworld.f\n        - tests/helloworld.f90\n  {% endif %}\n\nabout:\n  home: https://www.open-mpi.org/\n  license: BSD-3-Clause\n  license_family: BSD\n  license_file: LICENSE\n  summary: An open source Message Passing Interface implementation.\n  description: |\n    The Open MPI Project is an open source Message Passing Interface\n    implementation that is developed and maintained by a consortium of academic,\n    research, and industry partners.\n  doc_url: https://www.open-mpi.org/doc/\n  dev_url: https://github.com/open-mpi/ompi\n\nextra:\n  recipe-maintainers:\n    - astrofrog\n    - bekozi\n    - dalcinl\n    - leofang\n    - minrk\n    - msarahan\n    - ocefpaf\n    - beckermr\n    - j34ni\n",
+ "raw_meta_yaml": "{% set version = \"5.0.5\" %}\n{% set major = version.rpartition('.')[0] %}\n{% set cuda_major = (cuda_compiler_version|default(\"11.8\")).rpartition('.')[0] %}\n{% set build = 2 %}\n\n# give conda package a higher build number\n{% if mpi_type == 'conda' %}\n{% set build = build + 100 %}\n{% endif %}\n\npackage:\n  # must not match any outputs for requirements to be handled correctly\n  name: openmpi-mpi\n  version: {{ version }}\n\nsource:\n  fn: openmpi-{{ version }}.tar.bz2\n  url: https://www.open-mpi.org/software/ompi/v{{ major }}/downloads/openmpi-{{ version }}.tar.bz2\n  sha256: 6588d57c0a4bd299a24103f4e196051b29e8b55fbda49e11d5b3d32030a32776\n  patches:\n    - ldflags-mac.patch  # [osx]\n\nbuild:\n  number: {{ build }}\n  skip: true  # [win]\n  skip: true  # [linux and cuda_compiler_version != \"11.8\"]\n\noutputs:\n  - name: openmpi\n    {% if mpi_type == 'conda' %}\n    script: build-mpi.sh\n    {% endif %}\n    build:\n      {% if mpi_type == 'conda' %}\n      run_exports:\n        - {{ pin_subpackage('openmpi', min_pin='x.x.x', max_pin='x') }}\n      {% else %}\n      string: {{ mpi_type }}_h{{ PKG_HASH }}_{{ build }}\n      track_features:\n        - openmpi_{{ mpi_type }}\n      {% endif %}\n      ignore_run_exports:\n        - ucx  # [linux]\n        - ucc  # [linux]\n      ignore_run_exports_from:\n        - {{ compiler('cuda') }}   # [cuda_compiler != \"None\"]\n    requirements:\n      build:\n        - {{ compiler('c') }}\n        - {{ compiler('cxx') }}\n        - {{ compiler('cuda') }}     # [cuda_compiler != \"None\"]\n        - {{ compiler('fortran') }}\n        - {{ stdlib('c') }}\n        # FIXME: autotools, perl required for ldflags-mac.patch\n        - perl  # [osx]\n        - autoconf  # [osx]\n        - automake  # [osx]\n        - libtool  # [unix]\n        - make  # [unix]\n      host:\n        #- openpmix\n        #- prrte\n        - libevent\n        - libhwloc\n        - libnl  # [linux]\n        - zlib\n        - ucc  # [linux and not ppc64le]\n        - ucx  # [linux and not ppc64le]\n        - cuda-version {{ cuda_compiler_version }}  # [cuda_compiler != \"None\"]\n      run:\n        - mpi 1.0 openmpi\n        #- openpmix\n        #- prrte\n      run_constrained:\n        - {{ pin_compatible(\"ucx\", max_pin=\"x.x\") }}  # [linux and not ppc64le]\n        - {{ pin_compatible(\"ucc\", max_pin=\"x.x\") }}  # [linux and not ppc64le]\n        # Open MPI only uses CUDA Driver APIs, set the minimal driver version\n        - __cuda  >= {{ cuda_major ~ \".0\" }}  # [cuda_compiler != \"None\"]\n        # Ensure a consistent CUDA environment\n        - cuda-version  >= {{ cuda_major ~ \".0\" }}  # [cuda_compiler != \"None\"]\n    test:\n      {% if mpi_type == 'conda' %}\n      script: run_test.sh\n      files:\n        - tests/helloworld.sh\n      {% else %}\n      commands:\n        - echo \"It works!\"\n      {% endif %}\n\n  {% if mpi_type == 'conda' %}\n  - name: openmpi-mpicc\n    build:\n      script:\n        - echo 'ok'\n    requirements:\n      build:\n        - {{ stdlib('c') }}\n      run:\n        - {{ pin_subpackage('openmpi', exact=True) }}\n        # host C compilers work fine (better) on mac\n        - {{ compiler('c') }}\n    test:\n      script: run_test.sh\n      files:\n        - tests/helloworld.c\n\n  - name: openmpi-mpicxx\n    build:\n      script:\n        - echo 'ok'\n    requirements:\n      build:\n        - {{ stdlib('c') }}\n      run:\n        - {{ pin_subpackage('openmpi', exact=True) }}\n        # host C compilers work fine (better) on mac\n        - {{ compiler('cxx') }}\n    test:\n      script: run_test.sh\n      files:\n        - tests/helloworld.cxx\n\n  - name: openmpi-mpifort\n    build:\n      script:\n        - echo 'ok'\n    requirements:\n      build:\n        - {{ stdlib('c') }}\n      run:\n        - {{ pin_subpackage('openmpi', exact=True) }}\n        - {{ compiler('fortran') }}\n    test:\n      script: run_test.sh\n      files:\n        - tests/helloworld.f\n        - tests/helloworld.f90\n  {% endif %}\n\nabout:\n  home: https://www.open-mpi.org/\n  license: BSD-3-Clause\n  license_family: BSD\n  license_file: LICENSE\n  summary: An open source Message Passing Interface implementation.\n  description: |\n    The Open MPI Project is an open source Message Passing Interface\n    implementation that is developed and maintained by a consortium of academic,\n    research, and industry partners.\n  doc_url: https://www.open-mpi.org/doc/\n  dev_url: https://github.com/open-mpi/ompi\n\nextra:\n  recipe-maintainers:\n    - astrofrog\n    - bekozi\n    - dalcinl\n    - leofang\n    - minrk\n    - msarahan\n    - ocefpaf\n    - beckermr\n    - j34ni\n",
  "req": {
   "__set__": true,
   "elements": [
