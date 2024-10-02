@@ -3,6 +3,8 @@
  "branch": "main",
  "conda-forge.yml": {
   "build_platform": {
+   "linux_aarch64": "linux_64",
+   "linux_ppc64le": "linux_64",
    "osx_arm64": "osx_64"
   },
   "conda_build": {
@@ -14,8 +16,8 @@
    "tooling_branch_name": "main"
   },
   "provider": {
-   "linux_aarch64": "default",
-   "linux_ppc64le": "default"
+   "linux_aarch64": "azure",
+   "linux_ppc64le": "azure"
   },
   "test": "native_and_emulated"
  },
@@ -32,21 +34,112 @@
    "summary": "NeXus is a common data format for neutron, x-ray, and muon science"
   },
   "build": {
-   "number": "13"
+   "number": "14"
   },
   "extra": {
+   "feedstock-name": "nexus",
    "recipe-maintainers": [
     "beenje"
    ]
   },
+  "outputs": [
+   {
+    "build": {
+     "run_exports": [
+      "libnexus"
+     ]
+    },
+    "name": "libnexus",
+    "requirements": {
+     "build": [
+      "c_compiler_stub",
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "ninja"
+     ],
+     "host": [
+      "hdf5",
+      "hdf4",
+      "libjpeg-turbo",
+      "zlib",
+      "libxml2",
+      "ncurses",
+      "readline"
+     ]
+    },
+    "script": "install.sh",
+    "test": {
+     "commands": [
+      "test -f $PREFIX/lib/libNeXus${SHLIB_EXT}",
+      "test -f $PREFIX/lib/libNeXusCPP${SHLIB_EXT}",
+      "test -f $PREFIX/include/nexus/NeXusFile.hpp",
+      "test ! -f $PREFIX/bin/nxdir"
+     ]
+    }
+   },
+   {
+    "name": "nexus-apps",
+    "requirements": {
+     "build": [
+      "c_compiler_stub",
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "ninja"
+     ],
+     "host": [
+      "hdf5",
+      "hdf4",
+      "libjpeg-turbo",
+      "zlib",
+      "libxml2",
+      "ncurses",
+      "readline",
+      "libnexus"
+     ],
+     "run": [
+      "libnexus"
+     ],
+     "run_constrained": [
+      "nexusformat ==9999999999"
+     ]
+    },
+    "script": "install.sh",
+    "test": {
+     "commands": [
+      "nxtraverse -h",
+      "nxsummary --help",
+      "nxtranslate --help",
+      "nxdir --help"
+     ]
+    }
+   },
+   {
+    "name": "nexus",
+    "requirements": {
+     "run": [
+      "libnexus",
+      "nexus-apps"
+     ]
+    },
+    "test": {
+     "commands": [
+      "nxsummary --help",
+      "nxdir --help"
+     ]
+    }
+   }
+  ],
   "package": {
-   "name": "nexus",
+   "name": "nexus-split",
    "version": "4.4.3"
   },
   "requirements": {
    "build": [
     "c_compiler_stub",
     "cxx_compiler_stub",
+    "c_stdlib_stub",
     "cmake >=2.8.8",
     "ninja"
    ],
@@ -58,11 +151,6 @@
     "libxml2",
     "ncurses",
     "readline"
-   ],
-   "run": [
-    "hdf5",
-    "hdf4",
-    "ncurses"
    ]
   },
   "schema_version": 0,
@@ -72,14 +160,6 @@
    ],
    "sha256": "e78a116feb2ebd04de31a8d8707c65e8e15a64aa8999a40fea305e3909bd6533",
    "url": "https://github.com/nexusformat/code/archive/v4.4.3.tar.gz"
-  },
-  "test": {
-   "commands": [
-    "nxdir --help",
-    "nxtraverse -h",
-    "nxsummary --help",
-    "nxtranslate --help"
-   ]
   }
  },
  "linux_64_requirements": {
@@ -87,6 +167,7 @@
    "__set__": true,
    "elements": [
     "c_compiler_stub",
+    "c_stdlib_stub",
     "cmake",
     "cxx_compiler_stub",
     "ninja"
@@ -98,6 +179,7 @@
     "hdf4",
     "hdf5",
     "libjpeg-turbo",
+    "libnexus",
     "libxml2",
     "ncurses",
     "readline",
@@ -107,9 +189,8 @@
   "run": {
    "__set__": true,
    "elements": [
-    "hdf4",
-    "hdf5",
-    "ncurses"
+    "libnexus",
+    "nexus-apps"
    ]
   },
   "test": {
@@ -128,21 +209,112 @@
    "summary": "NeXus is a common data format for neutron, x-ray, and muon science"
   },
   "build": {
-   "number": "13"
+   "number": "14"
   },
   "extra": {
+   "feedstock-name": "nexus",
    "recipe-maintainers": [
     "beenje"
    ]
   },
+  "outputs": [
+   {
+    "build": {
+     "run_exports": [
+      "libnexus"
+     ]
+    },
+    "name": "libnexus",
+    "requirements": {
+     "build": [
+      "c_compiler_stub",
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "ninja"
+     ],
+     "host": [
+      "hdf5",
+      "hdf4",
+      "libjpeg-turbo",
+      "zlib",
+      "libxml2",
+      "ncurses",
+      "readline"
+     ]
+    },
+    "script": "install.sh",
+    "test": {
+     "commands": [
+      "test -f $PREFIX/lib/libNeXus${SHLIB_EXT}",
+      "test -f $PREFIX/lib/libNeXusCPP${SHLIB_EXT}",
+      "test -f $PREFIX/include/nexus/NeXusFile.hpp",
+      "test ! -f $PREFIX/bin/nxdir"
+     ]
+    }
+   },
+   {
+    "name": "nexus-apps",
+    "requirements": {
+     "build": [
+      "c_compiler_stub",
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "ninja"
+     ],
+     "host": [
+      "hdf5",
+      "hdf4",
+      "libjpeg-turbo",
+      "zlib",
+      "libxml2",
+      "ncurses",
+      "readline",
+      "libnexus"
+     ],
+     "run": [
+      "libnexus"
+     ],
+     "run_constrained": [
+      "nexusformat ==9999999999"
+     ]
+    },
+    "script": "install.sh",
+    "test": {
+     "commands": [
+      "nxtraverse -h",
+      "nxsummary --help",
+      "nxtranslate --help",
+      "nxdir --help"
+     ]
+    }
+   },
+   {
+    "name": "nexus",
+    "requirements": {
+     "run": [
+      "libnexus",
+      "nexus-apps"
+     ]
+    },
+    "test": {
+     "commands": [
+      "nxsummary --help",
+      "nxdir --help"
+     ]
+    }
+   }
+  ],
   "package": {
-   "name": "nexus",
+   "name": "nexus-split",
    "version": "4.4.3"
   },
   "requirements": {
    "build": [
     "c_compiler_stub",
     "cxx_compiler_stub",
+    "c_stdlib_stub",
     "cmake >=2.8.8",
     "ninja"
    ],
@@ -154,11 +326,6 @@
     "libxml2",
     "ncurses",
     "readline"
-   ],
-   "run": [
-    "hdf5",
-    "hdf4",
-    "ncurses"
    ]
   },
   "schema_version": 0,
@@ -168,14 +335,6 @@
    ],
    "sha256": "e78a116feb2ebd04de31a8d8707c65e8e15a64aa8999a40fea305e3909bd6533",
    "url": "https://github.com/nexusformat/code/archive/v4.4.3.tar.gz"
-  },
-  "test": {
-   "commands": [
-    "nxdir --help",
-    "nxtraverse -h",
-    "nxsummary --help",
-    "nxtranslate --help"
-   ]
   }
  },
  "linux_aarch64_requirements": {
@@ -183,6 +342,7 @@
    "__set__": true,
    "elements": [
     "c_compiler_stub",
+    "c_stdlib_stub",
     "cmake",
     "cxx_compiler_stub",
     "ninja"
@@ -194,6 +354,7 @@
     "hdf4",
     "hdf5",
     "libjpeg-turbo",
+    "libnexus",
     "libxml2",
     "ncurses",
     "readline",
@@ -203,9 +364,8 @@
   "run": {
    "__set__": true,
    "elements": [
-    "hdf4",
-    "hdf5",
-    "ncurses"
+    "libnexus",
+    "nexus-apps"
    ]
   },
   "test": {
@@ -224,21 +384,112 @@
    "summary": "NeXus is a common data format for neutron, x-ray, and muon science"
   },
   "build": {
-   "number": "13"
+   "number": "14"
   },
   "extra": {
+   "feedstock-name": "nexus",
    "recipe-maintainers": [
     "beenje"
    ]
   },
+  "outputs": [
+   {
+    "build": {
+     "run_exports": [
+      "libnexus"
+     ]
+    },
+    "name": "libnexus",
+    "requirements": {
+     "build": [
+      "c_compiler_stub",
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "ninja"
+     ],
+     "host": [
+      "hdf5",
+      "hdf4",
+      "libjpeg-turbo",
+      "zlib",
+      "libxml2",
+      "ncurses",
+      "readline"
+     ]
+    },
+    "script": "install.sh",
+    "test": {
+     "commands": [
+      "test -f $PREFIX/lib/libNeXus${SHLIB_EXT}",
+      "test -f $PREFIX/lib/libNeXusCPP${SHLIB_EXT}",
+      "test -f $PREFIX/include/nexus/NeXusFile.hpp",
+      "test ! -f $PREFIX/bin/nxdir"
+     ]
+    }
+   },
+   {
+    "name": "nexus-apps",
+    "requirements": {
+     "build": [
+      "c_compiler_stub",
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "ninja"
+     ],
+     "host": [
+      "hdf5",
+      "hdf4",
+      "libjpeg-turbo",
+      "zlib",
+      "libxml2",
+      "ncurses",
+      "readline",
+      "libnexus"
+     ],
+     "run": [
+      "libnexus"
+     ],
+     "run_constrained": [
+      "nexusformat ==9999999999"
+     ]
+    },
+    "script": "install.sh",
+    "test": {
+     "commands": [
+      "nxtraverse -h",
+      "nxsummary --help",
+      "nxtranslate --help",
+      "nxdir --help"
+     ]
+    }
+   },
+   {
+    "name": "nexus",
+    "requirements": {
+     "run": [
+      "libnexus",
+      "nexus-apps"
+     ]
+    },
+    "test": {
+     "commands": [
+      "nxsummary --help",
+      "nxdir --help"
+     ]
+    }
+   }
+  ],
   "package": {
-   "name": "nexus",
+   "name": "nexus-split",
    "version": "4.4.3"
   },
   "requirements": {
    "build": [
     "c_compiler_stub",
     "cxx_compiler_stub",
+    "c_stdlib_stub",
     "cmake >=2.8.8",
     "ninja"
    ],
@@ -250,11 +501,6 @@
     "libxml2",
     "ncurses",
     "readline"
-   ],
-   "run": [
-    "hdf5",
-    "hdf4",
-    "ncurses"
    ]
   },
   "schema_version": 0,
@@ -264,14 +510,6 @@
    ],
    "sha256": "e78a116feb2ebd04de31a8d8707c65e8e15a64aa8999a40fea305e3909bd6533",
    "url": "https://github.com/nexusformat/code/archive/v4.4.3.tar.gz"
-  },
-  "test": {
-   "commands": [
-    "nxdir --help",
-    "nxtraverse -h",
-    "nxsummary --help",
-    "nxtranslate --help"
-   ]
   }
  },
  "linux_ppc64le_requirements": {
@@ -279,6 +517,7 @@
    "__set__": true,
    "elements": [
     "c_compiler_stub",
+    "c_stdlib_stub",
     "cmake",
     "cxx_compiler_stub",
     "ninja"
@@ -290,6 +529,7 @@
     "hdf4",
     "hdf5",
     "libjpeg-turbo",
+    "libnexus",
     "libxml2",
     "ncurses",
     "readline",
@@ -299,9 +539,8 @@
   "run": {
    "__set__": true,
    "elements": [
-    "hdf4",
-    "hdf5",
-    "ncurses"
+    "libnexus",
+    "nexus-apps"
    ]
   },
   "test": {
@@ -320,21 +559,538 @@
    "summary": "NeXus is a common data format for neutron, x-ray, and muon science"
   },
   "build": {
-   "number": "13"
+   "number": "14"
   },
   "extra": {
+   "feedstock-name": "nexus",
    "recipe-maintainers": [
     "beenje"
    ]
   },
+  "outputs": [
+   {
+    "build": {
+     "run_exports": [
+      "libnexus"
+     ]
+    },
+    "name": "libnexus",
+    "requirements": {
+     "build": [
+      "c_compiler_stub",
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "ninja"
+     ],
+     "host": [
+      "hdf5",
+      "hdf4",
+      "libjpeg-turbo",
+      "zlib",
+      "libxml2",
+      "ncurses",
+      "readline"
+     ]
+    },
+    "script": "install.sh",
+    "test": {
+     "commands": [
+      "test -f $PREFIX/lib/libNeXus${SHLIB_EXT}",
+      "test -f $PREFIX/lib/libNeXusCPP${SHLIB_EXT}",
+      "test -f $PREFIX/include/nexus/NeXusFile.hpp",
+      "test ! -f $PREFIX/bin/nxdir"
+     ]
+    }
+   },
+   {
+    "name": "nexus-apps",
+    "requirements": {
+     "build": [
+      "c_compiler_stub",
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "ninja"
+     ],
+     "host": [
+      "hdf5",
+      "hdf4",
+      "libjpeg-turbo",
+      "zlib",
+      "libxml2",
+      "ncurses",
+      "readline",
+      "libnexus"
+     ],
+     "run": [
+      "libnexus"
+     ],
+     "run_constrained": [
+      "nexusformat ==9999999999"
+     ]
+    },
+    "script": "install.sh",
+    "test": {
+     "commands": [
+      "nxtraverse -h",
+      "nxsummary --help",
+      "nxtranslate --help",
+      "nxdir --help"
+     ]
+    }
+   },
+   {
+    "name": "nexus",
+    "requirements": {
+     "run": [
+      "libnexus",
+      "nexus-apps"
+     ]
+    },
+    "test": {
+     "commands": [
+      "nxsummary --help",
+      "nxdir --help"
+     ]
+    }
+   },
+   {
+    "build": {
+     "run_exports": [
+      "libnexus"
+     ]
+    },
+    "name": "libnexus",
+    "requirements": {
+     "build": [
+      "c_compiler_stub",
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "ninja"
+     ],
+     "host": [
+      "hdf5",
+      "hdf4",
+      "libjpeg-turbo",
+      "zlib",
+      "libxml2",
+      "ncurses",
+      "readline"
+     ]
+    },
+    "script": "install.sh",
+    "test": {
+     "commands": [
+      "test -f $PREFIX/lib/libNeXus${SHLIB_EXT}",
+      "test -f $PREFIX/lib/libNeXusCPP${SHLIB_EXT}",
+      "test -f $PREFIX/include/nexus/NeXusFile.hpp",
+      "test ! -f $PREFIX/bin/nxdir"
+     ]
+    }
+   },
+   {
+    "name": "nexus-apps",
+    "requirements": {
+     "build": [
+      "c_compiler_stub",
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "ninja"
+     ],
+     "host": [
+      "hdf5",
+      "hdf4",
+      "libjpeg-turbo",
+      "zlib",
+      "libxml2",
+      "ncurses",
+      "readline",
+      "libnexus"
+     ],
+     "run": [
+      "libnexus"
+     ],
+     "run_constrained": [
+      "nexusformat ==9999999999"
+     ]
+    },
+    "script": "install.sh",
+    "test": {
+     "commands": [
+      "nxtraverse -h",
+      "nxsummary --help",
+      "nxtranslate --help",
+      "nxdir --help"
+     ]
+    }
+   },
+   {
+    "name": "nexus",
+    "requirements": {
+     "run": [
+      "libnexus",
+      "nexus-apps"
+     ]
+    },
+    "test": {
+     "commands": [
+      "nxsummary --help",
+      "nxdir --help"
+     ]
+    }
+   },
+   {
+    "build": {
+     "run_exports": [
+      "libnexus"
+     ]
+    },
+    "name": "libnexus",
+    "requirements": {
+     "build": [
+      "c_compiler_stub",
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "ninja"
+     ],
+     "host": [
+      "hdf5",
+      "hdf4",
+      "libjpeg-turbo",
+      "zlib",
+      "libxml2",
+      "ncurses",
+      "readline"
+     ]
+    },
+    "script": "install.sh",
+    "test": {
+     "commands": [
+      "test -f $PREFIX/lib/libNeXus${SHLIB_EXT}",
+      "test -f $PREFIX/lib/libNeXusCPP${SHLIB_EXT}",
+      "test -f $PREFIX/include/nexus/NeXusFile.hpp",
+      "test ! -f $PREFIX/bin/nxdir"
+     ]
+    }
+   },
+   {
+    "name": "nexus-apps",
+    "requirements": {
+     "build": [
+      "c_compiler_stub",
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "ninja"
+     ],
+     "host": [
+      "hdf5",
+      "hdf4",
+      "libjpeg-turbo",
+      "zlib",
+      "libxml2",
+      "ncurses",
+      "readline",
+      "libnexus"
+     ],
+     "run": [
+      "libnexus"
+     ],
+     "run_constrained": [
+      "nexusformat ==9999999999"
+     ]
+    },
+    "script": "install.sh",
+    "test": {
+     "commands": [
+      "nxtraverse -h",
+      "nxsummary --help",
+      "nxtranslate --help",
+      "nxdir --help"
+     ]
+    }
+   },
+   {
+    "name": "nexus",
+    "requirements": {
+     "run": [
+      "libnexus",
+      "nexus-apps"
+     ]
+    },
+    "test": {
+     "commands": [
+      "nxsummary --help",
+      "nxdir --help"
+     ]
+    }
+   },
+   {
+    "build": {
+     "run_exports": [
+      "libnexus"
+     ]
+    },
+    "name": "libnexus",
+    "requirements": {
+     "build": [
+      "c_compiler_stub",
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "ninja"
+     ],
+     "host": [
+      "hdf5",
+      "hdf4",
+      "libjpeg-turbo",
+      "zlib",
+      "libxml2",
+      "ncurses",
+      "readline"
+     ]
+    },
+    "script": "install.sh",
+    "test": {
+     "commands": [
+      "test -f $PREFIX/lib/libNeXus${SHLIB_EXT}",
+      "test -f $PREFIX/lib/libNeXusCPP${SHLIB_EXT}",
+      "test -f $PREFIX/include/nexus/NeXusFile.hpp",
+      "test ! -f $PREFIX/bin/nxdir"
+     ]
+    }
+   },
+   {
+    "name": "nexus-apps",
+    "requirements": {
+     "build": [
+      "c_compiler_stub",
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "ninja"
+     ],
+     "host": [
+      "hdf5",
+      "hdf4",
+      "libjpeg-turbo",
+      "zlib",
+      "libxml2",
+      "ncurses",
+      "readline",
+      "libnexus"
+     ],
+     "run": [
+      "libnexus"
+     ],
+     "run_constrained": [
+      "nexusformat ==9999999999"
+     ]
+    },
+    "script": "install.sh",
+    "test": {
+     "commands": [
+      "nxtraverse -h",
+      "nxsummary --help",
+      "nxtranslate --help",
+      "nxdir --help"
+     ]
+    }
+   },
+   {
+    "name": "nexus",
+    "requirements": {
+     "run": [
+      "libnexus",
+      "nexus-apps"
+     ]
+    },
+    "test": {
+     "commands": [
+      "nxsummary --help",
+      "nxdir --help"
+     ]
+    }
+   },
+   {
+    "build": {
+     "run_exports": [
+      "libnexus"
+     ]
+    },
+    "name": "libnexus",
+    "requirements": {
+     "build": [
+      "c_compiler_stub",
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "ninja"
+     ],
+     "host": [
+      "hdf5",
+      "hdf4",
+      "libjpeg-turbo",
+      "zlib",
+      "libxml2",
+      "ncurses",
+      "readline"
+     ]
+    },
+    "script": "install.sh",
+    "test": {
+     "commands": [
+      "test -f $PREFIX/lib/libNeXus${SHLIB_EXT}",
+      "test -f $PREFIX/lib/libNeXusCPP${SHLIB_EXT}",
+      "test -f $PREFIX/include/nexus/NeXusFile.hpp",
+      "test ! -f $PREFIX/bin/nxdir"
+     ]
+    }
+   },
+   {
+    "name": "nexus-apps",
+    "requirements": {
+     "build": [
+      "c_compiler_stub",
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "ninja"
+     ],
+     "host": [
+      "hdf5",
+      "hdf4",
+      "libjpeg-turbo",
+      "zlib",
+      "libxml2",
+      "ncurses",
+      "readline",
+      "libnexus"
+     ],
+     "run": [
+      "libnexus"
+     ],
+     "run_constrained": [
+      "nexusformat ==9999999999"
+     ]
+    },
+    "script": "install.sh",
+    "test": {
+     "commands": [
+      "nxtraverse -h",
+      "nxsummary --help",
+      "nxtranslate --help",
+      "nxdir --help"
+     ]
+    }
+   },
+   {
+    "name": "nexus",
+    "requirements": {
+     "run": [
+      "libnexus",
+      "nexus-apps"
+     ]
+    },
+    "test": {
+     "commands": [
+      "nxsummary --help",
+      "nxdir --help"
+     ]
+    }
+   },
+   {
+    "build": {
+     "run_exports": [
+      "libnexus"
+     ]
+    },
+    "name": "libnexus",
+    "requirements": {
+     "build": [
+      "c_compiler_stub",
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "ninja"
+     ],
+     "host": [
+      "hdf5",
+      "hdf4",
+      "libjpeg-turbo",
+      "zlib"
+     ]
+    },
+    "script": "install.bat",
+    "test": {
+     "commands": [
+      "if not exist %LIBRARY_BIN%\\\\NeXus.dll exit 1",
+      "if not exist %LIBRARY_LIB%\\\\NeXus.lib exit 1",
+      "if not exist %LIBRARY_LIB%\\\\NeXusCPP.lib exit 1",
+      "if exist %LIBRARY_BIN%\\\\nxdir.exe exit 1"
+     ]
+    }
+   },
+   {
+    "name": "nexus-apps",
+    "requirements": {
+     "build": [
+      "c_compiler_stub",
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "ninja"
+     ],
+     "host": [
+      "hdf5",
+      "hdf4",
+      "libjpeg-turbo",
+      "zlib",
+      "libnexus"
+     ],
+     "run": [
+      "libnexus"
+     ],
+     "run_constrained": [
+      "nexusformat ==9999999999"
+     ]
+    },
+    "script": "install.bat",
+    "test": {
+     "commands": [
+      "nxtraverse -h",
+      "nxdir --help"
+     ]
+    }
+   },
+   {
+    "name": "nexus",
+    "requirements": {
+     "run": [
+      "libnexus",
+      "nexus-apps"
+     ]
+    },
+    "test": {
+     "commands": [
+      "nxdir --help"
+     ]
+    }
+   }
+  ],
   "package": {
-   "name": "nexus",
+   "name": "nexus-split",
    "version": "4.4.3"
   },
   "requirements": {
    "build": [
     "c_compiler_stub",
     "cxx_compiler_stub",
+    "c_stdlib_stub",
     "cmake >=2.8.8",
     "ninja"
    ],
@@ -346,11 +1102,6 @@
     "libxml2",
     "ncurses",
     "readline"
-   ],
-   "run": [
-    "hdf5",
-    "hdf4",
-    "ncurses"
    ]
   },
   "schema_version": 0,
@@ -361,18 +1112,9 @@
    ],
    "sha256": "e78a116feb2ebd04de31a8d8707c65e8e15a64aa8999a40fea305e3909bd6533",
    "url": "https://github.com/nexusformat/code/archive/v4.4.3.tar.gz"
-  },
-  "test": {
-   "commands": [
-    "nxdir --help",
-    "nxtraverse -h",
-    "nxsummary --help",
-    "nxtranslate --help",
-    "if not exist %LIBRARY_LIB%\\\\NeXusCPP.lib exit 1"
-   ]
   }
  },
- "name": "nexus",
+ "name": "nexus-split",
  "osx_64_meta_yaml": {
   "about": {
    "description": "NeXus is a common data format for neutron, x-ray, and muon science.\nIt is being developed as an international standard by scientists and\nprogrammers representing major scientific facilities in order to facilitate\ngreater cooperation in the analysis and visualization of neutron, x-ray, and muon data.\n",
@@ -384,21 +1126,112 @@
    "summary": "NeXus is a common data format for neutron, x-ray, and muon science"
   },
   "build": {
-   "number": "13"
+   "number": "14"
   },
   "extra": {
+   "feedstock-name": "nexus",
    "recipe-maintainers": [
     "beenje"
    ]
   },
+  "outputs": [
+   {
+    "build": {
+     "run_exports": [
+      "libnexus"
+     ]
+    },
+    "name": "libnexus",
+    "requirements": {
+     "build": [
+      "c_compiler_stub",
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "ninja"
+     ],
+     "host": [
+      "hdf5",
+      "hdf4",
+      "libjpeg-turbo",
+      "zlib",
+      "libxml2",
+      "ncurses",
+      "readline"
+     ]
+    },
+    "script": "install.sh",
+    "test": {
+     "commands": [
+      "test -f $PREFIX/lib/libNeXus${SHLIB_EXT}",
+      "test -f $PREFIX/lib/libNeXusCPP${SHLIB_EXT}",
+      "test -f $PREFIX/include/nexus/NeXusFile.hpp",
+      "test ! -f $PREFIX/bin/nxdir"
+     ]
+    }
+   },
+   {
+    "name": "nexus-apps",
+    "requirements": {
+     "build": [
+      "c_compiler_stub",
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "ninja"
+     ],
+     "host": [
+      "hdf5",
+      "hdf4",
+      "libjpeg-turbo",
+      "zlib",
+      "libxml2",
+      "ncurses",
+      "readline",
+      "libnexus"
+     ],
+     "run": [
+      "libnexus"
+     ],
+     "run_constrained": [
+      "nexusformat ==9999999999"
+     ]
+    },
+    "script": "install.sh",
+    "test": {
+     "commands": [
+      "nxtraverse -h",
+      "nxsummary --help",
+      "nxtranslate --help",
+      "nxdir --help"
+     ]
+    }
+   },
+   {
+    "name": "nexus",
+    "requirements": {
+     "run": [
+      "libnexus",
+      "nexus-apps"
+     ]
+    },
+    "test": {
+     "commands": [
+      "nxsummary --help",
+      "nxdir --help"
+     ]
+    }
+   }
+  ],
   "package": {
-   "name": "nexus",
+   "name": "nexus-split",
    "version": "4.4.3"
   },
   "requirements": {
    "build": [
     "c_compiler_stub",
     "cxx_compiler_stub",
+    "c_stdlib_stub",
     "cmake >=2.8.8",
     "ninja"
    ],
@@ -410,11 +1243,6 @@
     "libxml2",
     "ncurses",
     "readline"
-   ],
-   "run": [
-    "hdf5",
-    "hdf4",
-    "ncurses"
    ]
   },
   "schema_version": 0,
@@ -424,14 +1252,6 @@
    ],
    "sha256": "e78a116feb2ebd04de31a8d8707c65e8e15a64aa8999a40fea305e3909bd6533",
    "url": "https://github.com/nexusformat/code/archive/v4.4.3.tar.gz"
-  },
-  "test": {
-   "commands": [
-    "nxdir --help",
-    "nxtraverse -h",
-    "nxsummary --help",
-    "nxtranslate --help"
-   ]
   }
  },
  "osx_64_requirements": {
@@ -439,6 +1259,7 @@
    "__set__": true,
    "elements": [
     "c_compiler_stub",
+    "c_stdlib_stub",
     "cmake",
     "cxx_compiler_stub",
     "ninja"
@@ -450,6 +1271,7 @@
     "hdf4",
     "hdf5",
     "libjpeg-turbo",
+    "libnexus",
     "libxml2",
     "ncurses",
     "readline",
@@ -459,9 +1281,8 @@
   "run": {
    "__set__": true,
    "elements": [
-    "hdf4",
-    "hdf5",
-    "ncurses"
+    "libnexus",
+    "nexus-apps"
    ]
   },
   "test": {
@@ -480,21 +1301,112 @@
    "summary": "NeXus is a common data format for neutron, x-ray, and muon science"
   },
   "build": {
-   "number": "13"
+   "number": "14"
   },
   "extra": {
+   "feedstock-name": "nexus",
    "recipe-maintainers": [
     "beenje"
    ]
   },
+  "outputs": [
+   {
+    "build": {
+     "run_exports": [
+      "libnexus"
+     ]
+    },
+    "name": "libnexus",
+    "requirements": {
+     "build": [
+      "c_compiler_stub",
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "ninja"
+     ],
+     "host": [
+      "hdf5",
+      "hdf4",
+      "libjpeg-turbo",
+      "zlib",
+      "libxml2",
+      "ncurses",
+      "readline"
+     ]
+    },
+    "script": "install.sh",
+    "test": {
+     "commands": [
+      "test -f $PREFIX/lib/libNeXus${SHLIB_EXT}",
+      "test -f $PREFIX/lib/libNeXusCPP${SHLIB_EXT}",
+      "test -f $PREFIX/include/nexus/NeXusFile.hpp",
+      "test ! -f $PREFIX/bin/nxdir"
+     ]
+    }
+   },
+   {
+    "name": "nexus-apps",
+    "requirements": {
+     "build": [
+      "c_compiler_stub",
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "ninja"
+     ],
+     "host": [
+      "hdf5",
+      "hdf4",
+      "libjpeg-turbo",
+      "zlib",
+      "libxml2",
+      "ncurses",
+      "readline",
+      "libnexus"
+     ],
+     "run": [
+      "libnexus"
+     ],
+     "run_constrained": [
+      "nexusformat ==9999999999"
+     ]
+    },
+    "script": "install.sh",
+    "test": {
+     "commands": [
+      "nxtraverse -h",
+      "nxsummary --help",
+      "nxtranslate --help",
+      "nxdir --help"
+     ]
+    }
+   },
+   {
+    "name": "nexus",
+    "requirements": {
+     "run": [
+      "libnexus",
+      "nexus-apps"
+     ]
+    },
+    "test": {
+     "commands": [
+      "nxsummary --help",
+      "nxdir --help"
+     ]
+    }
+   }
+  ],
   "package": {
-   "name": "nexus",
+   "name": "nexus-split",
    "version": "4.4.3"
   },
   "requirements": {
    "build": [
     "c_compiler_stub",
     "cxx_compiler_stub",
+    "c_stdlib_stub",
     "cmake >=2.8.8",
     "ninja"
    ],
@@ -506,11 +1418,6 @@
     "libxml2",
     "ncurses",
     "readline"
-   ],
-   "run": [
-    "hdf5",
-    "hdf4",
-    "ncurses"
    ]
   },
   "schema_version": 0,
@@ -520,14 +1427,6 @@
    ],
    "sha256": "e78a116feb2ebd04de31a8d8707c65e8e15a64aa8999a40fea305e3909bd6533",
    "url": "https://github.com/nexusformat/code/archive/v4.4.3.tar.gz"
-  },
-  "test": {
-   "commands": [
-    "nxdir --help",
-    "nxtraverse -h",
-    "nxsummary --help",
-    "nxtranslate --help"
-   ]
   }
  },
  "osx_arm64_requirements": {
@@ -535,6 +1434,7 @@
    "__set__": true,
    "elements": [
     "c_compiler_stub",
+    "c_stdlib_stub",
     "cmake",
     "cxx_compiler_stub",
     "ninja"
@@ -546,6 +1446,7 @@
     "hdf4",
     "hdf5",
     "libjpeg-turbo",
+    "libnexus",
     "libxml2",
     "ncurses",
     "readline",
@@ -555,9 +1456,8 @@
   "run": {
    "__set__": true,
    "elements": [
-    "hdf4",
-    "hdf5",
-    "ncurses"
+    "libnexus",
+    "nexus-apps"
    ]
   },
   "test": {
@@ -568,7 +1468,9 @@
  "outputs_names": {
   "__set__": true,
   "elements": [
-   "nexus"
+   "libnexus",
+   "nexus",
+   "nexus-apps"
   ]
  },
  "parsing_error": false,
@@ -583,18 +1485,21 @@
  "pr_info": {
   "__lazy_json__": "pr_info/nexus.json"
  },
- "raw_meta_yaml": "{% set name = \"nexus\" %}\n{% set version = \"4.4.3\" %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://github.com/nexusformat/code/archive/v{{ version }}.tar.gz\n  sha256: e78a116feb2ebd04de31a8d8707c65e8e15a64aa8999a40fea305e3909bd6533\n  patches:\n    - include_libxml_sax.patch\n    - nexus_windows.patch  # [win]\n\nbuild:\n  number: 13\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ compiler('cxx') }}\n    - cmake >=2.8.8\n    - ninja\n  host:\n    - hdf5\n    - hdf4\n    - libjpeg-turbo\n    - zlib\n    - libxml2  # [not win]\n    - ncurses  # [not win]\n    - readline  # [not win]\n  run:\n    - hdf5\n    - hdf4\n    - ncurses  # [not win]\n\ntest:\n  commands:\n    - nxdir --help  # [not win]\n    - nxtraverse -h  # [not win]\n    - nxsummary --help  # [not win]\n    - nxtranslate --help  # [not win]\n    - if not exist %LIBRARY_LIB%\\\\NeXusCPP.lib exit 1  # [win]\n\nabout:\n  home: https://github.com/nexusformat/code\n  license: LGPL-2.1-or-later\n  license_file: COPYING\n  summary: NeXus is a common data format for neutron, x-ray, and muon science\n  description: |\n    NeXus is a common data format for neutron, x-ray, and muon science.\n    It is being developed as an international standard by scientists and\n    programmers representing major scientific facilities in order to facilitate\n    greater cooperation in the analysis and visualization of neutron, x-ray, and muon data.\n  doc_url: https://www.nexusformat.org\n  dev_url: https://github.com/nexusformat/code\n\nextra:\n  recipe-maintainers:\n    - beenje\n",
+ "raw_meta_yaml": "{% set version = \"4.4.3\" %}\n\npackage:\n  name: nexus-split\n  version: {{ version }}\n\nsource:\n  url: https://github.com/nexusformat/code/archive/v{{ version }}.tar.gz\n  sha256: e78a116feb2ebd04de31a8d8707c65e8e15a64aa8999a40fea305e3909bd6533\n  patches:\n    - include_libxml_sax.patch\n    - nexus_windows.patch  # [win]\n\nbuild:\n  number: 14\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ compiler('cxx') }}\n    - {{ stdlib(\"c\") }}\n    - cmake >=2.8.8\n    - ninja\n  host:\n    - hdf5\n    - hdf4\n    - libjpeg-turbo\n    - zlib\n    - libxml2   # [not win]\n    - ncurses   # [not win]\n    - readline  # [not win]\n\noutputs:\n  # Do not package apps in libnexus to avoid conflict with nexusformat\n  # (which includes a pure python nxdir)\n  - name: libnexus\n    script: install.sh   # [unix]\n    script: install.bat  # [win]\n    build:\n      run_exports:\n        - {{ pin_subpackage(\"libnexus\", max_pin=\"x.x\") }}\n    requirements:\n      build:\n        - {{ compiler('c') }}\n        - {{ compiler('cxx') }}\n        - {{ stdlib(\"c\") }}\n        - cmake\n        - ninja\n      host:\n        - hdf5\n        - hdf4\n        - libjpeg-turbo\n        - zlib\n        - libxml2   # [not win]\n        - ncurses   # [not win]\n        - readline  # [not win]\n    test:\n      commands:\n        - test -f $PREFIX/lib/libNeXus${SHLIB_EXT}         # [unix]\n        - test -f $PREFIX/lib/libNeXusCPP${SHLIB_EXT}      # [unix]\n        - test -f $PREFIX/include/nexus/NeXusFile.hpp      # [unix]\n        - if not exist %LIBRARY_BIN%\\\\NeXus.dll exit 1     # [win]\n        - if not exist %LIBRARY_LIB%\\\\NeXus.lib exit 1     # [win]\n        - if not exist %LIBRARY_LIB%\\\\NeXusCPP.lib exit 1  # [win]\n        # nxdir shouldn't be in that package\n        - test ! -f $PREFIX/bin/nxdir                      # [unix]\n        - if exist %LIBRARY_BIN%\\\\nxdir.exe exit 1         # [win]\n\n  # separate package for apps (executables)\n  - name: nexus-apps\n    script: install.sh   # [unix]\n    script: install.bat  # [win]\n    requirements:\n      build:\n        - {{ compiler('c') }}\n        - {{ compiler('cxx') }}\n        - {{ stdlib(\"c\") }}\n        - cmake\n        - ninja\n      host:\n        - hdf5\n        - hdf4\n        - libjpeg-turbo\n        - zlib\n        - libxml2   # [not win]\n        - ncurses   # [not win]\n        - readline  # [not win]\n        - {{ pin_subpackage(\"libnexus\", exact=True) }}\n      run:\n        - {{ pin_subpackage(\"libnexus\", exact=True) }}\n      run_constrained:\n        # Package can't be installed with nexusformat due to conflict\n        # with included pure python nxdir\n        - nexusformat ==9999999999\n    test:\n      commands:\n        - nxtraverse -h\n        - nxsummary --help                              # [not win]\n        - nxtranslate --help                            # [not win]\n        - nxdir --help\n\n  # meta-package to install libnexus and applications\n  - name: nexus\n    requirements:\n      run:\n        - {{ pin_subpackage(\"libnexus\", exact=True) }}\n        - {{ pin_subpackage(\"nexus-apps\", exact=True) }}\n    test:\n      commands:\n        - nxsummary --help                              # [not win]\n        - nxdir --help\n\n\nabout:\n  home: https://github.com/nexusformat/code\n  license: LGPL-2.1-or-later\n  license_file: COPYING\n  summary: NeXus is a common data format for neutron, x-ray, and muon science\n  description: |\n    NeXus is a common data format for neutron, x-ray, and muon science.\n    It is being developed as an international standard by scientists and\n    programmers representing major scientific facilities in order to facilitate\n    greater cooperation in the analysis and visualization of neutron, x-ray, and muon data.\n  doc_url: https://www.nexusformat.org\n  dev_url: https://github.com/nexusformat/code\n\nextra:\n  feedstock-name: nexus\n  recipe-maintainers:\n    - beenje\n",
  "req": {
   "__set__": true,
   "elements": [
    "c_compiler_stub",
+   "c_stdlib_stub",
    "cmake",
    "cxx_compiler_stub",
    "hdf4",
    "hdf5",
    "libjpeg-turbo",
+   "libnexus",
    "libxml2",
    "ncurses",
+   "nexus-apps",
    "ninja",
    "readline",
    "zlib"
@@ -605,6 +1510,7 @@
    "__set__": true,
    "elements": [
     "c_compiler_stub",
+    "c_stdlib_stub",
     "cmake",
     "cxx_compiler_stub",
     "ninja"
@@ -614,10 +1520,12 @@
    "__set__": true,
    "elements": [
     "c_compiler_stub",
+    "c_stdlib_stub",
     "cxx_compiler_stub",
     "hdf4",
     "hdf5",
     "libjpeg-turbo",
+    "libnexus",
     "libxml2",
     "ncurses",
     "readline",
@@ -628,10 +1536,10 @@
    "__set__": true,
    "elements": [
     "c_compiler_stub",
+    "c_stdlib_stub",
     "cxx_compiler_stub",
-    "hdf4",
-    "hdf5",
-    "ncurses"
+    "libnexus",
+    "nexus-apps"
    ]
   },
   "test": {
@@ -645,6 +1553,8 @@
    "__set__": true,
    "elements": [
     "c_compiler_stub",
+    "c_stdlib_stub",
+    "cmake",
     "cmake >=2.8.8",
     "cxx_compiler_stub",
     "ninja"
@@ -656,6 +1566,7 @@
     "hdf4",
     "hdf5",
     "libjpeg-turbo",
+    "libnexus",
     "libxml2",
     "ncurses",
     "readline",
@@ -665,9 +1576,8 @@
   "run": {
    "__set__": true,
    "elements": [
-    "hdf4",
-    "hdf5",
-    "ncurses"
+    "libnexus",
+    "nexus-apps"
    ]
   },
   "test": {
@@ -691,21 +1601,103 @@
    "summary": "NeXus is a common data format for neutron, x-ray, and muon science"
   },
   "build": {
-   "number": "13"
+   "number": "14"
   },
   "extra": {
+   "feedstock-name": "nexus",
    "recipe-maintainers": [
     "beenje"
    ]
   },
+  "outputs": [
+   {
+    "build": {
+     "run_exports": [
+      "libnexus"
+     ]
+    },
+    "name": "libnexus",
+    "requirements": {
+     "build": [
+      "c_compiler_stub",
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "ninja"
+     ],
+     "host": [
+      "hdf5",
+      "hdf4",
+      "libjpeg-turbo",
+      "zlib"
+     ]
+    },
+    "script": "install.bat",
+    "test": {
+     "commands": [
+      "if not exist %LIBRARY_BIN%\\\\NeXus.dll exit 1",
+      "if not exist %LIBRARY_LIB%\\\\NeXus.lib exit 1",
+      "if not exist %LIBRARY_LIB%\\\\NeXusCPP.lib exit 1",
+      "if exist %LIBRARY_BIN%\\\\nxdir.exe exit 1"
+     ]
+    }
+   },
+   {
+    "name": "nexus-apps",
+    "requirements": {
+     "build": [
+      "c_compiler_stub",
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "ninja"
+     ],
+     "host": [
+      "hdf5",
+      "hdf4",
+      "libjpeg-turbo",
+      "zlib",
+      "libnexus"
+     ],
+     "run": [
+      "libnexus"
+     ],
+     "run_constrained": [
+      "nexusformat ==9999999999"
+     ]
+    },
+    "script": "install.bat",
+    "test": {
+     "commands": [
+      "nxtraverse -h",
+      "nxdir --help"
+     ]
+    }
+   },
+   {
+    "name": "nexus",
+    "requirements": {
+     "run": [
+      "libnexus",
+      "nexus-apps"
+     ]
+    },
+    "test": {
+     "commands": [
+      "nxdir --help"
+     ]
+    }
+   }
+  ],
   "package": {
-   "name": "nexus",
+   "name": "nexus-split",
    "version": "4.4.3"
   },
   "requirements": {
    "build": [
     "c_compiler_stub",
     "cxx_compiler_stub",
+    "c_stdlib_stub",
     "cmake >=2.8.8",
     "ninja"
    ],
@@ -714,10 +1706,6 @@
     "hdf4",
     "libjpeg-turbo",
     "zlib"
-   ],
-   "run": [
-    "hdf5",
-    "hdf4"
    ]
   },
   "schema_version": 0,
@@ -728,11 +1716,6 @@
    ],
    "sha256": "e78a116feb2ebd04de31a8d8707c65e8e15a64aa8999a40fea305e3909bd6533",
    "url": "https://github.com/nexusformat/code/archive/v4.4.3.tar.gz"
-  },
-  "test": {
-   "commands": [
-    "if not exist %LIBRARY_LIB%\\\\NeXusCPP.lib exit 1"
-   ]
   }
  },
  "win_64_requirements": {
@@ -740,6 +1723,7 @@
    "__set__": true,
    "elements": [
     "c_compiler_stub",
+    "c_stdlib_stub",
     "cmake",
     "cxx_compiler_stub",
     "ninja"
@@ -751,14 +1735,15 @@
     "hdf4",
     "hdf5",
     "libjpeg-turbo",
+    "libnexus",
     "zlib"
    ]
   },
   "run": {
    "__set__": true,
    "elements": [
-    "hdf4",
-    "hdf5"
+    "libnexus",
+    "nexus-apps"
    ]
   },
   "test": {
