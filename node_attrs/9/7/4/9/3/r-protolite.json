@@ -33,7 +33,8 @@
    "summary": "Optimized C++ implementations for reading and writing protocol-buffers. Currently supports 'rexp.proto' for serializing R objects and 'geobuf.proto' for geojson data. This lightweight package is complementary to the much larger 'RProtoBuf' package which provides a full featured toolkit for working with protocol-buffers in R."
   },
   "build": {
-   "number": "0",
+   "missing_dso_whitelist": null,
+   "number": "1",
    "rpaths": [
     "lib/R/lib/",
     "lib/"
@@ -68,12 +69,14 @@
    "run": [
     "r-base",
     "r-rcpp >=0.12.12",
-    "r-jsonlite",
-    "libprotobuf"
+    "r-jsonlite"
    ]
   },
   "schema_version": 0,
   "source": {
+   "patches": [
+    "patches/0001-add-win-pthread.patch"
+   ],
    "sha256": "eed46fd63f9d183f974f420e9351f64e45c9edba00f56cc8c132c7aeb21697cc",
    "url": [
     "https://cran.r-project.org/src/contrib/protolite_2.3.1.tar.gz",
@@ -119,7 +122,6 @@
   "run": {
    "__set__": true,
    "elements": [
-    "libprotobuf",
     "r-base",
     "r-jsonlite",
     "r-rcpp"
@@ -146,7 +148,12 @@
    "summary": "Optimized C++ implementations for reading and writing protocol-buffers. Currently supports 'rexp.proto' for serializing R objects and 'geobuf.proto' for geojson data. This lightweight package is complementary to the much larger 'RProtoBuf' package which provides a full featured toolkit for working with protocol-buffers in R."
   },
   "build": {
-   "number": "0",
+   "missing_dso_whitelist": [
+    "*/R.dll",
+    "*/Rblas.dll",
+    "*/Rlapack.dll"
+   ],
+   "number": "1",
    "rpaths": [
     "lib/R/lib/",
     "lib/"
@@ -170,7 +177,16 @@
     "autoconf",
     "automake",
     "pkg-config",
-    "make"
+    "make",
+    "m2w64_c_compiler_stub",
+    "m2w64_c_stdlib_stub",
+    "m2w64_cxx_compiler_stub",
+    "filesystem",
+    "sed",
+    "grep",
+    "automake-wrapper",
+    "coreutils",
+    "zip"
    ],
    "host": [
     "r-base",
@@ -181,12 +197,14 @@
    "run": [
     "r-base",
     "r-rcpp >=0.12.12",
-    "r-jsonlite",
-    "libprotobuf"
+    "r-jsonlite"
    ]
   },
   "schema_version": 0,
   "source": {
+   "patches": [
+    "patches/0001-add-win-pthread.patch"
+   ],
    "sha256": "eed46fd63f9d183f974f420e9351f64e45c9edba00f56cc8c132c7aeb21697cc",
    "url": [
     "https://cran.r-project.org/src/contrib/protolite_2.3.1.tar.gz",
@@ -196,7 +214,9 @@
   "test": {
    "commands": [
     "$R -e \"library('protolite')\"",
-    "$R -e \"testthat::test_file('tests/testthat.R', stop_on_failure=TRUE)\""
+    "$R -e \"testthat::test_file('tests/testthat.R', stop_on_failure=TRUE)\"",
+    "\"%R%\" -e \"library('protolite')\"",
+    "\"%R%\" -e \"testthat::test_file('tests/testthat.R', stop_on_failure=TRUE)\""
    ],
    "requires": [
     "r-testthat",
@@ -221,7 +241,8 @@
    "summary": "Optimized C++ implementations for reading and writing protocol-buffers. Currently supports 'rexp.proto' for serializing R objects and 'geobuf.proto' for geojson data. This lightweight package is complementary to the much larger 'RProtoBuf' package which provides a full featured toolkit for working with protocol-buffers in R."
   },
   "build": {
-   "number": "0",
+   "missing_dso_whitelist": null,
+   "number": "1",
    "rpaths": [
     "lib/R/lib/",
     "lib/"
@@ -256,12 +277,14 @@
    "run": [
     "r-base",
     "r-rcpp >=0.12.12",
-    "r-jsonlite",
-    "libprotobuf"
+    "r-jsonlite"
    ]
   },
   "schema_version": 0,
   "source": {
+   "patches": [
+    "patches/0001-add-win-pthread.patch"
+   ],
    "sha256": "eed46fd63f9d183f974f420e9351f64e45c9edba00f56cc8c132c7aeb21697cc",
    "url": [
     "https://cran.r-project.org/src/contrib/protolite_2.3.1.tar.gz",
@@ -307,7 +330,6 @@
   "run": {
    "__set__": true,
    "elements": [
-    "libprotobuf",
     "r-base",
     "r-jsonlite",
     "r-rcpp"
@@ -330,26 +352,36 @@
  "parsing_error": false,
  "platforms": [
   "linux_64",
-  "osx_64"
+  "osx_64",
+  "win_64"
  ],
  "pr_info": {
   "__lazy_json__": "pr_info/r-protolite.json"
  },
- "raw_meta_yaml": "{% set version = \"2.3.1\" %}\n{% set posix = 'm2-' if win else '' %}\n{% set native = 'm2w64-' if win else '' %}\n\npackage:\n  name: r-protolite\n  version: {{ version|replace(\"-\", \"_\") }}\n\nsource:\n  url:\n    - {{ cran_mirror }}/src/contrib/protolite_{{ version }}.tar.gz\n    - {{ cran_mirror }}/src/contrib/Archive/protolite/protolite_{{ version }}.tar.gz\n  sha256: eed46fd63f9d183f974f420e9351f64e45c9edba00f56cc8c132c7aeb21697cc\n\nbuild:\n  skip: true  # [win]\n  merge_build_host: true  # [win]\n  number: 0\n  rpaths:\n    - lib/R/lib/\n    - lib/\n\nrequirements:\n  build:\n    - {{ compiler('c') }}          # [not win]\n    - {{ stdlib('c') }}            # [not win]\n    - {{ compiler('m2w64_c') }}    # [win]\n    - {{ stdlib('m2w64_c') }}      # [win]\n    - {{ compiler('cxx') }}        # [not win]\n    - {{ compiler('m2w64_cxx') }}  # [win]\n    - {{ posix }}filesystem        # [win]\n    - {{ posix }}sed               # [win]\n    - {{ posix }}grep              # [win]\n    - {{ posix }}autoconf\n    - {{ posix }}automake          # [not win]\n    - {{ posix }}automake-wrapper  # [win]\n    - {{ posix }}pkg-config\n    - {{ posix }}make\n    - {{ posix }}coreutils         # [win]\n    - {{ posix }}zip               # [win]\n  host:\n    - r-base\n    - r-rcpp >=0.12.12\n    - r-jsonlite\n    - libprotobuf\n  run:\n    - r-base\n    - {{ native }}gcc-libs         # [win]\n    - r-rcpp >=0.12.12\n    - r-jsonlite\n    - libprotobuf\n\ntest:\n  requires:\n    - r-testthat\n    - r-sf\n  source_files:\n    - tests/\n  commands:\n    - $R -e \"library('protolite')\"                                                    # [not win]\n    - $R -e \"testthat::test_file('tests/testthat.R', stop_on_failure=TRUE)\"           # [not win]\n    - \"\\\"%R%\\\" -e \\\"library('protolite')\\\"\"                                           # [win]\n    - \"\\\"%R%\\\" -e \\\"testthat::test_file('tests/testthat.R', stop_on_failure=TRUE)\\\"\"  # [win]\n\nabout:\n  home: https://github.com/jeroen/protolite#readme\n  dev_url: https://github.com/jeroen/protolite\n  license: MIT\n  license_file:\n    - {{ environ[\"PREFIX\"] }}/lib/R/share/licenses/MIT\n    - LICENSE\n  summary: Optimized C++ implementations for reading and writing protocol-buffers. Currently supports 'rexp.proto' for serializing R objects and 'geobuf.proto' for geojson data. This lightweight package is complementary to the much larger 'RProtoBuf' package which provides a full featured toolkit for working with protocol-buffers\n    in R.\n  license_family: MIT\n\nextra:\n  recipe-maintainers:\n    - conda-forge/r\n    - xhochy\n",
+ "raw_meta_yaml": "{% set version = \"2.3.1\" %}\n{% set posix = 'm2-' if win else '' %}\n\npackage:\n  name: r-protolite\n  version: {{ version|replace(\"-\", \"_\") }}\n\nsource:\n  url:\n    - {{ cran_mirror }}/src/contrib/protolite_{{ version }}.tar.gz\n    - {{ cran_mirror }}/src/contrib/Archive/protolite/protolite_{{ version }}.tar.gz\n  sha256: eed46fd63f9d183f974f420e9351f64e45c9edba00f56cc8c132c7aeb21697cc\n  patches:\n    - patches/0001-add-win-pthread.patch\n\nbuild:\n  number: 1\n  rpaths:\n    - lib/R/lib/\n    - lib/\n  missing_dso_whitelist:\n    - '*/R.dll'        # [win]\n    - '*/Rblas.dll'    # [win]\n    - '*/Rlapack.dll'  # [win]\n\nrequirements:\n  build:\n    - {{ compiler('c') }}          # [not win]\n    - {{ stdlib('c') }}            # [not win]\n    - {{ compiler('m2w64_c') }}    # [win]\n    - {{ stdlib('m2w64_c') }}      # [win]\n    - {{ compiler('cxx') }}        # [not win]\n    - {{ compiler('m2w64_cxx') }}  # [win]\n    - {{ posix }}filesystem        # [win]\n    - {{ posix }}sed               # [win]\n    - {{ posix }}grep              # [win]\n    - {{ posix }}autoconf\n    - {{ posix }}automake          # [not win]\n    - {{ posix }}automake-wrapper  # [win]\n    - pkg-config\n    - {{ posix }}make\n    - {{ posix }}coreutils         # [win]\n    - {{ posix }}zip               # [win]\n  host:\n    - r-base\n    - r-rcpp >=0.12.12\n    - r-jsonlite\n    - libprotobuf                  # [not win]\n  run:\n    - r-base\n    - r-rcpp >=0.12.12\n    - r-jsonlite\n\ntest:\n  requires:\n    - r-testthat\n    - r-sf\n  source_files:\n    - tests/\n  commands:\n    - $R -e \"library('protolite')\"                                                    # [not win]\n    - $R -e \"testthat::test_file('tests/testthat.R', stop_on_failure=TRUE)\"           # [not win]\n    - \"\\\"%R%\\\" -e \\\"library('protolite')\\\"\"                                           # [win]\n    - \"\\\"%R%\\\" -e \\\"testthat::test_file('tests/testthat.R', stop_on_failure=TRUE)\\\"\"  # [win]\n\nabout:\n  home: https://github.com/jeroen/protolite#readme\n  dev_url: https://github.com/jeroen/protolite\n  license: MIT\n  license_file:\n    - {{ environ[\"PREFIX\"] }}/lib/R/share/licenses/MIT\n    - LICENSE\n  summary: Optimized C++ implementations for reading and writing protocol-buffers. Currently supports 'rexp.proto' for serializing R objects and 'geobuf.proto' for geojson data. This lightweight package is complementary to the much larger 'RProtoBuf' package which provides a full featured toolkit for working with protocol-buffers\n    in R.\n  license_family: MIT\n\nextra:\n  recipe-maintainers:\n    - conda-forge/r\n    - xhochy\n",
  "req": {
   "__set__": true,
   "elements": [
    "autoconf",
    "automake",
+   "automake-wrapper",
    "c_compiler_stub",
    "c_stdlib_stub",
+   "coreutils",
    "cxx_compiler_stub",
+   "filesystem",
+   "grep",
    "libprotobuf",
+   "m2w64_c_compiler_stub",
+   "m2w64_c_stdlib_stub",
+   "m2w64_cxx_compiler_stub",
    "make",
    "pkg-config",
    "r-base",
    "r-jsonlite",
-   "r-rcpp"
+   "r-rcpp",
+   "sed",
+   "zip"
   ]
  },
  "requirements": {
@@ -358,11 +390,20 @@
    "elements": [
     "autoconf",
     "automake",
+    "automake-wrapper",
     "c_compiler_stub",
     "c_stdlib_stub",
+    "coreutils",
     "cxx_compiler_stub",
+    "filesystem",
+    "grep",
+    "m2w64_c_compiler_stub",
+    "m2w64_c_stdlib_stub",
+    "m2w64_cxx_compiler_stub",
     "make",
-    "pkg-config"
+    "pkg-config",
+    "sed",
+    "zip"
    ]
   },
   "host": {
@@ -383,7 +424,6 @@
     "c_compiler_stub",
     "c_stdlib_stub",
     "cxx_compiler_stub",
-    "libprotobuf",
     "r-base",
     "r-jsonlite",
     "r-rcpp"
@@ -404,11 +444,20 @@
    "elements": [
     "autoconf",
     "automake",
+    "automake-wrapper",
     "c_compiler_stub",
     "c_stdlib_stub",
+    "coreutils",
     "cxx_compiler_stub",
+    "filesystem",
+    "grep",
+    "m2w64_c_compiler_stub",
+    "m2w64_c_stdlib_stub",
+    "m2w64_cxx_compiler_stub",
     "make",
-    "pkg-config"
+    "pkg-config",
+    "sed",
+    "zip"
    ]
   },
   "host": {
@@ -423,7 +472,6 @@
   "run": {
    "__set__": true,
    "elements": [
-    "libprotobuf",
     "r-base",
     "r-jsonlite",
     "r-rcpp >=0.12.12"
@@ -441,10 +489,139 @@
   "https://cran.r-project.org/src/contrib/protolite_2.3.1.tar.gz",
   "https://cran.r-project.org/src/contrib/Archive/protolite/protolite_2.3.1.tar.gz",
   "https://cran.r-project.org/src/contrib/protolite_2.3.1.tar.gz",
+  "https://cran.r-project.org/src/contrib/Archive/protolite/protolite_2.3.1.tar.gz",
+  "https://cran.r-project.org/src/contrib/protolite_2.3.1.tar.gz",
   "https://cran.r-project.org/src/contrib/Archive/protolite/protolite_2.3.1.tar.gz"
  ],
  "version": "2.3.1",
  "version_pr_info": {
   "__lazy_json__": "version_pr_info/r-protolite.json"
+ },
+ "win_64_meta_yaml": {
+  "about": {
+   "dev_url": "https://github.com/jeroen/protolite",
+   "home": "https://github.com/jeroen/protolite#readme",
+   "license": "MIT",
+   "license_family": "MIT",
+   "license_file": [
+    "/lib/R/share/licenses/MIT",
+    "LICENSE"
+   ],
+   "summary": "Optimized C++ implementations for reading and writing protocol-buffers. Currently supports 'rexp.proto' for serializing R objects and 'geobuf.proto' for geojson data. This lightweight package is complementary to the much larger 'RProtoBuf' package which provides a full featured toolkit for working with protocol-buffers in R."
+  },
+  "build": {
+   "missing_dso_whitelist": [
+    "*/R.dll",
+    "*/Rblas.dll",
+    "*/Rlapack.dll"
+   ],
+   "number": "1",
+   "rpaths": [
+    "lib/R/lib/",
+    "lib/"
+   ]
+  },
+  "extra": {
+   "recipe-maintainers": [
+    "conda-forge/r",
+    "xhochy"
+   ]
+  },
+  "package": {
+   "name": "r-protolite",
+   "version": "2.3.1"
+  },
+  "requirements": {
+   "build": [
+    "m2w64_c_compiler_stub",
+    "m2w64_c_stdlib_stub",
+    "m2w64_cxx_compiler_stub",
+    "filesystem",
+    "sed",
+    "grep",
+    "autoconf",
+    "automake-wrapper",
+    "pkg-config",
+    "make",
+    "coreutils",
+    "zip"
+   ],
+   "host": [
+    "r-base",
+    "r-rcpp >=0.12.12",
+    "r-jsonlite"
+   ],
+   "run": [
+    "r-base",
+    "r-rcpp >=0.12.12",
+    "r-jsonlite"
+   ]
+  },
+  "schema_version": 0,
+  "source": {
+   "patches": [
+    "patches/0001-add-win-pthread.patch"
+   ],
+   "sha256": "eed46fd63f9d183f974f420e9351f64e45c9edba00f56cc8c132c7aeb21697cc",
+   "url": [
+    "https://cran.r-project.org/src/contrib/protolite_2.3.1.tar.gz",
+    "https://cran.r-project.org/src/contrib/Archive/protolite/protolite_2.3.1.tar.gz"
+   ]
+  },
+  "test": {
+   "commands": [
+    "\"%R%\" -e \"library('protolite')\"",
+    "\"%R%\" -e \"testthat::test_file('tests/testthat.R', stop_on_failure=TRUE)\""
+   ],
+   "requires": [
+    "r-testthat",
+    "r-sf"
+   ],
+   "source_files": [
+    "tests/"
+   ]
+  }
+ },
+ "win_64_requirements": {
+  "build": {
+   "__set__": true,
+   "elements": [
+    "autoconf",
+    "automake-wrapper",
+    "coreutils",
+    "filesystem",
+    "grep",
+    "m2w64_c_compiler_stub",
+    "m2w64_c_stdlib_stub",
+    "m2w64_cxx_compiler_stub",
+    "make",
+    "pkg-config",
+    "sed",
+    "zip"
+   ]
+  },
+  "host": {
+   "__set__": true,
+   "elements": [
+    "r-base",
+    "r-jsonlite",
+    "r-rcpp"
+   ]
+  },
+  "run": {
+   "__set__": true,
+   "elements": [
+    "r-base",
+    "r-jsonlite",
+    "r-rcpp"
+   ]
+  },
+  "test": {
+   "__set__": true,
+   "elements": [
+    "r-sf",
+    "r-testthat"
+   ]
+  }
  }
 }
