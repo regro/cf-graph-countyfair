@@ -24,8 +24,8 @@
    "summary": "The bitsandbytes library is a lightweight Python wrapper around CUDA custom functions, in particular 8-bit optimizers, matrix multiplication (LLM.int8()), and 8 & 4-bit quantization functions."
   },
   "build": {
-   "number": "0",
-   "string": "cpu_py39h1234567_0"
+   "number": "1",
+   "string": "cpu_py39h1234567_1"
   },
   "extra": {
    "recipe-maintainers": [
@@ -62,6 +62,7 @@
    "run": [
     "python",
     "pytorch",
+    "setuptools",
     "scipy"
    ]
   },
@@ -112,7 +113,8 @@
    "elements": [
     "python",
     "pytorch",
-    "scipy"
+    "scipy",
+    "setuptools"
    ]
   },
   "test": {
@@ -130,8 +132,8 @@
    "summary": "The bitsandbytes library is a lightweight Python wrapper around CUDA custom functions, in particular 8-bit optimizers, matrix multiplication (LLM.int8()), and 8 & 4-bit quantization functions."
   },
   "build": {
-   "number": "0",
-   "string": "cpu_py39h1234567_0"
+   "number": "1",
+   "string": "cpu_py39h1234567_1"
   },
   "extra": {
    "recipe-maintainers": [
@@ -168,6 +170,7 @@
    "run": [
     "python",
     "pytorch",
+    "setuptools",
     "scipy"
    ]
   },
@@ -202,7 +205,7 @@
  "pr_info": {
   "__lazy_json__": "pr_info/bitsandbytes.json"
  },
- "raw_meta_yaml": "{% set name = \"bitsandbytes\" %}\n{% set version = \"0.44.1\" %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  # Don't use the PyPI source tarball as this already contains compiled code.\n  url: https://github.com/bitsandbytes-foundation/bitsandbytes/archive/refs/tags/{{ version }}.tar.gz\n  sha256: 8c5ebba06615e5e0cbafbd7fc70656245862a38349ef82b1352cc9f3b5727fbb\n\nbuild:\n  number: 0\n  string: cuda{{ cuda_compiler_version | replace('.', '') }}_py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version != \"None\"]\n  string: cpu_py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version == \"None\"]\n  skip: true  # [not linux]\n  skip: true  # [cuda_compiler_version == \"10.2\"]\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ stdlib('c') }}\n    - {{ compiler('cxx') }}\n    - {{ compiler(\"cuda\") }}                 # [cuda_compiler_version != \"None\"]\n    - cmake\n    - ninja\n  host:\n    - python\n    - pip\n    - setuptools\n    - cuda-cudart-dev   # [(cuda_compiler_version or \"\").startswith(\"12\")]\n    - libcublas-dev     # [(cuda_compiler_version or \"\").startswith(\"12\")]\n    - libcusparse-dev   # [(cuda_compiler_version or \"\").startswith(\"12\")]\n    - cuda-version  {{ cuda_compiler_version }}  # [cuda_compiler_version != \"None\"]\n    - scipy\n  run:\n    - python\n    - pytorch\n    - scipy\n\ntest:\n  imports:\n    - bitsandbytes\n  commands:\n    - pip check\n  requires:\n    - pip\n\nabout:\n  home: https://github.com/bitsandbytes-foundation/bitsandbytes\n  summary: The bitsandbytes library is a lightweight Python wrapper around CUDA custom functions, in particular 8-bit optimizers, matrix multiplication (LLM.int8()), and 8 & 4-bit quantization functions.\n  license: MIT\n  license_file: LICENSE\n\nextra:\n  recipe-maintainers:\n    - xhochy\n    - iamthebot\n    - shaowei-su\n    - snapbug\n",
+ "raw_meta_yaml": "{% set name = \"bitsandbytes\" %}\n{% set version = \"0.44.1\" %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  # Don't use the PyPI source tarball as this already contains compiled code.\n  url: https://github.com/bitsandbytes-foundation/bitsandbytes/archive/refs/tags/{{ version }}.tar.gz\n  sha256: 8c5ebba06615e5e0cbafbd7fc70656245862a38349ef82b1352cc9f3b5727fbb\n\nbuild:\n  number: 1\n  string: cuda{{ cuda_compiler_version | replace('.', '') }}_py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version != \"None\"]\n  string: cpu_py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version == \"None\"]\n  skip: true  # [not linux]\n  skip: true  # [cuda_compiler_version == \"10.2\"]\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ stdlib('c') }}\n    - {{ compiler('cxx') }}\n    - {{ compiler(\"cuda\") }}                 # [cuda_compiler_version != \"None\"]\n    - cmake\n    - ninja\n  host:\n    - python\n    - pip\n    - setuptools\n    - cuda-cudart-dev   # [(cuda_compiler_version or \"\").startswith(\"12\")]\n    - libcublas-dev     # [(cuda_compiler_version or \"\").startswith(\"12\")]\n    - libcusparse-dev   # [(cuda_compiler_version or \"\").startswith(\"12\")]\n    - cuda-version  {{ cuda_compiler_version }}  # [cuda_compiler_version != \"None\"]\n    - scipy\n  run:\n    - python\n    - pytorch\n    # This fixes:\n    # torch 2.4.1 requires setuptools, which is not installed.\n    # Remove once the feedstock has fixed this.\n    - setuptools\n    - scipy\n\ntest:\n  imports:\n    - bitsandbytes\n  commands:\n    - pip check\n  requires:\n    - pip\n\nabout:\n  home: https://github.com/bitsandbytes-foundation/bitsandbytes\n  summary: The bitsandbytes library is a lightweight Python wrapper around CUDA custom functions, in particular 8-bit optimizers, matrix multiplication (LLM.int8()), and 8 & 4-bit quantization functions.\n  license: MIT\n  license_file: LICENSE\n\nextra:\n  recipe-maintainers:\n    - xhochy\n    - iamthebot\n    - shaowei-su\n    - snapbug\n",
  "req": {
   "__set__": true,
   "elements": [
@@ -261,7 +264,8 @@
     "cxx_compiler_stub",
     "python",
     "pytorch",
-    "scipy"
+    "scipy",
+    "setuptools"
    ]
   },
   "test": {
@@ -303,7 +307,8 @@
    "elements": [
     "python",
     "pytorch",
-    "scipy"
+    "scipy",
+    "setuptools"
    ]
   },
   "test": {
