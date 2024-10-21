@@ -66,13 +66,14 @@ jobs:
           git config --global user.name regro-cf-autotick-bot
           git config --global user.email 36490558+regro-cf-autotick-bot@users.noreply.github.com
           git config --global pull.rebase false
+          git config --global push.autoSetupRemote true
 
           git add conda-lock.yml
           git commit -m "relock w/ conda-lock.yml"
 
           for i in `seq 1 5`; do
             git pull -s recursive -X theirs --no-edit --commit || :
-            git push https://x-access-token:${TOKEN}@github.com/regro/cf-graph-countyfair.git master || :
+            git push https://x-access-token:${GH_TOKEN}@github.com/regro/cf-graph-countyfair.git master || :
           done
 
           cd ..
@@ -100,12 +101,16 @@ jobs:
           done
 
           if [[ "${found_one}" == "true" ]]; then
+            git checkout -b relock-env-${GITHUB_RUN_ID}-${GITHUB_RUN_NUMBER}
             git commit -m "rebuild for new conda-lock.yml file" --allow-empty
             
             for i in `seq 1 5`; do
               git pull -s recursive -X theirs --no-edit --commit || :
-              git push https://x-access-token:${TOKEN}@github.com/regro/cf-scripts.git main || :
+              git push https://x-access-token:${GH_TOKEN}@github.com/regro/cf-scripts.git main || :
             done
+
+            pr_url=$(gh pr -R regro/cf-scripts create -B main -H relock-env-${GITHUB_RUN_ID}-${GITHUB_RUN_NUMBER} --fill)
+            gh pr -R regro/cf-scripts merge ${pr_url} --admin  # we already tested above so skip merge queue
           fi
           
           cd ..
