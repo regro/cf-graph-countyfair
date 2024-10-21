@@ -13,6 +13,7 @@ jobs:
     runs-on: "ubuntu-latest"
     outputs:
       relocked: ${{ steps.relock.outputs.relocked }}
+      summary: ${{ steps.relock.outputs.summary }}
     steps:
       - name: download env and lockfile
         run: |
@@ -21,7 +22,7 @@ jobs:
 
       - name: relock env
         id: relock
-        uses: beckermr/relock-conda@7ea2f88bde7a082770f6ac4a121fa9ab9ced0dc8
+        uses: beckermr/relock-conda@49530e32234db1af2014b31a9e7c484488ec5daa
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           action: file
@@ -73,5 +74,41 @@ jobs:
             git pull -s recursive -X theirs --no-edit --commit || :
             git push https://x-access-token:${TOKEN}@github.com/regro/cf-graph-countyfair.git master || :
           done
+
+          cd ..
+
+          git clone --depth=5 https://github.com/regro/cf-scripts.git
+          cd cf-scripts
+
+          found_one=false
+          for pkg in \
+            conda-forge-feedstock-ops \
+            conda conda-build \
+            mamba \
+            rattler-build \
+            conda-forge-feedstock-check-solvable \
+            conda-libmamba-solver \
+            conda-forge-metadata \
+            conda-smithy \
+            conda-package-handling \
+            ; \
+          do
+            val=$(echo "${SUMMARY}" | grep "${pkg}")
+            if [[ "${val}" != "" ]]; then
+              found_one=true
+            fi
+          done
+
+          if [[ "${found_one}" == "true" ]]; then
+            git commit -m "rebuild for new conda-lock.yml file" --allow-empty
+            
+            for i in `seq 1 5`; do
+              git pull -s recursive -X theirs --no-edit --commit || :
+              git push https://x-access-token:${TOKEN}@github.com/regro/cf-scripts.git main || :
+            done
+          fi
+          
+          cd ..
         env:
+          SUMMARY: ${{ needs.relock.outputs.summary }}
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
