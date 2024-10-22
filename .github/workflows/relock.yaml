@@ -1,7 +1,13 @@
 name: relock
 
 on:
-  workflow_dispatch: null
+  workflow_dispatch:
+    inputs:
+      force_relock:
+        description: 'force the environment to be relocked'
+        required: false
+        type: boolean
+        default: false
   schedule:
     - cron: '*/30 * * * *'
 
@@ -26,6 +32,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           action: file
+          relock-all-packages: ${{ inputs.force_relock }}$
 
       - name: upload conda-lock.yml to artifact
         if: steps.relock.outputs.relocked == 'true'
