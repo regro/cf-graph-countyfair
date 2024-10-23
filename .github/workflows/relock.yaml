@@ -108,16 +108,19 @@ jobs:
           done
 
           if [[ "${found_one}" == "true" ]]; then
-            git checkout -b relock-env-${GITHUB_RUN_ID}-${GITHUB_RUN_NUMBER}
+            # cf_scripts_branch=relock-env-${GITHUB_RUN_ID}-${GITHUB_RUN_NUMBER}
+            # git checkout -b ${cf_scripts_branch}
+            cf_scripts_branch=main
+            
             git commit -m "rebuild for new conda-lock.yml file" --allow-empty
             
             for i in `seq 1 5`; do
               git pull -s recursive -X theirs --no-edit --commit || :
-              git push https://x-access-token:${GH_TOKEN}@github.com/regro/cf-scripts.git relock-env-${GITHUB_RUN_ID}-${GITHUB_RUN_NUMBER} || :
+              git push https://x-access-token:${GH_TOKEN}@github.com/regro/cf-scripts.git ${cf_scripts_branch} || :
             done
 
-            pr_url=$(gh pr -R regro/cf-scripts create -B main -H relock-env-${GITHUB_RUN_ID}-${GITHUB_RUN_NUMBER} --fill)
-            gh pr -R regro/cf-scripts merge ${pr_url} --admin --merge  # we already tested above so skip merge queue
+            # pr_url=$(gh pr -R regro/cf-scripts create -B main -H ${cf_scripts_branch} --fill)
+            # gh pr -R regro/cf-scripts merge ${pr_url} --admin --merge  # we already tested above so skip merge queue
           fi
           
           cd ..
