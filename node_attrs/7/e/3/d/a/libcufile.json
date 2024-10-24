@@ -35,7 +35,7 @@
   },
   "build": {
    "binary_relocation": false,
-   "number": "0"
+   "number": "1"
   },
   "extra": {
    "recipe-maintainers": [
@@ -68,10 +68,10 @@
       "c_compiler_stub",
       "cxx_compiler_stub",
       "c_stdlib_stub",
-      "cdt_stub",
       "patchelf <0.18.0"
      ],
      "host": [
+      "rdma-core",
       "cuda-version 12.6"
      ],
      "run": [
@@ -239,7 +239,6 @@
    "elements": [
     "c_compiler_stub",
     "c_stdlib_stub",
-    "cdt_stub",
     "cxx_compiler_stub",
     "patchelf"
    ]
@@ -249,7 +248,8 @@
    "elements": [
     "cuda-version",
     "libcufile-dev",
-    "libnuma"
+    "libnuma",
+    "rdma-core"
    ]
   },
   "run": {
@@ -278,7 +278,7 @@
   },
   "build": {
    "binary_relocation": false,
-   "number": "0"
+   "number": "1"
   },
   "extra": {
    "recipe-maintainers": [
@@ -315,6 +315,7 @@
       "patchelf <0.18.0"
      ],
      "host": [
+      "rdma-core",
       "cuda-version 12.6"
      ],
      "run": [
@@ -469,9 +470,13 @@
   "test": {
    "commands": [
     "test -L $PREFIX/lib/libcufile.so.0",
+    "test -L $PREFIX/lib/libcufile_rdma.so.1",
     "test -L $PREFIX/lib/libcufile.so.1.11.1",
+    "test -L $PREFIX/lib/libcufile_rdma.so.1.11.1",
     "test -L $PREFIX/targets/sbsa-linux/lib/libcufile.so.0",
+    "test -L $PREFIX/targets/sbsa-linux/lib/libcufile_rdma.so.1",
     "test -f $PREFIX/targets/sbsa-linux/lib/libcufile.so.1.11.1",
+    "test -f $PREFIX/targets/sbsa-linux/lib/libcufile_rdma.so.1.11.1",
     "bash test-rpath.sh"
    ],
    "files": [
@@ -498,7 +503,8 @@
    "elements": [
     "cuda-version",
     "libcufile-dev",
-    "libnuma"
+    "libnuma",
+    "rdma-core"
    ]
   },
   "run": {
@@ -527,7 +533,7 @@
   },
   "build": {
    "binary_relocation": false,
-   "number": "0"
+   "number": "1"
   },
   "extra": {
    "recipe-maintainers": [
@@ -560,10 +566,10 @@
       "c_compiler_stub",
       "cxx_compiler_stub",
       "c_stdlib_stub",
-      "cdt_stub",
       "patchelf <0.18.0"
      ],
      "host": [
+      "rdma-core",
       "cuda-version 12.6"
      ],
      "run": [
@@ -724,6 +730,7 @@
       "patchelf <0.18.0"
      ],
      "host": [
+      "rdma-core",
       "cuda-version 12.6"
      ],
      "run": [
@@ -913,20 +920,20 @@
  "pr_info": {
   "__lazy_json__": "pr_info/libcufile.json"
  },
- "raw_meta_yaml": "{% set name = \"libcufile\" %}\n{% set version = \"1.11.1.6\" %}\n{% set cuda_version = \"12.6\" %}\n{% set platform = \"linux-x86_64\" %}  # [linux64]\n{% set platform = \"linux-sbsa\" %}  # [aarch64]\n{% set target_name = \"x86_64-linux\" %}  # [linux64]\n{% set target_name = \"sbsa-linux\" %}  # [aarch64]\n{% set extension = \"tar.xz\" %}  # [not win]\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://developer.download.nvidia.com/compute/cuda/redist/{{ name }}/{{ platform }}/{{ name }}-{{ platform }}-{{ version }}-archive.{{ extension }}\n  sha256: 99ee42e0ebf826f13cea9d15d63f54f225ddc42ff87be1427c58be9692ae25bc  # [linux64]\n  sha256: fda8d0491f9e3311adb317841893a531737b82316187619e2116d86d7a84faaf  # [aarch64]\n\nbuild:\n  number: 0\n  binary_relocation: false\n  skip: true  # [not (linux64 or aarch64)]\n\ntest:\n  requires:\n    - patchelf  # [linux]\n  files:\n    - test-rpath.sh\n  commands:\n    # Note that the version of libcufile does not match\n    # {{ version.split(\".\")[0] }} but the major version of libcufile_rdma does\n    # match that. Also we must drop the last component of the version when\n    # finding the versioned .so file.\n    {% set full_version = version.split(\".\")[:-1] | join(\".\") %}\n    - test -L $PREFIX/lib/libcufile.so.0\n    - test -L $PREFIX/lib/libcufile_rdma.so.{{ version.split(\".\")[0] }}  # [linux64]\n    - test -L $PREFIX/lib/libcufile.so.{{ full_version }}\n    - test -L $PREFIX/lib/libcufile_rdma.so.{{ full_version }}  # [linux64]\n    - test -L $PREFIX/targets/{{ target_name }}/lib/libcufile.so.0\n    - test -L $PREFIX/targets/{{ target_name }}/lib/libcufile_rdma.so.{{ version.split(\".\")[0] }}  # [linux64]\n    - test -f $PREFIX/targets/{{ target_name }}/lib/libcufile.so.{{ full_version }}\n    - test -f $PREFIX/targets/{{ target_name }}/lib/libcufile_rdma.so.{{ full_version }}  # [linux64]\n    - bash test-rpath.sh                                                                      # [linux]\n\noutputs:\n  - name: libcufile\n    build:\n      missing_dso_whitelist:\n        - \"*/libcuda.so.*\"\n    files:\n      - lib/libcufile*.so.*\n      - targets/{{ target_name }}/lib/libcufile*.so.*\n    requirements:\n      build:\n        - {{ compiler(\"c\") }}\n        - {{ compiler(\"cxx\") }}\n        - arm-variant * {{ arm_variant_type }}  # [aarch64]\n        - {{ stdlib(\"c\") }}\n        - {{ cdt(\"rdma-core-devel\") }}          # [linux64]\n        - patchelf <0.18.0                      # [linux]\n      host:\n        - cuda-version {{ cuda_version }}\n      run:\n        - {{ pin_compatible(\"cuda-version\", max_pin=\"x.x\") }}\n      run_constrained:\n        - arm-variant * {{ arm_variant_type }}  # [aarch64]\n    # Tests are defined at the top level, due to package/output name conflicts.\n    about:\n      home: https://developer.nvidia.com/cuda-toolkit\n      license: LicenseRef-NVIDIA-End-User-License-Agreement\n      license_file: LICENSE\n      license_url: https://docs.nvidia.com/cuda/eula/index.html\n      summary: Library for NVIDIA GPUDirect Storage\n      description: |\n        The cuFile library provides a direct data path between GPU memory and storage.\n      doc_url: https://docs.nvidia.com/gpudirect-storage/api-reference-guide/index.html\n\n  - name: libcufile-dev\n    build:\n      run_exports:\n        - {{ pin_subpackage(\"libcufile\", max_pin=\"x\") }}\n    files:\n      - lib/libcufile*.so\n      - lib/pkgconfig\n      - targets/{{ target_name }}/include\n      - targets/{{ target_name }}/lib/libcufile*.so\n      - man/man3\n    requirements:\n      build:\n        - {{ compiler(\"c\") }}\n        - {{ compiler(\"cxx\") }}\n        - arm-variant * {{ arm_variant_type }}  # [aarch64]\n        - {{ stdlib(\"c\") }}\n      host:\n        - cuda-version {{ cuda_version }}\n      run:\n        - {{ pin_compatible(\"cuda-version\", max_pin=\"x.x\") }}\n        - {{ pin_subpackage(\"libcufile\", exact=True) }}\n      run_constrained:\n        - arm-variant * {{ arm_variant_type }}  # [aarch64]\n        - libcufile-static >={{ version }}\n    test:\n      commands:\n        - test -L $PREFIX/lib/libcufile.so\n        - test -L $PREFIX/lib/libcufile_rdma.so\n        - test -f $PREFIX/targets/{{ target_name }}/include/cufile.h\n        - test -L $PREFIX/targets/{{ target_name }}/lib/libcufile.so\n        - test -L $PREFIX/targets/{{ target_name }}/lib/libcufile_rdma.so\n        - test -d $PREFIX/man/man3\n    about:\n      home: https://developer.nvidia.com/cuda-toolkit\n      license: LicenseRef-NVIDIA-End-User-License-Agreement\n      license_file: LICENSE\n      license_url: https://docs.nvidia.com/cuda/eula/index.html\n      summary: Library for NVIDIA GPUDirect Storage\n      description: |\n        The cuFile library provides a direct data path between GPU memory and storage.\n      doc_url: https://docs.nvidia.com/gpudirect-storage/api-reference-guide/index.html\n\n  - name: libcufile-static\n    files:\n      - targets/{{ target_name }}/lib/libcufile*_static.a\n    requirements:\n      build:\n        - {{ compiler(\"c\") }}\n        - {{ compiler(\"cxx\") }}\n        - arm-variant * {{ arm_variant_type }}  # [aarch64]\n        - {{ stdlib(\"c\") }}\n      host:\n        - cuda-version {{ cuda_version }}\n      run:\n        - {{ pin_compatible(\"cuda-version\", max_pin=\"x.x\") }}\n      run_constrained:\n        - arm-variant * {{ arm_variant_type }}  # [aarch64]\n    test:\n      commands:\n        - test -f $PREFIX/targets/{{ target_name }}/lib/libcufile_static.a\n        - test -f $PREFIX/targets/{{ target_name }}/lib/libcufile_rdma_static.a\n    about:\n      home: https://developer.nvidia.com/cuda-toolkit\n      license: LicenseRef-NVIDIA-End-User-License-Agreement\n      license_file: LICENSE\n      license_url: https://docs.nvidia.com/cuda/eula/index.html\n      summary: Library for NVIDIA GPUDirect Storage\n      description: |\n        The cuFile library provides a direct data path between GPU memory and storage.\n      doc_url: https://docs.nvidia.com/gpudirect-storage/api-reference-guide/index.html\n\n  - name: gds-tools\n    files:\n      - gds/tools\n    requirements:\n      build:\n        - {{ compiler(\"c\") }}\n        - {{ compiler(\"cxx\") }}\n        - arm-variant * {{ arm_variant_type }}  # [aarch64]\n        - {{ stdlib(\"c\") }}\n      host:\n        - cuda-version {{ cuda_version }}\n        - libcufile-dev {{ version }}\n        - libnuma  # [linux]\n      run:\n        - {{ pin_compatible(\"cuda-version\", max_pin=\"x.x\") }}\n        - {{ pin_subpackage(\"libcufile\", max_pin=\"x\") }}\n      run_constrained:\n        - arm-variant * {{ arm_variant_type }}  # [aarch64]\n    test:\n      commands:\n        - test -d $PREFIX/gds/tools\n    about:\n      home: https://developer.nvidia.com/cuda-toolkit\n      license: LicenseRef-NVIDIA-End-User-License-Agreement\n      license_file: LICENSE\n      license_url: https://docs.nvidia.com/cuda/eula/index.html\n      summary: Library for NVIDIA GPUDirect Storage\n      description: |\n        The cuFile library provides a direct data path between GPU memory and storage.\n      doc_url: https://docs.nvidia.com/gpudirect-storage/api-reference-guide/index.html\n\nabout:\n  home: https://developer.nvidia.com/cuda-toolkit\n  license: LicenseRef-NVIDIA-End-User-License-Agreement\n  license_file: LICENSE\n  license_url: https://docs.nvidia.com/cuda/eula/index.html\n  summary: Library for NVIDIA GPUDirect Storage\n  description: |\n    The cuFile library provides a direct data path between GPU memory and storage.\n  doc_url: https://docs.nvidia.com/gpudirect-storage/api-reference-guide/index.html\n\nextra:\n  recipe-maintainers:\n    - conda-forge/cuda\n",
+ "raw_meta_yaml": "{% set name = \"libcufile\" %}\n{% set version = \"1.11.1.6\" %}\n{% set cuda_version = \"12.6\" %}\n{% set platform = \"linux-x86_64\" %}  # [linux64]\n{% set platform = \"linux-sbsa\" %}  # [aarch64]\n{% set target_name = \"x86_64-linux\" %}  # [linux64]\n{% set target_name = \"sbsa-linux\" %}  # [aarch64]\n{% set extension = \"tar.xz\" %}  # [not win]\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://developer.download.nvidia.com/compute/cuda/redist/{{ name }}/{{ platform }}/{{ name }}-{{ platform }}-{{ version }}-archive.{{ extension }}\n  sha256: 99ee42e0ebf826f13cea9d15d63f54f225ddc42ff87be1427c58be9692ae25bc  # [linux64]\n  sha256: fda8d0491f9e3311adb317841893a531737b82316187619e2116d86d7a84faaf  # [aarch64]\n\nbuild:\n  number: 1\n  binary_relocation: false\n  skip: true  # [not (linux64 or aarch64)]\n\ntest:\n  requires:\n    - patchelf  # [linux]\n  files:\n    - test-rpath.sh\n  commands:\n    # Note that the version of libcufile does not match\n    # {{ version.split(\".\")[0] }} but the major version of libcufile_rdma does\n    # match that. Also we must drop the last component of the version when\n    # finding the versioned .so file.\n    {% set full_version = version.split(\".\")[:-1] | join(\".\") %}\n    - test -L $PREFIX/lib/libcufile.so.0\n    - test -L $PREFIX/lib/libcufile_rdma.so.{{ version.split(\".\")[0] }}\n    - test -L $PREFIX/lib/libcufile.so.{{ full_version }}\n    - test -L $PREFIX/lib/libcufile_rdma.so.{{ full_version }}\n    - test -L $PREFIX/targets/{{ target_name }}/lib/libcufile.so.0\n    - test -L $PREFIX/targets/{{ target_name }}/lib/libcufile_rdma.so.{{ version.split(\".\")[0] }}\n    - test -f $PREFIX/targets/{{ target_name }}/lib/libcufile.so.{{ full_version }}\n    - test -f $PREFIX/targets/{{ target_name }}/lib/libcufile_rdma.so.{{ full_version }}\n    - bash test-rpath.sh                                                                      # [linux]\n\noutputs:\n  - name: libcufile\n    build:\n      missing_dso_whitelist:\n        - \"*/libcuda.so.*\"\n    files:\n      - lib/libcufile*.so.*\n      - targets/{{ target_name }}/lib/libcufile*.so.*\n    requirements:\n      build:\n        - {{ compiler(\"c\") }}\n        - {{ compiler(\"cxx\") }}\n        - arm-variant * {{ arm_variant_type }}  # [aarch64]\n        - {{ stdlib(\"c\") }}\n        - patchelf <0.18.0                      # [linux]\n      host:\n        - rdma-core                             # [linux]\n        - cuda-version {{ cuda_version }}\n      run:\n        - {{ pin_compatible(\"cuda-version\", max_pin=\"x.x\") }}\n      run_constrained:\n        - arm-variant * {{ arm_variant_type }}  # [aarch64]\n    # Tests are defined at the top level, due to package/output name conflicts.\n    about:\n      home: https://developer.nvidia.com/cuda-toolkit\n      license: LicenseRef-NVIDIA-End-User-License-Agreement\n      license_file: LICENSE\n      license_url: https://docs.nvidia.com/cuda/eula/index.html\n      summary: Library for NVIDIA GPUDirect Storage\n      description: |\n        The cuFile library provides a direct data path between GPU memory and storage.\n      doc_url: https://docs.nvidia.com/gpudirect-storage/api-reference-guide/index.html\n\n  - name: libcufile-dev\n    build:\n      run_exports:\n        - {{ pin_subpackage(\"libcufile\", max_pin=\"x\") }}\n    files:\n      - lib/libcufile*.so\n      - lib/pkgconfig\n      - targets/{{ target_name }}/include\n      - targets/{{ target_name }}/lib/libcufile*.so\n      - man/man3\n    requirements:\n      build:\n        - {{ compiler(\"c\") }}\n        - {{ compiler(\"cxx\") }}\n        - arm-variant * {{ arm_variant_type }}  # [aarch64]\n        - {{ stdlib(\"c\") }}\n      host:\n        - cuda-version {{ cuda_version }}\n      run:\n        - {{ pin_compatible(\"cuda-version\", max_pin=\"x.x\") }}\n        - {{ pin_subpackage(\"libcufile\", exact=True) }}\n      run_constrained:\n        - arm-variant * {{ arm_variant_type }}  # [aarch64]\n        - libcufile-static >={{ version }}\n    test:\n      commands:\n        - test -L $PREFIX/lib/libcufile.so\n        - test -L $PREFIX/lib/libcufile_rdma.so\n        - test -f $PREFIX/targets/{{ target_name }}/include/cufile.h\n        - test -L $PREFIX/targets/{{ target_name }}/lib/libcufile.so\n        - test -L $PREFIX/targets/{{ target_name }}/lib/libcufile_rdma.so\n        - test -d $PREFIX/man/man3\n    about:\n      home: https://developer.nvidia.com/cuda-toolkit\n      license: LicenseRef-NVIDIA-End-User-License-Agreement\n      license_file: LICENSE\n      license_url: https://docs.nvidia.com/cuda/eula/index.html\n      summary: Library for NVIDIA GPUDirect Storage\n      description: |\n        The cuFile library provides a direct data path between GPU memory and storage.\n      doc_url: https://docs.nvidia.com/gpudirect-storage/api-reference-guide/index.html\n\n  - name: libcufile-static\n    files:\n      - targets/{{ target_name }}/lib/libcufile*_static.a\n    requirements:\n      build:\n        - {{ compiler(\"c\") }}\n        - {{ compiler(\"cxx\") }}\n        - arm-variant * {{ arm_variant_type }}  # [aarch64]\n        - {{ stdlib(\"c\") }}\n      host:\n        - cuda-version {{ cuda_version }}\n      run:\n        - {{ pin_compatible(\"cuda-version\", max_pin=\"x.x\") }}\n      run_constrained:\n        - arm-variant * {{ arm_variant_type }}  # [aarch64]\n    test:\n      commands:\n        - test -f $PREFIX/targets/{{ target_name }}/lib/libcufile_static.a\n        - test -f $PREFIX/targets/{{ target_name }}/lib/libcufile_rdma_static.a\n    about:\n      home: https://developer.nvidia.com/cuda-toolkit\n      license: LicenseRef-NVIDIA-End-User-License-Agreement\n      license_file: LICENSE\n      license_url: https://docs.nvidia.com/cuda/eula/index.html\n      summary: Library for NVIDIA GPUDirect Storage\n      description: |\n        The cuFile library provides a direct data path between GPU memory and storage.\n      doc_url: https://docs.nvidia.com/gpudirect-storage/api-reference-guide/index.html\n\n  - name: gds-tools\n    files:\n      - gds/tools\n    requirements:\n      build:\n        - {{ compiler(\"c\") }}\n        - {{ compiler(\"cxx\") }}\n        - arm-variant * {{ arm_variant_type }}  # [aarch64]\n        - {{ stdlib(\"c\") }}\n      host:\n        - cuda-version {{ cuda_version }}\n        - libcufile-dev {{ version }}\n        - libnuma  # [linux]\n      run:\n        - {{ pin_compatible(\"cuda-version\", max_pin=\"x.x\") }}\n        - {{ pin_subpackage(\"libcufile\", max_pin=\"x\") }}\n      run_constrained:\n        - arm-variant * {{ arm_variant_type }}  # [aarch64]\n    test:\n      commands:\n        - test -d $PREFIX/gds/tools\n    about:\n      home: https://developer.nvidia.com/cuda-toolkit\n      license: LicenseRef-NVIDIA-End-User-License-Agreement\n      license_file: LICENSE\n      license_url: https://docs.nvidia.com/cuda/eula/index.html\n      summary: Library for NVIDIA GPUDirect Storage\n      description: |\n        The cuFile library provides a direct data path between GPU memory and storage.\n      doc_url: https://docs.nvidia.com/gpudirect-storage/api-reference-guide/index.html\n\nabout:\n  home: https://developer.nvidia.com/cuda-toolkit\n  license: LicenseRef-NVIDIA-End-User-License-Agreement\n  license_file: LICENSE\n  license_url: https://docs.nvidia.com/cuda/eula/index.html\n  summary: Library for NVIDIA GPUDirect Storage\n  description: |\n    The cuFile library provides a direct data path between GPU memory and storage.\n  doc_url: https://docs.nvidia.com/gpudirect-storage/api-reference-guide/index.html\n\nextra:\n  recipe-maintainers:\n    - conda-forge/cuda\n",
  "req": {
   "__set__": true,
   "elements": [
    "arm-variant",
    "c_compiler_stub",
    "c_stdlib_stub",
-   "cdt_stub",
    "cuda-version",
    "cxx_compiler_stub",
    "libcufile",
    "libcufile-dev",
    "libnuma",
-   "patchelf"
+   "patchelf",
+   "rdma-core"
   ]
  },
  "requirements": {
@@ -936,7 +943,6 @@
     "arm-variant",
     "c_compiler_stub",
     "c_stdlib_stub",
-    "cdt_stub",
     "cxx_compiler_stub",
     "patchelf"
    ]
@@ -949,7 +955,8 @@
     "cuda-version",
     "cxx_compiler_stub",
     "libcufile-dev",
-    "libnuma"
+    "libnuma",
+    "rdma-core"
    ]
   },
   "run": {
@@ -977,7 +984,6 @@
     "arm-variant * sbsa",
     "c_compiler_stub",
     "c_stdlib_stub",
-    "cdt_stub",
     "cxx_compiler_stub",
     "patchelf <0.18.0"
    ]
@@ -987,7 +993,8 @@
    "elements": [
     "cuda-version 12.6",
     "libcufile-dev 1.11.1.6",
-    "libnuma"
+    "libnuma",
+    "rdma-core"
    ]
   },
   "run": {
