@@ -1,6 +1,6 @@
 # cf-graph
 
-[![tests](https://github.com/regro/cf-graph-countyfair/actions/workflows/tests.yaml/badge.svg)](https://github.com/regro/cf-graph-countyfair/actions/workflows/tests.yaml) [![relock](https://github.com/regro/cf-graph-countyfair/actions/workflows/relock.yaml/badge.svg)](https://github.com/regro/cf-graph-countyfair/actions/workflows/relock.yaml)
+[![tests](https://github.com/regro/cf-graph-countyfair/actions/workflows/tests.yaml/badge.svg)](https://github.com/regro/cf-graph-countyfair/actions/workflows/tests.yaml)
 
 Repo for holding the conda-forge dependency graph and its introspection.
 
