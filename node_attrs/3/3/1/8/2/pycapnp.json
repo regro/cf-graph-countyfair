@@ -24,9 +24,9 @@
    "summary": "A cython wrapping of the C++ Cap'n Proto library"
   },
   "build": {
-   "number": "1",
+   "number": "2",
    "script": [
-    "cp -f PREFIX/include/capnp/*.capnp ./capnp/",
+    "cp -f \"/include/capnp\"/*.capnp ./capnp/",
     "python setup.py build_ext --force-system-libcapnp install"
    ]
   },
@@ -123,9 +123,9 @@
    "summary": "A cython wrapping of the C++ Cap'n Proto library"
   },
   "build": {
-   "number": "1",
+   "number": "2",
    "script": [
-    "cp -f PREFIX/include/capnp/*.capnp ./capnp/",
+    "cp -f \"/include/capnp\"/*.capnp ./capnp/",
     "python setup.py build_ext --force-system-libcapnp install",
     "copy /y \"\\capnp\\*.capnp\" .\\capnp\\"
    ]
@@ -189,9 +189,9 @@
    "summary": "A cython wrapping of the C++ Cap'n Proto library"
   },
   "build": {
-   "number": "1",
+   "number": "2",
    "script": [
-    "cp -f PREFIX/include/capnp/*.capnp ./capnp/",
+    "cp -f \"/include/capnp\"/*.capnp ./capnp/",
     "python setup.py build_ext --force-system-libcapnp install"
    ]
   },
@@ -288,9 +288,9 @@
    "summary": "A cython wrapping of the C++ Cap'n Proto library"
   },
   "build": {
-   "number": "1",
+   "number": "2",
    "script": [
-    "cp -f PREFIX/include/capnp/*.capnp ./capnp/",
+    "cp -f \"/include/capnp\"/*.capnp ./capnp/",
     "python setup.py build_ext --force-system-libcapnp install"
    ]
   },
@@ -395,7 +395,7 @@
  "pr_info": {
   "__lazy_json__": "pr_info/pycapnp.json"
  },
- "raw_meta_yaml": "{% set name = \"pycapnp\" %}\n{% set version = \"2.0.0\" %}\n\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  # as of 2.0.0, the PyPi source does not include the _custom_build/ directory, which is needed\n  # for pip install to work. This is why we are using the GitHub source.\n  url: https://github.com/capnproto/{{ name }}/archive/refs/tags/v{{ version }}.tar.gz\n  sha256: a9e3acc58d8d67a08dbe6c86513b6bbff734a608a7fceb102883a88877643059\n\nbuild:\n  skip: true  # [python_impl == 'pypy']\n  number: 1\n  script:\n    - copy /y \"{{ LIBRARY_INC }}\\capnp\\*.capnp\" .\\capnp\\  # [win]\n    - cp -f {{ PREFIX }}/include/capnp/*.capnp ./capnp/  # [not win]\n    # Can't use `pip install` because it doesn't seem there's a way to set this\n    # argument that way.\n    - python setup.py build_ext --force-system-libcapnp install\n\nrequirements:\n  build:\n    - capnproto                              # [build_platform != target_platform]\n    - python                                 # [build_platform != target_platform]\n    - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n    # <3 because https://github.com/capnproto/pycapnp/issues/319\n    - cython <3                              # [build_platform != target_platform]\n    - {{ compiler('c') }}\n    - {{ compiler('cxx') }}\n    - {{ stdlib('c') }}\n  host:\n    - capnproto\n    # <3 because https://github.com/capnproto/pycapnp/issues/319\n    - cython <3\n    - libxcrypt  # [py==38 and linux]\n    - pkgconfig\n    - setuptools\n    - pip\n    - python\n  run:\n    - python\n\ntest:\n  source_files:\n    - test\n    - examples\n  requires:\n    - python\n    - pytest\n    - pytest-asyncio\n  imports:\n    - capnp        # [build_platform == target_platform]\n  commands:\n    - pytest test  # [build_platform == target_platform]\n\nabout:\n  home: https://github.com/capnproto/pycapnp\n  summary: A cython wrapping of the C++ Cap'n Proto library\n  license: BSD-2-Clause\n  license_file: LICENSE.md\n\nextra:\n  recipe-maintainers:\n    - LehMaxence\n",
+ "raw_meta_yaml": "{% set name = \"pycapnp\" %}\n{% set version = \"2.0.0\" %}\n\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  # as of 2.0.0, the PyPi source does not include the _custom_build/ directory, which is needed\n  # for pip install to work. This is why we are using the GitHub source.\n  url: https://github.com/capnproto/{{ name }}/archive/refs/tags/v{{ version }}.tar.gz\n  sha256: a9e3acc58d8d67a08dbe6c86513b6bbff734a608a7fceb102883a88877643059\n\nbuild:\n  number: 2\n  script:\n    - copy /y \"{{ environ.get('LIBRARY_INC', '') }}\\capnp\\*.capnp\" .\\capnp\\  # [win]\n    - cp -f \"{{ environ.get('PREFIX', '') }}/include/capnp\"/*.capnp ./capnp/  # [not win]\n    # Can't use `pip install` because it doesn't seem there's a way to set this\n    # argument that way.\n    - python setup.py build_ext --force-system-libcapnp install\n\nrequirements:\n  build:\n    - capnproto                              # [build_platform != target_platform]\n    - python                                 # [build_platform != target_platform]\n    - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n    # <3 because https://github.com/capnproto/pycapnp/issues/319\n    - cython <3                              # [build_platform != target_platform]\n    - {{ compiler('c') }}\n    - {{ compiler('cxx') }}\n    - {{ stdlib('c') }}\n  host:\n    - capnproto\n    # <3 because https://github.com/capnproto/pycapnp/issues/319\n    - cython <3\n    - pkgconfig\n    - setuptools\n    - pip\n    - python\n  run:\n    - python\n\ntest:\n  source_files:\n    - test\n    - examples\n  requires:\n    - python\n    - pytest\n    - pytest-asyncio\n  imports:\n    - capnp        # [build_platform == target_platform]\n  commands:\n    - pytest test  # [build_platform == target_platform]\n\nabout:\n  home: https://github.com/capnproto/pycapnp\n  summary: A cython wrapping of the C++ Cap'n Proto library\n  license: BSD-2-Clause\n  license_file: LICENSE.md\n\nextra:\n  recipe-maintainers:\n    - LehMaxence\n",
  "req": {
   "__set__": true,
   "elements": [
@@ -500,7 +500,7 @@
    "summary": "A cython wrapping of the C++ Cap'n Proto library"
   },
   "build": {
-   "number": "1",
+   "number": "2",
    "script": [
     "copy /y \"\\capnp\\*.capnp\" .\\capnp\\",
     "python setup.py build_ext --force-system-libcapnp install"
