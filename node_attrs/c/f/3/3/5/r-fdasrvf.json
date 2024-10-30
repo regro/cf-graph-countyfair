@@ -20,14 +20,14 @@
   "about": {
    "home": "https://github.com/jdtuck/fdasrvf_R",
    "license": "GPL-2.0-or-later",
-   "license_family": "GPL3",
    "license_file": [
     "/lib/R/share/licenses/GPL-3"
    ],
    "summary": "Performs alignment, PCA, and modeling of multidimensional and unidimensional functions using the square-root velocity framework (Srivastava et al., 2011 <arXiv:1103.3817> and Tucker et al., 2014 <DOI:10.1016/j.csda.2012.12.001>). This framework allows for elastic analysis of functional data through phase and amplitude separation."
   },
   "build": {
-   "number": "0",
+   "missing_dso_whitelist": null,
+   "number": "1",
    "rpaths": [
     "lib/R/lib/",
     "lib/"
@@ -168,14 +168,18 @@
   "about": {
    "home": "https://github.com/jdtuck/fdasrvf_R",
    "license": "GPL-2.0-or-later",
-   "license_family": "GPL3",
    "license_file": [
     "/lib/R/share/licenses/GPL-3"
    ],
    "summary": "Performs alignment, PCA, and modeling of multidimensional and unidimensional functions using the square-root velocity framework (Srivastava et al., 2011 <arXiv:1103.3817> and Tucker et al., 2014 <DOI:10.1016/j.csda.2012.12.001>). This framework allows for elastic analysis of functional data through phase and amplitude separation."
   },
   "build": {
-   "number": "0",
+   "missing_dso_whitelist": [
+    "*/R.dll",
+    "*/Rblas.dll",
+    "*/Rlapack.dll"
+   ],
+   "number": "1",
    "rpaths": [
     "lib/R/lib/",
     "lib/"
@@ -196,7 +200,14 @@
     "c_compiler_stub",
     "c_stdlib_stub",
     "cxx_compiler_stub",
-    "make"
+    "make",
+    "m2w64_c_compiler_stub",
+    "m2w64_c_stdlib_stub",
+    "m2w64_cxx_compiler_stub",
+    "filesystem",
+    "sed",
+    "coreutils",
+    "zip"
    ],
    "host": [
     "r-base",
@@ -235,7 +246,8 @@
     "r-viridislite",
     "libblas",
     "liblapack",
-    "llvm-openmp"
+    "llvm-openmp",
+    "libgomp"
    ]
   },
   "schema_version": 0,
@@ -248,7 +260,8 @@
   },
   "test": {
    "commands": [
-    "$R -e \"library('fdasrvf')\""
+    "$R -e \"library('fdasrvf')\"",
+    "\"%R%\" -e \"library('fdasrvf')\""
    ]
   }
  },
@@ -257,14 +270,14 @@
   "about": {
    "home": "https://github.com/jdtuck/fdasrvf_R",
    "license": "GPL-2.0-or-later",
-   "license_family": "GPL3",
    "license_file": [
     "/lib/R/share/licenses/GPL-3"
    ],
    "summary": "Performs alignment, PCA, and modeling of multidimensional and unidimensional functions using the square-root velocity framework (Srivastava et al., 2011 <arXiv:1103.3817> and Tucker et al., 2014 <DOI:10.1016/j.csda.2012.12.001>). This framework allows for elastic analysis of functional data through phase and amplitude separation."
   },
   "build": {
-   "number": "0",
+   "missing_dso_whitelist": null,
+   "number": "1",
    "rpaths": [
     "lib/R/lib/",
     "lib/"
@@ -408,22 +421,28 @@
  "parsing_error": false,
  "platforms": [
   "linux_64",
-  "osx_64"
+  "osx_64",
+  "win_64"
  ],
  "pr_info": {
   "__lazy_json__": "pr_info/r-fdasrvf.json"
  },
- "raw_meta_yaml": "{% set version = \"2.3.3\" %}\n{% set posix = 'm2-' if win else '' %}\n{% set native = 'm2w64-' if win else '' %}\n\npackage:\n  name: r-fdasrvf\n  version: {{ version|replace(\"-\", \"_\") }}\n\nsource:\n  url:\n    - {{ cran_mirror }}/src/contrib/fdasrvf_{{ version }}.tar.gz\n    - {{ cran_mirror }}/src/contrib/Archive/fdasrvf/fdasrvf_{{ version }}.tar.gz\n  sha256: e8814d95da4a0482cad642d3ebfc33393946d9832e614944ebe2f24cb036a491\n\nbuild:\n  merge_build_host: true  # [win]\n  number: 0\n  skip: true  # [win]\n  rpaths:\n    - lib/R/lib/\n    - lib/\n\nrequirements:\n  build:\n    - {{ compiler('c') }}              # [not win]\n    - {{ stdlib(\"c\") }}                # [not win]\n    - {{ compiler('m2w64_c') }}        # [win]\n    - {{ stdlib(\"m2w64_c\") }}          # [win]\n    - {{ compiler('cxx') }}            # [not win]\n    - {{ compiler('m2w64_cxx') }}      # [win]\n    - {{ posix }}filesystem        # [win]\n    - {{ posix }}make\n    - {{ posix }}sed               # [win]\n    - {{ posix }}coreutils         # [win]\n    - {{ posix }}zip               # [win]\n    - cross-r-base {{ r_base }}    # [build_platform != target_platform]\n  host:\n    - r-base\n    - r-matrix\n    - r-rcpp\n    - r-rcpparmadillo\n    - r-cli\n    - r-coda\n    - r-doparallel\n    - r-fields\n    - r-foreach\n    - r-lpsolve\n    - r-mvtnorm\n    - r-rlang\n    - r-tolerance\n    - r-viridislite\n    - libblas\n    - liblapack\n    - libgomp                      # [linux]\n    - llvm-openmp\n  run:\n    - r-base\n    - {{ native }}gcc-libs         # [win]\n    - r-matrix\n    - r-rcpp\n    - r-rcpparmadillo\n    - r-cli\n    - r-coda\n    - r-doparallel\n    - r-fields\n    - r-foreach\n    - r-lpsolve\n    - r-mvtnorm\n    - r-rlang\n    - r-tolerance\n    - r-viridislite\n    - libblas\n    - liblapack\n    - llvm-openmp\n\ntest:\n  commands:\n    - $R -e \"library('fdasrvf')\"           # [not win]\n    - \"\\\"%R%\\\" -e \\\"library('fdasrvf')\\\"\"  # [win]\n\nabout:\n  home: https://github.com/jdtuck/fdasrvf_R\n  license: GPL-2.0-or-later\n  summary: Performs alignment, PCA, and modeling of multidimensional and unidimensional functions using the square-root velocity framework (Srivastava et al., 2011 <arXiv:1103.3817> and Tucker et al., 2014 <DOI:10.1016/j.csda.2012.12.001>). This framework allows for elastic analysis of functional data through phase and amplitude\n    separation.\n  license_family: GPL3\n  license_file:\n    - '{{ environ[\"PREFIX\"] }}/lib/R/share/licenses/GPL-3'\n\nextra:\n  recipe-maintainers:\n    - conda-forge/r\n    - jdtuck\n\n# Package: fdasrvf\n# Type: Package\n# Title: Elastic Functional Data Analysis\n# Version: 2.1.2\n# Date: 2023-12-20\n# Authors@R: c( person(given = \"J. Derek\", family = \"Tucker\", role = c(\"aut\", \"cre\"), email = \"jdtuck@sandia.gov\", comment = c(ORCID = \"0000-0001-8844-2169\")), person(given = \"Aymeric\", family = \"Stamm\", role = \"ctb\", email = \"aymeric.stamm@math.cnrs.fr\", comment = c(ORCID = \"0000-0002-8725-3654\")))\n# Description: Performs alignment, PCA, and modeling of multidimensional and unidimensional functions using the square-root velocity framework (Srivastava et al., 2011 <arXiv:1103.3817> and Tucker et al., 2014 <DOI:10.1016/j.csda.2012.12.001>). This framework allows for elastic analysis of functional data through phase and amplitude separation.\n# License: GPL-3\n# LazyData: TRUE\n# Imports: cli, coda, doParallel, fields, foreach, lpSolve, Matrix, mvtnorm, Rcpp, rlang, tolerance, viridisLite\n# Suggests: covr, interp, plot3D, plot3Drgl, rgl, testthat (>= 3.0.0), withr\n# Depends: R (>= 4.1.0),\n# RoxygenNote: 7.2.3\n# Encoding: UTF-8\n# Config/testthat/edition: 3\n# LinkingTo: Rcpp, RcppArmadillo\n# URL: https://github.com/jdtuck/fdasrvf_R\n# BugReports: https://github.com/jdtuck/fdasrvf_R/issues\n# NeedsCompilation: yes\n# Packaged: 2023-12-21 11:15:05 UTC; jdtuck\n# Author: J. Derek Tucker [aut, cre] (<https://orcid.org/0000-0001-8844-2169>), Aymeric Stamm [ctb] (<https://orcid.org/0000-0002-8725-3654>)\n# Maintainer: J. Derek Tucker <jdtuck@sandia.gov>\n# Repository: CRAN\n# Date/Publication: 2023-12-21 12:00:04 UTC\n",
+ "raw_meta_yaml": "{% set version = \"2.3.3\" %}\n{% set posix = 'm2-' if win else '' %}\n\npackage:\n  name: r-fdasrvf\n  version: {{ version|replace(\"-\", \"_\") }}\n\nsource:\n  url:\n    - {{ cran_mirror }}/src/contrib/fdasrvf_{{ version }}.tar.gz\n    - {{ cran_mirror }}/src/contrib/Archive/fdasrvf/fdasrvf_{{ version }}.tar.gz\n  sha256: e8814d95da4a0482cad642d3ebfc33393946d9832e614944ebe2f24cb036a491\n\nbuild:\n  number: 1\n  rpaths:\n    - lib/R/lib/\n    - lib/\n  missing_dso_whitelist:\n    - '*/R.dll'        # [win]\n    - '*/Rblas.dll'    # [win]\n    - '*/Rlapack.dll'  # [win]\n\nrequirements:\n  build:\n    - {{ compiler('c') }}              # [not win]\n    - {{ stdlib(\"c\") }}                # [not win]\n    - {{ compiler('m2w64_c') }}        # [win]\n    - {{ stdlib(\"m2w64_c\") }}          # [win]\n    - {{ compiler('cxx') }}            # [not win]\n    - {{ compiler('m2w64_cxx') }}      # [win]\n    - {{ posix }}filesystem        # [win]\n    - {{ posix }}make\n    - {{ posix }}sed               # [win]\n    - {{ posix }}coreutils         # [win]\n    - {{ posix }}zip               # [win]\n    - cross-r-base {{ r_base }}    # [build_platform != target_platform]\n  host:\n    - r-base\n    - r-matrix\n    - r-rcpp\n    - r-rcpparmadillo\n    - r-cli\n    - r-coda\n    - r-doparallel\n    - r-fields\n    - r-foreach\n    - r-lpsolve\n    - r-mvtnorm\n    - r-rlang\n    - r-tolerance\n    - r-viridislite\n    - libblas\n    - liblapack\n    - libgomp                      # [not osx]\n    - llvm-openmp\n  run:\n    - r-base\n    - r-matrix\n    - r-rcpp\n    - r-rcpparmadillo\n    - r-cli\n    - r-coda\n    - r-doparallel\n    - r-fields\n    - r-foreach\n    - r-lpsolve\n    - r-mvtnorm\n    - r-rlang\n    - r-tolerance\n    - r-viridislite\n    - libblas\n    - liblapack\n    - libgomp                      # [win]\n    - llvm-openmp\n\ntest:\n  commands:\n    - $R -e \"library('fdasrvf')\"           # [not win]\n    - \"\\\"%R%\\\" -e \\\"library('fdasrvf')\\\"\"  # [win]\n\nabout:\n  home: https://github.com/jdtuck/fdasrvf_R\n  license: GPL-2.0-or-later\n  summary: Performs alignment, PCA, and modeling of multidimensional and unidimensional functions using the square-root velocity framework (Srivastava et al., 2011 <arXiv:1103.3817> and Tucker et al., 2014 <DOI:10.1016/j.csda.2012.12.001>). This framework allows for elastic analysis of functional data through phase and amplitude\n    separation.\n  license_file:\n    - '{{ environ[\"PREFIX\"] }}/lib/R/share/licenses/GPL-3'\n\nextra:\n  recipe-maintainers:\n    - conda-forge/r\n    - jdtuck\n\n# Package: fdasrvf\n# Type: Package\n# Title: Elastic Functional Data Analysis\n# Version: 2.1.2\n# Date: 2023-12-20\n# Authors@R: c( person(given = \"J. Derek\", family = \"Tucker\", role = c(\"aut\", \"cre\"), email = \"jdtuck@sandia.gov\", comment = c(ORCID = \"0000-0001-8844-2169\")), person(given = \"Aymeric\", family = \"Stamm\", role = \"ctb\", email = \"aymeric.stamm@math.cnrs.fr\", comment = c(ORCID = \"0000-0002-8725-3654\")))\n# Description: Performs alignment, PCA, and modeling of multidimensional and unidimensional functions using the square-root velocity framework (Srivastava et al., 2011 <arXiv:1103.3817> and Tucker et al., 2014 <DOI:10.1016/j.csda.2012.12.001>). This framework allows for elastic analysis of functional data through phase and amplitude separation.\n# License: GPL-3\n# LazyData: TRUE\n# Imports: cli, coda, doParallel, fields, foreach, lpSolve, Matrix, mvtnorm, Rcpp, rlang, tolerance, viridisLite\n# Suggests: covr, interp, plot3D, plot3Drgl, rgl, testthat (>= 3.0.0), withr\n# Depends: R (>= 4.1.0),\n# RoxygenNote: 7.2.3\n# Encoding: UTF-8\n# Config/testthat/edition: 3\n# LinkingTo: Rcpp, RcppArmadillo\n# URL: https://github.com/jdtuck/fdasrvf_R\n# BugReports: https://github.com/jdtuck/fdasrvf_R/issues\n# NeedsCompilation: yes\n# Packaged: 2023-12-21 11:15:05 UTC; jdtuck\n# Author: J. Derek Tucker [aut, cre] (<https://orcid.org/0000-0001-8844-2169>), Aymeric Stamm [ctb] (<https://orcid.org/0000-0002-8725-3654>)\n# Maintainer: J. Derek Tucker <jdtuck@sandia.gov>\n# Repository: CRAN\n# Date/Publication: 2023-12-21 12:00:04 UTC\n",
  "req": {
   "__set__": true,
   "elements": [
    "c_compiler_stub",
    "c_stdlib_stub",
+   "coreutils",
    "cxx_compiler_stub",
+   "filesystem",
    "libblas",
    "libgomp",
    "liblapack",
    "llvm-openmp",
+   "m2w64_c_compiler_stub",
+   "m2w64_c_stdlib_stub",
+   "m2w64_cxx_compiler_stub",
    "make",
    "r-base",
    "r-cli",
@@ -438,7 +457,9 @@
    "r-rcpparmadillo",
    "r-rlang",
    "r-tolerance",
-   "r-viridislite"
+   "r-viridislite",
+   "sed",
+   "zip"
   ]
  },
  "requirements": {
@@ -447,8 +468,15 @@
    "elements": [
     "c_compiler_stub",
     "c_stdlib_stub",
+    "coreutils",
     "cxx_compiler_stub",
-    "make"
+    "filesystem",
+    "m2w64_c_compiler_stub",
+    "m2w64_c_stdlib_stub",
+    "m2w64_cxx_compiler_stub",
+    "make",
+    "sed",
+    "zip"
    ]
   },
   "host": {
@@ -487,6 +515,7 @@
     "ctng-compilers",
     "cxx_compiler_stub",
     "libblas",
+    "libgomp",
     "liblapack",
     "llvm-openmp",
     "openmp",
@@ -518,8 +547,15 @@
    "elements": [
     "c_compiler_stub",
     "c_stdlib_stub",
+    "coreutils",
     "cxx_compiler_stub",
-    "make"
+    "filesystem",
+    "m2w64_c_compiler_stub",
+    "m2w64_c_stdlib_stub",
+    "m2w64_cxx_compiler_stub",
+    "make",
+    "sed",
+    "zip"
    ]
   },
   "host": {
@@ -549,6 +585,7 @@
    "__set__": true,
    "elements": [
     "libblas",
+    "libgomp",
     "liblapack",
     "llvm-openmp",
     "r-base",
@@ -576,10 +613,174 @@
   "https://cran.r-project.org/src/contrib/fdasrvf_2.3.3.tar.gz",
   "https://cran.r-project.org/src/contrib/Archive/fdasrvf/fdasrvf_2.3.3.tar.gz",
   "https://cran.r-project.org/src/contrib/fdasrvf_2.3.3.tar.gz",
+  "https://cran.r-project.org/src/contrib/Archive/fdasrvf/fdasrvf_2.3.3.tar.gz",
+  "https://cran.r-project.org/src/contrib/fdasrvf_2.3.3.tar.gz",
   "https://cran.r-project.org/src/contrib/Archive/fdasrvf/fdasrvf_2.3.3.tar.gz"
  ],
  "version": "2.3.3",
  "version_pr_info": {
   "__lazy_json__": "version_pr_info/r-fdasrvf.json"
+ },
+ "win_64_meta_yaml": {
+  "about": {
+   "home": "https://github.com/jdtuck/fdasrvf_R",
+   "license": "GPL-2.0-or-later",
+   "license_file": [
+    "/lib/R/share/licenses/GPL-3"
+   ],
+   "summary": "Performs alignment, PCA, and modeling of multidimensional and unidimensional functions using the square-root velocity framework (Srivastava et al., 2011 <arXiv:1103.3817> and Tucker et al., 2014 <DOI:10.1016/j.csda.2012.12.001>). This framework allows for elastic analysis of functional data through phase and amplitude separation."
+  },
+  "build": {
+   "missing_dso_whitelist": [
+    "*/R.dll",
+    "*/Rblas.dll",
+    "*/Rlapack.dll"
+   ],
+   "number": "1",
+   "rpaths": [
+    "lib/R/lib/",
+    "lib/"
+   ]
+  },
+  "extra": {
+   "recipe-maintainers": [
+    "conda-forge/r",
+    "jdtuck"
+   ]
+  },
+  "package": {
+   "name": "r-fdasrvf",
+   "version": "2.3.3"
+  },
+  "requirements": {
+   "build": [
+    "m2w64_c_compiler_stub",
+    "m2w64_c_stdlib_stub",
+    "m2w64_cxx_compiler_stub",
+    "filesystem",
+    "make",
+    "sed",
+    "coreutils",
+    "zip"
+   ],
+   "host": [
+    "r-base",
+    "r-matrix",
+    "r-rcpp",
+    "r-rcpparmadillo",
+    "r-cli",
+    "r-coda",
+    "r-doparallel",
+    "r-fields",
+    "r-foreach",
+    "r-lpsolve",
+    "r-mvtnorm",
+    "r-rlang",
+    "r-tolerance",
+    "r-viridislite",
+    "libblas",
+    "liblapack",
+    "libgomp",
+    "llvm-openmp"
+   ],
+   "run": [
+    "r-base",
+    "r-matrix",
+    "r-rcpp",
+    "r-rcpparmadillo",
+    "r-cli",
+    "r-coda",
+    "r-doparallel",
+    "r-fields",
+    "r-foreach",
+    "r-lpsolve",
+    "r-mvtnorm",
+    "r-rlang",
+    "r-tolerance",
+    "r-viridislite",
+    "libblas",
+    "liblapack",
+    "libgomp",
+    "llvm-openmp"
+   ]
+  },
+  "schema_version": 0,
+  "source": {
+   "sha256": "e8814d95da4a0482cad642d3ebfc33393946d9832e614944ebe2f24cb036a491",
+   "url": [
+    "https://cran.r-project.org/src/contrib/fdasrvf_2.3.3.tar.gz",
+    "https://cran.r-project.org/src/contrib/Archive/fdasrvf/fdasrvf_2.3.3.tar.gz"
+   ]
+  },
+  "test": {
+   "commands": [
+    "\"%R%\" -e \"library('fdasrvf')\""
+   ]
+  }
+ },
+ "win_64_requirements": {
+  "build": {
+   "__set__": true,
+   "elements": [
+    "coreutils",
+    "filesystem",
+    "m2w64_c_compiler_stub",
+    "m2w64_c_stdlib_stub",
+    "m2w64_cxx_compiler_stub",
+    "make",
+    "sed",
+    "zip"
+   ]
+  },
+  "host": {
+   "__set__": true,
+   "elements": [
+    "libblas",
+    "libgomp",
+    "liblapack",
+    "llvm-openmp",
+    "r-base",
+    "r-cli",
+    "r-coda",
+    "r-doparallel",
+    "r-fields",
+    "r-foreach",
+    "r-lpsolve",
+    "r-matrix",
+    "r-mvtnorm",
+    "r-rcpp",
+    "r-rcpparmadillo",
+    "r-rlang",
+    "r-tolerance",
+    "r-viridislite"
+   ]
+  },
+  "run": {
+   "__set__": true,
+   "elements": [
+    "libblas",
+    "libgomp",
+    "liblapack",
+    "llvm-openmp",
+    "r-base",
+    "r-cli",
+    "r-coda",
+    "r-doparallel",
+    "r-fields",
+    "r-foreach",
+    "r-lpsolve",
+    "r-matrix",
+    "r-mvtnorm",
+    "r-rcpp",
+    "r-rcpparmadillo",
+    "r-rlang",
+    "r-tolerance",
+    "r-viridislite"
+   ]
+  },
+  "test": {
+   "__set__": true,
+   "elements": []
+  }
  }
 }
