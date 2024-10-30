@@ -24,7 +24,7 @@
    "summary": "A meta-package to enable the right nvcc."
   },
   "build": {
-   "number": "24"
+   "number": "25"
   },
   "extra": {
    "recipe-maintainers": [
@@ -65,6 +65,7 @@
       "sysroot_linux-64 >=2.17"
      ],
      "run": [
+      "cudatoolkit >=11.8,<12",
       "sed",
       "sysroot_linux-64 >=2.17"
      ]
@@ -110,6 +111,7 @@
       "sysroot_linux-aarch64 >=2.17"
      ],
      "run": [
+      "cudatoolkit >=11.8,<12",
       "sed",
       "sysroot_linux-aarch64 >=2.17"
      ]
@@ -153,6 +155,7 @@
       "sysroot_linux-ppc64le >=2.17"
      ],
      "run": [
+      "cudatoolkit >=11.8,<12",
       "sed",
       "sysroot_linux-ppc64le >=2.17"
      ]
@@ -197,6 +200,7 @@
   "run": {
    "__set__": true,
    "elements": [
+    "cudatoolkit",
     "sed",
     "sysroot_linux-64",
     "sysroot_linux-aarch64",
@@ -223,7 +227,7 @@
    "summary": "A meta-package to enable the right nvcc."
   },
   "build": {
-   "number": "24"
+   "number": "25"
   },
   "extra": {
    "recipe-maintainers": [
@@ -264,6 +268,7 @@
       "sysroot_linux-aarch64 >=2.17"
      ],
      "run": [
+      "cudatoolkit >=11.8,<12",
       "sed",
       "sysroot_linux-aarch64 >=2.17"
      ]
@@ -306,6 +311,7 @@
   "run": {
    "__set__": true,
    "elements": [
+    "cudatoolkit",
     "sed",
     "sysroot_linux-aarch64"
    ]
@@ -326,7 +332,7 @@
    "summary": "A meta-package to enable the right nvcc."
   },
   "build": {
-   "number": "24"
+   "number": "25"
   },
   "extra": {
    "recipe-maintainers": [
@@ -367,6 +373,7 @@
       "sysroot_linux-ppc64le >=2.17"
      ],
      "run": [
+      "cudatoolkit >=11.8,<12",
       "sed",
       "sysroot_linux-ppc64le >=2.17"
      ]
@@ -409,6 +416,7 @@
   "run": {
    "__set__": true,
    "elements": [
+    "cudatoolkit",
     "sed",
     "sysroot_linux-ppc64le"
    ]
@@ -429,7 +437,7 @@
    "summary": "A meta-package to enable the right nvcc."
   },
   "build": {
-   "number": "24"
+   "number": "25"
   },
   "extra": {
    "recipe-maintainers": [
@@ -470,6 +478,7 @@
       "sysroot_linux-64 >=2.17"
      ],
      "run": [
+      "cudatoolkit >=11.8,<12",
       "sed",
       "sysroot_linux-64 >=2.17"
      ]
@@ -515,6 +524,7 @@
       "sysroot_linux-aarch64 >=2.17"
      ],
      "run": [
+      "cudatoolkit >=11.8,<12",
       "sed",
       "sysroot_linux-aarch64 >=2.17"
      ]
@@ -558,6 +568,7 @@
       "sysroot_linux-ppc64le >=2.17"
      ],
      "run": [
+      "cudatoolkit >=11.8,<12",
       "sed",
       "sysroot_linux-ppc64le >=2.17"
      ]
@@ -601,6 +612,7 @@
       "sysroot_linux-aarch64 >=2.17"
      ],
      "run": [
+      "cudatoolkit >=11.8,<12",
       "sed",
       "sysroot_linux-aarch64 >=2.17"
      ]
@@ -646,6 +658,7 @@
       "sysroot_linux-ppc64le >=2.17"
      ],
      "run": [
+      "cudatoolkit >=11.8,<12",
       "sed",
       "sysroot_linux-ppc64le >=2.17"
      ]
@@ -691,7 +704,9 @@
       "c_stdlib_stub",
       "vs2019_win-64"
      ],
-     "run": []
+     "run": [
+      "cudatoolkit >=11.8,<12"
+     ]
     },
     "script": "windows/install_nvcc.bat",
     "test": {
@@ -734,11 +749,12 @@
  "pr_info": {
   "__lazy_json__": "pr_info/nvcc.json"
  },
- "raw_meta_yaml": "{% if cuda_compiler_version in (None, \"None\", True, False) %}\n{% set cuda_major = 0 %}\n{% else %}\n{% set cuda_major = environ.get(\"cuda_compiler_version\", \"11.8\").split(\".\")[0]|int %}\n{% endif %}\n\n{% if cross_target_platform is undefined %}\n{% set cross_target_platform = target_platform %}\n{% endif %}\n\npackage:\n  name: nvcc\n  version: {{ cuda_compiler_version }}\n\nbuild:\n  number: 24\n  skip: true  # [cuda_compiler_version != \"11.8\"]\n\n\noutputs:\n  - name: nvcc_{{ cross_target_platform }}\n    script: linux/install_nvcc.sh     # [linux]\n    script: windows/install_nvcc.bat  # [win]\n    build:\n      ignore_run_exports_from:\n        - {{ c_compiler }}_{{ cross_target_platform }}\n      run_exports:\n        strong:\n          - cudatoolkit >={{ cuda_compiler_version }},<{{ cuda_major + 1 }}\n          - sysroot_{{ cross_target_platform }} >={{ c_stdlib_version }}    # [linux]\n    requirements:\n      build:      # [win]\n        - m2-sed  # [win]\n      host:\n        - {{ stdlib(\"c\") }}\n        # Needed to symlink libcuda into sysroot libs.\n        - {{ c_compiler }}_{{ cross_target_platform }} {{ c_compiler_version }}.*       # [linux]\n        - {{ c_compiler }}_{{ cross_target_platform }}                                  # [win]\n        - sysroot_{{ cross_target_platform }} >={{ c_stdlib_version }}  # [linux]\n      run:\n        - sed                                                           # [linux]\n        - sysroot_{{ cross_target_platform }} >={{ c_stdlib_version }}  # [linux]\n    test:\n      requires:\n        - {{ c_compiler }}_{{ cross_target_platform }} {{ c_compiler_version }}.*       # [linux]\n        - {{ c_compiler }}_{{ cross_target_platform }}                                  # [win]\n        # Host code is forwarded to a C++ compiler\n        - {{ cxx_compiler }}_{{ cross_target_platform }} {{ cxx_compiler_version }}.*   # [linux]\n        - {{ cxx_compiler }}_{{ cross_target_platform }}                                # [win]\n      files:\n        - test.cu\n        - linux/test_nvcc.sh     # [linux]\n        - windows\\test_nvcc.bat  # [win]\n      commands:\n        - bash linux/test_nvcc.sh  # [linux and target_platform == cross_target_platform]\n        - windows\\test_nvcc.bat    # [win and target_platform == cross_target_platform]\n    about:\n      home: https://github.com/conda-forge/nvcc-feedstock\n      license: BSD-3-Clause\n      license_file: LICENSE.txt\n      summary: A meta-package to enable the right nvcc.\n\nabout:\n  home: https://github.com/conda-forge/nvcc-feedstock\n  license: BSD-3-Clause\n  license_file: LICENSE.txt\n  summary: A meta-package to enable the right nvcc.\n\nextra:\n  recipe-maintainers:\n    - dillon-cullinan\n    - isuruf\n    - jakirkham\n    - kkraus14\n    - mike-wendt\n    - raydouglass\n    - jaimergp\n    - leofang\n",
+ "raw_meta_yaml": "{% if cuda_compiler_version in (None, \"None\", True, False) %}\n{% set cuda_major = 0 %}\n{% else %}\n{% set cuda_major = environ.get(\"cuda_compiler_version\", \"11.8\").split(\".\")[0]|int %}\n{% endif %}\n\n{% if cross_target_platform is undefined %}\n{% set cross_target_platform = target_platform %}\n{% endif %}\n\npackage:\n  name: nvcc\n  version: {{ cuda_compiler_version }}\n\nbuild:\n  number: 25\n  skip: true  # [cuda_compiler_version != \"11.8\"]\n\n\noutputs:\n  - name: nvcc_{{ cross_target_platform }}\n    script: linux/install_nvcc.sh     # [linux]\n    script: windows/install_nvcc.bat  # [win]\n    build:\n      ignore_run_exports_from:\n        - {{ c_compiler }}_{{ cross_target_platform }}\n      run_exports:\n        strong:\n          - cudatoolkit >={{ cuda_compiler_version }},<{{ cuda_major + 1 }}\n          - sysroot_{{ cross_target_platform }} >={{ c_stdlib_version }}    # [linux]\n    requirements:\n      build:      # [win]\n        - m2-sed  # [win]\n      host:\n        - {{ stdlib(\"c\") }}\n        # Needed to symlink libcuda into sysroot libs.\n        - {{ c_compiler }}_{{ cross_target_platform }} {{ c_compiler_version }}.*       # [linux]\n        - {{ c_compiler }}_{{ cross_target_platform }}                                  # [win]\n        - sysroot_{{ cross_target_platform }} >={{ c_stdlib_version }}  # [linux]\n      run:\n        - cudatoolkit >={{ cuda_compiler_version }},<{{ cuda_major + 1 }}\n        - sed                                                           # [linux]\n        - sysroot_{{ cross_target_platform }} >={{ c_stdlib_version }}  # [linux]\n    test:\n      requires:\n        - {{ c_compiler }}_{{ cross_target_platform }} {{ c_compiler_version }}.*       # [linux]\n        - {{ c_compiler }}_{{ cross_target_platform }}                                  # [win]\n        # Host code is forwarded to a C++ compiler\n        - {{ cxx_compiler }}_{{ cross_target_platform }} {{ cxx_compiler_version }}.*   # [linux]\n        - {{ cxx_compiler }}_{{ cross_target_platform }}                                # [win]\n      files:\n        - test.cu\n        - linux/test_nvcc.sh     # [linux]\n        - windows\\test_nvcc.bat  # [win]\n      commands:\n        - bash linux/test_nvcc.sh  # [linux and target_platform == cross_target_platform]\n        - windows\\test_nvcc.bat    # [win and target_platform == cross_target_platform]\n    about:\n      home: https://github.com/conda-forge/nvcc-feedstock\n      license: BSD-3-Clause\n      license_file: LICENSE.txt\n      summary: A meta-package to enable the right nvcc.\n\nabout:\n  home: https://github.com/conda-forge/nvcc-feedstock\n  license: BSD-3-Clause\n  license_file: LICENSE.txt\n  summary: A meta-package to enable the right nvcc.\n\nextra:\n  recipe-maintainers:\n    - dillon-cullinan\n    - isuruf\n    - jakirkham\n    - kkraus14\n    - mike-wendt\n    - raydouglass\n    - jaimergp\n    - leofang\n",
  "req": {
   "__set__": true,
   "elements": [
    "c_stdlib_stub",
+   "cudatoolkit",
    "gcc_linux-64",
    "gcc_linux-aarch64",
    "gcc_linux-ppc64le",
@@ -778,6 +794,7 @@
    "elements": [
     "c_stdlib_stub",
     "ctng-compiler-activation",
+    "cudatoolkit",
     "linux-sysroot",
     "sed",
     "sysroot_linux-64",
@@ -824,6 +841,7 @@
   "run": {
    "__set__": true,
    "elements": [
+    "cudatoolkit >=11.8,<12",
     "sed",
     "sysroot_linux-64 >=2.17",
     "sysroot_linux-aarch64 >=2.17",
@@ -855,7 +873,7 @@
    "summary": "A meta-package to enable the right nvcc."
   },
   "build": {
-   "number": "24"
+   "number": "25"
   },
   "extra": {
    "recipe-maintainers": [
@@ -896,7 +914,9 @@
       "c_stdlib_stub",
       "vs2019_win-64"
      ],
-     "run": []
+     "run": [
+      "cudatoolkit >=11.8,<12"
+     ]
     },
     "script": "windows/install_nvcc.bat",
     "test": {
@@ -935,7 +955,9 @@
   },
   "run": {
    "__set__": true,
-   "elements": []
+   "elements": [
+    "cudatoolkit"
+   ]
   },
   "test": {
    "__set__": true,
