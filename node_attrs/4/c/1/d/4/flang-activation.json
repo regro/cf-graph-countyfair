@@ -33,8 +33,8 @@
    {
     "name": "flang_impl_linux-64",
     "requirements": [
-     "flang =19.1.2",
-     "compiler-rt_linux-64 =19.1.2"
+     "flang =19.1.3",
+     "compiler-rt_linux-64 =19.1.3"
     ],
     "script": "install_flang_impl.sh",
     "test": {
@@ -55,7 +55,7 @@
     },
     "run_exports": {
      "strong": [
-      "libflang >=19.1.2"
+      "libflang >=19.1.3"
      ]
     },
     "script": "install_flang.sh",
@@ -72,7 +72,7 @@
   ],
   "package": {
    "name": "flang-activation",
-   "version": "19.1.2"
+   "version": "19.1.3"
   },
   "schema_version": 0
  },
@@ -121,8 +121,8 @@
    {
     "name": "flang_impl_linux-64",
     "requirements": [
-     "flang =19.1.2",
-     "compiler-rt_linux-64 =19.1.2"
+     "flang =19.1.3",
+     "compiler-rt_linux-64 =19.1.3"
     ],
     "script": "install_flang_impl.sh",
     "test": {
@@ -143,7 +143,7 @@
     },
     "run_exports": {
      "strong": [
-      "libflang >=19.1.2"
+      "libflang >=19.1.3"
      ]
     },
     "script": "install_flang.sh",
@@ -160,9 +160,9 @@
    {
     "name": "flang_impl_win-64",
     "requirements": [
-     "flang =19.1.2",
+     "flang =19.1.3",
      "lld",
-     "compiler-rt_win-64 =19.1.2"
+     "compiler-rt_win-64 =19.1.3"
     ],
     "test": {
      "commands": null
@@ -178,11 +178,7 @@
       "flang_impl_win-64"
      ]
     },
-    "run_exports": {
-     "strong": [
-      "libflang >=19.1.2"
-     ]
-    },
+    "run_exports": null,
     "script": "install_flang.bat",
     "test": {
      "commands": [
@@ -197,7 +193,7 @@
   ],
   "package": {
    "name": "flang-activation",
-   "version": "19.1.2"
+   "version": "19.1.3"
   },
   "schema_version": 0
  },
@@ -219,7 +215,7 @@
  "pr_info": {
   "__lazy_json__": "pr_info/flang-activation.json"
  },
- "raw_meta_yaml": "{% set version = \"19.1.2\" %}\n\npackage:\n  name: flang-activation\n  version: {{ version }}\n\nbuild:\n  number: 0\n  # intentionally only windows (main target) & linux (debuggability)\n  skip: true  # [osx]\n\noutputs:\n  - name: flang_impl_{{ cross_target_platform }}\n    script: install_flang_impl.sh   # [unix]\n    # we don't cross-compile on windows -> no symlinks\n    requirements:\n      - flang ={{ version }}\n      - lld                     # [win]\n      - compiler-rt_{{ cross_target_platform }} ={{ version }}\n    test:\n      commands:\n        - {{ CBUILD }}-flang --version  # [unix]\n        - {{ CHOST }}-flang --version   # [unix]\n\n  - name: flang_{{ cross_target_platform }}\n    script: install_flang.sh   # [unix]\n    script: install_flang.bat  # [win]\n    run_exports:\n      strong:\n        - libflang >={{ version }}\n    requirements:\n      build:\n        - sed       # [unix]\n        - m2-sed    # [win]\n      run:\n        - {{ pin_subpackage(\"flang_impl_\" ~ cross_target_platform, exact=True) }}\n    test:\n      files:\n        - hello_world.f90\n      commands:\n        # on linux we point FC to the symlink; on windows, we point to the binary;\n        # the latter is still named \"flang-new\" instead of \"flang\" as of v19, see\n        # https://discourse.llvm.org/t/proposal-rename-flang-new-to-flang/69462\n        - $FC hello_world.f90       # [unix]\n        - \"%FC% hello_world.f90\"    # [win]\n        - ./a.out   # [unix]\n        - a.exe     # [win]\n\nabout:\n  home: https://flang.llvm.org\n  license: BSD-3-Clause\n  license_file: LICENSE\n  summary: Flang is a Fortran compiler targeting LLVM.\n  dev_url: https://github.com/llvm/llvm-project\n\nextra:\n  recipe-maintainers:\n    - isuruf\n    - h-vetinari\n",
+ "raw_meta_yaml": "{% set version = \"19.1.3\" %}\n\npackage:\n  name: flang-activation\n  version: {{ version }}\n\nbuild:\n  number: 0\n  # intentionally only windows (main target) & linux (debuggability)\n  skip: true  # [osx]\n\noutputs:\n  - name: flang_impl_{{ cross_target_platform }}\n    script: install_flang_impl.sh   # [unix]\n    # we don't cross-compile on windows -> no symlinks\n    requirements:\n      - flang ={{ version }}\n      - lld                     # [win]\n      - compiler-rt_{{ cross_target_platform }} ={{ version }}\n    test:\n      commands:\n        - {{ CBUILD }}-flang --version  # [unix]\n        - {{ CHOST }}-flang --version   # [unix]\n\n  - name: flang_{{ cross_target_platform }}\n    script: install_flang.sh   # [unix]\n    script: install_flang.bat  # [win]\n    run_exports:\n      strong:                       # [unix]\n        - libflang >={{ version }}  # [unix]\n    requirements:\n      build:\n        - sed       # [unix]\n        - m2-sed    # [win]\n      run:\n        - {{ pin_subpackage(\"flang_impl_\" ~ cross_target_platform, exact=True) }}\n    test:\n      files:\n        - hello_world.f90\n      commands:\n        # on linux we point FC to the symlink; on windows, we point to the binary;\n        # the latter is still named \"flang-new\" instead of \"flang\" as of v19, see\n        # https://discourse.llvm.org/t/proposal-rename-flang-new-to-flang/69462\n        - $FC hello_world.f90       # [unix]\n        - \"%FC% hello_world.f90\"    # [win]\n        - ./a.out   # [unix]\n        - a.exe     # [win]\n\nabout:\n  home: https://flang.llvm.org\n  license: BSD-3-Clause\n  license_file: LICENSE\n  summary: Flang is a Fortran compiler targeting LLVM.\n  dev_url: https://github.com/llvm/llvm-project\n\nextra:\n  recipe-maintainers:\n    - isuruf\n    - h-vetinari\n",
  "req": {
   "__set__": true,
   "elements": [
@@ -277,9 +273,9 @@
   "run": {
    "__set__": true,
    "elements": [
-    "compiler-rt_linux-64 =19.1.2",
-    "compiler-rt_win-64 =19.1.2",
-    "flang =19.1.2",
+    "compiler-rt_linux-64 =19.1.3",
+    "compiler-rt_win-64 =19.1.3",
+    "flang =19.1.3",
     "flang_impl_linux-64",
     "flang_impl_win-64",
     "lld"
@@ -290,7 +286,7 @@
    "elements": []
   }
  },
- "version": "19.1.2",
+ "version": "19.1.3",
  "version_pr_info": {
   "__lazy_json__": "version_pr_info/flang-activation.json"
  },
@@ -315,9 +311,9 @@
    {
     "name": "flang_impl_win-64",
     "requirements": [
-     "flang =19.1.2",
+     "flang =19.1.3",
      "lld",
-     "compiler-rt_win-64 =19.1.2"
+     "compiler-rt_win-64 =19.1.3"
     ],
     "test": {
      "commands": null
@@ -333,11 +329,7 @@
       "flang_impl_win-64"
      ]
     },
-    "run_exports": {
-     "strong": [
-      "libflang >=19.1.2"
-     ]
-    },
+    "run_exports": null,
     "script": "install_flang.bat",
     "test": {
      "commands": [
@@ -352,7 +344,7 @@
   ],
   "package": {
    "name": "flang-activation",
-   "version": "19.1.2"
+   "version": "19.1.3"
   },
   "schema_version": 0
  },
