@@ -7,7 +7,7 @@
    "linux_ppc64le": "linux_64"
   },
   "conda_build": {
-   "error_overlinking": true
+   "error_overlinking": false
   },
   "conda_forge_output_validation": true,
   "github": {
@@ -37,7 +37,8 @@
    "summary": "Prunes host object files and libraries to only contain device code"
   },
   "build": {
-   "number": "0"
+   "binary_relocation": false,
+   "number": "1"
   },
   "extra": {
    "recipe-maintainers": [
@@ -68,7 +69,14 @@
   },
   "test": {
    "commands": [
-    "test -f $PREFIX/bin/nvprune"
+    "test -f $PREFIX/bin/nvprune",
+    "bash test-rpath.sh"
+   ],
+   "files": [
+    "test-rpath.sh"
+   ],
+   "requires": [
+    "patchelf"
    ]
   }
  },
@@ -95,7 +103,9 @@
   },
   "test": {
    "__set__": true,
-   "elements": []
+   "elements": [
+    "patchelf"
+   ]
   }
  },
  "linux_aarch64_meta_yaml": {
@@ -109,7 +119,8 @@
    "summary": "Prunes host object files and libraries to only contain device code"
   },
   "build": {
-   "number": "0"
+   "binary_relocation": false,
+   "number": "1"
   },
   "extra": {
    "recipe-maintainers": [
@@ -140,7 +151,14 @@
   },
   "test": {
    "commands": [
-    "test -f $PREFIX/bin/nvprune"
+    "test -f $PREFIX/bin/nvprune",
+    "bash test-rpath.sh"
+   ],
+   "files": [
+    "test-rpath.sh"
+   ],
+   "requires": [
+    "patchelf"
    ]
   }
  },
@@ -167,7 +185,9 @@
   },
   "test": {
    "__set__": true,
-   "elements": []
+   "elements": [
+    "patchelf"
+   ]
   }
  },
  "meta_yaml": {
@@ -181,7 +201,8 @@
    "summary": "Prunes host object files and libraries to only contain device code"
   },
   "build": {
-   "number": "0"
+   "binary_relocation": false,
+   "number": "1"
   },
   "extra": {
    "recipe-maintainers": [
@@ -213,8 +234,11 @@
   "test": {
    "commands": [
     "test -f $PREFIX/bin/nvprune",
+    "bash test-rpath.sh",
     "if not exist %LIBRARY_BIN%\\\\nvprune.exe exit 1"
-   ]
+   ],
+   "files": null,
+   "requires": null
   }
  },
  "name": "cuda-nvprune",
@@ -233,7 +257,7 @@
  "pr_info": {
   "__lazy_json__": "pr_info/cuda-nvprune.json"
  },
- "raw_meta_yaml": "{% set name = \"cuda-nvprune\" %}\n{% set version = \"12.6.77\" %}\n{% set cuda_version = \"12.6\" %}\n{% set platform = \"linux-x86_64\" %}  # [linux64]\n{% set platform = \"linux-ppc64le\" %}  # [ppc64le]\n{% set platform = \"linux-sbsa\" %}  # [aarch64]\n{% set platform = \"windows-x86_64\" %}  # [win]\n{% set extension = \"tar.xz\" %}  # [not win]\n{% set extension = \"zip\" %}  # [win]\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://developer.download.nvidia.com/compute/cuda/redist/cuda_nvprune/{{ platform }}/cuda_nvprune-{{ platform }}-{{ version }}-archive.{{ extension }}\n  sha256: c633bf85f0263ff01fd2c34bd8341e65363faef775b3127dfdac48d74e6d2b8b  # [linux64]\n  sha256: 94e0fb67ac1329b22f1e459aad5bdf0188a65c9f03d8635601fc88180d089199  # [aarch64]\n  sha256: b586c315e32731794f8bc7b3cbccbeb7f535d361f0191b456f730c70ad74612e  # [win]\n\nbuild:\n  number: 0\n  skip: true  # [osx or ppc64le]\n\nrequirements:\n  build:\n    - {{ compiler(\"c\") }}\n    - {{ compiler(\"cxx\") }}\n    - {{ stdlib(\"c\") }}\n  host:\n    - cuda-version {{ cuda_version }}\n  run:\n    - {{ pin_compatible(\"cuda-version\", max_pin=\"x.x\") }}\n\ntest:\n  commands:\n    - test -f $PREFIX/bin/nvprune  # [unix]\n    - if not exist %LIBRARY_BIN%\\\\nvprune.exe exit 1  # [win]\n\nabout:\n  home: https://developer.nvidia.com/cuda-toolkit\n  license_file: LICENSE\n  license: LicenseRef-NVIDIA-End-User-License-Agreement\n  license_url: https://docs.nvidia.com/cuda/eula/index.html\n  summary: Prunes host object files and libraries to only contain device code\n  description: |\n    Prunes host object files and libraries to only contain device code for the\n    specified targets.\n  doc_url: https://docs.nvidia.com/cuda/index.html\n\nextra:\n  recipe-maintainers:\n    - conda-forge/cuda\n",
+ "raw_meta_yaml": "{% set name = \"cuda-nvprune\" %}\n{% set version = \"12.6.77\" %}\n{% set cuda_version = \"12.6\" %}\n{% set platform = \"linux-x86_64\" %}  # [linux64]\n{% set platform = \"linux-ppc64le\" %}  # [ppc64le]\n{% set platform = \"linux-sbsa\" %}  # [aarch64]\n{% set platform = \"windows-x86_64\" %}  # [win]\n{% set extension = \"tar.xz\" %}  # [not win]\n{% set extension = \"zip\" %}  # [win]\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://developer.download.nvidia.com/compute/cuda/redist/cuda_nvprune/{{ platform }}/cuda_nvprune-{{ platform }}-{{ version }}-archive.{{ extension }}\n  sha256: c633bf85f0263ff01fd2c34bd8341e65363faef775b3127dfdac48d74e6d2b8b  # [linux64]\n  sha256: 94e0fb67ac1329b22f1e459aad5bdf0188a65c9f03d8635601fc88180d089199  # [aarch64]\n  sha256: b586c315e32731794f8bc7b3cbccbeb7f535d361f0191b456f730c70ad74612e  # [win]\n\nbuild:\n  number: 1\n  binary_relocation: false\n  skip: true  # [osx or ppc64le]\n\nrequirements:\n  build:\n    - {{ compiler(\"c\") }}\n    - {{ compiler(\"cxx\") }}\n    - {{ stdlib(\"c\") }}\n  host:\n    - cuda-version {{ cuda_version }}\n  run:\n    - {{ pin_compatible(\"cuda-version\", max_pin=\"x.x\") }}\n\ntest:\n  requires:\n    - patchelf                                                # [linux]\n  files:\n    - test-rpath.sh                                           # [linux]\n  commands:\n    - test -f $PREFIX/bin/nvprune  # [unix]\n    - if not exist %LIBRARY_BIN%\\\\nvprune.exe exit 1  # [win]\n    - bash test-rpath.sh                                      # [linux]\n\nabout:\n  home: https://developer.nvidia.com/cuda-toolkit\n  license_file: LICENSE\n  license: LicenseRef-NVIDIA-End-User-License-Agreement\n  license_url: https://docs.nvidia.com/cuda/eula/index.html\n  summary: Prunes host object files and libraries to only contain device code\n  description: |\n    Prunes host object files and libraries to only contain device code for the\n    specified targets.\n  doc_url: https://docs.nvidia.com/cuda/index.html\n\nextra:\n  recipe-maintainers:\n    - conda-forge/cuda\n",
  "req": {
   "__set__": true,
   "elements": [
@@ -318,7 +342,8 @@
    "summary": "Prunes host object files and libraries to only contain device code"
   },
   "build": {
-   "number": "0"
+   "binary_relocation": false,
+   "number": "1"
   },
   "extra": {
    "recipe-maintainers": [
@@ -350,7 +375,9 @@
   "test": {
    "commands": [
     "if not exist %LIBRARY_BIN%\\\\nvprune.exe exit 1"
-   ]
+   ],
+   "files": null,
+   "requires": null
   }
  },
  "win_64_requirements": {
