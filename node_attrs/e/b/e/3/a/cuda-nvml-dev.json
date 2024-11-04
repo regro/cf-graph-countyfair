@@ -7,7 +7,7 @@
    "linux_ppc64le": "linux_64"
   },
   "conda_build": {
-   "error_overlinking": true
+   "error_overlinking": false
   },
   "conda_forge_output_validation": true,
   "github": {
@@ -37,7 +37,8 @@
    "summary": "NVML native dev links, headers"
   },
   "build": {
-   "number": "0"
+   "binary_relocation": false,
+   "number": "1"
   },
   "extra": {
    "recipe-maintainers": [
@@ -71,7 +72,14 @@
    "commands": [
     "test -f $PREFIX/lib/pkgconfig/nvidia-ml-*.pc",
     "test -f $PREFIX/targets/x64/lib/stubs/libnvidia-ml.so",
-    "test -f $PREFIX/targets/x64/include/nvml.h"
+    "test -f $PREFIX/targets/x64/include/nvml.h",
+    "bash test-rpath.sh"
+   ],
+   "files": [
+    "test-rpath.sh"
+   ],
+   "requires": [
+    "patchelf"
    ]
   }
  },
@@ -98,7 +106,9 @@
   },
   "test": {
    "__set__": true,
-   "elements": []
+   "elements": [
+    "patchelf"
+   ]
   }
  },
  "linux_aarch64_meta_yaml": {
@@ -112,7 +122,8 @@
    "summary": "NVML native dev links, headers"
   },
   "build": {
-   "number": "0"
+   "binary_relocation": false,
+   "number": "1"
   },
   "extra": {
    "recipe-maintainers": [
@@ -149,7 +160,14 @@
    "commands": [
     "test -f $PREFIX/lib/pkgconfig/nvidia-ml-*.pc",
     "test -f $PREFIX/targets/x64/lib/stubs/libnvidia-ml.so",
-    "test -f $PREFIX/targets/x64/include/nvml.h"
+    "test -f $PREFIX/targets/x64/include/nvml.h",
+    "bash test-rpath.sh"
+   ],
+   "files": [
+    "test-rpath.sh"
+   ],
+   "requires": [
+    "patchelf"
    ]
   }
  },
@@ -177,7 +195,9 @@
   },
   "test": {
    "__set__": true,
-   "elements": []
+   "elements": [
+    "patchelf"
+   ]
   }
  },
  "meta_yaml": {
@@ -191,7 +211,8 @@
    "summary": "NVML native dev links, headers"
   },
   "build": {
-   "number": "0"
+   "binary_relocation": false,
+   "number": "1"
   },
   "extra": {
    "recipe-maintainers": [
@@ -227,9 +248,14 @@
     "test -f $PREFIX/lib/pkgconfig/nvidia-ml-*.pc",
     "test -f $PREFIX/targets/x64/lib/stubs/libnvidia-ml.so",
     "test -f $PREFIX/targets/x64/include/nvml.h",
+    "bash test-rpath.sh",
     "if not exist %LIBRARY_LIB%\\nvml.lib exit 1",
     "if not exist %LIBRARY_INC%\\nvml.h exit 1"
-   ]
+   ],
+   "files": [
+    "test-rpath.sh"
+   ],
+   "requires": null
   }
  },
  "name": "cuda-nvml-dev",
@@ -248,7 +274,7 @@
  "pr_info": {
   "__lazy_json__": "pr_info/cuda-nvml-dev.json"
  },
- "raw_meta_yaml": "{% set name = \"cuda-nvml-dev\" %}\n{% set version = \"12.6.77\" %}\n{% set cuda_version = \"12.6\" %}\n{% set platform = \"linux-x86_64\" %}  # [linux64]\n{% set platform = \"linux-ppc64le\" %}  # [ppc64le]\n{% set platform = \"linux-sbsa\" %}  # [aarch64]\n{% set platform = \"windows-x86_64\" %}  # [win]\n{% set target_name = \"x86_64-linux\" %}  # [linux64]\n{% set target_name = \"ppc64le-linux\" %}  # [ppc64le]\n{% set target_name = \"sbsa-linux\" %}  # [aarch64]\n{% set target_name = \"x64\" %}  # [win]\n{% set extension = \"tar.xz\" %}  # [not win]\n{% set extension = \"zip\" %}  # [win]\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://developer.download.nvidia.com/compute/cuda/redist/cuda_nvml_dev/{{ platform }}/cuda_nvml_dev-{{ platform }}-{{ version }}-archive.{{ extension }}\n  sha256: bf297acf16ddc9340859180c5395689fcd890c1e3295915851de3977f306d601  # [linux64]\n  sha256: 3083c53ca6fcde4f5a41eebee647fe6b49a408431e1bd53ab5b0a38e4fd2268e  # [aarch64]\n  sha256: 45f2466ff154a44701388a90913b7d1c4c0ec591f0ec33b3d30464d5c2ffbe8d  # [win]\n\nbuild:\n  number: 0\n  skip: true  # [osx or ppc64le]\n\nrequirements:\n  build:\n    - {{ compiler(\"c\") }}\n    - {{ compiler(\"cxx\") }}\n    - {{ stdlib(\"c\") }}\n    - arm-variant * {{ arm_variant_type }}  # [aarch64]\n  host:\n    - cuda-version {{ cuda_version }}\n  run:\n    - {{ pin_compatible(\"cuda-version\", max_pin=\"x.x\") }}\n  run_constrained:\n    - arm-variant * {{ arm_variant_type }}  # [aarch64]\n\ntest:\n  commands:\n    - test -f $PREFIX/lib/pkgconfig/nvidia-ml-*.pc                         # [linux]\n    - test -f $PREFIX/targets/{{ target_name }}/lib/stubs/libnvidia-ml.so  # [linux]\n    - test -f $PREFIX/targets/{{ target_name }}/include/nvml.h             # [linux]\n    - if not exist %LIBRARY_LIB%\\nvml.lib exit 1  # [win]\n    - if not exist %LIBRARY_INC%\\nvml.h exit 1    # [win]\n\nabout:\n  home: https://developer.nvidia.com/cuda-toolkit\n  license_file: LICENSE\n  license: LicenseRef-NVIDIA-End-User-License-Agreement\n  license_url: https://docs.nvidia.com/cuda/eula/index.html\n  summary: NVML native dev links, headers\n  description: |\n    NVML native dev links, headers\n  doc_url: https://docs.nvidia.com/cuda/index.html\n\nextra:\n  recipe-maintainers:\n    - conda-forge/cuda\n",
+ "raw_meta_yaml": "{% set name = \"cuda-nvml-dev\" %}\n{% set version = \"12.6.77\" %}\n{% set cuda_version = \"12.6\" %}\n{% set platform = \"linux-x86_64\" %}  # [linux64]\n{% set platform = \"linux-ppc64le\" %}  # [ppc64le]\n{% set platform = \"linux-sbsa\" %}  # [aarch64]\n{% set platform = \"windows-x86_64\" %}  # [win]\n{% set target_name = \"x86_64-linux\" %}  # [linux64]\n{% set target_name = \"ppc64le-linux\" %}  # [ppc64le]\n{% set target_name = \"sbsa-linux\" %}  # [aarch64]\n{% set target_name = \"x64\" %}  # [win]\n{% set extension = \"tar.xz\" %}  # [not win]\n{% set extension = \"zip\" %}  # [win]\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://developer.download.nvidia.com/compute/cuda/redist/cuda_nvml_dev/{{ platform }}/cuda_nvml_dev-{{ platform }}-{{ version }}-archive.{{ extension }}\n  sha256: bf297acf16ddc9340859180c5395689fcd890c1e3295915851de3977f306d601  # [linux64]\n  sha256: 3083c53ca6fcde4f5a41eebee647fe6b49a408431e1bd53ab5b0a38e4fd2268e  # [aarch64]\n  sha256: 45f2466ff154a44701388a90913b7d1c4c0ec591f0ec33b3d30464d5c2ffbe8d  # [win]\n\nbuild:\n  number: 1\n  binary_relocation: false\n  skip: true  # [osx or ppc64le]\n\nrequirements:\n  build:\n    - {{ compiler(\"c\") }}\n    - {{ compiler(\"cxx\") }}\n    - {{ stdlib(\"c\") }}\n    - arm-variant * {{ arm_variant_type }}  # [aarch64]\n  host:\n    - cuda-version {{ cuda_version }}\n  run:\n    - {{ pin_compatible(\"cuda-version\", max_pin=\"x.x\") }}\n  run_constrained:\n    - arm-variant * {{ arm_variant_type }}  # [aarch64]\n\ntest:\n  requires:\n    - patchelf  # [linux]\n  files:\n    - test-rpath.sh\n  commands:\n    - test -f $PREFIX/lib/pkgconfig/nvidia-ml-*.pc                         # [linux]\n    - test -f $PREFIX/targets/{{ target_name }}/lib/stubs/libnvidia-ml.so  # [linux]\n    - test -f $PREFIX/targets/{{ target_name }}/include/nvml.h             # [linux]\n    - bash test-rpath.sh                                                   # [linux]\n    - if not exist %LIBRARY_LIB%\\nvml.lib exit 1  # [win]\n    - if not exist %LIBRARY_INC%\\nvml.h exit 1    # [win]\n\nabout:\n  home: https://developer.nvidia.com/cuda-toolkit\n  license_file: LICENSE\n  license: LicenseRef-NVIDIA-End-User-License-Agreement\n  license_url: https://docs.nvidia.com/cuda/eula/index.html\n  summary: NVML native dev links, headers\n  description: |\n    NVML native dev links, headers\n  doc_url: https://docs.nvidia.com/cuda/index.html\n\nextra:\n  recipe-maintainers:\n    - conda-forge/cuda\n",
  "req": {
   "__set__": true,
   "elements": [
@@ -336,7 +362,8 @@
    "summary": "NVML native dev links, headers"
   },
   "build": {
-   "number": "0"
+   "binary_relocation": false,
+   "number": "1"
   },
   "extra": {
    "recipe-maintainers": [
@@ -370,7 +397,11 @@
    "commands": [
     "if not exist %LIBRARY_LIB%\\nvml.lib exit 1",
     "if not exist %LIBRARY_INC%\\nvml.h exit 1"
-   ]
+   ],
+   "files": [
+    "test-rpath.sh"
+   ],
+   "requires": null
   }
  },
  "win_64_requirements": {
