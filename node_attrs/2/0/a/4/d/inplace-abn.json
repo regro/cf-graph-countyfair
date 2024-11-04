@@ -24,8 +24,9 @@
    "summary": "In-Place Activated BatchNorm for Memory-Optimized Training of DNNs"
   },
   "build": {
-   "number": "4",
-   "string": "cuda118_py39_h1234567_4"
+   "number": "7",
+   "skip": true,
+   "string": "cuda126_py39_h1234567_7"
   },
   "extra": {
    "recipe-maintainers": [
@@ -52,7 +53,7 @@
     "nccl",
     "magma",
     "cuda-version 12.0",
-    "cuda-version 11.8"
+    "cuda-version 12.6"
    ],
    "run": [
     "python"
@@ -121,8 +122,9 @@
    "summary": "In-Place Activated BatchNorm for Memory-Optimized Training of DNNs"
   },
   "build": {
-   "number": "4",
-   "string": "cpu_py39_h1234567_4"
+   "number": "7",
+   "skip": true,
+   "string": "cpu_py39_h1234567_7"
   },
   "extra": {
    "recipe-maintainers": [
@@ -149,7 +151,7 @@
     "nccl",
     "magma",
     "cuda-version 12.0",
-    "cuda-version 11.8"
+    "cuda-version 12.6"
    ],
    "run": [
     "python"
@@ -182,8 +184,8 @@
    "summary": "In-Place Activated BatchNorm for Memory-Optimized Training of DNNs"
   },
   "build": {
-   "number": "4",
-   "string": "cpu_py39_h1234567_4"
+   "number": "7",
+   "string": "cpu_py39_h1234567_7"
   },
   "extra": {
    "recipe-maintainers": [
@@ -274,7 +276,7 @@
  "pr_info": {
   "__lazy_json__": "pr_info/inplace-abn.json"
  },
- "raw_meta_yaml": "{% set name = \"inplace-abn\" %}\n{% set version = \"1.1.0\" %}\n\n{% if cuda_compiler_version in (None, \"None\", True, False) %}\n{% set cuda_major = 0 %}\n{% else %}\n{% set cuda_major = environ.get(\"cuda_compiler_version\", \"11.8\").split(\".\")[0] | int %}\n{% endif %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/inplace-abn-{{ version }}.tar.gz\n  sha256: 7c286ca53d35cb37b0d1f8b9beb5a910c694129d3d4f7b8e53188370bb260c27\n\nbuild:\n  number: 4\n  skip: true  # [win]\n  string: cpu_py{{ CONDA_PY }}_h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version == \"None\"]\n  string: cuda{{ cuda_compiler_version | replace('.', '') }}_py{{ CONDA_PY }}_h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version != \"None\"]\n\nrequirements:\n  build:\n    - {{ compiler(\"cxx\") }}\n    - {{ compiler(\"cuda\") }}    # [cuda_compiler_version != \"None\"]\n    - {{ stdlib(\"c\") }}\n    {% if cuda_major >= 12 %}\n    - cuda-driver-dev           # [build_platform != target_platform]\n    - cuda-cudart-dev           # [build_platform != target_platform]\n    - cuda-nvrtc-dev            # [build_platform != target_platform]\n    - cuda-nvtx-dev             # [build_platform != target_platform]\n    - cuda-nvml-dev             # [build_platform != target_platform]\n    - cuda-profiler-api         # [build_platform != target_platform]\n    - libcublas-dev             # [build_platform != target_platform]\n    - libcufft-dev              # [build_platform != target_platform]\n    - libcurand-dev             # [build_platform != target_platform]\n    - libcusolver-dev           # [build_platform != target_platform]\n    - libcusparse-dev           # [build_platform != target_platform]\n    {% endif %}\n  host:\n    # GPU requirements\n    - cudnn                                     # [cuda_compiler_version != \"None\"]\n    - nccl                                      # [cuda_compiler_version != \"None\"]\n    - magma                                     # [cuda_compiler_version != \"None\"]\n    - cuda-version {{ cuda_compiler_version }}  # [cuda_compiler_version != \"None\"]\n    {% if cuda_major >= 12 %}\n    - cuda-driver-dev\n    - cuda-cudart-dev\n    - cuda-nvrtc-dev\n    - cuda-nvtx-dev\n    - cuda-nvml-dev\n    - cuda-profiler-api\n    - libcublas-dev\n    - libcufft-dev\n    - libcurand-dev\n    - libcusolver-dev\n    - libcusparse-dev\n    {% endif %}\n    # other requirements\n    - pip\n    - python\n    - pytorch >=2.4.0\n    - setuptools\n    - setuptools-scm\n  run:\n    - python\n\ntest:\n  imports:\n    - inplace_abn\n  commands:\n    - pip check\n  requires:\n    - pip\n    - setuptools\n\nabout:\n  home: https://github.com/mapillary/inplace_abn\n  summary: In-Place Activated BatchNorm for Memory-Optimized Training of DNNs\n  license: BSD-3-Clause\n  license_file: LICENSE\n\nextra:\n  recipe-maintainers:\n    - jeongseok-meta\n",
+ "raw_meta_yaml": "{% set name = \"inplace-abn\" %}\n{% set version = \"1.1.0\" %}\n\n{% if cuda_compiler_version in (None, \"None\", True, False) %}\n{% set cuda_major = 0 %}\n{% else %}\n{% set cuda_major = environ.get(\"cuda_compiler_version\", \"11.8\").split(\".\")[0] | int %}\n{% endif %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/inplace-abn-{{ version }}.tar.gz\n  sha256: 7c286ca53d35cb37b0d1f8b9beb5a910c694129d3d4f7b8e53188370bb260c27\n\nbuild:\n  number: 7\n  skip: true  # [win]\n  {% if cuda_major < 12 %}\n  skip: true  # [cuda_compiler_version != \"None\"]\n  {% endif %}\n  string: cpu_py{{ CONDA_PY }}_h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version == \"None\"]\n  string: cuda{{ cuda_compiler_version | replace('.', '') }}_py{{ CONDA_PY }}_h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version != \"None\"]\n\nrequirements:\n  build:\n    - {{ compiler(\"cxx\") }}\n    - {{ compiler(\"cuda\") }}    # [cuda_compiler_version != \"None\"]\n    - {{ stdlib(\"c\") }}\n    {% if cuda_major >= 12 %}\n    - cuda-driver-dev           # [build_platform != target_platform]\n    - cuda-cudart-dev           # [build_platform != target_platform]\n    - cuda-nvrtc-dev            # [build_platform != target_platform]\n    - cuda-nvtx-dev             # [build_platform != target_platform]\n    - cuda-nvml-dev             # [build_platform != target_platform]\n    - cuda-profiler-api         # [build_platform != target_platform]\n    - libcublas-dev             # [build_platform != target_platform]\n    - libcufft-dev              # [build_platform != target_platform]\n    - libcurand-dev             # [build_platform != target_platform]\n    - libcusolver-dev           # [build_platform != target_platform]\n    - libcusparse-dev           # [build_platform != target_platform]\n    {% endif %}\n  host:\n    # GPU requirements\n    - cudnn                                     # [cuda_compiler_version != \"None\"]\n    - nccl                                      # [cuda_compiler_version != \"None\"]\n    - magma                                     # [cuda_compiler_version != \"None\"]\n    - cuda-version {{ cuda_compiler_version }}  # [cuda_compiler_version != \"None\"]\n    {% if cuda_major >= 12 %}\n    - cuda-driver-dev\n    - cuda-cudart-dev\n    - cuda-nvrtc-dev\n    - cuda-nvtx-dev\n    - cuda-nvml-dev\n    - cuda-profiler-api\n    - libcublas-dev\n    - libcufft-dev\n    - libcurand-dev\n    - libcusolver-dev\n    - libcusparse-dev\n    {% endif %}\n    # other requirements\n    - pip\n    - python\n    - pytorch >=2.4.0\n    - setuptools\n    - setuptools-scm\n  run:\n    - python\n\ntest:\n  imports:\n    - inplace_abn\n  commands:\n    - pip check\n  requires:\n    - pip\n    - setuptools\n\nabout:\n  home: https://github.com/mapillary/inplace_abn\n  summary: In-Place Activated BatchNorm for Memory-Optimized Training of DNNs\n  license: BSD-3-Clause\n  license_file: LICENSE\n\nextra:\n  recipe-maintainers:\n    - jeongseok-meta\n",
  "req": {
   "__set__": true,
   "elements": [
@@ -348,8 +350,8 @@
   "host": {
    "__set__": true,
    "elements": [
-    "cuda-version 11.8",
     "cuda-version 12.0",
+    "cuda-version 12.6",
     "cudnn",
     "magma",
     "nccl",
