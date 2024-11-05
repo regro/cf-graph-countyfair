@@ -36,7 +36,7 @@
   },
   "build": {
    "ignore_run_exports_from": null,
-   "number": "301",
+   "number": "302",
    "run_exports": [
     "slepc",
     "slepc * cuda11_complex_*",
@@ -49,7 +49,7 @@
     "CUDA_CONDA_MAJOR=11",
     "CUDA_CONDA_MAJOR=0"
    ],
-   "string": "real_h1234567_301",
+   "string": "real_h1234567_302",
    "track_features": null
   },
   "extra": {
@@ -184,7 +184,7 @@
   },
   "build": {
    "ignore_run_exports_from": null,
-   "number": "301",
+   "number": "302",
    "run_exports": [
     "slepc",
     "slepc * cuda11_complex_*",
@@ -197,7 +197,7 @@
     "CUDA_CONDA_MAJOR=11",
     "CUDA_CONDA_MAJOR=0"
    ],
-   "string": "real_h1234567_301",
+   "string": "real_h1234567_302",
    "track_features": null
   },
   "extra": {
@@ -332,7 +332,7 @@
   },
   "build": {
    "ignore_run_exports_from": null,
-   "number": "301",
+   "number": "302",
    "run_exports": [
     "slepc",
     "slepc * cuda11_complex_*",
@@ -345,7 +345,7 @@
     "CUDA_CONDA_MAJOR=11",
     "CUDA_CONDA_MAJOR=0"
    ],
-   "string": "real_h1234567_301",
+   "string": "real_h1234567_302",
    "track_features": null
   },
   "extra": {
@@ -480,7 +480,7 @@
   },
   "build": {
    "ignore_run_exports_from": null,
-   "number": "301",
+   "number": "302",
    "run_exports": [
     "slepc",
     "slepc * cuda11_complex_*",
@@ -493,7 +493,7 @@
     "CUDA_CONDA_MAJOR=11",
     "CUDA_CONDA_MAJOR=0"
    ],
-   "string": "real_h1234567_301",
+   "string": "real_h1234567_302",
    "track_features": null
   },
   "extra": {
@@ -580,7 +580,7 @@
   },
   "build": {
    "ignore_run_exports_from": null,
-   "number": "301",
+   "number": "302",
    "run_exports": [
     "slepc",
     "slepc * complex_*",
@@ -590,7 +590,7 @@
     "CUDA_CONDA_TARGET_NAME=",
     "CUDA_CONDA_MAJOR=0"
    ],
-   "string": "real_h1234567_301",
+   "string": "real_h1234567_302",
    "track_features": null
   },
   "extra": {
@@ -716,7 +716,7 @@
   },
   "build": {
    "ignore_run_exports_from": null,
-   "number": "301",
+   "number": "302",
    "run_exports": [
     "slepc",
     "slepc * complex_*",
@@ -726,7 +726,7 @@
     "CUDA_CONDA_TARGET_NAME=",
     "CUDA_CONDA_MAJOR=0"
    ],
-   "string": "real_h1234567_301",
+   "string": "real_h1234567_302",
    "track_features": null
   },
   "extra": {
@@ -859,7 +859,7 @@
  "pr_info": {
   "__lazy_json__": "pr_info/slepc.json"
  },
- "raw_meta_yaml": "{% set version = \"3.22.1\" %}\n{% set sha256 = \"badb5cb038d09dbf1cc8f34d194673ab011c69cc46888101955c786d21c8d8c9\" %}\n{% set build = 1 %}\n\n{% set version_xy = version.rsplit(\".\", 1)[0] %}\n{% set mpi = mpi or 'mpich' %}\n{% if scalar == \"real\" %}\n{% set build = build + 100 %}\n{% endif %}\n{% set build = build + 200 %}  # [cuda_compiler_version == \"None\"]\n\n\n{% if cuda_compiler_version == \"None\" %}\n{% set cuda_major = 0 %}\n{% set cuda_target_name = \"\" %}\n{% else %}\n{% set cuda_major = environ.get(\"cuda_compiler_version\", \"11.8\").split(\".\")[0] | int %}\n{% set cuda_target_name = \"x86_64-linux\" %}  # [linux64]\n{% set cuda_target_name = \"ppc64le-linux\" %}  # [ppc64le]\n{% set cuda_target_name = \"sbsa-linux\" %}  # [aarch64]\n{% set cuda_target_name = \"\" %}  # [osx]\n{% endif %}\n\npackage:\n  name: slepc\n  version: {{ version }}\n\nsource:\n  url: http://slepc.upv.es/download/distrib/slepc-{{ version }}.tar.gz\n  sha256: {{ sha256 }}\n  patches:\n    - install_name_tool.patch\n\nbuild:\n  skip: true  # [win]\n  skip: true  # [cuda_compiler_version not in (\"None\", \"11.8\", \"12.4\")]\n  number: {{ build }}\n  string: {{ scalar }}_h{{ PKG_HASH }}_{{ build }}  # [cuda_compiler_version == \"None\"]\n  string: cuda{{ cuda_major }}_{{ scalar }}_h{{ PKG_HASH }}_{{ build }}  # [cuda_compiler_version != \"None\"]\n  script_env:\n    - CUDA_CONDA_TARGET_NAME={{ cuda_target_name }}\n    - CUDA_CONDA_MAJOR={{ cuda_major }}\n  run_exports:\n    - {{ pin_subpackage('slepc', max_pin='x.x') }}\n    - slepc * {{ scalar }}_*                       # [cuda_compiler_version == \"None\"]\n    - slepc * cuda{{ cuda_major }}_{{ scalar }}_*  # [cuda_compiler_version != \"None\"]\n  track_features:\n    - slepc_complex  # [scalar == \"complex\"]\n    - slepc_cuda     # [cuda_compiler_version != \"None\"]\n  ignore_run_exports_from:\n    - {{ compiler('cuda') }}  # [cuda_compiler_version != \"None\"]\n    - cudatoolkit             # [(cuda_compiler_version or \"\").startswith(\"11\")]\n    {% if cuda_major >= 12 %}\n    - cuda-cudart-dev\n    - cuda-nvtx-dev\n    - libcublas-dev\n    - libcufft-dev\n    - libcurand-dev\n    - libcusolver-dev\n    - libcusparse-dev\n    {% endif %}\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ stdlib(\"c\") }}\n    - {{ compiler('cxx') }}\n    - {{ compiler('fortran') }}\n    - {{ compiler('cuda') }}  # [cuda_compiler_version != \"None\"]\n    - make\n    - python\n    - gnuconfig\n    - {{ mpi }}  # [mpi == 'openmpi' and build_platform != target_platform]\n  host:\n    - libblas\n    - liblapack\n    - {{ mpi }}\n    - petsc {{ version_xy }}.* {{ scalar }}_*                       # [cuda_compiler_version == \"None\"]\n    - petsc {{ version_xy }}.* cuda{{ cuda_major }}_{{ scalar }}_*  # [cuda_compiler_version != \"None\"]\n    - scalapack\n    - cuda-version {{ cuda_compiler_version }}  # [cuda_compiler_version != \"None\"]\n    - cudatoolkit                               # [(cuda_compiler_version or \"\").startswith(\"11\")]\n    {% if cuda_major >= 12 %}\n    - cuda-cudart-dev\n    - cuda-nvtx-dev\n    - libcublas-dev\n    - libcufft-dev\n    - libcurand-dev\n    - libcusolver-dev\n    - libcusparse-dev\n    {% endif %}\n  run:\n    - {{ mpi }}\n    - libblas\n    - liblapack\n    - scalapack\n    - petsc\n\ntest:\n  requires:\n    - pkg-config\n    - {{ compiler('c') }}\n    - {{ compiler('cxx') }}\n    - {{ compiler('fortran') }}\n    - make\n  files:\n    - tests/testdlopen.c\n    - tests/test10.c\n    - tests/test14f.F\n    - tests/makefile\n  commands:\n    - PKG_CONFIG_PATH=$PREFIX/lib/pkgconfig pkg-config --cflags SLEPc\n    - PKG_CONFIG_PATH=$PREFIX/lib/pkgconfig pkg-config --libs   SLEPc\n\nabout:\n  home: http://slepc.upv.es/\n  summary: 'SLEPc: Scalable Library for Eigenvalue Problem Computations'\n  license: BSD-2-Clause\n  license_file: LICENSE.md\n  license_family: BSD\n\nextra:\n  recipe-maintainers:\n    - dalcinl\n    - joseeroman\n    - minrk\n",
+ "raw_meta_yaml": "{% set version = \"3.22.1\" %}\n{% set sha256 = \"badb5cb038d09dbf1cc8f34d194673ab011c69cc46888101955c786d21c8d8c9\" %}\n{% set build = 2 %}\n\n{% set version_xy = version.rsplit(\".\", 1)[0] %}\n{% set mpi = mpi or 'mpich' %}\n{% if scalar == \"real\" %}\n{% set build = build + 100 %}\n{% endif %}\n{% set build = build + 200 %}  # [cuda_compiler_version == \"None\"]\n\n\n{% if cuda_compiler_version == \"None\" %}\n{% set cuda_major = 0 %}\n{% set cuda_target_name = \"\" %}\n{% else %}\n{% set cuda_major = environ.get(\"cuda_compiler_version\", \"11.8\").split(\".\")[0] | int %}\n{% set cuda_target_name = \"x86_64-linux\" %}  # [linux64]\n{% set cuda_target_name = \"ppc64le-linux\" %}  # [ppc64le]\n{% set cuda_target_name = \"sbsa-linux\" %}  # [aarch64]\n{% set cuda_target_name = \"\" %}  # [osx]\n{% endif %}\n\npackage:\n  name: slepc\n  version: {{ version }}\n\nsource:\n  url: http://slepc.upv.es/download/distrib/slepc-{{ version }}.tar.gz\n  sha256: {{ sha256 }}\n  patches:\n    - install_name_tool.patch\n\nbuild:\n  skip: true  # [win]\n  skip: true  # [cuda_compiler_version not in (\"None\", \"11.8\", \"12.4\")]\n  number: {{ build }}\n  string: {{ scalar }}_h{{ PKG_HASH }}_{{ build }}  # [cuda_compiler_version == \"None\"]\n  string: cuda{{ cuda_major }}_{{ scalar }}_h{{ PKG_HASH }}_{{ build }}  # [cuda_compiler_version != \"None\"]\n  script_env:\n    - CUDA_CONDA_TARGET_NAME={{ cuda_target_name }}\n    - CUDA_CONDA_MAJOR={{ cuda_major }}\n  run_exports:\n    - {{ pin_subpackage('slepc', max_pin='x.x') }}\n    - slepc * {{ scalar }}_*                       # [cuda_compiler_version == \"None\"]\n    - slepc * cuda{{ cuda_major }}_{{ scalar }}_*  # [cuda_compiler_version != \"None\"]\n  track_features:\n    - slepc_complex  # [scalar == \"complex\"]\n    - slepc_cuda     # [cuda_compiler_version != \"None\"]\n  ignore_run_exports_from:\n    - {{ compiler('cuda') }}  # [cuda_compiler_version != \"None\"]\n    - cudatoolkit             # [(cuda_compiler_version or \"\").startswith(\"11\")]\n    {% if cuda_major >= 12 %}\n    - cuda-cudart-dev\n    - cuda-nvtx-dev\n    - libcublas-dev\n    - libcufft-dev\n    - libcurand-dev\n    - libcusolver-dev\n    - libcusparse-dev\n    {% endif %}\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ stdlib(\"c\") }}\n    - {{ compiler('cxx') }}\n    - {{ compiler('fortran') }}\n    - {{ compiler('cuda') }}  # [cuda_compiler_version != \"None\"]\n    - make\n    - python\n    - gnuconfig\n    - {{ mpi }}  # [mpi == 'openmpi' and build_platform != target_platform]\n  host:\n    - libblas\n    - liblapack\n    - {{ mpi }}\n    - petsc {{ version_xy }}.* {{ scalar }}_*                       # [cuda_compiler_version == \"None\"]\n    - petsc {{ version_xy }}.* cuda{{ cuda_major }}_{{ scalar }}_*  # [cuda_compiler_version != \"None\"]\n    - scalapack\n    - cuda-version {{ cuda_compiler_version }}  # [cuda_compiler_version != \"None\"]\n    - cudatoolkit                               # [(cuda_compiler_version or \"\").startswith(\"11\")]\n    {% if cuda_major >= 12 %}\n    - cuda-cudart-dev\n    - cuda-nvtx-dev\n    - libcublas-dev\n    - libcufft-dev\n    - libcurand-dev\n    - libcusolver-dev\n    - libcusparse-dev\n    {% endif %}\n  run:\n    - {{ mpi }}\n    - libblas\n    - liblapack\n    - scalapack\n    - petsc\n\ntest:\n  requires:\n    - pkg-config\n    - {{ compiler('c') }}\n    - {{ compiler('cxx') }}\n    - {{ compiler('fortran') }}\n    - make\n  files:\n    - tests/testdlopen.c\n    - tests/test10.c\n    - tests/test14f.F\n    - tests/makefile\n  commands:\n    - PKG_CONFIG_PATH=$PREFIX/lib/pkgconfig pkg-config --cflags SLEPc\n    - PKG_CONFIG_PATH=$PREFIX/lib/pkgconfig pkg-config --libs   SLEPc\n\nabout:\n  home: http://slepc.upv.es/\n  summary: 'SLEPc: Scalable Library for Eigenvalue Problem Computations'\n  license: BSD-2-Clause\n  license_file: LICENSE.md\n  license_family: BSD\n\nextra:\n  recipe-maintainers:\n    - dalcinl\n    - joseeroman\n    - minrk\n",
  "req": {
   "__set__": true,
   "elements": [
