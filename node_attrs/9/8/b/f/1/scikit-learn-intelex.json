@@ -27,8 +27,11 @@
    "summary": "Intel(R) Extension for Scikit-learn* is a seamless way to speed up your Scikit-learn application."
   },
   "build": {
+   "ignore_run_exports": [
+    "dpcpp_linux-64"
+   ],
    "include_recipe": false,
-   "number": "0",
+   "number": "1",
    "script_env": [
     "DPCPPROOT",
     "DALROOT"
@@ -62,11 +65,13 @@
     "jinja2",
     "pybind11",
     "numpy",
-    "impi-devel",
+    "mpich",
     "dal-devel ==2025.0.0"
    ],
    "run": [
     "python",
+    "numpy",
+    "scikit-learn",
     "dal ==2025.0.0"
    ]
   },
@@ -78,10 +83,9 @@
   "test": {
    "requires": [
     "pyyaml",
-    "impi_rt",
+    "mpich",
     "dpcpp-cpp-rt",
     "pytest",
-    "scikit-learn",
     "pandas",
     "xgboost",
     "lightgbm",
@@ -112,8 +116,8 @@
     "cmake",
     "cython",
     "dal-devel",
-    "impi-devel",
     "jinja2",
+    "mpich",
     "numpy",
     "pybind11",
     "python",
@@ -124,7 +128,9 @@
    "__set__": true,
    "elements": [
     "dal",
-    "python"
+    "numpy",
+    "python",
+    "scikit-learn"
    ]
   },
   "test": {
@@ -133,12 +139,11 @@
     "array-api-compat",
     "array-api-strict",
     "dpcpp-cpp-rt",
-    "impi_rt",
     "lightgbm",
+    "mpich",
     "pandas",
     "pytest",
     "pyyaml",
-    "scikit-learn",
     "xgboost"
    ]
   }
@@ -157,8 +162,9 @@
    "summary": "Intel(R) Extension for Scikit-learn* is a seamless way to speed up your Scikit-learn application."
   },
   "build": {
+   "ignore_run_exports": null,
    "include_recipe": false,
-   "number": "0",
+   "number": "1",
    "script_env": [
     "DPCPPROOT",
     "DALROOT",
@@ -193,11 +199,13 @@
     "jinja2",
     "pybind11",
     "numpy",
-    "impi-devel",
+    "mpich",
     "dal-devel ==2025.0.0"
    ],
    "run": [
     "python",
+    "numpy",
+    "scikit-learn",
     "dal ==2025.0.0"
    ]
   },
@@ -209,10 +217,9 @@
   "test": {
    "requires": [
     "pyyaml",
-    "impi_rt",
+    "mpich",
     "dpcpp-cpp-rt",
     "pytest",
-    "scikit-learn",
     "pandas",
     "xgboost",
     "lightgbm",
@@ -241,7 +248,7 @@
  "pr_info": {
   "__lazy_json__": "pr_info/scikit-learn-intelex.json"
  },
- "raw_meta_yaml": "# NB: this recipe should be synced between sklearnex repo and feedstocks\n\n{% set name = \"scikit-learn-intelex\" %}\n{% set buildnumber = 0 %}\n# version is set manually in feedstocks and through git tag in repo\n{% set version = \"2025.0.0\" %}\n\npackage:\n  name: {{ name|lower }}\n  # version: {{ environ.get('GIT_DESCRIBE_TAG') }}\n  version: {{ version }}\n\n# Reminder: source should point to path for repo or github archive for feedstock\nsource:\n  url: https://github.com/intel/scikit-learn-intelex/archive/{{ version }}.tar.gz\n  sha256: a119bd7c122d7039d7046feb1d22767f81a3d0446db0b3d194cad4f83bf5520f\n# source:\n#   path: ..\n\nbuild:\n  skip: true  # [not (linux64 or win)]\n  number: {{ buildnumber }}\n  include_recipe: False\n  script_env:\n  - DPCPPROOT\n  - DALROOT\n  - NO_DIST=1  # [win]\n\nrequirements:\n  build:\n    - make  # [linux]\n    - dpcpp_linux-64  # [linux64]\n    # - dpcpp_win-64  # [win]\n    - {{ compiler('cxx') }}  # [linux64 or win]\n    # conda-forge feedstock specific\n    - {{ stdlib(\"c\") }}  # [linux64 or win]\n  host:\n    - python\n    - setuptools\n    - cmake\n    - clang-format\n    - cython\n    - jinja2\n    - pybind11\n    - numpy {{ numpy }}\n    - impi-devel  # [not win]\n    # dal-devel pinning depends on the recipe location (repo or feedstock)\n    # - dal-devel\n    - dal-devel =={{ version }}\n  run:\n    - python\n    # dal pinning depends on the recipe location (repo or feedstock)\n    # - dal\n    - dal =={{ version }}\n\ntest:\n  requires:\n    - pyyaml\n    - impi_rt  # [not win]\n    # DPC part of sklearnex is optional\n    - dpcpp-cpp-rt  # [linux64]\n    # TODO: enable data parallel frameworks when they are available on conda-forge\n    # - dpctl\n    # - dpnp\n    # next deps are synced with requirements-test.txt\n    - pytest\n    - scikit-learn\n    - pandas\n    - xgboost\n    - lightgbm\n    # TODO: re-enable shap and catboost when conda-forge packages has a numpy 2.* compatibility\n    # - shap\n    # - catboost\n    - array-api-compat\n    - array-api-strict\n  source_files:\n    - .ci\n    - examples\n    - tests\n\nabout:\n  home: https://intel.github.io/scikit-learn-intelex\n  license: Apache-2.0\n  license_file:\n    - LICENSE\n    - doc/third-party-programs-sklearnex.txt\n  summary: Intel(R) Extension for Scikit-learn* is a seamless way to speed up your Scikit-learn application.\n  description: |\n    <strong>LEGAL NOTICE: Use of this software package is subject to the\n    software license agreement (as set forth above, in the license section of\n    the installed Conda package and/or the README file) and all notices,\n    disclaimers or license terms for third party or open source software\n    included in or with the software.</strong>\n    <br/><br/>\n    EULA: <a href=\"https://opensource.org/licenses/Apache-2.0\" target=\"_blank\">Apache-2.0</a>\n    <br/><br/>\n  dev_url: https://github.com/intel/scikit-learn-intelex\n  doc_url: https://intel.github.io/scikit-learn-intelex\n\nextra:\n  recipe-maintainers:\n    # GitHub IDs for maintainers of the recipe.\n    - napetrov\n    - Alexsandruss\n    - maria-Petrova\n    - ethanglaser\n",
+ "raw_meta_yaml": "# NB: this recipe should be synced between sklearnex repo and feedstocks\n\n{% set name = \"scikit-learn-intelex\" %}\n{% set buildnumber = 1 %}\n# version is set manually in feedstocks and through git tag in repo\n{% set version = \"2025.0.0\" %}\n\npackage:\n  name: {{ name|lower }}\n  # version: {{ environ.get('GIT_DESCRIBE_TAG') }}\n  version: {{ version }}\n\n# Reminder: source should point to path for repo or github archive for feedstock\nsource:\n  url: https://github.com/intel/scikit-learn-intelex/archive/{{ version }}.tar.gz\n  sha256: a119bd7c122d7039d7046feb1d22767f81a3d0446db0b3d194cad4f83bf5520f\n# source:\n#   path: ..\n\nbuild:\n  skip: true  # [not (linux64 or win)]\n  number: {{ buildnumber }}\n  include_recipe: False\n  script_env:\n  - DPCPPROOT\n  - DALROOT\n  - NO_DIST=1  # [win]\n  ignore_run_exports:\n  - dpcpp_linux-64  # [linux64]\n  # - dpcpp_win-64  # [win]\n\nrequirements:\n  build:\n    - make  # [linux]\n    - dpcpp_linux-64  # [linux64]\n    # - dpcpp_win-64  # [win]\n    - {{ compiler('cxx') }}  # [linux64 or win]\n    # conda-forge feedstock specific\n    - {{ stdlib(\"c\") }}  # [linux64 or win]\n  host:\n    - python\n    - setuptools\n    - cmake\n    - clang-format\n    - cython\n    - jinja2\n    - pybind11\n    - numpy\n    - mpich  # [not win]\n    # dal-devel pinning depends on the recipe location (repo or feedstock)\n    # - dal-devel\n    - dal-devel =={{ version }}\n  run:\n    - python\n    - numpy\n    - scikit-learn\n    # dal pinning depends on the recipe location (repo or feedstock)\n    # - dal\n    - dal =={{ version }}\n\ntest:\n  requires:\n    - pyyaml\n    - mpich  # [not win]\n    # DPC part of sklearnex is optional\n    - dpcpp-cpp-rt  # [linux64]\n    # TODO: enable data parallel frameworks when they are available on conda-forge\n    # - dpctl\n    # - dpnp\n    # next deps are synced with requirements-test.txt\n    - pytest\n    - pandas\n    - xgboost\n    - lightgbm\n    # TODO: re-enable shap and catboost when conda-forge packages has a numpy 2.* compatibility\n    # - shap\n    # - catboost\n    - array-api-compat\n    - array-api-strict\n  source_files:\n    - .ci\n    - examples\n    - tests\n\nabout:\n  home: https://intel.github.io/scikit-learn-intelex\n  license: Apache-2.0\n  license_file:\n    - LICENSE\n    - doc/third-party-programs-sklearnex.txt\n  summary: Intel(R) Extension for Scikit-learn* is a seamless way to speed up your Scikit-learn application.\n  description: |\n    <strong>LEGAL NOTICE: Use of this software package is subject to the\n    software license agreement (as set forth above, in the license section of\n    the installed Conda package and/or the README file) and all notices,\n    disclaimers or license terms for third party or open source software\n    included in or with the software.</strong>\n    <br/><br/>\n    EULA: <a href=\"https://opensource.org/licenses/Apache-2.0\" target=\"_blank\">Apache-2.0</a>\n    <br/><br/>\n  dev_url: https://github.com/intel/scikit-learn-intelex\n  doc_url: https://intel.github.io/scikit-learn-intelex\n\nextra:\n  recipe-maintainers:\n    # GitHub IDs for maintainers of the recipe.\n    - napetrov\n    - Alexsandruss\n    - maria-Petrova\n    - ethanglaser\n",
  "req": {
   "__set__": true,
   "elements": [
@@ -253,12 +260,13 @@
    "dal",
    "dal-devel",
    "dpcpp_linux-64",
-   "impi-devel",
    "jinja2",
    "make",
+   "mpich",
    "numpy",
    "pybind11",
    "python",
+   "scikit-learn",
    "setuptools"
   ]
  },
@@ -281,9 +289,9 @@
     "cxx_compiler_stub",
     "cython",
     "dal-devel",
-    "impi-devel",
     "intel-compiler-repack",
     "jinja2",
+    "mpich",
     "numpy",
     "pybind11",
     "python",
@@ -297,7 +305,9 @@
     "cxx_compiler_stub",
     "dal",
     "intel-compiler-repack",
-    "python"
+    "numpy",
+    "python",
+    "scikit-learn"
    ]
   },
   "test": {
@@ -306,12 +316,11 @@
     "array-api-compat",
     "array-api-strict",
     "dpcpp-cpp-rt",
-    "impi_rt",
     "lightgbm",
+    "mpich",
     "pandas",
     "pytest",
     "pyyaml",
-    "scikit-learn",
     "xgboost"
    ]
   }
@@ -334,8 +343,8 @@
     "cmake",
     "cython",
     "dal-devel ==2025.0.0",
-    "impi-devel",
     "jinja2",
+    "mpich",
     "numpy",
     "pybind11",
     "python",
@@ -346,7 +355,9 @@
    "__set__": true,
    "elements": [
     "dal ==2025.0.0",
-    "python"
+    "numpy",
+    "python",
+    "scikit-learn"
    ]
   },
   "test": {
@@ -355,12 +366,11 @@
     "array-api-compat",
     "array-api-strict",
     "dpcpp-cpp-rt",
-    "impi_rt",
     "lightgbm",
+    "mpich",
     "pandas",
     "pytest",
     "pyyaml",
-    "scikit-learn",
     "xgboost"
    ]
   }
@@ -384,8 +394,9 @@
    "summary": "Intel(R) Extension for Scikit-learn* is a seamless way to speed up your Scikit-learn application."
   },
   "build": {
+   "ignore_run_exports": null,
    "include_recipe": false,
-   "number": "0",
+   "number": "1",
    "script_env": [
     "DPCPPROOT",
     "DALROOT",
@@ -422,6 +433,8 @@
    ],
    "run": [
     "python",
+    "numpy",
+    "scikit-learn",
     "dal ==2025.0.0"
    ]
   },
@@ -434,7 +447,6 @@
    "requires": [
     "pyyaml",
     "pytest",
-    "scikit-learn",
     "pandas",
     "xgboost",
     "lightgbm",
@@ -474,7 +486,9 @@
    "__set__": true,
    "elements": [
     "dal",
-    "python"
+    "numpy",
+    "python",
+    "scikit-learn"
    ]
   },
   "test": {
@@ -486,7 +500,6 @@
     "pandas",
     "pytest",
     "pyyaml",
-    "scikit-learn",
     "xgboost"
    ]
   }
