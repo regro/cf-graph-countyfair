@@ -36,14 +36,14 @@
    "summary": "MultiResolution Chemistry"
   },
   "build": {
-   "number": "1",
+   "number": "2",
    "run_exports": [
     "mrchem",
     "mrchem * mpi_mpich_*",
     "mrchem * nompi_*",
     "mrchem * mpi_openmpi_*"
    ],
-   "string": "mpi_openmpi_h1234567_1"
+   "string": "mpi_openmpi_h1234567_2"
   },
   "extra": {
    "recipe-maintainers": [
@@ -305,14 +305,14 @@
    "summary": "MultiResolution Chemistry"
   },
   "build": {
-   "number": "1",
+   "number": "2",
    "run_exports": [
     "mrchem",
     "mrchem * mpi_mpich_*",
     "mrchem * nompi_*",
     "mrchem * mpi_openmpi_*"
    ],
-   "string": "mpi_openmpi_h1234567_1"
+   "string": "mpi_openmpi_h1234567_2"
   },
   "extra": {
    "recipe-maintainers": [
@@ -574,14 +574,14 @@
    "summary": "MultiResolution Chemistry"
   },
   "build": {
-   "number": "1",
+   "number": "2",
    "run_exports": [
     "mrchem",
     "mrchem * mpi_mpich_*",
     "mrchem * nompi_*",
     "mrchem * mpi_openmpi_*"
    ],
-   "string": "mpi_openmpi_h1234567_1"
+   "string": "mpi_openmpi_h1234567_2"
   },
   "extra": {
    "recipe-maintainers": [
@@ -843,14 +843,14 @@
    "summary": "MultiResolution Chemistry"
   },
   "build": {
-   "number": "1",
+   "number": "2",
    "run_exports": [
     "mrchem",
     "mrchem * mpi_mpich_*",
     "mrchem * nompi_*",
     "mrchem * mpi_openmpi_*"
    ],
-   "string": "mpi_openmpi_h1234567_1"
+   "string": "mpi_openmpi_h1234567_2"
   },
   "extra": {
    "recipe-maintainers": [
@@ -1743,14 +1743,14 @@
    "summary": "MultiResolution Chemistry"
   },
   "build": {
-   "number": "1",
+   "number": "2",
    "run_exports": [
     "mrchem",
     "mrchem * mpi_mpich_*",
     "mrchem * nompi_*",
     "mrchem * mpi_openmpi_*"
    ],
-   "string": "mpi_openmpi_h1234567_1"
+   "string": "mpi_openmpi_h1234567_2"
   },
   "extra": {
    "recipe-maintainers": [
@@ -2012,14 +2012,14 @@
    "summary": "MultiResolution Chemistry"
   },
   "build": {
-   "number": "1",
+   "number": "2",
    "run_exports": [
     "mrchem",
     "mrchem * mpi_mpich_*",
     "mrchem * nompi_*",
     "mrchem * mpi_openmpi_*"
    ],
-   "string": "mpi_openmpi_h1234567_1"
+   "string": "mpi_openmpi_h1234567_2"
   },
   "extra": {
    "recipe-maintainers": [
@@ -2285,7 +2285,7 @@
  "pr_info": {
   "__lazy_json__": "pr_info/mrchem.json"
  },
- "raw_meta_yaml": "{% set name = \"mrchem\" %}\n{% set version = \"1.1.4\" %}\n{% set sha256 = \"80724ee337d3d48af559342ee090d883c90662d2d60a1c5219a6a18c9bd32d6c\" %}\n{% set build = 1 %}\n\n# recipe-lint fails if mpi is undefined\n{% set mpi = mpi or 'nompi' %}\n{% if mpi == 'nompi' %}\n# prioritize shared-memory variant via build number\n{% set build = build + 100 %}\n{% endif %}\n# NOTE This means that the OpenMP build will be highest priority\n\n{% if mpi != 'nompi' %}\n{% set mpi_prefix = 'mpi_' + mpi %}\n{% else %}\n{% set mpi_prefix = 'nompi' %}\n{% endif %}\n# add build string so packages can depend on\n# mpi or nompi variants\n# dependencies:\n# `mrchem * mpi_mpich_*` for mpich\n# `mrchem * mpi_*` for any mpi\n# `mrchem * nompi_*` for no mpi\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://github.com/MRChemSoft/mrchem/archive/v{{ version }}.tar.gz\n  sha256: {{ sha256 }}\n\nbuild:\n  number: {{ build }}\n  skip: true  # [win]\n  string: {{ mpi_prefix }}_h{{ PKG_HASH }}_{{ build }}\n  run_exports:\n    - {{ pin_subpackage('mrchem', max_pin='x.x') }}\n    - {{ name }} * {{ mpi_prefix }}_*\n\nrequirements:\n  build:\n    - python  # [build_platform != target_platform]\n    - cross-python_{{ target_platform }}  # [build_platform != target_platform]\n    - cmake >=3.12\n    - {{ compiler('cxx') }}\n    - {{ stdlib(\"c\") }}\n    - ninja\n    - {{ mpi }}  # [mpi == 'openmpi' and build_platform != target_platform]\n  host:\n    - llvm-openmp  # [osx]\n    - libgomp  # [linux]\n    - {{ mpi }}  # [mpi != 'nompi']\n    - nlohmann_json\n    - xcfun\n    - {{ pin_compatible('eigen', max_pin='x.x') }}\n    - mrcpp * {{ mpi_prefix }}_*\n    - python\n\ntest:\n  imports:\n    - mrchem\n  commands:\n    # Verify existence and execution\n    - test -f $PREFIX/bin/mrchem\n    - $PREFIX/bin/mrchem --version\n    - ls -l $SP_DIR/mrchem  # [not win]\n    # Inspect linkage\n    - ldd -v $PREFIX/bin/mrchem.x  # [linux and build_platform == target_platform]\n    - otool -L $PREFIX/bin/mrchem.x  # [osx]\n\noutputs:\n  - name: mrchem\n    files:\n      - bin/mrchem  # [not win]\n      - bin/mrchem.x  # [not win]\n      - include/MRChem  # [not win]\n      - lib/libmrchem*  # [not win]\n      - share/MRChem/sad_basis  # [not win]\n      - {{ SP_DIR }}/mrchem  # [not win]\n\nabout:\n  home: https://github.com/MRChemSoft/mrchem\n  dev_url: https://github.com/MRChemSoft/mrchem\n  doc_url: https://mrchem.readthedocs.io/en/latest/\n  doc_source_url: https://github.com/MRChemSoft/mrchem/blob/master/doc/index.rst\n  license: LGPL-3.0-or-later\n  license_url: https://opensource.org/licenses/LGPL-3.0\n  license_file: LICENSE\n  license_family: LGPL\n  summary: MultiResolution Chemistry\n\nextra:\n  recipe-maintainers:\n    - robertodr\n    - bjorgve\n    - stigrj\n",
+ "raw_meta_yaml": "{% set name = \"mrchem\" %}\n{% set version = \"1.1.4\" %}\n{% set sha256 = \"80724ee337d3d48af559342ee090d883c90662d2d60a1c5219a6a18c9bd32d6c\" %}\n{% set build = 2 %}\n\n# recipe-lint fails if mpi is undefined\n{% set mpi = mpi or 'nompi' %}\n{% if mpi == 'nompi' %}\n# prioritize shared-memory variant via build number\n{% set build = build + 100 %}\n{% endif %}\n# NOTE This means that the OpenMP build will be highest priority\n\n{% if mpi != 'nompi' %}\n{% set mpi_prefix = 'mpi_' + mpi %}\n{% else %}\n{% set mpi_prefix = 'nompi' %}\n{% endif %}\n# add build string so packages can depend on\n# mpi or nompi variants\n# dependencies:\n# `mrchem * mpi_mpich_*` for mpich\n# `mrchem * mpi_*` for any mpi\n# `mrchem * nompi_*` for no mpi\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://github.com/MRChemSoft/mrchem/archive/v{{ version }}.tar.gz\n  sha256: {{ sha256 }}\n\nbuild:\n  number: {{ build }}\n  skip: true  # [win]\n  string: {{ mpi_prefix }}_h{{ PKG_HASH }}_{{ build }}\n  run_exports:\n    - {{ pin_subpackage('mrchem', max_pin='x.x') }}\n    - {{ name }} * {{ mpi_prefix }}_*\n\nrequirements:\n  build:\n    - python  # [build_platform != target_platform]\n    - cross-python_{{ target_platform }}  # [build_platform != target_platform]\n    - cmake >=3.12\n    - {{ compiler('cxx') }}\n    - {{ stdlib(\"c\") }}\n    - ninja\n    - {{ mpi }}  # [mpi == 'openmpi' and build_platform != target_platform]\n  host:\n    - llvm-openmp  # [osx]\n    - libgomp  # [linux]\n    - {{ mpi }}  # [mpi != 'nompi']\n    - nlohmann_json\n    - xcfun\n    - {{ pin_compatible('eigen', max_pin='x.x') }}\n    - mrcpp * {{ mpi_prefix }}_*\n    - python\n\ntest:\n  imports:\n    - mrchem\n  commands:\n    # Verify existence and execution\n    - test -f $PREFIX/bin/mrchem\n    - $PREFIX/bin/mrchem --version\n    - ls -l $SP_DIR/mrchem  # [not win]\n    # Inspect linkage\n    - ldd -v $PREFIX/bin/mrchem.x  # [linux and build_platform == target_platform]\n    - otool -L $PREFIX/bin/mrchem.x  # [osx]\n\noutputs:\n  - name: mrchem\n    files:\n      - bin/mrchem  # [not win]\n      - bin/mrchem.x  # [not win]\n      - include/MRChem  # [not win]\n      - lib/libmrchem*  # [not win]\n      - share/MRChem/sad_basis  # [not win]\n      - {{ SP_DIR }}/mrchem  # [not win]\n\nabout:\n  home: https://github.com/MRChemSoft/mrchem\n  dev_url: https://github.com/MRChemSoft/mrchem\n  doc_url: https://mrchem.readthedocs.io/en/latest/\n  doc_source_url: https://github.com/MRChemSoft/mrchem/blob/master/doc/index.rst\n  license: LGPL-3.0-or-later\n  license_url: https://opensource.org/licenses/LGPL-3.0\n  license_file: LICENSE\n  license_family: LGPL\n  summary: MultiResolution Chemistry\n\nextra:\n  recipe-maintainers:\n    - robertodr\n    - bjorgve\n    - stigrj\n",
  "req": {
   "__set__": true,
   "elements": [
