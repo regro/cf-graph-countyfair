@@ -39,7 +39,7 @@
   },
   "build": {
    "noarch": "python",
-   "number": "1"
+   "number": "2"
   },
   "extra": {
    "feedstock-name": "nbconvert",
@@ -119,7 +119,7 @@
      ],
      "run_constrained": [
       "pandoc >=2.9.2,<4.0.0",
-      "nbconvert =7.16.4=*_1"
+      "nbconvert =7.16.4=*_2"
      ]
     },
     "test": {
@@ -138,6 +138,9 @@
       "nbconvert.resources",
       "nbconvert.utils",
       "nbconvert.writers"
+     ],
+     "requires": [
+      "python 3.9"
      ]
     }
    },
@@ -313,11 +316,14 @@
   "schema_version": 0,
   "source": {
    "sha256": "86ca91ba266b0a448dc96fa6c5b9d98affabde2867b363258703536807f9f7f4",
-   "url": "https://pypi.io/packages/source/n/nbconvert/nbconvert-7.16.4.tar.gz"
+   "url": "https://pypi.org/packages/source/n/nbconvert/nbconvert-7.16.4.tar.gz"
   },
   "test": {
    "commands": [
     "echo \"tests in outputs\""
+   ],
+   "requires": [
+    "python 3.9"
    ]
   }
  },
@@ -372,7 +378,8 @@
     "ipykernel",
     "ipywidgets",
     "pip",
-    "pytest-dependency"
+    "pytest-dependency",
+    "python"
    ]
   }
  },
@@ -388,7 +395,7 @@
   },
   "build": {
    "noarch": "python",
-   "number": "1"
+   "number": "2"
   },
   "extra": {
    "feedstock-name": "nbconvert",
@@ -468,7 +475,7 @@
      ],
      "run_constrained": [
       "pandoc >=2.9.2,<4.0.0",
-      "nbconvert =7.16.4=*_1"
+      "nbconvert =7.16.4=*_2"
      ]
     },
     "test": {
@@ -487,6 +494,9 @@
       "nbconvert.resources",
       "nbconvert.utils",
       "nbconvert.writers"
+     ],
+     "requires": [
+      "python 3.9"
      ]
     }
    },
@@ -662,11 +672,14 @@
   "schema_version": 0,
   "source": {
    "sha256": "86ca91ba266b0a448dc96fa6c5b9d98affabde2867b363258703536807f9f7f4",
-   "url": "https://pypi.io/packages/source/n/nbconvert/nbconvert-7.16.4.tar.gz"
+   "url": "https://pypi.org/packages/source/n/nbconvert/nbconvert-7.16.4.tar.gz"
   },
   "test": {
    "commands": [
     "echo \"tests in outputs\""
+   ],
+   "requires": [
+    "python 3.9"
    ]
   }
  },
@@ -690,7 +703,7 @@
  "pr_info": {
   "__lazy_json__": "pr_info/nbconvert.json"
  },
- "raw_meta_yaml": "{% set min_python = \"python >=3.8\" %}\n{% set version = \"7.16.4\" %}\n\n{% set min_python = \"python >=3.8\" %}\n\n{% set min_pandoc = \"2.9.2\" %}\n{% set max_pandoc = \"4.0.0\" %}\n\n{% set build = 1 %}\n\n{% set pytest_args = \"-k \\\"not (convert_full_qualified_name or post_processor)\\\"\" %}\n{% set cov_fail_under = \"71\" %}\n\n# handle undefined PYTHON in `noarch: generic` outputs\n{% if PYTHON is not defined %}{% set PYTHON = \"$PYTHON\" %}{% endif %}\n\npackage:\n  name: nbconvert-meta\n  version: {{ version }}\n\nsource:\n  url: https://pypi.io/packages/source/n/nbconvert/nbconvert-{{ version }}.tar.gz\n  sha256: 86ca91ba266b0a448dc96fa6c5b9d98affabde2867b363258703536807f9f7f4\n\nbuild:\n  number: {{ build }}\n  noarch: python\n\nrequirements:\n  host:\n    - {{ min_python }}\n    - pip\n  run:\n    - {{ min_python }}\n\ntest:\n  commands:\n    - echo \"tests in outputs\"\n\noutputs:\n  - name: nbconvert\n    build:\n      noarch: generic\n    requirements:\n      run:\n        - {{ pin_subpackage(\"nbconvert-core\", exact=True) }}\n        - {{ pin_subpackage(\"nbconvert-pandoc\", exact=True) }}\n    test:\n      requires:\n        - pip\n      commands:\n        - pip check\n        - jupyter nbconvert --version\n        - jupyter dejavu --version\n        - jupyter nbconvert --help\n        - jupyter dejavu --help\n\n  - name: nbconvert-core\n    build:\n      noarch: python\n      script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation\n      entry_points:\n        - jupyter-dejavu = nbconvert.nbconvertapp:dejavu_main\n        - jupyter-nbconvert = nbconvert.nbconvertapp:main\n    requirements:\n      host:\n        - {{ min_python }}\n        - hatchling >=1.5\n        - pip\n      run:\n        - {{ min_python }}\n        - beautifulsoup4\n        - bleach\n        - defusedxml\n        - entrypoints >=0.2.2\n        - jinja2 >=3.0\n        - jupyter_core >=4.7\n        - jupyterlab_pygments\n        - markupsafe >=2.0\n        - mistune >=2.0.3,<4\n        - nbclient >=0.5.0\n        - nbformat >=5.1\n        - packaging\n        - pandocfilters >=1.4.1\n        - pygments >=2.4.1\n        - tinycss2\n        - traitlets >=5.0\n      run_constrained:\n        # other packages carry the full `run` dependency\n        - pandoc >={{ min_pandoc }},<{{ max_pandoc }}\n        # avoid mixing nbconvert-core and pre-split nbconvert\n        # can't mix noarch:generic and noarch:python with exact=True\n        - nbconvert ={{ version }}=*_{{ build }}\n\n    test:\n      imports:\n        - nbconvert\n        - nbconvert.exporters\n        - nbconvert.filters\n        - nbconvert.postprocessors\n        - nbconvert.preprocessors\n        - nbconvert.resources\n        - nbconvert.utils\n        - nbconvert.writers\n      commands:\n        - jupyter nbconvert --version\n        - jupyter dejavu --version\n        - jupyter nbconvert --help\n        - jupyter dejavu --help\n\n  - name: nbconvert-qtpdf\n    build:\n      noarch: generic\n    requirements:\n      run:\n        - {{ pin_subpackage(\"nbconvert-core\", exact=True) }}\n        - pyqtwebengine >=5.5\n    test:\n      source_files:\n        - tests/files/notebook1.ipynb\n      requires:\n        - pip\n      script_env:\n        - DISPLAY=localhost:1.0  # [linux]\n      commands:\n        - pip check\n        - jupyter nbconvert --version\n        - jupyter dejavu --version\n        - jupyter nbconvert --help\n        - jupyter dejavu --help\n        - jupyter nbconvert tests/files/notebook1.ipynb --to qtpdf  # [not linux]\n        - xvfb-run -a jupyter nbconvert tests/files/notebook1.ipynb --to qtpdf  # [linux]\n    about:\n      home: https://jupyter.org\n      license: BSD-3-Clause\n      license_file: LICENSE\n      description: nbconvert with extra packages for browser-based PDF generation\n      doc_url: https://nbconvert.readthedocs.org/\n      dev_url: https://github.com/jupyter/nbconvert\n\n  - name: nbconvert-pandoc\n    build:\n      noarch: generic\n    requirements:\n      run:\n        - {{ pin_subpackage(\"nbconvert-core\", exact=True) }}\n        # the pin is handled by the `run_constrained` in nbconvert-core\n        - pandoc\n    test:\n      files:\n        - check_pandoc.py\n      requires:\n        - pip\n      commands:\n        - pip check\n        - jupyter nbconvert --version\n        - jupyter dejavu --version\n        - jupyter nbconvert --help\n        - jupyter dejavu --help\n        - python check_pandoc.py \">={{ min_pandoc }}\" \"<{{ max_pandoc }}\"\n    about:\n      home: https://jupyter.org\n      license: BSD-3-Clause\n      license_file: LICENSE\n      description: nbconvert with extra packages for pandoc-based outputs\n      doc_url: https://nbconvert.readthedocs.org/\n      dev_url: https://github.com/jupyter/nbconvert\n\n  - name: nbconvert-webpdf\n    build:\n      noarch: generic\n    requirements:\n      run:\n        - {{ pin_subpackage(\"nbconvert-core\", exact=True) }}\n        - playwright-python\n    test:\n      source_files:\n        - tests/files/notebook1.ipynb\n      requires:\n        - pip\n      script_env:\n        - DISPLAY=localhost:1.0  # [linux]\n      commands:\n        - pip check\n        - jupyter nbconvert --version\n        - jupyter dejavu --version\n        - jupyter nbconvert --help\n        - jupyter dejavu --help\n        - playwright install chromium\n        - jupyter nbconvert tests/files/notebook1.ipynb --to webpdf\n    about:\n      description: nbconvert with extra packages for browser-based PDF generation\n\n  - name: nbconvert-all\n    build:\n      noarch: generic\n    requirements:\n      run:\n        - {{ pin_subpackage(\"nbconvert-core\", exact=True) }}\n        - {{ pin_subpackage(\"nbconvert-qtpdf\", exact=True) }}\n        - {{ pin_subpackage(\"nbconvert-webpdf\", exact=True) }}\n        - {{ pin_subpackage(\"nbconvert\", exact=True) }}\n    test:\n      source_files:\n        - tests\n        - pyproject.toml\n      requires:\n        - coverage\n        - flaky\n        - ipykernel\n        - ipywidgets >=7.9.0\n        - pip\n        - pytest-dependency\n      commands:\n        - pip check\n        - jupyter nbconvert --version\n        - jupyter dejavu --version\n        - jupyter nbconvert --help\n        - jupyter dejavu --help\n        - pytest -vv {{ pytest_args }}                                                          # [not linux]\n        - xvfb-run -a coverage run --branch --source=nbconvert -m pytest -vv {{ pytest_args }}  # [linux]\n        - coverage report --show-missing --skip-covered --fail-under={{ cov_fail_under }}       # [linux]\n    about:\n      home: https://jupyter.org\n      license: BSD-3-Clause\n      license_file: LICENSE\n      description: nbconvert with all optional packages\n      doc_url: https://nbconvert.readthedocs.org/\n      dev_url: https://github.com/jupyter/nbconvert\n\nabout:\n  home: https://jupyter.org\n  license: BSD-3-Clause\n  license_file: LICENSE\n  summary: Converting Jupyter Notebooks\n  description: |\n    The nbconvert tool, jupyter nbconvert, converts notebooks to various other\n    formats via Jinja templates. The nbconvert tool allows you to convert an\n    .ipynb notebook file into various static formats.\n  doc_url: https://nbconvert.readthedocs.org/\n  dev_url: https://github.com/jupyter/nbconvert\n\nextra:\n  feedstock-name: nbconvert\n  recipe-maintainers:\n    - jakirkham\n    - mpacer\n    - minrk\n    - pelson\n    - takluyver\n    - mseal\n    - blink1073\n    - ocefpaf\n    - jasongrout\n    - bollwyvl\n    - martinRenou\n",
+ "raw_meta_yaml": "{% set min_python = \"python >=3.8\" %}\n{% set version = \"7.16.4\" %}\n\n{% set min_python = \"python >=3.8\" %}\n\n{% set min_pandoc = \"2.9.2\" %}\n{% set max_pandoc = \"4.0.0\" %}\n\n{% set build = 2 %}\n\n{% set pytest_args = \"-k \\\"not (convert_full_qualified_name or post_processor)\\\"\" %}\n{% set cov_fail_under = \"71\" %}\n\n# handle undefined PYTHON in `noarch: generic` outputs\n{% if PYTHON is not defined %}{% set PYTHON = \"$PYTHON\" %}{% endif %}\n\npackage:\n  name: nbconvert-meta\n  version: {{ version }}\n\nsource:\n  url: https://pypi.org/packages/source/n/nbconvert/nbconvert-{{ version }}.tar.gz\n  sha256: 86ca91ba266b0a448dc96fa6c5b9d98affabde2867b363258703536807f9f7f4\n\nbuild:\n  number: {{ build }}\n  noarch: python\n\nrequirements:\n  host:\n    - {{ min_python }}\n    - pip\n  run:\n    - {{ min_python }}\n\ntest:\n  requires:\n    - python {{ python_min }}\n  commands:\n    - echo \"tests in outputs\"\n\noutputs:\n  - name: nbconvert\n    build:\n      noarch: generic\n    requirements:\n      run:\n        - {{ pin_subpackage(\"nbconvert-core\", exact=True) }}\n        - {{ pin_subpackage(\"nbconvert-pandoc\", exact=True) }}\n    test:\n      requires:\n        - pip\n      commands:\n        - pip check\n        - jupyter nbconvert --version\n        - jupyter dejavu --version\n        - jupyter nbconvert --help\n        - jupyter dejavu --help\n\n  - name: nbconvert-core\n    build:\n      noarch: python\n      script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation\n      entry_points:\n        - jupyter-dejavu = nbconvert.nbconvertapp:dejavu_main\n        - jupyter-nbconvert = nbconvert.nbconvertapp:main\n    requirements:\n      host:\n        - {{ min_python }}\n        - hatchling >=1.5\n        - pip\n      run:\n        - {{ min_python }}\n        - beautifulsoup4\n        - bleach\n        - defusedxml\n        - entrypoints >=0.2.2\n        - jinja2 >=3.0\n        - jupyter_core >=4.7\n        - jupyterlab_pygments\n        - markupsafe >=2.0\n        - mistune >=2.0.3,<4\n        - nbclient >=0.5.0\n        - nbformat >=5.1\n        - packaging\n        - pandocfilters >=1.4.1\n        - pygments >=2.4.1\n        - tinycss2\n        - traitlets >=5.0\n      run_constrained:\n        # other packages carry the full `run` dependency\n        - pandoc >={{ min_pandoc }},<{{ max_pandoc }}\n        # avoid mixing nbconvert-core and pre-split nbconvert\n        # can't mix noarch:generic and noarch:python with exact=True\n        - nbconvert ={{ version }}=*_{{ build }}\n\n    test:\n      requires:\n        - python {{ python_min }}\n      imports:\n        - nbconvert\n        - nbconvert.exporters\n        - nbconvert.filters\n        - nbconvert.postprocessors\n        - nbconvert.preprocessors\n        - nbconvert.resources\n        - nbconvert.utils\n        - nbconvert.writers\n      commands:\n        - jupyter nbconvert --version\n        - jupyter dejavu --version\n        - jupyter nbconvert --help\n        - jupyter dejavu --help\n\n  - name: nbconvert-qtpdf\n    build:\n      noarch: generic\n    requirements:\n      run:\n        - {{ pin_subpackage(\"nbconvert-core\", exact=True) }}\n        - pyqtwebengine >=5.5\n    test:\n      source_files:\n        - tests/files/notebook1.ipynb\n      requires:\n        - pip\n      script_env:\n        - DISPLAY=localhost:1.0  # [linux]\n      commands:\n        - pip check\n        - jupyter nbconvert --version\n        - jupyter dejavu --version\n        - jupyter nbconvert --help\n        - jupyter dejavu --help\n        - jupyter nbconvert tests/files/notebook1.ipynb --to qtpdf  # [not linux]\n        - xvfb-run -a jupyter nbconvert tests/files/notebook1.ipynb --to qtpdf  # [linux]\n    about:\n      home: https://jupyter.org\n      license: BSD-3-Clause\n      license_file: LICENSE\n      description: nbconvert with extra packages for browser-based PDF generation\n      doc_url: https://nbconvert.readthedocs.org/\n      dev_url: https://github.com/jupyter/nbconvert\n\n  - name: nbconvert-pandoc\n    build:\n      noarch: generic\n    requirements:\n      run:\n        - {{ pin_subpackage(\"nbconvert-core\", exact=True) }}\n        # the pin is handled by the `run_constrained` in nbconvert-core\n        - pandoc\n    test:\n      files:\n        - check_pandoc.py\n      requires:\n        - pip\n      commands:\n        - pip check\n        - jupyter nbconvert --version\n        - jupyter dejavu --version\n        - jupyter nbconvert --help\n        - jupyter dejavu --help\n        - python check_pandoc.py \">={{ min_pandoc }}\" \"<{{ max_pandoc }}\"\n    about:\n      home: https://jupyter.org\n      license: BSD-3-Clause\n      license_file: LICENSE\n      description: nbconvert with extra packages for pandoc-based outputs\n      doc_url: https://nbconvert.readthedocs.org/\n      dev_url: https://github.com/jupyter/nbconvert\n\n  - name: nbconvert-webpdf\n    build:\n      noarch: generic\n    requirements:\n      run:\n        - {{ pin_subpackage(\"nbconvert-core\", exact=True) }}\n        - playwright-python\n    test:\n      source_files:\n        - tests/files/notebook1.ipynb\n      requires:\n        - pip\n      script_env:\n        - DISPLAY=localhost:1.0  # [linux]\n      commands:\n        - pip check\n        - jupyter nbconvert --version\n        - jupyter dejavu --version\n        - jupyter nbconvert --help\n        - jupyter dejavu --help\n        - playwright install chromium\n        - jupyter nbconvert tests/files/notebook1.ipynb --to webpdf\n    about:\n      description: nbconvert with extra packages for browser-based PDF generation\n\n  - name: nbconvert-all\n    build:\n      noarch: generic\n    requirements:\n      run:\n        - {{ pin_subpackage(\"nbconvert-core\", exact=True) }}\n        - {{ pin_subpackage(\"nbconvert-qtpdf\", exact=True) }}\n        - {{ pin_subpackage(\"nbconvert-webpdf\", exact=True) }}\n        - {{ pin_subpackage(\"nbconvert\", exact=True) }}\n    test:\n      source_files:\n        - tests\n        - pyproject.toml\n      requires:\n        - coverage\n        - flaky\n        - ipykernel\n        - ipywidgets >=7.9.0\n        - pip\n        - pytest-dependency\n      commands:\n        - pip check\n        - jupyter nbconvert --version\n        - jupyter dejavu --version\n        - jupyter nbconvert --help\n        - jupyter dejavu --help\n        - pytest -vv {{ pytest_args }}                                                          # [not linux]\n        - xvfb-run -a coverage run --branch --source=nbconvert -m pytest -vv {{ pytest_args }}  # [linux]\n        - coverage report --show-missing --skip-covered --fail-under={{ cov_fail_under }}       # [linux]\n    about:\n      home: https://jupyter.org\n      license: BSD-3-Clause\n      license_file: LICENSE\n      description: nbconvert with all optional packages\n      doc_url: https://nbconvert.readthedocs.org/\n      dev_url: https://github.com/jupyter/nbconvert\n\nabout:\n  home: https://jupyter.org\n  license: BSD-3-Clause\n  license_file: LICENSE\n  summary: Converting Jupyter Notebooks\n  description: |\n    The nbconvert tool, jupyter nbconvert, converts notebooks to various other\n    formats via Jinja templates. The nbconvert tool allows you to convert an\n    .ipynb notebook file into various static formats.\n  doc_url: https://nbconvert.readthedocs.org/\n  dev_url: https://github.com/jupyter/nbconvert\n\nextra:\n  feedstock-name: nbconvert\n  recipe-maintainers:\n    - jakirkham\n    - mpacer\n    - minrk\n    - pelson\n    - takluyver\n    - mseal\n    - blink1073\n    - ocefpaf\n    - jasongrout\n    - bollwyvl\n    - martinRenou\n",
  "req": {
   "__set__": true,
   "elements": [
@@ -774,7 +787,8 @@
     "ipykernel",
     "ipywidgets",
     "pip",
-    "pytest-dependency"
+    "pytest-dependency",
+    "python"
    ]
   }
  },
@@ -830,11 +844,12 @@
     "ipykernel",
     "ipywidgets >=7.9.0",
     "pip",
-    "pytest-dependency"
+    "pytest-dependency",
+    "python 3.9"
    ]
   }
  },
- "url": "https://pypi.io/packages/source/n/nbconvert/nbconvert-7.16.4.tar.gz",
+ "url": "https://pypi.org/packages/source/n/nbconvert/nbconvert-7.16.4.tar.gz",
  "version": "7.16.4",
  "version_pr_info": {
   "__lazy_json__": "version_pr_info/nbconvert.json"
