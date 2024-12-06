@@ -2,6 +2,9 @@
  "archived": false,
  "branch": "main",
  "conda-forge.yml": {
+  "build_platform": {
+   "linux_ppc64le": "linux_64"
+  },
   "conda_build": {
    "error_overlinking": true
   },
@@ -9,7 +12,11 @@
   "github": {
    "branch_name": "main",
    "tooling_branch_name": "main"
-  }
+  },
+  "provider": {
+   "linux_ppc64le": "default"
+  },
+  "test": "native_and_emulated"
  },
  "feedstock_name": "ninja-hep-ph",
  "hash_type": "sha256",
@@ -24,7 +31,7 @@
    "summary": "Ninja: Automated Integrand Reduction via Laurent Expansion for One-Loop Amplitudes"
   },
   "build": {
-   "number": "0",
+   "number": "1",
    "run_exports": [
     "ninja-hep-ph"
    ]
@@ -174,6 +181,167 @@
    ]
   }
  },
+ "linux_ppc64le_meta_yaml": {
+  "about": {
+   "description": "Ninja implements the Laurent series expansion method for the computation of\none-loop integrals.\n\nIt is based on:\n* P. Mastrolia, E. Mirabella and T. Peraro, \"_Integrand reduction of\none-loop scattering amplitudes through Laurent series expansion_,\"\nJHEP 1206 (2012) 095\n[arXiv:1203.0291 [hep-ph]](https://arxiv.org/abs/1203.0291)\nDOI: [10.1007/JHEP06(2012)095](https://doi.org/10.1007/JHEP06(2012)095)\n* T. Peraro, \"_Ninja: Automated Integrand Reduction via Laurent Expansion\nfor One-Loop Amplitudes_,\" Comput. Phys. Commun. 185 (2014) 2771\n[arXiv:1403.1229 [hep-ph]](http://arxiv.org/abs/1403.1229)\nDOI: [10.1016/j.cpc.2014.06.017](https://doi.org/10.1016/j.cpc.2014.06.017)\n",
+   "dev_url": "https://github.com/peraro/ninja",
+   "home": "https://github.com/peraro/ninja",
+   "license": "GPL-3.0-only",
+   "license_family": "GPL",
+   "license_file": "COPYING",
+   "summary": "Ninja: Automated Integrand Reduction via Laurent Expansion for One-Loop Amplitudes"
+  },
+  "build": {
+   "number": "1",
+   "run_exports": [
+    "ninja-hep-ph"
+   ]
+  },
+  "extra": {
+   "recipe-maintainers": [
+    "matthewfeickert"
+   ]
+  },
+  "package": {
+   "name": "ninja-hep-ph",
+   "version": "1.2.0"
+  },
+  "requirements": {
+   "build": [
+    "c_stdlib_stub",
+    "cxx_compiler_stub",
+    "fortran_compiler_stub",
+    "automake",
+    "libtool",
+    "make",
+    "pkg-config",
+    "gnuconfig"
+   ],
+   "host": [
+    "oneloop",
+    "looptools-static"
+   ],
+   "run": [
+    "oneloop"
+   ]
+  },
+  "schema_version": 0,
+  "source": {
+   "patches": [
+    "posix-compliant-shell.patch",
+    "update-version-number-to-v1.2.0.patch"
+   ],
+   "sha256": "b9709aada408286b6533ac7427bab9d1364d449a9c11098c324ea0875fe9a9e1",
+   "url": "https://github.com/peraro/ninja/archive/v1.2.0.tar.gz"
+  },
+  "test": {
+   "commands": [
+    "test -f $PREFIX/lib/libninja${SHLIB_EXT}",
+    "test ! -f $PREFIX/lib/libninja.la",
+    "test ! -f $PREFIX/lib/libninja.a",
+    "test -f $PREFIX/include/ninja/zero_float.hh",
+    "test -f $PREFIX/include/ninja/types.hh",
+    "test -f $PREFIX/include/ninja/tensor_ninja.hh",
+    "test -f $PREFIX/include/ninja/ninja_in.hh",
+    "test -f $PREFIX/include/ninja/ninja.hh",
+    "test -f $PREFIX/include/ninja/thread_safe_integral_library.hh",
+    "test -f $PREFIX/include/ninja/static_arrays.hh",
+    "test -f $PREFIX/include/ninja/spinors.hh",
+    "test -f $PREFIX/include/ninja/s_mat.hh",
+    "test -f $PREFIX/include/ninja/rambo.hh",
+    "test -f $PREFIX/include/ninja/num_defs.hh",
+    "test -f $PREFIX/include/ninja/ninjanumgen.hh",
+    "test -f $PREFIX/include/ninja/momentum.hh",
+    "test -f $PREFIX/include/ninja/looptools.hh",
+    "test -f $PREFIX/include/ninja/integral_library.hh",
+    "test -f $PREFIX/include/ninja/avholo.hh",
+    "test -f $PREFIX/include/ninja/ninja_config.h",
+    "test -f $PREFIX/include/ninjavholo.mod",
+    "test -f $PREFIX/include/ninjago_module.mod",
+    "test -f $PREFIX/include/mninja.mod",
+    "test -f $PREFIX/bin/ninja-config",
+    "ninja-config --help",
+    "ninja-config --version",
+    "ninja-config --quadsupport",
+    "autoreconf --install",
+    "./configure --prefix=$PREFIX --enable-static=no --with-avholo=\"$FFLAGS -lavh_olo\" --with-looptools=\"$FLDFLAGS -looptools -lgfortran -lquadmath\" FCINCLUDE=\"${FCINCLUDE} -I$PREFIX/include/oneloop\"",
+    "make examples",
+    "cd examples",
+    "echo -e \"\\n# simple_test\"",
+    "./simple_test",
+    "echo -e \"\\n# simple_higher_rank_test\"",
+    "./simple_higher_rank_test",
+    "echo -e \"\\n# tensor_test\"",
+    "./tensor_test",
+    "echo -e \"\\n# tensor_higher_rank_test\"",
+    "./tensor_higher_rank_test",
+    "echo -e \"\\n# 4photons\"",
+    "./4photons",
+    "echo -e \"\\n# 6photons\"",
+    "./6photons",
+    "echo -e \"\\n# ttbarh\"",
+    "./ttbarh",
+    "make clean",
+    "echo -e \"\\n# simple_test by hand\"",
+    "$CXX simple_test.cc mynum.cc -o simple_test $CXXFLAGS -I./ -I$PREFIX/include/ninja $LDFLAGS -lninja -lavh_olo -looptools -lgfortran -lquadmath",
+    "cd .."
+   ],
+   "requires": [
+    "cxx_compiler_stub",
+    "fortran_compiler_stub",
+    "automake",
+    "libtool",
+    "make",
+    "looptools-static"
+   ],
+   "source_files": [
+    "examples/",
+    "m4/",
+    "src/",
+    "Makefile.am",
+    "configure.ac"
+   ]
+  }
+ },
+ "linux_ppc64le_requirements": {
+  "build": {
+   "__set__": true,
+   "elements": [
+    "automake",
+    "c_stdlib_stub",
+    "cxx_compiler_stub",
+    "fortran_compiler_stub",
+    "gnuconfig",
+    "libtool",
+    "make",
+    "pkg-config"
+   ]
+  },
+  "host": {
+   "__set__": true,
+   "elements": [
+    "looptools-static",
+    "oneloop"
+   ]
+  },
+  "run": {
+   "__set__": true,
+   "elements": [
+    "oneloop"
+   ]
+  },
+  "test": {
+   "__set__": true,
+   "elements": [
+    "automake",
+    "cxx_compiler_stub",
+    "fortran_compiler_stub",
+    "libtool",
+    "looptools-static",
+    "make"
+   ]
+  }
+ },
  "meta_yaml": {
   "about": {
    "description": "Ninja implements the Laurent series expansion method for the computation of\none-loop integrals.\n\nIt is based on:\n* P. Mastrolia, E. Mirabella and T. Peraro, \"_Integrand reduction of\none-loop scattering amplitudes through Laurent series expansion_,\"\nJHEP 1206 (2012) 095\n[arXiv:1203.0291 [hep-ph]](https://arxiv.org/abs/1203.0291)\nDOI: [10.1007/JHEP06(2012)095](https://doi.org/10.1007/JHEP06(2012)095)\n* T. Peraro, \"_Ninja: Automated Integrand Reduction via Laurent Expansion\nfor One-Loop Amplitudes_,\" Comput. Phys. Commun. 185 (2014) 2771\n[arXiv:1403.1229 [hep-ph]](http://arxiv.org/abs/1403.1229)\nDOI: [10.1016/j.cpc.2014.06.017](https://doi.org/10.1016/j.cpc.2014.06.017)\n",
@@ -185,7 +353,7 @@
    "summary": "Ninja: Automated Integrand Reduction via Laurent Expansion for One-Loop Amplitudes"
   },
   "build": {
-   "number": "0",
+   "number": "1",
    "run_exports": [
     "ninja-hep-ph"
    ]
@@ -305,12 +473,13 @@
  },
  "parsing_error": false,
  "platforms": [
-  "linux_64"
+  "linux_64",
+  "linux_ppc64le"
  ],
  "pr_info": {
   "__lazy_json__": "pr_info/ninja-hep-ph.json"
  },
- "raw_meta_yaml": "{% set name = \"ninja\" %}\n{% set version = \"1.2.0\" %}\n\npackage:\n  name: {{ name }}-hep-ph\n  version: {{ version }}\n\nsource:\n  url: https://github.com/peraro/ninja/archive/v{{ version }}.tar.gz\n  sha256: b9709aada408286b6533ac7427bab9d1364d449a9c11098c324ea0875fe9a9e1\n  patches:\n    - posix-compliant-shell.patch\n    - update-version-number-to-v1.2.0.patch\n\nbuild:\n  # libquadmath is required, so macOS is not supported\n  skip: true  # [not linux]\n  number: 0\n  run_exports:\n    - {{ pin_subpackage('ninja-hep-ph', max_pin='x.x') }}\n\nrequirements:\n  build:\n    - {{ stdlib('c') }}\n    - {{ compiler('cxx') }}\n    - {{ compiler('fortran') }}\n    - automake  # includes autoconf\n    - libtool\n    - make\n    - pkg-config\n    - gnuconfig\n    - oneloop  # [build_platform != target_platform]\n    - looptools-static  # [build_platform != target_platform]\n  host:\n    - oneloop\n    - looptools-static\n  run:\n    - oneloop\n\ntest:\n  # As need to regenerate Makefiles, need all of the source files that\n  # configure uses to do so\n  source_files:\n    - examples/\n    - m4/\n    - src/\n    - Makefile.am\n    - configure.ac\n  requires:\n    - {{ compiler('cxx') }}\n    - {{ compiler('fortran') }}\n    - automake\n    - libtool\n    - make\n    # libooptools.a is needed at linktime, but not at runtime\n    - looptools-static\n  commands:\n    - test -f $PREFIX/lib/libninja${SHLIB_EXT}\n    # c.f. https://github.com/conda/conda-build/issues/3075\n    - test ! -f $PREFIX/lib/libninja.la\n    - test ! -f $PREFIX/lib/libninja.a\n    - test -f $PREFIX/include/ninja/zero_float.hh\n    - test -f $PREFIX/include/ninja/types.hh\n    - test -f $PREFIX/include/ninja/tensor_ninja.hh\n    - test -f $PREFIX/include/ninja/ninja_in.hh\n    - test -f $PREFIX/include/ninja/ninja.hh\n    - test -f $PREFIX/include/ninja/thread_safe_integral_library.hh\n    - test -f $PREFIX/include/ninja/static_arrays.hh\n    - test -f $PREFIX/include/ninja/spinors.hh\n    - test -f $PREFIX/include/ninja/s_mat.hh\n    - test -f $PREFIX/include/ninja/rambo.hh\n    - test -f $PREFIX/include/ninja/num_defs.hh\n    - test -f $PREFIX/include/ninja/ninjanumgen.hh\n    - test -f $PREFIX/include/ninja/momentum.hh\n    - test -f $PREFIX/include/ninja/looptools.hh\n    - test -f $PREFIX/include/ninja/integral_library.hh\n    - test -f $PREFIX/include/ninja/avholo.hh\n    - test -f $PREFIX/include/ninja/ninja_config.h\n    - test -f $PREFIX/include/ninjavholo.mod\n    - test -f $PREFIX/include/ninjago_module.mod\n    - test -f $PREFIX/include/mninja.mod\n    - test -f $PREFIX/bin/ninja-config\n\n    - ninja-config --help\n    - ninja-config --version\n    - ninja-config --quadsupport\n\n    # Given the way the examples/Makefile works, need to regenerate it and\n    # other supporting files with configure again\n    - autoreconf --install\n    - ./configure --prefix=$PREFIX --enable-static=no --with-avholo=\"$FFLAGS -lavh_olo\" --with-looptools=\"$FLDFLAGS -looptools -lgfortran -lquadmath\" FCINCLUDE=\"${FCINCLUDE} -I$PREFIX/include/oneloop\"\n    - make examples\n\n    - cd examples\n    - echo -e \"\\n# simple_test\"\n    - ./simple_test\n    - echo -e \"\\n# simple_higher_rank_test\"\n    - ./simple_higher_rank_test\n    - echo -e \"\\n# tensor_test\"\n    - ./tensor_test\n    - echo -e \"\\n# tensor_higher_rank_test\"\n    - ./tensor_higher_rank_test\n    - echo -e \"\\n# 4photons\"\n    - ./4photons\n    - echo -e \"\\n# 6photons\"\n    - ./6photons\n    - echo -e \"\\n# ttbarh\"\n    - ./ttbarh\n\n    # Show how to build manually\n    - make clean\n    - echo -e \"\\n# simple_test by hand\"\n    - $CXX simple_test.cc mynum.cc -o simple_test $CXXFLAGS -I./ -I$PREFIX/include/ninja $LDFLAGS -lninja -lavh_olo -looptools -lgfortran -lquadmath\n    - ./simple_test\n\n    - make clean\n    - cd ..\n    - make clean\n\nabout:\n  home: https://github.com/peraro/ninja\n  summary: 'Ninja: Automated Integrand Reduction via Laurent Expansion for One-Loop Amplitudes'\n  description: |\n    Ninja implements the Laurent series expansion method for the computation of\n    one-loop integrals.\n\n    It is based on:\n    * P. Mastrolia, E. Mirabella and T. Peraro, \"_Integrand reduction of\n    one-loop scattering amplitudes through Laurent series expansion_,\"\n    JHEP 1206 (2012) 095\n    [arXiv:1203.0291 [hep-ph]](https://arxiv.org/abs/1203.0291)\n    DOI: [10.1007/JHEP06(2012)095](https://doi.org/10.1007/JHEP06(2012)095)\n    * T. Peraro, \"_Ninja: Automated Integrand Reduction via Laurent Expansion\n    for One-Loop Amplitudes_,\" Comput. Phys. Commun. 185 (2014) 2771\n    [arXiv:1403.1229 [hep-ph]](http://arxiv.org/abs/1403.1229)\n    DOI: [10.1016/j.cpc.2014.06.017](https://doi.org/10.1016/j.cpc.2014.06.017)\n  license: GPL-3.0-only\n  license_family: GPL\n  license_file: COPYING\n  dev_url: https://github.com/peraro/ninja\n\nextra:\n  recipe-maintainers:\n    - matthewfeickert\n",
+ "raw_meta_yaml": "{% set name = \"ninja\" %}\n{% set version = \"1.2.0\" %}\n\npackage:\n  name: {{ name }}-hep-ph\n  version: {{ version }}\n\nsource:\n  url: https://github.com/peraro/ninja/archive/v{{ version }}.tar.gz\n  sha256: b9709aada408286b6533ac7427bab9d1364d449a9c11098c324ea0875fe9a9e1\n  patches:\n    - posix-compliant-shell.patch\n    - update-version-number-to-v1.2.0.patch\n\nbuild:\n  # libquadmath is required, so macOS is not supported\n  skip: true  # [not linux]\n  number: 1\n  run_exports:\n    - {{ pin_subpackage('ninja-hep-ph', max_pin='x.x') }}\n\nrequirements:\n  build:\n    - {{ stdlib('c') }}\n    - {{ compiler('cxx') }}\n    - {{ compiler('fortran') }}\n    - automake  # includes autoconf\n    - libtool\n    - make\n    - pkg-config\n    - gnuconfig\n    - oneloop  # [build_platform != target_platform]\n    - looptools-static  # [build_platform != target_platform]\n  host:\n    - oneloop\n    - looptools-static\n  run:\n    - oneloop\n\ntest:\n  # As need to regenerate Makefiles, need all of the source files that\n  # configure uses to do so\n  source_files:\n    - examples/\n    - m4/\n    - src/\n    - Makefile.am\n    - configure.ac\n  requires:\n    - {{ compiler('cxx') }}\n    - {{ compiler('fortran') }}\n    - automake\n    - libtool\n    - make\n    # libooptools.a is needed at linktime, but not at runtime\n    - looptools-static\n  commands:\n    - test -f $PREFIX/lib/libninja${SHLIB_EXT}\n    # c.f. https://github.com/conda/conda-build/issues/3075\n    - test ! -f $PREFIX/lib/libninja.la\n    - test ! -f $PREFIX/lib/libninja.a\n    - test -f $PREFIX/include/ninja/zero_float.hh\n    - test -f $PREFIX/include/ninja/types.hh\n    - test -f $PREFIX/include/ninja/tensor_ninja.hh\n    - test -f $PREFIX/include/ninja/ninja_in.hh\n    - test -f $PREFIX/include/ninja/ninja.hh\n    - test -f $PREFIX/include/ninja/thread_safe_integral_library.hh\n    - test -f $PREFIX/include/ninja/static_arrays.hh\n    - test -f $PREFIX/include/ninja/spinors.hh\n    - test -f $PREFIX/include/ninja/s_mat.hh\n    - test -f $PREFIX/include/ninja/rambo.hh\n    - test -f $PREFIX/include/ninja/num_defs.hh\n    - test -f $PREFIX/include/ninja/ninjanumgen.hh\n    - test -f $PREFIX/include/ninja/momentum.hh\n    - test -f $PREFIX/include/ninja/looptools.hh\n    - test -f $PREFIX/include/ninja/integral_library.hh\n    - test -f $PREFIX/include/ninja/avholo.hh\n    - test -f $PREFIX/include/ninja/ninja_config.h\n    - test -f $PREFIX/include/ninjavholo.mod\n    - test -f $PREFIX/include/ninjago_module.mod\n    - test -f $PREFIX/include/mninja.mod\n    - test -f $PREFIX/bin/ninja-config\n\n    - ninja-config --help\n    - ninja-config --version\n    - ninja-config --quadsupport\n\n    # Given the way the examples/Makefile works, need to regenerate it and\n    # other supporting files with configure again\n    - autoreconf --install\n    - ./configure --prefix=$PREFIX --enable-static=no --with-avholo=\"$FFLAGS -lavh_olo\" --with-looptools=\"$FLDFLAGS -looptools -lgfortran -lquadmath\" FCINCLUDE=\"${FCINCLUDE} -I$PREFIX/include/oneloop\"\n    - make examples\n\n    - cd examples\n    - echo -e \"\\n# simple_test\"\n    - ./simple_test\n    - echo -e \"\\n# simple_higher_rank_test\"\n    - ./simple_higher_rank_test\n    - echo -e \"\\n# tensor_test\"\n    - ./tensor_test\n    - echo -e \"\\n# tensor_higher_rank_test\"\n    - ./tensor_higher_rank_test\n    - echo -e \"\\n# 4photons\"\n    - ./4photons\n    - echo -e \"\\n# 6photons\"\n    - ./6photons\n    - echo -e \"\\n# ttbarh\"\n    - ./ttbarh\n\n    # Show how to build manually\n    - make clean\n    - echo -e \"\\n# simple_test by hand\"\n    - $CXX simple_test.cc mynum.cc -o simple_test $CXXFLAGS -I./ -I$PREFIX/include/ninja $LDFLAGS -lninja -lavh_olo -looptools -lgfortran -lquadmath\n    - ./simple_test\n\n    - make clean\n    - cd ..\n    - make clean\n\nabout:\n  home: https://github.com/peraro/ninja\n  summary: 'Ninja: Automated Integrand Reduction via Laurent Expansion for One-Loop Amplitudes'\n  description: |\n    Ninja implements the Laurent series expansion method for the computation of\n    one-loop integrals.\n\n    It is based on:\n    * P. Mastrolia, E. Mirabella and T. Peraro, \"_Integrand reduction of\n    one-loop scattering amplitudes through Laurent series expansion_,\"\n    JHEP 1206 (2012) 095\n    [arXiv:1203.0291 [hep-ph]](https://arxiv.org/abs/1203.0291)\n    DOI: [10.1007/JHEP06(2012)095](https://doi.org/10.1007/JHEP06(2012)095)\n    * T. Peraro, \"_Ninja: Automated Integrand Reduction via Laurent Expansion\n    for One-Loop Amplitudes_,\" Comput. Phys. Commun. 185 (2014) 2771\n    [arXiv:1403.1229 [hep-ph]](http://arxiv.org/abs/1403.1229)\n    DOI: [10.1016/j.cpc.2014.06.017](https://doi.org/10.1016/j.cpc.2014.06.017)\n  license: GPL-3.0-only\n  license_family: GPL\n  license_file: COPYING\n  dev_url: https://github.com/peraro/ninja\n\nextra:\n  recipe-maintainers:\n    - matthewfeickert\n",
  "req": {
   "__set__": true,
   "elements": [
