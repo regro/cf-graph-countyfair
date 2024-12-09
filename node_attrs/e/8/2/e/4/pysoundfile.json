@@ -2,7 +2,6 @@
  "archived": false,
  "branch": "main",
  "conda-forge.yml": {
-  "compiler_stack": "comp7",
   "conda_build": {
    "pkg_format": "2"
   },
@@ -10,9 +9,7 @@
   "github": {
    "branch_name": "main",
    "tooling_branch_name": "main"
-  },
-  "max_py_ver": "37",
-  "max_r_ver": "35"
+  }
  },
  "feedstock_name": "pysoundfile",
  "hash_type": "sha256",
@@ -27,7 +24,7 @@
   },
   "build": {
    "noarch": "python",
-   "number": "1",
+   "number": "2",
    "script": [
     "export PYSOUNDFILE_PLATFORM=win32",
     "python -m pip install . --no-deps -vv"
@@ -47,12 +44,12 @@
   "requirements": {
    "host": [
     "pip",
-    "python >=3.6",
+    "python 3.9",
     "setuptools",
     "cffi"
    ],
    "run": [
-    "python >=3.6",
+    "python >=3.9",
     "cffi",
     "numpy",
     "libsndfile >=1.2"
@@ -61,13 +58,25 @@
   "schema_version": 0,
   "source": {
    "fn": "soundfile-0.12.1.tar.gz",
+   "patches": [
+    "cmdclass.patch"
+   ],
    "sha256": "e8e1017b2cf1dda767aef19d2fd9ee5ebe07e050d430f77a0a7c66ba08b8cdae",
-   "url": "https://pypi.io/packages/source/s/soundfile/soundfile-0.12.1.tar.gz"
+   "url": "https://pypi.org/packages/source/s/soundfile/soundfile-0.12.1.tar.gz"
   },
   "test": {
-   "commands": "python -c \"import soundfile; print(soundfile._libname)\"",
+   "commands": [
+    "python -c \"import soundfile; print(soundfile._libname)\"",
+    "python -c \"import soundfile as sf, pprint; fmts = sf.available_formats(); pprint.pprint(fmts); assert 'WAV' in fmts\"",
+    "pip show -vvv soundfile",
+    "pip check -vvv"
+   ],
    "imports": [
     "soundfile"
+   ],
+   "requires": [
+    "pip",
+    "python 3.9"
    ]
   }
  },
@@ -96,7 +105,10 @@
   },
   "test": {
    "__set__": true,
-   "elements": []
+   "elements": [
+    "pip",
+    "python"
+   ]
   }
  },
  "meta_yaml": {
@@ -110,7 +122,7 @@
   },
   "build": {
    "noarch": "python",
-   "number": "1",
+   "number": "2",
    "script": [
     "export PYSOUNDFILE_PLATFORM=win32",
     "python -m pip install . --no-deps -vv"
@@ -130,12 +142,12 @@
   "requirements": {
    "host": [
     "pip",
-    "python >=3.6",
+    "python 3.9",
     "setuptools",
     "cffi"
    ],
    "run": [
-    "python >=3.6",
+    "python >=3.9",
     "cffi",
     "numpy",
     "libsndfile >=1.2"
@@ -144,13 +156,25 @@
   "schema_version": 0,
   "source": {
    "fn": "soundfile-0.12.1.tar.gz",
+   "patches": [
+    "cmdclass.patch"
+   ],
    "sha256": "e8e1017b2cf1dda767aef19d2fd9ee5ebe07e050d430f77a0a7c66ba08b8cdae",
-   "url": "https://pypi.io/packages/source/s/soundfile/soundfile-0.12.1.tar.gz"
+   "url": "https://pypi.org/packages/source/s/soundfile/soundfile-0.12.1.tar.gz"
   },
   "test": {
-   "commands": "python -c \"import soundfile; print(soundfile._libname)\"",
+   "commands": [
+    "python -c \"import soundfile; print(soundfile._libname)\"",
+    "python -c \"import soundfile as sf, pprint; fmts = sf.available_formats(); pprint.pprint(fmts); assert 'WAV' in fmts\"",
+    "pip show -vvv soundfile",
+    "pip check -vvv"
+   ],
    "imports": [
     "soundfile"
+   ],
+   "requires": [
+    "pip",
+    "python 3.9"
    ]
   }
  },
@@ -168,7 +192,7 @@
  "pr_info": {
   "__lazy_json__": "pr_info/pysoundfile.json"
  },
- "raw_meta_yaml": "{% set name = \"pysoundfile\" %}\n{% set pypi_name = \"soundfile\" %}\n{% set version = \"0.12.1\" %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  fn: {{ pypi_name }}-{{ version }}.tar.gz\n  url: https://pypi.io/packages/source/{{ pypi_name[0] }}/{{ pypi_name }}/{{ pypi_name }}-{{ version }}.tar.gz\n  sha256: e8e1017b2cf1dda767aef19d2fd9ee5ebe07e050d430f77a0a7c66ba08b8cdae\n\nbuild:\n  number: 1\n  noarch: python\n  script:\n    # We are currently building a noarch package, but pysoundfile contains a\n    # install-time check for the OS and injects the sf_wchar_open function\n    # conditionally. If this variable is not set, opening files on Windows doesn't work\n    # Fix coming hopefully with https://github.com/bastibe/python-soundfile/pull/288\n    # Original issue on conda-forge: https://github.com/conda-forge/libsndfile-feedstock/issues/14\n    - export PYSOUNDFILE_PLATFORM=win32\n    - python -m pip install . --no-deps -vv\n\nrequirements:\n  host:\n    - pip\n    - python >=3.6\n    - setuptools\n    - cffi\n  run:\n    - python >=3.6\n    - cffi\n    - numpy\n    - libsndfile >=1.2\n\ntest:\n  imports:\n    - soundfile\n  commands:\n    # Verify that soundfile is linking the correct libsndfile object\n     python -c \"import soundfile; print(soundfile._libname)\"\n\n\nabout:\n  home: https://python-soundfile.readthedocs.io/\n  license: BSD-3-Clause\n  license_family: BSD\n  license_file: LICENSE\n  summary: 'SoundFile is an audio library based on libsndfile, CFFI, and NumPy'\n  dev_url: https://github.com/bastibe/python-soundfile\n\nextra:\n  recipe-maintainers:\n    - scopatz\n    - wolfv\n    - bmcfee\n",
+ "raw_meta_yaml": "{% set name = \"pysoundfile\" %}\n{% set pypi_name = \"soundfile\" %}\n{% set version = \"0.12.1\" %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  fn: {{ pypi_name }}-{{ version }}.tar.gz\n  url: https://pypi.org/packages/source/{{ pypi_name[0] }}/{{ pypi_name }}/{{ pypi_name }}-{{ version }}.tar.gz\n  sha256: e8e1017b2cf1dda767aef19d2fd9ee5ebe07e050d430f77a0a7c66ba08b8cdae\n  patches:\n    # Don't use the wheel-related cmdclass patching, we need to pretend the platform\n    # is windows to add an appropriate CFFI function. However, doing so makes the\n    # wheel name and metadata indicate it's Windows-only, which is not true.\n    - cmdclass.patch\n\nbuild:\n  number: 2\n  noarch: python\n  script:\n    # We are currently building a noarch package, but pysoundfile contains a\n    # install-time check for the OS and injects the sf_wchar_open function\n    # conditionally. If this variable is not set, opening files on Windows doesn't work\n    # Fix coming hopefully with https://github.com/bastibe/python-soundfile/pull/288\n    # Original issue on conda-forge: https://github.com/conda-forge/libsndfile-feedstock/issues/14\n    - export PYSOUNDFILE_PLATFORM=win32\n    - python -m pip install . --no-deps -vv\n\nrequirements:\n  host:\n    - pip\n    - python {{ python_min }}\n    - setuptools\n    - cffi\n  run:\n    - python >={{ python_min }}\n    - cffi\n    - numpy\n    - libsndfile >=1.2\n\ntest:\n  requires:\n    - pip\n    - python {{ python_min }}\n  imports:\n    - soundfile\n  commands:\n    # Verify that soundfile is linking the correct libsndfile object\n    - python -c \"import soundfile; print(soundfile._libname)\"\n    # Verify that we can actually access the library\n    - python -c \"import soundfile as sf, pprint; fmts = sf.available_formats(); pprint.pprint(fmts); assert 'WAV' in fmts\"\n    - pip show -vvv soundfile\n    - pip check -vvv\n\n\nabout:\n  home: https://python-soundfile.readthedocs.io/\n  license: BSD-3-Clause\n  license_family: BSD\n  license_file: LICENSE\n  summary: 'SoundFile is an audio library based on libsndfile, CFFI, and NumPy'\n  dev_url: https://github.com/bastibe/python-soundfile\n\nextra:\n  recipe-maintainers:\n    - scopatz\n    - wolfv\n    - bmcfee\n",
  "req": {
   "__set__": true,
   "elements": [
@@ -205,7 +229,10 @@
   },
   "test": {
    "__set__": true,
-   "elements": []
+   "elements": [
+    "pip",
+    "python"
+   ]
   }
  },
  "strong_exports": false,
@@ -219,7 +246,7 @@
    "elements": [
     "cffi",
     "pip",
-    "python >=3.6",
+    "python 3.9",
     "setuptools"
    ]
   },
@@ -229,15 +256,18 @@
     "cffi",
     "libsndfile >=1.2",
     "numpy",
-    "python >=3.6"
+    "python >=3.9"
    ]
   },
   "test": {
    "__set__": true,
-   "elements": []
+   "elements": [
+    "pip",
+    "python 3.9"
+   ]
   }
  },
- "url": "https://pypi.io/packages/source/s/soundfile/soundfile-0.12.1.tar.gz",
+ "url": "https://pypi.org/packages/source/s/soundfile/soundfile-0.12.1.tar.gz",
  "version": "0.12.1",
  "version_pr_info": {
   "__lazy_json__": "version_pr_info/pysoundfile.json"
