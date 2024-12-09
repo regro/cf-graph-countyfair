@@ -17,7 +17,7 @@ def _is_pr_duplicated(node, number):
     with LazyJson(f"node_attrs/{node}.json") as lzj:
         with lzj["pr_info"] as pr_info:
             for pr in pr_info["PRed"]:
-                if "PR" not in pr or "number" not in pr["PR"]:
+                if "PR" not in pr or "number" not in pr["PR"] or pr["PR"]["number"] is None:
                     continue
                 _pr = repo.get_pull(int(pr["PR"]["number"]))
                 if _pr.title == orig_pr.title:
@@ -80,11 +80,10 @@ for pr_json in orphaned_pr_json:
                 else:
                     if _is_pr_duplicated(pr_data["base"]["repo"]["name"], pr_data["number"]):
                         print(
-                            "can remove %s - PR is duplicated" % pr_json,
+                            "can remove %s - PR is duplicated so closing. "
+                            "Run script again after a git pull to delete json." % pr_json,
                             flush=True,
                         )
-                        pth = get_sharded_path(pr_json)
-                        subprocess.run(["git", "rm", "-f", pth], check=True)
                     else:
                         print("orphaned PR (%s): %s" % (pr_data["state"], pr_data["html_url"]), flush=True)
         else:
