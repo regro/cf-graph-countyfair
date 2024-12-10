@@ -30,14 +30,14 @@
    "summary": "Fortnet, a software package for training Behler-Parrinello neural networks"
   },
   "build": {
-   "number": "3",
+   "number": "0",
    "run_exports": [
     "fortnet * mpi_mpich_*",
     "fortnet",
     "fortnet * nompi_*",
     "fortnet * mpi_openmpi_*"
    ],
-   "string": "mpi_openmpi_h1234567_3"
+   "string": "mpi_openmpi_h1234567_0"
   },
   "extra": {
    "recipe-maintainers": [
@@ -46,11 +46,12 @@
   },
   "package": {
    "name": "fortnet",
-   "version": "0.7.3"
+   "version": "0.7.4"
   },
   "requirements": {
    "build": [
     "c_compiler_stub",
+    "c_stdlib_stub",
     "fortran_compiler_stub",
     "python >=3.7",
     "h5py",
@@ -72,8 +73,8 @@
   },
   "schema_version": 0,
   "source": {
-   "sha256": "20e285b098f1417be96c6353aa034658f1e8190683177efab56e3bbabfffd777",
-   "url": "https://github.com/vanderhe/fortnet/archive/refs/tags/v0.7.3.tar.gz"
+   "sha256": "237e07b79b1d75b50db38db89a8298e995e51b9a6cf56208a9c68315da545c65",
+   "url": "https://github.com/vanderhe/fortnet/archive/refs/tags/v0.7.4.tar.gz"
   },
   "test": {
    "commands": [
@@ -90,6 +91,7 @@
    "__set__": true,
    "elements": [
     "c_compiler_stub",
+    "c_stdlib_stub",
     "cmake",
     "fortran_compiler_stub",
     "h5py",
@@ -134,14 +136,14 @@
    "summary": "Fortnet, a software package for training Behler-Parrinello neural networks"
   },
   "build": {
-   "number": "3",
+   "number": "0",
    "run_exports": [
     "fortnet * mpi_mpich_*",
     "fortnet",
     "fortnet * nompi_*",
     "fortnet * mpi_openmpi_*"
    ],
-   "string": "mpi_openmpi_h1234567_3"
+   "string": "mpi_openmpi_h1234567_0"
   },
   "extra": {
    "recipe-maintainers": [
@@ -150,11 +152,12 @@
   },
   "package": {
    "name": "fortnet",
-   "version": "0.7.3"
+   "version": "0.7.4"
   },
   "requirements": {
    "build": [
     "c_compiler_stub",
+    "c_stdlib_stub",
     "fortran_compiler_stub",
     "python >=3.7",
     "h5py",
@@ -176,8 +179,8 @@
   },
   "schema_version": 0,
   "source": {
-   "sha256": "20e285b098f1417be96c6353aa034658f1e8190683177efab56e3bbabfffd777",
-   "url": "https://github.com/vanderhe/fortnet/archive/refs/tags/v0.7.3.tar.gz"
+   "sha256": "237e07b79b1d75b50db38db89a8298e995e51b9a6cf56208a9c68315da545c65",
+   "url": "https://github.com/vanderhe/fortnet/archive/refs/tags/v0.7.4.tar.gz"
   },
   "test": {
    "commands": [
@@ -203,11 +206,12 @@
  "pr_info": {
   "__lazy_json__": "pr_info/fortnet.json"
  },
- "raw_meta_yaml": "{% set name = \"fortnet\" %}\n{% set version = \"0.7.3\" %}\n{% set build = 3 %}\n{% set mpi = mpi or \"nompi\" %}\n{% set origin = \"vanderhe\" %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://github.com/{{ origin }}/{{ name }}/archive/refs/tags/v{{ version }}.tar.gz\n  sha256: 20e285b098f1417be96c6353aa034658f1e8190683177efab56e3bbabfffd777\n\n{% if mpi == \"nompi\" %}\n{% set build = build + 100 %}\n{% endif %}\nbuild:\n  number: {{ build }}\n  skip: true  # [not linux]\n\n  {% if mpi != \"nompi\" %}\n  {% set mpi_prefix = \"mpi_\" + mpi %}\n  {% else %}\n  {% set mpi_prefix = \"nompi\" %}\n  {% endif %}\n  string: {{ mpi_prefix }}_h{{ PKG_HASH }}_{{ build }}\n\n  run_exports:\n    - {{ name|lower }} * {{ mpi_prefix }}_*\n    - {{ pin_subpackage( name|lower, max_pin='x.x.x') }}\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ compiler('fortran') }}\n    - python >=3.7\n    - h5py\n    - numpy >=1.14.5\n    - cmake >=3.16\n    - ninja\n  host:\n    - mpifx * mpi_{{ mpi }}_*  # [mpi != \"nompi\"]\n    - libblas\n    - hdf5\n    - hdf5 * nompi_*\n  run:\n    - {{ pin_compatible('mpifx', max_pin='x.x') }} mpi_{{ mpi }}_*  # [mpi != \"nompi\"]\n\ntest:\n  commands:\n    - export OMPI_MCA_plm=isolated OMPI_MCA_btl_vader_single_copy_mechanism=none OMPI_MCA_rmaps_base_oversubscribe=yes  # [mpi == \"openmpi\"]\n    - test -f $PREFIX/bin/fnet\n    - fnet | grep \"Error in opening file\"  # [mpi == \"nompi\" and build_platform == target_platform]\n    - mpiexec $PREFIX/bin/fnet | grep \"Error in opening file\"  # [mpi != \"nompi\" and build_platform == target_platform]\n    - test -f $PREFIX/lib/libfortnet${SHLIB_EXT}\n\nabout:\n  home: https://github.com/vanderhe/fortnet\n  license: LGPL-3.0-or-later\n  license_family: LGPL\n  license_file:\n    - LICENSE\n    - COPYING\n    - COPYING.LESSER\n    - external/fsockets/LICENSE\n    - external/xmlf90/LICENSE\n  summary: Fortnet, a software package for training Behler-Parrinello neural networks\n  doc_url: https://fortnet.readthedocs.io\n  dev_url: https://github.com/vanderhe/fortnet\n\nextra:\n  recipe-maintainers:\n    - vanderhe\n",
+ "raw_meta_yaml": "{% set name = \"fortnet\" %}\n{% set version = \"0.7.4\" %}\n{% set build = 0 %}\n{% set mpi = mpi or \"nompi\" %}\n{% set origin = \"vanderhe\" %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://github.com/{{ origin }}/{{ name }}/archive/refs/tags/v{{ version }}.tar.gz\n  sha256: 237e07b79b1d75b50db38db89a8298e995e51b9a6cf56208a9c68315da545c65\n\n{% if mpi == \"nompi\" %}\n{% set build = build + 100 %}\n{% endif %}\nbuild:\n  number: {{ build }}\n  skip: true  # [not linux]\n\n  {% if mpi != \"nompi\" %}\n  {% set mpi_prefix = \"mpi_\" + mpi %}\n  {% else %}\n  {% set mpi_prefix = \"nompi\" %}\n  {% endif %}\n  string: {{ mpi_prefix }}_h{{ PKG_HASH }}_{{ build }}\n\n  run_exports:\n    - {{ name|lower }} * {{ mpi_prefix }}_*\n    - {{ pin_subpackage( name|lower, max_pin='x.x.x') }}\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ stdlib(\"c\") }}\n    - {{ compiler('fortran') }}\n    - python >=3.7\n    - h5py\n    - numpy >=1.14.5\n    - cmake >=3.16\n    - ninja\n  host:\n    - mpifx * mpi_{{ mpi }}_*  # [mpi != \"nompi\"]\n    - libblas\n    - hdf5\n    - hdf5 * nompi_*\n  run:\n    - {{ pin_compatible('mpifx', max_pin='x.x') }} mpi_{{ mpi }}_*  # [mpi != \"nompi\"]\n\ntest:\n  commands:\n    - export OMPI_MCA_plm=isolated OMPI_MCA_btl_vader_single_copy_mechanism=none OMPI_MCA_rmaps_base_oversubscribe=yes  # [mpi == \"openmpi\"]\n    - test -f $PREFIX/bin/fnet\n    - fnet | grep \"Error in opening file\"  # [mpi == \"nompi\" and build_platform == target_platform]\n    - mpiexec $PREFIX/bin/fnet | grep \"Error in opening file\"  # [mpi != \"nompi\" and build_platform == target_platform]\n    - test -f $PREFIX/lib/libfortnet${SHLIB_EXT}\n\nabout:\n  home: https://github.com/vanderhe/fortnet\n  license: LGPL-3.0-or-later\n  license_family: LGPL\n  license_file:\n    - LICENSE\n    - COPYING\n    - COPYING.LESSER\n    - external/fsockets/LICENSE\n    - external/xmlf90/LICENSE\n  summary: Fortnet, a software package for training Behler-Parrinello neural networks\n  doc_url: https://fortnet.readthedocs.io\n  dev_url: https://github.com/vanderhe/fortnet\n\nextra:\n  recipe-maintainers:\n    - vanderhe\n",
  "req": {
   "__set__": true,
   "elements": [
    "c_compiler_stub",
+   "c_stdlib_stub",
    "cmake",
    "fortran_compiler_stub",
    "h5py",
@@ -224,6 +228,7 @@
    "__set__": true,
    "elements": [
     "c_compiler_stub",
+    "c_stdlib_stub",
     "cmake",
     "fortran_compiler_stub",
     "h5py",
@@ -236,6 +241,7 @@
    "__set__": true,
    "elements": [
     "c_compiler_stub",
+    "c_stdlib_stub",
     "fortran_compiler_stub",
     "hdf5",
     "libblas",
@@ -246,6 +252,7 @@
    "__set__": true,
    "elements": [
     "c_compiler_stub",
+    "c_stdlib_stub",
     "fortran_compiler_stub",
     "mpifx"
    ]
@@ -261,6 +268,7 @@
    "__set__": true,
    "elements": [
     "c_compiler_stub",
+    "c_stdlib_stub",
     "cmake >=3.16",
     "fortran_compiler_stub",
     "h5py",
@@ -291,8 +299,8 @@
    "elements": []
   }
  },
- "url": "https://github.com/vanderhe/fortnet/archive/refs/tags/v0.7.3.tar.gz",
- "version": "0.7.3",
+ "url": "https://github.com/vanderhe/fortnet/archive/refs/tags/v0.7.4.tar.gz",
+ "version": "0.7.4",
  "version_pr_info": {
   "__lazy_json__": "version_pr_info/fortnet.json"
  }
