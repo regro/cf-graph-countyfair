@@ -32,7 +32,7 @@
   },
   "build": {
    "noarch": "python",
-   "number": "0",
+   "number": "1",
    "script": "cd dist && PYTHON -m pip install . -vv --no-deps --no-build-isolation"
   },
   "extra": {
@@ -166,10 +166,10 @@
    "host": [
     "flit-core >=3.9,<4",
     "pip",
-    "python >=3.8"
+    "python 3.9"
    ],
    "run": [
-    "python >=3.8",
+    "python >=3.9",
     "typing_extensions >=4.0"
    ]
   },
@@ -178,7 +178,7 @@
    {
     "folder": "dist",
     "sha256": "425a129abb1614183fd1aca6982f650b47f8026867c0ce7c4b9f281c443d2740",
-    "url": "https://pypi.io/packages/source/p/pypdf/pypdf-5.1.0.tar.gz"
+    "url": "https://pypi.org/packages/source/p/pypdf/pypdf-5.1.0.tar.gz"
    },
    {
     "folder": "src",
@@ -194,7 +194,8 @@
     "pypdf"
    ],
    "requires": [
-    "pip"
+    "pip",
+    "python 3.9"
    ]
   }
  },
@@ -232,6 +233,7 @@
     "pytest-cov",
     "pytest-socket",
     "pytest-timeout",
+    "python",
     "pyyaml",
     "types-pillow"
    ]
@@ -248,7 +250,7 @@
   },
   "build": {
    "noarch": "python",
-   "number": "0",
+   "number": "1",
    "script": "cd dist && PYTHON -m pip install . -vv --no-deps --no-build-isolation"
   },
   "extra": {
@@ -382,10 +384,10 @@
    "host": [
     "flit-core >=3.9,<4",
     "pip",
-    "python >=3.8"
+    "python 3.9"
    ],
    "run": [
-    "python >=3.8",
+    "python >=3.9",
     "typing_extensions >=4.0"
    ]
   },
@@ -394,7 +396,7 @@
    {
     "folder": "dist",
     "sha256": "425a129abb1614183fd1aca6982f650b47f8026867c0ce7c4b9f281c443d2740",
-    "url": "https://pypi.io/packages/source/p/pypdf/pypdf-5.1.0.tar.gz"
+    "url": "https://pypi.org/packages/source/p/pypdf/pypdf-5.1.0.tar.gz"
    },
    {
     "folder": "src",
@@ -410,7 +412,8 @@
     "pypdf"
    ],
    "requires": [
-    "pip"
+    "pip",
+    "python 3.9"
    ]
   }
  },
@@ -432,7 +435,7 @@
  "pr_info": {
   "__lazy_json__": "pr_info/pypdf.json"
  },
- "raw_meta_yaml": "{% set version = \"5.1.0\" %}\n\n# handle undefined PYTHON in `noarch: generic` outputs\n{% if PYTHON is not defined %}{% set PYTHON = \"$PYTHON\" %}{% endif %}\n\npackage:\n  name: pypdf\n  version: {{ version }}\n\nsource:\n  - folder: dist\n    url: https://pypi.io/packages/source/p/pypdf/pypdf-{{ version }}.tar.gz\n    sha256: 425a129abb1614183fd1aca6982f650b47f8026867c0ce7c4b9f281c443d2740\n  - folder: src\n    url: https://github.com/py-pdf/pypdf/archive/refs/tags/{{ version }}.tar.gz\n    sha256: a4d6e70aba5789eb8d68a762067d81d604fc0940c3dbc1704f103d8de5d6ab87\n\nbuild:\n  number: 0\n  noarch: python\n  script: cd dist && {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation\n\nrequirements:\n  build:\n    - python                                 # [build_platform != target_platform]\n    - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n  host:\n    - flit-core >=3.9,<4\n    - pip\n    - python >=3.8\n  run:\n    - python >=3.8\n    - typing_extensions >=4.0\n\ntest:\n  imports:\n    - pypdf\n  commands:\n    - pip check\n  requires:\n    - pip\n\noutputs:\n  - name: pypdf\n\n  - name: pypdf-with-crypto\n    build:\n      noarch: generic\n    requirements:\n      run:\n        - {{ pin_subpackage(\"pypdf\", max_pin=\"x.x.x\") }}\n        - cryptography\n    test:\n      imports:\n        - pypdf\n      commands:\n        - pip check\n      requires:\n        - pip\n\n\n  - name: pypdf-with-image\n    build:\n      noarch: generic\n    requirements:\n      run:\n        - {{ pin_subpackage(\"pypdf\", max_pin=\"x.x.x\") }}\n        - pillow >=8.0.0\n    test:\n      imports:\n        - pypdf\n      commands:\n        - pip check\n      requires:\n        - pip\n\n\n  - name: pypdf-with-full\n    build:\n      noarch: generic\n    requirements:\n      run:\n        - {{ pin_subpackage(\"pypdf-with-crypto\", max_pin=\"x.x.x\") }}\n        - {{ pin_subpackage(\"pypdf-with-image\", max_pin=\"x.x.x\") }}\n        - {{ pin_subpackage(\"pypdf\", max_pin=\"x.x.x\") }}\n      test:\n        imports:\n          - pypdf\n        commands:\n          - pip check\n        requires:\n          - pip\n\n  - name: _pypdf-with-full-tests\n    build:\n      noarch: generic\n    requirements:\n      run:\n        - {{ pin_subpackage(\"pypdf-with-crypto\", max_pin=\"x.x.x\") }}\n        - {{ pin_subpackage(\"pypdf-with-full\", max_pin=\"x.x.x\") }}\n        - {{ pin_subpackage(\"pypdf-with-image\", max_pin=\"x.x.x\") }}\n        - {{ pin_subpackage(\"pypdf\", max_pin=\"x.x.x\") }}\n    test:\n      files:\n        - test_all.py\n      source_files:\n        - src/pyproject.toml\n        - src/tests\n        - src/resources\n      imports:\n        - pypdf\n      commands:\n        - pip check\n        - python test_all.py\n      requires:\n        - fpdf\n        - pip\n        - pytest-cov\n        - pytest-socket\n        - pytest-timeout\n        - pyyaml\n        - types-pillow\n\nabout:\n  home: https://pypi.org/project/pypdf\n  summary: A pure-python PDF library capable of splitting, merging, cropping, and transforming PDF files\n  license: BSD-3-Clause\n  license_file: dist/LICENSE\n  dev_url: https://github.com/py-pdf/pypdf\n  doc_url: https://pypdf.readthedocs.io\n\nextra:\n  feedstock-name: pypdf\n  recipe-maintainers:\n    - MartinThoma\n    - bollwyvl\n",
+ "raw_meta_yaml": "{% set version = \"5.1.0\" %}\n\n# handle undefined PYTHON in `noarch: generic` outputs\n{% if PYTHON is not defined %}{% set PYTHON = \"$PYTHON\" %}{% endif %}\n\npackage:\n  name: pypdf\n  version: {{ version }}\n\nsource:\n  - folder: dist\n    url: https://pypi.org/packages/source/p/pypdf/pypdf-{{ version }}.tar.gz\n    sha256: 425a129abb1614183fd1aca6982f650b47f8026867c0ce7c4b9f281c443d2740\n  - folder: src\n    url: https://github.com/py-pdf/pypdf/archive/refs/tags/{{ version }}.tar.gz\n    sha256: a4d6e70aba5789eb8d68a762067d81d604fc0940c3dbc1704f103d8de5d6ab87\n\nbuild:\n  number: 1\n  noarch: python\n  script: cd dist && {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation\n\nrequirements:\n  build:\n    - python                                 # [build_platform != target_platform]\n    - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n  host:\n    - flit-core >=3.9,<4\n    - pip\n    - python {{ python_min }}\n  run:\n    - python >={{ python_min }}\n    - typing_extensions >=4.0\n\ntest:\n  imports:\n    - pypdf\n  commands:\n    - pip check\n  requires:\n    - pip\n    - python {{ python_min }}\n\noutputs:\n  - name: pypdf\n\n  - name: pypdf-with-crypto\n    build:\n      noarch: generic\n    requirements:\n      run:\n        - {{ pin_subpackage(\"pypdf\", max_pin=\"x.x.x\") }}\n        - cryptography\n    test:\n      imports:\n        - pypdf\n      commands:\n        - pip check\n      requires:\n        - pip\n\n\n  - name: pypdf-with-image\n    build:\n      noarch: generic\n    requirements:\n      run:\n        - {{ pin_subpackage(\"pypdf\", max_pin=\"x.x.x\") }}\n        - pillow >=8.0.0\n    test:\n      imports:\n        - pypdf\n      commands:\n        - pip check\n      requires:\n        - pip\n\n\n  - name: pypdf-with-full\n    build:\n      noarch: generic\n    requirements:\n      run:\n        - {{ pin_subpackage(\"pypdf-with-crypto\", max_pin=\"x.x.x\") }}\n        - {{ pin_subpackage(\"pypdf-with-image\", max_pin=\"x.x.x\") }}\n        - {{ pin_subpackage(\"pypdf\", max_pin=\"x.x.x\") }}\n      test:\n        imports:\n          - pypdf\n        commands:\n          - pip check\n        requires:\n          - pip\n\n  - name: _pypdf-with-full-tests\n    build:\n      noarch: generic\n    requirements:\n      run:\n        - {{ pin_subpackage(\"pypdf-with-crypto\", max_pin=\"x.x.x\") }}\n        - {{ pin_subpackage(\"pypdf-with-full\", max_pin=\"x.x.x\") }}\n        - {{ pin_subpackage(\"pypdf-with-image\", max_pin=\"x.x.x\") }}\n        - {{ pin_subpackage(\"pypdf\", max_pin=\"x.x.x\") }}\n    test:\n      files:\n        - test_all.py\n      source_files:\n        - src/pyproject.toml\n        - src/tests\n        - src/resources\n      imports:\n        - pypdf\n      commands:\n        - pip check\n        - python test_all.py\n      requires:\n        - fpdf\n        - pip\n        - pytest-cov\n        - pytest-socket\n        - pytest-timeout\n        - pyyaml\n        - types-pillow\n\nabout:\n  home: https://pypi.org/project/pypdf\n  summary: A pure-python PDF library capable of splitting, merging, cropping, and transforming PDF files\n  license: BSD-3-Clause\n  license_file: dist/LICENSE\n  dev_url: https://github.com/py-pdf/pypdf\n  doc_url: https://pypdf.readthedocs.io\n\nextra:\n  feedstock-name: pypdf\n  recipe-maintainers:\n    - MartinThoma\n    - bollwyvl\n",
  "req": {
   "__set__": true,
   "elements": [
@@ -482,6 +485,7 @@
     "pytest-cov",
     "pytest-socket",
     "pytest-timeout",
+    "python",
     "pyyaml",
     "types-pillow"
    ]
@@ -498,7 +502,7 @@
    "elements": [
     "flit-core >=3.9,<4",
     "pip",
-    "python >=3.8"
+    "python 3.9"
    ]
   },
   "run": {
@@ -510,7 +514,7 @@
     "pypdf-with-crypto",
     "pypdf-with-full",
     "pypdf-with-image",
-    "python >=3.8",
+    "python >=3.9",
     "typing_extensions >=4.0"
    ]
   },
@@ -522,12 +526,13 @@
     "pytest-cov",
     "pytest-socket",
     "pytest-timeout",
+    "python 3.9",
     "pyyaml",
     "types-pillow"
    ]
   }
  },
- "url": "https://pypi.io/packages/source/p/pypdf/pypdf-5.1.0.tar.gz",
+ "url": "https://pypi.org/packages/source/p/pypdf/pypdf-5.1.0.tar.gz",
  "version": "5.1.0",
  "version_pr_info": {
   "__lazy_json__": "version_pr_info/pypdf.json"
