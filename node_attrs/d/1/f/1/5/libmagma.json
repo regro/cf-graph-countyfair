@@ -43,7 +43,7 @@
    "summary": "Matrix Algebra on GPU and Multicore Architectures"
   },
   "build": {
-   "number": "1",
+   "number": "2",
    "run_exports": [
     "libmagma"
    ]
@@ -226,7 +226,7 @@
    "summary": "Matrix Algebra on GPU and Multicore Architectures"
   },
   "build": {
-   "number": "1",
+   "number": "2",
    "run_exports": [
     "libmagma"
    ]
@@ -409,7 +409,7 @@
    "summary": "Matrix Algebra on GPU and Multicore Architectures"
   },
   "build": {
-   "number": "1",
+   "number": "2",
    "run_exports": [
     "libmagma"
    ]
@@ -592,7 +592,7 @@
    "summary": "Matrix Algebra on GPU and Multicore Architectures"
   },
   "build": {
-   "number": "1",
+   "number": "2",
    "run_exports": [
     "libmagma"
    ]
@@ -901,7 +901,7 @@
  "pr_info": {
   "__lazy_json__": "pr_info/libmagma.json"
  },
- "raw_meta_yaml": "# find  magma_* | sed \"s/magma_/'/\" | sed \"s/\\.h/',/\"\n{% set magma_headers = [\n  'auxiliary',\n  'batched',\n  'bulge',\n  'cbatched',\n  'cbulge',\n  'cbulgeinc',\n  'cgehrd_m',\n  'c',\n  'clapack',\n  'config',\n  'copy',\n  'copy_v1',\n  'cvbatched',\n  'dbatched',\n  'dbulge',\n  'dbulgeinc',\n  'dgehrd_m',\n  'd',\n  'dlapack',\n  'ds',\n  'dvbatched',\n  'hbatched',\n  'htc',\n  'lapack',\n  'mangling_cmake',\n  'mangling',\n  'operators',\n  'sbatched',\n  'sbulge',\n  'sbulgeinc',\n  'sgehrd_m',\n  's',\n  'slapack',\n  'svbatched',\n  'types',\n  'v2',\n  'vbatched',\n  'zbatched',\n  'zbulge',\n  'zbulgeinc',\n  'zc',\n  'zgehrd_m',\n  'z',\n  'zlapack',\n  'zvbatched'\n] %}\n\n{% set magmasparse_headers = [\n  'c',\n  'd',\n  'ds',\n  'mmio',\n  's',\n  'types',\n  'zc',\n  'z'\n] %}\n\n{% set magmablas_headers = [\n  'c',\n  'c_v1',\n  'c_v1_map',\n  'd',\n  'ds',\n  'ds_v1',\n  'ds_v1_map',\n  'd_v1',\n  'd_v1_map',\n  'h',\n  's',\n  's_v1',\n  's_v1_map',\n  'v1',\n  'v1_map',\n  'zc',\n  'zc_v1',\n  'zc_v1_map',\n  'z',\n  'z_v1',\n  'z_v1_map'\n] %}\n\n{% set cuda_major = environ.get(\"cuda_compiler_version\", \"11.2\").split(\".\")[0]|int %}\n\n{% set version = \"2.8.0\" %}\n\npackage:\n  name: libmagma\n  version: {{ version }}\n\nsource:\n  - url: https://icl.utk.edu/projectsfiles/magma/downloads/magma-{{ version }}.tar.gz\n    sha256: f4e5e75350743fe57f49b615247da2cc875e5193cc90c11b43554a7c82cc4348\n    patches:\n      - 001-optional-install.patch\n      # https://github.com/icl-utk-edu/magma/pull/8\n      - 002-quick-fix-12.6.patch\n  - path: make.inc\n\nbuild:\n  number: 1\n  skip: true  # [cuda_compiler_version == \"None\"]\n  skip: true  # [cuda_compiler_version == \"11.2\"]\n  run_exports:\n    - {{ pin_subpackage('libmagma', max_pin='x.x.x') }}\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ compiler('cxx') }}\n    - {{ compiler('cuda') }}\n    - {{ stdlib('c') }}\n    - cmake >=3.20\n    - libgomp  # [linux]\n    - llvm-openmp  # [osx]\n    - m2-coreutils  # [win]\n    - m2-make  # [win]\n    - m2-perl  # [win]\n    - make  # [unix]\n    - ninja\n    - python\n  host:\n    - cuda-version {{ cuda_compiler_version }}\n{% if cuda_major == 12 %}\n    - cuda-cudart-dev\n    - libcublas-dev\n    - libcusparse-dev\n{% endif %}\n    - liblapack\n    - libblas\n\ntest:\n  commands:\n    - test ! -f $PREFIX/include/magma.h                        # [unix]\n    - if exist %LIBRARY_PREFIX%\\include\\magma.h exit 1         # [win]\n    - test -f $PREFIX/lib/libmagma${SHLIB_EXT}                 # [unix]\n    - if not exist %LIBRARY_PREFIX%\\lib\\magma.lib exit 1       # [win]\n    - if not exist %LIBRARY_PREFIX%\\bin\\magma.dll exit 1       # [win]\n    - test ! -f $PREFIX/lib/libmagma_sparse${SHLIB_EXT}        # [unix]\n    - if exist %LIBRARY_PREFIX%\\lib\\magma_sparse.lib exit 1    # [win]\n    - if exist %LIBRARY_PREFIX%\\bin\\magma_sparse.dll exit 1    # [win]\n    - test ! -f $PREFIX/lib/pkgconfig/magma.pc                 # [unix]\n    - if exist %LIBRARY_PREFIX%\\lib\\pkgconfig\\magma.pc exit 1  # [win]\n{% for each_header in magma_headers %}\n    - test ! -f $PREFIX/include/magma_{{ each_header }}.h                 # [unix]\n    - if exist %LIBRARY_PREFIX%\\include\\magma_{{ each_header }}.h exit 1  # [win]\n{% endfor %}\n{% for each_header in magmasparse_headers %}\n    - test ! -f $PREFIX/include/magmasparse_{{ each_header }}.h                 # [unix]\n    - if exist %LIBRARY_PREFIX%\\include\\magmasparse_{{ each_header }}.h exit 1  # [win]\n{% endfor %}\n{% for each_header in magmablas_headers %}\n    - test ! -f $PREFIX/include/magmablas_{{ each_header }}.h                 # [unix]\n    - if exist %LIBRARY_PREFIX%\\include\\magmablas_{{ each_header }}.h exit 1  # [win]\n{% endfor %}\n\nabout:\n  home: http://icl.cs.utk.edu/magma/software/index.html\n  dev_url: https://bitbucket.org/icl/magma\n  summary: Matrix Algebra on GPU and Multicore Architectures\n  license: BSD-3-Clause\n  license_file: COPYRIGHT\n\nextra:\n  recipe-maintainers:\n    - carterbox\n    - conda-forge/pytorch-cpu\n",
+ "raw_meta_yaml": "# find  magma_* | sed \"s/magma_/'/\" | sed \"s/\\.h/',/\"\n{% set magma_headers = [\n  'auxiliary',\n  'batched',\n  'bulge',\n  'cbatched',\n  'cbulge',\n  'cbulgeinc',\n  'cgehrd_m',\n  'c',\n  'clapack',\n  'config',\n  'copy',\n  'copy_v1',\n  'cvbatched',\n  'dbatched',\n  'dbulge',\n  'dbulgeinc',\n  'dgehrd_m',\n  'd',\n  'dlapack',\n  'ds',\n  'dvbatched',\n  'hbatched',\n  'htc',\n  'lapack',\n  'mangling_cmake',\n  'mangling',\n  'operators',\n  'sbatched',\n  'sbulge',\n  'sbulgeinc',\n  'sgehrd_m',\n  's',\n  'slapack',\n  'svbatched',\n  'types',\n  'v2',\n  'vbatched',\n  'zbatched',\n  'zbulge',\n  'zbulgeinc',\n  'zc',\n  'zgehrd_m',\n  'z',\n  'zlapack',\n  'zvbatched'\n] %}\n\n{% set magmasparse_headers = [\n  'c',\n  'd',\n  'ds',\n  'mmio',\n  's',\n  'types',\n  'zc',\n  'z'\n] %}\n\n{% set magmablas_headers = [\n  'c',\n  'c_v1',\n  'c_v1_map',\n  'd',\n  'ds',\n  'ds_v1',\n  'ds_v1_map',\n  'd_v1',\n  'd_v1_map',\n  'h',\n  's',\n  's_v1',\n  's_v1_map',\n  'v1',\n  'v1_map',\n  'zc',\n  'zc_v1',\n  'zc_v1_map',\n  'z',\n  'z_v1',\n  'z_v1_map'\n] %}\n\n{% set cuda_major = environ.get(\"cuda_compiler_version\", \"11.2\").split(\".\")[0]|int %}\n\n{% set version = \"2.8.0\" %}\n\npackage:\n  name: libmagma\n  version: {{ version }}\n\nsource:\n  - url: https://icl.utk.edu/projectsfiles/magma/downloads/magma-{{ version }}.tar.gz\n    sha256: f4e5e75350743fe57f49b615247da2cc875e5193cc90c11b43554a7c82cc4348\n    patches:\n      - 001-optional-install.patch\n      # https://github.com/icl-utk-edu/magma/pull/8\n      - 002-quick-fix-12.6.patch\n  - path: make.inc\n\nbuild:\n  number: 2\n  skip: true  # [cuda_compiler_version == \"None\"]\n  skip: true  # [cuda_compiler_version == \"11.2\"]\n  run_exports:\n    - {{ pin_subpackage('libmagma', max_pin='x.x.x') }}\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ compiler('cxx') }}\n    - {{ compiler('cuda') }}\n    - {{ stdlib('c') }}\n    - cmake >=3.20\n    - libgomp  # [linux]\n    - llvm-openmp  # [osx]\n    - m2-coreutils  # [win]\n    - m2-make  # [win]\n    - m2-perl  # [win]\n    - make  # [unix]\n    - ninja\n    - python\n  host:\n    - cuda-version {{ cuda_compiler_version }}\n{% if cuda_major == 12 %}\n    - cuda-cudart-dev\n    - libcublas-dev\n    - libcusparse-dev\n{% endif %}\n    - liblapack\n    - libblas\n\ntest:\n  commands:\n    - test ! -f $PREFIX/include/magma.h                        # [unix]\n    - if exist %LIBRARY_PREFIX%\\include\\magma.h exit 1         # [win]\n    - test -f $PREFIX/lib/libmagma${SHLIB_EXT}                 # [unix]\n    - if not exist %LIBRARY_PREFIX%\\lib\\magma.lib exit 1       # [win]\n    - if not exist %LIBRARY_PREFIX%\\bin\\magma.dll exit 1       # [win]\n    - test ! -f $PREFIX/lib/libmagma_sparse${SHLIB_EXT}        # [unix]\n    - if exist %LIBRARY_PREFIX%\\lib\\magma_sparse.lib exit 1    # [win]\n    - if exist %LIBRARY_PREFIX%\\bin\\magma_sparse.dll exit 1    # [win]\n    - test ! -f $PREFIX/lib/pkgconfig/magma.pc                 # [unix]\n    - if exist %LIBRARY_PREFIX%\\lib\\pkgconfig\\magma.pc exit 1  # [win]\n{% for each_header in magma_headers %}\n    - test ! -f $PREFIX/include/magma_{{ each_header }}.h                 # [unix]\n    - if exist %LIBRARY_PREFIX%\\include\\magma_{{ each_header }}.h exit 1  # [win]\n{% endfor %}\n{% for each_header in magmasparse_headers %}\n    - test ! -f $PREFIX/include/magmasparse_{{ each_header }}.h                 # [unix]\n    - if exist %LIBRARY_PREFIX%\\include\\magmasparse_{{ each_header }}.h exit 1  # [win]\n{% endfor %}\n{% for each_header in magmablas_headers %}\n    - test ! -f $PREFIX/include/magmablas_{{ each_header }}.h                 # [unix]\n    - if exist %LIBRARY_PREFIX%\\include\\magmablas_{{ each_header }}.h exit 1  # [win]\n{% endfor %}\n\nabout:\n  home: http://icl.cs.utk.edu/magma/software/index.html\n  dev_url: https://bitbucket.org/icl/magma\n  summary: Matrix Algebra on GPU and Multicore Architectures\n  license: BSD-3-Clause\n  license_file: COPYRIGHT\n\nextra:\n  recipe-maintainers:\n    - carterbox\n    - conda-forge/pytorch-cpu\n",
  "req": {
   "__set__": true,
   "elements": [
@@ -1020,7 +1020,7 @@
    "summary": "Matrix Algebra on GPU and Multicore Architectures"
   },
   "build": {
-   "number": "1",
+   "number": "2",
    "run_exports": [
     "libmagma"
    ]
