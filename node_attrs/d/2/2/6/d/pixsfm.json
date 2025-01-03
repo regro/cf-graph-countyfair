@@ -20,13 +20,7 @@
    "branch_name": "main",
    "tooling_branch_name": "main"
   },
-  "os_version": {
-   "linux_64": "cos7"
-  },
-  "provider": {
-   "linux_aarch64": "default"
-  },
-  "test": "native_and_emulated"
+  "test": "native"
  },
  "feedstock_name": "pixsfm",
  "hash_type": "sha256",
@@ -39,9 +33,9 @@
    "summary": "Pixel-Perfect Structure-from-Motion"
   },
   "build": {
-   "number": "10",
+   "number": "11",
    "script": "${PYTHON} -m pip install . --no-deps -vv",
-   "string": "cpuh1234567_10"
+   "string": "cpuh1234567_11"
   },
   "extra": {
    "recipe-maintainers": [
@@ -60,7 +54,6 @@
     "make",
     "git",
     "libgomp",
-    "cdt_stub",
     "cuda_compiler_stub"
    ],
    "host": [
@@ -81,6 +74,7 @@
     "pytorch",
     "torchvision",
     "libboost-devel",
+    "libgl-devel",
     "glog",
     "gflags",
     "pycolmap =0.4.0=cuda*"
@@ -127,7 +121,6 @@
    "__set__": true,
    "elements": [
     "c_stdlib_stub",
-    "cdt_stub",
     "cmake",
     "cuda_compiler_stub",
     "cxx_compiler_stub",
@@ -149,6 +142,7 @@
     "hdf5",
     "highfive",
     "libboost-devel",
+    "libgl-devel",
     "numpy",
     "pip",
     "pybind11",
@@ -192,9 +186,9 @@
    "summary": "Pixel-Perfect Structure-from-Motion"
   },
   "build": {
-   "number": "10",
+   "number": "11",
    "script": "${PYTHON} -m pip install . --no-deps -vv",
-   "string": "cpuh1234567_10"
+   "string": "cpuh1234567_11"
   },
   "extra": {
    "recipe-maintainers": [
@@ -213,7 +207,6 @@
     "make",
     "git",
     "libgomp",
-    "cdt_stub",
     "cuda_compiler_stub"
    ],
    "host": [
@@ -234,6 +227,7 @@
     "pytorch",
     "torchvision",
     "libboost-devel",
+    "libgl-devel",
     "glog",
     "gflags",
     "pycolmap =0.4.0=cuda*"
@@ -280,7 +274,6 @@
    "__set__": true,
    "elements": [
     "c_stdlib_stub",
-    "cdt_stub",
     "cmake",
     "cuda_compiler_stub",
     "cxx_compiler_stub",
@@ -302,6 +295,7 @@
     "hdf5",
     "highfive",
     "libboost-devel",
+    "libgl-devel",
     "numpy",
     "pip",
     "pybind11",
@@ -345,9 +339,9 @@
    "summary": "Pixel-Perfect Structure-from-Motion"
   },
   "build": {
-   "number": "10",
+   "number": "11",
    "script": "${PYTHON} -m pip install . --no-deps -vv",
-   "string": "cpuh1234567_10"
+   "string": "cpuh1234567_11"
   },
   "extra": {
    "recipe-maintainers": [
@@ -366,7 +360,6 @@
     "make",
     "git",
     "libgomp",
-    "cdt_stub",
     "cuda_compiler_stub",
     "llvm-openmp"
    ],
@@ -388,6 +381,7 @@
     "pytorch",
     "torchvision",
     "libboost-devel",
+    "libgl-devel",
     "glog",
     "gflags",
     "pycolmap =0.4.0=cuda*"
@@ -440,9 +434,9 @@
    "summary": "Pixel-Perfect Structure-from-Motion"
   },
   "build": {
-   "number": "10",
+   "number": "11",
    "script": "${PYTHON} -m pip install . --no-deps -vv",
-   "string": "cpuh1234567_10"
+   "string": "cpuh1234567_11"
   },
   "extra": {
    "recipe-maintainers": [
@@ -586,9 +580,9 @@
    "summary": "Pixel-Perfect Structure-from-Motion"
   },
   "build": {
-   "number": "10",
+   "number": "11",
    "script": "${PYTHON} -m pip install . --no-deps -vv",
-   "string": "cpuh1234567_10"
+   "string": "cpuh1234567_11"
   },
   "extra": {
    "recipe-maintainers": [
@@ -739,13 +733,12 @@
  "pr_info": {
   "__lazy_json__": "pr_info/pixsfm.json"
  },
- "raw_meta_yaml": "{% set name = \"pixsfm\" %}\n{% set version = \"1.0.0\" %}\n{% set build = 10 %}\n\n{% set processor = \"cpu\" if cuda_compiler_version == \"None\" else \"gpu\" %}  # [not osx]\n{% set processor = \"cpu\" %}  # [osx]\n\n# Prioritize gpu build if cudatoolkit can be installed (through __cuda virtual package)\n{% set build = build + 100 if processor == \"gpu\" else build %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://github.com/cvg/pixel-perfect-sfm/archive/refs/tags/v{{ version.split('.')[0] }}.{{ version.split('.')[1] }}.tar.gz\n  sha256: 0b24a8b90ec1aeac4f8e2df211f1604d585c7f3a71be4626bb6750b020b5ad1b\n  patches:\n    - unvendor.patch\n    - limit-parallel-jobs.patch\n    - fix-osx.patch  # [osx]\n    - 119.patch\n    - fix-python-executable.patch\n    - fix-pyceres.patch\n\nbuild:\n  number: {{ build }}\n  string: {{ processor }}h{{ PKG_HASH }}_{{ build }}\n  skip: True  # [win]\n  skip: True  # [py<39]\n  script: ${PYTHON} -m pip install . --no-deps -vv\n\nrequirements:\n  build:\n    - {{ stdlib('c') }}\n    - {{ compiler('cxx') }}\n    - {{ compiler('cuda') }}         # [(cuda_compiler or \"None\") != \"None\"]\n    - cmake\n    - make\n    - git\n    - llvm-openmp  # [osx]\n    - libgomp      # [linux]\n    - python                                 # [build_platform != target_platform]\n    - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n    - numpy                                  # [build_platform != target_platform]\n    - pybind11                               # [build_platform != target_platform]\n    # x11 stuff\n    - {{ cdt('mesa-libgl-devel') }}  # [linux]\n    - {{ cdt('mesa-dri-drivers') }}  # [linux]\n    - {{ cdt('libselinux') }}        # [linux]\n    - {{ cdt('libxcb') }}            # [linux]\n    - {{ cdt('libxdamage') }}        # [linux]\n    - {{ cdt('libxfixes') }}         # [linux]\n    - {{ cdt('libxxf86vm') }}        # [linux]\n    - {{ cdt('libxext') }}           # [linux]\n    - {{ cdt('libxau') }}            # [linux]\n    - {{ cdt('expat-devel') }}       # [linux]\n  host:\n    - hdf5\n    - pybind11\n    - highfive\n    - cpp-half\n    - python\n    - pip\n    - setuptools\n    - eigen\n    - cgal-cpp\n    - colmap =3.8={{ processor }}*\n    - ceres-solver\n    - highfive\n    - numpy\n    - pycolmap =0.4.0=cuda*  # [(cuda_compiler or \"None\") != \"None\"]\n    - pycolmap =0.4.0=cpu*   # [(cuda_compiler or \"None\") == \"None\"]\n    - pyceres\n    - pytorch\n    - torchvision\n    - libboost-devel\n    - glog\n    - gflags\n    - libcurand-dev                  # [cuda_compiler_version == \"12.0\"]\n    - cuda-cudart-dev                # [win and cuda_compiler_version == \"12.0\"]\n  run:\n    - python\n    - pycolmap 0.4.0\n    - pyceres\n    - tqdm\n    - matplotlib-base\n    - plotly\n    - scipy\n    - h5py\n    - omegaconf\n    - packaging\n    - hloc\n    - setuptools\n    - __cuda >={{ cuda_compiler_version }}  # [(cuda_compiler or \"None\") != \"None\"]\n\ntest:\n  imports:\n    - pixsfm\n    - pixsfm.refine_colmap\n    - pixsfm.refine_hloc\n\nabout:\n  home: https://github.com/cvg/pixel-perfect-sfm\n  license: Apache-2.0\n  license_file: LICENSE\n  summary: Pixel-Perfect Structure-from-Motion\n  description: | \n    Here we provide pixsfm, a Python package that can be readily used with COLMAP and our toolbox hloc.\n    This makes it easy to refine an existing COLMAP model or reconstruct a new dataset with state-of-the-art\n    image matching. Our framework also improves visual localization in challenging conditions.\n\nextra:\n  recipe-maintainers:\n    - Tobias-Fischer\n",
+ "raw_meta_yaml": "{% set name = \"pixsfm\" %}\n{% set version = \"1.0.0\" %}\n{% set build = 11 %}\n\n{% set processor = \"cpu\" if cuda_compiler_version == \"None\" else \"gpu\" %}  # [not osx]\n{% set processor = \"cpu\" %}  # [osx]\n\n# Prioritize gpu build if cudatoolkit can be installed (through __cuda virtual package)\n{% set build = build + 100 if processor == \"gpu\" else build %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://github.com/cvg/pixel-perfect-sfm/archive/refs/tags/v{{ version.split('.')[0] }}.{{ version.split('.')[1] }}.tar.gz\n  sha256: 0b24a8b90ec1aeac4f8e2df211f1604d585c7f3a71be4626bb6750b020b5ad1b\n  patches:\n    - unvendor.patch\n    - limit-parallel-jobs.patch\n    - fix-osx.patch  # [osx]\n    - 119.patch\n    - fix-python-executable.patch\n    - fix-pyceres.patch\n\nbuild:\n  number: {{ build }}\n  string: {{ processor }}h{{ PKG_HASH }}_{{ build }}\n  skip: True  # [win]\n  skip: True  # [py<39]\n  script: ${PYTHON} -m pip install . --no-deps -vv\n\nrequirements:\n  build:\n    - {{ stdlib('c') }}\n    - {{ compiler('cxx') }}\n    - {{ compiler('cuda') }}         # [(cuda_compiler or \"None\") != \"None\"]\n    - cmake\n    - make\n    - git\n    - llvm-openmp  # [osx]\n    - libgomp      # [linux]\n    - python                                 # [build_platform != target_platform]\n    - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n    - numpy                                  # [build_platform != target_platform]\n    - pybind11                               # [build_platform != target_platform]\n  host:\n    - hdf5\n    - pybind11\n    - highfive\n    - cpp-half\n    - python\n    - pip\n    - setuptools\n    - eigen\n    - cgal-cpp\n    - colmap =3.8={{ processor }}*\n    - ceres-solver\n    - highfive\n    - numpy\n    - pycolmap =0.4.0=cuda*  # [(cuda_compiler or \"None\") != \"None\"]\n    - pycolmap =0.4.0=cpu*   # [(cuda_compiler or \"None\") == \"None\"]\n    - pyceres\n    - pytorch\n    - torchvision\n    - libboost-devel\n    - libgl-devel  # [linux]\n    - glog\n    - gflags\n    - libcurand-dev                  # [cuda_compiler_version == \"12.0\"]\n    - cuda-cudart-dev                # [win and cuda_compiler_version == \"12.0\"]\n  run:\n    - python\n    - pycolmap 0.4.0\n    - pyceres\n    - tqdm\n    - matplotlib-base\n    - plotly\n    - scipy\n    - h5py\n    - omegaconf\n    - packaging\n    - hloc\n    - setuptools\n    - __cuda >={{ cuda_compiler_version }}  # [(cuda_compiler or \"None\") != \"None\"]\n\ntest:\n  imports:\n    - pixsfm\n    - pixsfm.refine_colmap\n    - pixsfm.refine_hloc\n\nabout:\n  home: https://github.com/cvg/pixel-perfect-sfm\n  license: Apache-2.0\n  license_file: LICENSE\n  summary: Pixel-Perfect Structure-from-Motion\n  description: | \n    Here we provide pixsfm, a Python package that can be readily used with COLMAP and our toolbox hloc.\n    This makes it easy to refine an existing COLMAP model or reconstruct a new dataset with state-of-the-art\n    image matching. Our framework also improves visual localization in challenging conditions.\n\nextra:\n  recipe-maintainers:\n    - Tobias-Fischer\n",
  "req": {
   "__set__": true,
   "elements": [
    "__cuda",
    "c_stdlib_stub",
-   "cdt_stub",
    "ceres-solver",
    "cgal-cpp",
    "cmake",
@@ -762,6 +755,7 @@
    "highfive",
    "hloc",
    "libboost-devel",
+   "libgl-devel",
    "libgomp",
    "llvm-openmp",
    "make",
@@ -787,7 +781,6 @@
    "__set__": true,
    "elements": [
     "c_stdlib_stub",
-    "cdt_stub",
     "cmake",
     "cuda_compiler_stub",
     "cxx_compiler_stub",
@@ -814,6 +807,7 @@
     "hdf5",
     "highfive",
     "libboost-devel",
+    "libgl-devel",
     "numpy",
     "openmp",
     "pip",
@@ -860,7 +854,6 @@
    "__set__": true,
    "elements": [
     "c_stdlib_stub",
-    "cdt_stub",
     "cmake",
     "cuda_compiler_stub",
     "cxx_compiler_stub",
@@ -883,6 +876,7 @@
     "hdf5",
     "highfive",
     "libboost-devel",
+    "libgl-devel",
     "numpy",
     "pip",
     "pybind11",
