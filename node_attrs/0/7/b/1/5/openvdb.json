@@ -5,6 +5,7 @@
   "conda_build": {
    "error_overlinking": true
   },
+  "conda_build_tool": "rattler-build",
   "conda_forge_output_validation": true,
   "github": {
    "branch_name": "main",
@@ -15,18 +16,34 @@
  "hash_type": "sha256",
  "linux_64_meta_yaml": {
   "about": {
-   "description": "OpenVDB is an open source C++ library comprising a novel hierarchical data structure and a large suite of tools for the efficient storage and manipulation of sparse volumetric data discretized on three-dimensional grids. It was developed by DreamWorks Animation for use in volumetric applications typically encountered in feature film production.\n",
+   "description": "OpenVDB is an open source C++ library comprising a novel hierarchical data structure and a large suite of tools for the efficient storage and manipulation of sparse volumetric data discretized on three-dimensional grids. It was developed by DreamWorks Animation for use in volumetric applications typically encountered in feature film production.",
    "dev_url": "https://github.com/AcademySoftwareFoundation/openvdb",
    "home": "https://github.com/AcademySoftwareFoundation/openvdb",
-   "license": "MPL-2.0",
+   "license": "Apache-2.0",
+   "license_family": "Apache-2.0",
    "license_file": "LICENSE",
    "summary": "OpenVDB - Sparse volume data structure and tools"
   },
   "build": {
-   "number": "0",
-   "run_exports": [
-    "openvdb"
-   ]
+   "number": "4",
+   "run_exports": {
+    "weak": [
+     "openvdb"
+    ]
+   },
+   "script": {
+    "content": [
+     "mkdir -p build",
+     "cd build",
+     "cmake .. $CMAKE_ARGS $SHARED_CMAKE_ARGS $OUTPUT_CMAKE_ARGS -Dnanobind_DIR=$SP_DIR/nanobind/cmake",
+     "cmake --build . --target install --config Release"
+    ],
+    "env": {
+     "CMAKE_BUILD_PARALLEL_LEVEL": "$CPU_COUNT",
+     "OUTPUT_CMAKE_ARGS": "-DOPENVDB_BUILD_CORE=ON -DOPENVDB_CORE_SHARED=ON -DOPENVDB_CORE_STATIC=OFF -DOPENVDB_INSTALL_CMAKE_MODULES=ON -DOPENVDB_BUILD_PYTHON_MODULE=ON -DUSE_NUMPY=ON",
+     "SHARED_CMAKE_ARGS": "-Wno-dev -DOPENVDB_BUILD_CORE=OFF -DOPENVDB_BUILD_BINARIES=OFF -DOPENVDB_INSTALL_CMAKE_MODULES=OFF -DNANOVDB_BUILD_TOOLS=OFF -DUSE_EXPLICIT_INSTANTIATION=OFF"
+    }
+   }
   },
   "extra": {
    "recipe-maintainers": [
@@ -34,6 +51,506 @@
     "tetov"
    ]
   },
+  "outputs": [
+   {
+    "build": {
+     "strong": [],
+     "weak": [
+      "openvdb"
+     ]
+    },
+    "name": "openvdb",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "nanobind",
+      "pkg-config",
+      "python",
+      "zlib",
+      "jemalloc",
+      "make"
+     ],
+     "host": [
+      "blosc",
+      "libboost-devel",
+      "nanobind",
+      "numpy >=1.23.0",
+      "python",
+      "tbb-devel",
+      "zlib"
+     ],
+     "run": [
+      "python",
+      "numpy"
+     ]
+    },
+    "tests": [
+     {
+      "python": {
+       "imports": [
+        "openvdb"
+       ]
+      }
+     },
+     {
+      "requirements": {
+       "run": [
+        "numpy"
+       ]
+      },
+      "script": "python -c \"import openvdb; import numpy; grid = openvdb.FloatGrid(); grid.copyFromArray(numpy.random.rand(200, 200, 200))\""
+     },
+     {
+      "script": [
+       "test -f ${PREFIX}/include/openvdb/openvdb.h",
+       "test -f ${PREFIX}/lib/cmake/OpenVDB/FindOpenVDB.cmake",
+       "test -f ${PREFIX}/lib/libopenvdb${SHLIB_EXT}"
+      ]
+     }
+    ]
+   },
+   {
+    "build": {
+     "strong": [],
+     "weak": [
+      "nanovdb"
+     ]
+    },
+    "name": "nanovdb",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "nanobind",
+      "python",
+      "make"
+     ],
+     "host": [
+      "nanobind",
+      "python",
+      "tbb-devel",
+      "zlib",
+      "openvdb"
+     ],
+     "run": [
+      "python"
+     ]
+    },
+    "tests": [
+     {
+      "python": {
+       "imports": [
+        "nanovdb"
+       ]
+      }
+     },
+     {
+      "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+     }
+    ]
+   },
+   {
+    "build": null,
+    "name": "nanovdb-tools",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "make"
+     ],
+     "host": [
+      "libboost-devel",
+      "tbb-devel",
+      "zlib",
+      "openvdb",
+      "nanovdb"
+     ],
+     "run": []
+    },
+    "tests": [
+     {
+      "script": [
+       "nanovdb_convert --help",
+       "nanovdb_print --help",
+       "nanovdb_validate --help"
+      ]
+     }
+    ]
+   },
+   {
+    "build": null,
+    "name": "openvdb-tools",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "blosc",
+      "libboost-devel",
+      "make"
+     ],
+     "host": [
+      "glfw",
+      "tbb-devel",
+      "zlib",
+      "libgl-devel",
+      "libglu",
+      "jemalloc",
+      "openvdb"
+     ],
+     "run": []
+    },
+    "tests": [
+     {
+      "script": [
+       "vdb_print --help",
+       "vdb_lod --help",
+       "vdb_render --help",
+       "vdb_tool --help"
+      ]
+     }
+    ]
+   },
+   {
+    "build": {
+     "strong": [],
+     "weak": [
+      "openvdb"
+     ]
+    },
+    "name": "openvdb",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "nanobind",
+      "pkg-config",
+      "python",
+      "zlib",
+      "jemalloc",
+      "make"
+     ],
+     "host": [
+      "blosc",
+      "libboost-devel",
+      "nanobind",
+      "numpy >=1.23.0",
+      "python",
+      "tbb-devel",
+      "zlib"
+     ],
+     "run": [
+      "python",
+      "numpy"
+     ]
+    },
+    "tests": [
+     {
+      "python": {
+       "imports": [
+        "openvdb"
+       ]
+      }
+     },
+     {
+      "requirements": {
+       "run": [
+        "numpy"
+       ]
+      },
+      "script": "python -c \"import openvdb; import numpy; grid = openvdb.FloatGrid(); grid.copyFromArray(numpy.random.rand(200, 200, 200))\""
+     },
+     {
+      "script": [
+       "test -f ${PREFIX}/include/openvdb/openvdb.h",
+       "test -f ${PREFIX}/lib/cmake/OpenVDB/FindOpenVDB.cmake",
+       "test -f ${PREFIX}/lib/libopenvdb${SHLIB_EXT}"
+      ]
+     }
+    ]
+   },
+   {
+    "build": {
+     "strong": [],
+     "weak": [
+      "nanovdb"
+     ]
+    },
+    "name": "nanovdb",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "nanobind",
+      "python",
+      "make"
+     ],
+     "host": [
+      "nanobind",
+      "python",
+      "tbb-devel",
+      "zlib",
+      "openvdb"
+     ],
+     "run": [
+      "python"
+     ]
+    },
+    "tests": [
+     {
+      "python": {
+       "imports": [
+        "nanovdb"
+       ]
+      }
+     },
+     {
+      "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+     }
+    ]
+   },
+   {
+    "build": null,
+    "name": "nanovdb-tools",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "make"
+     ],
+     "host": [
+      "libboost-devel",
+      "tbb-devel",
+      "zlib",
+      "openvdb",
+      "nanovdb"
+     ],
+     "run": []
+    },
+    "tests": [
+     {
+      "script": [
+       "nanovdb_convert --help",
+       "nanovdb_print --help",
+       "nanovdb_validate --help"
+      ]
+     }
+    ]
+   },
+   {
+    "build": null,
+    "name": "openvdb-tools",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "blosc",
+      "libboost-devel",
+      "make"
+     ],
+     "host": [
+      "glfw",
+      "tbb-devel",
+      "zlib",
+      "libgl-devel",
+      "libglu",
+      "jemalloc",
+      "openvdb"
+     ],
+     "run": []
+    },
+    "tests": [
+     {
+      "script": [
+       "vdb_print --help",
+       "vdb_lod --help",
+       "vdb_render --help",
+       "vdb_tool --help"
+      ]
+     }
+    ]
+   },
+   {
+    "build": {
+     "strong": [],
+     "weak": [
+      "openvdb"
+     ]
+    },
+    "name": "openvdb",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "nanobind",
+      "pkg-config",
+      "python",
+      "zlib",
+      "jemalloc",
+      "make"
+     ],
+     "host": [
+      "blosc",
+      "libboost-devel",
+      "nanobind",
+      "numpy >=1.23.0",
+      "python",
+      "tbb-devel",
+      "zlib"
+     ],
+     "run": [
+      "python",
+      "numpy"
+     ]
+    },
+    "tests": [
+     {
+      "python": {
+       "imports": [
+        "openvdb"
+       ]
+      }
+     },
+     {
+      "requirements": {
+       "run": [
+        "numpy"
+       ]
+      },
+      "script": "python -c \"import openvdb; import numpy; grid = openvdb.FloatGrid(); grid.copyFromArray(numpy.random.rand(200, 200, 200))\""
+     },
+     {
+      "script": [
+       "test -f ${PREFIX}/include/openvdb/openvdb.h",
+       "test -f ${PREFIX}/lib/cmake/OpenVDB/FindOpenVDB.cmake",
+       "test -f ${PREFIX}/lib/libopenvdb${SHLIB_EXT}"
+      ]
+     }
+    ]
+   },
+   {
+    "build": {
+     "strong": [],
+     "weak": [
+      "nanovdb"
+     ]
+    },
+    "name": "nanovdb",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "nanobind",
+      "python",
+      "make"
+     ],
+     "host": [
+      "nanobind",
+      "python",
+      "tbb-devel",
+      "zlib",
+      "openvdb"
+     ],
+     "run": [
+      "python"
+     ]
+    },
+    "tests": [
+     {
+      "python": {
+       "imports": [
+        "nanovdb"
+       ]
+      }
+     },
+     {
+      "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+     }
+    ]
+   },
+   {
+    "build": null,
+    "name": "nanovdb-tools",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "make"
+     ],
+     "host": [
+      "libboost-devel",
+      "tbb-devel",
+      "zlib",
+      "openvdb",
+      "nanovdb"
+     ],
+     "run": []
+    },
+    "tests": [
+     {
+      "script": [
+       "nanovdb_convert --help",
+       "nanovdb_print --help",
+       "nanovdb_validate --help"
+      ]
+     }
+    ]
+   },
+   {
+    "build": null,
+    "name": "openvdb-tools",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "blosc",
+      "libboost-devel",
+      "make"
+     ],
+     "host": [
+      "glfw",
+      "tbb-devel",
+      "zlib",
+      "libgl-devel",
+      "libglu",
+      "jemalloc",
+      "openvdb"
+     ],
+     "run": []
+    },
+    "tests": [
+     {
+      "script": [
+       "vdb_print --help",
+       "vdb_lod --help",
+       "vdb_render --help",
+       "vdb_tool --help"
+      ]
+     }
+    ]
+   }
+  ],
   "package": {
    "name": "openvdb",
    "version": "12.0.0"
@@ -42,64 +559,50 @@
    "build": [
     "cxx_compiler_stub",
     "c_stdlib_stub",
-    "cdt_stub",
     "cmake",
     "libboost-devel",
-    "make",
     "nanobind",
-    "python"
+    "pkg-config",
+    "python",
+    "zlib",
+    "jemalloc",
+    "make"
    ],
    "host": [
     "blosc",
-    "glfw",
-    "jemalloc",
     "libboost-devel",
-    "numpy >=1.23.0",
     "nanobind",
+    "numpy >=1.23.0",
     "python",
     "tbb-devel",
     "zlib"
    ],
    "run": [
-    "numpy",
-    "python"
+    "python",
+    "numpy"
    ]
   },
-  "schema_version": 0,
+  "schema_version": 1,
   "source": {
    "sha256": "23ceb5b18a851f45af118f718a9dd3001efaee364e3f623c37ffbdad03b8905f",
    "url": "https://github.com/AcademySoftwareFoundation/openvdb/archive/refs/tags/v12.0.0.tar.gz"
-  },
-  "test": {
-   "commands": [
-    "test -f ${PREFIX}/bin/vdb_print",
-    "test -f ${PREFIX}/bin/vdb_view",
-    "test -f ${PREFIX}/include/openvdb/openvdb.h",
-    "test -f ${PREFIX}/lib/cmake/OpenVDB/FindOpenVDB.cmake",
-    "test -f ${PREFIX}/lib/libopenvdb${SHLIB_EXT}",
-    "vdb_print --help",
-    "python -c \"import openvdb; import numpy; grid = openvdb.FloatGrid(); grid.copyFromArray(numpy.random.rand(200, 200, 200))\""
-   ],
-   "imports": [
-    "openvdb"
-   ],
-   "requires": [
-    "numpy"
-   ]
   }
  },
  "linux_64_requirements": {
   "build": {
    "__set__": true,
    "elements": [
+    "blosc",
     "c_stdlib_stub",
-    "cdt_stub",
     "cmake",
     "cxx_compiler_stub",
+    "jemalloc",
     "libboost-devel",
     "make",
     "nanobind",
-    "python"
+    "pkg-config",
+    "python",
+    "zlib"
    ]
   },
   "host": {
@@ -109,8 +612,12 @@
     "glfw",
     "jemalloc",
     "libboost-devel",
+    "libgl-devel",
+    "libglu",
     "nanobind",
+    "nanovdb",
     "numpy",
+    "openvdb",
     "python",
     "tbb-devel",
     "zlib"
@@ -126,24 +633,41 @@
   "test": {
    "__set__": true,
    "elements": [
-    "numpy"
+    "numpy",
+    "pip"
    ]
   }
  },
  "meta_yaml": {
   "about": {
-   "description": "OpenVDB is an open source C++ library comprising a novel hierarchical data structure and a large suite of tools for the efficient storage and manipulation of sparse volumetric data discretized on three-dimensional grids. It was developed by DreamWorks Animation for use in volumetric applications typically encountered in feature film production.\n",
+   "description": "OpenVDB is an open source C++ library comprising a novel hierarchical data structure and a large suite of tools for the efficient storage and manipulation of sparse volumetric data discretized on three-dimensional grids. It was developed by DreamWorks Animation for use in volumetric applications typically encountered in feature film production.",
    "dev_url": "https://github.com/AcademySoftwareFoundation/openvdb",
    "home": "https://github.com/AcademySoftwareFoundation/openvdb",
-   "license": "MPL-2.0",
+   "license": "Apache-2.0",
+   "license_family": "Apache-2.0",
    "license_file": "LICENSE",
    "summary": "OpenVDB - Sparse volume data structure and tools"
   },
   "build": {
-   "number": "0",
-   "run_exports": [
-    "openvdb"
-   ]
+   "number": "4",
+   "run_exports": {
+    "weak": [
+     "openvdb"
+    ]
+   },
+   "script": {
+    "content": [
+     "mkdir -p build",
+     "cd build",
+     "cmake .. $CMAKE_ARGS $SHARED_CMAKE_ARGS $OUTPUT_CMAKE_ARGS -Dnanobind_DIR=$SP_DIR/nanobind/cmake",
+     "cmake --build . --target install --config Release"
+    ],
+    "env": {
+     "CMAKE_BUILD_PARALLEL_LEVEL": "$CPU_COUNT",
+     "OUTPUT_CMAKE_ARGS": "-DOPENVDB_BUILD_CORE=ON -DOPENVDB_CORE_SHARED=ON -DOPENVDB_CORE_STATIC=OFF -DOPENVDB_INSTALL_CMAKE_MODULES=ON -DOPENVDB_BUILD_PYTHON_MODULE=ON -DUSE_NUMPY=ON",
+     "SHARED_CMAKE_ARGS": "-Wno-dev -DOPENVDB_BUILD_CORE=OFF -DOPENVDB_BUILD_BINARIES=OFF -DOPENVDB_INSTALL_CMAKE_MODULES=OFF -DNANOVDB_BUILD_TOOLS=OFF -DUSE_EXPLICIT_INSTANTIATION=OFF"
+    }
+   }
   },
   "extra": {
    "recipe-maintainers": [
@@ -151,6 +675,1502 @@
     "tetov"
    ]
   },
+  "outputs": [
+   {
+    "build": {
+     "strong": [],
+     "weak": [
+      "openvdb"
+     ]
+    },
+    "name": "openvdb",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "nanobind",
+      "pkg-config",
+      "python",
+      "zlib",
+      "jemalloc",
+      "make"
+     ],
+     "host": [
+      "blosc",
+      "libboost-devel",
+      "nanobind",
+      "numpy >=1.23.0",
+      "python",
+      "tbb-devel",
+      "zlib"
+     ],
+     "run": [
+      "python",
+      "numpy"
+     ]
+    },
+    "tests": [
+     {
+      "python": {
+       "imports": [
+        "openvdb"
+       ]
+      }
+     },
+     {
+      "requirements": {
+       "run": [
+        "numpy"
+       ]
+      },
+      "script": "python -c \"import openvdb; import numpy; grid = openvdb.FloatGrid(); grid.copyFromArray(numpy.random.rand(200, 200, 200))\""
+     },
+     {
+      "script": [
+       "test -f ${PREFIX}/include/openvdb/openvdb.h",
+       "test -f ${PREFIX}/lib/cmake/OpenVDB/FindOpenVDB.cmake",
+       "test -f ${PREFIX}/lib/libopenvdb${SHLIB_EXT}"
+      ]
+     }
+    ]
+   },
+   {
+    "build": {
+     "strong": [],
+     "weak": [
+      "nanovdb"
+     ]
+    },
+    "name": "nanovdb",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "nanobind",
+      "python",
+      "make"
+     ],
+     "host": [
+      "nanobind",
+      "python",
+      "tbb-devel",
+      "zlib",
+      "openvdb"
+     ],
+     "run": [
+      "python"
+     ]
+    },
+    "tests": [
+     {
+      "python": {
+       "imports": [
+        "nanovdb"
+       ]
+      }
+     },
+     {
+      "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+     }
+    ]
+   },
+   {
+    "build": null,
+    "name": "nanovdb-tools",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "make"
+     ],
+     "host": [
+      "libboost-devel",
+      "tbb-devel",
+      "zlib",
+      "openvdb",
+      "nanovdb"
+     ],
+     "run": []
+    },
+    "tests": [
+     {
+      "script": [
+       "nanovdb_convert --help",
+       "nanovdb_print --help",
+       "nanovdb_validate --help"
+      ]
+     }
+    ]
+   },
+   {
+    "build": null,
+    "name": "openvdb-tools",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "blosc",
+      "libboost-devel",
+      "make"
+     ],
+     "host": [
+      "glfw",
+      "tbb-devel",
+      "zlib",
+      "libgl-devel",
+      "libglu",
+      "jemalloc",
+      "openvdb"
+     ],
+     "run": []
+    },
+    "tests": [
+     {
+      "script": [
+       "vdb_print --help",
+       "vdb_lod --help",
+       "vdb_render --help",
+       "vdb_tool --help"
+      ]
+     }
+    ]
+   },
+   {
+    "build": {
+     "strong": [],
+     "weak": [
+      "openvdb"
+     ]
+    },
+    "name": "openvdb",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "nanobind",
+      "pkg-config",
+      "python",
+      "zlib",
+      "jemalloc",
+      "make"
+     ],
+     "host": [
+      "blosc",
+      "libboost-devel",
+      "nanobind",
+      "numpy >=1.23.0",
+      "python",
+      "tbb-devel",
+      "zlib"
+     ],
+     "run": [
+      "python",
+      "numpy"
+     ]
+    },
+    "tests": [
+     {
+      "python": {
+       "imports": [
+        "openvdb"
+       ]
+      }
+     },
+     {
+      "requirements": {
+       "run": [
+        "numpy"
+       ]
+      },
+      "script": "python -c \"import openvdb; import numpy; grid = openvdb.FloatGrid(); grid.copyFromArray(numpy.random.rand(200, 200, 200))\""
+     },
+     {
+      "script": [
+       "test -f ${PREFIX}/include/openvdb/openvdb.h",
+       "test -f ${PREFIX}/lib/cmake/OpenVDB/FindOpenVDB.cmake",
+       "test -f ${PREFIX}/lib/libopenvdb${SHLIB_EXT}"
+      ]
+     }
+    ]
+   },
+   {
+    "build": {
+     "strong": [],
+     "weak": [
+      "nanovdb"
+     ]
+    },
+    "name": "nanovdb",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "nanobind",
+      "python",
+      "make"
+     ],
+     "host": [
+      "nanobind",
+      "python",
+      "tbb-devel",
+      "zlib",
+      "openvdb"
+     ],
+     "run": [
+      "python"
+     ]
+    },
+    "tests": [
+     {
+      "python": {
+       "imports": [
+        "nanovdb"
+       ]
+      }
+     },
+     {
+      "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+     }
+    ]
+   },
+   {
+    "build": null,
+    "name": "nanovdb-tools",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "make"
+     ],
+     "host": [
+      "libboost-devel",
+      "tbb-devel",
+      "zlib",
+      "openvdb",
+      "nanovdb"
+     ],
+     "run": []
+    },
+    "tests": [
+     {
+      "script": [
+       "nanovdb_convert --help",
+       "nanovdb_print --help",
+       "nanovdb_validate --help"
+      ]
+     }
+    ]
+   },
+   {
+    "build": null,
+    "name": "openvdb-tools",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "blosc",
+      "libboost-devel",
+      "make"
+     ],
+     "host": [
+      "glfw",
+      "tbb-devel",
+      "zlib",
+      "libgl-devel",
+      "libglu",
+      "jemalloc",
+      "openvdb"
+     ],
+     "run": []
+    },
+    "tests": [
+     {
+      "script": [
+       "vdb_print --help",
+       "vdb_lod --help",
+       "vdb_render --help",
+       "vdb_tool --help"
+      ]
+     }
+    ]
+   },
+   {
+    "build": {
+     "strong": [],
+     "weak": [
+      "openvdb"
+     ]
+    },
+    "name": "openvdb",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "nanobind",
+      "pkg-config",
+      "python",
+      "zlib",
+      "jemalloc",
+      "make"
+     ],
+     "host": [
+      "blosc",
+      "libboost-devel",
+      "nanobind",
+      "numpy >=1.23.0",
+      "python",
+      "tbb-devel",
+      "zlib"
+     ],
+     "run": [
+      "python",
+      "numpy"
+     ]
+    },
+    "tests": [
+     {
+      "python": {
+       "imports": [
+        "openvdb"
+       ]
+      }
+     },
+     {
+      "requirements": {
+       "run": [
+        "numpy"
+       ]
+      },
+      "script": "python -c \"import openvdb; import numpy; grid = openvdb.FloatGrid(); grid.copyFromArray(numpy.random.rand(200, 200, 200))\""
+     },
+     {
+      "script": [
+       "test -f ${PREFIX}/include/openvdb/openvdb.h",
+       "test -f ${PREFIX}/lib/cmake/OpenVDB/FindOpenVDB.cmake",
+       "test -f ${PREFIX}/lib/libopenvdb${SHLIB_EXT}"
+      ]
+     }
+    ]
+   },
+   {
+    "build": {
+     "strong": [],
+     "weak": [
+      "nanovdb"
+     ]
+    },
+    "name": "nanovdb",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "nanobind",
+      "python",
+      "make"
+     ],
+     "host": [
+      "nanobind",
+      "python",
+      "tbb-devel",
+      "zlib",
+      "openvdb"
+     ],
+     "run": [
+      "python"
+     ]
+    },
+    "tests": [
+     {
+      "python": {
+       "imports": [
+        "nanovdb"
+       ]
+      }
+     },
+     {
+      "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+     }
+    ]
+   },
+   {
+    "build": null,
+    "name": "nanovdb-tools",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "make"
+     ],
+     "host": [
+      "libboost-devel",
+      "tbb-devel",
+      "zlib",
+      "openvdb",
+      "nanovdb"
+     ],
+     "run": []
+    },
+    "tests": [
+     {
+      "script": [
+       "nanovdb_convert --help",
+       "nanovdb_print --help",
+       "nanovdb_validate --help"
+      ]
+     }
+    ]
+   },
+   {
+    "build": null,
+    "name": "openvdb-tools",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "blosc",
+      "libboost-devel",
+      "make"
+     ],
+     "host": [
+      "glfw",
+      "tbb-devel",
+      "zlib",
+      "libgl-devel",
+      "libglu",
+      "jemalloc",
+      "openvdb"
+     ],
+     "run": []
+    },
+    "tests": [
+     {
+      "script": [
+       "vdb_print --help",
+       "vdb_lod --help",
+       "vdb_render --help",
+       "vdb_tool --help"
+      ]
+     }
+    ]
+   },
+   {
+    "build": {
+     "strong": [],
+     "weak": [
+      "openvdb"
+     ]
+    },
+    "name": "openvdb",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "nanobind",
+      "pkg-config",
+      "python",
+      "zlib",
+      "jemalloc",
+      "make"
+     ],
+     "host": [
+      "blosc",
+      "libboost-devel",
+      "nanobind",
+      "numpy >=1.23.0",
+      "python",
+      "tbb-devel",
+      "zlib"
+     ],
+     "run": [
+      "python",
+      "numpy"
+     ]
+    },
+    "tests": [
+     {
+      "python": {
+       "imports": [
+        "openvdb"
+       ]
+      }
+     },
+     {
+      "requirements": {
+       "run": [
+        "numpy"
+       ]
+      },
+      "script": "python -c \"import openvdb; import numpy; grid = openvdb.FloatGrid(); grid.copyFromArray(numpy.random.rand(200, 200, 200))\""
+     },
+     {
+      "script": [
+       "test -f ${PREFIX}/include/openvdb/openvdb.h",
+       "test -f ${PREFIX}/lib/cmake/OpenVDB/FindOpenVDB.cmake",
+       "test -f ${PREFIX}/lib/libopenvdb${SHLIB_EXT}"
+      ]
+     }
+    ]
+   },
+   {
+    "build": {
+     "strong": [],
+     "weak": [
+      "nanovdb"
+     ]
+    },
+    "name": "nanovdb",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "nanobind",
+      "python",
+      "make"
+     ],
+     "host": [
+      "nanobind",
+      "python",
+      "tbb-devel",
+      "zlib",
+      "openvdb"
+     ],
+     "run": [
+      "python"
+     ]
+    },
+    "tests": [
+     {
+      "python": {
+       "imports": [
+        "nanovdb"
+       ]
+      }
+     },
+     {
+      "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+     }
+    ]
+   },
+   {
+    "build": null,
+    "name": "nanovdb-tools",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "make"
+     ],
+     "host": [
+      "libboost-devel",
+      "tbb-devel",
+      "zlib",
+      "openvdb",
+      "nanovdb"
+     ],
+     "run": []
+    },
+    "tests": [
+     {
+      "script": [
+       "nanovdb_convert --help",
+       "nanovdb_print --help",
+       "nanovdb_validate --help"
+      ]
+     }
+    ]
+   },
+   {
+    "build": null,
+    "name": "openvdb-tools",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "blosc",
+      "libboost-devel",
+      "make"
+     ],
+     "host": [
+      "glfw",
+      "tbb-devel",
+      "zlib",
+      "libgl-devel",
+      "libglu",
+      "jemalloc",
+      "openvdb"
+     ],
+     "run": []
+    },
+    "tests": [
+     {
+      "script": [
+       "vdb_print --help",
+       "vdb_lod --help",
+       "vdb_render --help",
+       "vdb_tool --help"
+      ]
+     }
+    ]
+   },
+   {
+    "build": {
+     "strong": [],
+     "weak": [
+      "openvdb"
+     ]
+    },
+    "name": "openvdb",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "nanobind",
+      "pkg-config",
+      "python",
+      "zlib",
+      "jemalloc",
+      "make"
+     ],
+     "host": [
+      "blosc",
+      "libboost-devel",
+      "nanobind",
+      "numpy >=1.23.0",
+      "python",
+      "tbb-devel",
+      "zlib"
+     ],
+     "run": [
+      "python",
+      "numpy"
+     ]
+    },
+    "tests": [
+     {
+      "python": {
+       "imports": [
+        "openvdb"
+       ]
+      }
+     },
+     {
+      "requirements": {
+       "run": [
+        "numpy"
+       ]
+      },
+      "script": "python -c \"import openvdb; import numpy; grid = openvdb.FloatGrid(); grid.copyFromArray(numpy.random.rand(200, 200, 200))\""
+     },
+     {
+      "script": [
+       "test -f ${PREFIX}/include/openvdb/openvdb.h",
+       "test -f ${PREFIX}/lib/cmake/OpenVDB/FindOpenVDB.cmake",
+       "test -f ${PREFIX}/lib/libopenvdb${SHLIB_EXT}"
+      ]
+     }
+    ]
+   },
+   {
+    "build": {
+     "strong": [],
+     "weak": [
+      "nanovdb"
+     ]
+    },
+    "name": "nanovdb",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "nanobind",
+      "python",
+      "make"
+     ],
+     "host": [
+      "nanobind",
+      "python",
+      "tbb-devel",
+      "zlib",
+      "openvdb"
+     ],
+     "run": [
+      "python"
+     ]
+    },
+    "tests": [
+     {
+      "python": {
+       "imports": [
+        "nanovdb"
+       ]
+      }
+     },
+     {
+      "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+     }
+    ]
+   },
+   {
+    "build": null,
+    "name": "nanovdb-tools",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "make"
+     ],
+     "host": [
+      "libboost-devel",
+      "tbb-devel",
+      "zlib",
+      "openvdb",
+      "nanovdb"
+     ],
+     "run": []
+    },
+    "tests": [
+     {
+      "script": [
+       "nanovdb_convert --help",
+       "nanovdb_print --help",
+       "nanovdb_validate --help"
+      ]
+     }
+    ]
+   },
+   {
+    "build": null,
+    "name": "openvdb-tools",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "blosc",
+      "libboost-devel",
+      "make"
+     ],
+     "host": [
+      "glfw",
+      "tbb-devel",
+      "zlib",
+      "libgl-devel",
+      "libglu",
+      "jemalloc",
+      "openvdb"
+     ],
+     "run": []
+    },
+    "tests": [
+     {
+      "script": [
+       "vdb_print --help",
+       "vdb_lod --help",
+       "vdb_render --help",
+       "vdb_tool --help"
+      ]
+     }
+    ]
+   },
+   {
+    "build": {
+     "strong": [],
+     "weak": [
+      "openvdb"
+     ]
+    },
+    "name": "openvdb",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "nanobind",
+      "pkg-config",
+      "python",
+      "zlib",
+      "jemalloc",
+      "make"
+     ],
+     "host": [
+      "blosc",
+      "libboost-devel",
+      "nanobind",
+      "numpy >=1.23.0",
+      "python",
+      "tbb-devel",
+      "zlib"
+     ],
+     "run": [
+      "python",
+      "numpy"
+     ]
+    },
+    "tests": [
+     {
+      "python": {
+       "imports": [
+        "openvdb"
+       ]
+      }
+     },
+     {
+      "requirements": {
+       "run": [
+        "numpy"
+       ]
+      },
+      "script": "python -c \"import openvdb; import numpy; grid = openvdb.FloatGrid(); grid.copyFromArray(numpy.random.rand(200, 200, 200))\""
+     },
+     {
+      "script": [
+       "test -f ${PREFIX}/include/openvdb/openvdb.h",
+       "test -f ${PREFIX}/lib/cmake/OpenVDB/FindOpenVDB.cmake",
+       "test -f ${PREFIX}/lib/libopenvdb${SHLIB_EXT}"
+      ]
+     }
+    ]
+   },
+   {
+    "build": {
+     "strong": [],
+     "weak": [
+      "nanovdb"
+     ]
+    },
+    "name": "nanovdb",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "nanobind",
+      "python",
+      "make"
+     ],
+     "host": [
+      "nanobind",
+      "python",
+      "tbb-devel",
+      "zlib",
+      "openvdb"
+     ],
+     "run": [
+      "python"
+     ]
+    },
+    "tests": [
+     {
+      "python": {
+       "imports": [
+        "nanovdb"
+       ]
+      }
+     },
+     {
+      "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+     }
+    ]
+   },
+   {
+    "build": null,
+    "name": "nanovdb-tools",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "make"
+     ],
+     "host": [
+      "libboost-devel",
+      "tbb-devel",
+      "zlib",
+      "openvdb",
+      "nanovdb"
+     ],
+     "run": []
+    },
+    "tests": [
+     {
+      "script": [
+       "nanovdb_convert --help",
+       "nanovdb_print --help",
+       "nanovdb_validate --help"
+      ]
+     }
+    ]
+   },
+   {
+    "build": null,
+    "name": "openvdb-tools",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "blosc",
+      "libboost-devel",
+      "make"
+     ],
+     "host": [
+      "glfw",
+      "tbb-devel",
+      "zlib",
+      "libgl-devel",
+      "libglu",
+      "jemalloc",
+      "openvdb"
+     ],
+     "run": []
+    },
+    "tests": [
+     {
+      "script": [
+       "vdb_print --help",
+       "vdb_lod --help",
+       "vdb_render --help",
+       "vdb_tool --help"
+      ]
+     }
+    ]
+   },
+   {
+    "build": {
+     "strong": [],
+     "weak": [
+      "openvdb"
+     ]
+    },
+    "name": "openvdb",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "nanobind",
+      "pkg-config",
+      "python",
+      "zlib",
+      "jemalloc",
+      "make"
+     ],
+     "host": [
+      "blosc",
+      "libboost-devel",
+      "nanobind",
+      "numpy >=1.23.0",
+      "python",
+      "tbb-devel",
+      "zlib"
+     ],
+     "run": [
+      "python",
+      "numpy"
+     ]
+    },
+    "tests": [
+     {
+      "python": {
+       "imports": [
+        "openvdb"
+       ]
+      }
+     },
+     {
+      "requirements": {
+       "run": [
+        "numpy"
+       ]
+      },
+      "script": "python -c \"import openvdb; import numpy; grid = openvdb.FloatGrid(); grid.copyFromArray(numpy.random.rand(200, 200, 200))\""
+     },
+     {
+      "script": [
+       "test -f ${PREFIX}/include/openvdb/openvdb.h",
+       "test -f ${PREFIX}/lib/cmake/OpenVDB/FindOpenVDB.cmake",
+       "test -f ${PREFIX}/lib/libopenvdb${SHLIB_EXT}"
+      ]
+     }
+    ]
+   },
+   {
+    "build": {
+     "strong": [],
+     "weak": [
+      "nanovdb"
+     ]
+    },
+    "name": "nanovdb",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "nanobind",
+      "python",
+      "make"
+     ],
+     "host": [
+      "nanobind",
+      "python",
+      "tbb-devel",
+      "zlib",
+      "openvdb"
+     ],
+     "run": [
+      "python"
+     ]
+    },
+    "tests": [
+     {
+      "python": {
+       "imports": [
+        "nanovdb"
+       ]
+      }
+     },
+     {
+      "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+     }
+    ]
+   },
+   {
+    "build": null,
+    "name": "nanovdb-tools",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "make"
+     ],
+     "host": [
+      "libboost-devel",
+      "tbb-devel",
+      "zlib",
+      "openvdb",
+      "nanovdb"
+     ],
+     "run": []
+    },
+    "tests": [
+     {
+      "script": [
+       "nanovdb_convert --help",
+       "nanovdb_print --help",
+       "nanovdb_validate --help"
+      ]
+     }
+    ]
+   },
+   {
+    "build": null,
+    "name": "openvdb-tools",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "blosc",
+      "libboost-devel",
+      "make"
+     ],
+     "host": [
+      "glfw",
+      "tbb-devel",
+      "zlib",
+      "libgl-devel",
+      "libglu",
+      "jemalloc",
+      "openvdb"
+     ],
+     "run": []
+    },
+    "tests": [
+     {
+      "script": [
+       "vdb_print --help",
+       "vdb_lod --help",
+       "vdb_render --help",
+       "vdb_tool --help"
+      ]
+     }
+    ]
+   },
+   {
+    "build": {
+     "strong": [],
+     "weak": [
+      "openvdb"
+     ]
+    },
+    "name": "openvdb",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "nanobind",
+      "pkg-config",
+      "python",
+      "zlib",
+      "jemalloc",
+      "make"
+     ],
+     "host": [
+      "blosc",
+      "libboost-devel",
+      "nanobind",
+      "numpy >=1.23.0",
+      "python",
+      "tbb-devel",
+      "zlib"
+     ],
+     "run": [
+      "python",
+      "numpy"
+     ]
+    },
+    "tests": [
+     {
+      "python": {
+       "imports": [
+        "openvdb"
+       ]
+      }
+     },
+     {
+      "requirements": {
+       "run": [
+        "numpy"
+       ]
+      },
+      "script": "python -c \"import openvdb; import numpy; grid = openvdb.FloatGrid(); grid.copyFromArray(numpy.random.rand(200, 200, 200))\""
+     },
+     {
+      "script": [
+       "test -f ${PREFIX}/include/openvdb/openvdb.h",
+       "test -f ${PREFIX}/lib/cmake/OpenVDB/FindOpenVDB.cmake",
+       "test -f ${PREFIX}/lib/libopenvdb${SHLIB_EXT}"
+      ]
+     }
+    ]
+   },
+   {
+    "build": {
+     "strong": [],
+     "weak": [
+      "nanovdb"
+     ]
+    },
+    "name": "nanovdb",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "nanobind",
+      "python",
+      "make"
+     ],
+     "host": [
+      "nanobind",
+      "python",
+      "tbb-devel",
+      "zlib",
+      "openvdb"
+     ],
+     "run": [
+      "python"
+     ]
+    },
+    "tests": [
+     {
+      "python": {
+       "imports": [
+        "nanovdb"
+       ]
+      }
+     },
+     {
+      "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+     }
+    ]
+   },
+   {
+    "build": null,
+    "name": "nanovdb-tools",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "make"
+     ],
+     "host": [
+      "libboost-devel",
+      "tbb-devel",
+      "zlib",
+      "openvdb",
+      "nanovdb"
+     ],
+     "run": []
+    },
+    "tests": [
+     {
+      "script": [
+       "nanovdb_convert --help",
+       "nanovdb_print --help",
+       "nanovdb_validate --help"
+      ]
+     }
+    ]
+   },
+   {
+    "build": null,
+    "name": "openvdb-tools",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "blosc",
+      "libboost-devel",
+      "make"
+     ],
+     "host": [
+      "glfw",
+      "tbb-devel",
+      "zlib",
+      "libgl-devel",
+      "libglu",
+      "jemalloc",
+      "openvdb"
+     ],
+     "run": []
+    },
+    "tests": [
+     {
+      "script": [
+       "vdb_print --help",
+       "vdb_lod --help",
+       "vdb_render --help",
+       "vdb_tool --help"
+      ]
+     }
+    ]
+   },
+   {
+    "build": {
+     "strong": [],
+     "weak": [
+      "openvdb"
+     ]
+    },
+    "name": "openvdb",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "nanobind",
+      "pkg-config",
+      "python",
+      "zlib",
+      "jemalloc",
+      "make"
+     ],
+     "host": [
+      "blosc",
+      "libboost-devel",
+      "nanobind",
+      "numpy >=1.23.0",
+      "python",
+      "tbb-devel",
+      "zlib"
+     ],
+     "run": [
+      "python",
+      "numpy"
+     ]
+    },
+    "tests": [
+     {
+      "python": {
+       "imports": [
+        "openvdb"
+       ]
+      }
+     },
+     {
+      "requirements": {
+       "run": [
+        "numpy"
+       ]
+      },
+      "script": "python -c \"import openvdb; import numpy; grid = openvdb.FloatGrid(); grid.copyFromArray(numpy.random.rand(200, 200, 200))\""
+     },
+     {
+      "script": [
+       "test -f ${PREFIX}/include/openvdb/openvdb.h",
+       "test -f ${PREFIX}/lib/cmake/OpenVDB/FindOpenVDB.cmake",
+       "test -f ${PREFIX}/lib/libopenvdb${SHLIB_EXT}"
+      ]
+     }
+    ]
+   },
+   {
+    "build": {
+     "strong": [],
+     "weak": [
+      "nanovdb"
+     ]
+    },
+    "name": "nanovdb",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "nanobind",
+      "python",
+      "make"
+     ],
+     "host": [
+      "nanobind",
+      "python",
+      "tbb-devel",
+      "zlib",
+      "openvdb"
+     ],
+     "run": [
+      "python"
+     ]
+    },
+    "tests": [
+     {
+      "python": {
+       "imports": [
+        "nanovdb"
+       ]
+      }
+     },
+     {
+      "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+     }
+    ]
+   },
+   {
+    "build": null,
+    "name": "nanovdb-tools",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "make"
+     ],
+     "host": [
+      "libboost-devel",
+      "tbb-devel",
+      "zlib",
+      "openvdb",
+      "nanovdb"
+     ],
+     "run": []
+    },
+    "tests": [
+     {
+      "script": [
+       "nanovdb_convert --help",
+       "nanovdb_print --help",
+       "nanovdb_validate --help"
+      ]
+     }
+    ]
+   },
+   {
+    "build": null,
+    "name": "openvdb-tools",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "blosc",
+      "libboost-devel",
+      "make"
+     ],
+     "host": [
+      "glfw",
+      "tbb-devel",
+      "zlib",
+      "libgl-devel",
+      "libglu",
+      "jemalloc",
+      "openvdb"
+     ],
+     "run": []
+    },
+    "tests": [
+     {
+      "script": [
+       "vdb_print --help",
+       "vdb_lod --help",
+       "vdb_render --help",
+       "vdb_tool --help"
+      ]
+     }
+    ]
+   }
+  ],
   "package": {
    "name": "openvdb",
    "version": "12.0.0"
@@ -159,144 +2179,625 @@
    "build": [
     "cxx_compiler_stub",
     "c_stdlib_stub",
-    "cdt_stub",
     "cmake",
     "libboost-devel",
-    "make",
     "nanobind",
-    "python"
-   ],
-   "host": [
-    "blosc",
-    "glfw",
-    "jemalloc",
-    "libboost-devel",
-    "numpy >=1.23.0",
-    "nanobind",
+    "pkg-config",
     "python",
-    "tbb-devel",
     "zlib",
-    "glew"
-   ],
-   "run": [
-    "numpy",
-    "python"
-   ]
-  },
-  "schema_version": 0,
-  "source": {
-   "sha256": "23ceb5b18a851f45af118f718a9dd3001efaee364e3f623c37ffbdad03b8905f",
-   "url": "https://github.com/AcademySoftwareFoundation/openvdb/archive/refs/tags/v12.0.0.tar.gz"
-  },
-  "test": {
-   "commands": [
-    "test -f ${PREFIX}/bin/vdb_print",
-    "test -f ${PREFIX}/bin/vdb_view",
-    "test -f ${PREFIX}/include/openvdb/openvdb.h",
-    "test -f ${PREFIX}/lib/cmake/OpenVDB/FindOpenVDB.cmake",
-    "test -f ${PREFIX}/lib/libopenvdb${SHLIB_EXT}",
-    "vdb_print --help",
-    "python -c \"import openvdb; import numpy; grid = openvdb.FloatGrid(); grid.copyFromArray(numpy.random.rand(200, 200, 200))\"",
-    "if not exist %LIBRARY_BIN%\\openvdb%SHLIB_EXT% exit 1",
-    "if not exist %LIBRARY_BIN%\\vdb_print.exe exit 1",
-    "if not exist %LIBRARY_BIN%\\vdb_view.exe exit 1",
-    "if not exist %LIBRARY_INC%\\openvdb\\openvdb.h exit 1",
-    "if not exist %LIBRARY_LIB%\\cmake\\OpenVDB\\FindOpenVDB.cmake exit 1",
-    "if not exist %LIBRARY_LIB%\\openvdb.lib exit 1"
-   ],
-   "imports": [
-    "openvdb"
-   ],
-   "requires": [
-    "numpy"
-   ]
-  }
- },
- "name": "openvdb",
- "osx_64_meta_yaml": {
-  "about": {
-   "description": "OpenVDB is an open source C++ library comprising a novel hierarchical data structure and a large suite of tools for the efficient storage and manipulation of sparse volumetric data discretized on three-dimensional grids. It was developed by DreamWorks Animation for use in volumetric applications typically encountered in feature film production.\n",
-   "dev_url": "https://github.com/AcademySoftwareFoundation/openvdb",
-   "home": "https://github.com/AcademySoftwareFoundation/openvdb",
-   "license": "MPL-2.0",
-   "license_file": "LICENSE",
-   "summary": "OpenVDB - Sparse volume data structure and tools"
-  },
-  "build": {
-   "number": "0",
-   "run_exports": [
-    "openvdb"
-   ]
-  },
-  "extra": {
-   "recipe-maintainers": [
-    "versatran01",
-    "tetov"
-   ]
-  },
-  "package": {
-   "name": "openvdb",
-   "version": "12.0.0"
-  },
-  "requirements": {
-   "build": [
-    "cxx_compiler_stub",
-    "c_stdlib_stub",
-    "cmake",
-    "libboost-devel",
-    "make",
-    "nanobind",
-    "python"
+    "jemalloc",
+    "make"
    ],
    "host": [
     "blosc",
-    "glfw",
     "libboost-devel",
-    "numpy >=1.23.0",
     "nanobind",
+    "numpy >=1.23.0",
     "python",
     "tbb-devel",
     "zlib"
    ],
    "run": [
-    "numpy",
-    "python"
+    "python",
+    "numpy"
    ]
   },
-  "schema_version": 0,
+  "schema_version": 1,
   "source": {
    "sha256": "23ceb5b18a851f45af118f718a9dd3001efaee364e3f623c37ffbdad03b8905f",
    "url": "https://github.com/AcademySoftwareFoundation/openvdb/archive/refs/tags/v12.0.0.tar.gz"
+  }
+ },
+ "name": "openvdb",
+ "osx_64_meta_yaml": {
+  "about": {
+   "description": "OpenVDB is an open source C++ library comprising a novel hierarchical data structure and a large suite of tools for the efficient storage and manipulation of sparse volumetric data discretized on three-dimensional grids. It was developed by DreamWorks Animation for use in volumetric applications typically encountered in feature film production.",
+   "dev_url": "https://github.com/AcademySoftwareFoundation/openvdb",
+   "home": "https://github.com/AcademySoftwareFoundation/openvdb",
+   "license": "Apache-2.0",
+   "license_family": "Apache-2.0",
+   "license_file": "LICENSE",
+   "summary": "OpenVDB - Sparse volume data structure and tools"
   },
-  "test": {
-   "commands": [
-    "test -f ${PREFIX}/bin/vdb_print",
-    "test -f ${PREFIX}/bin/vdb_view",
-    "test -f ${PREFIX}/include/openvdb/openvdb.h",
-    "test -f ${PREFIX}/lib/cmake/OpenVDB/FindOpenVDB.cmake",
-    "test -f ${PREFIX}/lib/libopenvdb${SHLIB_EXT}",
-    "vdb_print --help",
-    "python -c \"import openvdb; import numpy; grid = openvdb.FloatGrid(); grid.copyFromArray(numpy.random.rand(200, 200, 200))\""
+  "build": {
+   "number": "4",
+   "run_exports": {
+    "weak": [
+     "openvdb"
+    ]
+   },
+   "script": {
+    "content": [
+     "mkdir -p build",
+     "cd build",
+     "cmake .. $CMAKE_ARGS $SHARED_CMAKE_ARGS $OUTPUT_CMAKE_ARGS -Dnanobind_DIR=$SP_DIR/nanobind/cmake",
+     "cmake --build . --target install --config Release"
+    ],
+    "env": {
+     "CMAKE_BUILD_PARALLEL_LEVEL": "$CPU_COUNT",
+     "OUTPUT_CMAKE_ARGS": "-DOPENVDB_BUILD_CORE=ON -DOPENVDB_CORE_SHARED=ON -DOPENVDB_CORE_STATIC=OFF -DOPENVDB_INSTALL_CMAKE_MODULES=ON -DOPENVDB_BUILD_PYTHON_MODULE=ON -DUSE_NUMPY=ON",
+     "SHARED_CMAKE_ARGS": "-Wno-dev -DOPENVDB_BUILD_CORE=OFF -DOPENVDB_BUILD_BINARIES=OFF -DOPENVDB_INSTALL_CMAKE_MODULES=OFF -DNANOVDB_BUILD_TOOLS=OFF -DUSE_EXPLICIT_INSTANTIATION=OFF"
+    }
+   }
+  },
+  "extra": {
+   "recipe-maintainers": [
+    "versatran01",
+    "tetov"
+   ]
+  },
+  "outputs": [
+   {
+    "build": {
+     "strong": [],
+     "weak": [
+      "openvdb"
+     ]
+    },
+    "name": "openvdb",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "nanobind",
+      "pkg-config",
+      "python",
+      "zlib",
+      "jemalloc",
+      "make"
+     ],
+     "host": [
+      "blosc",
+      "libboost-devel",
+      "nanobind",
+      "numpy >=1.23.0",
+      "python",
+      "tbb-devel",
+      "zlib"
+     ],
+     "run": [
+      "python",
+      "numpy"
+     ]
+    },
+    "tests": [
+     {
+      "python": {
+       "imports": [
+        "openvdb"
+       ]
+      }
+     },
+     {
+      "requirements": {
+       "run": [
+        "numpy"
+       ]
+      },
+      "script": "python -c \"import openvdb; import numpy; grid = openvdb.FloatGrid(); grid.copyFromArray(numpy.random.rand(200, 200, 200))\""
+     },
+     {
+      "script": [
+       "test -f ${PREFIX}/include/openvdb/openvdb.h",
+       "test -f ${PREFIX}/lib/cmake/OpenVDB/FindOpenVDB.cmake",
+       "test -f ${PREFIX}/lib/libopenvdb${SHLIB_EXT}"
+      ]
+     }
+    ]
+   },
+   {
+    "build": {
+     "strong": [],
+     "weak": [
+      "nanovdb"
+     ]
+    },
+    "name": "nanovdb",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "nanobind",
+      "python",
+      "make"
+     ],
+     "host": [
+      "nanobind",
+      "python",
+      "tbb-devel",
+      "zlib",
+      "openvdb"
+     ],
+     "run": [
+      "python"
+     ]
+    },
+    "tests": [
+     {
+      "python": {
+       "imports": [
+        "nanovdb"
+       ]
+      }
+     },
+     {
+      "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+     }
+    ]
+   },
+   {
+    "build": null,
+    "name": "nanovdb-tools",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "make"
+     ],
+     "host": [
+      "libboost-devel",
+      "tbb-devel",
+      "zlib",
+      "openvdb",
+      "nanovdb"
+     ],
+     "run": []
+    },
+    "tests": [
+     {
+      "script": [
+       "nanovdb_convert --help",
+       "nanovdb_print --help",
+       "nanovdb_validate --help"
+      ]
+     }
+    ]
+   },
+   {
+    "build": null,
+    "name": "openvdb-tools",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "blosc",
+      "libboost-devel",
+      "make"
+     ],
+     "host": [
+      "glfw",
+      "tbb-devel",
+      "zlib",
+      "libgl-devel",
+      "libglu",
+      "jemalloc",
+      "openvdb"
+     ],
+     "run": []
+    },
+    "tests": [
+     {
+      "script": [
+       "vdb_print --help",
+       "vdb_lod --help",
+       "vdb_render --help",
+       "vdb_tool --help"
+      ]
+     }
+    ]
+   },
+   {
+    "build": {
+     "strong": [],
+     "weak": [
+      "openvdb"
+     ]
+    },
+    "name": "openvdb",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "nanobind",
+      "pkg-config",
+      "python",
+      "zlib",
+      "jemalloc",
+      "make"
+     ],
+     "host": [
+      "blosc",
+      "libboost-devel",
+      "nanobind",
+      "numpy >=1.23.0",
+      "python",
+      "tbb-devel",
+      "zlib"
+     ],
+     "run": [
+      "python",
+      "numpy"
+     ]
+    },
+    "tests": [
+     {
+      "python": {
+       "imports": [
+        "openvdb"
+       ]
+      }
+     },
+     {
+      "requirements": {
+       "run": [
+        "numpy"
+       ]
+      },
+      "script": "python -c \"import openvdb; import numpy; grid = openvdb.FloatGrid(); grid.copyFromArray(numpy.random.rand(200, 200, 200))\""
+     },
+     {
+      "script": [
+       "test -f ${PREFIX}/include/openvdb/openvdb.h",
+       "test -f ${PREFIX}/lib/cmake/OpenVDB/FindOpenVDB.cmake",
+       "test -f ${PREFIX}/lib/libopenvdb${SHLIB_EXT}"
+      ]
+     }
+    ]
+   },
+   {
+    "build": {
+     "strong": [],
+     "weak": [
+      "nanovdb"
+     ]
+    },
+    "name": "nanovdb",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "nanobind",
+      "python",
+      "make"
+     ],
+     "host": [
+      "nanobind",
+      "python",
+      "tbb-devel",
+      "zlib",
+      "openvdb"
+     ],
+     "run": [
+      "python"
+     ]
+    },
+    "tests": [
+     {
+      "python": {
+       "imports": [
+        "nanovdb"
+       ]
+      }
+     },
+     {
+      "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+     }
+    ]
+   },
+   {
+    "build": null,
+    "name": "nanovdb-tools",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "make"
+     ],
+     "host": [
+      "libboost-devel",
+      "tbb-devel",
+      "zlib",
+      "openvdb",
+      "nanovdb"
+     ],
+     "run": []
+    },
+    "tests": [
+     {
+      "script": [
+       "nanovdb_convert --help",
+       "nanovdb_print --help",
+       "nanovdb_validate --help"
+      ]
+     }
+    ]
+   },
+   {
+    "build": null,
+    "name": "openvdb-tools",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "blosc",
+      "libboost-devel",
+      "make"
+     ],
+     "host": [
+      "glfw",
+      "tbb-devel",
+      "zlib",
+      "libgl-devel",
+      "libglu",
+      "jemalloc",
+      "openvdb"
+     ],
+     "run": []
+    },
+    "tests": [
+     {
+      "script": [
+       "vdb_print --help",
+       "vdb_lod --help",
+       "vdb_render --help",
+       "vdb_tool --help"
+      ]
+     }
+    ]
+   },
+   {
+    "build": {
+     "strong": [],
+     "weak": [
+      "openvdb"
+     ]
+    },
+    "name": "openvdb",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "nanobind",
+      "pkg-config",
+      "python",
+      "zlib",
+      "jemalloc",
+      "make"
+     ],
+     "host": [
+      "blosc",
+      "libboost-devel",
+      "nanobind",
+      "numpy >=1.23.0",
+      "python",
+      "tbb-devel",
+      "zlib"
+     ],
+     "run": [
+      "python",
+      "numpy"
+     ]
+    },
+    "tests": [
+     {
+      "python": {
+       "imports": [
+        "openvdb"
+       ]
+      }
+     },
+     {
+      "requirements": {
+       "run": [
+        "numpy"
+       ]
+      },
+      "script": "python -c \"import openvdb; import numpy; grid = openvdb.FloatGrid(); grid.copyFromArray(numpy.random.rand(200, 200, 200))\""
+     },
+     {
+      "script": [
+       "test -f ${PREFIX}/include/openvdb/openvdb.h",
+       "test -f ${PREFIX}/lib/cmake/OpenVDB/FindOpenVDB.cmake",
+       "test -f ${PREFIX}/lib/libopenvdb${SHLIB_EXT}"
+      ]
+     }
+    ]
+   },
+   {
+    "build": {
+     "strong": [],
+     "weak": [
+      "nanovdb"
+     ]
+    },
+    "name": "nanovdb",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "nanobind",
+      "python",
+      "make"
+     ],
+     "host": [
+      "nanobind",
+      "python",
+      "tbb-devel",
+      "zlib",
+      "openvdb"
+     ],
+     "run": [
+      "python"
+     ]
+    },
+    "tests": [
+     {
+      "python": {
+       "imports": [
+        "nanovdb"
+       ]
+      }
+     },
+     {
+      "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+     }
+    ]
+   },
+   {
+    "build": null,
+    "name": "nanovdb-tools",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "make"
+     ],
+     "host": [
+      "libboost-devel",
+      "tbb-devel",
+      "zlib",
+      "openvdb",
+      "nanovdb"
+     ],
+     "run": []
+    },
+    "tests": [
+     {
+      "script": [
+       "nanovdb_convert --help",
+       "nanovdb_print --help",
+       "nanovdb_validate --help"
+      ]
+     }
+    ]
+   },
+   {
+    "build": null,
+    "name": "openvdb-tools",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "blosc",
+      "libboost-devel",
+      "make"
+     ],
+     "host": [
+      "glfw",
+      "tbb-devel",
+      "zlib",
+      "libgl-devel",
+      "libglu",
+      "jemalloc",
+      "openvdb"
+     ],
+     "run": []
+    },
+    "tests": [
+     {
+      "script": [
+       "vdb_print --help",
+       "vdb_lod --help",
+       "vdb_render --help",
+       "vdb_tool --help"
+      ]
+     }
+    ]
+   }
+  ],
+  "package": {
+   "name": "openvdb",
+   "version": "12.0.0"
+  },
+  "requirements": {
+   "build": [
+    "cxx_compiler_stub",
+    "c_stdlib_stub",
+    "cmake",
+    "libboost-devel",
+    "nanobind",
+    "pkg-config",
+    "python",
+    "zlib",
+    "jemalloc",
+    "make"
    ],
-   "imports": [
-    "openvdb"
+   "host": [
+    "blosc",
+    "libboost-devel",
+    "nanobind",
+    "numpy >=1.23.0",
+    "python",
+    "tbb-devel",
+    "zlib"
    ],
-   "requires": [
+   "run": [
+    "python",
     "numpy"
    ]
+  },
+  "schema_version": 1,
+  "source": {
+   "sha256": "23ceb5b18a851f45af118f718a9dd3001efaee364e3f623c37ffbdad03b8905f",
+   "url": "https://github.com/AcademySoftwareFoundation/openvdb/archive/refs/tags/v12.0.0.tar.gz"
   }
  },
  "osx_64_requirements": {
   "build": {
    "__set__": true,
    "elements": [
+    "blosc",
     "c_stdlib_stub",
     "cmake",
     "cxx_compiler_stub",
+    "jemalloc",
     "libboost-devel",
     "make",
     "nanobind",
-    "python"
+    "pkg-config",
+    "python",
+    "zlib"
    ]
   },
   "host": {
@@ -304,9 +2805,14 @@
    "elements": [
     "blosc",
     "glfw",
+    "jemalloc",
     "libboost-devel",
+    "libgl-devel",
+    "libglu",
     "nanobind",
+    "nanovdb",
     "numpy",
+    "openvdb",
     "python",
     "tbb-devel",
     "zlib"
@@ -322,17 +2828,21 @@
   "test": {
    "__set__": true,
    "elements": [
-    "numpy"
+    "numpy",
+    "pip"
    ]
   }
  },
  "outputs_names": {
   "__set__": true,
   "elements": [
-   "openvdb"
+   "nanovdb",
+   "nanovdb-tools",
+   "openvdb",
+   "openvdb-tools"
   ]
  },
- "parsing_error": "feedstock parsing error: Error running 'conda-forge-tick-container parse-feedstock --existing-feedstock-node-attrs - --log-level info --mark-not-archived' in container - error TypeError raised:\n\"unhashable type: 'dict'\"\nTraceback (most recent call last):\n  File \"/home/runner/work/cf-scripts/cf-scripts/cf-scripts/conda_forge_tick/make_graph.py\", line 102, in try_load_feedstock\n    data = load_feedstock(name, attrs.data, mark_not_archived=mark_not_archived)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/runner/work/cf-scripts/cf-scripts/cf-scripts/conda_forge_tick/feedstock_parser.py\", line 705, in load_feedstock\n    return load_feedstock_containerized(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/runner/work/cf-scripts/cf-scripts/cf-scripts/conda_forge_tick/feedstock_parser.py\", line 657, in load_feedstock_containerized\n    data = run_container_operation(\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/runner/micromamba/envs/cf-scripts/lib/python3.11/site-packages/conda_forge_feedstock_ops/container_utils.py\", line 221, in run_container_operation\n    raise ContainerRuntimeError(\nconda_forge_feedstock_ops.container_utils.ContainerRuntimeError: Error running 'conda-forge-tick-container parse-feedstock --existing-feedstock-node-attrs - --log-level info --mark-not-archived' in container - error TypeError raised:\n\"unhashable type: 'dict'\"\n",
+ "parsing_error": false,
  "platforms": [
   "linux_64",
   "osx_64",
@@ -341,22 +2851,25 @@
  "pr_info": {
   "__lazy_json__": "pr_info/openvdb.json"
  },
- "raw_meta_yaml": "{% set version = \"12.0.0\" %}\n\npackage:\n  name: openvdb\n  version: {{ version }}\n\nsource:\n  url: https://github.com/AcademySoftwareFoundation/openvdb/archive/refs/tags/v{{ version }}.tar.gz\n  sha256: 23ceb5b18a851f45af118f718a9dd3001efaee364e3f623c37ffbdad03b8905f\n\nbuild:\n  number: 0\n  skip: true  # [py<310]\n  run_exports:\n    - {{ pin_subpackage('openvdb', max_pin='x') }}\n\nrequirements:\n  build:\n    - {{ compiler('cxx') }}\n    - {{ stdlib(\"c\") }}\n    - {{ cdt('mesa-libgl-devel') }}  # [linux]\n    - {{ cdt('mesa-libglu-devel') }}  # [linux]\n    - {{ cdt('mesa-dri-drivers') }}  # [linux]\n    - {{ cdt('libselinux') }}  # [linux]\n    - {{ cdt('libxdamage') }}  # [linux]\n    - {{ cdt('libxxf86vm') }}  # [linux]\n    - {{ cdt('libxext') }}     # [linux]\n    - cmake\n    - libboost-devel\n    - make  # [unix]\n    - nanobind\n    - python\n    - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n    - numpy                                  # [build_platform != target_platform]\n\n  host:\n    - blosc\n    - glew  # [win]\n    - glfw\n    - jemalloc  # [linux]\n    - libboost-devel\n    - numpy >=1.23.0\n    - nanobind\n    - python\n    - tbb-devel\n    - zlib\n\n  run:\n    - {{ pin_compatible('numpy') }}\n    - python\n\ntest:\n  requires:\n    - numpy\n\n  commands:\n    - test -f ${PREFIX}/bin/vdb_print  # [unix]\n    - test -f ${PREFIX}/bin/vdb_view   # [unix]\n    - test -f ${PREFIX}/include/openvdb/openvdb.h  # [unix]\n    - test -f ${PREFIX}/lib/cmake/OpenVDB/FindOpenVDB.cmake  # [unix]\n    - test -f ${PREFIX}/lib/libopenvdb${SHLIB_EXT}  # [unix]\n    - if not exist %LIBRARY_BIN%\\openvdb%SHLIB_EXT% exit 1  # [win]\n    - if not exist %LIBRARY_BIN%\\vdb_print.exe exit 1  # [win]\n    - if not exist %LIBRARY_BIN%\\vdb_view.exe exit 1  # [win]\n    - if not exist %LIBRARY_INC%\\openvdb\\openvdb.h exit 1  # [win]\n    - if not exist %LIBRARY_LIB%\\cmake\\OpenVDB\\FindOpenVDB.cmake exit 1  # [win]\n    - if not exist %LIBRARY_LIB%\\openvdb.lib exit 1  # [win]\n    - vdb_print --help\n    # test numpy support\n    - python -c \"import openvdb; import numpy; grid = openvdb.FloatGrid(); grid.copyFromArray(numpy.random.rand(200, 200, 200))\"\n  imports:\n    - openvdb\n\nabout:\n  home: https://github.com/AcademySoftwareFoundation/openvdb\n  summary: 'OpenVDB - Sparse volume data structure and tools'\n  description: |\n    OpenVDB is an open source C++ library comprising a novel hierarchical data structure and a large suite of tools for the efficient storage and manipulation of sparse volumetric data discretized on three-dimensional grids. It was developed by DreamWorks Animation for use in volumetric applications typically encountered in feature film production.\n  license: MPL-2.0\n  license_file: LICENSE\n  dev_url: https://github.com/AcademySoftwareFoundation/openvdb\n\nextra:\n  recipe-maintainers:\n    - versatran01\n    - tetov\n",
+ "raw_meta_yaml": "context:\n  version: 12.0.0\n  build_num: 4\n  nanovdb_version: 32.7.0\n  shared_cmake_args: >\n    -Wno-dev\n    -DOPENVDB_BUILD_CORE=OFF\n    -DOPENVDB_BUILD_BINARIES=OFF\n    -DOPENVDB_INSTALL_CMAKE_MODULES=OFF\n    -DNANOVDB_BUILD_TOOLS=OFF\n    -DUSE_EXPLICIT_INSTANTIATION=OFF\n\nrecipe:\n  name: openvdb-split\n  version: ${{ version }}\n\nsource:\n  url: https://github.com/AcademySoftwareFoundation/openvdb/archive/refs/tags/v${{ version }}.tar.gz\n  sha256: 23ceb5b18a851f45af118f718a9dd3001efaee364e3f623c37ffbdad03b8905f\n\nbuild:\n  number: ${{ build_num }}\n  skip: match(python, \"<=3.10\")\n\noutputs:\n  - package:\n      name: openvdb\n    requirements:\n      build:\n        - ${{ compiler('cxx') }}\n        - ${{ stdlib(\"c\") }}\n        - cmake\n        - libboost-devel\n        - nanobind\n        - pkg-config\n        - python\n        - zlib\n        - ${{ \"jemalloc\" if linux }}\n        - ${{ \"make\" if not win }}\n      host:\n        - blosc\n        - libboost-devel\n        - nanobind\n        - numpy >=1.23.0\n        - python\n        - tbb-devel\n        - zlib\n        - ${{ \"glew\" if win }}\n      run:\n        - python\n        - numpy\n      run_exports:\n        - ${{ pin_subpackage('openvdb', upper_bound='x') }}\n\n    build:\n      script:\n        env:\n          SHARED_CMAKE_ARGS: ${{ shared_cmake_args }}\n          OUTPUT_CMAKE_ARGS: >\n            -DOPENVDB_BUILD_CORE=ON\n            -DOPENVDB_CORE_SHARED=ON\n            -DOPENVDB_CORE_STATIC=OFF\n            -DOPENVDB_INSTALL_CMAKE_MODULES=ON\n            -DOPENVDB_BUILD_PYTHON_MODULE=ON\n            -DUSE_NUMPY=ON\n          CMAKE_BUILD_PARALLEL_LEVEL: ${{ \"%CPU_COUNT%\" if win else \"$CPU_COUNT\" }}\n        content:\n          - mkdir -p build\n          - cd build\n          - if: win\n            then: >\n              cmake ..\n              %CMAKE_ARGS%\n              %SHARED_CMAKE_ARGS%\n              %OUTPUT_CMAKE_ARGS%\n              -DVDB_PYTHON_INSTALL_DIRECTORY=\"%PREFIX%/Lib/site-packages\"\n              -Dnanobind_DIR=%SP_DIR%/nanobind/cmake\n            else: >\n              cmake ..\n              $CMAKE_ARGS\n              $SHARED_CMAKE_ARGS\n              $OUTPUT_CMAKE_ARGS\n              -Dnanobind_DIR=$SP_DIR/nanobind/cmake\n          - cmake --build . --target install --config Release\n\n    tests:\n      - python:\n          imports:\n            - openvdb\n          pip_check: true\n      - script: python -c \"import openvdb; import numpy; grid = openvdb.FloatGrid(); grid.copyFromArray(numpy.random.rand(200, 200, 200))\"\n        requirements:\n          run: [numpy]\n      - script:\n          - if: win\n            then:\n              - if not exist %LIBRARY_BIN%\\openvdb%SHLIB_EXT% exit 1\n              - if not exist %LIBRARY_INC%\\openvdb\\openvdb.h exit 1\n              - if not exist %LIBRARY_LIB%\\cmake\\OpenVDB\\FindOpenVDB.cmake exit 1\n            else:\n              - test -f ${PREFIX}/include/openvdb/openvdb.h\n              - test -f ${PREFIX}/lib/cmake/OpenVDB/FindOpenVDB.cmake\n              - test -f ${PREFIX}/lib/libopenvdb${SHLIB_EXT}\n\n  - package:\n      name: openvdb-tools\n\n    requirements:\n      build:\n        - ${{ compiler('cxx') }}\n        - ${{ stdlib(\"c\") }}\n        - cmake\n        - blosc\n        - libboost-devel\n        - ${{ \"make\" if not win }}\n      host:\n        - glfw\n        - tbb-devel\n        - zlib\n        - if: linux\n          then:\n            - libgl-devel\n            - libglu\n        - ${{ \"jemalloc\" if linux }}\n        - ${{ pin_subpackage('openvdb', upper_bound='x') }}\n\n    build:\n      script:\n        env:\n          SHARED_CMAKE_ARGS: ${{ shared_cmake_args }}\n          OUTPUT_CMAKE_ARGS: >\n            -DOPENVDB_BUILD_BINARIES=ON\n            -DOPENVDB_BUILD_VDB_PRINT=ON\n            -DOPENVDB_BUILD_VDB_LOD=ON \n            -DOPENVDB_BUILD_VDB_RENDER=ON\n            -DOPENVDB_BUILD_VDB_VIEW=ON\n            -DOPENVDB_BUILD_VDB_TOOL=ON\n          CMAKE_BUILD_PARALLEL_LEVEL: ${{ \"%CPU_COUNT%\" if win else \"$CPU_COUNT\" }}\n        content:\n          - mkdir -p build\n          - cd build\n          - if: win\n            then: cmake .. %CMAKE_ARGS% %SHARED_CMAKE_ARGS% %OUTPUT_CMAKE_ARGS%\n            else: cmake .. $CMAKE_ARGS $SHARED_CMAKE_ARGS $OUTPUT_CMAKE_ARGS\n          - cmake --build . --target install --config Release\n\n    tests:\n      - script:\n          - vdb_print --help\n          - vdb_lod --help\n          - vdb_render --help\n          - vdb_tool --help\n\n  - package:\n      name: nanovdb\n      version: ${{ nanovdb_version }}\n\n    requirements:\n      build:\n        - ${{ compiler('cxx') }}\n        - ${{ stdlib(\"c\") }}\n        - cmake\n        - libboost-devel\n        - nanobind\n        - python\n        - ${{ \"make\" if not win }}\n      host:\n        - nanobind\n        - python\n        - tbb-devel\n        - zlib\n        - ${{ pin_subpackage('openvdb', upper_bound='x') }}\n      run:\n        - python\n      run_exports:\n        - ${{ pin_subpackage('nanovdb', upper_bound='x.x') }}\n\n    build:\n      script:\n        env:\n          SHARED_CMAKE_ARGS: ${{ shared_cmake_args }}\n          OUTPUT_CMAKE_ARGS: >\n            -DOPENVDB_BUILD_NANOVDB=ON\n            -DNANOVDB_USE_OPENVDB=ON\n            -DNANOVDB_BUILD_PYTHON_MODULE=ON\n            -DNANOVDB_USE_TBB=ON\n          CMAKE_BUILD_PARALLEL_LEVEL: ${{ \"%CPU_COUNT%\" if win else \"$CPU_COUNT\" }}\n        content:\n          - mkdir -p build\n          - cd build\n          - if: win\n            then: >\n              cmake .. \n              %CMAKE_ARGS% \n              %SHARED_CMAKE_ARGS% \n              %OUTPUT_CMAKE_ARGS%\n              -DVDB_PYTHON_INSTALL_DIRECTORY=\"%PREFIX%/Lib/site-packages\"\n              -Dnanobind_DIR=%SP_DIR%/nanobind/cmake\n            else: >\n              cmake .. \n              $CMAKE_ARGS \n              $SHARED_CMAKE_ARGS \n              $OUTPUT_CMAKE_ARGS\n              -Dnanobind_DIR=$SP_DIR/nanobind/cmake\n          - cmake --build . --target install --config Release\n\n    tests:\n      - python:\n          imports:\n            - nanovdb\n          pip_check: true\n      - script:\n          - if: win\n            then:\n              - if not exist %LIBRARY_INC%\\nanovdb\\NanoVDB.h exit 1\n            else:\n              - test -f ${PREFIX}/include/nanovdb/NanoVDB.h\n\n  - package:\n      name: nanovdb-tools\n\n    requirements:\n      build:\n        - ${{ compiler('cxx') }}\n        - ${{ stdlib(\"c\") }}\n        - cmake\n        - libboost-devel\n        - ${{ \"make\" if not win }}\n      host:\n        - libboost-devel\n        - tbb-devel\n        - zlib\n        - ${{ pin_subpackage('openvdb', upper_bound='x') }}\n        - ${{ pin_subpackage('nanovdb', upper_bound='x.x') }}\n\n    build:\n      script:\n        env:\n          SHARED_CMAKE_ARGS: ${{ shared_cmake_args }}\n          CMAKE_BUILD_PARALLEL_LEVEL: ${{ \"%CPU_COUNT%\" if win else \"$CPU_COUNT\" }}\n        content:\n          - mkdir -p build\n          - cd build\n          - if: win\n            then: >\n              cmake .. \n              %CMAKE_ARGS% \n              %SHARED_CMAKE_ARGS%\n              -DOPENVDB_BUILD_NANOVDB=ON \n              -DNANOVDB_USE_OPENVDB=ON\n              -DNANOVDB_BUILD_TOOLS=ON\n            else: >\n              cmake ..\n              $CMAKE_ARGS\n              $SHARED_CMAKE_ARGS\n              -DOPENVDB_BUILD_NANOVDB=ON \n              -DNANOVDB_USE_OPENVDB=ON\n              -DNANOVDB_BUILD_TOOLS=ON\n          - cmake --build . --target install --config Release\n\n    tests:\n      - script:\n          - nanovdb_convert --help\n          - nanovdb_print --help\n          - nanovdb_validate --help\n\nabout:\n  summary: OpenVDB - Sparse volume data structure and tools\n  description: |\n    OpenVDB is an open source C++ library comprising a novel hierarchical data structure and a large suite of tools for the efficient storage and manipulation of sparse volumetric data discretized on three-dimensional grids. It was developed by DreamWorks Animation for use in volumetric applications typically encountered in feature film production.\n  license: Apache-2.0\n  license_file: LICENSE\n  homepage: https://github.com/AcademySoftwareFoundation/openvdb\n  repository: https://github.com/AcademySoftwareFoundation/openvdb\n\nextra:\n  recipe-maintainers:\n    - versatran01\n    - tetov\n",
  "req": {
   "__set__": true,
   "elements": [
    "blosc",
    "c_stdlib_stub",
-   "cdt_stub",
    "cmake",
    "cxx_compiler_stub",
-   "glew",
    "glfw",
    "jemalloc",
    "libboost-devel",
+   "libgl-devel",
+   "libglu",
    "make",
    "nanobind",
+   "nanovdb",
    "numpy",
+   "openvdb",
+   "pkg-config",
    "python",
    "tbb-devel",
    "zlib"
@@ -366,14 +2879,17 @@
   "build": {
    "__set__": true,
    "elements": [
+    "blosc",
     "c_stdlib_stub",
-    "cdt_stub",
     "cmake",
     "cxx_compiler_stub",
+    "jemalloc",
     "libboost-devel",
     "make",
     "nanobind",
-    "python"
+    "pkg-config",
+    "python",
+    "zlib"
    ]
   },
   "host": {
@@ -382,12 +2898,15 @@
     "blosc",
     "c_stdlib_stub",
     "cxx_compiler_stub",
-    "glew",
     "glfw",
     "jemalloc",
     "libboost-devel",
+    "libgl-devel",
+    "libglu",
     "nanobind",
+    "nanovdb",
     "numpy",
+    "openvdb",
     "python",
     "tbb-devel",
     "zlib"
@@ -405,7 +2924,8 @@
   "test": {
    "__set__": true,
    "elements": [
-    "numpy"
+    "numpy",
+    "pip"
    ]
   }
  },
@@ -414,26 +2934,32 @@
   "build": {
    "__set__": true,
    "elements": [
+    "blosc",
     "c_stdlib_stub",
-    "cdt_stub",
     "cmake",
     "cxx_compiler_stub",
+    "jemalloc",
     "libboost-devel",
     "make",
     "nanobind",
-    "python"
+    "pkg-config",
+    "python",
+    "zlib"
    ]
   },
   "host": {
    "__set__": true,
    "elements": [
     "blosc",
-    "glew",
     "glfw",
     "jemalloc",
     "libboost-devel",
+    "libgl-devel",
+    "libglu",
     "nanobind",
+    "nanovdb",
     "numpy >=1.23.0",
+    "openvdb",
     "python",
     "tbb-devel",
     "zlib"
@@ -449,7 +2975,8 @@
   "test": {
    "__set__": true,
    "elements": [
-    "numpy"
+    "numpy",
+    "pip"
    ]
   }
  },
@@ -460,18 +2987,34 @@
  },
  "win_64_meta_yaml": {
   "about": {
-   "description": "OpenVDB is an open source C++ library comprising a novel hierarchical data structure and a large suite of tools for the efficient storage and manipulation of sparse volumetric data discretized on three-dimensional grids. It was developed by DreamWorks Animation for use in volumetric applications typically encountered in feature film production.\n",
+   "description": "OpenVDB is an open source C++ library comprising a novel hierarchical data structure and a large suite of tools for the efficient storage and manipulation of sparse volumetric data discretized on three-dimensional grids. It was developed by DreamWorks Animation for use in volumetric applications typically encountered in feature film production.",
    "dev_url": "https://github.com/AcademySoftwareFoundation/openvdb",
    "home": "https://github.com/AcademySoftwareFoundation/openvdb",
-   "license": "MPL-2.0",
+   "license": "Apache-2.0",
+   "license_family": "Apache-2.0",
    "license_file": "LICENSE",
    "summary": "OpenVDB - Sparse volume data structure and tools"
   },
   "build": {
-   "number": "0",
-   "run_exports": [
-    "openvdb"
-   ]
+   "number": "4",
+   "run_exports": {
+    "weak": [
+     "openvdb"
+    ]
+   },
+   "script": {
+    "content": [
+     "mkdir -p build",
+     "cd build",
+     "cmake .. $CMAKE_ARGS $SHARED_CMAKE_ARGS $OUTPUT_CMAKE_ARGS -Dnanobind_DIR=$SP_DIR/nanobind/cmake",
+     "cmake --build . --target install --config Release"
+    ],
+    "env": {
+     "CMAKE_BUILD_PARALLEL_LEVEL": "$CPU_COUNT",
+     "OUTPUT_CMAKE_ARGS": "-DOPENVDB_BUILD_CORE=ON -DOPENVDB_CORE_SHARED=ON -DOPENVDB_CORE_STATIC=OFF -DOPENVDB_INSTALL_CMAKE_MODULES=ON -DOPENVDB_BUILD_PYTHON_MODULE=ON -DUSE_NUMPY=ON",
+     "SHARED_CMAKE_ARGS": "-Wno-dev -DOPENVDB_BUILD_CORE=OFF -DOPENVDB_BUILD_BINARIES=OFF -DOPENVDB_INSTALL_CMAKE_MODULES=OFF -DNANOVDB_BUILD_TOOLS=OFF -DUSE_EXPLICIT_INSTANTIATION=OFF"
+    }
+   }
   },
   "extra": {
    "recipe-maintainers": [
@@ -479,6 +3022,506 @@
     "tetov"
    ]
   },
+  "outputs": [
+   {
+    "build": {
+     "strong": [],
+     "weak": [
+      "openvdb"
+     ]
+    },
+    "name": "openvdb",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "nanobind",
+      "pkg-config",
+      "python",
+      "zlib",
+      "jemalloc",
+      "make"
+     ],
+     "host": [
+      "blosc",
+      "libboost-devel",
+      "nanobind",
+      "numpy >=1.23.0",
+      "python",
+      "tbb-devel",
+      "zlib"
+     ],
+     "run": [
+      "python",
+      "numpy"
+     ]
+    },
+    "tests": [
+     {
+      "python": {
+       "imports": [
+        "openvdb"
+       ]
+      }
+     },
+     {
+      "requirements": {
+       "run": [
+        "numpy"
+       ]
+      },
+      "script": "python -c \"import openvdb; import numpy; grid = openvdb.FloatGrid(); grid.copyFromArray(numpy.random.rand(200, 200, 200))\""
+     },
+     {
+      "script": [
+       "test -f ${PREFIX}/include/openvdb/openvdb.h",
+       "test -f ${PREFIX}/lib/cmake/OpenVDB/FindOpenVDB.cmake",
+       "test -f ${PREFIX}/lib/libopenvdb${SHLIB_EXT}"
+      ]
+     }
+    ]
+   },
+   {
+    "build": {
+     "strong": [],
+     "weak": [
+      "nanovdb"
+     ]
+    },
+    "name": "nanovdb",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "nanobind",
+      "python",
+      "make"
+     ],
+     "host": [
+      "nanobind",
+      "python",
+      "tbb-devel",
+      "zlib",
+      "openvdb"
+     ],
+     "run": [
+      "python"
+     ]
+    },
+    "tests": [
+     {
+      "python": {
+       "imports": [
+        "nanovdb"
+       ]
+      }
+     },
+     {
+      "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+     }
+    ]
+   },
+   {
+    "build": null,
+    "name": "nanovdb-tools",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "make"
+     ],
+     "host": [
+      "libboost-devel",
+      "tbb-devel",
+      "zlib",
+      "openvdb",
+      "nanovdb"
+     ],
+     "run": []
+    },
+    "tests": [
+     {
+      "script": [
+       "nanovdb_convert --help",
+       "nanovdb_print --help",
+       "nanovdb_validate --help"
+      ]
+     }
+    ]
+   },
+   {
+    "build": null,
+    "name": "openvdb-tools",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "blosc",
+      "libboost-devel",
+      "make"
+     ],
+     "host": [
+      "glfw",
+      "tbb-devel",
+      "zlib",
+      "libgl-devel",
+      "libglu",
+      "jemalloc",
+      "openvdb"
+     ],
+     "run": []
+    },
+    "tests": [
+     {
+      "script": [
+       "vdb_print --help",
+       "vdb_lod --help",
+       "vdb_render --help",
+       "vdb_tool --help"
+      ]
+     }
+    ]
+   },
+   {
+    "build": {
+     "strong": [],
+     "weak": [
+      "openvdb"
+     ]
+    },
+    "name": "openvdb",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "nanobind",
+      "pkg-config",
+      "python",
+      "zlib",
+      "jemalloc",
+      "make"
+     ],
+     "host": [
+      "blosc",
+      "libboost-devel",
+      "nanobind",
+      "numpy >=1.23.0",
+      "python",
+      "tbb-devel",
+      "zlib"
+     ],
+     "run": [
+      "python",
+      "numpy"
+     ]
+    },
+    "tests": [
+     {
+      "python": {
+       "imports": [
+        "openvdb"
+       ]
+      }
+     },
+     {
+      "requirements": {
+       "run": [
+        "numpy"
+       ]
+      },
+      "script": "python -c \"import openvdb; import numpy; grid = openvdb.FloatGrid(); grid.copyFromArray(numpy.random.rand(200, 200, 200))\""
+     },
+     {
+      "script": [
+       "test -f ${PREFIX}/include/openvdb/openvdb.h",
+       "test -f ${PREFIX}/lib/cmake/OpenVDB/FindOpenVDB.cmake",
+       "test -f ${PREFIX}/lib/libopenvdb${SHLIB_EXT}"
+      ]
+     }
+    ]
+   },
+   {
+    "build": {
+     "strong": [],
+     "weak": [
+      "nanovdb"
+     ]
+    },
+    "name": "nanovdb",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "nanobind",
+      "python",
+      "make"
+     ],
+     "host": [
+      "nanobind",
+      "python",
+      "tbb-devel",
+      "zlib",
+      "openvdb"
+     ],
+     "run": [
+      "python"
+     ]
+    },
+    "tests": [
+     {
+      "python": {
+       "imports": [
+        "nanovdb"
+       ]
+      }
+     },
+     {
+      "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+     }
+    ]
+   },
+   {
+    "build": null,
+    "name": "nanovdb-tools",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "make"
+     ],
+     "host": [
+      "libboost-devel",
+      "tbb-devel",
+      "zlib",
+      "openvdb",
+      "nanovdb"
+     ],
+     "run": []
+    },
+    "tests": [
+     {
+      "script": [
+       "nanovdb_convert --help",
+       "nanovdb_print --help",
+       "nanovdb_validate --help"
+      ]
+     }
+    ]
+   },
+   {
+    "build": null,
+    "name": "openvdb-tools",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "blosc",
+      "libboost-devel",
+      "make"
+     ],
+     "host": [
+      "glfw",
+      "tbb-devel",
+      "zlib",
+      "libgl-devel",
+      "libglu",
+      "jemalloc",
+      "openvdb"
+     ],
+     "run": []
+    },
+    "tests": [
+     {
+      "script": [
+       "vdb_print --help",
+       "vdb_lod --help",
+       "vdb_render --help",
+       "vdb_tool --help"
+      ]
+     }
+    ]
+   },
+   {
+    "build": {
+     "strong": [],
+     "weak": [
+      "openvdb"
+     ]
+    },
+    "name": "openvdb",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "nanobind",
+      "pkg-config",
+      "python",
+      "zlib",
+      "jemalloc",
+      "make"
+     ],
+     "host": [
+      "blosc",
+      "libboost-devel",
+      "nanobind",
+      "numpy >=1.23.0",
+      "python",
+      "tbb-devel",
+      "zlib"
+     ],
+     "run": [
+      "python",
+      "numpy"
+     ]
+    },
+    "tests": [
+     {
+      "python": {
+       "imports": [
+        "openvdb"
+       ]
+      }
+     },
+     {
+      "requirements": {
+       "run": [
+        "numpy"
+       ]
+      },
+      "script": "python -c \"import openvdb; import numpy; grid = openvdb.FloatGrid(); grid.copyFromArray(numpy.random.rand(200, 200, 200))\""
+     },
+     {
+      "script": [
+       "test -f ${PREFIX}/include/openvdb/openvdb.h",
+       "test -f ${PREFIX}/lib/cmake/OpenVDB/FindOpenVDB.cmake",
+       "test -f ${PREFIX}/lib/libopenvdb${SHLIB_EXT}"
+      ]
+     }
+    ]
+   },
+   {
+    "build": {
+     "strong": [],
+     "weak": [
+      "nanovdb"
+     ]
+    },
+    "name": "nanovdb",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "nanobind",
+      "python",
+      "make"
+     ],
+     "host": [
+      "nanobind",
+      "python",
+      "tbb-devel",
+      "zlib",
+      "openvdb"
+     ],
+     "run": [
+      "python"
+     ]
+    },
+    "tests": [
+     {
+      "python": {
+       "imports": [
+        "nanovdb"
+       ]
+      }
+     },
+     {
+      "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+     }
+    ]
+   },
+   {
+    "build": null,
+    "name": "nanovdb-tools",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "libboost-devel",
+      "make"
+     ],
+     "host": [
+      "libboost-devel",
+      "tbb-devel",
+      "zlib",
+      "openvdb",
+      "nanovdb"
+     ],
+     "run": []
+    },
+    "tests": [
+     {
+      "script": [
+       "nanovdb_convert --help",
+       "nanovdb_print --help",
+       "nanovdb_validate --help"
+      ]
+     }
+    ]
+   },
+   {
+    "build": null,
+    "name": "openvdb-tools",
+    "requirements": {
+     "build": [
+      "cxx_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "blosc",
+      "libboost-devel",
+      "make"
+     ],
+     "host": [
+      "glfw",
+      "tbb-devel",
+      "zlib",
+      "libgl-devel",
+      "libglu",
+      "jemalloc",
+      "openvdb"
+     ],
+     "run": []
+    },
+    "tests": [
+     {
+      "script": [
+       "vdb_print --help",
+       "vdb_lod --help",
+       "vdb_render --help",
+       "vdb_tool --help"
+      ]
+     }
+    ]
+   }
+  ],
   "package": {
    "name": "openvdb",
    "version": "12.0.0"
@@ -490,69 +3533,62 @@
     "cmake",
     "libboost-devel",
     "nanobind",
-    "python"
+    "pkg-config",
+    "python",
+    "zlib",
+    "jemalloc",
+    "make"
    ],
    "host": [
     "blosc",
-    "glew",
-    "glfw",
     "libboost-devel",
-    "numpy >=1.23.0",
     "nanobind",
+    "numpy >=1.23.0",
     "python",
     "tbb-devel",
     "zlib"
    ],
    "run": [
-    "numpy",
-    "python"
+    "python",
+    "numpy"
    ]
   },
-  "schema_version": 0,
+  "schema_version": 1,
   "source": {
    "sha256": "23ceb5b18a851f45af118f718a9dd3001efaee364e3f623c37ffbdad03b8905f",
    "url": "https://github.com/AcademySoftwareFoundation/openvdb/archive/refs/tags/v12.0.0.tar.gz"
-  },
-  "test": {
-   "commands": [
-    "if not exist %LIBRARY_BIN%\\openvdb%SHLIB_EXT% exit 1",
-    "if not exist %LIBRARY_BIN%\\vdb_print.exe exit 1",
-    "if not exist %LIBRARY_BIN%\\vdb_view.exe exit 1",
-    "if not exist %LIBRARY_INC%\\openvdb\\openvdb.h exit 1",
-    "if not exist %LIBRARY_LIB%\\cmake\\OpenVDB\\FindOpenVDB.cmake exit 1",
-    "if not exist %LIBRARY_LIB%\\openvdb.lib exit 1",
-    "vdb_print --help",
-    "python -c \"import openvdb; import numpy; grid = openvdb.FloatGrid(); grid.copyFromArray(numpy.random.rand(200, 200, 200))\""
-   ],
-   "imports": [
-    "openvdb"
-   ],
-   "requires": [
-    "numpy"
-   ]
   }
  },
  "win_64_requirements": {
   "build": {
    "__set__": true,
    "elements": [
+    "blosc",
     "c_stdlib_stub",
     "cmake",
     "cxx_compiler_stub",
+    "jemalloc",
     "libboost-devel",
+    "make",
     "nanobind",
-    "python"
+    "pkg-config",
+    "python",
+    "zlib"
    ]
   },
   "host": {
    "__set__": true,
    "elements": [
     "blosc",
-    "glew",
     "glfw",
+    "jemalloc",
     "libboost-devel",
+    "libgl-devel",
+    "libglu",
     "nanobind",
+    "nanovdb",
     "numpy",
+    "openvdb",
     "python",
     "tbb-devel",
     "zlib"
@@ -568,7 +3604,8 @@
   "test": {
    "__set__": true,
    "elements": [
-    "numpy"
+    "numpy",
+    "pip"
    ]
   }
  }
