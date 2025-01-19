@@ -2,6 +2,9 @@
  "archived": false,
  "branch": "main",
  "conda-forge.yml": {
+  "azure": {
+   "store_build_artifacts": true
+  },
   "conda_build": {
    "pkg_format": "2"
   },
@@ -9,11 +12,7 @@
   "github": {
    "branch_name": "main",
    "tooling_branch_name": "main"
-  },
-  "noarch_platforms": [
-   "linux_64",
-   "win_64"
-  ]
+  }
  },
  "feedstock_name": "hyperspyui",
  "hash_type": "sha256",
@@ -36,7 +35,15 @@
     "hyperspyui = hyperspyui.__main__:main"
    ],
    "noarch": "python",
-   "number": "0"
+   "number": "1",
+   "script": [
+    "mkdir -p \"PREFIX/Menu\"",
+    "sed \"s/__PKG_VERSION__/2.0.2/\" \"RECIPE_DIR/menu.json\" > \"PREFIX/Menu/hyperspyui_menu.json\"",
+    "cp \"RECIPE_DIR/hyperspyui.icns\" \"PREFIX/Menu/hyperspyui.icns\"",
+    "cp \"RECIPE_DIR/hyperspyui.ico\" \"PREFIX/Menu/hyperspyui.ico\"",
+    "cp \"RECIPE_DIR/hyperspyui.png\" \"PREFIX/Menu/hyperspyui.png\"",
+    "PYTHON -m pip install . --no-deps -vv"
+   ]
   },
   "extra": {
    "recipe-maintainers": [
@@ -56,13 +63,14 @@
     "setuptools"
    ],
    "run": [
-    "__unix",
     "python >=3.9",
     "exspy",
     "hyperspy-base >=2.0",
     "hyperspy-gui-traitsui >=2.0",
     "pyqode.core >=4.0.10",
     "pyqode.python >=4.0.2",
+    "pyqt",
+    "pyqtwebengine",
     "pyflakes",
     "autopep8",
     "qtconsole-base >=5.2.0",
@@ -71,7 +79,9 @@
     "ipykernel >=5.2.0",
     "traitsui >=5.2.0"
    ],
-   "run_constrained": null
+   "run_constrained": [
+    "menuinst >=2"
+   ]
   },
   "schema_version": 0,
   "source": {
@@ -79,6 +89,11 @@
    "url": "https://pypi.org/packages/source/h/hyperspyUI/hyperspyui-2.0.2.tar.gz"
   },
   "test": {
+   "commands": [
+    "test -f ${CONDA_PREFIX}/Menu/hyperspyui_menu.json",
+    "test `ls ${CONDA_PREFIX}/Menu/hyperspyui.*  | wc -l` -eq 3",
+    "python -c \"import json; json.load(open('${CONDA_PREFIX}/Menu/hyperspyui_menu.json'))\""
+   ],
    "imports": [
     "hyperspyui",
     "hyperspyui.__main__"
@@ -104,7 +119,6 @@
   "run": {
    "__set__": true,
    "elements": [
-    "__unix",
     "autopep8",
     "exspy",
     "ffmpeg",
@@ -114,6 +128,8 @@
     "pyflakes",
     "pyqode.core",
     "pyqode.python",
+    "pyqt",
+    "pyqtwebengine",
     "python",
     "qtconsole-base",
     "qtpy",
@@ -146,7 +162,15 @@
     "hyperspyui = hyperspyui.__main__:main"
    ],
    "noarch": "python",
-   "number": "0"
+   "number": "1",
+   "script": [
+    "mkdir -p \"PREFIX/Menu\"",
+    "sed \"s/__PKG_VERSION__/2.0.2/\" \"RECIPE_DIR/menu.json\" > \"PREFIX/Menu/hyperspyui_menu.json\"",
+    "cp \"RECIPE_DIR/hyperspyui.icns\" \"PREFIX/Menu/hyperspyui.icns\"",
+    "cp \"RECIPE_DIR/hyperspyui.ico\" \"PREFIX/Menu/hyperspyui.ico\"",
+    "cp \"RECIPE_DIR/hyperspyui.png\" \"PREFIX/Menu/hyperspyui.png\"",
+    "PYTHON -m pip install . --no-deps -vv"
+   ]
   },
   "extra": {
    "recipe-maintainers": [
@@ -166,24 +190,24 @@
     "setuptools"
    ],
    "run": [
-    "__unix",
     "python >=3.9",
     "exspy",
     "hyperspy-base >=2.0",
     "hyperspy-gui-traitsui >=2.0",
     "pyqode.core >=4.0.10",
     "pyqode.python >=4.0.2",
+    "pyqt",
+    "pyqtwebengine",
     "pyflakes",
     "autopep8",
     "qtconsole-base >=5.2.0",
     "qtpy",
     "ffmpeg",
     "ipykernel >=5.2.0",
-    "traitsui >=5.2.0",
-    "__win"
+    "traitsui >=5.2.0"
    ],
    "run_constrained": [
-    "menuinst >=1.4.17"
+    "menuinst >=2"
    ]
   },
   "schema_version": 0,
@@ -192,6 +216,11 @@
    "url": "https://pypi.org/packages/source/h/hyperspyUI/hyperspyui-2.0.2.tar.gz"
   },
   "test": {
+   "commands": [
+    "test -f ${CONDA_PREFIX}/Menu/hyperspyui_menu.json",
+    "test `ls ${CONDA_PREFIX}/Menu/hyperspyui.*  | wc -l` -eq 3",
+    "python -c \"import json; json.load(open('${CONDA_PREFIX}/Menu/hyperspyui_menu.json'))\""
+   ],
    "imports": [
     "hyperspyui",
     "hyperspyui.__main__"
@@ -210,18 +239,15 @@
  },
  "parsing_error": false,
  "platforms": [
-  "linux_64",
-  "win_64"
+  "linux_64"
  ],
  "pr_info": {
   "__lazy_json__": "pr_info/hyperspyui.json"
  },
- "raw_meta_yaml": "{% set name = \"hyperspyUI\" %}\n{% set version = \"2.0.2\" %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/hyperspyui-{{ version }}.tar.gz\n  sha256: 400dc0f7e53e7849811b8472e74978099503f0ed0ce5f0f77314729c7deb0f28\n\nbuild:\n  number: 0\n  noarch: python\n  entry_points:\n    - hyperspyui = hyperspyui.__main__:main\n\nrequirements:\n  host:\n    - python {{ python_min }}\n    - pip\n    - setuptools\n  run:\n    - __{{ target_os }}\n    - python >={{ python_min }}\n    - exspy\n    - hyperspy-base >=2.0\n    - hyperspy-gui-traitsui >=2.0\n    - pyqode.core >=4.0.10\n    - pyqode.python >=4.0.2\n    - pyflakes\n    - autopep8\n    - qtconsole-base >=5.2.0\n    - qtpy\n    - ffmpeg\n    - ipykernel >=5.2.0\n    - traitsui >=5.2.0\n  run_constrained:\n    - menuinst >=1.4.17   # [win]\n\ntest:\n  requires:\n    - python {{ python_min }}\n  imports:\n    - hyperspyui\n    - hyperspyui.__main__\n\n  # commands:\n  #  - DISPLAY=localhost:1.0 xvfb-run -a bash -c 'hyperspyui -h'\n  #  - DISPLAY=localhost:1.0 xvfb-run -a bash -c 'pytest --pyargs hyperspyui'\n\n  # requires:\n  #  - pytest\n  #  - pytest-qt\n\napp:\n  entry: hyperspyui\n  summary: HyperSpyUI\n  type: desk\n\nabout:\n  home: https://github.com/hyperspy/hyperspyUI\n  license: GPL-3.0-or-later\n\n  summary: \"HyperSpyUI tries to bring a streamlined user interface to the powerful multi-dimensional analysis capabilities of HyperSpy. HyperSpy is an open source Python library which provides tools to facilitate data analysis of multidimensional datasets.\\nHyperSpy aims at making it easy and natural to apply analytical\n    procedures that operate on an individual signal to multidimensional arrays, as well as providing easy access to analytical tools that exploit the multidimensionality of the dataset.\\nWhile the UI tries to create a simple and intuitive interface to HyperSpy, it still retains the raw power of HyperSpy via the UI\u2019s built\n    in IPython console, which runs on the same Python kernel as the UI. \"\n  license_file: COPYING.txt\n  doc_url: http://hyperspy.org/hyperspyUI/\n  dev_url: https://github.com/hyperspy/hyperspyUI\n\nextra:\n  recipe-maintainers:\n    - vidartf\n    - francisco-dlp\n    - ericpre\n",
+ "raw_meta_yaml": "{% set name = \"hyperspyUI\" %}\n{% set version = \"2.0.2\" %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/hyperspyui-{{ version }}.tar.gz\n  sha256: 400dc0f7e53e7849811b8472e74978099503f0ed0ce5f0f77314729c7deb0f28\n\nbuild:\n  number: 1\n  noarch: python\n  script:\n    - mkdir -p \"{{ PREFIX }}/Menu\"\n    - sed \"s/__PKG_VERSION__/{{ version }}/\" \"{{ RECIPE_DIR }}/menu.json\" > \"{{ PREFIX }}/Menu/hyperspyui_menu.json\"\n    - cp \"{{ RECIPE_DIR }}/hyperspyui.icns\" \"{{ PREFIX }}/Menu/hyperspyui.icns\"\n    - cp \"{{ RECIPE_DIR }}/hyperspyui.ico\" \"{{ PREFIX }}/Menu/hyperspyui.ico\"\n    - cp \"{{ RECIPE_DIR }}/hyperspyui.png\" \"{{ PREFIX }}/Menu/hyperspyui.png\"\n    - {{ PYTHON }} -m pip install . --no-deps -vv\n  entry_points:\n    - hyperspyui = hyperspyui.__main__:main\n\nrequirements:\n  host:\n    - python {{ python_min }}\n    - pip\n    - setuptools\n  run:\n    - python >={{ python_min }}\n    - exspy\n    - hyperspy-base >=2.0\n    - hyperspy-gui-traitsui >=2.0\n    - pyqode.core >=4.0.10\n    - pyqode.python >=4.0.2\n    # Select pyqt binding since pyside6 is not supported\n    # Add variant when pyside6 will be supported\n    - pyqt\n    - pyqtwebengine\n    - pyflakes\n    - autopep8\n    - qtconsole-base >=5.2.0\n    - qtpy\n    - ffmpeg\n    - ipykernel >=5.2.0\n    - traitsui >=5.2.0\n  run_constrained:\n    - menuinst >=2\n\ntest:\n  requires:\n    - python {{ python_min }}\n  imports:\n    - hyperspyui\n    - hyperspyui.__main__\n  commands:\n    # Check that the menu is installed\n    - test -f ${CONDA_PREFIX}/Menu/hyperspyui_menu.json\n    # Check we didn't forget any icons\n    - test `ls ${CONDA_PREFIX}/Menu/hyperspyui.*  | wc -l` -eq 3\n    # Check that the json file loads without error to catch json formatting issues\n    - python -c \"import json; json.load(open('${CONDA_PREFIX}/Menu/hyperspyui_menu.json'))\"\n\n  # commands:\n  #  - DISPLAY=localhost:1.0 xvfb-run -a bash -c 'hyperspyui -h'\n  #  - DISPLAY=localhost:1.0 xvfb-run -a bash -c 'pytest --pyargs hyperspyui'\n\n  # requires:\n  #  - pytest\n  #  - pytest-qt\n\napp:\n  entry: hyperspyui\n  summary: HyperSpyUI\n  type: desk\n\nabout:\n  home: https://github.com/hyperspy/hyperspyUI\n  license: GPL-3.0-or-later\n\n  summary: \"HyperSpyUI tries to bring a streamlined user interface to the powerful multi-dimensional analysis capabilities of HyperSpy. HyperSpy is an open source Python library which provides tools to facilitate data analysis of multidimensional datasets.\\nHyperSpy aims at making it easy and natural to apply analytical\n    procedures that operate on an individual signal to multidimensional arrays, as well as providing easy access to analytical tools that exploit the multidimensionality of the dataset.\\nWhile the UI tries to create a simple and intuitive interface to HyperSpy, it still retains the raw power of HyperSpy via the UI\u2019s built\n    in IPython console, which runs on the same Python kernel as the UI. \"\n  license_file: COPYING.txt\n  doc_url: http://hyperspy.org/hyperspyUI/\n  dev_url: https://github.com/hyperspy/hyperspyUI\n\nextra:\n  recipe-maintainers:\n    - vidartf\n    - francisco-dlp\n    - ericpre\n",
  "req": {
   "__set__": true,
   "elements": [
-   "__unix",
-   "__win",
    "autopep8",
    "exspy",
    "ffmpeg",
@@ -232,6 +258,8 @@
    "pyflakes",
    "pyqode.core",
    "pyqode.python",
+   "pyqt",
+   "pyqtwebengine",
    "python",
    "qtconsole-base",
    "qtpy",
@@ -255,8 +283,6 @@
   "run": {
    "__set__": true,
    "elements": [
-    "__unix",
-    "__win",
     "autopep8",
     "exspy",
     "ffmpeg",
@@ -266,6 +292,8 @@
     "pyflakes",
     "pyqode.core",
     "pyqode.python",
+    "pyqt",
+    "pyqtwebengine",
     "python",
     "qtconsole-base",
     "qtpy",
@@ -296,8 +324,6 @@
   "run": {
    "__set__": true,
    "elements": [
-    "__unix",
-    "__win",
     "autopep8",
     "exspy",
     "ffmpeg",
@@ -307,6 +333,8 @@
     "pyflakes",
     "pyqode.core >=4.0.10",
     "pyqode.python >=4.0.2",
+    "pyqt",
+    "pyqtwebengine",
     "python >=3.9",
     "qtconsole-base >=5.2.0",
     "qtpy",
@@ -324,117 +352,5 @@
  "version": "2.0.2",
  "version_pr_info": {
   "__lazy_json__": "version_pr_info/hyperspyui.json"
- },
- "win_64_meta_yaml": {
-  "about": {
-   "dev_url": "https://github.com/hyperspy/hyperspyUI",
-   "doc_url": "http://hyperspy.org/hyperspyUI/",
-   "home": "https://github.com/hyperspy/hyperspyUI",
-   "license": "GPL-3.0-or-later",
-   "license_file": "COPYING.txt",
-   "summary": "HyperSpyUI tries to bring a streamlined user interface to the powerful multi-dimensional analysis capabilities of HyperSpy. HyperSpy is an open source Python library which provides tools to facilitate data analysis of multidimensional datasets.\nHyperSpy aims at making it easy and natural to apply analytical procedures that operate on an individual signal to multidimensional arrays, as well as providing easy access to analytical tools that exploit the multidimensionality of the dataset.\nWhile the UI tries to create a simple and intuitive interface to HyperSpy, it still retains the raw power of HyperSpy via the UI\u2019s built in IPython console, which runs on the same Python kernel as the UI. "
-  },
-  "app": {
-   "entry": "hyperspyui",
-   "summary": "HyperSpyUI",
-   "type": "desk"
-  },
-  "build": {
-   "entry_points": [
-    "hyperspyui = hyperspyui.__main__:main"
-   ],
-   "noarch": "python",
-   "number": "0"
-  },
-  "extra": {
-   "recipe-maintainers": [
-    "vidartf",
-    "francisco-dlp",
-    "ericpre"
-   ]
-  },
-  "package": {
-   "name": "hyperspyui",
-   "version": "2.0.2"
-  },
-  "requirements": {
-   "host": [
-    "python 3.9",
-    "pip",
-    "setuptools"
-   ],
-   "run": [
-    "__win",
-    "python >=3.9",
-    "exspy",
-    "hyperspy-base >=2.0",
-    "hyperspy-gui-traitsui >=2.0",
-    "pyqode.core >=4.0.10",
-    "pyqode.python >=4.0.2",
-    "pyflakes",
-    "autopep8",
-    "qtconsole-base >=5.2.0",
-    "qtpy",
-    "ffmpeg",
-    "ipykernel >=5.2.0",
-    "traitsui >=5.2.0"
-   ],
-   "run_constrained": [
-    "menuinst >=1.4.17"
-   ]
-  },
-  "schema_version": 0,
-  "source": {
-   "sha256": "400dc0f7e53e7849811b8472e74978099503f0ed0ce5f0f77314729c7deb0f28",
-   "url": "https://pypi.org/packages/source/h/hyperspyUI/hyperspyui-2.0.2.tar.gz"
-  },
-  "test": {
-   "imports": [
-    "hyperspyui",
-    "hyperspyui.__main__"
-   ],
-   "requires": [
-    "python 3.9"
-   ]
-  }
- },
- "win_64_requirements": {
-  "build": {
-   "__set__": true,
-   "elements": []
-  },
-  "host": {
-   "__set__": true,
-   "elements": [
-    "pip",
-    "python",
-    "setuptools"
-   ]
-  },
-  "run": {
-   "__set__": true,
-   "elements": [
-    "__win",
-    "autopep8",
-    "exspy",
-    "ffmpeg",
-    "hyperspy-base",
-    "hyperspy-gui-traitsui",
-    "ipykernel",
-    "pyflakes",
-    "pyqode.core",
-    "pyqode.python",
-    "python",
-    "qtconsole-base",
-    "qtpy",
-    "traitsui"
-   ]
-  },
-  "test": {
-   "__set__": true,
-   "elements": [
-    "python"
-   ]
-  }
  }
 }
