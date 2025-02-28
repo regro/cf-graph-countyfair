@@ -6,6 +6,7 @@ import tqdm
 
 
 def _commit_and_push(done, itr, tot_itr):
+    print(" ", flush=True)
     subprocess.run(["git", "add", "."], check=True)
     subprocess.run(["git", "commit", "--allow-empty", "-m", f"[{itr} of {tot_itr}] rewrite JSON blobs"], check=True)
     subprocess.run(["git", "push"], check=True)
@@ -17,7 +18,7 @@ print(f"found {len(all_fnames)} files", flush=True)
 
 modfac = 5000
 itr = 0
-tot_itr = len(all_fnames) // 100 + 1
+tot_itr = len(all_fnames) // modfac + 1
 
 done = set()
 for fname in tqdm.tqdm(all_fnames, ncols=80):
