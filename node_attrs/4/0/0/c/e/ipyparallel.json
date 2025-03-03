@@ -11,7 +11,9 @@
     "conda_build": {
       "pkg_format": "2"
     },
+    "conda_build_tool": "rattler-build",
     "conda_forge_output_validation": true,
+    "conda_install_tool": "pixi",
     "github": {
       "branch_name": "main",
       "tooling_branch_name": "main"
@@ -28,27 +30,17 @@
   "linux_64_meta_yaml": {
     "about": {
       "dev_url": "https://github.com/ipython/ipyparallel",
-      "doc_url": "https://ipyparallel.readthedocs.io",
+      "doc_url": "https://ipyparallel.readthedocs.io/",
       "home": "https://github.com/ipython/ipyparallel",
       "license": "BSD-3-Clause",
-      "license_family": "BSD",
-      "license_file": [
-        "COPYING.md",
-        "ipyparallel/labextension/static/third-party-licenses.json"
-      ],
+      "license_family": "BSD-3-Clause",
+      "license_file": "COPYING.md",
       "summary": "Interactive Parallel Computing with IPython"
     },
     "build": {
-      "entry_points": [
-        "ipcluster = ipyparallel.cluster.app:main",
-        "ipcontroller = ipyparallel.controller.app:main",
-        "ipengine = ipyparallel.engine.app:main"
-      ],
       "noarch": "python",
-      "number": "1",
-      "script": [
-        "PYTHON -m pip install . -vv --no-deps --no-build-isolation"
-      ]
+      "number": "0",
+      "script": "${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation"
     },
     "extra": {
       "recipe-maintainers": [
@@ -57,15 +49,83 @@
         "bollwyvl"
       ]
     },
+    "outputs": [
+      {
+        "build": null,
+        "name": "ipyparallel",
+        "requirements": {
+          "build": [],
+          "host": [
+            "hatchling >=0.25",
+            "pip",
+            "python 3.9.*"
+          ],
+          "run": [
+            "decorator",
+            "importlib-metadata >=3.6",
+            "ipykernel >=6.9.1",
+            "ipython >=5",
+            "jupyter_client >=7",
+            "psutil",
+            "python >=3.9",
+            "python-dateutil >=2.1",
+            "pyzmq >=25",
+            "tornado >=6.1",
+            "tqdm",
+            "traitlets >=5"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "ipyparallel",
+                "ipyparallel.apps",
+                "ipyparallel.client",
+                "ipyparallel.controller",
+                "ipyparallel.engine",
+                "ipyparallel.serialize"
+              ],
+              "python_version": "3.9.*"
+            }
+          },
+          {
+            "requirements": {
+              "run": [
+                "python 3.9.*",
+                "jupyterlab ==4.*",
+                "nbclassic",
+                "pip"
+              ]
+            },
+            "script": [
+              "pip check",
+              "ipcluster -h",
+              "ipengine -h",
+              "ipcontroller -h",
+              "jupyter labextension list",
+              "jupyter server extension list",
+              "jupyter nbclassic extension list",
+              "jupyter labextension list 1>labextensions 2>&1",
+              "jupyter server extension list 1>server_extensions 2>&1",
+              "jupyter nbclassic extension list 1>nbclassic_extensions 2>&1",
+              "grep -iE \"ipyparallel-labextension.*OK\" labextensions",
+              "grep -iE \"ipyparallel.*OK\" server_extensions",
+              "grep -iE \"ipyparallel.*OK\" nbclassic_extensions"
+            ]
+          }
+        ]
+      }
+    ],
     "package": {
       "name": "ipyparallel",
-      "version": "9.0.0"
+      "version": "9.0.1"
     },
     "requirements": {
       "host": [
         "hatchling >=0.25",
         "pip",
-        "python 3.9"
+        "python 3.9.*"
       ],
       "run": [
         "decorator",
@@ -82,41 +142,10 @@
         "traitlets >=5"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
-      "sha256": "70601cbaf9a169d350ffe22c82d5bbdfe6dfe4c4df02836d9990e9c559b5bcb6",
-      "url": "https://pypi.org/packages/source/i/ipyparallel/ipyparallel-9.0.0.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "pip check",
-        "ipcluster -h",
-        "ipengine -h",
-        "ipcontroller -h",
-        "jupyter labextension list",
-        "jupyter server extension list",
-        "jupyter nbclassic extension list",
-        "jupyter labextension list 1>labextensions 2>&1",
-        "jupyter server extension list 1>server_extensions 2>&1",
-        "jupyter nbclassic extension list 1>nbclassic_extensions 2>&1",
-        "grep -iE \"ipyparallel-labextension.*v9\\.0\\.0.*OK\" labextensions",
-        "grep -iE \"ipyparallel.*9\\.0\\.0.*OK\" server_extensions",
-        "grep -iE \"ipyparallel.*9\\.0\\.0.*OK\" nbclassic_extensions"
-      ],
-      "imports": [
-        "ipyparallel",
-        "ipyparallel.apps",
-        "ipyparallel.client",
-        "ipyparallel.controller",
-        "ipyparallel.engine",
-        "ipyparallel.serialize"
-      ],
-      "requires": [
-        "python 3.9",
-        "jupyterlab ==4.*",
-        "nbclassic",
-        "pip"
-      ]
+      "sha256": "2e592cad2200c5a94fbbff639bff36e6ec9122f34b36b2fc6b4d678d9e98f29c",
+      "url": "https://pypi.org/packages/source/i/ipyparallel/ipyparallel-9.0.1.tar.gz"
     }
   },
   "linux_64_requirements": {
@@ -162,27 +191,17 @@
   "meta_yaml": {
     "about": {
       "dev_url": "https://github.com/ipython/ipyparallel",
-      "doc_url": "https://ipyparallel.readthedocs.io",
+      "doc_url": "https://ipyparallel.readthedocs.io/",
       "home": "https://github.com/ipython/ipyparallel",
       "license": "BSD-3-Clause",
-      "license_family": "BSD",
-      "license_file": [
-        "COPYING.md",
-        "ipyparallel/labextension/static/third-party-licenses.json"
-      ],
+      "license_family": "BSD-3-Clause",
+      "license_file": "COPYING.md",
       "summary": "Interactive Parallel Computing with IPython"
     },
     "build": {
-      "entry_points": [
-        "ipcluster = ipyparallel.cluster.app:main",
-        "ipcontroller = ipyparallel.controller.app:main",
-        "ipengine = ipyparallel.engine.app:main"
-      ],
       "noarch": "python",
-      "number": "1",
-      "script": [
-        "PYTHON -m pip install . -vv --no-deps --no-build-isolation"
-      ]
+      "number": "0",
+      "script": "${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation"
     },
     "extra": {
       "recipe-maintainers": [
@@ -191,15 +210,83 @@
         "bollwyvl"
       ]
     },
+    "outputs": [
+      {
+        "build": null,
+        "name": "ipyparallel",
+        "requirements": {
+          "build": [],
+          "host": [
+            "hatchling >=0.25",
+            "pip",
+            "python 3.9.*"
+          ],
+          "run": [
+            "decorator",
+            "importlib-metadata >=3.6",
+            "ipykernel >=6.9.1",
+            "ipython >=5",
+            "jupyter_client >=7",
+            "psutil",
+            "python >=3.9",
+            "python-dateutil >=2.1",
+            "pyzmq >=25",
+            "tornado >=6.1",
+            "tqdm",
+            "traitlets >=5"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "ipyparallel",
+                "ipyparallel.apps",
+                "ipyparallel.client",
+                "ipyparallel.controller",
+                "ipyparallel.engine",
+                "ipyparallel.serialize"
+              ],
+              "python_version": "3.9.*"
+            }
+          },
+          {
+            "requirements": {
+              "run": [
+                "python 3.9.*",
+                "jupyterlab ==4.*",
+                "nbclassic",
+                "pip"
+              ]
+            },
+            "script": [
+              "pip check",
+              "ipcluster -h",
+              "ipengine -h",
+              "ipcontroller -h",
+              "jupyter labextension list",
+              "jupyter server extension list",
+              "jupyter nbclassic extension list",
+              "jupyter labextension list 1>labextensions 2>&1",
+              "jupyter server extension list 1>server_extensions 2>&1",
+              "jupyter nbclassic extension list 1>nbclassic_extensions 2>&1",
+              "grep -iE \"ipyparallel-labextension.*OK\" labextensions",
+              "grep -iE \"ipyparallel.*OK\" server_extensions",
+              "grep -iE \"ipyparallel.*OK\" nbclassic_extensions"
+            ]
+          }
+        ]
+      }
+    ],
     "package": {
       "name": "ipyparallel",
-      "version": "9.0.0"
+      "version": "9.0.1"
     },
     "requirements": {
       "host": [
         "hatchling >=0.25",
         "pip",
-        "python 3.9"
+        "python 3.9.*"
       ],
       "run": [
         "decorator",
@@ -216,41 +303,10 @@
         "traitlets >=5"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
-      "sha256": "70601cbaf9a169d350ffe22c82d5bbdfe6dfe4c4df02836d9990e9c559b5bcb6",
-      "url": "https://pypi.org/packages/source/i/ipyparallel/ipyparallel-9.0.0.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "pip check",
-        "ipcluster -h",
-        "ipengine -h",
-        "ipcontroller -h",
-        "jupyter labextension list",
-        "jupyter server extension list",
-        "jupyter nbclassic extension list",
-        "jupyter labextension list 1>labextensions 2>&1",
-        "jupyter server extension list 1>server_extensions 2>&1",
-        "jupyter nbclassic extension list 1>nbclassic_extensions 2>&1",
-        "grep -iE \"ipyparallel-labextension.*v9\\.0\\.0.*OK\" labextensions",
-        "grep -iE \"ipyparallel.*9\\.0\\.0.*OK\" server_extensions",
-        "grep -iE \"ipyparallel.*9\\.0\\.0.*OK\" nbclassic_extensions"
-      ],
-      "imports": [
-        "ipyparallel",
-        "ipyparallel.apps",
-        "ipyparallel.client",
-        "ipyparallel.controller",
-        "ipyparallel.engine",
-        "ipyparallel.serialize"
-      ],
-      "requires": [
-        "python 3.9",
-        "jupyterlab ==4.*",
-        "nbclassic",
-        "pip"
-      ]
+      "sha256": "2e592cad2200c5a94fbbff639bff36e6ec9122f34b36b2fc6b4d678d9e98f29c",
+      "url": "https://pypi.org/packages/source/i/ipyparallel/ipyparallel-9.0.1.tar.gz"
     }
   },
   "name": "ipyparallel",
@@ -267,7 +323,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/ipyparallel.json"
   },
-  "raw_meta_yaml": "{% set version = \"9.0.0\" %}\n{% set python_min = python_min | default(\"3.9\") %}\n\npackage:\n  name: ipyparallel\n  version: {{ version }}\n\nsource:\n  url: https://pypi.org/packages/source/i/ipyparallel/ipyparallel-{{ version }}.tar.gz\n  sha256: 70601cbaf9a169d350ffe22c82d5bbdfe6dfe4c4df02836d9990e9c559b5bcb6\n\nbuild:\n  number: 1\n  noarch: python\n  entry_points:\n    - ipcluster = ipyparallel.cluster.app:main\n    - ipcontroller = ipyparallel.controller.app:main\n    - ipengine = ipyparallel.engine.app:main\n  script:\n    - {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation\n\nrequirements:\n  host:\n    - hatchling >=0.25\n    - pip\n    - python {{ python_min }}\n  run:\n    - decorator\n    - importlib-metadata >=3.6\n    - ipykernel >=6.9.1\n    - ipython >=5\n    - jupyter_client >=7\n    - psutil\n    - python >={{ python_min }}\n    - python-dateutil >=2.1\n    - pyzmq >=25\n    - tornado >=6.1\n    - tqdm\n    - traitlets >=5\n\ntest:\n  requires:\n    - m2-grep  # [win]\n    - python {{ python_min }}\n    - jupyterlab ==4.*\n    - nbclassic\n    - pip\n  imports:\n    - ipyparallel\n    - ipyparallel.apps\n    - ipyparallel.client\n    - ipyparallel.controller\n    - ipyparallel.engine\n    - ipyparallel.serialize\n  commands:\n    - pip check\n    - ipcluster -h\n    - ipengine -h\n    - ipcontroller -h\n    # list\n    - jupyter labextension list\n    - jupyter server extension list\n    - jupyter nbclassic extension list\n    # write\n    - jupyter labextension list 1>labextensions 2>&1\n    - jupyter server extension list 1>server_extensions 2>&1\n    - jupyter nbclassic extension list 1>nbclassic_extensions 2>&1\n    # validate\n    - grep -iE \"ipyparallel-labextension.*v{{ version.replace(\".\", \"\\\\.\") }}.*OK\" labextensions\n    - grep -iE \"ipyparallel.*{{ version.replace(\".\", \"\\\\.\") }}.*OK\" server_extensions\n    - grep -iE \"ipyparallel.*{{ version.replace(\".\", \"\\\\.\") }}.*OK\" nbclassic_extensions\n\nabout:\n  home: https://github.com/ipython/ipyparallel\n  license: BSD-3-Clause\n  license_file:\n    - COPYING.md\n    - ipyparallel/labextension/static/third-party-licenses.json\n  license_family: BSD\n  summary: Interactive Parallel Computing with IPython\n  doc_url: https://ipyparallel.readthedocs.io\n  dev_url: https://github.com/ipython/ipyparallel\n\nextra:\n  recipe-maintainers:\n    - jakirkham\n    - minrk\n    - bollwyvl\n",
+  "raw_meta_yaml": "schema_version: 1\n\ncontext:\n  version: 9.0.1\n  python_min: ${{ python_min | default(\"3.9\") }}\n\npackage:\n  name: ipyparallel\n  version: ${{ version }}\n\nsource:\n  url: https://pypi.org/packages/source/i/ipyparallel/ipyparallel-${{ version }}.tar.gz\n  sha256: 2e592cad2200c5a94fbbff639bff36e6ec9122f34b36b2fc6b4d678d9e98f29c\n\nbuild:\n  number: 0\n  noarch: python\n  script:\n    - ${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation\n  python:\n    entry_points:\n      - ipcluster = ipyparallel.cluster.app:main\n      - ipcontroller = ipyparallel.controller.app:main\n      - ipengine = ipyparallel.engine.app:main\n\nrequirements:\n  host:\n    - hatchling >=0.25\n    - pip\n    - python ${{ python_min }}.*\n  run:\n    - decorator\n    - importlib-metadata >=3.6\n    - ipykernel >=6.9.1\n    - ipython >=5\n    - jupyter_client >=7\n    - psutil\n    - python >=${{ python_min }}\n    - python-dateutil >=2.1\n    - pyzmq >=25\n    - tornado >=6.1\n    - tqdm\n    - traitlets >=5\n\ntests:\n  - python:\n      imports:\n        - ipyparallel\n        - ipyparallel.apps\n        - ipyparallel.client\n        - ipyparallel.controller\n        - ipyparallel.engine\n        - ipyparallel.serialize\n      python_version: ${{ python_min }}.*\n  - requirements:\n      run:\n        - if: win\n          then: m2-grep\n        - python ${{ python_min }}.*\n        - jupyterlab ==4.*\n        - nbclassic\n        - pip\n    script:\n      - pip check\n      - ipcluster -h\n      - ipengine -h\n      - ipcontroller -h\n      - jupyter labextension list\n      - jupyter server extension list\n      - jupyter nbclassic extension list\n      - jupyter labextension list 1>labextensions 2>&1\n      - jupyter server extension list 1>server_extensions 2>&1\n      - jupyter nbclassic extension list 1>nbclassic_extensions 2>&1\n      - grep -iE \"ipyparallel-labextension.*OK\" labextensions\n      - grep -iE \"ipyparallel.*OK\" server_extensions\n      - grep -iE \"ipyparallel.*OK\" nbclassic_extensions\n\nabout:\n  license: BSD-3-Clause\n  license_file:\n    - COPYING.md\n    - ipyparallel/labextension/static/third-party-licenses.json\n  summary: Interactive Parallel Computing with IPython\n  homepage: https://github.com/ipython/ipyparallel\n  repository: https://github.com/ipython/ipyparallel\n  documentation: https://ipyparallel.readthedocs.io\n\nextra:\n  recipe-maintainers:\n    - jakirkham\n    - minrk\n    - bollwyvl\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -338,7 +394,7 @@
       "elements": [
         "hatchling >=0.25",
         "pip",
-        "python 3.9"
+        "python 3.9.*"
       ]
     },
     "run": {
@@ -364,12 +420,12 @@
         "jupyterlab ==4.*",
         "nbclassic",
         "pip",
-        "python 3.9"
+        "python 3.9.*"
       ]
     }
   },
-  "url": "https://pypi.org/packages/source/i/ipyparallel/ipyparallel-9.0.0.tar.gz",
-  "version": "9.0.0",
+  "url": "https://pypi.org/packages/source/i/ipyparallel/ipyparallel-9.0.1.tar.gz",
+  "version": "9.0.1",
   "version_pr_info": {
     "__lazy_json__": "version_pr_info/ipyparallel.json"
   }
