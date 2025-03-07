@@ -4,11 +4,13 @@
   "conda-forge.yml": {
     "bot": {
       "automerge": true,
-      "check_solvable": true
+      "check_solvable": true,
+      "inspection": "hint-all"
     },
     "conda_build": {
       "pkg_format": "2"
     },
+    "conda_build_tool": "rattler-build",
     "conda_forge_output_validation": true,
     "github": {
       "branch_name": "main",
@@ -21,79 +23,113 @@
     "about": {
       "dev_url": "https://github.com/grpc/grpc/tree/master/src/python/grpcio_health_checking",
       "doc_url": "https://grpc.github.io/grpc/python/grpc_health_checking.html",
-      "home": "https://grpc.io",
+      "home": "https://grpc.io/",
       "license": "Apache-2.0",
+      "license_family": "Apache-2.0",
       "license_file": "dist/LICENSE",
       "summary": "Standard Health Checking Service for gRPC"
     },
     "build": {
       "noarch": "python",
       "number": "0",
-      "script": "cd dist && PYTHON -m pip install . -vv --no-deps --no-build-isolation"
+      "script": [
+        "cd dist",
+        "${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation --disable-pip-version-check"
+      ]
     },
     "extra": {
       "recipe-maintainers": [
         "bollwyvl"
       ]
     },
+    "outputs": [
+      {
+        "build": null,
+        "name": "grpcio-health-checking",
+        "requirements": {
+          "build": [],
+          "host": [
+            "pip",
+            "python 3.9.*",
+            "setuptools"
+          ],
+          "run": [
+            "grpcio >=1.70.0",
+            "protobuf >=5.26.1,<6.0dev",
+            "python >=3.9"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "grpc_health",
+                "grpc_health.v1.health"
+              ],
+              "python_version": "3.9.*"
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "run_test.py"
+              ],
+              "source": [
+                "dist/setup.py",
+                "dist/grpc_version.py",
+                "src/src/python/grpcio_tests/tests/health_check/**",
+                "src/src/python/grpcio_tests/tests/__init__.py",
+                "src/src/python/grpcio_tests/tests/_loader.py",
+                "src/src/python/grpcio_tests/tests/_result.py",
+                "src/src/python/grpcio_tests/tests/_runner.py",
+                "src/src/python/grpcio_tests/tests/unit/__init__.py",
+                "src/src/python/grpcio_tests/tests/unit/framework/__init__.py",
+                "src/src/python/grpcio_tests/tests/unit/framework/common/__init__.py",
+                "src/src/python/grpcio_tests/tests/unit/framework/common/test_constants.py",
+                "src/src/python/grpcio_tests/tests/unit/test_common.py",
+                "src/src/python/grpcio_tests/tests/unit/thread_pool.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest-cov",
+                "python 3.9.*"
+              ]
+            },
+            "script": {
+              "content": [
+                "python run_test.py"
+              ],
+              "env": {
+                "PKG_GRPCIO_MIN": "1.70.0",
+                "PKG_PROTOBUF_MAX": "6.0dev",
+                "PKG_PROTOBUF_MIN": "5.26.1"
+              }
+            }
+          }
+        ]
+      }
+    ],
     "package": {
       "name": "grpcio-health-checking",
-      "version": "1.69.0"
+      "version": "1.70.0"
     },
     "requirements": {
       "host": [
         "pip",
-        "python 3.9",
+        "python 3.9.*",
         "setuptools"
       ],
       "run": [
-        "grpcio >=1.69.0",
+        "grpcio >=1.70.0",
         "protobuf >=5.26.1,<6.0dev",
         "python >=3.9"
       ]
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "folder": "dist",
-        "sha256": "ff6e1d38c2a300b1bbd296916fbd9165667bc4b5a8557f99dd4226d4f9e8f4c1",
-        "url": "https://pypi.org/packages/source/g/grpcio-health-checking/grpcio_health_checking-1.69.0.tar.gz"
-      },
-      {
-        "folder": "src",
-        "sha256": "cd256d91781911d46a57506978b3979bfee45d5086a1b6668a3ae19c5e77f8dc",
-        "url": "https://github.com/grpc/grpc/archive/v1.69.0.tar.gz"
-      }
-    ],
-    "test": {
-      "commands": [
-        "pip check",
-        "cd src/src/python/grpcio_tests",
-        "pytest -vv -k health_check --cov grpc_health --cov-fail-under 71"
-      ],
-      "imports": [
-        "grpc_health",
-        "grpc_health.v1.health"
-      ],
-      "requires": [
-        "pip",
-        "pytest-cov",
-        "python 3.9"
-      ],
-      "source_files": [
-        "dist/grpc_version.py",
-        "src/src/python/grpcio_tests/tests/health_check/",
-        "src/src/python/grpcio_tests/tests/__init__.py",
-        "src/src/python/grpcio_tests/tests/_loader.py",
-        "src/src/python/grpcio_tests/tests/_result.py",
-        "src/src/python/grpcio_tests/tests/_runner.py",
-        "src/src/python/grpcio_tests/tests/unit/__init__.py",
-        "src/src/python/grpcio_tests/tests/unit/framework/__init__.py",
-        "src/src/python/grpcio_tests/tests/unit/framework/common/__init__.py",
-        "src/src/python/grpcio_tests/tests/unit/framework/common/test_constants.py",
-        "src/src/python/grpcio_tests/tests/unit/test_common.py",
-        "src/src/python/grpcio_tests/tests/unit/thread_pool.py"
-      ]
+    "schema_version": 1,
+    "source": {
+      "sha256": "ca5fc86a7c609848c3877d11b5d2d2ed27e2923151e2bf61e47051c7d3c10d1b",
+      "url": "https://pypi.org/packages/source/g/grpcio-health-checking/grpcio_health_checking-1.70.0.tar.gz"
     }
   },
   "linux_64_requirements": {
@@ -130,79 +166,113 @@
     "about": {
       "dev_url": "https://github.com/grpc/grpc/tree/master/src/python/grpcio_health_checking",
       "doc_url": "https://grpc.github.io/grpc/python/grpc_health_checking.html",
-      "home": "https://grpc.io",
+      "home": "https://grpc.io/",
       "license": "Apache-2.0",
+      "license_family": "Apache-2.0",
       "license_file": "dist/LICENSE",
       "summary": "Standard Health Checking Service for gRPC"
     },
     "build": {
       "noarch": "python",
       "number": "0",
-      "script": "cd dist && PYTHON -m pip install . -vv --no-deps --no-build-isolation"
+      "script": [
+        "cd dist",
+        "${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation --disable-pip-version-check"
+      ]
     },
     "extra": {
       "recipe-maintainers": [
         "bollwyvl"
       ]
     },
+    "outputs": [
+      {
+        "build": null,
+        "name": "grpcio-health-checking",
+        "requirements": {
+          "build": [],
+          "host": [
+            "pip",
+            "python 3.9.*",
+            "setuptools"
+          ],
+          "run": [
+            "grpcio >=1.70.0",
+            "protobuf >=5.26.1,<6.0dev",
+            "python >=3.9"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "grpc_health",
+                "grpc_health.v1.health"
+              ],
+              "python_version": "3.9.*"
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "run_test.py"
+              ],
+              "source": [
+                "dist/setup.py",
+                "dist/grpc_version.py",
+                "src/src/python/grpcio_tests/tests/health_check/**",
+                "src/src/python/grpcio_tests/tests/__init__.py",
+                "src/src/python/grpcio_tests/tests/_loader.py",
+                "src/src/python/grpcio_tests/tests/_result.py",
+                "src/src/python/grpcio_tests/tests/_runner.py",
+                "src/src/python/grpcio_tests/tests/unit/__init__.py",
+                "src/src/python/grpcio_tests/tests/unit/framework/__init__.py",
+                "src/src/python/grpcio_tests/tests/unit/framework/common/__init__.py",
+                "src/src/python/grpcio_tests/tests/unit/framework/common/test_constants.py",
+                "src/src/python/grpcio_tests/tests/unit/test_common.py",
+                "src/src/python/grpcio_tests/tests/unit/thread_pool.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest-cov",
+                "python 3.9.*"
+              ]
+            },
+            "script": {
+              "content": [
+                "python run_test.py"
+              ],
+              "env": {
+                "PKG_GRPCIO_MIN": "1.70.0",
+                "PKG_PROTOBUF_MAX": "6.0dev",
+                "PKG_PROTOBUF_MIN": "5.26.1"
+              }
+            }
+          }
+        ]
+      }
+    ],
     "package": {
       "name": "grpcio-health-checking",
-      "version": "1.69.0"
+      "version": "1.70.0"
     },
     "requirements": {
       "host": [
         "pip",
-        "python 3.9",
+        "python 3.9.*",
         "setuptools"
       ],
       "run": [
-        "grpcio >=1.69.0",
+        "grpcio >=1.70.0",
         "protobuf >=5.26.1,<6.0dev",
         "python >=3.9"
       ]
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "folder": "dist",
-        "sha256": "ff6e1d38c2a300b1bbd296916fbd9165667bc4b5a8557f99dd4226d4f9e8f4c1",
-        "url": "https://pypi.org/packages/source/g/grpcio-health-checking/grpcio_health_checking-1.69.0.tar.gz"
-      },
-      {
-        "folder": "src",
-        "sha256": "cd256d91781911d46a57506978b3979bfee45d5086a1b6668a3ae19c5e77f8dc",
-        "url": "https://github.com/grpc/grpc/archive/v1.69.0.tar.gz"
-      }
-    ],
-    "test": {
-      "commands": [
-        "pip check",
-        "cd src/src/python/grpcio_tests",
-        "pytest -vv -k health_check --cov grpc_health --cov-fail-under 71"
-      ],
-      "imports": [
-        "grpc_health",
-        "grpc_health.v1.health"
-      ],
-      "requires": [
-        "pip",
-        "pytest-cov",
-        "python 3.9"
-      ],
-      "source_files": [
-        "dist/grpc_version.py",
-        "src/src/python/grpcio_tests/tests/health_check/",
-        "src/src/python/grpcio_tests/tests/__init__.py",
-        "src/src/python/grpcio_tests/tests/_loader.py",
-        "src/src/python/grpcio_tests/tests/_result.py",
-        "src/src/python/grpcio_tests/tests/_runner.py",
-        "src/src/python/grpcio_tests/tests/unit/__init__.py",
-        "src/src/python/grpcio_tests/tests/unit/framework/__init__.py",
-        "src/src/python/grpcio_tests/tests/unit/framework/common/__init__.py",
-        "src/src/python/grpcio_tests/tests/unit/framework/common/test_constants.py",
-        "src/src/python/grpcio_tests/tests/unit/test_common.py",
-        "src/src/python/grpcio_tests/tests/unit/thread_pool.py"
-      ]
+    "schema_version": 1,
+    "source": {
+      "sha256": "ca5fc86a7c609848c3877d11b5d2d2ed27e2923151e2bf61e47051c7d3c10d1b",
+      "url": "https://pypi.org/packages/source/g/grpcio-health-checking/grpcio_health_checking-1.70.0.tar.gz"
     }
   },
   "name": "grpcio-health-checking",
@@ -219,7 +289,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/grpcio-health-checking.json"
   },
-  "raw_meta_yaml": "{% set version = \"1.69.0\" %}\n\n# TODO: this upstream pin appears in setup.py, not updated w/r/t to code generation version\n{% set min_protobuf = \"5.26.1\" %}\n{% set max_protobuf = \"6.0dev\" %}\n\npackage:\n  name: grpcio-health-checking\n  version: {{ version }}\n\nsource:\n  - folder: dist\n    url: https://pypi.org/packages/source/g/grpcio-health-checking/grpcio_health_checking-{{ version }}.tar.gz\n    sha256: ff6e1d38c2a300b1bbd296916fbd9165667bc4b5a8557f99dd4226d4f9e8f4c1\n  - folder: src\n    url: https://github.com/grpc/grpc/archive/v{{ version }}.tar.gz\n    sha256: cd256d91781911d46a57506978b3979bfee45d5086a1b6668a3ae19c5e77f8dc\n\nbuild:\n  number: 0\n  noarch: python\n  script: cd dist && {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation\n\nrequirements:\n  host:\n    - pip\n    - python {{ python_min }}\n    - setuptools\n  run:\n    - grpcio >={{ version }}\n    - protobuf >={{ min_protobuf }},<{{ max_protobuf }}\n    - python >={{ python_min }}\n\ntest:\n  source_files:\n    # checked grpc version in run_test.py\n    - dist/grpc_version.py\n    # the actual tests to run under coverage\n    - src/src/python/grpcio_tests/tests/health_check/\n    # test imports\n    - src/src/python/grpcio_tests/tests/__init__.py\n    - src/src/python/grpcio_tests/tests/_loader.py\n    - src/src/python/grpcio_tests/tests/_result.py\n    - src/src/python/grpcio_tests/tests/_runner.py\n    - src/src/python/grpcio_tests/tests/unit/__init__.py\n    - src/src/python/grpcio_tests/tests/unit/framework/__init__.py\n    - src/src/python/grpcio_tests/tests/unit/framework/common/__init__.py\n    - src/src/python/grpcio_tests/tests/unit/framework/common/test_constants.py\n    - src/src/python/grpcio_tests/tests/unit/test_common.py\n    - src/src/python/grpcio_tests/tests/unit/thread_pool.py\n  imports:\n    - grpc_health\n    - grpc_health.v1.health\n  commands:\n    - pip check\n    - cd src/src/python/grpcio_tests\n    - pytest -vv -k health_check --cov grpc_health --cov-fail-under 71\n  requires:\n    - pip\n    - pytest-cov\n    # TODO: do import tests with the minimum to assure it hasn't changed\n    # - protobuf =={{ min_protobuf }}\n    - python {{ python_min }}\n\nabout:\n  home: https://grpc.io\n  summary: Standard Health Checking Service for gRPC\n  license: Apache-2.0\n  license_file: dist/LICENSE\n  dev_url: https://github.com/grpc/grpc/tree/master/src/python/grpcio_health_checking\n  doc_url: https://grpc.github.io/grpc/python/grpc_health_checking.html\n\nextra:\n  recipe-maintainers:\n    - bollwyvl\n",
+  "raw_meta_yaml": "# yaml-language-server: $schema=https://raw.githubusercontent.com/prefix-dev/recipe-format/main/schema.json\nschema_version: 1\n\ncontext:\n  version: 1.70.0\n  # this upstream pin appears in grpcio_version.py, and has always been the same as `version`\n  grpcio_min: ${{ version }}\n  # this upstream pin appears in setup.py, not updated w/r/t to code generation version\n  protobuf_min: 5.26.1\n  protobuf_max: 6.0dev\n\npackage:\n  name: grpcio-health-checking\n  version: ${{ version }}\n\nsource:\n  - target_directory: dist\n    url: https://pypi.org/packages/source/g/grpcio-health-checking/grpcio_health_checking-${{ version }}.tar.gz\n    sha256: ca5fc86a7c609848c3877d11b5d2d2ed27e2923151e2bf61e47051c7d3c10d1b\n  - target_directory: src\n    url: https://github.com/grpc/grpc/archive/v${{ version }}.tar.gz\n    sha256: 3c95034f6b23ce7d286e2e7b5f3f4f223720b8bb3f5a9662ff96b7013b2c3c26\n\nbuild:\n  number: 0\n  noarch: python\n  script:\n    - cd dist\n    - ${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation --disable-pip-version-check\n\nrequirements:\n  host:\n    - pip\n    - python ${{ python_min }}.*\n    - setuptools\n  run:\n    - grpcio >=${{ grpcio_min }}\n    - protobuf >=${{ protobuf_min }},<${{ protobuf_max }}\n    - python >=${{ python_min }}\n\ntests:\n  - python:\n      pip_check: true\n      python_version: ${{ python_min }}.*\n      imports:\n        - grpc_health\n        - grpc_health.v1.health\n  - files:\n      recipe:\n        - run_test.py\n      source:\n        - dist/setup.py\n        - dist/grpc_version.py\n        # the actual tests to run under coverage\n        - src/src/python/grpcio_tests/tests/health_check/\n        # test imports\n        - src/src/python/grpcio_tests/tests/__init__.py\n        - src/src/python/grpcio_tests/tests/_loader.py\n        - src/src/python/grpcio_tests/tests/_result.py\n        - src/src/python/grpcio_tests/tests/_runner.py\n        - src/src/python/grpcio_tests/tests/unit/__init__.py\n        - src/src/python/grpcio_tests/tests/unit/framework/__init__.py\n        - src/src/python/grpcio_tests/tests/unit/framework/common/__init__.py\n        - src/src/python/grpcio_tests/tests/unit/framework/common/test_constants.py\n        - src/src/python/grpcio_tests/tests/unit/test_common.py\n        - src/src/python/grpcio_tests/tests/unit/thread_pool.py\n    requirements:\n      run:\n        - pytest-cov\n        - python ${{ python_min }}.*\n    script:\n      env:\n        PKG_GRPCIO_MIN: ${{ grpcio_min }}\n        PKG_PROTOBUF_MIN: ${{ protobuf_min}}\n        PKG_PROTOBUF_MAX: ${{ protobuf_max}}\n      content:\n        - python run_test.py\n\nabout:\n  summary: Standard Health Checking Service for gRPC\n  license: Apache-2.0\n  license_file: dist/LICENSE\n  homepage: https://grpc.io\n  repository: https://github.com/grpc/grpc/tree/master/src/python/grpcio_health_checking\n  documentation: https://grpc.github.io/grpc/python/grpc_health_checking.html\n\nextra:\n  recipe-maintainers:\n    - bollwyvl\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -270,14 +340,14 @@
       "__set__": true,
       "elements": [
         "pip",
-        "python 3.9",
+        "python 3.9.*",
         "setuptools"
       ]
     },
     "run": {
       "__set__": true,
       "elements": [
-        "grpcio >=1.69.0",
+        "grpcio >=1.70.0",
         "protobuf >=5.26.1,<6.0dev",
         "python >=3.9"
       ]
@@ -287,12 +357,12 @@
       "elements": [
         "pip",
         "pytest-cov",
-        "python 3.9"
+        "python 3.9.*"
       ]
     }
   },
-  "url": "https://pypi.org/packages/source/g/grpcio-health-checking/grpcio_health_checking-1.69.0.tar.gz",
-  "version": "1.69.0",
+  "url": "https://pypi.org/packages/source/g/grpcio-health-checking/grpcio_health_checking-1.70.0.tar.gz",
+  "version": "1.70.0",
   "version_pr_info": {
     "__lazy_json__": "version_pr_info/grpcio-health-checking.json"
   }
