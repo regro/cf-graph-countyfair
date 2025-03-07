@@ -11,6 +11,7 @@
       "error_overlinking": true,
       "pkg_format": "2"
     },
+    "conda_build_tool": "rattler-build",
     "conda_forge_output_validation": true,
     "github": {
       "branch_name": "main",
@@ -27,24 +28,25 @@
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
     "about": {
-      "description": "AMReX is a software framework containing all the functionality to write\nmassively parallel, block-structured adaptive mesh refinement (AMR)\napplications. AMReX is developed at LBNL, NREL, and ANL as part of the\nBlock-Structured AMR Co-Design Center in DOE's Exascale Computing Project.\n",
+      "description": "AMReX is a software framework containing all the functionality to write\nmassively parallel, block-structured adaptive mesh refinement (AMR)\napplications. AMReX is developed at LBNL, NREL, and ANL as part of the\nBlock-Structured AMR Co-Design Center in DOE's Exascale Computing Project.",
       "dev_url": "https://github.com/AMReX-Codes/amrex",
       "doc_url": "https://amrex-codes.github.io/amrex/docs_html/",
       "home": "https://amrex-codes.github.io/amrex/",
       "license": "BSD-3-Clause-LBNL",
-      "license_family": "BSD",
+      "license_family": "BSD-3-Clause-LBNL",
       "license_file": "LICENSE",
       "summary": "A software framework for massively parallel, block-structured adaptive mesh refinement (AMR) applications"
     },
     "build": {
       "number": "0",
-      "run_exports": [
-        "amrex * mpi_mpich_*",
-        "amrex 25.02",
-        "amrex * nompi_*",
-        "amrex * mpi_openmpi_*"
-      ],
-      "string": "mpi_openmpi_h1234567_0"
+      "run_exports": {
+        "weak": [
+          "amrex * mpi_mpich_*",
+          "amrex ==25.3",
+          "amrex * nompi_*",
+          "amrex * mpi_openmpi_*"
+        ]
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -53,19 +55,156 @@
         "WeiqunZhang"
       ]
     },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "amrex * mpi_mpich_*",
+            "amrex ==25.3"
+          ]
+        },
+        "name": "amrex",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "cmake",
+            "curl",
+            "pkg-config"
+          ],
+          "host": [
+            "mpich",
+            "fftw"
+          ],
+          "run": [
+            "mpich"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/AMReX/AMReXConfig.cmake"
+              ],
+              "include": [
+                "AMReX.H"
+              ],
+              "lib": [
+                "amrex",
+                "amrex_1d",
+                "amrex_2d",
+                "amrex_3d"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "amrex * nompi_*",
+            "amrex ==25.3"
+          ]
+        },
+        "name": "amrex",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "cmake",
+            "curl",
+            "pkg-config"
+          ],
+          "host": [
+            "fftw"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/AMReX/AMReXConfig.cmake"
+              ],
+              "include": [
+                "AMReX.H"
+              ],
+              "lib": [
+                "amrex",
+                "amrex_1d",
+                "amrex_2d",
+                "amrex_3d"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "amrex * mpi_openmpi_*",
+            "amrex ==25.3"
+          ]
+        },
+        "name": "amrex",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "cmake",
+            "curl",
+            "pkg-config"
+          ],
+          "host": [
+            "openmpi",
+            "fftw"
+          ],
+          "run": [
+            "openmpi"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/AMReX/AMReXConfig.cmake"
+              ],
+              "include": [
+                "AMReX.H"
+              ],
+              "lib": [
+                "amrex",
+                "amrex_1d",
+                "amrex_2d",
+                "amrex_3d"
+              ]
+            }
+          }
+        ]
+      }
+    ],
     "package": {
       "name": "amrex",
-      "version": "25.02"
+      "version": "25.03"
     },
     "requirements": {
       "build": [
         "c_compiler_stub",
-        "cxx_compiler_stub",
         "c_stdlib_stub",
-        "cmake",
+        "cxx_compiler_stub",
         "make",
-        "libgomp",
-        "pkgconfig"
+        "cmake",
+        "curl",
+        "pkg-config"
       ],
       "host": [
         "mpich",
@@ -77,17 +216,10 @@
         "openmpi"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
-      "sha256": "d916f4e6fa66ee9f4bb3c6e481f9c105dd70f2fc0e65b7984dc55877ac059524",
-      "url": "https://github.com/AMReX-Codes/amrex/archive/refs/tags/25.02.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "test -f ${PREFIX}/lib/libamrex_1d.so",
-        "test -f ${PREFIX}/lib/libamrex_2d.so",
-        "test -f ${PREFIX}/lib/libamrex_3d.so"
-      ]
+      "sha256": "bfa0e497f1d7e0f5e40e2518e2b88bb0a6006b855c10ff36356bb00348e82b95",
+      "url": "https://github.com/AMReX-Codes/amrex/archive/refs/tags/25.03.tar.gz"
     }
   },
   "linux_64_requirements": {
@@ -97,10 +229,10 @@
         "c_compiler_stub",
         "c_stdlib_stub",
         "cmake",
+        "curl",
         "cxx_compiler_stub",
-        "libgomp",
         "make",
-        "pkgconfig"
+        "pkg-config"
       ]
     },
     "host": {
@@ -125,24 +257,25 @@
   },
   "linux_aarch64_meta_yaml": {
     "about": {
-      "description": "AMReX is a software framework containing all the functionality to write\nmassively parallel, block-structured adaptive mesh refinement (AMR)\napplications. AMReX is developed at LBNL, NREL, and ANL as part of the\nBlock-Structured AMR Co-Design Center in DOE's Exascale Computing Project.\n",
+      "description": "AMReX is a software framework containing all the functionality to write\nmassively parallel, block-structured adaptive mesh refinement (AMR)\napplications. AMReX is developed at LBNL, NREL, and ANL as part of the\nBlock-Structured AMR Co-Design Center in DOE's Exascale Computing Project.",
       "dev_url": "https://github.com/AMReX-Codes/amrex",
       "doc_url": "https://amrex-codes.github.io/amrex/docs_html/",
       "home": "https://amrex-codes.github.io/amrex/",
       "license": "BSD-3-Clause-LBNL",
-      "license_family": "BSD",
+      "license_family": "BSD-3-Clause-LBNL",
       "license_file": "LICENSE",
       "summary": "A software framework for massively parallel, block-structured adaptive mesh refinement (AMR) applications"
     },
     "build": {
       "number": "0",
-      "run_exports": [
-        "amrex * mpi_mpich_*",
-        "amrex 25.02",
-        "amrex * nompi_*",
-        "amrex * mpi_openmpi_*"
-      ],
-      "string": "mpi_openmpi_h1234567_0"
+      "run_exports": {
+        "weak": [
+          "amrex * mpi_mpich_*",
+          "amrex ==25.3",
+          "amrex * nompi_*",
+          "amrex * mpi_openmpi_*"
+        ]
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -151,19 +284,156 @@
         "WeiqunZhang"
       ]
     },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "amrex * mpi_mpich_*",
+            "amrex ==25.3"
+          ]
+        },
+        "name": "amrex",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "cmake",
+            "curl",
+            "pkg-config"
+          ],
+          "host": [
+            "mpich",
+            "fftw"
+          ],
+          "run": [
+            "mpich"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/AMReX/AMReXConfig.cmake"
+              ],
+              "include": [
+                "AMReX.H"
+              ],
+              "lib": [
+                "amrex",
+                "amrex_1d",
+                "amrex_2d",
+                "amrex_3d"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "amrex * nompi_*",
+            "amrex ==25.3"
+          ]
+        },
+        "name": "amrex",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "cmake",
+            "curl",
+            "pkg-config"
+          ],
+          "host": [
+            "fftw"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/AMReX/AMReXConfig.cmake"
+              ],
+              "include": [
+                "AMReX.H"
+              ],
+              "lib": [
+                "amrex",
+                "amrex_1d",
+                "amrex_2d",
+                "amrex_3d"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "amrex * mpi_openmpi_*",
+            "amrex ==25.3"
+          ]
+        },
+        "name": "amrex",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "cmake",
+            "curl",
+            "pkg-config"
+          ],
+          "host": [
+            "openmpi",
+            "fftw"
+          ],
+          "run": [
+            "openmpi"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/AMReX/AMReXConfig.cmake"
+              ],
+              "include": [
+                "AMReX.H"
+              ],
+              "lib": [
+                "amrex",
+                "amrex_1d",
+                "amrex_2d",
+                "amrex_3d"
+              ]
+            }
+          }
+        ]
+      }
+    ],
     "package": {
       "name": "amrex",
-      "version": "25.02"
+      "version": "25.03"
     },
     "requirements": {
       "build": [
         "c_compiler_stub",
-        "cxx_compiler_stub",
         "c_stdlib_stub",
-        "cmake",
+        "cxx_compiler_stub",
         "make",
-        "libgomp",
-        "pkgconfig"
+        "cmake",
+        "curl",
+        "pkg-config"
       ],
       "host": [
         "mpich",
@@ -175,17 +445,10 @@
         "openmpi"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
-      "sha256": "d916f4e6fa66ee9f4bb3c6e481f9c105dd70f2fc0e65b7984dc55877ac059524",
-      "url": "https://github.com/AMReX-Codes/amrex/archive/refs/tags/25.02.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "test -f ${PREFIX}/lib/libamrex_1d.so",
-        "test -f ${PREFIX}/lib/libamrex_2d.so",
-        "test -f ${PREFIX}/lib/libamrex_3d.so"
-      ]
+      "sha256": "bfa0e497f1d7e0f5e40e2518e2b88bb0a6006b855c10ff36356bb00348e82b95",
+      "url": "https://github.com/AMReX-Codes/amrex/archive/refs/tags/25.03.tar.gz"
     }
   },
   "linux_aarch64_requirements": {
@@ -195,10 +458,10 @@
         "c_compiler_stub",
         "c_stdlib_stub",
         "cmake",
+        "curl",
         "cxx_compiler_stub",
-        "libgomp",
         "make",
-        "pkgconfig"
+        "pkg-config"
       ]
     },
     "host": {
@@ -223,24 +486,25 @@
   },
   "linux_ppc64le_meta_yaml": {
     "about": {
-      "description": "AMReX is a software framework containing all the functionality to write\nmassively parallel, block-structured adaptive mesh refinement (AMR)\napplications. AMReX is developed at LBNL, NREL, and ANL as part of the\nBlock-Structured AMR Co-Design Center in DOE's Exascale Computing Project.\n",
+      "description": "AMReX is a software framework containing all the functionality to write\nmassively parallel, block-structured adaptive mesh refinement (AMR)\napplications. AMReX is developed at LBNL, NREL, and ANL as part of the\nBlock-Structured AMR Co-Design Center in DOE's Exascale Computing Project.",
       "dev_url": "https://github.com/AMReX-Codes/amrex",
       "doc_url": "https://amrex-codes.github.io/amrex/docs_html/",
       "home": "https://amrex-codes.github.io/amrex/",
       "license": "BSD-3-Clause-LBNL",
-      "license_family": "BSD",
+      "license_family": "BSD-3-Clause-LBNL",
       "license_file": "LICENSE",
       "summary": "A software framework for massively parallel, block-structured adaptive mesh refinement (AMR) applications"
     },
     "build": {
       "number": "0",
-      "run_exports": [
-        "amrex * mpi_mpich_*",
-        "amrex 25.02",
-        "amrex * nompi_*",
-        "amrex * mpi_openmpi_*"
-      ],
-      "string": "mpi_openmpi_h1234567_0"
+      "run_exports": {
+        "weak": [
+          "amrex * mpi_mpich_*",
+          "amrex ==25.3",
+          "amrex * nompi_*",
+          "amrex * mpi_openmpi_*"
+        ]
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -249,19 +513,156 @@
         "WeiqunZhang"
       ]
     },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "amrex * mpi_mpich_*",
+            "amrex ==25.3"
+          ]
+        },
+        "name": "amrex",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "cmake",
+            "curl",
+            "pkg-config"
+          ],
+          "host": [
+            "mpich",
+            "fftw"
+          ],
+          "run": [
+            "mpich"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/AMReX/AMReXConfig.cmake"
+              ],
+              "include": [
+                "AMReX.H"
+              ],
+              "lib": [
+                "amrex",
+                "amrex_1d",
+                "amrex_2d",
+                "amrex_3d"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "amrex * nompi_*",
+            "amrex ==25.3"
+          ]
+        },
+        "name": "amrex",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "cmake",
+            "curl",
+            "pkg-config"
+          ],
+          "host": [
+            "fftw"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/AMReX/AMReXConfig.cmake"
+              ],
+              "include": [
+                "AMReX.H"
+              ],
+              "lib": [
+                "amrex",
+                "amrex_1d",
+                "amrex_2d",
+                "amrex_3d"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "amrex * mpi_openmpi_*",
+            "amrex ==25.3"
+          ]
+        },
+        "name": "amrex",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "cmake",
+            "curl",
+            "pkg-config"
+          ],
+          "host": [
+            "openmpi",
+            "fftw"
+          ],
+          "run": [
+            "openmpi"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/AMReX/AMReXConfig.cmake"
+              ],
+              "include": [
+                "AMReX.H"
+              ],
+              "lib": [
+                "amrex",
+                "amrex_1d",
+                "amrex_2d",
+                "amrex_3d"
+              ]
+            }
+          }
+        ]
+      }
+    ],
     "package": {
       "name": "amrex",
-      "version": "25.02"
+      "version": "25.03"
     },
     "requirements": {
       "build": [
         "c_compiler_stub",
-        "cxx_compiler_stub",
         "c_stdlib_stub",
-        "cmake",
+        "cxx_compiler_stub",
         "make",
-        "libgomp",
-        "pkgconfig"
+        "cmake",
+        "curl",
+        "pkg-config"
       ],
       "host": [
         "mpich",
@@ -273,17 +674,10 @@
         "openmpi"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
-      "sha256": "d916f4e6fa66ee9f4bb3c6e481f9c105dd70f2fc0e65b7984dc55877ac059524",
-      "url": "https://github.com/AMReX-Codes/amrex/archive/refs/tags/25.02.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "test -f ${PREFIX}/lib/libamrex_1d.so",
-        "test -f ${PREFIX}/lib/libamrex_2d.so",
-        "test -f ${PREFIX}/lib/libamrex_3d.so"
-      ]
+      "sha256": "bfa0e497f1d7e0f5e40e2518e2b88bb0a6006b855c10ff36356bb00348e82b95",
+      "url": "https://github.com/AMReX-Codes/amrex/archive/refs/tags/25.03.tar.gz"
     }
   },
   "linux_ppc64le_requirements": {
@@ -293,10 +687,10 @@
         "c_compiler_stub",
         "c_stdlib_stub",
         "cmake",
+        "curl",
         "cxx_compiler_stub",
-        "libgomp",
         "make",
-        "pkgconfig"
+        "pkg-config"
       ]
     },
     "host": {
@@ -321,24 +715,25 @@
   },
   "meta_yaml": {
     "about": {
-      "description": "AMReX is a software framework containing all the functionality to write\nmassively parallel, block-structured adaptive mesh refinement (AMR)\napplications. AMReX is developed at LBNL, NREL, and ANL as part of the\nBlock-Structured AMR Co-Design Center in DOE's Exascale Computing Project.\n",
+      "description": "AMReX is a software framework containing all the functionality to write\nmassively parallel, block-structured adaptive mesh refinement (AMR)\napplications. AMReX is developed at LBNL, NREL, and ANL as part of the\nBlock-Structured AMR Co-Design Center in DOE's Exascale Computing Project.",
       "dev_url": "https://github.com/AMReX-Codes/amrex",
       "doc_url": "https://amrex-codes.github.io/amrex/docs_html/",
       "home": "https://amrex-codes.github.io/amrex/",
       "license": "BSD-3-Clause-LBNL",
-      "license_family": "BSD",
+      "license_family": "BSD-3-Clause-LBNL",
       "license_file": "LICENSE",
       "summary": "A software framework for massively parallel, block-structured adaptive mesh refinement (AMR) applications"
     },
     "build": {
       "number": "100",
-      "run_exports": [
-        "amrex * mpi_mpich_*",
-        "amrex 25.02",
-        "amrex * nompi_*",
-        "amrex * mpi_openmpi_*"
-      ],
-      "string": "nompi_h1234567_100"
+      "run_exports": {
+        "weak": [
+          "amrex * mpi_mpich_*",
+          "amrex ==25.3",
+          "amrex * nompi_*",
+          "amrex * mpi_openmpi_*"
+        ]
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -347,23 +742,739 @@
         "WeiqunZhang"
       ]
     },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "amrex * mpi_mpich_*",
+            "amrex ==25.3"
+          ]
+        },
+        "name": "amrex",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "cmake",
+            "curl",
+            "pkg-config"
+          ],
+          "host": [
+            "mpich",
+            "fftw"
+          ],
+          "run": [
+            "mpich"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/AMReX/AMReXConfig.cmake"
+              ],
+              "include": [
+                "AMReX.H"
+              ],
+              "lib": [
+                "amrex",
+                "amrex_1d",
+                "amrex_2d",
+                "amrex_3d"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "amrex * nompi_*",
+            "amrex ==25.3"
+          ]
+        },
+        "name": "amrex",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "cmake",
+            "curl",
+            "pkg-config"
+          ],
+          "host": [
+            "fftw"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/AMReX/AMReXConfig.cmake"
+              ],
+              "include": [
+                "AMReX.H"
+              ],
+              "lib": [
+                "amrex",
+                "amrex_1d",
+                "amrex_2d",
+                "amrex_3d"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "amrex * mpi_openmpi_*",
+            "amrex ==25.3"
+          ]
+        },
+        "name": "amrex",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "cmake",
+            "curl",
+            "pkg-config"
+          ],
+          "host": [
+            "openmpi",
+            "fftw"
+          ],
+          "run": [
+            "openmpi"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/AMReX/AMReXConfig.cmake"
+              ],
+              "include": [
+                "AMReX.H"
+              ],
+              "lib": [
+                "amrex",
+                "amrex_1d",
+                "amrex_2d",
+                "amrex_3d"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "amrex * mpi_mpich_*",
+            "amrex ==25.3"
+          ]
+        },
+        "name": "amrex",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "cmake",
+            "curl",
+            "pkg-config"
+          ],
+          "host": [
+            "mpich",
+            "fftw"
+          ],
+          "run": [
+            "mpich"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/AMReX/AMReXConfig.cmake"
+              ],
+              "include": [
+                "AMReX.H"
+              ],
+              "lib": [
+                "amrex",
+                "amrex_1d",
+                "amrex_2d",
+                "amrex_3d"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "amrex * nompi_*",
+            "amrex ==25.3"
+          ]
+        },
+        "name": "amrex",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "cmake",
+            "curl",
+            "pkg-config"
+          ],
+          "host": [
+            "fftw"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/AMReX/AMReXConfig.cmake"
+              ],
+              "include": [
+                "AMReX.H"
+              ],
+              "lib": [
+                "amrex",
+                "amrex_1d",
+                "amrex_2d",
+                "amrex_3d"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "amrex * mpi_openmpi_*",
+            "amrex ==25.3"
+          ]
+        },
+        "name": "amrex",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "cmake",
+            "curl",
+            "pkg-config"
+          ],
+          "host": [
+            "openmpi",
+            "fftw"
+          ],
+          "run": [
+            "openmpi"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/AMReX/AMReXConfig.cmake"
+              ],
+              "include": [
+                "AMReX.H"
+              ],
+              "lib": [
+                "amrex",
+                "amrex_1d",
+                "amrex_2d",
+                "amrex_3d"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "amrex * mpi_mpich_*",
+            "amrex ==25.3"
+          ]
+        },
+        "name": "amrex",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "cmake",
+            "curl",
+            "pkg-config"
+          ],
+          "host": [
+            "mpich",
+            "fftw"
+          ],
+          "run": [
+            "mpich"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/AMReX/AMReXConfig.cmake"
+              ],
+              "include": [
+                "AMReX.H"
+              ],
+              "lib": [
+                "amrex",
+                "amrex_1d",
+                "amrex_2d",
+                "amrex_3d"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "amrex * nompi_*",
+            "amrex ==25.3"
+          ]
+        },
+        "name": "amrex",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "cmake",
+            "curl",
+            "pkg-config"
+          ],
+          "host": [
+            "fftw"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/AMReX/AMReXConfig.cmake"
+              ],
+              "include": [
+                "AMReX.H"
+              ],
+              "lib": [
+                "amrex",
+                "amrex_1d",
+                "amrex_2d",
+                "amrex_3d"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "amrex * mpi_openmpi_*",
+            "amrex ==25.3"
+          ]
+        },
+        "name": "amrex",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "cmake",
+            "curl",
+            "pkg-config"
+          ],
+          "host": [
+            "openmpi",
+            "fftw"
+          ],
+          "run": [
+            "openmpi"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/AMReX/AMReXConfig.cmake"
+              ],
+              "include": [
+                "AMReX.H"
+              ],
+              "lib": [
+                "amrex",
+                "amrex_1d",
+                "amrex_2d",
+                "amrex_3d"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "amrex * mpi_mpich_*",
+            "amrex ==25.3"
+          ]
+        },
+        "name": "amrex",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "cmake",
+            "curl",
+            "pkg-config"
+          ],
+          "host": [
+            "mpich",
+            "fftw"
+          ],
+          "run": [
+            "mpich"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/AMReX/AMReXConfig.cmake"
+              ],
+              "include": [
+                "AMReX.H"
+              ],
+              "lib": [
+                "amrex",
+                "amrex_1d",
+                "amrex_2d",
+                "amrex_3d"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "amrex * nompi_*",
+            "amrex ==25.3"
+          ]
+        },
+        "name": "amrex",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "cmake",
+            "curl",
+            "pkg-config"
+          ],
+          "host": [
+            "fftw"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/AMReX/AMReXConfig.cmake"
+              ],
+              "include": [
+                "AMReX.H"
+              ],
+              "lib": [
+                "amrex",
+                "amrex_1d",
+                "amrex_2d",
+                "amrex_3d"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "amrex * mpi_openmpi_*",
+            "amrex ==25.3"
+          ]
+        },
+        "name": "amrex",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "cmake",
+            "curl",
+            "pkg-config"
+          ],
+          "host": [
+            "openmpi",
+            "fftw"
+          ],
+          "run": [
+            "openmpi"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/AMReX/AMReXConfig.cmake"
+              ],
+              "include": [
+                "AMReX.H"
+              ],
+              "lib": [
+                "amrex",
+                "amrex_1d",
+                "amrex_2d",
+                "amrex_3d"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "amrex * mpi_mpich_*",
+            "amrex ==25.3"
+          ]
+        },
+        "name": "amrex",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "cmake",
+            "curl",
+            "pkg-config"
+          ],
+          "host": [
+            "mpich",
+            "fftw"
+          ],
+          "run": [
+            "mpich"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/AMReX/AMReXConfig.cmake"
+              ],
+              "include": [
+                "AMReX.H"
+              ],
+              "lib": [
+                "amrex",
+                "amrex_1d",
+                "amrex_2d",
+                "amrex_3d"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "amrex * nompi_*",
+            "amrex ==25.3"
+          ]
+        },
+        "name": "amrex",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "cmake",
+            "curl",
+            "pkg-config"
+          ],
+          "host": [
+            "fftw"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/AMReX/AMReXConfig.cmake"
+              ],
+              "include": [
+                "AMReX.H"
+              ],
+              "lib": [
+                "amrex",
+                "amrex_1d",
+                "amrex_2d",
+                "amrex_3d"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "amrex * mpi_openmpi_*",
+            "amrex ==25.3"
+          ]
+        },
+        "name": "amrex",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "cmake",
+            "curl",
+            "pkg-config"
+          ],
+          "host": [
+            "openmpi",
+            "fftw"
+          ],
+          "run": [
+            "openmpi"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/AMReX/AMReXConfig.cmake"
+              ],
+              "include": [
+                "AMReX.H"
+              ],
+              "lib": [
+                "amrex",
+                "amrex_1d",
+                "amrex_2d",
+                "amrex_3d"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "amrex * nompi_*",
+            "amrex ==25.3"
+          ]
+        },
+        "name": "amrex",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "cmake",
+            "curl",
+            "pkg-config"
+          ],
+          "host": [
+            "fftw"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/AMReX/AMReXConfig.cmake"
+              ],
+              "include": [
+                "AMReX.H"
+              ],
+              "lib": [
+                "amrex",
+                "amrex_1d",
+                "amrex_2d",
+                "amrex_3d"
+              ]
+            }
+          }
+        ]
+      }
+    ],
     "package": {
       "name": "amrex",
-      "version": "25.02"
+      "version": "25.03"
     },
     "requirements": {
       "build": [
         "c_compiler_stub",
-        "cxx_compiler_stub",
         "c_stdlib_stub",
-        "cmake",
+        "cxx_compiler_stub",
         "make",
-        "libgomp",
-        "pkgconfig",
-        "llvm-openmp",
-        "clang",
-        "lld",
-        "ninja"
+        "cmake",
+        "curl",
+        "pkg-config"
       ],
       "host": [
         "mpich",
@@ -372,50 +1483,37 @@
       ],
       "run": [
         "mpich",
-        "openmpi",
-        "libcxx"
+        "openmpi"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
-      "sha256": "d916f4e6fa66ee9f4bb3c6e481f9c105dd70f2fc0e65b7984dc55877ac059524",
-      "url": "https://github.com/AMReX-Codes/amrex/archive/refs/tags/25.02.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "test -f ${PREFIX}/lib/libamrex_1d.so",
-        "test -f ${PREFIX}/lib/libamrex_2d.so",
-        "test -f ${PREFIX}/lib/libamrex_3d.so",
-        "test -f ${PREFIX}/lib/libamrex_1d.dylib",
-        "test -f ${PREFIX}/lib/libamrex_2d.dylib",
-        "test -f ${PREFIX}/lib/libamrex_3d.dylib",
-        "if not exist %LIBRARY_PREFIX%\\bin\\amrex_1d.dll exit 1",
-        "if not exist %LIBRARY_PREFIX%\\bin\\amrex_2d.dll exit 1",
-        "if not exist %LIBRARY_PREFIX%\\bin\\amrex_3d.dll exit 1"
-      ]
+      "sha256": "bfa0e497f1d7e0f5e40e2518e2b88bb0a6006b855c10ff36356bb00348e82b95",
+      "url": "https://github.com/AMReX-Codes/amrex/archive/refs/tags/25.03.tar.gz"
     }
   },
   "name": "amrex",
   "osx_64_meta_yaml": {
     "about": {
-      "description": "AMReX is a software framework containing all the functionality to write\nmassively parallel, block-structured adaptive mesh refinement (AMR)\napplications. AMReX is developed at LBNL, NREL, and ANL as part of the\nBlock-Structured AMR Co-Design Center in DOE's Exascale Computing Project.\n",
+      "description": "AMReX is a software framework containing all the functionality to write\nmassively parallel, block-structured adaptive mesh refinement (AMR)\napplications. AMReX is developed at LBNL, NREL, and ANL as part of the\nBlock-Structured AMR Co-Design Center in DOE's Exascale Computing Project.",
       "dev_url": "https://github.com/AMReX-Codes/amrex",
       "doc_url": "https://amrex-codes.github.io/amrex/docs_html/",
       "home": "https://amrex-codes.github.io/amrex/",
       "license": "BSD-3-Clause-LBNL",
-      "license_family": "BSD",
+      "license_family": "BSD-3-Clause-LBNL",
       "license_file": "LICENSE",
       "summary": "A software framework for massively parallel, block-structured adaptive mesh refinement (AMR) applications"
     },
     "build": {
       "number": "0",
-      "run_exports": [
-        "amrex * mpi_mpich_*",
-        "amrex 25.02",
-        "amrex * nompi_*",
-        "amrex * mpi_openmpi_*"
-      ],
-      "string": "mpi_openmpi_h1234567_0"
+      "run_exports": {
+        "weak": [
+          "amrex * mpi_mpich_*",
+          "amrex ==25.3",
+          "amrex * nompi_*",
+          "amrex * mpi_openmpi_*"
+        ]
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -424,19 +1522,156 @@
         "WeiqunZhang"
       ]
     },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "amrex * mpi_mpich_*",
+            "amrex ==25.3"
+          ]
+        },
+        "name": "amrex",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "cmake",
+            "curl",
+            "pkg-config"
+          ],
+          "host": [
+            "mpich",
+            "fftw"
+          ],
+          "run": [
+            "mpich"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/AMReX/AMReXConfig.cmake"
+              ],
+              "include": [
+                "AMReX.H"
+              ],
+              "lib": [
+                "amrex",
+                "amrex_1d",
+                "amrex_2d",
+                "amrex_3d"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "amrex * nompi_*",
+            "amrex ==25.3"
+          ]
+        },
+        "name": "amrex",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "cmake",
+            "curl",
+            "pkg-config"
+          ],
+          "host": [
+            "fftw"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/AMReX/AMReXConfig.cmake"
+              ],
+              "include": [
+                "AMReX.H"
+              ],
+              "lib": [
+                "amrex",
+                "amrex_1d",
+                "amrex_2d",
+                "amrex_3d"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "amrex * mpi_openmpi_*",
+            "amrex ==25.3"
+          ]
+        },
+        "name": "amrex",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "cmake",
+            "curl",
+            "pkg-config"
+          ],
+          "host": [
+            "openmpi",
+            "fftw"
+          ],
+          "run": [
+            "openmpi"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/AMReX/AMReXConfig.cmake"
+              ],
+              "include": [
+                "AMReX.H"
+              ],
+              "lib": [
+                "amrex",
+                "amrex_1d",
+                "amrex_2d",
+                "amrex_3d"
+              ]
+            }
+          }
+        ]
+      }
+    ],
     "package": {
       "name": "amrex",
-      "version": "25.02"
+      "version": "25.03"
     },
     "requirements": {
       "build": [
         "c_compiler_stub",
-        "cxx_compiler_stub",
         "c_stdlib_stub",
-        "cmake",
+        "cxx_compiler_stub",
         "make",
-        "llvm-openmp",
-        "pkgconfig"
+        "cmake",
+        "curl",
+        "pkg-config"
       ],
       "host": [
         "mpich",
@@ -445,21 +1680,13 @@
       ],
       "run": [
         "mpich",
-        "libcxx",
         "openmpi"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
-      "sha256": "d916f4e6fa66ee9f4bb3c6e481f9c105dd70f2fc0e65b7984dc55877ac059524",
-      "url": "https://github.com/AMReX-Codes/amrex/archive/refs/tags/25.02.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "test -f ${PREFIX}/lib/libamrex_1d.dylib",
-        "test -f ${PREFIX}/lib/libamrex_2d.dylib",
-        "test -f ${PREFIX}/lib/libamrex_3d.dylib"
-      ]
+      "sha256": "bfa0e497f1d7e0f5e40e2518e2b88bb0a6006b855c10ff36356bb00348e82b95",
+      "url": "https://github.com/AMReX-Codes/amrex/archive/refs/tags/25.03.tar.gz"
     }
   },
   "osx_64_requirements": {
@@ -469,10 +1696,10 @@
         "c_compiler_stub",
         "c_stdlib_stub",
         "cmake",
+        "curl",
         "cxx_compiler_stub",
-        "llvm-openmp",
         "make",
-        "pkgconfig"
+        "pkg-config"
       ]
     },
     "host": {
@@ -486,7 +1713,6 @@
     "run": {
       "__set__": true,
       "elements": [
-        "libcxx",
         "mpich",
         "openmpi"
       ]
@@ -498,24 +1724,25 @@
   },
   "osx_arm64_meta_yaml": {
     "about": {
-      "description": "AMReX is a software framework containing all the functionality to write\nmassively parallel, block-structured adaptive mesh refinement (AMR)\napplications. AMReX is developed at LBNL, NREL, and ANL as part of the\nBlock-Structured AMR Co-Design Center in DOE's Exascale Computing Project.\n",
+      "description": "AMReX is a software framework containing all the functionality to write\nmassively parallel, block-structured adaptive mesh refinement (AMR)\napplications. AMReX is developed at LBNL, NREL, and ANL as part of the\nBlock-Structured AMR Co-Design Center in DOE's Exascale Computing Project.",
       "dev_url": "https://github.com/AMReX-Codes/amrex",
       "doc_url": "https://amrex-codes.github.io/amrex/docs_html/",
       "home": "https://amrex-codes.github.io/amrex/",
       "license": "BSD-3-Clause-LBNL",
-      "license_family": "BSD",
+      "license_family": "BSD-3-Clause-LBNL",
       "license_file": "LICENSE",
       "summary": "A software framework for massively parallel, block-structured adaptive mesh refinement (AMR) applications"
     },
     "build": {
       "number": "0",
-      "run_exports": [
-        "amrex * mpi_mpich_*",
-        "amrex 25.02",
-        "amrex * nompi_*",
-        "amrex * mpi_openmpi_*"
-      ],
-      "string": "mpi_openmpi_h1234567_0"
+      "run_exports": {
+        "weak": [
+          "amrex * mpi_mpich_*",
+          "amrex ==25.3",
+          "amrex * nompi_*",
+          "amrex * mpi_openmpi_*"
+        ]
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -524,19 +1751,156 @@
         "WeiqunZhang"
       ]
     },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "amrex * mpi_mpich_*",
+            "amrex ==25.3"
+          ]
+        },
+        "name": "amrex",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "cmake",
+            "curl",
+            "pkg-config"
+          ],
+          "host": [
+            "mpich",
+            "fftw"
+          ],
+          "run": [
+            "mpich"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/AMReX/AMReXConfig.cmake"
+              ],
+              "include": [
+                "AMReX.H"
+              ],
+              "lib": [
+                "amrex",
+                "amrex_1d",
+                "amrex_2d",
+                "amrex_3d"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "amrex * nompi_*",
+            "amrex ==25.3"
+          ]
+        },
+        "name": "amrex",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "cmake",
+            "curl",
+            "pkg-config"
+          ],
+          "host": [
+            "fftw"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/AMReX/AMReXConfig.cmake"
+              ],
+              "include": [
+                "AMReX.H"
+              ],
+              "lib": [
+                "amrex",
+                "amrex_1d",
+                "amrex_2d",
+                "amrex_3d"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "amrex * mpi_openmpi_*",
+            "amrex ==25.3"
+          ]
+        },
+        "name": "amrex",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "cmake",
+            "curl",
+            "pkg-config"
+          ],
+          "host": [
+            "openmpi",
+            "fftw"
+          ],
+          "run": [
+            "openmpi"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/AMReX/AMReXConfig.cmake"
+              ],
+              "include": [
+                "AMReX.H"
+              ],
+              "lib": [
+                "amrex",
+                "amrex_1d",
+                "amrex_2d",
+                "amrex_3d"
+              ]
+            }
+          }
+        ]
+      }
+    ],
     "package": {
       "name": "amrex",
-      "version": "25.02"
+      "version": "25.03"
     },
     "requirements": {
       "build": [
         "c_compiler_stub",
-        "cxx_compiler_stub",
         "c_stdlib_stub",
-        "cmake",
+        "cxx_compiler_stub",
         "make",
-        "llvm-openmp",
-        "pkgconfig"
+        "cmake",
+        "curl",
+        "pkg-config"
       ],
       "host": [
         "mpich",
@@ -545,21 +1909,13 @@
       ],
       "run": [
         "mpich",
-        "libcxx",
         "openmpi"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
-      "sha256": "d916f4e6fa66ee9f4bb3c6e481f9c105dd70f2fc0e65b7984dc55877ac059524",
-      "url": "https://github.com/AMReX-Codes/amrex/archive/refs/tags/25.02.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "test -f ${PREFIX}/lib/libamrex_1d.dylib",
-        "test -f ${PREFIX}/lib/libamrex_2d.dylib",
-        "test -f ${PREFIX}/lib/libamrex_3d.dylib"
-      ]
+      "sha256": "bfa0e497f1d7e0f5e40e2518e2b88bb0a6006b855c10ff36356bb00348e82b95",
+      "url": "https://github.com/AMReX-Codes/amrex/archive/refs/tags/25.03.tar.gz"
     }
   },
   "osx_arm64_requirements": {
@@ -569,10 +1925,10 @@
         "c_compiler_stub",
         "c_stdlib_stub",
         "cmake",
+        "curl",
         "cxx_compiler_stub",
-        "llvm-openmp",
         "make",
-        "pkgconfig"
+        "pkg-config"
       ]
     },
     "host": {
@@ -586,7 +1942,6 @@
     "run": {
       "__set__": true,
       "elements": [
-        "libcxx",
         "mpich",
         "openmpi"
       ]
@@ -614,25 +1969,20 @@
   "pr_info": {
     "__lazy_json__": "pr_info/amrex.json"
   },
-  "raw_meta_yaml": "{% set name = \"amrex\" %}\n{% set version = \"25.02\" %}\n{% set build = 0 %}\n\n# ensure mpi is defined (needed for conda-smithy recipe-lint)\n{% set mpi = mpi or 'nompi' %}\n\n# prioritize nompi variant via build number\n{% if mpi == 'nompi' %}\n{% set build = build + 100 %}\n{% endif %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://github.com/AMReX-Codes/amrex/archive/refs/tags/{{ version }}.tar.gz\n  sha256: d916f4e6fa66ee9f4bb3c6e481f9c105dd70f2fc0e65b7984dc55877ac059524\n\nbuild:\n  number: {{ build }}\n\n  # add build string so packages can depend on\n  # mpi or nompi variants\n  # dependencies:\n  # `pkg * mpi_mpich_*` for mpich\n  # `pkg * mpi_*` for any mpi\n  # `pkg * nompi_*` for no mpi\n  {% if mpi == 'nompi' %}\n  {% set mpi_prefix = \"nompi\" %}\n  {% else %}\n  {% set mpi_prefix = \"mpi_\" + mpi %}\n  {% endif %}\n  string: {{ mpi_prefix }}_h{{ PKG_HASH }}_{{ build }}\n\n  run_exports:\n    # strict runtime dependency on build-time MPI flavor\n    - {{ name }} * {{ mpi_prefix }}_*\n    # Releases are not (yet) compatible:\n    # There is no ABI compatibility check or guarantee between AMReX releases.\n    - amrex {{ version }}\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ compiler('cxx') }}\n    - {{ stdlib(\"c\") }}\n    - clang         # [win]\n    - cmake\n    - lld           # [win]\n    - make          # [unix]\n    - ninja         # [win]\n    - libgomp       # [linux]\n    - llvm-openmp   # [osx or win]\n    - pkgconfig\n    # In OpenMPI, the compiler wrappers are binaries and the wrappers in build\n    # can use host libraries by adding OPAL_PREFIX and in mpich, compiler\n    # wrappers are bash scripts and wrappers in build can't use host libraries.\n    - openmpi  # [mpi == \"openmpi\" and (build_platform != target_platform)]\n  host:\n    - {{ mpi }}  # [mpi != 'nompi']\n    - fftw\n  run:\n    - {{ mpi }}  # [mpi != 'nompi']\n    - libcxx  # [osx]\n\ntest:\n  commands:\n    - test -f ${PREFIX}/lib/libamrex_1d.so  # [linux]\n    - test -f ${PREFIX}/lib/libamrex_2d.so  # [linux]\n    - test -f ${PREFIX}/lib/libamrex_3d.so  # [linux]\n    - test -f ${PREFIX}/lib/libamrex_1d.dylib  # [osx]\n    - test -f ${PREFIX}/lib/libamrex_2d.dylib  # [osx]\n    - test -f ${PREFIX}/lib/libamrex_3d.dylib  # [osx]\n    - if not exist %LIBRARY_PREFIX%\\bin\\amrex_1d.dll exit 1  # [win]\n    - if not exist %LIBRARY_PREFIX%\\bin\\amrex_2d.dll exit 1  # [win]\n    - if not exist %LIBRARY_PREFIX%\\bin\\amrex_3d.dll exit 1  # [win]\n\nabout:\n  home: https://amrex-codes.github.io/amrex/\n  license: BSD-3-Clause-LBNL\n  license_family: BSD\n  license_file: LICENSE\n  summary: A software framework for massively parallel, block-structured adaptive mesh refinement (AMR) applications\n\n  description: |\n    AMReX is a software framework containing all the functionality to write\n    massively parallel, block-structured adaptive mesh refinement (AMR)\n    applications. AMReX is developed at LBNL, NREL, and ANL as part of the\n    Block-Structured AMR Co-Design Center in DOE's Exascale Computing Project.\n\n  doc_url: https://amrex-codes.github.io/amrex/docs_html/\n  dev_url: https://github.com/AMReX-Codes/amrex\n\nextra:\n  recipe-maintainers:\n    - atmyers\n    - ax3l\n    - WeiqunZhang\n",
+  "raw_meta_yaml": "# ensure mpi is defined (needed for conda-smithy recipe-lint)\n# prioritize nompi variant via build number\nschema_version: 1\n\ncontext:\n  name: amrex\n  version: 25.03\n  build: 0\n  mpi: ${{ mpi or \"nompi\" }}  # is this still needed?\n  mpi_prefix: ${{ \"nompi\" if mpi == \"nompi\" else \"mpi_\" + mpi }}\n\npackage:\n  name: ${{ name|lower }}\n  version: ${{ version }}\n\nsource:\n  url: https://github.com/AMReX-Codes/amrex/archive/refs/tags/${{ version }}.tar.gz\n  sha256: bfa0e497f1d7e0f5e40e2518e2b88bb0a6006b855c10ff36356bb00348e82b95\n\nbuild:\n  # add build string so packages can depend on\n  # mpi or nompi variants\n  # dependencies:\n  # `pkg * mpi_mpich_*` for mpich\n  # `pkg * mpi_*` for any mpi\n  number: ${{ build | int + 100 if mpi == \"nompi\" else build }}\n  string: ${{ mpi_prefix }}_h${{ hash }}_${{ build | int + 100 if mpi == \"nompi\" else build }}\n\nrequirements:\n  build:\n    - ${{ compiler('c') }}\n    - ${{ stdlib(\"c\") }}\n    - ${{ compiler('cxx') }}\n    - if: unix\n      then: make\n    - if: win\n      then:\n        - clang\n        - lld\n        - llvm-openmp\n        - ninja\n    - if: osx\n      then: llvm-openmp\n    - cmake\n    - curl\n    - pkg-config\n    # In OpenMPI, the compiler wrappers are binaries and the wrappers in build\n    # can use host libraries by adding OPAL_PREFIX and in mpich, compiler\n    # wrappers are bash scripts and wrappers in build can't use host libraries.\n    - if: \"mpi == 'openmpi' and (build_platform != target_platform)\"\n      then: openmpi\n\n  host:\n    - if: \"mpi != 'nompi'\"\n      then: ${{ mpi }}\n    - fftw\n  run:\n    - if: \"mpi != 'nompi'\"\n      then:\n        - ${{ mpi }}\n    - if: osx\n      then: libcxx\n  run_exports:\n    # strict runtime dependency on build-time MPI flavor\n    - ${{ name }} * ${{ mpi_prefix }}_*\n    # Releases are not (yet) compatible:\n    # There is no ABI compatibility check or guarantee between AMReX releases.\n    - amrex ==${{ version }}\n\ntests:\n  - package_contents:\n      lib:\n        - if: unix\n          then: amrex\n        - amrex_1d\n        - amrex_2d\n        - amrex_3d\n      include:\n        - AMReX.H\n      files:\n        - ${{ \"Library\" if win else \"lib\" }}/cmake/${{ \"AMReX/\" if unix }}AMReXConfig.cmake\n\nabout:\n  license: BSD-3-Clause-LBNL\n  license_file: LICENSE\n  summary: A software framework for massively parallel, block-structured adaptive mesh refinement (AMR) applications\n  description: |\n    AMReX is a software framework containing all the functionality to write\n    massively parallel, block-structured adaptive mesh refinement (AMR)\n    applications. AMReX is developed at LBNL, NREL, and ANL as part of the\n    Block-Structured AMR Co-Design Center in DOE's Exascale Computing Project.\n  homepage: https://amrex-codes.github.io/amrex/\n  repository: https://github.com/AMReX-Codes/amrex\n  documentation: https://amrex-codes.github.io/amrex/docs_html/\n\nextra:\n  recipe-maintainers:\n    - atmyers\n    - ax3l\n    - WeiqunZhang\n",
   "req": {
     "__set__": true,
     "elements": [
       "c_compiler_stub",
       "c_stdlib_stub",
-      "clang",
       "cmake",
+      "curl",
       "cxx_compiler_stub",
       "fftw",
-      "libcxx",
-      "libgomp",
-      "lld",
-      "llvm-openmp",
       "make",
       "mpich",
-      "ninja",
       "openmpi",
-      "pkgconfig"
+      "pkg-config"
     ]
   },
   "requirements": {
@@ -641,15 +1991,11 @@
       "elements": [
         "c_compiler_stub",
         "c_stdlib_stub",
-        "clang",
         "cmake",
+        "curl",
         "cxx_compiler_stub",
-        "libgomp",
-        "lld",
-        "llvm-openmp",
         "make",
-        "ninja",
-        "pkgconfig"
+        "pkg-config"
       ]
     },
     "host": {
@@ -657,11 +2003,9 @@
       "elements": [
         "c_compiler_stub",
         "c_stdlib_stub",
-        "ctng-compilers",
         "cxx_compiler_stub",
         "fftw",
         "mpich",
-        "openmp",
         "openmpi"
       ]
     },
@@ -670,11 +2014,8 @@
       "elements": [
         "c_compiler_stub",
         "c_stdlib_stub",
-        "ctng-compilers",
         "cxx_compiler_stub",
-        "libcxx",
         "mpich",
-        "openmp",
         "openmpi"
       ]
     },
@@ -690,15 +2031,11 @@
       "elements": [
         "c_compiler_stub",
         "c_stdlib_stub",
-        "clang",
         "cmake",
+        "curl",
         "cxx_compiler_stub",
-        "libgomp",
-        "lld",
-        "llvm-openmp",
         "make",
-        "ninja",
-        "pkgconfig"
+        "pkg-config"
       ]
     },
     "host": {
@@ -712,7 +2049,6 @@
     "run": {
       "__set__": true,
       "elements": [
-        "libcxx",
         "mpich",
         "openmpi"
       ]
@@ -722,29 +2058,30 @@
       "elements": []
     }
   },
-  "url": "https://github.com/AMReX-Codes/amrex/archive/refs/tags/25.02.tar.gz",
-  "version": "25.02",
+  "url": "https://github.com/AMReX-Codes/amrex/archive/refs/tags/25.03.tar.gz",
+  "version": "25.03",
   "version_pr_info": {
     "__lazy_json__": "version_pr_info/amrex.json"
   },
   "win_64_meta_yaml": {
     "about": {
-      "description": "AMReX is a software framework containing all the functionality to write\nmassively parallel, block-structured adaptive mesh refinement (AMR)\napplications. AMReX is developed at LBNL, NREL, and ANL as part of the\nBlock-Structured AMR Co-Design Center in DOE's Exascale Computing Project.\n",
+      "description": "AMReX is a software framework containing all the functionality to write\nmassively parallel, block-structured adaptive mesh refinement (AMR)\napplications. AMReX is developed at LBNL, NREL, and ANL as part of the\nBlock-Structured AMR Co-Design Center in DOE's Exascale Computing Project.",
       "dev_url": "https://github.com/AMReX-Codes/amrex",
       "doc_url": "https://amrex-codes.github.io/amrex/docs_html/",
       "home": "https://amrex-codes.github.io/amrex/",
       "license": "BSD-3-Clause-LBNL",
-      "license_family": "BSD",
+      "license_family": "BSD-3-Clause-LBNL",
       "license_file": "LICENSE",
       "summary": "A software framework for massively parallel, block-structured adaptive mesh refinement (AMR) applications"
     },
     "build": {
       "number": "100",
-      "run_exports": [
-        "amrex * nompi_*",
-        "amrex 25.02"
-      ],
-      "string": "nompi_h1234567_100"
+      "run_exports": {
+        "weak": [
+          "amrex * nompi_*",
+          "amrex ==25.3"
+        ]
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -753,38 +2090,73 @@
         "WeiqunZhang"
       ]
     },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "amrex * nompi_*",
+            "amrex ==25.3"
+          ]
+        },
+        "name": "amrex",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "cmake",
+            "curl",
+            "pkg-config"
+          ],
+          "host": [
+            "fftw"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/AMReX/AMReXConfig.cmake"
+              ],
+              "include": [
+                "AMReX.H"
+              ],
+              "lib": [
+                "amrex",
+                "amrex_1d",
+                "amrex_2d",
+                "amrex_3d"
+              ]
+            }
+          }
+        ]
+      }
+    ],
     "package": {
       "name": "amrex",
-      "version": "25.02"
+      "version": "25.03"
     },
     "requirements": {
       "build": [
         "c_compiler_stub",
-        "cxx_compiler_stub",
         "c_stdlib_stub",
-        "clang",
+        "cxx_compiler_stub",
+        "make",
         "cmake",
-        "lld",
-        "ninja",
-        "llvm-openmp",
-        "pkgconfig"
+        "curl",
+        "pkg-config"
       ],
       "host": [
         "fftw"
-      ],
-      "run": []
-    },
-    "schema_version": 0,
-    "source": {
-      "sha256": "d916f4e6fa66ee9f4bb3c6e481f9c105dd70f2fc0e65b7984dc55877ac059524",
-      "url": "https://github.com/AMReX-Codes/amrex/archive/refs/tags/25.02.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "if not exist %LIBRARY_PREFIX%\\bin\\amrex_1d.dll exit 1",
-        "if not exist %LIBRARY_PREFIX%\\bin\\amrex_2d.dll exit 1",
-        "if not exist %LIBRARY_PREFIX%\\bin\\amrex_3d.dll exit 1"
       ]
+    },
+    "schema_version": 1,
+    "source": {
+      "sha256": "bfa0e497f1d7e0f5e40e2518e2b88bb0a6006b855c10ff36356bb00348e82b95",
+      "url": "https://github.com/AMReX-Codes/amrex/archive/refs/tags/25.03.tar.gz"
     }
   },
   "win_64_requirements": {
@@ -793,13 +2165,11 @@
       "elements": [
         "c_compiler_stub",
         "c_stdlib_stub",
-        "clang",
         "cmake",
+        "curl",
         "cxx_compiler_stub",
-        "lld",
-        "llvm-openmp",
-        "ninja",
-        "pkgconfig"
+        "make",
+        "pkg-config"
       ]
     },
     "host": {
