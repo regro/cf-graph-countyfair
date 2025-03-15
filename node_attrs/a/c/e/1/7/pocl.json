@@ -3,9 +3,11 @@
   "branch": "main",
   "conda-forge.yml": {
     "azure": {
-      "store_build_artifacts": true
+      "free_disk_space": true
     },
     "build_platform": {
+      "linux_aarch64": "linux_64",
+      "linux_ppc64le": "linux_64",
       "osx_arm64": "osx_64"
     },
     "conda_build": {
@@ -15,10 +17,6 @@
     "github": {
       "branch_name": "main",
       "tooling_branch_name": "main"
-    },
-    "provider": {
-      "linux_aarch64": "native",
-      "linux_ppc64le": "azure"
     },
     "test": "native"
   },
@@ -37,7 +35,13 @@
       "summary": "Portable Computing Language -- a portable open source implementation of the OpenCL standard"
     },
     "build": {
-      "number": "1",
+      "ignore_run_exports_from": [
+        "cuda_compiler_stub",
+        "cuda-version",
+        "cuda-driver-dev",
+        "cuda-cudart-dev"
+      ],
+      "number": "2",
       "script_env": [
         "CUDA_HOME"
       ]
@@ -88,147 +92,14 @@
           "host": [
             "pocl-core",
             "pocl-cpu-minimal",
-            "llvm 15.0.7.*",
-            "libhwloc"
-          ],
-          "run": [
-            "pocl-core",
-            "pocl-cpu-minimal"
-          ]
-        },
-        "script": "install-pkg.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/pocl/libpocl-devices-pthread.so",
-            "export OCL_ICD_DEBUG=15",
-            "export POCL_DEBUG=1",
-            "curl -O https://raw.githubusercontent.com/inducer/pyopencl/main/examples/demo.py",
-            "python demo.py"
-          ],
-          "requires": [
-            "pyopencl",
-            "curl",
-            "pocl-cpu"
-          ]
-        }
-      },
-      {
-        "build": null,
-        "name": "pocl-cuda",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "pocl-core",
-            "llvm 15.0.7.*",
-            "libhwloc"
-          ],
-          "run": [
-            "pocl-core"
-          ],
-          "run_constrained": [
-            "__cuda >=11"
-          ]
-        },
-        "script": "install-pkg.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/pocl/libpocl-devices-cuda.so"
-          ]
-        }
-      },
-      {
-        "name": "pocl-remote",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "pocl-core",
-            "llvm 15.0.7.*",
-            "libhwloc"
-          ],
-          "run": [
-            "pocl-core"
-          ]
-        },
-        "script": "install-pkg.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/pocl/libpocl-devices-remote.so"
-          ]
-        }
-      },
-      {
-        "name": "pocl",
-        "requirements": {
-          "host": [
-            "libhwloc"
-          ],
-          "run": [
-            "pocl-core",
-            "pocl-cpu",
-            "pocl-cpu-minimal",
             "pocl-remote",
-            "pocl-cuda"
-          ]
-        },
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/pocl/libpocl-devices-pthread.so",
-            "test -f $PREFIX/lib/pocl/libpocl-devices-basic.so",
-            "test -f $PREFIX/lib/pocl/libpocl-devices-cuda.so"
-          ],
-          "downstreams": [
-            "pyopencl"
-          ]
-        }
-      },
-      {
-        "name": "pocl-core"
-      },
-      {
-        "name": "pocl-cpu-minimal",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "pocl-core",
             "llvm 15.0.7.*",
             "libhwloc"
           ],
           "run": [
-            "pocl-core"
-          ]
-        },
-        "script": "install-pkg.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/pocl/libpocl-devices-basic.so"
-          ]
-        }
-      },
-      {
-        "name": "pocl-cpu",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
             "pocl-core",
             "pocl-cpu-minimal",
-            "llvm 15.0.7.*",
-            "libhwloc"
-          ],
-          "run": [
-            "pocl-core",
-            "pocl-cpu-minimal"
+            "pocl-remote"
           ]
         },
         "script": "install-pkg.sh",
@@ -264,7 +135,7 @@
             "pocl-core"
           ],
           "run_constrained": [
-            "__cuda >=11"
+            "__cuda >=12.0"
           ]
         },
         "script": "install-pkg.sh",
@@ -333,6 +204,7 @@
         "make",
         "pkg-config",
         "cxx_compiler_stub",
+        "cuda_compiler_stub",
         "c_stdlib_stub"
       ],
       "host": [
@@ -343,7 +215,10 @@
         "clangdev 15.0.7.*",
         "llvm 15.0.7.*",
         "libclang-cpp 15.0.7.*",
-        "llvm-spirv-15"
+        "llvm-spirv-15",
+        "cuda-version 12.0.*",
+        "cuda-driver-dev",
+        "cuda-cudart-dev"
       ],
       "run": [
         "llvm-spirv-15",
@@ -358,16 +233,10 @@
     "source": [
       {
         "patches": [
-          "patches/gh1392.patch",
-          "patches/pocld.diff"
-        ],
-        "sha256": "de9710223fc1855f833dbbf42ea2681e06aa8ec0464f0201104dc80a74dfd1f2",
-        "url": "https://github.com/pocl/pocl/archive/refs/tags/v6.0.tar.gz"
-      },
-      {
-        "patches": [
-          "patches/gh1392.patch",
-          "patches/pocld.diff"
+          "patches/0001-gh1392.patch",
+          "patches/0002-pocld.patch",
+          "patches/0003-switch-to-newer-find_package-CUDAToolkit-for-CUDA-12.patch",
+          "patches/disable-cuda-test.patch"
         ],
         "sha256": "de9710223fc1855f833dbbf42ea2681e06aa8ec0464f0201104dc80a74dfd1f2",
         "url": "https://github.com/pocl/pocl/archive/refs/tags/v6.0.tar.gz"
@@ -385,6 +254,7 @@
       "elements": [
         "c_stdlib_stub",
         "cmake",
+        "cuda_compiler_stub",
         "cxx_compiler_stub",
         "make",
         "pkg-config"
@@ -395,6 +265,9 @@
       "elements": [
         "clangdev",
         "clhpp",
+        "cuda-cudart-dev",
+        "cuda-driver-dev",
+        "cuda-version",
         "libclang-cpp",
         "libhwloc",
         "llvm",
@@ -402,7 +275,8 @@
         "llvmdev",
         "ocl-icd",
         "pocl-core",
-        "pocl-cpu-minimal"
+        "pocl-cpu-minimal",
+        "pocl-remote"
       ]
     },
     "run": {
@@ -440,7 +314,13 @@
       "summary": "Portable Computing Language -- a portable open source implementation of the OpenCL standard"
     },
     "build": {
-      "number": "1",
+      "ignore_run_exports_from": [
+        "cuda_compiler_stub",
+        "cuda-version",
+        "cuda-driver-dev",
+        "cuda-cudart-dev"
+      ],
+      "number": "2",
       "script_env": [
         "CUDA_HOME"
       ]
@@ -491,147 +371,14 @@
           "host": [
             "pocl-core",
             "pocl-cpu-minimal",
-            "llvm 15.0.7.*",
-            "libhwloc"
-          ],
-          "run": [
-            "pocl-core",
-            "pocl-cpu-minimal"
-          ]
-        },
-        "script": "install-pkg.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/pocl/libpocl-devices-pthread.so",
-            "export OCL_ICD_DEBUG=15",
-            "export POCL_DEBUG=1",
-            "curl -O https://raw.githubusercontent.com/inducer/pyopencl/main/examples/demo.py",
-            "python demo.py"
-          ],
-          "requires": [
-            "pyopencl",
-            "curl",
-            "pocl-cpu"
-          ]
-        }
-      },
-      {
-        "build": null,
-        "name": "pocl-cuda",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "pocl-core",
-            "llvm 15.0.7.*",
-            "libhwloc"
-          ],
-          "run": [
-            "pocl-core"
-          ],
-          "run_constrained": [
-            "__cuda >=11"
-          ]
-        },
-        "script": "install-pkg.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/pocl/libpocl-devices-cuda.so"
-          ]
-        }
-      },
-      {
-        "name": "pocl-remote",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "pocl-core",
-            "llvm 15.0.7.*",
-            "libhwloc"
-          ],
-          "run": [
-            "pocl-core"
-          ]
-        },
-        "script": "install-pkg.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/pocl/libpocl-devices-remote.so"
-          ]
-        }
-      },
-      {
-        "name": "pocl",
-        "requirements": {
-          "host": [
-            "libhwloc"
-          ],
-          "run": [
-            "pocl-core",
-            "pocl-cpu",
-            "pocl-cpu-minimal",
             "pocl-remote",
-            "pocl-cuda"
-          ]
-        },
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/pocl/libpocl-devices-pthread.so",
-            "test -f $PREFIX/lib/pocl/libpocl-devices-basic.so",
-            "test -f $PREFIX/lib/pocl/libpocl-devices-cuda.so"
-          ],
-          "downstreams": [
-            "pyopencl"
-          ]
-        }
-      },
-      {
-        "name": "pocl-core"
-      },
-      {
-        "name": "pocl-cpu-minimal",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "pocl-core",
             "llvm 15.0.7.*",
             "libhwloc"
           ],
           "run": [
-            "pocl-core"
-          ]
-        },
-        "script": "install-pkg.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/pocl/libpocl-devices-basic.so"
-          ]
-        }
-      },
-      {
-        "name": "pocl-cpu",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
             "pocl-core",
             "pocl-cpu-minimal",
-            "llvm 15.0.7.*",
-            "libhwloc"
-          ],
-          "run": [
-            "pocl-core",
-            "pocl-cpu-minimal"
+            "pocl-remote"
           ]
         },
         "script": "install-pkg.sh",
@@ -667,7 +414,7 @@
             "pocl-core"
           ],
           "run_constrained": [
-            "__cuda >=11"
+            "__cuda >=12.0"
           ]
         },
         "script": "install-pkg.sh",
@@ -736,6 +483,7 @@
         "make",
         "pkg-config",
         "cxx_compiler_stub",
+        "cuda_compiler_stub",
         "c_stdlib_stub"
       ],
       "host": [
@@ -746,7 +494,10 @@
         "clangdev 15.0.7.*",
         "llvm 15.0.7.*",
         "libclang-cpp 15.0.7.*",
-        "llvm-spirv-15"
+        "llvm-spirv-15",
+        "cuda-version 12.0.*",
+        "cuda-driver-dev",
+        "cuda-cudart-dev"
       ],
       "run": [
         "llvm-spirv-15",
@@ -761,16 +512,10 @@
     "source": [
       {
         "patches": [
-          "patches/gh1392.patch",
-          "patches/pocld.diff"
-        ],
-        "sha256": "de9710223fc1855f833dbbf42ea2681e06aa8ec0464f0201104dc80a74dfd1f2",
-        "url": "https://github.com/pocl/pocl/archive/refs/tags/v6.0.tar.gz"
-      },
-      {
-        "patches": [
-          "patches/gh1392.patch",
-          "patches/pocld.diff"
+          "patches/0001-gh1392.patch",
+          "patches/0002-pocld.patch",
+          "patches/0003-switch-to-newer-find_package-CUDAToolkit-for-CUDA-12.patch",
+          "patches/disable-cuda-test.patch"
         ],
         "sha256": "de9710223fc1855f833dbbf42ea2681e06aa8ec0464f0201104dc80a74dfd1f2",
         "url": "https://github.com/pocl/pocl/archive/refs/tags/v6.0.tar.gz"
@@ -788,6 +533,7 @@
       "elements": [
         "c_stdlib_stub",
         "cmake",
+        "cuda_compiler_stub",
         "cxx_compiler_stub",
         "make",
         "pkg-config"
@@ -798,6 +544,9 @@
       "elements": [
         "clangdev",
         "clhpp",
+        "cuda-cudart-dev",
+        "cuda-driver-dev",
+        "cuda-version",
         "libclang-cpp",
         "libhwloc",
         "llvm",
@@ -805,7 +554,8 @@
         "llvmdev",
         "ocl-icd",
         "pocl-core",
-        "pocl-cpu-minimal"
+        "pocl-cpu-minimal",
+        "pocl-remote"
       ]
     },
     "run": {
@@ -843,7 +593,13 @@
       "summary": "Portable Computing Language -- a portable open source implementation of the OpenCL standard"
     },
     "build": {
-      "number": "1",
+      "ignore_run_exports_from": [
+        "cuda_compiler_stub",
+        "cuda-version",
+        "cuda-driver-dev",
+        "cuda-cudart-dev"
+      ],
+      "number": "2",
       "script_env": [
         "CUDA_HOME"
       ]
@@ -894,147 +650,14 @@
           "host": [
             "pocl-core",
             "pocl-cpu-minimal",
-            "llvm 15.0.7.*",
-            "libhwloc"
-          ],
-          "run": [
-            "pocl-core",
-            "pocl-cpu-minimal"
-          ]
-        },
-        "script": "install-pkg.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/pocl/libpocl-devices-pthread.so",
-            "export OCL_ICD_DEBUG=15",
-            "export POCL_DEBUG=1",
-            "curl -O https://raw.githubusercontent.com/inducer/pyopencl/main/examples/demo.py",
-            "python demo.py"
-          ],
-          "requires": [
-            "pyopencl",
-            "curl",
-            "pocl-cpu"
-          ]
-        }
-      },
-      {
-        "build": null,
-        "name": "pocl-cuda",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "pocl-core",
-            "llvm 15.0.7.*",
-            "libhwloc"
-          ],
-          "run": [
-            "pocl-core"
-          ],
-          "run_constrained": [
-            "__cuda >=10.2"
-          ]
-        },
-        "script": "install-pkg.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/pocl/libpocl-devices-cuda.so"
-          ]
-        }
-      },
-      {
-        "name": "pocl-remote",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "pocl-core",
-            "llvm 15.0.7.*",
-            "libhwloc"
-          ],
-          "run": [
-            "pocl-core"
-          ]
-        },
-        "script": "install-pkg.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/pocl/libpocl-devices-remote.so"
-          ]
-        }
-      },
-      {
-        "name": "pocl",
-        "requirements": {
-          "host": [
-            "libhwloc"
-          ],
-          "run": [
-            "pocl-core",
-            "pocl-cpu",
-            "pocl-cpu-minimal",
             "pocl-remote",
-            "pocl-cuda"
-          ]
-        },
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/pocl/libpocl-devices-pthread.so",
-            "test -f $PREFIX/lib/pocl/libpocl-devices-basic.so",
-            "test -f $PREFIX/lib/pocl/libpocl-devices-cuda.so"
-          ],
-          "downstreams": [
-            "pyopencl"
-          ]
-        }
-      },
-      {
-        "name": "pocl-core"
-      },
-      {
-        "name": "pocl-cpu-minimal",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "pocl-core",
             "llvm 15.0.7.*",
             "libhwloc"
           ],
           "run": [
-            "pocl-core"
-          ]
-        },
-        "script": "install-pkg.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/pocl/libpocl-devices-basic.so"
-          ]
-        }
-      },
-      {
-        "name": "pocl-cpu",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
             "pocl-core",
             "pocl-cpu-minimal",
-            "llvm 15.0.7.*",
-            "libhwloc"
-          ],
-          "run": [
-            "pocl-core",
-            "pocl-cpu-minimal"
+            "pocl-remote"
           ]
         },
         "script": "install-pkg.sh",
@@ -1070,7 +693,7 @@
             "pocl-core"
           ],
           "run_constrained": [
-            "__cuda >=10.2"
+            "__cuda >=12.0"
           ]
         },
         "script": "install-pkg.sh",
@@ -1139,6 +762,7 @@
         "make",
         "pkg-config",
         "cxx_compiler_stub",
+        "cuda_compiler_stub",
         "c_stdlib_stub"
       ],
       "host": [
@@ -1149,7 +773,10 @@
         "clangdev 15.0.7.*",
         "llvm 15.0.7.*",
         "libclang-cpp 15.0.7.*",
-        "llvm-spirv-15"
+        "llvm-spirv-15",
+        "cuda-version 12.0.*",
+        "cuda-driver-dev",
+        "cuda-cudart-dev"
       ],
       "run": [
         "llvm-spirv-15",
@@ -1164,18 +791,10 @@
     "source": [
       {
         "patches": [
-          "patches/gh1392.patch",
-          "patches/alignof.diff",
-          "patches/pocld.diff"
-        ],
-        "sha256": "de9710223fc1855f833dbbf42ea2681e06aa8ec0464f0201104dc80a74dfd1f2",
-        "url": "https://github.com/pocl/pocl/archive/refs/tags/v6.0.tar.gz"
-      },
-      {
-        "patches": [
-          "patches/gh1392.patch",
-          "patches/alignof.diff",
-          "patches/pocld.diff"
+          "patches/0001-gh1392.patch",
+          "patches/0002-pocld.patch",
+          "patches/0003-switch-to-newer-find_package-CUDAToolkit-for-CUDA-12.patch",
+          "patches/disable-cuda-test.patch"
         ],
         "sha256": "de9710223fc1855f833dbbf42ea2681e06aa8ec0464f0201104dc80a74dfd1f2",
         "url": "https://github.com/pocl/pocl/archive/refs/tags/v6.0.tar.gz"
@@ -1193,6 +812,7 @@
       "elements": [
         "c_stdlib_stub",
         "cmake",
+        "cuda_compiler_stub",
         "cxx_compiler_stub",
         "make",
         "pkg-config"
@@ -1203,6 +823,9 @@
       "elements": [
         "clangdev",
         "clhpp",
+        "cuda-cudart-dev",
+        "cuda-driver-dev",
+        "cuda-version",
         "libclang-cpp",
         "libhwloc",
         "llvm",
@@ -1210,7 +833,8 @@
         "llvmdev",
         "ocl-icd",
         "pocl-core",
-        "pocl-cpu-minimal"
+        "pocl-cpu-minimal",
+        "pocl-remote"
       ]
     },
     "run": {
@@ -1249,7 +873,8 @@
       "summary": "Portable Computing Language -- a portable open source implementation of the OpenCL standard"
     },
     "build": {
-      "number": "1",
+      "ignore_run_exports_from": null,
+      "number": "2",
       "script_env": [
         "CUDA_HOME"
       ]
@@ -1300,12 +925,14 @@
           "host": [
             "pocl-core",
             "pocl-cpu-minimal",
+            "pocl-remote",
             "llvm 15.0.7.*",
             "libhwloc"
           ],
           "run": [
             "pocl-core",
-            "pocl-cpu-minimal"
+            "pocl-cpu-minimal",
+            "pocl-remote"
           ]
         },
         "script": "install-pkg.sh",
@@ -1341,7 +968,7 @@
             "pocl-core"
           ],
           "run_constrained": [
-            "__cuda >=11"
+            "__cuda >=12.0"
           ]
         },
         "script": "install-pkg.sh",
@@ -1435,12 +1062,14 @@
           "host": [
             "pocl-core",
             "pocl-cpu-minimal",
+            "pocl-remote",
             "llvm 15.0.7.*",
             "libhwloc"
           ],
           "run": [
             "pocl-core",
-            "pocl-cpu-minimal"
+            "pocl-cpu-minimal",
+            "pocl-remote"
           ]
         },
         "script": "install-pkg.sh",
@@ -1476,7 +1105,7 @@
             "pocl-core"
           ],
           "run_constrained": [
-            "__cuda >=11"
+            "__cuda >=12.0"
           ]
         },
         "script": "install-pkg.sh",
@@ -1570,12 +1199,14 @@
           "host": [
             "pocl-core",
             "pocl-cpu-minimal",
+            "pocl-remote",
             "llvm 15.0.7.*",
             "libhwloc"
           ],
           "run": [
             "pocl-core",
-            "pocl-cpu-minimal"
+            "pocl-cpu-minimal",
+            "pocl-remote"
           ]
         },
         "script": "install-pkg.sh",
@@ -1611,7 +1242,7 @@
             "pocl-core"
           ],
           "run_constrained": [
-            "__cuda >=11"
+            "__cuda >=12.0"
           ]
         },
         "script": "install-pkg.sh",
@@ -1705,417 +1336,14 @@
           "host": [
             "pocl-core",
             "pocl-cpu-minimal",
-            "llvm 15.0.7.*",
-            "libhwloc"
-          ],
-          "run": [
-            "pocl-core",
-            "pocl-cpu-minimal"
-          ]
-        },
-        "script": "install-pkg.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/pocl/libpocl-devices-pthread.so",
-            "export OCL_ICD_DEBUG=15",
-            "export POCL_DEBUG=1",
-            "curl -O https://raw.githubusercontent.com/inducer/pyopencl/main/examples/demo.py",
-            "python demo.py"
-          ],
-          "requires": [
-            "pyopencl",
-            "curl",
-            "pocl-cpu"
-          ]
-        }
-      },
-      {
-        "build": null,
-        "name": "pocl-cuda",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "pocl-core",
-            "llvm 15.0.7.*",
-            "libhwloc"
-          ],
-          "run": [
-            "pocl-core"
-          ],
-          "run_constrained": [
-            "__cuda >=11"
-          ]
-        },
-        "script": "install-pkg.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/pocl/libpocl-devices-cuda.so"
-          ]
-        }
-      },
-      {
-        "name": "pocl-remote",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "pocl-core",
-            "llvm 15.0.7.*",
-            "libhwloc"
-          ],
-          "run": [
-            "pocl-core"
-          ]
-        },
-        "script": "install-pkg.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/pocl/libpocl-devices-remote.so"
-          ]
-        }
-      },
-      {
-        "name": "pocl",
-        "requirements": {
-          "host": [
-            "libhwloc"
-          ],
-          "run": [
-            "pocl-core",
-            "pocl-cpu",
-            "pocl-cpu-minimal",
             "pocl-remote",
-            "pocl-cuda"
-          ]
-        },
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/pocl/libpocl-devices-pthread.so",
-            "test -f $PREFIX/lib/pocl/libpocl-devices-basic.so",
-            "test -f $PREFIX/lib/pocl/libpocl-devices-cuda.so"
-          ],
-          "downstreams": [
-            "pyopencl"
-          ]
-        }
-      },
-      {
-        "name": "pocl-core"
-      },
-      {
-        "name": "pocl-cpu-minimal",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "pocl-core",
             "llvm 15.0.7.*",
             "libhwloc"
           ],
           "run": [
-            "pocl-core"
-          ]
-        },
-        "script": "install-pkg.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/pocl/libpocl-devices-basic.so"
-          ]
-        }
-      },
-      {
-        "name": "pocl-cpu",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
             "pocl-core",
             "pocl-cpu-minimal",
-            "llvm 15.0.7.*",
-            "libhwloc"
-          ],
-          "run": [
-            "pocl-core",
-            "pocl-cpu-minimal"
-          ]
-        },
-        "script": "install-pkg.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/pocl/libpocl-devices-pthread.so",
-            "export OCL_ICD_DEBUG=15",
-            "export POCL_DEBUG=1",
-            "curl -O https://raw.githubusercontent.com/inducer/pyopencl/main/examples/demo.py",
-            "python demo.py"
-          ],
-          "requires": [
-            "pyopencl",
-            "curl",
-            "pocl-cpu"
-          ]
-        }
-      },
-      {
-        "build": null,
-        "name": "pocl-cuda",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "pocl-core",
-            "llvm 15.0.7.*",
-            "libhwloc"
-          ],
-          "run": [
-            "pocl-core"
-          ],
-          "run_constrained": [
-            "__cuda >=10.2"
-          ]
-        },
-        "script": "install-pkg.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/pocl/libpocl-devices-cuda.so"
-          ]
-        }
-      },
-      {
-        "name": "pocl-remote",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "pocl-core",
-            "llvm 15.0.7.*",
-            "libhwloc"
-          ],
-          "run": [
-            "pocl-core"
-          ]
-        },
-        "script": "install-pkg.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/pocl/libpocl-devices-remote.so"
-          ]
-        }
-      },
-      {
-        "name": "pocl",
-        "requirements": {
-          "host": [
-            "libhwloc"
-          ],
-          "run": [
-            "pocl-core",
-            "pocl-cpu",
-            "pocl-cpu-minimal",
-            "pocl-remote",
-            "pocl-cuda"
-          ]
-        },
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/pocl/libpocl-devices-pthread.so",
-            "test -f $PREFIX/lib/pocl/libpocl-devices-basic.so",
-            "test -f $PREFIX/lib/pocl/libpocl-devices-cuda.so"
-          ],
-          "downstreams": [
-            "pyopencl"
-          ]
-        }
-      },
-      {
-        "name": "pocl-core"
-      },
-      {
-        "name": "pocl-cpu-minimal",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "pocl-core",
-            "llvm 15.0.7.*",
-            "libhwloc"
-          ],
-          "run": [
-            "pocl-core"
-          ]
-        },
-        "script": "install-pkg.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/pocl/libpocl-devices-basic.so"
-          ]
-        }
-      },
-      {
-        "name": "pocl-cpu",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "pocl-core",
-            "pocl-cpu-minimal",
-            "llvm 15.0.7.*",
-            "libhwloc"
-          ],
-          "run": [
-            "pocl-core",
-            "pocl-cpu-minimal"
-          ]
-        },
-        "script": "install-pkg.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/pocl/libpocl-devices-pthread.so",
-            "export OCL_ICD_DEBUG=15",
-            "export POCL_DEBUG=1",
-            "curl -O https://raw.githubusercontent.com/inducer/pyopencl/main/examples/demo.py",
-            "python demo.py"
-          ],
-          "requires": [
-            "pyopencl",
-            "curl",
-            "pocl-cpu"
-          ]
-        }
-      },
-      {
-        "build": null,
-        "name": "pocl-cuda",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "pocl-core",
-            "llvm 15.0.7.*",
-            "libhwloc"
-          ],
-          "run": [
-            "pocl-core"
-          ],
-          "run_constrained": [
-            "__cuda >=10.2"
-          ]
-        },
-        "script": "install-pkg.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/pocl/libpocl-devices-cuda.so"
-          ]
-        }
-      },
-      {
-        "name": "pocl-remote",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "pocl-core",
-            "llvm 15.0.7.*",
-            "libhwloc"
-          ],
-          "run": [
-            "pocl-core"
-          ]
-        },
-        "script": "install-pkg.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/pocl/libpocl-devices-remote.so"
-          ]
-        }
-      },
-      {
-        "name": "pocl",
-        "requirements": {
-          "host": [
-            "libhwloc"
-          ],
-          "run": [
-            "pocl-core",
-            "pocl-cpu",
-            "pocl-cpu-minimal",
-            "pocl-remote",
-            "pocl-cuda"
-          ]
-        },
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/pocl/libpocl-devices-pthread.so",
-            "test -f $PREFIX/lib/pocl/libpocl-devices-basic.so",
-            "test -f $PREFIX/lib/pocl/libpocl-devices-cuda.so"
-          ],
-          "downstreams": [
-            "pyopencl"
-          ]
-        }
-      },
-      {
-        "name": "pocl-core"
-      },
-      {
-        "name": "pocl-cpu-minimal",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "pocl-core",
-            "llvm 15.0.7.*",
-            "libhwloc"
-          ],
-          "run": [
-            "pocl-core"
-          ]
-        },
-        "script": "install-pkg.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/pocl/libpocl-devices-basic.so"
-          ]
-        }
-      },
-      {
-        "name": "pocl-cpu",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "pocl-core",
-            "pocl-cpu-minimal",
-            "llvm 15.0.7.*",
-            "libhwloc"
-          ],
-          "run": [
-            "pocl-core",
-            "pocl-cpu-minimal"
+            "pocl-remote"
           ]
         },
         "script": "install-pkg.sh",
@@ -2153,7 +1381,7 @@
             "pocl-core"
           ],
           "run_constrained": [
-            "__cuda >=11"
+            "__cuda >=12.0"
           ]
         },
         "script": "install-pkg.sh",
@@ -2245,149 +1473,16 @@
           "host": [
             "pocl-core",
             "pocl-cpu-minimal",
+            "pocl-remote",
             "llvm 15.0.7.*",
             "libhwloc"
           ],
           "run": [
             "pocl-core",
-            "pocl-cpu-minimal"
-          ]
-        },
-        "script": "install-pkg.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/pocl/libpocl-devices-pthread.so",
-            "rm -f $PREFIX/etc/OpenCL/vendors/apple.icd",
-            "export POCL_DEBUG=1",
-            "curl -O https://raw.githubusercontent.com/inducer/pyopencl/main/examples/demo.py",
-            "python demo.py"
-          ],
-          "requires": [
-            "pyopencl",
-            "curl",
-            "pocl-cpu"
-          ]
-        }
-      },
-      {
-        "build": {
-          "skip": true
-        },
-        "name": "pocl-cuda",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "pocl-core",
-            "llvm 15.0.7.*",
-            "libhwloc"
-          ],
-          "run": [
-            "pocl-core"
-          ],
-          "run_constrained": [
-            "__cuda >=11"
-          ]
-        },
-        "script": "install-pkg.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/pocl/libpocl-devices-cuda.so"
-          ]
-        }
-      },
-      {
-        "name": "pocl-remote",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "pocl-core",
-            "llvm 15.0.7.*",
-            "libhwloc"
-          ],
-          "run": [
-            "pocl-core"
-          ]
-        },
-        "script": "install-pkg.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/pocl/libpocl-devices-remote.so"
-          ]
-        }
-      },
-      {
-        "name": "pocl",
-        "requirements": {
-          "host": [
-            "libhwloc"
-          ],
-          "run": [
-            "pocl-core",
-            "pocl-cpu",
             "pocl-cpu-minimal",
             "pocl-remote"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/pocl/libpocl-devices-pthread.so",
-            "test -f $PREFIX/lib/pocl/libpocl-devices-basic.so"
-          ],
-          "downstreams": [
-            "pyopencl"
-          ]
-        }
-      },
-      {
-        "name": "pocl-core"
-      },
-      {
-        "name": "pocl-cpu-minimal",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "pocl-core",
-            "llvm 15.0.7.*",
-            "libhwloc"
-          ],
-          "run": [
-            "pocl-core"
-          ]
-        },
-        "script": "install-pkg.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/pocl/libpocl-devices-basic.so"
-          ]
-        }
-      },
-      {
-        "name": "pocl-cpu",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "pocl-core",
-            "pocl-cpu-minimal",
-            "llvm 15.0.7.*",
-            "libhwloc"
-          ],
-          "run": [
-            "pocl-core",
-            "pocl-cpu-minimal"
-          ]
-        },
         "script": "install-pkg.sh",
         "test": {
           "commands": [
@@ -2423,7 +1518,7 @@
             "pocl-core"
           ],
           "run_constrained": [
-            "__cuda >=11"
+            "__cuda >=12.0"
           ]
         },
         "script": "install-pkg.sh",
@@ -2490,8 +1585,10 @@
         "make",
         "pkg-config",
         "cxx_compiler_stub",
+        "cuda_compiler_stub",
         "c_stdlib_stub",
         "clangxx_osx-64 15.0.7.*",
+        "libcxx-devel 16",
         "clangxx_osx-arm64 15.0.7.*"
       ],
       "host": [
@@ -2503,7 +1600,10 @@
         "llvm 15.0.7.*",
         "libclang-cpp 15.0.7.*",
         "llvm-spirv-15",
-        "khronos-opencl-icd-loader",
+        "cuda-version 12.0.*",
+        "cuda-driver-dev",
+        "cuda-cudart-dev",
+        "khronos-opencl-icd-loader <2024.10",
         "zlib",
         "ld64 >=530,<711"
       ],
@@ -2522,74 +1622,50 @@
     "source": [
       {
         "patches": [
-          "patches/gh1392.patch",
-          "patches/pocld.diff"
+          "patches/0001-gh1392.patch",
+          "patches/0002-pocld.patch",
+          "patches/0003-switch-to-newer-find_package-CUDAToolkit-for-CUDA-12.patch",
+          "patches/disable-cuda-test.patch"
         ],
         "sha256": "de9710223fc1855f833dbbf42ea2681e06aa8ec0464f0201104dc80a74dfd1f2",
         "url": "https://github.com/pocl/pocl/archive/refs/tags/v6.0.tar.gz"
       },
       {
         "patches": [
-          "patches/gh1392.patch",
-          "patches/pocld.diff"
+          "patches/0001-gh1392.patch",
+          "patches/0002-pocld.patch",
+          "patches/0003-switch-to-newer-find_package-CUDAToolkit-for-CUDA-12.patch",
+          "patches/disable-cuda-test.patch"
         ],
         "sha256": "de9710223fc1855f833dbbf42ea2681e06aa8ec0464f0201104dc80a74dfd1f2",
         "url": "https://github.com/pocl/pocl/archive/refs/tags/v6.0.tar.gz"
       },
       {
         "patches": [
-          "patches/gh1392.patch",
-          "patches/pocld.diff"
+          "patches/0001-gh1392.patch",
+          "patches/0002-pocld.patch",
+          "patches/0003-switch-to-newer-find_package-CUDAToolkit-for-CUDA-12.patch",
+          "patches/disable-cuda-test.patch"
         ],
         "sha256": "de9710223fc1855f833dbbf42ea2681e06aa8ec0464f0201104dc80a74dfd1f2",
         "url": "https://github.com/pocl/pocl/archive/refs/tags/v6.0.tar.gz"
       },
       {
         "patches": [
-          "patches/gh1392.patch",
-          "patches/pocld.diff"
+          "patches/0001-gh1392.patch",
+          "patches/0002-pocld.patch",
+          "patches/0003-switch-to-newer-find_package-CUDAToolkit-for-CUDA-12.patch",
+          "patches/disable-cuda-test.patch"
         ],
         "sha256": "de9710223fc1855f833dbbf42ea2681e06aa8ec0464f0201104dc80a74dfd1f2",
         "url": "https://github.com/pocl/pocl/archive/refs/tags/v6.0.tar.gz"
       },
       {
         "patches": [
-          "patches/gh1392.patch",
-          "patches/alignof.diff",
-          "patches/pocld.diff"
-        ],
-        "sha256": "de9710223fc1855f833dbbf42ea2681e06aa8ec0464f0201104dc80a74dfd1f2",
-        "url": "https://github.com/pocl/pocl/archive/refs/tags/v6.0.tar.gz"
-      },
-      {
-        "patches": [
-          "patches/gh1392.patch",
-          "patches/alignof.diff",
-          "patches/pocld.diff"
-        ],
-        "sha256": "de9710223fc1855f833dbbf42ea2681e06aa8ec0464f0201104dc80a74dfd1f2",
-        "url": "https://github.com/pocl/pocl/archive/refs/tags/v6.0.tar.gz"
-      },
-      {
-        "patches": [
-          "patches/gh1392.patch",
-          "patches/pocld.diff"
-        ],
-        "sha256": "de9710223fc1855f833dbbf42ea2681e06aa8ec0464f0201104dc80a74dfd1f2",
-        "url": "https://github.com/pocl/pocl/archive/refs/tags/v6.0.tar.gz"
-      },
-      {
-        "patches": [
-          "patches/gh1392.patch",
-          "patches/pocld.diff"
-        ],
-        "sha256": "de9710223fc1855f833dbbf42ea2681e06aa8ec0464f0201104dc80a74dfd1f2",
-        "url": "https://github.com/pocl/pocl/archive/refs/tags/v6.0.tar.gz"
-      },
-      {
-        "patches": [
-          "patches/gh1392.patch",
-          "patches/pocld.diff"
+          "patches/0001-gh1392.patch",
+          "patches/0002-pocld.patch",
+          "patches/0003-switch-to-newer-find_package-CUDAToolkit-for-CUDA-12.patch",
+          "patches/disable-cuda-test.patch"
         ],
         "sha256": "de9710223fc1855f833dbbf42ea2681e06aa8ec0464f0201104dc80a74dfd1f2",
         "url": "https://github.com/pocl/pocl/archive/refs/tags/v6.0.tar.gz"
@@ -2616,7 +1692,8 @@
       "summary": "Portable Computing Language -- a portable open source implementation of the OpenCL standard"
     },
     "build": {
-      "number": "1"
+      "ignore_run_exports_from": null,
+      "number": "2"
     },
     "extra": {
       "feedstock-name": "pocl",
@@ -2664,149 +1741,16 @@
           "host": [
             "pocl-core",
             "pocl-cpu-minimal",
+            "pocl-remote",
             "llvm 15.0.7.*",
             "libhwloc"
           ],
           "run": [
             "pocl-core",
-            "pocl-cpu-minimal"
-          ]
-        },
-        "script": "install-pkg.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/pocl/libpocl-devices-pthread.so",
-            "rm -f $PREFIX/etc/OpenCL/vendors/apple.icd",
-            "export POCL_DEBUG=1",
-            "curl -O https://raw.githubusercontent.com/inducer/pyopencl/main/examples/demo.py",
-            "python demo.py"
-          ],
-          "requires": [
-            "pyopencl",
-            "curl",
-            "pocl-cpu"
-          ]
-        }
-      },
-      {
-        "build": {
-          "skip": true
-        },
-        "name": "pocl-cuda",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "pocl-core",
-            "llvm 15.0.7.*",
-            "libhwloc"
-          ],
-          "run": [
-            "pocl-core"
-          ],
-          "run_constrained": [
-            "__cuda >=11"
-          ]
-        },
-        "script": "install-pkg.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/pocl/libpocl-devices-cuda.so"
-          ]
-        }
-      },
-      {
-        "name": "pocl-remote",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "pocl-core",
-            "llvm 15.0.7.*",
-            "libhwloc"
-          ],
-          "run": [
-            "pocl-core"
-          ]
-        },
-        "script": "install-pkg.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/pocl/libpocl-devices-remote.so"
-          ]
-        }
-      },
-      {
-        "name": "pocl",
-        "requirements": {
-          "host": [
-            "libhwloc"
-          ],
-          "run": [
-            "pocl-core",
-            "pocl-cpu",
             "pocl-cpu-minimal",
             "pocl-remote"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/pocl/libpocl-devices-pthread.so",
-            "test -f $PREFIX/lib/pocl/libpocl-devices-basic.so"
-          ],
-          "downstreams": [
-            "pyopencl"
-          ]
-        }
-      },
-      {
-        "name": "pocl-core"
-      },
-      {
-        "name": "pocl-cpu-minimal",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "pocl-core",
-            "llvm 15.0.7.*",
-            "libhwloc"
-          ],
-          "run": [
-            "pocl-core"
-          ]
-        },
-        "script": "install-pkg.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/pocl/libpocl-devices-basic.so"
-          ]
-        }
-      },
-      {
-        "name": "pocl-cpu",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "pocl-core",
-            "pocl-cpu-minimal",
-            "llvm 15.0.7.*",
-            "libhwloc"
-          ],
-          "run": [
-            "pocl-core",
-            "pocl-cpu-minimal"
-          ]
-        },
         "script": "install-pkg.sh",
         "test": {
           "commands": [
@@ -2842,7 +1786,7 @@
             "pocl-core"
           ],
           "run_constrained": [
-            "__cuda >=11"
+            "__cuda >=12.0"
           ]
         },
         "script": "install-pkg.sh",
@@ -2909,10 +1853,11 @@
         "make",
         "pkg-config",
         "clangxx_osx-64 15.0.7.*",
+        "libcxx-devel 16",
         "c_stdlib_stub"
       ],
       "host": [
-        "khronos-opencl-icd-loader",
+        "khronos-opencl-icd-loader <2024.10",
         "libhwloc",
         "clhpp",
         "llvmdev 15.0.7.*",
@@ -2937,16 +1882,10 @@
     "source": [
       {
         "patches": [
-          "patches/gh1392.patch",
-          "patches/pocld.diff"
-        ],
-        "sha256": "de9710223fc1855f833dbbf42ea2681e06aa8ec0464f0201104dc80a74dfd1f2",
-        "url": "https://github.com/pocl/pocl/archive/refs/tags/v6.0.tar.gz"
-      },
-      {
-        "patches": [
-          "patches/gh1392.patch",
-          "patches/pocld.diff"
+          "patches/0001-gh1392.patch",
+          "patches/0002-pocld.patch",
+          "patches/0003-switch-to-newer-find_package-CUDAToolkit-for-CUDA-12.patch",
+          "patches/disable-cuda-test.patch"
         ],
         "sha256": "de9710223fc1855f833dbbf42ea2681e06aa8ec0464f0201104dc80a74dfd1f2",
         "url": "https://github.com/pocl/pocl/archive/refs/tags/v6.0.tar.gz"
@@ -2966,6 +1905,7 @@
         "clangxx_osx-64",
         "cmake",
         "cxx_compiler_stub",
+        "libcxx-devel",
         "make",
         "pkg-config"
       ]
@@ -2984,6 +1924,7 @@
         "llvmdev",
         "pocl-core",
         "pocl-cpu-minimal",
+        "pocl-remote",
         "zlib"
       ]
     },
@@ -3023,7 +1964,8 @@
       "summary": "Portable Computing Language -- a portable open source implementation of the OpenCL standard"
     },
     "build": {
-      "number": "1"
+      "ignore_run_exports_from": null,
+      "number": "2"
     },
     "extra": {
       "feedstock-name": "pocl",
@@ -3071,12 +2013,14 @@
           "host": [
             "pocl-core",
             "pocl-cpu-minimal",
+            "pocl-remote",
             "llvm 15.0.7.*",
             "libhwloc"
           ],
           "run": [
             "pocl-core",
-            "pocl-cpu-minimal"
+            "pocl-cpu-minimal",
+            "pocl-remote"
           ]
         },
         "script": "install-pkg.sh",
@@ -3114,7 +2058,7 @@
             "pocl-core"
           ],
           "run_constrained": [
-            "__cuda >=11"
+            "__cuda >=12.0"
           ]
         },
         "script": "install-pkg.sh",
@@ -3181,10 +2125,11 @@
         "make",
         "pkg-config",
         "clangxx_osx-arm64 15.0.7.*",
+        "libcxx-devel 16",
         "c_stdlib_stub"
       ],
       "host": [
-        "khronos-opencl-icd-loader",
+        "khronos-opencl-icd-loader <2024.10",
         "libhwloc",
         "clhpp",
         "llvmdev 15.0.7.*",
@@ -3209,8 +2154,10 @@
     "source": [
       {
         "patches": [
-          "patches/gh1392.patch",
-          "patches/pocld.diff"
+          "patches/0001-gh1392.patch",
+          "patches/0002-pocld.patch",
+          "patches/0003-switch-to-newer-find_package-CUDAToolkit-for-CUDA-12.patch",
+          "patches/disable-cuda-test.patch"
         ],
         "sha256": "de9710223fc1855f833dbbf42ea2681e06aa8ec0464f0201104dc80a74dfd1f2",
         "url": "https://github.com/pocl/pocl/archive/refs/tags/v6.0.tar.gz"
@@ -3230,6 +2177,7 @@
         "clangxx_osx-arm64",
         "cmake",
         "cxx_compiler_stub",
+        "libcxx-devel",
         "make",
         "pkg-config"
       ]
@@ -3248,6 +2196,7 @@
         "llvmdev",
         "pocl-core",
         "pocl-cpu-minimal",
+        "pocl-remote",
         "zlib"
       ]
     },
@@ -3295,7 +2244,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/pocl.json"
   },
-  "raw_meta_yaml": "{% set version = \"6.0\" %}\n{% set build_number = 1 %}\n{% set sha256 = \"de9710223fc1855f833dbbf42ea2681e06aa8ec0464f0201104dc80a74dfd1f2\" %}\n\n{% set llvm_version = \"15.0.7\" %}\n\npackage:\n  name: pocl-core\n  version: {{ version }}\n\nsource:\n  - url: https://github.com/pocl/pocl/archive/refs/tags/v{{ version.replace(\".rc\", \"-RC\") }}.tar.gz\n    sha256: {{ sha256 }}\n    patches:\n      - patches/gh1392.patch\n      - patches/alignof.diff  # [ppc64le]\n      - patches/pocld.diff\n\nbuild:\n  number: {{ build_number }}\n  skip: true  # [win]\n  script_env:   # [enable_cuda]\n    - CUDA_HOME   # [enable_cuda]\n\nrequirements:\n  build:\n    - cmake\n    - make\n    - pkg-config\n    - {{ compiler('cxx') }}                                   # [not osx]\n    - clangxx_{{ target_platform }} {{ llvm_version }}.*      # [osx]\n    - llvmdev {{ llvm_version }}.*       # [build_platform != target_platform]\n    - clangdev {{ llvm_version }}.*      # [build_platform != target_platform]\n    - {{ stdlib(\"c\") }}\n  host:\n    - ocl-icd                            # [linux]\n    - khronos-opencl-icd-loader          # [osx]\n    - libhwloc\n    - clhpp\n\n    - llvmdev {{ llvm_version }}.*\n    - clangdev {{ llvm_version }}.*\n    - llvm {{ llvm_version }}.*\n    - libclang-cpp {{ llvm_version }}.*\n    - llvm-spirv-{{ llvm_version.split(\".\")[0] }}\n\n    - zlib                               # [osx]\n    - ld64 >=530,<711                     # [osx]\n  run:\n    - llvm-spirv-{{ llvm_version.split(\".\")[0] }}\n    - ocl-icd                            # [linux]\n    - khronos-opencl-icd-loader          # [osx]\n    # See https://github.com/conda-forge/cctools-and-ld64-feedstock/issues/66\n    # why we need the upper bound for ld64\n    - ld64 >=530,<711                     # [osx]\n    - {{ pin_compatible('libhwloc') }}\n  run_constrained:\n    - pocl {{ version }}.*\n\ntest:\n  commands:\n    - test -f $PREFIX/lib/libpocl${SHLIB_EXT}     # [unix]\n\noutputs:\n  - name: pocl-core\n\n  - name: pocl-cpu-minimal\n    script: install-pkg.sh\n    requirements:\n      build:\n        - {{ compiler('cxx') }}\n        - {{ stdlib('c') }}\n      host:\n        - {{ pin_subpackage(\"pocl-core\", exact=True) }}\n        - llvm {{ llvm_version }}.*\n        - libhwloc\n      run:\n        - {{ pin_subpackage(\"pocl-core\", exact=True) }}\n    test:\n      commands:\n        - test -f $PREFIX/lib/pocl/libpocl-devices-basic.so     # [unix]\n\n  - name: pocl-cpu\n    script: install-pkg.sh\n    requirements:\n      build:\n        - {{ compiler('cxx') }}\n        - {{ stdlib('c') }}\n      host:\n        - {{ pin_subpackage(\"pocl-core\", exact=True) }}\n        - {{ pin_subpackage(\"pocl-cpu-minimal\", exact=True) }}\n        - llvm {{ llvm_version }}.*\n        - libhwloc\n      run:\n        - {{ pin_subpackage(\"pocl-core\", exact=True) }}\n        - {{ pin_subpackage(\"pocl-cpu-minimal\", exact=True) }}\n    test:\n      requires:\n        - pyopencl\n        - curl\n        - pocl-cpu\n      commands:\n        - test -f $PREFIX/lib/pocl/libpocl-devices-pthread.so     # [unix]\n        # Remove apple icd so that only pocl is found\n        - rm -f $PREFIX/etc/OpenCL/vendors/apple.icd     # [osx]\n        - export OCL_ICD_DEBUG=15                     # [linux]\n        - export POCL_DEBUG=1\n        - curl -O https://raw.githubusercontent.com/inducer/pyopencl/main/examples/demo.py\n        - python demo.py\n\n  - name: pocl-cuda\n    build:\n      skip: true  # [not enable_cuda]\n    script: install-pkg.sh\n    requirements:\n      build:\n        - {{ compiler('cxx') }}\n        - {{ stdlib('c') }}\n      host:\n        - {{ pin_subpackage(\"pocl-core\", exact=True) }}\n        - llvm {{ llvm_version }}.*\n        - libhwloc\n      run:\n        - {{ pin_subpackage(\"pocl-core\", exact=True) }}\n      run_constrained:\n        - __cuda >=11  # [not ppc64le]\n        - __cuda >=10.2  # [ppc64le]\n    test:\n      commands:\n        - test -f $PREFIX/lib/pocl/libpocl-devices-cuda.so      # [unix]\n\n  - name: pocl-remote\n    script: install-pkg.sh\n    requirements:\n      build:\n        - {{ compiler('cxx') }}\n        - {{ stdlib('c') }}\n      host:\n        - {{ pin_subpackage(\"pocl-core\", exact=True) }}\n        - llvm {{ llvm_version }}.*\n        - libhwloc\n      run:\n        - {{ pin_subpackage(\"pocl-core\", exact=True) }}\n    test:\n      commands:\n        - test -f $PREFIX/lib/pocl/libpocl-devices-remote.so      # [unix]\n\n  - name: pocl\n    requirements:\n      host:\n        # Need hwloc here for the pocl meta-package to have two hashes\n        # Otherwise only one of them gets uploaded and the `exact=True`\n        # conditions below prevent installations\n        - libhwloc\n      run:\n        - {{ pin_subpackage(\"pocl-core\", exact=True) }}\n        - {{ pin_subpackage(\"pocl-cpu\", exact=True) }}\n        - {{ pin_subpackage(\"pocl-cpu-minimal\", exact=True) }}\n        - {{ pin_subpackage(\"pocl-remote\", exact=True) }}\n        - {{ pin_subpackage(\"pocl-cuda\", exact=True) }}         # [enable_cuda]\n    test:\n      commands:\n        - test -f $PREFIX/lib/pocl/libpocl-devices-pthread.so   # [unix]\n        - test -f $PREFIX/lib/pocl/libpocl-devices-basic.so     # [unix]\n        - test -f $PREFIX/lib/pocl/libpocl-devices-cuda.so      # [enable_cuda]\n      downstreams:\n        - pyopencl\n\nabout:\n  home: http://portablecl.org/\n  license: MIT\n  license_file:\n    - LICENSE\n    - LLVM-License.txt\n    - LICENSE_THIRDPARTY  # [osx]\n  summary: Portable Computing Language -- a portable open source implementation of the OpenCL standard\n  dev_url: https://github.com/pocl/pocl\n  doc_url: http://portablecl.org/docs/html/\n\nextra:\n  feedstock-name: pocl\n  recipe-maintainers:\n    - inducer\n    - mattwala\n    - isuruf\n    - matthiasdiener\n",
+  "raw_meta_yaml": "{% set version = \"6.0\" %}\n{% set build_number = 2 %}\n{% set sha256 = \"de9710223fc1855f833dbbf42ea2681e06aa8ec0464f0201104dc80a74dfd1f2\" %}\n\n{% set llvm_version = \"15.0.7\" %}\n{% set cuda_version = \"12.0\" %}\n\npackage:\n  name: pocl-core\n  version: {{ version }}\n\nsource:\n  - url: https://github.com/pocl/pocl/archive/refs/tags/v{{ version.replace(\".rc\", \"-RC\") }}.tar.gz\n    sha256: {{ sha256 }}\n    patches:\n      # backport equivalent of https://github.com/pocl/pocl/commit/aa5595f871\n      # also for pocld/daemon.cc (c.f. https://github.com/pocl/pocl/pull/1392)\n      - patches/0001-gh1392.patch\n      - patches/0002-pocld.patch\n      - patches/0003-switch-to-newer-find_package-CUDAToolkit-for-CUDA-12.patch\n      # https://github.com/conda-forge/pocl-feedstock/pull/106#issuecomment-2467398973\n      - patches/disable-cuda-test.patch\n\nbuild:\n  number: {{ build_number }}\n  skip: true  # [win]\n  skip: true  # [cuda_compiler_version == \"11.8\"]\n  skip: true  # [enable_cuda and (cuda_compiler_version == \"None\")]\n  skip: true  # [not enable_cuda and (cuda_compiler_version != \"None\")]\n  script_env:   # [enable_cuda]\n    - CUDA_HOME   # [enable_cuda]\n  ignore_run_exports_from:\n    # we only need libcuda.so.1\n    - {{ compiler('cuda') }}   # [enable_cuda]\n    - cuda-version             # [enable_cuda]\n    - cuda-driver-dev          # [enable_cuda]\n    - cuda-cudart-dev          # [enable_cuda]\n\nrequirements:\n  build:\n    - cmake\n    - make\n    - pkg-config\n    - {{ compiler('cxx') }}                                   # [not osx]\n    - clangxx_{{ target_platform }} {{ llvm_version }}.*      # [osx]\n    - {{ compiler('cuda') }}                                  # [enable_cuda]\n    - llvmdev {{ llvm_version }}.*       # [build_platform != target_platform]\n    - clangdev {{ llvm_version }}.*      # [build_platform != target_platform]\n    # only exists from v16, but cannot leave unpinned because\n    # clang 15 is not compatible with libc++ 19 anymore\n    - libcxx-devel {{ llvm_version.split(\".\")[0]|int + 1 }}   # [osx]\n    - {{ stdlib(\"c\") }}\n  host:\n    - ocl-icd                            # [linux]\n    # FIXME: Undo the version restriction in the line below once pocl-6.1 is released (see https://github.com/conda-forge/pocl-feedstock/pull/106)\n    - khronos-opencl-icd-loader <2024.10          # [osx]\n    - libhwloc\n    - clhpp\n\n    - llvmdev {{ llvm_version }}.*\n    - clangdev {{ llvm_version }}.*\n    - llvm {{ llvm_version }}.*\n    - libclang-cpp {{ llvm_version }}.*\n    - llvm-spirv-{{ llvm_version.split(\".\")[0] }}\n    - cuda-version {{ cuda_version }}.*  # [enable_cuda]\n    - cuda-driver-dev                    # [enable_cuda]\n    - cuda-cudart-dev                    # [enable_cuda]\n\n    - zlib                               # [osx]\n    - ld64 >=530,<711                    # [osx]\n  run:\n    - llvm-spirv-{{ llvm_version.split(\".\")[0] }}\n    - ocl-icd                            # [linux]\n    - khronos-opencl-icd-loader          # [osx]\n    # See https://github.com/conda-forge/cctools-and-ld64-feedstock/issues/66\n    # why we need the upper bound for ld64\n    - ld64 >=530,<711                    # [osx]\n    - {{ pin_compatible('libhwloc') }}\n  run_constrained:\n    - pocl {{ version }}.*\n\ntest:\n  commands:\n    - test -f $PREFIX/lib/libpocl${SHLIB_EXT}     # [unix]\n\noutputs:\n  - name: pocl-core\n\n  - name: pocl-cpu-minimal\n    script: install-pkg.sh\n    requirements:\n      build:\n        - {{ compiler('cxx') }}\n        - {{ stdlib('c') }}\n      host:\n        - {{ pin_subpackage(\"pocl-core\", exact=True) }}\n        - llvm {{ llvm_version }}.*\n        - libhwloc\n      run:\n        - {{ pin_subpackage(\"pocl-core\", exact=True) }}\n    test:\n      commands:\n        - test -f $PREFIX/lib/pocl/libpocl-devices-basic.so     # [unix]\n\n  - name: pocl-cpu\n    script: install-pkg.sh\n    requirements:\n      build:\n        - {{ compiler('cxx') }}\n        - {{ stdlib('c') }}\n      host:\n        - {{ pin_subpackage(\"pocl-core\", exact=True) }}\n        - {{ pin_subpackage(\"pocl-cpu-minimal\", exact=True) }}\n        - {{ pin_subpackage(\"pocl-remote\", exact=True) }}\n        - llvm {{ llvm_version }}.*\n        - libhwloc\n      run:\n        - {{ pin_subpackage(\"pocl-core\", exact=True) }}\n        - {{ pin_subpackage(\"pocl-cpu-minimal\", exact=True) }}\n        - {{ pin_subpackage(\"pocl-remote\", exact=True) }}\n    test:\n      requires:\n        - pyopencl\n        - curl\n        - pocl-cpu\n      commands:\n        - test -f $PREFIX/lib/pocl/libpocl-devices-pthread.so     # [unix]\n        # Remove apple icd so that only pocl is found\n        - rm -f $PREFIX/etc/OpenCL/vendors/apple.icd     # [osx]\n        - export OCL_ICD_DEBUG=15                     # [linux]\n        - export POCL_DEBUG=1\n        - curl -O https://raw.githubusercontent.com/inducer/pyopencl/main/examples/demo.py\n        - python demo.py\n\n  - name: pocl-cuda\n    build:\n      skip: true  # [not enable_cuda]\n    script: install-pkg.sh\n    requirements:\n      build:\n        - {{ compiler('cxx') }}\n        - {{ stdlib('c') }}\n      host:\n        - {{ pin_subpackage(\"pocl-core\", exact=True) }}\n        - llvm {{ llvm_version }}.*\n        - libhwloc\n      run:\n        - {{ pin_subpackage(\"pocl-core\", exact=True) }}\n      run_constrained:\n        - __cuda >={{ cuda_version }}\n    test:\n      commands:\n        - test -f $PREFIX/lib/pocl/libpocl-devices-cuda.so      # [unix]\n\n  - name: pocl-remote\n    script: install-pkg.sh\n    requirements:\n      build:\n        - {{ compiler('cxx') }}\n        - {{ stdlib('c') }}\n      host:\n        - {{ pin_subpackage(\"pocl-core\", exact=True) }}\n        - llvm {{ llvm_version }}.*\n        - libhwloc\n      run:\n        - {{ pin_subpackage(\"pocl-core\", exact=True) }}\n    test:\n      commands:\n        - test -f $PREFIX/lib/pocl/libpocl-devices-remote.so      # [unix]\n\n  - name: pocl\n    requirements:\n      host:\n        # Need hwloc here for the pocl meta-package to have two hashes\n        # Otherwise only one of them gets uploaded and the `exact=True`\n        # conditions below prevent installations\n        - libhwloc\n      run:\n        - {{ pin_subpackage(\"pocl-core\", exact=True) }}\n        - {{ pin_subpackage(\"pocl-cpu\", exact=True) }}\n        - {{ pin_subpackage(\"pocl-cpu-minimal\", exact=True) }}\n        - {{ pin_subpackage(\"pocl-remote\", exact=True) }}\n        - {{ pin_subpackage(\"pocl-cuda\", exact=True) }}         # [enable_cuda]\n    test:\n      commands:\n        - test -f $PREFIX/lib/pocl/libpocl-devices-pthread.so   # [unix]\n        - test -f $PREFIX/lib/pocl/libpocl-devices-basic.so     # [unix]\n        - test -f $PREFIX/lib/pocl/libpocl-devices-cuda.so      # [enable_cuda]\n      downstreams:\n        - pyopencl\n\nabout:\n  home: http://portablecl.org/\n  license: MIT\n  license_file:\n    - LICENSE\n    - LLVM-License.txt\n    - LICENSE_THIRDPARTY  # [osx]\n  summary: Portable Computing Language -- a portable open source implementation of the OpenCL standard\n  dev_url: https://github.com/pocl/pocl\n  doc_url: http://portablecl.org/docs/html/\n\nextra:\n  feedstock-name: pocl\n  recipe-maintainers:\n    - inducer\n    - mattwala\n    - isuruf\n    - matthiasdiener\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -3305,10 +2254,15 @@
       "clangxx_osx-arm64",
       "clhpp",
       "cmake",
+      "cuda-cudart-dev",
+      "cuda-driver-dev",
+      "cuda-version",
+      "cuda_compiler_stub",
       "cxx_compiler_stub",
       "khronos-opencl-icd-loader",
       "ld64",
       "libclang-cpp",
+      "libcxx-devel",
       "libhwloc",
       "llvm",
       "llvm-spirv-15",
@@ -3332,7 +2286,9 @@
         "clangxx_osx-64",
         "clangxx_osx-arm64",
         "cmake",
+        "cuda_compiler_stub",
         "cxx_compiler_stub",
+        "libcxx-devel",
         "make",
         "pkg-config"
       ]
@@ -3344,6 +2300,10 @@
         "clang-compiler-activation",
         "clangdev",
         "clhpp",
+        "cuda-cudart-dev",
+        "cuda-driver-dev",
+        "cuda-version",
+        "cuda_compiler_stub",
         "cxx_compiler_stub",
         "khronos-opencl-icd-loader",
         "ld64",
@@ -3355,6 +2315,7 @@
         "ocl-icd",
         "pocl-core",
         "pocl-cpu-minimal",
+        "pocl-remote",
         "zlib"
       ]
     },
@@ -3363,6 +2324,7 @@
       "elements": [
         "c_stdlib_stub",
         "clang-compiler-activation",
+        "cuda_compiler_stub",
         "cxx_compiler_stub",
         "khronos-opencl-icd-loader",
         "ld64",
@@ -3394,7 +2356,9 @@
         "clangxx_osx-64 15.0.7.*",
         "clangxx_osx-arm64 15.0.7.*",
         "cmake",
+        "cuda_compiler_stub",
         "cxx_compiler_stub",
+        "libcxx-devel 16",
         "make",
         "pkg-config"
       ]
@@ -3404,7 +2368,10 @@
       "elements": [
         "clangdev 15.0.7.*",
         "clhpp",
-        "khronos-opencl-icd-loader",
+        "cuda-cudart-dev",
+        "cuda-driver-dev",
+        "cuda-version 12.0.*",
+        "khronos-opencl-icd-loader <2024.10",
         "ld64 >=530,<711",
         "libclang-cpp 15.0.7.*",
         "libhwloc",
@@ -3414,6 +2381,7 @@
         "ocl-icd",
         "pocl-core",
         "pocl-cpu-minimal",
+        "pocl-remote",
         "zlib"
       ]
     },
