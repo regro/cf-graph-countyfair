@@ -22,7 +22,7 @@
       "summary": "High-throughput, structured, and persistent streaming"
     },
     "build": {
-      "number": "5",
+      "number": "6",
       "run_exports": [
         "river-ingester"
       ]
@@ -112,7 +112,7 @@
       "summary": "High-throughput, structured, and persistent streaming"
     },
     "build": {
-      "number": "5",
+      "number": "6",
       "run_exports": [
         "river-ingester"
       ]
@@ -170,7 +170,7 @@
       "summary": "High-throughput, structured, and persistent streaming"
     },
     "build": {
-      "number": "5",
+      "number": "6",
       "run_exports": [
         "river-ingester"
       ]
@@ -265,7 +265,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/river-ingester.json"
   },
-  "raw_meta_yaml": "{% set name = \"river-ingester\" %}\n{% set version = \"1.0.11\" %}\n\n# appease linter\n{% if libarrow is undefined %}\n{% set libarrow = \"15\" %}\n{% endif %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://github.com/pbotros/river/archive/refs/tags/v{{ version }}.tar.gz\n  sha256: 04f6712d220a97fde76e3ed5998832c4a7ba790137cf656f8c2d1290077b8eaf\n  patches:\n    - patches/0001-disambiguate-make_unique-use-std-version-as-memory-a.patch\n\nbuild:\n  number: 5\n  run_exports:\n    - {{ pin_subpackage(\"river-ingester\", max_pin=\"x.x\") }}\n  # The ingester currently doesn't build on Windows, though admittedly not\n  # much effort was put in to get this working. Redis runs on Linux/Mac\n  # only anyways, so you'll need a Linux/Mac machine in the mix regardless.\n  skip: true  # [win]\n\nrequirements:\n  build:\n    - {{ compiler('cxx') }}\n    - {{ stdlib(\"c\") }}\n    - cmake\n    - make  # [not win]\n    - ninja  # [win]\n    - pkg-config\n  host:\n    - libboost-devel\n    - libarrow\n    - libparquet\n    - spdlog\n    - river-cpp {{ version }}\n  run:\n    - spdlog\n    - river-cpp {{ version }}\n\ntest:\n  commands:\n    - test -f ${PREFIX}/bin/river-ingester  # [osx]\n    - test -f ${PREFIX}/bin/river-ingester  # [linux]\n\nabout:\n  home: https://github.com/pbotros/river\n  summary: High-throughput, structured, and persistent streaming\n  description: |\n    A high-throughput, structured streaming framework built atop Redis Streams, with optional support for persistence-to-disk. C++ and Python support.\n  license: MIT\n  license_file: LICENSE\n\nextra:\n  recipe-maintainers:\n    - pbotros\n",
+  "raw_meta_yaml": "{% set name = \"river-ingester\" %}\n{% set version = \"1.0.11\" %}\n\n# appease linter\n{% if libarrow is undefined %}\n{% set libarrow = \"15\" %}\n{% endif %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://github.com/pbotros/river/archive/refs/tags/v{{ version }}.tar.gz\n  sha256: 04f6712d220a97fde76e3ed5998832c4a7ba790137cf656f8c2d1290077b8eaf\n  patches:\n    - patches/0001-disambiguate-make_unique-use-std-version-as-memory-a.patch\n\nbuild:\n  number: 6\n  run_exports:\n    - {{ pin_subpackage(\"river-ingester\", max_pin=\"x.x\") }}\n  # The ingester currently doesn't build on Windows, though admittedly not\n  # much effort was put in to get this working. Redis runs on Linux/Mac\n  # only anyways, so you'll need a Linux/Mac machine in the mix regardless.\n  skip: true  # [win]\n  {% if libarrow.split(\".\")[0]|int >= 18 %}\n  # incompatible, due to removal of deprecated APIs: apache/arrow#44079\n  skip: true\n  {% endif %}\n\nrequirements:\n  build:\n    - {{ compiler('cxx') }}\n    - {{ stdlib(\"c\") }}\n    - cmake\n    - make  # [not win]\n    - ninja  # [win]\n    - pkg-config\n  host:\n    - libboost-devel\n    - libarrow\n    - libparquet\n    - spdlog\n    - river-cpp {{ version }}\n  run:\n    - spdlog\n    - river-cpp {{ version }}\n\ntest:\n  commands:\n    - test -f ${PREFIX}/bin/river-ingester  # [osx]\n    - test -f ${PREFIX}/bin/river-ingester  # [linux]\n\nabout:\n  home: https://github.com/pbotros/river\n  summary: High-throughput, structured, and persistent streaming\n  description: |\n    A high-throughput, structured streaming framework built atop Redis Streams, with optional support for persistence-to-disk. C++ and Python support.\n  license: MIT\n  license_file: LICENSE\n\nextra:\n  recipe-maintainers:\n    - pbotros\n",
   "req": {
     "__set__": true,
     "elements": [
