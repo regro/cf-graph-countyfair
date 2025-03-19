@@ -14,11 +14,6 @@
       "branch_name": "main",
       "tooling_branch_name": "main"
     },
-    "os_version": {
-      "linux_64": "cos7",
-      "linux_aarch64": "cos7",
-      "linux_ppc64le": "cos7"
-    },
     "provider": {
       "linux_aarch64": "default",
       "linux_ppc64le": "default"
@@ -38,7 +33,7 @@
     },
     "build": {
       "binary_relocation": false,
-      "number": "0",
+      "number": "1",
       "script": null
     },
     "extra": {
@@ -54,7 +49,8 @@
       "build": [
         "c_compiler_stub",
         "cxx_compiler_stub",
-        "c_stdlib_stub"
+        "c_stdlib_stub",
+        "cf-nvidia-tools 1"
       ],
       "host": [
         "cuda-version 12.8"
@@ -88,6 +84,7 @@
       "elements": [
         "c_compiler_stub",
         "c_stdlib_stub",
+        "cf-nvidia-tools",
         "cxx_compiler_stub"
       ]
     },
@@ -122,7 +119,7 @@
     },
     "build": {
       "binary_relocation": false,
-      "number": "0",
+      "number": "1",
       "script": null
     },
     "extra": {
@@ -139,7 +136,8 @@
         "c_compiler_stub",
         "cxx_compiler_stub",
         "c_stdlib_stub",
-        "arm-variant * sbsa"
+        "arm-variant * sbsa",
+        "cf-nvidia-tools 1"
       ],
       "host": [
         "cuda-version 12.8"
@@ -176,6 +174,7 @@
         "arm-variant",
         "c_compiler_stub",
         "c_stdlib_stub",
+        "cf-nvidia-tools",
         "cxx_compiler_stub"
       ]
     },
@@ -210,7 +209,7 @@
     },
     "build": {
       "binary_relocation": false,
-      "number": "0",
+      "number": "1",
       "script": [
         "move bin\\* %LIBRARY_BIN%"
       ]
@@ -229,6 +228,7 @@
         "c_compiler_stub",
         "cxx_compiler_stub",
         "c_stdlib_stub",
+        "cf-nvidia-tools 1",
         "arm-variant * sbsa"
       ],
       "host": [
@@ -270,13 +270,14 @@
   "pr_info": {
     "__lazy_json__": "pr_info/cuda-nvdisasm.json"
   },
-  "raw_meta_yaml": "{% set name = \"cuda-nvdisasm\" %}\n{% set version = \"12.8.90\" %}\n{% set cuda_version = \"12.8\" %}\n{% set platform = \"linux-x86_64\" %}  # [linux64]\n{% set platform = \"linux-ppc64le\" %}  # [ppc64le]\n{% set platform = \"linux-sbsa\" %}  # [aarch64]\n{% set platform = \"windows-x86_64\" %}  # [win]\n{% set extension = \"tar.xz\" %}  # [not win]\n{% set extension = \"zip\" %}  # [win]\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://developer.download.nvidia.com/compute/cuda/redist/cuda_nvdisasm/{{ platform }}/cuda_nvdisasm-{{ platform }}-{{ version }}-archive.{{ extension }}\n  sha256: 8ac63f4079c47707ec958af3a97ceeb18194e16827a2766058f5872f6c3412ae  # [linux64]\n  sha256: 250ae30e878b0c4c1553e7c7f28c2c763902c807b5f493ebc16e6e10c71213f2  # [aarch64]\n  sha256: a348209c803fa67b7bc216a5b4d7a6f9a117ccc60a8c567eb94cf25ba737ec47  # [win]\n\nbuild:\n  number: 0\n  binary_relocation: false\n  skip: true  # [osx or ppc64le]\n  script:\n    - move bin\\* %LIBRARY_BIN%  # [win]\n\nrequirements:\n  build:\n    - {{ compiler(\"c\") }}\n    - {{ compiler(\"cxx\") }}\n    - {{ stdlib(\"c\") }}\n    - arm-variant * {{ arm_variant_type }}  # [aarch64]\n  host:\n    - cuda-version {{ cuda_version }}\n  run:\n    - {{ pin_compatible(\"cuda-version\", max_pin=\"x.x\") }}\n  run_constrained:\n    - arm-variant * {{ arm_variant_type }}  # [aarch64]\n\ntest:\n  requires:\n    - patchelf                                        # [linux]\n  files:\n    - test-rpath.sh                                   # [linux]\n  commands:\n    - test -f $PREFIX/bin/nvdisasm                    # [linux]\n    - bash test-rpath.sh                              # [linux]\n    - if not exist %LIBRARY_BIN%\\nvdisasm.exe exit 1  # [win]\n\nabout:\n  home: https://developer.nvidia.com/cuda-toolkit\n  license_file: LICENSE\n  license: LicenseRef-NVIDIA-End-User-License-Agreement\n  license_url: https://docs.nvidia.com/cuda/eula/index.html\n  summary: nvdisasm extracts information from standalone cubin files\n  description: |\n    nvdisasm extracts information from standalone cubin files and presents them in\n    human readable format.\n  doc_url: https://docs.nvidia.com/cuda/cuda-binary-utilities/\n\nextra:\n  recipe-maintainers:\n    - conda-forge/cuda\n",
+  "raw_meta_yaml": "{% set name = \"cuda-nvdisasm\" %}\n{% set version = \"12.8.90\" %}\n{% set cuda_version = \"12.8\" %}\n{% set platform = \"linux-x86_64\" %}  # [linux64]\n{% set platform = \"linux-ppc64le\" %}  # [ppc64le]\n{% set platform = \"linux-sbsa\" %}  # [aarch64]\n{% set platform = \"windows-x86_64\" %}  # [win]\n{% set extension = \"tar.xz\" %}  # [not win]\n{% set extension = \"zip\" %}  # [win]\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://developer.download.nvidia.com/compute/cuda/redist/cuda_nvdisasm/{{ platform }}/cuda_nvdisasm-{{ platform }}-{{ version }}-archive.{{ extension }}\n  sha256: 8ac63f4079c47707ec958af3a97ceeb18194e16827a2766058f5872f6c3412ae  # [linux64]\n  sha256: 250ae30e878b0c4c1553e7c7f28c2c763902c807b5f493ebc16e6e10c71213f2  # [aarch64]\n  sha256: a348209c803fa67b7bc216a5b4d7a6f9a117ccc60a8c567eb94cf25ba737ec47  # [win]\n\nbuild:\n  number: 1\n  binary_relocation: false\n  skip: true  # [osx or ppc64le]\n  script:\n    - move bin\\* %LIBRARY_BIN%  # [win]\n\nrequirements:\n  build:\n    - {{ compiler(\"c\") }}\n    - {{ compiler(\"cxx\") }}\n    - {{ stdlib(\"c\") }}\n    - arm-variant * {{ arm_variant_type }}  # [aarch64]\n    - cf-nvidia-tools 1  # [linux]\n  host:\n    - cuda-version {{ cuda_version }}\n  run:\n    - {{ pin_compatible(\"cuda-version\", max_pin=\"x.x\") }}\n  run_constrained:\n    - arm-variant * {{ arm_variant_type }}  # [aarch64]\n\ntest:\n  requires:\n    - patchelf                                        # [linux]\n  files:\n    - test-rpath.sh                                   # [linux]\n  commands:\n    - test -f $PREFIX/bin/nvdisasm                    # [linux]\n    - bash test-rpath.sh                              # [linux]\n    - if not exist %LIBRARY_BIN%\\nvdisasm.exe exit 1  # [win]\n\nabout:\n  home: https://developer.nvidia.com/cuda-toolkit\n  license_file: LICENSE\n  license: LicenseRef-NVIDIA-End-User-License-Agreement\n  license_url: https://docs.nvidia.com/cuda/eula/index.html\n  summary: nvdisasm extracts information from standalone cubin files\n  description: |\n    nvdisasm extracts information from standalone cubin files and presents them in\n    human readable format.\n  doc_url: https://docs.nvidia.com/cuda/cuda-binary-utilities/\n\nextra:\n  recipe-maintainers:\n    - conda-forge/cuda\n",
   "req": {
     "__set__": true,
     "elements": [
       "arm-variant",
       "c_compiler_stub",
       "c_stdlib_stub",
+      "cf-nvidia-tools",
       "cuda-version",
       "cxx_compiler_stub"
     ]
@@ -288,6 +289,7 @@
         "arm-variant",
         "c_compiler_stub",
         "c_stdlib_stub",
+        "cf-nvidia-tools",
         "cxx_compiler_stub"
       ]
     },
@@ -322,6 +324,7 @@
         "arm-variant * sbsa",
         "c_compiler_stub",
         "c_stdlib_stub",
+        "cf-nvidia-tools 1",
         "cxx_compiler_stub"
       ]
     },
@@ -359,7 +362,7 @@
     },
     "build": {
       "binary_relocation": false,
-      "number": "0",
+      "number": "1",
       "script": [
         "move bin\\* %LIBRARY_BIN%"
       ]
