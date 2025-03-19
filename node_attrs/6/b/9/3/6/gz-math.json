@@ -41,7 +41,7 @@
       "summary": "A set of CMake modules that are used by the C++-based Gazebo projects."
     },
     "build": {
-      "number": "1",
+      "number": "2",
       "run_exports": {
         "weak": [
           "libgz-math8"
@@ -379,7 +379,7 @@
       "summary": "A set of CMake modules that are used by the C++-based Gazebo projects."
     },
     "build": {
-      "number": "1",
+      "number": "2",
       "run_exports": {
         "weak": [
           "libgz-math8"
@@ -717,7 +717,7 @@
       "summary": "A set of CMake modules that are used by the C++-based Gazebo projects."
     },
     "build": {
-      "number": "1",
+      "number": "2",
       "run_exports": {
         "weak": [
           "libgz-math8"
@@ -1055,7 +1055,7 @@
       "summary": "A set of CMake modules that are used by the C++-based Gazebo projects."
     },
     "build": {
-      "number": "1",
+      "number": "2",
       "run_exports": {
         "weak": [
           "libgz-math8"
@@ -2552,7 +2552,7 @@
       "summary": "A set of CMake modules that are used by the C++-based Gazebo projects."
     },
     "build": {
-      "number": "1",
+      "number": "2",
       "run_exports": {
         "weak": [
           "libgz-math8"
@@ -2890,7 +2890,7 @@
       "summary": "A set of CMake modules that are used by the C++-based Gazebo projects."
     },
     "build": {
-      "number": "1",
+      "number": "2",
       "run_exports": {
         "weak": [
           "libgz-math8"
@@ -3238,7 +3238,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/gz-math.json"
   },
-  "raw_meta_yaml": "context:\n  version: \"8.1.1\"\n  major_version: \"8\"\n  component_name: \"math\"\n  component_version: \"math8\"\n  repo_name: \"gz-math\"\n  name: \"gz-math8\"\n  cxx_name: \"libgz-math8\"\n  python_name: \"gz-math8-python\"\n\nrecipe:\n  name: ${{ name }}\n  version: ${{ version }}\n\nsource:\n  - url: \"https://github.com/gazebosim/${{ repo_name }}/archive/${{ repo_name }}${{ major_version }}_${{ version }}.tar.gz\"\n    sha256: \"0455b24069c61172b625c55348f3a722652058262422019176d0ff43551f7093\"\n\nbuild:\n  number: 1\n\noutputs:\n  - package:\n      name: ${{ cxx_name }}\n    build:\n      script:\n        - if: unix\n          then: build_cxx.sh\n        - if: win\n          then: bld_cxx.bat\n    requirements:\n      build:\n        - ${{ compiler('c') }}\n        - ${{ stdlib('c') }}\n        - ${{ compiler('cxx') }}\n        - cmake\n        - pkg-config\n        - ninja\n        # INTEGRATION_ExamplesBuild_TEST requires the use of Make\n        - if: not win\n          then:\n            - make\n      host:\n        - libgz-cmake4\n        - libgz-utils3\n        - eigen\n      run:\n        - eigen\n      run_exports:\n         - ${{ pin_subpackage(cxx_name, upper_bound='x') }}\n  \n    tests:\n      - script:\n        - if: not win\n          then: \n            - test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake\n            - test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh\n            - test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}\n        - if: win\n          then: \n            - if not exist %PREFIX%\\Library\\lib\\cmake\\${{ name }}\\${{ name }}-config.cmake exit 1\n            - if not exist %PREFIX%\\\\Library\\\\include\\\\gz\\\\{{ component_version }}\\\\gz\\\\{{ component_name }}.hh\n            - if not exist %PREFIX%\\Library\\lib\\${{ name }}.lib exit 1\n            - if not exist %PREFIX%\\Library\\bin\\${{ name }}.dll exit 1\n\n  - package:\n      name: ${{ python_name }}\n    build:\n      script:\n        - if: unix\n          then: build_py.sh\n        - if: win\n          then: bld_py.bat\n    requirements:\n      build:\n        - ${{ compiler('c') }}\n        - ${{ stdlib('c') }}\n        - ${{ compiler('cxx') }}\n        - cmake\n        - pkg-config\n        - ninja\n        - if: build_platform != target_platform\n          then:\n            - cross-python_${{ target_platform }}\n            - python\n            - pybind11\n            - pybind11-abi\n            - pytest\n      host:\n        - ${{ pin_subpackage(cxx_name, exact=true) }}\n        - python\n        - pybind11\n        - pybind11-abi\n        - pytest\n      run:\n        - ${{ pin_subpackage(cxx_name, exact=true) }}\n        - python\n\n    tests:\n      - python:\n          imports:\n            - gz.math8\n\n  - package:\n      name: ${{ name }}\n    requirements:\n      run:\n        - ${{ pin_subpackage(cxx_name, exact=true) }}\n        - ${{ pin_subpackage(python_name, upper_bound='x.x.x') }}\n      run_exports:\n        - ${{ pin_subpackage(cxx_name, upper_bound='x') }}\n    tests:\n      - script:\n        - if: not win\n          then: \n            - test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake\n            - test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh\n            - test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}\n        - if: win\n          then: \n            - if not exist %PREFIX%\\Library\\lib\\cmake\\${{ name }}\\${{ name }}-config.cmake exit 1\n            - if not exist %PREFIX%\\Library\\include\\gz\\{{ component_version }}\\gz\\{{ component_name }}.hh\n            - if not exist %PREFIX%\\Library\\lib\\${{ name }}.lib exit 1\n            - if not exist %PREFIX%\\Library\\bin\\${{ name }}.dll exit 1\n      - python:\n          imports:\n            - gz.math8\n\nabout:\n  homepage: https://github.com/gazebosim/gz-cmake\n  repository: https://github.com/gazebosim/gz-cmake\n  license: \"Apache-2.0\"\n  license_file: \"LICENSE\"\n  summary: \"A set of CMake modules that are used by the C++-based Gazebo projects.\"\n\nextra:\n  recipe-maintainers:\n    - wolfv\n    - traversaro\n    - j-rivero\n",
+  "raw_meta_yaml": "context:\n  version: \"8.1.1\"\n  major_version: \"8\"\n  component_name: \"math\"\n  component_version: \"math8\"\n  repo_name: \"gz-math\"\n  name: \"gz-math8\"\n  cxx_name: \"libgz-math8\"\n  python_name: \"gz-math8-python\"\n\nrecipe:\n  name: ${{ name }}\n  version: ${{ version }}\n\nsource:\n  - url: \"https://github.com/gazebosim/${{ repo_name }}/archive/${{ repo_name }}${{ major_version }}_${{ version }}.tar.gz\"\n    sha256: \"0455b24069c61172b625c55348f3a722652058262422019176d0ff43551f7093\"\n\nbuild:\n  number: 2\n\noutputs:\n  - package:\n      name: ${{ cxx_name }}\n    build:\n      script:\n        - if: unix\n          then: build_cxx.sh\n        - if: win\n          then: bld_cxx.bat\n    requirements:\n      build:\n        - ${{ compiler('c') }}\n        - ${{ stdlib('c') }}\n        - ${{ compiler('cxx') }}\n        - cmake\n        - pkg-config\n        - ninja\n        # INTEGRATION_ExamplesBuild_TEST requires the use of Make\n        - if: not win\n          then:\n            - make\n      host:\n        - libgz-cmake4\n        - libgz-utils3\n        - eigen\n      run:\n        - eigen\n      run_exports:\n         - ${{ pin_subpackage(cxx_name, upper_bound='x') }}\n  \n    tests:\n      - script:\n        - if: not win\n          then: \n            - test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake\n            - test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh\n            - test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}\n        - if: win\n          then: \n            - if not exist %PREFIX%\\Library\\lib\\cmake\\${{ name }}\\${{ name }}-config.cmake exit 1\n            - if not exist %PREFIX%\\\\Library\\\\include\\\\gz\\\\{{ component_version }}\\\\gz\\\\{{ component_name }}.hh\n            - if not exist %PREFIX%\\Library\\lib\\${{ name }}.lib exit 1\n            - if not exist %PREFIX%\\Library\\bin\\${{ name }}.dll exit 1\n\n  - package:\n      name: ${{ python_name }}\n    build:\n      script:\n        - if: unix\n          then: build_py.sh\n        - if: win\n          then: bld_py.bat\n    requirements:\n      build:\n        - ${{ compiler('c') }}\n        - ${{ stdlib('c') }}\n        - ${{ compiler('cxx') }}\n        - cmake\n        - pkg-config\n        - ninja\n        - if: build_platform != target_platform\n          then:\n            - cross-python_${{ target_platform }}\n            - python\n            - pybind11\n            - pybind11-abi\n            - pytest\n      host:\n        - ${{ pin_subpackage(cxx_name, exact=true) }}\n        - python\n        - pybind11\n        - pybind11-abi\n        - pytest\n      run:\n        - ${{ pin_subpackage(cxx_name, exact=true) }}\n        - python\n\n    tests:\n      - python:\n          imports:\n            - gz.math8\n\n  - package:\n      name: ${{ name }}\n    requirements:\n      run:\n        - ${{ pin_subpackage(cxx_name, exact=true) }}\n        - ${{ pin_subpackage(python_name, upper_bound='x.x.x') }}\n      run_exports:\n        - ${{ pin_subpackage(cxx_name, upper_bound='x') }}\n    tests:\n      - script:\n        - if: not win\n          then: \n            - test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake\n            - test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh\n            - test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}\n        - if: win\n          then: \n            - if not exist %PREFIX%\\Library\\lib\\cmake\\${{ name }}\\${{ name }}-config.cmake exit 1\n            - if not exist %PREFIX%\\Library\\include\\gz\\{{ component_version }}\\gz\\{{ component_name }}.hh\n            - if not exist %PREFIX%\\Library\\lib\\${{ name }}.lib exit 1\n            - if not exist %PREFIX%\\Library\\bin\\${{ name }}.dll exit 1\n      - python:\n          imports:\n            - gz.math8\n\nabout:\n  homepage: https://github.com/gazebosim/gz-cmake\n  repository: https://github.com/gazebosim/gz-cmake\n  license: \"Apache-2.0\"\n  license_file: \"LICENSE\"\n  summary: \"A set of CMake modules that are used by the C++-based Gazebo projects.\"\n\nextra:\n  recipe-maintainers:\n    - wolfv\n    - traversaro\n    - j-rivero\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -3366,7 +3366,7 @@
       "summary": "A set of CMake modules that are used by the C++-based Gazebo projects."
     },
     "build": {
-      "number": "1",
+      "number": "2",
       "run_exports": {
         "weak": [
           "libgz-math8"
