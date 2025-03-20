@@ -2,9 +2,6 @@
   "archived": false,
   "branch": "main",
   "conda-forge.yml": {
-    "build_platform": {
-      "linux_aarch64": "linux_64"
-    },
     "conda_build": {
       "error_overlinking": true
     },
@@ -13,12 +10,9 @@
       "branch_name": "main",
       "tooling_branch_name": "main"
     },
-    "os_version": {
-      "linux_64": "cos7",
-      "linux_aarch64": "cos7"
-    },
+    "noarch_platforms": "linux_64",
     "provider": {
-      "linux_aarch64": "azure"
+      "linux_64": "azure"
     }
   },
   "feedstock_name": "mathdx",
@@ -34,10 +28,18 @@
       "summary": "NVIDIA MathDx device libraries"
     },
     "build": {
-      "number": "1",
+      "noarch": "generic",
+      "number": "0",
       "script": [
-        "cp -r $SRC_DIR/nvidia/mathdx/include/* $PREFIX/include/",
-        "cp $SRC_DIR/nvidia_mathdx-*.dist-info/LICENSE.txt $SRC_DIR/"
+        "cp -r $SRC_DIR/nvidia/mathdx/24.08/include/* $PREFIX/include/",
+        "cp -r $SRC_DIR/nvidia/mathdx/24.08/lib/* $PREFIX/lib/",
+        "cp $SRC_DIR/nvidia/mathdx/24.08/LICENSE.txt $SRC_DIR/",
+        "sed -i -E 's/(set_and_check\\(mathdx_INCLUDE_DIRS?).*/\\1 \"${CMAKE_CURRENT_LIST_DIR}\\/..\\/..\\/..\\/include\")/' $PREFIX/lib/cmake/mathdx/mathdx-config.cmake",
+        "sed -i -E 's/(set_and_check\\(cublasdx_INCLUDE_DIRS?).*/\\1 \"${CMAKE_CURRENT_LIST_DIR}\\/..\\/..\\/..\\/include\")/' $PREFIX/include/cublasdx/lib/cmake/cublasdx/cublasdx-config.cmake",
+        "sed -i -E 's/(INTERFACE_INCLUDE_DIRECTORIES).*/\\1 \"${CMAKE_CURRENT_LIST_DIR}\\/..\\/..\\/..\\/include\"/' $PREFIX/include/cublasdx/lib/cmake/cublasdx/cublasdx-targets.cmake",
+        "sed -i -E 's/(INTERFACE_INCLUDE_DIRECTORIES).*/\\1 \"${CMAKE_CURRENT_LIST_DIR}\\/..\\/..\\/..\\/include\"/' $PREFIX/lib/cmake/mathdx/mathdx-targets.cmake",
+        "sed -i -E '/set_and_check\\(mathdx_inc_CUTLASS_ROOT/d' $PREFIX/lib/cmake/mathdx/mathdx-config.cmake",
+        "sed -i -E '/set_and_check\\(mathdx_inc_CUTLASS_INCLUDE_DIR/d' $PREFIX/lib/cmake/mathdx/mathdx-config.cmake"
       ]
     },
     "extra": {
@@ -48,14 +50,15 @@
     },
     "package": {
       "name": "mathdx",
-      "version": "24.04.0"
+      "version": "24.08.0"
     },
     "requirements": {
       "build": [],
       "host": [
-        "cutlass 3.3.0"
+        "cutlass 3.5.1"
       ],
       "run": [
+        "__unix",
         "cutlass"
       ],
       "run_constrained": [
@@ -65,20 +68,33 @@
     "schema_version": 0,
     "source": [
       {
-        "sha256": "5be02c90487816c9e4f5aceb13f1466edb7e2c86608bf04eec5079e148667179",
-        "url": "https://files.pythonhosted.org/packages/py3/n/nvidia-mathdx/nvidia_mathdx-24.4.0-py3-none-any.whl"
+        "sha256": "66e4a0a1d15969c6b099e15e6f89a89a378b630b8ec7dca18f3e573bf403e0a2",
+        "url": "https://developer.download.nvidia.com/compute/cuFFTDx/redist/cuFFTDx/nvidia-mathdx-24.08.0.tar.gz"
       }
     ],
     "test": {
       "commands": [
         "test -f $PREFIX/include/cufftdx.hpp",
         "test -f $PREFIX/include/cublasdx.hpp",
+        "test -f $PREFIX/lib/cmake/mathdx/mathdx-config.cmake",
         "test -d $PREFIX/include/cufftdx",
         "test -d $PREFIX/include/cublasdx",
-        "tree $PREFIX/include/"
+        "tree $PREFIX/include/",
+        "cmake ${CMAKE_ARGS} -GNinja test",
+        "cmake --build ."
+      ],
+      "files": [
+        "test"
       ],
       "requires": [
-        "tree"
+        "tree",
+        "c_compiler_stub",
+        "cxx_compiler_stub",
+        "c_stdlib_stub",
+        "cuda_compiler_stub",
+        "cmake",
+        "ninja",
+        "cutlass 3.5.1"
       ]
     }
   },
@@ -96,95 +112,20 @@
     "run": {
       "__set__": true,
       "elements": [
+        "__unix",
         "cutlass"
       ]
     },
     "test": {
       "__set__": true,
       "elements": [
-        "tree"
-      ]
-    }
-  },
-  "linux_aarch64_meta_yaml": {
-    "about": {
-      "description": "NVIDIA MathDx currently contains cuFFTDx and cuBLASDx.\n",
-      "doc_url": "https://docs.nvidia.com/cuda/cufftdx/",
-      "home": "https://developer.nvidia.com/mathdx",
-      "license": "LicenseRef-MathDx-Software-License-Agreement",
-      "license_file": "LICENSE.txt",
-      "license_url": "https://docs.nvidia.com/cuda/cufftdx/license.html",
-      "summary": "NVIDIA MathDx device libraries"
-    },
-    "build": {
-      "number": "1",
-      "script": [
-        "cp -r $SRC_DIR/nvidia/mathdx/include/* $PREFIX/include/",
-        "cp $SRC_DIR/nvidia_mathdx-*.dist-info/LICENSE.txt $SRC_DIR/"
-      ]
-    },
-    "extra": {
-      "recipe-maintainers": [
-        "conda-forge/cuda",
-        "leofang"
-      ]
-    },
-    "package": {
-      "name": "mathdx",
-      "version": "24.04.0"
-    },
-    "requirements": {
-      "build": [],
-      "host": [
-        "cutlass 3.3.0"
-      ],
-      "run": [
-        "cutlass"
-      ],
-      "run_constrained": [
-        "cuda-version >=11.0.*,<13.a0"
-      ]
-    },
-    "schema_version": 0,
-    "source": [
-      {
-        "sha256": "5be02c90487816c9e4f5aceb13f1466edb7e2c86608bf04eec5079e148667179",
-        "url": "https://files.pythonhosted.org/packages/py3/n/nvidia-mathdx/nvidia_mathdx-24.4.0-py3-none-any.whl"
-      }
-    ],
-    "test": {
-      "commands": [
-        "test -f $PREFIX/include/cufftdx.hpp",
-        "test -f $PREFIX/include/cublasdx.hpp",
-        "test -d $PREFIX/include/cufftdx",
-        "test -d $PREFIX/include/cublasdx",
-        "tree $PREFIX/include/"
-      ],
-      "requires": [
-        "tree"
-      ]
-    }
-  },
-  "linux_aarch64_requirements": {
-    "build": {
-      "__set__": true,
-      "elements": []
-    },
-    "host": {
-      "__set__": true,
-      "elements": [
-        "cutlass"
-      ]
-    },
-    "run": {
-      "__set__": true,
-      "elements": [
-        "cutlass"
-      ]
-    },
-    "test": {
-      "__set__": true,
-      "elements": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "cmake",
+        "cuda_compiler_stub",
+        "cutlass",
+        "cxx_compiler_stub",
+        "ninja",
         "tree"
       ]
     }
@@ -200,10 +141,18 @@
       "summary": "NVIDIA MathDx device libraries"
     },
     "build": {
-      "number": "1",
+      "noarch": "generic",
+      "number": "0",
       "script": [
-        "cp -r $SRC_DIR/nvidia/mathdx/include/* $PREFIX/include/",
-        "cp $SRC_DIR/nvidia_mathdx-*.dist-info/LICENSE.txt $SRC_DIR/"
+        "cp -r $SRC_DIR/nvidia/mathdx/24.08/include/* $PREFIX/include/",
+        "cp -r $SRC_DIR/nvidia/mathdx/24.08/lib/* $PREFIX/lib/",
+        "cp $SRC_DIR/nvidia/mathdx/24.08/LICENSE.txt $SRC_DIR/",
+        "sed -i -E 's/(set_and_check\\(mathdx_INCLUDE_DIRS?).*/\\1 \"${CMAKE_CURRENT_LIST_DIR}\\/..\\/..\\/..\\/include\")/' $PREFIX/lib/cmake/mathdx/mathdx-config.cmake",
+        "sed -i -E 's/(set_and_check\\(cublasdx_INCLUDE_DIRS?).*/\\1 \"${CMAKE_CURRENT_LIST_DIR}\\/..\\/..\\/..\\/include\")/' $PREFIX/include/cublasdx/lib/cmake/cublasdx/cublasdx-config.cmake",
+        "sed -i -E 's/(INTERFACE_INCLUDE_DIRECTORIES).*/\\1 \"${CMAKE_CURRENT_LIST_DIR}\\/..\\/..\\/..\\/include\"/' $PREFIX/include/cublasdx/lib/cmake/cublasdx/cublasdx-targets.cmake",
+        "sed -i -E 's/(INTERFACE_INCLUDE_DIRECTORIES).*/\\1 \"${CMAKE_CURRENT_LIST_DIR}\\/..\\/..\\/..\\/include\"/' $PREFIX/lib/cmake/mathdx/mathdx-targets.cmake",
+        "sed -i -E '/set_and_check\\(mathdx_inc_CUTLASS_ROOT/d' $PREFIX/lib/cmake/mathdx/mathdx-config.cmake",
+        "sed -i -E '/set_and_check\\(mathdx_inc_CUTLASS_INCLUDE_DIR/d' $PREFIX/lib/cmake/mathdx/mathdx-config.cmake"
       ]
     },
     "extra": {
@@ -214,14 +163,15 @@
     },
     "package": {
       "name": "mathdx",
-      "version": "24.04.0"
+      "version": "24.08.0"
     },
     "requirements": {
       "build": [],
       "host": [
-        "cutlass 3.3.0"
+        "cutlass 3.5.1"
       ],
       "run": [
+        "__unix",
         "cutlass"
       ],
       "run_constrained": [
@@ -231,24 +181,33 @@
     "schema_version": 0,
     "source": [
       {
-        "sha256": "5be02c90487816c9e4f5aceb13f1466edb7e2c86608bf04eec5079e148667179",
-        "url": "https://files.pythonhosted.org/packages/py3/n/nvidia-mathdx/nvidia_mathdx-24.4.0-py3-none-any.whl"
-      },
-      {
-        "sha256": "5be02c90487816c9e4f5aceb13f1466edb7e2c86608bf04eec5079e148667179",
-        "url": "https://files.pythonhosted.org/packages/py3/n/nvidia-mathdx/nvidia_mathdx-24.4.0-py3-none-any.whl"
+        "sha256": "66e4a0a1d15969c6b099e15e6f89a89a378b630b8ec7dca18f3e573bf403e0a2",
+        "url": "https://developer.download.nvidia.com/compute/cuFFTDx/redist/cuFFTDx/nvidia-mathdx-24.08.0.tar.gz"
       }
     ],
     "test": {
       "commands": [
         "test -f $PREFIX/include/cufftdx.hpp",
         "test -f $PREFIX/include/cublasdx.hpp",
+        "test -f $PREFIX/lib/cmake/mathdx/mathdx-config.cmake",
         "test -d $PREFIX/include/cufftdx",
         "test -d $PREFIX/include/cublasdx",
-        "tree $PREFIX/include/"
+        "tree $PREFIX/include/",
+        "cmake ${CMAKE_ARGS} -GNinja test",
+        "cmake --build ."
+      ],
+      "files": [
+        "test"
       ],
       "requires": [
-        "tree"
+        "tree",
+        "c_compiler_stub",
+        "cxx_compiler_stub",
+        "c_stdlib_stub",
+        "cuda_compiler_stub",
+        "cmake",
+        "ninja",
+        "cutlass 3.5.1"
       ]
     }
   },
@@ -261,16 +220,16 @@
   },
   "parsing_error": false,
   "platforms": [
-    "linux_64",
-    "linux_aarch64"
+    "linux_64"
   ],
   "pr_info": {
     "__lazy_json__": "pr_info/mathdx.json"
   },
-  "raw_meta_yaml": "{% set version = \"24.04.0\" %}\n{% set number = 1 %}\n\npackage:\n  name: mathdx\n  version: {{ version }}\n\nsource:\n  - url: https://files.pythonhosted.org/packages/py3/n/nvidia-mathdx/nvidia_mathdx-24.4.0-py3-none-any.whl\n    sha256: 5be02c90487816c9e4f5aceb13f1466edb7e2c86608bf04eec5079e148667179\n\nbuild:\n  number: {{ number }}\n  skip: true  # [not (linux64 or aarch64)]\n  script:\n    - cp -r $SRC_DIR/nvidia/mathdx/include/* $PREFIX/include/      # [linux]\n    - cp $SRC_DIR/nvidia_mathdx-*.dist-info/LICENSE.txt $SRC_DIR/  # [linux]\n\nrequirements:\n  build:\n  host:\n    - cutlass 3.3.0\n  run:\n    - {{ pin_compatible(\"cutlass\", max_pin=\"x.x\") }}\n  run_constrained:\n    - cuda-version >=11.0.*,<13.a0  # mathdx supports both CUDA majors\n\ntest:\n  requires:\n    - tree  # [linux]\n  commands:\n    - test -f $PREFIX/include/cufftdx.hpp   # [linux]\n    - test -f $PREFIX/include/cublasdx.hpp  # [linux]\n    - test -d $PREFIX/include/cufftdx       # [linux]\n    - test -d $PREFIX/include/cublasdx      # [linux]  \n    - tree $PREFIX/include/                 # [linux]\n\n\nabout:\n  home: https://developer.nvidia.com/mathdx\n  license: LicenseRef-MathDx-Software-License-Agreement\n  license_url: https://docs.nvidia.com/cuda/cufftdx/license.html\n  license_file: LICENSE.txt\n  summary: \"NVIDIA MathDx device libraries\"\n  description: |\n    NVIDIA MathDx currently contains cuFFTDx and cuBLASDx.\n  doc_url: https://docs.nvidia.com/cuda/cufftdx/\n\nextra:\n  recipe-maintainers:\n    - conda-forge/cuda\n    - leofang\n",
+  "raw_meta_yaml": "{% set version = \"24.08.0\" %}\n{% set number = 0 %}\n{% set min_cutlass_version = \"3.5.1\" %}\n\n{% set major_version = version.split(\".\")[0] %}\n{% set minor_version = version.split(\".\")[1] %}\n\npackage:\n  name: mathdx\n  version: {{ version }}\n\nsource:\n  - url: https://developer.download.nvidia.com/compute/cuFFTDx/redist/cuFFTDx/nvidia-mathdx-{{ version }}.tar.gz\n    sha256: 66e4a0a1d15969c6b099e15e6f89a89a378b630b8ec7dca18f3e573bf403e0a2\n\nbuild:\n  number: {{ number }}\n  noarch: generic\n  # cuda is only for tests, so we don't want to build multiple variants\n  skip: true  # [(not linux) or (not (cuda_compiler_version or \"\").startswith(\"12\"))]\n  script:\n    - cp -r $SRC_DIR/nvidia/mathdx/{{ major_version }}.{{ minor_version }}/include/* $PREFIX/include/  # [linux]\n    - cp -r $SRC_DIR/nvidia/mathdx/{{ major_version }}.{{ minor_version }}/lib/* $PREFIX/lib/          # [linux]\n    - cp $SRC_DIR/nvidia/mathdx/{{ major_version }}.{{ minor_version }}/LICENSE.txt $SRC_DIR/          # [linux]\n    - sed -i -E 's/(set_and_check\\(mathdx_INCLUDE_DIRS?).*/\\1 \"${CMAKE_CURRENT_LIST_DIR}\\/..\\/..\\/..\\/include\")/' $PREFIX/lib/cmake/mathdx/mathdx-config.cmake  # [linux]\n    - sed -i -E 's/(set_and_check\\(cublasdx_INCLUDE_DIRS?).*/\\1 \"${CMAKE_CURRENT_LIST_DIR}\\/..\\/..\\/..\\/include\")/' $PREFIX/include/cublasdx/lib/cmake/cublasdx/cublasdx-config.cmake  # [linux]\n    - sed -i -E 's/(INTERFACE_INCLUDE_DIRECTORIES).*/\\1 \"${CMAKE_CURRENT_LIST_DIR}\\/..\\/..\\/..\\/include\"/' $PREFIX/include/cublasdx/lib/cmake/cublasdx/cublasdx-targets.cmake  # [linux]\n    - sed -i -E 's/(INTERFACE_INCLUDE_DIRECTORIES).*/\\1 \"${CMAKE_CURRENT_LIST_DIR}\\/..\\/..\\/..\\/include\"/' $PREFIX/lib/cmake/mathdx/mathdx-targets.cmake  # [linux]\n    - sed -i -E '/set_and_check\\(mathdx_inc_CUTLASS_ROOT/d' $PREFIX/lib/cmake/mathdx/mathdx-config.cmake  # [linux]\n    - sed -i -E '/set_and_check\\(mathdx_inc_CUTLASS_INCLUDE_DIR/d' $PREFIX/lib/cmake/mathdx/mathdx-config.cmake  # [linux]\n\nrequirements:\n  build:\n  host:\n    - cutlass {{ min_cutlass_version }}\n  run:\n    - __unix\n    - {{ pin_compatible(\"cutlass\", max_pin=\"x\") }}\n  run_constrained:\n    - cuda-version >=11.0.*,<13.a0  # mathdx supports both CUDA majors\n\ntest:\n  files:\n    - test\n  requires:\n    - tree  # [linux]\n    - {{ compiler(\"c\") }}  # [linux]\n    - {{ compiler(\"cxx\") }}  # [linux]\n    - {{ stdlib(\"c\") }}  # [linux]\n    - {{ compiler(\"cuda\") }}  # [linux]\n    - cmake  # [linux]\n    - ninja  # [linux]\n    # Testing that the minimal supported version is correct\n    - cutlass {{ min_cutlass_version }}\n  commands:\n    - test -f $PREFIX/include/cufftdx.hpp                   # [linux]\n    - test -f $PREFIX/include/cublasdx.hpp                  # [linux]\n    - test -f $PREFIX/lib/cmake/mathdx/mathdx-config.cmake  # [linux]\n    - test -d $PREFIX/include/cufftdx                       # [linux]\n    - test -d $PREFIX/include/cublasdx                      # [linux]\n    - tree $PREFIX/include/                                 # [linux]\n    - cmake ${CMAKE_ARGS} -GNinja test                      # [linux]\n    - cmake --build .                                       # [linux]\n\n\nabout:\n  home: https://developer.nvidia.com/mathdx\n  license: LicenseRef-MathDx-Software-License-Agreement\n  license_url: https://docs.nvidia.com/cuda/cufftdx/license.html\n  license_file: LICENSE.txt\n  summary: \"NVIDIA MathDx device libraries\"\n  description: |\n    NVIDIA MathDx currently contains cuFFTDx and cuBLASDx.\n  doc_url: https://docs.nvidia.com/cuda/cufftdx/\n\nextra:\n  recipe-maintainers:\n    - conda-forge/cuda\n    - leofang\n",
   "req": {
     "__set__": true,
     "elements": [
+      "__unix",
       "cutlass"
     ]
   },
@@ -282,18 +241,34 @@
     "host": {
       "__set__": true,
       "elements": [
-        "cutlass"
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "cuda_compiler_stub",
+        "cutlass",
+        "cxx_compiler_stub"
       ]
     },
     "run": {
       "__set__": true,
       "elements": [
-        "cutlass"
+        "__unix",
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "cuda_compiler_stub",
+        "cutlass",
+        "cxx_compiler_stub"
       ]
     },
     "test": {
       "__set__": true,
       "elements": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "cmake",
+        "cuda_compiler_stub",
+        "cutlass",
+        "cxx_compiler_stub",
+        "ninja",
         "tree"
       ]
     }
@@ -307,24 +282,32 @@
     "host": {
       "__set__": true,
       "elements": [
-        "cutlass 3.3.0"
+        "cutlass 3.5.1"
       ]
     },
     "run": {
       "__set__": true,
       "elements": [
+        "__unix",
         "cutlass"
       ]
     },
     "test": {
       "__set__": true,
       "elements": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "cmake",
+        "cuda_compiler_stub",
+        "cutlass 3.5.1",
+        "cxx_compiler_stub",
+        "ninja",
         "tree"
       ]
     }
   },
-  "url": "https://files.pythonhosted.org/packages/py3/n/nvidia-mathdx/nvidia_mathdx-24.4.0-py3-none-any.whl",
-  "version": "24.04.0",
+  "url": "https://developer.download.nvidia.com/compute/cuFFTDx/redist/cuFFTDx/nvidia-mathdx-24.08.0.tar.gz",
+  "version": "24.08.0",
   "version_pr_info": {
     "__lazy_json__": "version_pr_info/mathdx.json"
   }
