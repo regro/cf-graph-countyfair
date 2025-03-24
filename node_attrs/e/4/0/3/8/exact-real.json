@@ -24,7 +24,7 @@
       "summary": "Lazy computations with real numbers in C++ and Python"
     },
     "build": {
-      "number": "4"
+      "number": "5"
     },
     "extra": {
       "recipe-maintainers": [
@@ -73,7 +73,9 @@
             "c_stdlib_stub"
           ],
           "host": [
+            "icu",
             "libboost-headers",
+            "libxml2",
             "python",
             "cppyy >=3,<4",
             "cppyythonizations",
@@ -127,11 +129,13 @@
         "cppyy",
         "cppyythonizations",
         "gmp",
+        "icu",
         "libboost-devel",
         "libboost-headers",
         "libeantic",
         "libexactreal",
         "libflint",
+        "libxml2",
         "pytest",
         "python",
         "setuptools"
@@ -165,7 +169,7 @@
       "summary": "Lazy computations with real numbers in C++ and Python"
     },
     "build": {
-      "number": "4"
+      "number": "5"
     },
     "extra": {
       "recipe-maintainers": [
@@ -214,7 +218,9 @@
             "c_stdlib_stub"
           ],
           "host": [
+            "icu",
             "libboost-headers",
+            "libxml2",
             "python",
             "cppyy >=3,<4",
             "cppyythonizations",
@@ -280,7 +286,9 @@
             "c_stdlib_stub"
           ],
           "host": [
+            "icu",
             "libboost-headers",
+            "libxml2",
             "python",
             "cppyy >=3,<4",
             "cppyythonizations",
@@ -328,7 +336,7 @@
       "summary": "Lazy computations with real numbers in C++ and Python"
     },
     "build": {
-      "number": "4"
+      "number": "5"
     },
     "extra": {
       "recipe-maintainers": [
@@ -377,7 +385,9 @@
             "c_stdlib_stub"
           ],
           "host": [
+            "icu",
             "libboost-headers",
+            "libxml2",
             "python",
             "cppyy >=3,<4",
             "cppyythonizations",
@@ -431,11 +441,13 @@
         "cppyy",
         "cppyythonizations",
         "gmp",
+        "icu",
         "libboost-devel",
         "libboost-headers",
         "libeantic",
         "libexactreal",
         "libflint",
+        "libxml2",
         "pytest",
         "python",
         "setuptools"
@@ -473,7 +485,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/exact-real.json"
   },
-  "raw_meta_yaml": "{% set name = \"exact-real\" %}\n{% set version = \"4.0.0\" %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://github.com/flatsurf/exact-real/releases/download/{{ version }}/exact-real-{{ version }}.tar.gz\n  sha256: 02cfef7aa18c316bafaf0d80163dc3d1bc25c804bf862d86353cde656931e0c3\n\nbuild:\n  number: 4\n  # dependency libeantic is not available for Windows on conda-forge yet\n  skip: true  # [win]\n\noutputs:\n  - name: libexactreal\n    script: build-libexactreal.sh  # [not win]\n    script: build-libexactreal.bat  # [win]\n    run_exports:\n      - {{ pin_subpackage(\"libexactreal\") }}\n    requirements:\n      build:\n        - libtool   # [unix]\n        - automake  # [unix]\n        - make      # [unix]\n        - autotools_clang_conda  # [win]\n        - gnuconfig  # [unix]\n        - {{ compiler('cxx') }}\n        - {{ stdlib(\"c\") }}\n      host:\n        - libflint\n        # We only need the libboost-headers at compile time. However, since we\n        # use bits of boost in our API, code built against libexactreal must be\n        # built with a compatible version of the headers. Therefore, we add a\n        # liboost pin to our run exports so libbookst-headers are going to be\n        # in a compatible version.\n        - libboost-devel\n        - libeantic\n        - gmp  # [unix]\n        - mpir  # [win]\n    test:\n      commands:\n        - test -f $PREFIX/include/exact-real/exact-real.hpp  # [unix]\n        - test -f $PREFIX/lib/libexactreal${SHLIB_EXT}                # [unix]\n  - name: pyexactreal\n    script: build-pyexactreal.sh  # [not win]\n    script: bld-pyexactreal.bat  # [win]\n    requirements:\n      build:\n        - python                              # [build_platform != target_platform]\n        - cross-python_{{ target_platform }}  # [build_platform != target_platform]\n        - libtool   # [unix]\n        - automake  # [unix]\n        - make      # [unix]\n        - autotools_clang_conda  # [win]\n        - gnuconfig  # [unix]\n        - {{ compiler('cxx') }}\n        - {{ stdlib(\"c\") }}\n      host:\n        # Note that the libboost-devel from libexactreal forces these headers to be\n        # compatible with ones used when building libexactreal.\n        - libboost-headers\n        - python\n        - cppyy >=3,<4\n        - cppyythonizations\n        - setuptools\n        - pytest\n        - {{ pin_subpackage(\"libexactreal\") }}\n      run:\n        # cppyy dynamically compiles C++ wrappers at runtime, therefore we need C++ headers of boost.\n        # Note that the libboost-devel from libexactreal forces these headers to be\n        # compatible with ones used when building libexactreal.\n        - libboost-headers\n        - python\n        - cppyy >=3,<4\n        - cppyythonizations\n        - pyeantic\n        - gmpxxyy\n        # A subpackage does not see the run_exports of another subpackage:\n        # https://github.com/conda/conda-build/issues/3478\n        - {{ pin_subpackage(\"libexactreal\") }}\n    test:\n      imports:\n        - pyexactreal\n\nabout:\n  home: https://github.com/flatsurf/exact-real\n  license: GPL-3.0-or-later\n  license_family: GPL\n  license_file: COPYING\n  summary: Lazy computations with real numbers in C++ and Python\n  description: |\n    exact-real is a C++/Python library which provides exact lazy computations\n    in the Real Numbers. In particular it provides arithmetic and comparisons\n    of (random) transcendental numbers.\n  dev_url: https://github.com/flatsurf/exact-real\n\nextra:\n  recipe-maintainers:\n    - saraedum\n",
+  "raw_meta_yaml": "{% set name = \"exact-real\" %}\n{% set version = \"4.0.0\" %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://github.com/flatsurf/exact-real/releases/download/{{ version }}/exact-real-{{ version }}.tar.gz\n  sha256: 02cfef7aa18c316bafaf0d80163dc3d1bc25c804bf862d86353cde656931e0c3\n\nbuild:\n  number: 5\n  # dependency libeantic is not available for Windows on conda-forge yet\n  skip: true  # [win]\n\noutputs:\n  - name: libexactreal\n    script: build-libexactreal.sh  # [not win]\n    script: build-libexactreal.bat  # [win]\n    run_exports:\n      - {{ pin_subpackage(\"libexactreal\") }}\n    requirements:\n      build:\n        - libtool   # [unix]\n        - automake  # [unix]\n        - make      # [unix]\n        - autotools_clang_conda  # [win]\n        - gnuconfig  # [unix]\n        - {{ compiler('cxx') }}\n        - {{ stdlib(\"c\") }}\n      host:\n        - libflint\n        # We only need the libboost-headers at compile time. However, since we\n        # use bits of boost in our API, code built against libexactreal must be\n        # built with a compatible version of the headers. Therefore, we add a\n        # liboost pin to our run exports so libbookst-headers are going to be\n        # in a compatible version.\n        - libboost-devel\n        - libeantic\n        - gmp  # [unix]\n        - mpir  # [win]\n    test:\n      commands:\n        - test -f $PREFIX/include/exact-real/exact-real.hpp  # [unix]\n        - test -f $PREFIX/lib/libexactreal${SHLIB_EXT}                # [unix]\n\n  - name: pyexactreal\n    script: build-pyexactreal.sh  # [not win]\n    script: bld-pyexactreal.bat  # [win]\n    requirements:\n      build:\n        - python                              # [build_platform != target_platform]\n        - cross-python_{{ target_platform }}  # [build_platform != target_platform]\n        - libtool   # [unix]\n        - automake  # [unix]\n        - make      # [unix]\n        - autotools_clang_conda  # [win]\n        - gnuconfig  # [unix]\n        - {{ compiler('cxx') }}\n        - {{ stdlib(\"c\") }}\n      host:\n        - icu\n        # Note that the libboost-devel from libexactreal forces these headers to be\n        # compatible with ones used when building libexactreal.\n        - libboost-headers\n        - libxml2\n        - python\n        - cppyy >=3,<4\n        - cppyythonizations\n        - setuptools\n        - pytest\n        - {{ pin_subpackage(\"libexactreal\") }}\n      run:\n        # cppyy dynamically compiles C++ wrappers at runtime, therefore we need C++ headers of boost.\n        # Note that the libboost-devel from libexactreal forces these headers to be\n        # compatible with ones used when building libexactreal.\n        - libboost-headers\n        - python\n        - cppyy >=3,<4\n        - cppyythonizations\n        - pyeantic\n        - gmpxxyy\n        # A subpackage does not see the run_exports of another subpackage:\n        # https://github.com/conda/conda-build/issues/3478\n        - {{ pin_subpackage(\"libexactreal\") }}\n    test:\n      imports:\n        - pyexactreal\n\nabout:\n  home: https://github.com/flatsurf/exact-real\n  license: GPL-3.0-or-later\n  license_family: GPL\n  license_file: COPYING\n  summary: Lazy computations with real numbers in C++ and Python\n  description: |\n    exact-real is a C++/Python library which provides exact lazy computations\n    in the Real Numbers. In particular it provides arithmetic and comparisons\n    of (random) transcendental numbers.\n  dev_url: https://github.com/flatsurf/exact-real\n\nextra:\n  recipe-maintainers:\n    - saraedum\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -485,12 +497,14 @@
       "gmp",
       "gmpxxyy",
       "gnuconfig",
+      "icu",
       "libboost-devel",
       "libboost-headers",
       "libeantic",
       "libexactreal",
       "libflint",
       "libtool",
+      "libxml2",
       "make",
       "pyeantic",
       "pytest",
@@ -518,11 +532,13 @@
         "cppyythonizations",
         "cxx_compiler_stub",
         "gmp",
+        "icu",
         "libboost-devel",
         "libboost-headers",
         "libeantic",
         "libexactreal",
         "libflint",
+        "libxml2",
         "pytest",
         "python",
         "setuptools"
@@ -566,11 +582,13 @@
         "cppyy >=3,<4",
         "cppyythonizations",
         "gmp",
+        "icu",
         "libboost-devel",
         "libboost-headers",
         "libeantic",
         "libexactreal",
         "libflint",
+        "libxml2",
         "pytest",
         "python",
         "setuptools"
