@@ -10,7 +10,9 @@
     "conda_build": {
       "error_overlinking": true
     },
+    "conda_build_tool": "rattler-build",
     "conda_forge_output_validation": true,
+    "conda_install_tool": "pixi",
     "github": {
       "branch_name": "main",
       "tooling_branch_name": "main"
@@ -25,20 +27,22 @@
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
     "about": {
-      "description": "FastJet is a software package for jet finding in pp and e+e- collisions.\nIt includes fast native implementations of many sequential recombination\nclustering algorithms, plugins for access to a range of cone jet finders\nand tools for advanced jet manipulation.\n",
+      "description": "FastJet is a software package for jet finding in pp and e+e- collisions.\nIt includes fast native implementations of many sequential recombination\nclustering algorithms, plugins for access to a range of cone jet finders\nand tools for advanced jet manipulation.",
       "dev_url": "https://gitlab.com/fastjet/fastjet",
       "doc_url": "https://fastjet.fr/",
       "home": "https://gitlab.com/fastjet/fastjet",
       "license": "GPL-2.0-or-later",
-      "license_family": "GPL",
+      "license_family": "GPL-2.0-or-later",
       "license_file": "COPYING",
       "summary": "FastJet: jet finding in pp and e+e- collisions"
     },
     "build": {
-      "number": "1",
-      "run_exports": [
-        "fastjet-cxx"
-      ]
+      "number": "2",
+      "run_exports": {
+        "weak": [
+          "fastjet-cxx"
+        ]
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -46,6 +50,123 @@
         "matthewfeickert"
       ]
     },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "fastjet-cxx"
+          ]
+        },
+        "name": "fastjet-cxx",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "automake",
+            "libtool",
+            "make",
+            "pkg-config",
+            "gnuconfig",
+            "cgal"
+          ],
+          "host": [
+            "siscone"
+          ],
+          "run": [
+            "siscone"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "source": [
+                "example/fastjet_example.cc",
+                "example/fastjet_areas.cc",
+                "example/01-basic.cc",
+                "example/02-jetdef.cc",
+                "example/03-plugin.cc",
+                "example/04-constituents.cc",
+                "example/05-eplus_eminus.cc",
+                "example/06-area.cc",
+                "example/07-subtraction.cc",
+                "example/08-selector.cc",
+                "example/09-user_info.cc",
+                "example/10-subjets.cc",
+                "example/11-filter.cc",
+                "example/12-boosted_higgs.cc",
+                "example/13-boosted_top.cc",
+                "example/14-groomers.cc",
+                "example/data/single-event.dat",
+                "example/data/single-ee-event.dat",
+                "example/data/Pythia-Zp2jets-lhc-pileup-1ev.dat",
+                "example/data/Pythia-dijet-ptmin100-lhc-pileup-1ev.dat",
+                "example/data/HZ-event-Hmass115.dat",
+                "example/data/boosted_top_event.dat"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "test -f $PREFIX/bin/fastjet-config",
+              "test -f $PREFIX/lib/libfastjet${SHLIB_EXT}",
+              "test -f $PREFIX/lib/libfastjetplugins${SHLIB_EXT}",
+              "test -f $PREFIX/lib/libfastjettools${SHLIB_EXT}",
+              "test -d $PREFIX/include/fastjet",
+              "test -d $PREFIX/include/fastjet/internal",
+              "test -d $PREFIX/include/fastjet/tools",
+              "fastjet-config --help",
+              "fastjet-config --version",
+              "fastjet-config --prefix",
+              "fastjet-config --cxxflags",
+              "fastjet-config --libs",
+              "fastjet-config --list-plugins",
+              "fastjet-config --libs --plugins",
+              "fastjet-config --config",
+              "fastjet-config --pythonpath",
+              "cd example/",
+              "$CXX fastjet_example.cc -o fastjet_example $CXXFLAGS $LDFLAGS -lfastjet",
+              "./fastjet_example < data/single-event.dat",
+              "$CXX fastjet_areas.cc -o fastjet_areas $CXXFLAGS $LDFLAGS -lfastjet",
+              "./fastjet_areas < data/single-event.dat",
+              "$CXX 01-basic.cc -o 01-basic $CXXFLAGS $LDFLAGS -lfastjet",
+              "./01-basic < data/single-event.dat",
+              "$CXX 02-jetdef.cc -o 02-jetdef $CXXFLAGS $LDFLAGS -lfastjet",
+              "./02-jetdef < data/single-event.dat",
+              "$CXX 03-plugin.cc -o 03-plugin $CXXFLAGS $LDFLAGS -lfastjet -lfastjetplugins",
+              "./03-plugin < data/single-event.dat",
+              "rm ./03-plugin",
+              "$CXX 03-plugin.cc -o 03-plugin $CXXFLAGS $LDFLAGS $(fastjet-config --libs --plugins)",
+              "$CXX 04-constituents.cc -o 04-constituents $CXXFLAGS $LDFLAGS -lfastjet",
+              "./04-constituents < data/single-event.dat",
+              "$CXX 05-eplus_eminus.cc -o 05-eplus_eminus $CXXFLAGS $LDFLAGS -lfastjet",
+              "./05-eplus_eminus < data/single-ee-event.dat",
+              "$CXX 06-area.cc -o 06-area $CXXFLAGS $LDFLAGS -lfastjet",
+              "./06-area < data/single-event.dat",
+              "$CXX 07-subtraction.cc -o 07-subtraction $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./07-subtraction < data/Pythia-Zp2jets-lhc-pileup-1ev.dat",
+              "$CXX 08-selector.cc -o 08-selector $CXXFLAGS $LDFLAGS -lfastjet",
+              "./08-selector < data/single-event.dat",
+              "$CXX 09-user_info.cc -o 09-user_info $CXXFLAGS $LDFLAGS -lfastjet",
+              "./09-user_info < data/Pythia-dijet-ptmin100-lhc-pileup-1ev.dat",
+              "$CXX 10-subjets.cc -o 10-subjets $CXXFLAGS $LDFLAGS -lfastjet",
+              "./10-subjets < data/single-event.dat",
+              "$CXX 11-filter.cc -o 11-filter $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./11-filter < data/single-event.dat",
+              "$CXX 12-boosted_higgs.cc -o 12-boosted_higgs $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./12-boosted_higgs < data/HZ-event-Hmass115.dat",
+              "$CXX 13-boosted_top.cc -o 13-boosted_top $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./13-boosted_top < data/boosted_top_event.dat",
+              "$CXX 14-groomers.cc -o 14-groomers $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./14-groomers < data/boosted_top_event.dat"
+            ]
+          }
+        ]
+      }
+    ],
     "package": {
       "name": "fastjet-cxx",
       "version": "3.4.3"
@@ -68,97 +189,13 @@
         "siscone"
       ]
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "patches": [
-          "0001-use-conda-forge-siscone-for-plugin.patch"
-        ],
-        "sha256": "8ce8b9be5cd0fba4f2fe914871eabe259dfa7524edf925635e20072cde2ae6a8",
-        "url": "https://gitlab.com/fastjet/fastjet/-/archive/fastjet-3.4.3/fastjet-fastjet-3.4.3.tar.gz"
-      }
-    ],
-    "test": {
-      "commands": [
-        "test -f $PREFIX/bin/fastjet-config",
-        "test -f $PREFIX/lib/libfastjet${SHLIB_EXT}",
-        "test -f $PREFIX/lib/libfastjetplugins${SHLIB_EXT}",
-        "test -f $PREFIX/lib/libfastjettools${SHLIB_EXT}",
-        "test -d $PREFIX/include/fastjet",
-        "test -d $PREFIX/include/fastjet/internal",
-        "test -d $PREFIX/include/fastjet/tools",
-        "fastjet-config --help",
-        "fastjet-config --version",
-        "fastjet-config --prefix",
-        "fastjet-config --cxxflags",
-        "fastjet-config --libs",
-        "fastjet-config --list-plugins",
-        "fastjet-config --libs --plugins",
-        "fastjet-config --config",
-        "fastjet-config --pythonpath",
-        "cd example/",
-        "$CXX fastjet_example.cc -o fastjet_example $CXXFLAGS $LDFLAGS -lfastjet",
-        "./fastjet_example < data/single-event.dat",
-        "$CXX fastjet_areas.cc -o fastjet_areas $CXXFLAGS $LDFLAGS -lfastjet",
-        "./fastjet_areas < data/single-event.dat",
-        "$CXX 01-basic.cc -o 01-basic $CXXFLAGS $LDFLAGS -lfastjet",
-        "./01-basic < data/single-event.dat",
-        "$CXX 02-jetdef.cc -o 02-jetdef $CXXFLAGS $LDFLAGS -lfastjet",
-        "./02-jetdef < data/single-event.dat",
-        "$CXX 03-plugin.cc -o 03-plugin $CXXFLAGS $LDFLAGS -lfastjet -lfastjetplugins",
-        "./03-plugin < data/single-event.dat",
-        "rm ./03-plugin",
-        "$CXX 03-plugin.cc -o 03-plugin $CXXFLAGS $LDFLAGS $(fastjet-config --libs --plugins)",
-        "$CXX 04-constituents.cc -o 04-constituents $CXXFLAGS $LDFLAGS -lfastjet",
-        "./04-constituents < data/single-event.dat",
-        "$CXX 05-eplus_eminus.cc -o 05-eplus_eminus $CXXFLAGS $LDFLAGS -lfastjet",
-        "./05-eplus_eminus < data/single-ee-event.dat",
-        "$CXX 06-area.cc -o 06-area $CXXFLAGS $LDFLAGS -lfastjet",
-        "./06-area < data/single-event.dat",
-        "$CXX 07-subtraction.cc -o 07-subtraction $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
-        "./07-subtraction < data/Pythia-Zp2jets-lhc-pileup-1ev.dat",
-        "$CXX 08-selector.cc -o 08-selector $CXXFLAGS $LDFLAGS -lfastjet",
-        "./08-selector < data/single-event.dat",
-        "$CXX 09-user_info.cc -o 09-user_info $CXXFLAGS $LDFLAGS -lfastjet",
-        "./09-user_info < data/Pythia-dijet-ptmin100-lhc-pileup-1ev.dat",
-        "$CXX 10-subjets.cc -o 10-subjets $CXXFLAGS $LDFLAGS -lfastjet",
-        "./10-subjets < data/single-event.dat",
-        "$CXX 11-filter.cc -o 11-filter $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
-        "./11-filter < data/single-event.dat",
-        "$CXX 12-boosted_higgs.cc -o 12-boosted_higgs $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
-        "./12-boosted_higgs < data/HZ-event-Hmass115.dat",
-        "$CXX 13-boosted_top.cc -o 13-boosted_top $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
-        "./13-boosted_top < data/boosted_top_event.dat",
-        "$CXX 14-groomers.cc -o 14-groomers $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
-        "./14-groomers < data/boosted_top_event.dat"
+    "schema_version": 1,
+    "source": {
+      "patches": [
+        "0001-use-conda-forge-siscone-for-plugin.patch"
       ],
-      "requires": [
-        "cxx_compiler_stub"
-      ],
-      "source_files": [
-        "example/fastjet_example.cc",
-        "example/fastjet_areas.cc",
-        "example/01-basic.cc",
-        "example/02-jetdef.cc",
-        "example/03-plugin.cc",
-        "example/04-constituents.cc",
-        "example/05-eplus_eminus.cc",
-        "example/06-area.cc",
-        "example/07-subtraction.cc",
-        "example/08-selector.cc",
-        "example/09-user_info.cc",
-        "example/10-subjets.cc",
-        "example/11-filter.cc",
-        "example/12-boosted_higgs.cc",
-        "example/13-boosted_top.cc",
-        "example/14-groomers.cc",
-        "example/data/single-event.dat",
-        "example/data/single-ee-event.dat",
-        "example/data/Pythia-Zp2jets-lhc-pileup-1ev.dat",
-        "example/data/Pythia-dijet-ptmin100-lhc-pileup-1ev.dat",
-        "example/data/HZ-event-Hmass115.dat",
-        "example/data/boosted_top_event.dat"
-      ]
+      "sha256": "8ce8b9be5cd0fba4f2fe914871eabe259dfa7524edf925635e20072cde2ae6a8",
+      "url": "https://gitlab.com/fastjet/fastjet/-/archive/fastjet-3.4.3/fastjet-fastjet-3.4.3.tar.gz"
     }
   },
   "linux_64_requirements": {
@@ -196,20 +233,22 @@
   },
   "linux_aarch64_meta_yaml": {
     "about": {
-      "description": "FastJet is a software package for jet finding in pp and e+e- collisions.\nIt includes fast native implementations of many sequential recombination\nclustering algorithms, plugins for access to a range of cone jet finders\nand tools for advanced jet manipulation.\n",
+      "description": "FastJet is a software package for jet finding in pp and e+e- collisions.\nIt includes fast native implementations of many sequential recombination\nclustering algorithms, plugins for access to a range of cone jet finders\nand tools for advanced jet manipulation.",
       "dev_url": "https://gitlab.com/fastjet/fastjet",
       "doc_url": "https://fastjet.fr/",
       "home": "https://gitlab.com/fastjet/fastjet",
       "license": "GPL-2.0-or-later",
-      "license_family": "GPL",
+      "license_family": "GPL-2.0-or-later",
       "license_file": "COPYING",
       "summary": "FastJet: jet finding in pp and e+e- collisions"
     },
     "build": {
-      "number": "1",
-      "run_exports": [
-        "fastjet-cxx"
-      ]
+      "number": "2",
+      "run_exports": {
+        "weak": [
+          "fastjet-cxx"
+        ]
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -217,6 +256,123 @@
         "matthewfeickert"
       ]
     },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "fastjet-cxx"
+          ]
+        },
+        "name": "fastjet-cxx",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "automake",
+            "libtool",
+            "make",
+            "pkg-config",
+            "gnuconfig",
+            "cgal"
+          ],
+          "host": [
+            "siscone"
+          ],
+          "run": [
+            "siscone"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "source": [
+                "example/fastjet_example.cc",
+                "example/fastjet_areas.cc",
+                "example/01-basic.cc",
+                "example/02-jetdef.cc",
+                "example/03-plugin.cc",
+                "example/04-constituents.cc",
+                "example/05-eplus_eminus.cc",
+                "example/06-area.cc",
+                "example/07-subtraction.cc",
+                "example/08-selector.cc",
+                "example/09-user_info.cc",
+                "example/10-subjets.cc",
+                "example/11-filter.cc",
+                "example/12-boosted_higgs.cc",
+                "example/13-boosted_top.cc",
+                "example/14-groomers.cc",
+                "example/data/single-event.dat",
+                "example/data/single-ee-event.dat",
+                "example/data/Pythia-Zp2jets-lhc-pileup-1ev.dat",
+                "example/data/Pythia-dijet-ptmin100-lhc-pileup-1ev.dat",
+                "example/data/HZ-event-Hmass115.dat",
+                "example/data/boosted_top_event.dat"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "test -f $PREFIX/bin/fastjet-config",
+              "test -f $PREFIX/lib/libfastjet${SHLIB_EXT}",
+              "test -f $PREFIX/lib/libfastjetplugins${SHLIB_EXT}",
+              "test -f $PREFIX/lib/libfastjettools${SHLIB_EXT}",
+              "test -d $PREFIX/include/fastjet",
+              "test -d $PREFIX/include/fastjet/internal",
+              "test -d $PREFIX/include/fastjet/tools",
+              "fastjet-config --help",
+              "fastjet-config --version",
+              "fastjet-config --prefix",
+              "fastjet-config --cxxflags",
+              "fastjet-config --libs",
+              "fastjet-config --list-plugins",
+              "fastjet-config --libs --plugins",
+              "fastjet-config --config",
+              "fastjet-config --pythonpath",
+              "cd example/",
+              "$CXX fastjet_example.cc -o fastjet_example $CXXFLAGS $LDFLAGS -lfastjet",
+              "./fastjet_example < data/single-event.dat",
+              "$CXX fastjet_areas.cc -o fastjet_areas $CXXFLAGS $LDFLAGS -lfastjet",
+              "./fastjet_areas < data/single-event.dat",
+              "$CXX 01-basic.cc -o 01-basic $CXXFLAGS $LDFLAGS -lfastjet",
+              "./01-basic < data/single-event.dat",
+              "$CXX 02-jetdef.cc -o 02-jetdef $CXXFLAGS $LDFLAGS -lfastjet",
+              "./02-jetdef < data/single-event.dat",
+              "$CXX 03-plugin.cc -o 03-plugin $CXXFLAGS $LDFLAGS -lfastjet -lfastjetplugins",
+              "./03-plugin < data/single-event.dat",
+              "rm ./03-plugin",
+              "$CXX 03-plugin.cc -o 03-plugin $CXXFLAGS $LDFLAGS $(fastjet-config --libs --plugins)",
+              "$CXX 04-constituents.cc -o 04-constituents $CXXFLAGS $LDFLAGS -lfastjet",
+              "./04-constituents < data/single-event.dat",
+              "$CXX 05-eplus_eminus.cc -o 05-eplus_eminus $CXXFLAGS $LDFLAGS -lfastjet",
+              "./05-eplus_eminus < data/single-ee-event.dat",
+              "$CXX 06-area.cc -o 06-area $CXXFLAGS $LDFLAGS -lfastjet",
+              "./06-area < data/single-event.dat",
+              "$CXX 07-subtraction.cc -o 07-subtraction $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./07-subtraction < data/Pythia-Zp2jets-lhc-pileup-1ev.dat",
+              "$CXX 08-selector.cc -o 08-selector $CXXFLAGS $LDFLAGS -lfastjet",
+              "./08-selector < data/single-event.dat",
+              "$CXX 09-user_info.cc -o 09-user_info $CXXFLAGS $LDFLAGS -lfastjet",
+              "./09-user_info < data/Pythia-dijet-ptmin100-lhc-pileup-1ev.dat",
+              "$CXX 10-subjets.cc -o 10-subjets $CXXFLAGS $LDFLAGS -lfastjet",
+              "./10-subjets < data/single-event.dat",
+              "$CXX 11-filter.cc -o 11-filter $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./11-filter < data/single-event.dat",
+              "$CXX 12-boosted_higgs.cc -o 12-boosted_higgs $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./12-boosted_higgs < data/HZ-event-Hmass115.dat",
+              "$CXX 13-boosted_top.cc -o 13-boosted_top $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./13-boosted_top < data/boosted_top_event.dat",
+              "$CXX 14-groomers.cc -o 14-groomers $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./14-groomers < data/boosted_top_event.dat"
+            ]
+          }
+        ]
+      }
+    ],
     "package": {
       "name": "fastjet-cxx",
       "version": "3.4.3"
@@ -239,97 +395,13 @@
         "siscone"
       ]
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "patches": [
-          "0001-use-conda-forge-siscone-for-plugin.patch"
-        ],
-        "sha256": "8ce8b9be5cd0fba4f2fe914871eabe259dfa7524edf925635e20072cde2ae6a8",
-        "url": "https://gitlab.com/fastjet/fastjet/-/archive/fastjet-3.4.3/fastjet-fastjet-3.4.3.tar.gz"
-      }
-    ],
-    "test": {
-      "commands": [
-        "test -f $PREFIX/bin/fastjet-config",
-        "test -f $PREFIX/lib/libfastjet${SHLIB_EXT}",
-        "test -f $PREFIX/lib/libfastjetplugins${SHLIB_EXT}",
-        "test -f $PREFIX/lib/libfastjettools${SHLIB_EXT}",
-        "test -d $PREFIX/include/fastjet",
-        "test -d $PREFIX/include/fastjet/internal",
-        "test -d $PREFIX/include/fastjet/tools",
-        "fastjet-config --help",
-        "fastjet-config --version",
-        "fastjet-config --prefix",
-        "fastjet-config --cxxflags",
-        "fastjet-config --libs",
-        "fastjet-config --list-plugins",
-        "fastjet-config --libs --plugins",
-        "fastjet-config --config",
-        "fastjet-config --pythonpath",
-        "cd example/",
-        "$CXX fastjet_example.cc -o fastjet_example $CXXFLAGS $LDFLAGS -lfastjet",
-        "./fastjet_example < data/single-event.dat",
-        "$CXX fastjet_areas.cc -o fastjet_areas $CXXFLAGS $LDFLAGS -lfastjet",
-        "./fastjet_areas < data/single-event.dat",
-        "$CXX 01-basic.cc -o 01-basic $CXXFLAGS $LDFLAGS -lfastjet",
-        "./01-basic < data/single-event.dat",
-        "$CXX 02-jetdef.cc -o 02-jetdef $CXXFLAGS $LDFLAGS -lfastjet",
-        "./02-jetdef < data/single-event.dat",
-        "$CXX 03-plugin.cc -o 03-plugin $CXXFLAGS $LDFLAGS -lfastjet -lfastjetplugins",
-        "./03-plugin < data/single-event.dat",
-        "rm ./03-plugin",
-        "$CXX 03-plugin.cc -o 03-plugin $CXXFLAGS $LDFLAGS $(fastjet-config --libs --plugins)",
-        "$CXX 04-constituents.cc -o 04-constituents $CXXFLAGS $LDFLAGS -lfastjet",
-        "./04-constituents < data/single-event.dat",
-        "$CXX 05-eplus_eminus.cc -o 05-eplus_eminus $CXXFLAGS $LDFLAGS -lfastjet",
-        "./05-eplus_eminus < data/single-ee-event.dat",
-        "$CXX 06-area.cc -o 06-area $CXXFLAGS $LDFLAGS -lfastjet",
-        "./06-area < data/single-event.dat",
-        "$CXX 07-subtraction.cc -o 07-subtraction $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
-        "./07-subtraction < data/Pythia-Zp2jets-lhc-pileup-1ev.dat",
-        "$CXX 08-selector.cc -o 08-selector $CXXFLAGS $LDFLAGS -lfastjet",
-        "./08-selector < data/single-event.dat",
-        "$CXX 09-user_info.cc -o 09-user_info $CXXFLAGS $LDFLAGS -lfastjet",
-        "./09-user_info < data/Pythia-dijet-ptmin100-lhc-pileup-1ev.dat",
-        "$CXX 10-subjets.cc -o 10-subjets $CXXFLAGS $LDFLAGS -lfastjet",
-        "./10-subjets < data/single-event.dat",
-        "$CXX 11-filter.cc -o 11-filter $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
-        "./11-filter < data/single-event.dat",
-        "$CXX 12-boosted_higgs.cc -o 12-boosted_higgs $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
-        "./12-boosted_higgs < data/HZ-event-Hmass115.dat",
-        "$CXX 13-boosted_top.cc -o 13-boosted_top $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
-        "./13-boosted_top < data/boosted_top_event.dat",
-        "$CXX 14-groomers.cc -o 14-groomers $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
-        "./14-groomers < data/boosted_top_event.dat"
+    "schema_version": 1,
+    "source": {
+      "patches": [
+        "0001-use-conda-forge-siscone-for-plugin.patch"
       ],
-      "requires": [
-        "cxx_compiler_stub"
-      ],
-      "source_files": [
-        "example/fastjet_example.cc",
-        "example/fastjet_areas.cc",
-        "example/01-basic.cc",
-        "example/02-jetdef.cc",
-        "example/03-plugin.cc",
-        "example/04-constituents.cc",
-        "example/05-eplus_eminus.cc",
-        "example/06-area.cc",
-        "example/07-subtraction.cc",
-        "example/08-selector.cc",
-        "example/09-user_info.cc",
-        "example/10-subjets.cc",
-        "example/11-filter.cc",
-        "example/12-boosted_higgs.cc",
-        "example/13-boosted_top.cc",
-        "example/14-groomers.cc",
-        "example/data/single-event.dat",
-        "example/data/single-ee-event.dat",
-        "example/data/Pythia-Zp2jets-lhc-pileup-1ev.dat",
-        "example/data/Pythia-dijet-ptmin100-lhc-pileup-1ev.dat",
-        "example/data/HZ-event-Hmass115.dat",
-        "example/data/boosted_top_event.dat"
-      ]
+      "sha256": "8ce8b9be5cd0fba4f2fe914871eabe259dfa7524edf925635e20072cde2ae6a8",
+      "url": "https://gitlab.com/fastjet/fastjet/-/archive/fastjet-3.4.3/fastjet-fastjet-3.4.3.tar.gz"
     }
   },
   "linux_aarch64_requirements": {
@@ -367,20 +439,22 @@
   },
   "linux_ppc64le_meta_yaml": {
     "about": {
-      "description": "FastJet is a software package for jet finding in pp and e+e- collisions.\nIt includes fast native implementations of many sequential recombination\nclustering algorithms, plugins for access to a range of cone jet finders\nand tools for advanced jet manipulation.\n",
+      "description": "FastJet is a software package for jet finding in pp and e+e- collisions.\nIt includes fast native implementations of many sequential recombination\nclustering algorithms, plugins for access to a range of cone jet finders\nand tools for advanced jet manipulation.",
       "dev_url": "https://gitlab.com/fastjet/fastjet",
       "doc_url": "https://fastjet.fr/",
       "home": "https://gitlab.com/fastjet/fastjet",
       "license": "GPL-2.0-or-later",
-      "license_family": "GPL",
+      "license_family": "GPL-2.0-or-later",
       "license_file": "COPYING",
       "summary": "FastJet: jet finding in pp and e+e- collisions"
     },
     "build": {
-      "number": "1",
-      "run_exports": [
-        "fastjet-cxx"
-      ]
+      "number": "2",
+      "run_exports": {
+        "weak": [
+          "fastjet-cxx"
+        ]
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -388,6 +462,123 @@
         "matthewfeickert"
       ]
     },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "fastjet-cxx"
+          ]
+        },
+        "name": "fastjet-cxx",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "automake",
+            "libtool",
+            "make",
+            "pkg-config",
+            "gnuconfig",
+            "cgal"
+          ],
+          "host": [
+            "siscone"
+          ],
+          "run": [
+            "siscone"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "source": [
+                "example/fastjet_example.cc",
+                "example/fastjet_areas.cc",
+                "example/01-basic.cc",
+                "example/02-jetdef.cc",
+                "example/03-plugin.cc",
+                "example/04-constituents.cc",
+                "example/05-eplus_eminus.cc",
+                "example/06-area.cc",
+                "example/07-subtraction.cc",
+                "example/08-selector.cc",
+                "example/09-user_info.cc",
+                "example/10-subjets.cc",
+                "example/11-filter.cc",
+                "example/12-boosted_higgs.cc",
+                "example/13-boosted_top.cc",
+                "example/14-groomers.cc",
+                "example/data/single-event.dat",
+                "example/data/single-ee-event.dat",
+                "example/data/Pythia-Zp2jets-lhc-pileup-1ev.dat",
+                "example/data/Pythia-dijet-ptmin100-lhc-pileup-1ev.dat",
+                "example/data/HZ-event-Hmass115.dat",
+                "example/data/boosted_top_event.dat"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "test -f $PREFIX/bin/fastjet-config",
+              "test -f $PREFIX/lib/libfastjet${SHLIB_EXT}",
+              "test -f $PREFIX/lib/libfastjetplugins${SHLIB_EXT}",
+              "test -f $PREFIX/lib/libfastjettools${SHLIB_EXT}",
+              "test -d $PREFIX/include/fastjet",
+              "test -d $PREFIX/include/fastjet/internal",
+              "test -d $PREFIX/include/fastjet/tools",
+              "fastjet-config --help",
+              "fastjet-config --version",
+              "fastjet-config --prefix",
+              "fastjet-config --cxxflags",
+              "fastjet-config --libs",
+              "fastjet-config --list-plugins",
+              "fastjet-config --libs --plugins",
+              "fastjet-config --config",
+              "fastjet-config --pythonpath",
+              "cd example/",
+              "$CXX fastjet_example.cc -o fastjet_example $CXXFLAGS $LDFLAGS -lfastjet",
+              "./fastjet_example < data/single-event.dat",
+              "$CXX fastjet_areas.cc -o fastjet_areas $CXXFLAGS $LDFLAGS -lfastjet",
+              "./fastjet_areas < data/single-event.dat",
+              "$CXX 01-basic.cc -o 01-basic $CXXFLAGS $LDFLAGS -lfastjet",
+              "./01-basic < data/single-event.dat",
+              "$CXX 02-jetdef.cc -o 02-jetdef $CXXFLAGS $LDFLAGS -lfastjet",
+              "./02-jetdef < data/single-event.dat",
+              "$CXX 03-plugin.cc -o 03-plugin $CXXFLAGS $LDFLAGS -lfastjet -lfastjetplugins",
+              "./03-plugin < data/single-event.dat",
+              "rm ./03-plugin",
+              "$CXX 03-plugin.cc -o 03-plugin $CXXFLAGS $LDFLAGS $(fastjet-config --libs --plugins)",
+              "$CXX 04-constituents.cc -o 04-constituents $CXXFLAGS $LDFLAGS -lfastjet",
+              "./04-constituents < data/single-event.dat",
+              "$CXX 05-eplus_eminus.cc -o 05-eplus_eminus $CXXFLAGS $LDFLAGS -lfastjet",
+              "./05-eplus_eminus < data/single-ee-event.dat",
+              "$CXX 06-area.cc -o 06-area $CXXFLAGS $LDFLAGS -lfastjet",
+              "./06-area < data/single-event.dat",
+              "$CXX 07-subtraction.cc -o 07-subtraction $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./07-subtraction < data/Pythia-Zp2jets-lhc-pileup-1ev.dat",
+              "$CXX 08-selector.cc -o 08-selector $CXXFLAGS $LDFLAGS -lfastjet",
+              "./08-selector < data/single-event.dat",
+              "$CXX 09-user_info.cc -o 09-user_info $CXXFLAGS $LDFLAGS -lfastjet",
+              "./09-user_info < data/Pythia-dijet-ptmin100-lhc-pileup-1ev.dat",
+              "$CXX 10-subjets.cc -o 10-subjets $CXXFLAGS $LDFLAGS -lfastjet",
+              "./10-subjets < data/single-event.dat",
+              "$CXX 11-filter.cc -o 11-filter $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./11-filter < data/single-event.dat",
+              "$CXX 12-boosted_higgs.cc -o 12-boosted_higgs $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./12-boosted_higgs < data/HZ-event-Hmass115.dat",
+              "$CXX 13-boosted_top.cc -o 13-boosted_top $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./13-boosted_top < data/boosted_top_event.dat",
+              "$CXX 14-groomers.cc -o 14-groomers $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./14-groomers < data/boosted_top_event.dat"
+            ]
+          }
+        ]
+      }
+    ],
     "package": {
       "name": "fastjet-cxx",
       "version": "3.4.3"
@@ -410,97 +601,13 @@
         "siscone"
       ]
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "patches": [
-          "0001-use-conda-forge-siscone-for-plugin.patch"
-        ],
-        "sha256": "8ce8b9be5cd0fba4f2fe914871eabe259dfa7524edf925635e20072cde2ae6a8",
-        "url": "https://gitlab.com/fastjet/fastjet/-/archive/fastjet-3.4.3/fastjet-fastjet-3.4.3.tar.gz"
-      }
-    ],
-    "test": {
-      "commands": [
-        "test -f $PREFIX/bin/fastjet-config",
-        "test -f $PREFIX/lib/libfastjet${SHLIB_EXT}",
-        "test -f $PREFIX/lib/libfastjetplugins${SHLIB_EXT}",
-        "test -f $PREFIX/lib/libfastjettools${SHLIB_EXT}",
-        "test -d $PREFIX/include/fastjet",
-        "test -d $PREFIX/include/fastjet/internal",
-        "test -d $PREFIX/include/fastjet/tools",
-        "fastjet-config --help",
-        "fastjet-config --version",
-        "fastjet-config --prefix",
-        "fastjet-config --cxxflags",
-        "fastjet-config --libs",
-        "fastjet-config --list-plugins",
-        "fastjet-config --libs --plugins",
-        "fastjet-config --config",
-        "fastjet-config --pythonpath",
-        "cd example/",
-        "$CXX fastjet_example.cc -o fastjet_example $CXXFLAGS $LDFLAGS -lfastjet",
-        "./fastjet_example < data/single-event.dat",
-        "$CXX fastjet_areas.cc -o fastjet_areas $CXXFLAGS $LDFLAGS -lfastjet",
-        "./fastjet_areas < data/single-event.dat",
-        "$CXX 01-basic.cc -o 01-basic $CXXFLAGS $LDFLAGS -lfastjet",
-        "./01-basic < data/single-event.dat",
-        "$CXX 02-jetdef.cc -o 02-jetdef $CXXFLAGS $LDFLAGS -lfastjet",
-        "./02-jetdef < data/single-event.dat",
-        "$CXX 03-plugin.cc -o 03-plugin $CXXFLAGS $LDFLAGS -lfastjet -lfastjetplugins",
-        "./03-plugin < data/single-event.dat",
-        "rm ./03-plugin",
-        "$CXX 03-plugin.cc -o 03-plugin $CXXFLAGS $LDFLAGS $(fastjet-config --libs --plugins)",
-        "$CXX 04-constituents.cc -o 04-constituents $CXXFLAGS $LDFLAGS -lfastjet",
-        "./04-constituents < data/single-event.dat",
-        "$CXX 05-eplus_eminus.cc -o 05-eplus_eminus $CXXFLAGS $LDFLAGS -lfastjet",
-        "./05-eplus_eminus < data/single-ee-event.dat",
-        "$CXX 06-area.cc -o 06-area $CXXFLAGS $LDFLAGS -lfastjet",
-        "./06-area < data/single-event.dat",
-        "$CXX 07-subtraction.cc -o 07-subtraction $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
-        "./07-subtraction < data/Pythia-Zp2jets-lhc-pileup-1ev.dat",
-        "$CXX 08-selector.cc -o 08-selector $CXXFLAGS $LDFLAGS -lfastjet",
-        "./08-selector < data/single-event.dat",
-        "$CXX 09-user_info.cc -o 09-user_info $CXXFLAGS $LDFLAGS -lfastjet",
-        "./09-user_info < data/Pythia-dijet-ptmin100-lhc-pileup-1ev.dat",
-        "$CXX 10-subjets.cc -o 10-subjets $CXXFLAGS $LDFLAGS -lfastjet",
-        "./10-subjets < data/single-event.dat",
-        "$CXX 11-filter.cc -o 11-filter $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
-        "./11-filter < data/single-event.dat",
-        "$CXX 12-boosted_higgs.cc -o 12-boosted_higgs $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
-        "./12-boosted_higgs < data/HZ-event-Hmass115.dat",
-        "$CXX 13-boosted_top.cc -o 13-boosted_top $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
-        "./13-boosted_top < data/boosted_top_event.dat",
-        "$CXX 14-groomers.cc -o 14-groomers $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
-        "./14-groomers < data/boosted_top_event.dat"
+    "schema_version": 1,
+    "source": {
+      "patches": [
+        "0001-use-conda-forge-siscone-for-plugin.patch"
       ],
-      "requires": [
-        "cxx_compiler_stub"
-      ],
-      "source_files": [
-        "example/fastjet_example.cc",
-        "example/fastjet_areas.cc",
-        "example/01-basic.cc",
-        "example/02-jetdef.cc",
-        "example/03-plugin.cc",
-        "example/04-constituents.cc",
-        "example/05-eplus_eminus.cc",
-        "example/06-area.cc",
-        "example/07-subtraction.cc",
-        "example/08-selector.cc",
-        "example/09-user_info.cc",
-        "example/10-subjets.cc",
-        "example/11-filter.cc",
-        "example/12-boosted_higgs.cc",
-        "example/13-boosted_top.cc",
-        "example/14-groomers.cc",
-        "example/data/single-event.dat",
-        "example/data/single-ee-event.dat",
-        "example/data/Pythia-Zp2jets-lhc-pileup-1ev.dat",
-        "example/data/Pythia-dijet-ptmin100-lhc-pileup-1ev.dat",
-        "example/data/HZ-event-Hmass115.dat",
-        "example/data/boosted_top_event.dat"
-      ]
+      "sha256": "8ce8b9be5cd0fba4f2fe914871eabe259dfa7524edf925635e20072cde2ae6a8",
+      "url": "https://gitlab.com/fastjet/fastjet/-/archive/fastjet-3.4.3/fastjet-fastjet-3.4.3.tar.gz"
     }
   },
   "linux_ppc64le_requirements": {
@@ -538,20 +645,22 @@
   },
   "meta_yaml": {
     "about": {
-      "description": "FastJet is a software package for jet finding in pp and e+e- collisions.\nIt includes fast native implementations of many sequential recombination\nclustering algorithms, plugins for access to a range of cone jet finders\nand tools for advanced jet manipulation.\n",
+      "description": "FastJet is a software package for jet finding in pp and e+e- collisions.\nIt includes fast native implementations of many sequential recombination\nclustering algorithms, plugins for access to a range of cone jet finders\nand tools for advanced jet manipulation.",
       "dev_url": "https://gitlab.com/fastjet/fastjet",
       "doc_url": "https://fastjet.fr/",
       "home": "https://gitlab.com/fastjet/fastjet",
       "license": "GPL-2.0-or-later",
-      "license_family": "GPL",
+      "license_family": "GPL-2.0-or-later",
       "license_file": "COPYING",
       "summary": "FastJet: jet finding in pp and e+e- collisions"
     },
     "build": {
-      "number": "1",
-      "run_exports": [
-        "fastjet-cxx"
-      ]
+      "number": "2",
+      "run_exports": {
+        "weak": [
+          "fastjet-cxx"
+        ]
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -559,6 +668,583 @@
         "matthewfeickert"
       ]
     },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "fastjet-cxx"
+          ]
+        },
+        "name": "fastjet-cxx",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "automake",
+            "libtool",
+            "make",
+            "pkg-config",
+            "gnuconfig",
+            "cgal"
+          ],
+          "host": [
+            "siscone"
+          ],
+          "run": [
+            "siscone"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "source": [
+                "example/fastjet_example.cc",
+                "example/fastjet_areas.cc",
+                "example/01-basic.cc",
+                "example/02-jetdef.cc",
+                "example/03-plugin.cc",
+                "example/04-constituents.cc",
+                "example/05-eplus_eminus.cc",
+                "example/06-area.cc",
+                "example/07-subtraction.cc",
+                "example/08-selector.cc",
+                "example/09-user_info.cc",
+                "example/10-subjets.cc",
+                "example/11-filter.cc",
+                "example/12-boosted_higgs.cc",
+                "example/13-boosted_top.cc",
+                "example/14-groomers.cc",
+                "example/data/single-event.dat",
+                "example/data/single-ee-event.dat",
+                "example/data/Pythia-Zp2jets-lhc-pileup-1ev.dat",
+                "example/data/Pythia-dijet-ptmin100-lhc-pileup-1ev.dat",
+                "example/data/HZ-event-Hmass115.dat",
+                "example/data/boosted_top_event.dat"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "test -f $PREFIX/bin/fastjet-config",
+              "test -f $PREFIX/lib/libfastjet${SHLIB_EXT}",
+              "test -f $PREFIX/lib/libfastjetplugins${SHLIB_EXT}",
+              "test -f $PREFIX/lib/libfastjettools${SHLIB_EXT}",
+              "test -d $PREFIX/include/fastjet",
+              "test -d $PREFIX/include/fastjet/internal",
+              "test -d $PREFIX/include/fastjet/tools",
+              "fastjet-config --help",
+              "fastjet-config --version",
+              "fastjet-config --prefix",
+              "fastjet-config --cxxflags",
+              "fastjet-config --libs",
+              "fastjet-config --list-plugins",
+              "fastjet-config --libs --plugins",
+              "fastjet-config --config",
+              "fastjet-config --pythonpath",
+              "cd example/",
+              "$CXX fastjet_example.cc -o fastjet_example $CXXFLAGS $LDFLAGS -lfastjet",
+              "./fastjet_example < data/single-event.dat",
+              "$CXX fastjet_areas.cc -o fastjet_areas $CXXFLAGS $LDFLAGS -lfastjet",
+              "./fastjet_areas < data/single-event.dat",
+              "$CXX 01-basic.cc -o 01-basic $CXXFLAGS $LDFLAGS -lfastjet",
+              "./01-basic < data/single-event.dat",
+              "$CXX 02-jetdef.cc -o 02-jetdef $CXXFLAGS $LDFLAGS -lfastjet",
+              "./02-jetdef < data/single-event.dat",
+              "$CXX 03-plugin.cc -o 03-plugin $CXXFLAGS $LDFLAGS -lfastjet -lfastjetplugins",
+              "./03-plugin < data/single-event.dat",
+              "rm ./03-plugin",
+              "$CXX 03-plugin.cc -o 03-plugin $CXXFLAGS $LDFLAGS $(fastjet-config --libs --plugins)",
+              "$CXX 04-constituents.cc -o 04-constituents $CXXFLAGS $LDFLAGS -lfastjet",
+              "./04-constituents < data/single-event.dat",
+              "$CXX 05-eplus_eminus.cc -o 05-eplus_eminus $CXXFLAGS $LDFLAGS -lfastjet",
+              "./05-eplus_eminus < data/single-ee-event.dat",
+              "$CXX 06-area.cc -o 06-area $CXXFLAGS $LDFLAGS -lfastjet",
+              "./06-area < data/single-event.dat",
+              "$CXX 07-subtraction.cc -o 07-subtraction $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./07-subtraction < data/Pythia-Zp2jets-lhc-pileup-1ev.dat",
+              "$CXX 08-selector.cc -o 08-selector $CXXFLAGS $LDFLAGS -lfastjet",
+              "./08-selector < data/single-event.dat",
+              "$CXX 09-user_info.cc -o 09-user_info $CXXFLAGS $LDFLAGS -lfastjet",
+              "./09-user_info < data/Pythia-dijet-ptmin100-lhc-pileup-1ev.dat",
+              "$CXX 10-subjets.cc -o 10-subjets $CXXFLAGS $LDFLAGS -lfastjet",
+              "./10-subjets < data/single-event.dat",
+              "$CXX 11-filter.cc -o 11-filter $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./11-filter < data/single-event.dat",
+              "$CXX 12-boosted_higgs.cc -o 12-boosted_higgs $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./12-boosted_higgs < data/HZ-event-Hmass115.dat",
+              "$CXX 13-boosted_top.cc -o 13-boosted_top $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./13-boosted_top < data/boosted_top_event.dat",
+              "$CXX 14-groomers.cc -o 14-groomers $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./14-groomers < data/boosted_top_event.dat"
+            ]
+          }
+        ]
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "fastjet-cxx"
+          ]
+        },
+        "name": "fastjet-cxx",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "automake",
+            "libtool",
+            "make",
+            "pkg-config",
+            "gnuconfig",
+            "cgal"
+          ],
+          "host": [
+            "siscone"
+          ],
+          "run": [
+            "siscone"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "source": [
+                "example/fastjet_example.cc",
+                "example/fastjet_areas.cc",
+                "example/01-basic.cc",
+                "example/02-jetdef.cc",
+                "example/03-plugin.cc",
+                "example/04-constituents.cc",
+                "example/05-eplus_eminus.cc",
+                "example/06-area.cc",
+                "example/07-subtraction.cc",
+                "example/08-selector.cc",
+                "example/09-user_info.cc",
+                "example/10-subjets.cc",
+                "example/11-filter.cc",
+                "example/12-boosted_higgs.cc",
+                "example/13-boosted_top.cc",
+                "example/14-groomers.cc",
+                "example/data/single-event.dat",
+                "example/data/single-ee-event.dat",
+                "example/data/Pythia-Zp2jets-lhc-pileup-1ev.dat",
+                "example/data/Pythia-dijet-ptmin100-lhc-pileup-1ev.dat",
+                "example/data/HZ-event-Hmass115.dat",
+                "example/data/boosted_top_event.dat"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "test -f $PREFIX/bin/fastjet-config",
+              "test -f $PREFIX/lib/libfastjet${SHLIB_EXT}",
+              "test -f $PREFIX/lib/libfastjetplugins${SHLIB_EXT}",
+              "test -f $PREFIX/lib/libfastjettools${SHLIB_EXT}",
+              "test -d $PREFIX/include/fastjet",
+              "test -d $PREFIX/include/fastjet/internal",
+              "test -d $PREFIX/include/fastjet/tools",
+              "fastjet-config --help",
+              "fastjet-config --version",
+              "fastjet-config --prefix",
+              "fastjet-config --cxxflags",
+              "fastjet-config --libs",
+              "fastjet-config --list-plugins",
+              "fastjet-config --libs --plugins",
+              "fastjet-config --config",
+              "fastjet-config --pythonpath",
+              "cd example/",
+              "$CXX fastjet_example.cc -o fastjet_example $CXXFLAGS $LDFLAGS -lfastjet",
+              "./fastjet_example < data/single-event.dat",
+              "$CXX fastjet_areas.cc -o fastjet_areas $CXXFLAGS $LDFLAGS -lfastjet",
+              "./fastjet_areas < data/single-event.dat",
+              "$CXX 01-basic.cc -o 01-basic $CXXFLAGS $LDFLAGS -lfastjet",
+              "./01-basic < data/single-event.dat",
+              "$CXX 02-jetdef.cc -o 02-jetdef $CXXFLAGS $LDFLAGS -lfastjet",
+              "./02-jetdef < data/single-event.dat",
+              "$CXX 03-plugin.cc -o 03-plugin $CXXFLAGS $LDFLAGS -lfastjet -lfastjetplugins",
+              "./03-plugin < data/single-event.dat",
+              "rm ./03-plugin",
+              "$CXX 03-plugin.cc -o 03-plugin $CXXFLAGS $LDFLAGS $(fastjet-config --libs --plugins)",
+              "$CXX 04-constituents.cc -o 04-constituents $CXXFLAGS $LDFLAGS -lfastjet",
+              "./04-constituents < data/single-event.dat",
+              "$CXX 05-eplus_eminus.cc -o 05-eplus_eminus $CXXFLAGS $LDFLAGS -lfastjet",
+              "./05-eplus_eminus < data/single-ee-event.dat",
+              "$CXX 06-area.cc -o 06-area $CXXFLAGS $LDFLAGS -lfastjet",
+              "./06-area < data/single-event.dat",
+              "$CXX 07-subtraction.cc -o 07-subtraction $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./07-subtraction < data/Pythia-Zp2jets-lhc-pileup-1ev.dat",
+              "$CXX 08-selector.cc -o 08-selector $CXXFLAGS $LDFLAGS -lfastjet",
+              "./08-selector < data/single-event.dat",
+              "$CXX 09-user_info.cc -o 09-user_info $CXXFLAGS $LDFLAGS -lfastjet",
+              "./09-user_info < data/Pythia-dijet-ptmin100-lhc-pileup-1ev.dat",
+              "$CXX 10-subjets.cc -o 10-subjets $CXXFLAGS $LDFLAGS -lfastjet",
+              "./10-subjets < data/single-event.dat",
+              "$CXX 11-filter.cc -o 11-filter $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./11-filter < data/single-event.dat",
+              "$CXX 12-boosted_higgs.cc -o 12-boosted_higgs $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./12-boosted_higgs < data/HZ-event-Hmass115.dat",
+              "$CXX 13-boosted_top.cc -o 13-boosted_top $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./13-boosted_top < data/boosted_top_event.dat",
+              "$CXX 14-groomers.cc -o 14-groomers $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./14-groomers < data/boosted_top_event.dat"
+            ]
+          }
+        ]
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "fastjet-cxx"
+          ]
+        },
+        "name": "fastjet-cxx",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "automake",
+            "libtool",
+            "make",
+            "pkg-config",
+            "gnuconfig",
+            "cgal"
+          ],
+          "host": [
+            "siscone"
+          ],
+          "run": [
+            "siscone"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "source": [
+                "example/fastjet_example.cc",
+                "example/fastjet_areas.cc",
+                "example/01-basic.cc",
+                "example/02-jetdef.cc",
+                "example/03-plugin.cc",
+                "example/04-constituents.cc",
+                "example/05-eplus_eminus.cc",
+                "example/06-area.cc",
+                "example/07-subtraction.cc",
+                "example/08-selector.cc",
+                "example/09-user_info.cc",
+                "example/10-subjets.cc",
+                "example/11-filter.cc",
+                "example/12-boosted_higgs.cc",
+                "example/13-boosted_top.cc",
+                "example/14-groomers.cc",
+                "example/data/single-event.dat",
+                "example/data/single-ee-event.dat",
+                "example/data/Pythia-Zp2jets-lhc-pileup-1ev.dat",
+                "example/data/Pythia-dijet-ptmin100-lhc-pileup-1ev.dat",
+                "example/data/HZ-event-Hmass115.dat",
+                "example/data/boosted_top_event.dat"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "test -f $PREFIX/bin/fastjet-config",
+              "test -f $PREFIX/lib/libfastjet${SHLIB_EXT}",
+              "test -f $PREFIX/lib/libfastjetplugins${SHLIB_EXT}",
+              "test -f $PREFIX/lib/libfastjettools${SHLIB_EXT}",
+              "test -d $PREFIX/include/fastjet",
+              "test -d $PREFIX/include/fastjet/internal",
+              "test -d $PREFIX/include/fastjet/tools",
+              "fastjet-config --help",
+              "fastjet-config --version",
+              "fastjet-config --prefix",
+              "fastjet-config --cxxflags",
+              "fastjet-config --libs",
+              "fastjet-config --list-plugins",
+              "fastjet-config --libs --plugins",
+              "fastjet-config --config",
+              "fastjet-config --pythonpath",
+              "cd example/",
+              "$CXX fastjet_example.cc -o fastjet_example $CXXFLAGS $LDFLAGS -lfastjet",
+              "./fastjet_example < data/single-event.dat",
+              "$CXX fastjet_areas.cc -o fastjet_areas $CXXFLAGS $LDFLAGS -lfastjet",
+              "./fastjet_areas < data/single-event.dat",
+              "$CXX 01-basic.cc -o 01-basic $CXXFLAGS $LDFLAGS -lfastjet",
+              "./01-basic < data/single-event.dat",
+              "$CXX 02-jetdef.cc -o 02-jetdef $CXXFLAGS $LDFLAGS -lfastjet",
+              "./02-jetdef < data/single-event.dat",
+              "$CXX 03-plugin.cc -o 03-plugin $CXXFLAGS $LDFLAGS -lfastjet -lfastjetplugins",
+              "./03-plugin < data/single-event.dat",
+              "rm ./03-plugin",
+              "$CXX 03-plugin.cc -o 03-plugin $CXXFLAGS $LDFLAGS $(fastjet-config --libs --plugins)",
+              "$CXX 04-constituents.cc -o 04-constituents $CXXFLAGS $LDFLAGS -lfastjet",
+              "./04-constituents < data/single-event.dat",
+              "$CXX 05-eplus_eminus.cc -o 05-eplus_eminus $CXXFLAGS $LDFLAGS -lfastjet",
+              "./05-eplus_eminus < data/single-ee-event.dat",
+              "$CXX 06-area.cc -o 06-area $CXXFLAGS $LDFLAGS -lfastjet",
+              "./06-area < data/single-event.dat",
+              "$CXX 07-subtraction.cc -o 07-subtraction $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./07-subtraction < data/Pythia-Zp2jets-lhc-pileup-1ev.dat",
+              "$CXX 08-selector.cc -o 08-selector $CXXFLAGS $LDFLAGS -lfastjet",
+              "./08-selector < data/single-event.dat",
+              "$CXX 09-user_info.cc -o 09-user_info $CXXFLAGS $LDFLAGS -lfastjet",
+              "./09-user_info < data/Pythia-dijet-ptmin100-lhc-pileup-1ev.dat",
+              "$CXX 10-subjets.cc -o 10-subjets $CXXFLAGS $LDFLAGS -lfastjet",
+              "./10-subjets < data/single-event.dat",
+              "$CXX 11-filter.cc -o 11-filter $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./11-filter < data/single-event.dat",
+              "$CXX 12-boosted_higgs.cc -o 12-boosted_higgs $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./12-boosted_higgs < data/HZ-event-Hmass115.dat",
+              "$CXX 13-boosted_top.cc -o 13-boosted_top $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./13-boosted_top < data/boosted_top_event.dat",
+              "$CXX 14-groomers.cc -o 14-groomers $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./14-groomers < data/boosted_top_event.dat"
+            ]
+          }
+        ]
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "fastjet-cxx"
+          ]
+        },
+        "name": "fastjet-cxx",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "automake",
+            "libtool",
+            "make",
+            "pkg-config",
+            "gnuconfig",
+            "cgal"
+          ],
+          "host": [
+            "siscone"
+          ],
+          "run": [
+            "siscone"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "source": [
+                "example/fastjet_example.cc",
+                "example/fastjet_areas.cc",
+                "example/01-basic.cc",
+                "example/02-jetdef.cc",
+                "example/03-plugin.cc",
+                "example/04-constituents.cc",
+                "example/05-eplus_eminus.cc",
+                "example/06-area.cc",
+                "example/07-subtraction.cc",
+                "example/08-selector.cc",
+                "example/09-user_info.cc",
+                "example/10-subjets.cc",
+                "example/11-filter.cc",
+                "example/12-boosted_higgs.cc",
+                "example/13-boosted_top.cc",
+                "example/14-groomers.cc",
+                "example/data/single-event.dat",
+                "example/data/single-ee-event.dat",
+                "example/data/Pythia-Zp2jets-lhc-pileup-1ev.dat",
+                "example/data/Pythia-dijet-ptmin100-lhc-pileup-1ev.dat",
+                "example/data/HZ-event-Hmass115.dat",
+                "example/data/boosted_top_event.dat"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "test -f $PREFIX/bin/fastjet-config",
+              "test -f $PREFIX/lib/libfastjet${SHLIB_EXT}",
+              "test -f $PREFIX/lib/libfastjetplugins${SHLIB_EXT}",
+              "test -f $PREFIX/lib/libfastjettools${SHLIB_EXT}",
+              "test -d $PREFIX/include/fastjet",
+              "test -d $PREFIX/include/fastjet/internal",
+              "test -d $PREFIX/include/fastjet/tools",
+              "fastjet-config --help",
+              "fastjet-config --version",
+              "fastjet-config --prefix",
+              "fastjet-config --cxxflags",
+              "fastjet-config --libs",
+              "fastjet-config --list-plugins",
+              "fastjet-config --libs --plugins",
+              "fastjet-config --config",
+              "fastjet-config --pythonpath",
+              "cd example/",
+              "$CXX fastjet_example.cc -o fastjet_example $CXXFLAGS $LDFLAGS -lfastjet",
+              "./fastjet_example < data/single-event.dat",
+              "$CXX fastjet_areas.cc -o fastjet_areas $CXXFLAGS $LDFLAGS -lfastjet",
+              "./fastjet_areas < data/single-event.dat",
+              "$CXX 01-basic.cc -o 01-basic $CXXFLAGS $LDFLAGS -lfastjet",
+              "./01-basic < data/single-event.dat",
+              "$CXX 02-jetdef.cc -o 02-jetdef $CXXFLAGS $LDFLAGS -lfastjet",
+              "./02-jetdef < data/single-event.dat",
+              "$CXX 03-plugin.cc -o 03-plugin $CXXFLAGS $LDFLAGS -lfastjet -lfastjetplugins",
+              "./03-plugin < data/single-event.dat",
+              "rm ./03-plugin",
+              "$CXX 03-plugin.cc -o 03-plugin $CXXFLAGS $LDFLAGS $(fastjet-config --libs --plugins)",
+              "$CXX 04-constituents.cc -o 04-constituents $CXXFLAGS $LDFLAGS -lfastjet",
+              "./04-constituents < data/single-event.dat",
+              "$CXX 05-eplus_eminus.cc -o 05-eplus_eminus $CXXFLAGS $LDFLAGS -lfastjet",
+              "./05-eplus_eminus < data/single-ee-event.dat",
+              "$CXX 06-area.cc -o 06-area $CXXFLAGS $LDFLAGS -lfastjet",
+              "./06-area < data/single-event.dat",
+              "$CXX 07-subtraction.cc -o 07-subtraction $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./07-subtraction < data/Pythia-Zp2jets-lhc-pileup-1ev.dat",
+              "$CXX 08-selector.cc -o 08-selector $CXXFLAGS $LDFLAGS -lfastjet",
+              "./08-selector < data/single-event.dat",
+              "$CXX 09-user_info.cc -o 09-user_info $CXXFLAGS $LDFLAGS -lfastjet",
+              "./09-user_info < data/Pythia-dijet-ptmin100-lhc-pileup-1ev.dat",
+              "$CXX 10-subjets.cc -o 10-subjets $CXXFLAGS $LDFLAGS -lfastjet",
+              "./10-subjets < data/single-event.dat",
+              "$CXX 11-filter.cc -o 11-filter $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./11-filter < data/single-event.dat",
+              "$CXX 12-boosted_higgs.cc -o 12-boosted_higgs $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./12-boosted_higgs < data/HZ-event-Hmass115.dat",
+              "$CXX 13-boosted_top.cc -o 13-boosted_top $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./13-boosted_top < data/boosted_top_event.dat",
+              "$CXX 14-groomers.cc -o 14-groomers $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./14-groomers < data/boosted_top_event.dat"
+            ]
+          }
+        ]
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "fastjet-cxx"
+          ]
+        },
+        "name": "fastjet-cxx",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "automake",
+            "libtool",
+            "make",
+            "pkg-config",
+            "gnuconfig",
+            "cgal"
+          ],
+          "host": [
+            "siscone"
+          ],
+          "run": [
+            "siscone"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "source": [
+                "example/fastjet_example.cc",
+                "example/fastjet_areas.cc",
+                "example/01-basic.cc",
+                "example/02-jetdef.cc",
+                "example/03-plugin.cc",
+                "example/04-constituents.cc",
+                "example/05-eplus_eminus.cc",
+                "example/06-area.cc",
+                "example/07-subtraction.cc",
+                "example/08-selector.cc",
+                "example/09-user_info.cc",
+                "example/10-subjets.cc",
+                "example/11-filter.cc",
+                "example/12-boosted_higgs.cc",
+                "example/13-boosted_top.cc",
+                "example/14-groomers.cc",
+                "example/data/single-event.dat",
+                "example/data/single-ee-event.dat",
+                "example/data/Pythia-Zp2jets-lhc-pileup-1ev.dat",
+                "example/data/Pythia-dijet-ptmin100-lhc-pileup-1ev.dat",
+                "example/data/HZ-event-Hmass115.dat",
+                "example/data/boosted_top_event.dat"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "test -f $PREFIX/bin/fastjet-config",
+              "test -f $PREFIX/lib/libfastjet${SHLIB_EXT}",
+              "test -f $PREFIX/lib/libfastjetplugins${SHLIB_EXT}",
+              "test -f $PREFIX/lib/libfastjettools${SHLIB_EXT}",
+              "test -d $PREFIX/include/fastjet",
+              "test -d $PREFIX/include/fastjet/internal",
+              "test -d $PREFIX/include/fastjet/tools",
+              "fastjet-config --help",
+              "fastjet-config --version",
+              "fastjet-config --prefix",
+              "fastjet-config --cxxflags",
+              "fastjet-config --libs",
+              "fastjet-config --list-plugins",
+              "fastjet-config --libs --plugins",
+              "fastjet-config --config",
+              "fastjet-config --pythonpath",
+              "cd example/",
+              "$CXX fastjet_example.cc -o fastjet_example $CXXFLAGS $LDFLAGS -lfastjet",
+              "./fastjet_example < data/single-event.dat",
+              "$CXX fastjet_areas.cc -o fastjet_areas $CXXFLAGS $LDFLAGS -lfastjet",
+              "./fastjet_areas < data/single-event.dat",
+              "$CXX 01-basic.cc -o 01-basic $CXXFLAGS $LDFLAGS -lfastjet",
+              "./01-basic < data/single-event.dat",
+              "$CXX 02-jetdef.cc -o 02-jetdef $CXXFLAGS $LDFLAGS -lfastjet",
+              "./02-jetdef < data/single-event.dat",
+              "$CXX 03-plugin.cc -o 03-plugin $CXXFLAGS $LDFLAGS -lfastjet -lfastjetplugins",
+              "./03-plugin < data/single-event.dat",
+              "rm ./03-plugin",
+              "$CXX 03-plugin.cc -o 03-plugin $CXXFLAGS $LDFLAGS $(fastjet-config --libs --plugins)",
+              "$CXX 04-constituents.cc -o 04-constituents $CXXFLAGS $LDFLAGS -lfastjet",
+              "./04-constituents < data/single-event.dat",
+              "$CXX 05-eplus_eminus.cc -o 05-eplus_eminus $CXXFLAGS $LDFLAGS -lfastjet",
+              "./05-eplus_eminus < data/single-ee-event.dat",
+              "$CXX 06-area.cc -o 06-area $CXXFLAGS $LDFLAGS -lfastjet",
+              "./06-area < data/single-event.dat",
+              "$CXX 07-subtraction.cc -o 07-subtraction $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./07-subtraction < data/Pythia-Zp2jets-lhc-pileup-1ev.dat",
+              "$CXX 08-selector.cc -o 08-selector $CXXFLAGS $LDFLAGS -lfastjet",
+              "./08-selector < data/single-event.dat",
+              "$CXX 09-user_info.cc -o 09-user_info $CXXFLAGS $LDFLAGS -lfastjet",
+              "./09-user_info < data/Pythia-dijet-ptmin100-lhc-pileup-1ev.dat",
+              "$CXX 10-subjets.cc -o 10-subjets $CXXFLAGS $LDFLAGS -lfastjet",
+              "./10-subjets < data/single-event.dat",
+              "$CXX 11-filter.cc -o 11-filter $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./11-filter < data/single-event.dat",
+              "$CXX 12-boosted_higgs.cc -o 12-boosted_higgs $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./12-boosted_higgs < data/HZ-event-Hmass115.dat",
+              "$CXX 13-boosted_top.cc -o 13-boosted_top $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./13-boosted_top < data/boosted_top_event.dat",
+              "$CXX 14-groomers.cc -o 14-groomers $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./14-groomers < data/boosted_top_event.dat"
+            ]
+          }
+        ]
+      }
+    ],
     "package": {
       "name": "fastjet-cxx",
       "version": "3.4.3"
@@ -581,144 +1267,34 @@
         "siscone"
       ]
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "patches": [
-          "0001-use-conda-forge-siscone-for-plugin.patch"
-        ],
-        "sha256": "8ce8b9be5cd0fba4f2fe914871eabe259dfa7524edf925635e20072cde2ae6a8",
-        "url": "https://gitlab.com/fastjet/fastjet/-/archive/fastjet-3.4.3/fastjet-fastjet-3.4.3.tar.gz"
-      },
-      {
-        "patches": [
-          "0001-use-conda-forge-siscone-for-plugin.patch"
-        ],
-        "sha256": "8ce8b9be5cd0fba4f2fe914871eabe259dfa7524edf925635e20072cde2ae6a8",
-        "url": "https://gitlab.com/fastjet/fastjet/-/archive/fastjet-3.4.3/fastjet-fastjet-3.4.3.tar.gz"
-      },
-      {
-        "patches": [
-          "0001-use-conda-forge-siscone-for-plugin.patch"
-        ],
-        "sha256": "8ce8b9be5cd0fba4f2fe914871eabe259dfa7524edf925635e20072cde2ae6a8",
-        "url": "https://gitlab.com/fastjet/fastjet/-/archive/fastjet-3.4.3/fastjet-fastjet-3.4.3.tar.gz"
-      },
-      {
-        "patches": [
-          "0001-use-conda-forge-siscone-for-plugin.patch"
-        ],
-        "sha256": "8ce8b9be5cd0fba4f2fe914871eabe259dfa7524edf925635e20072cde2ae6a8",
-        "url": "https://gitlab.com/fastjet/fastjet/-/archive/fastjet-3.4.3/fastjet-fastjet-3.4.3.tar.gz"
-      },
-      {
-        "patches": [
-          "0001-use-conda-forge-siscone-for-plugin.patch"
-        ],
-        "sha256": "8ce8b9be5cd0fba4f2fe914871eabe259dfa7524edf925635e20072cde2ae6a8",
-        "url": "https://gitlab.com/fastjet/fastjet/-/archive/fastjet-3.4.3/fastjet-fastjet-3.4.3.tar.gz"
-      }
-    ],
-    "test": {
-      "commands": [
-        "test -f $PREFIX/bin/fastjet-config",
-        "test -f $PREFIX/lib/libfastjet${SHLIB_EXT}",
-        "test -f $PREFIX/lib/libfastjetplugins${SHLIB_EXT}",
-        "test -f $PREFIX/lib/libfastjettools${SHLIB_EXT}",
-        "test -d $PREFIX/include/fastjet",
-        "test -d $PREFIX/include/fastjet/internal",
-        "test -d $PREFIX/include/fastjet/tools",
-        "fastjet-config --help",
-        "fastjet-config --version",
-        "fastjet-config --prefix",
-        "fastjet-config --cxxflags",
-        "fastjet-config --libs",
-        "fastjet-config --list-plugins",
-        "fastjet-config --libs --plugins",
-        "fastjet-config --config",
-        "fastjet-config --pythonpath",
-        "cd example/",
-        "$CXX fastjet_example.cc -o fastjet_example $CXXFLAGS $LDFLAGS -lfastjet",
-        "./fastjet_example < data/single-event.dat",
-        "$CXX fastjet_areas.cc -o fastjet_areas $CXXFLAGS $LDFLAGS -lfastjet",
-        "./fastjet_areas < data/single-event.dat",
-        "$CXX 01-basic.cc -o 01-basic $CXXFLAGS $LDFLAGS -lfastjet",
-        "./01-basic < data/single-event.dat",
-        "$CXX 02-jetdef.cc -o 02-jetdef $CXXFLAGS $LDFLAGS -lfastjet",
-        "./02-jetdef < data/single-event.dat",
-        "$CXX 03-plugin.cc -o 03-plugin $CXXFLAGS $LDFLAGS -lfastjet -lfastjetplugins",
-        "./03-plugin < data/single-event.dat",
-        "rm ./03-plugin",
-        "$CXX 03-plugin.cc -o 03-plugin $CXXFLAGS $LDFLAGS $(fastjet-config --libs --plugins)",
-        "$CXX 04-constituents.cc -o 04-constituents $CXXFLAGS $LDFLAGS -lfastjet",
-        "./04-constituents < data/single-event.dat",
-        "$CXX 05-eplus_eminus.cc -o 05-eplus_eminus $CXXFLAGS $LDFLAGS -lfastjet",
-        "./05-eplus_eminus < data/single-ee-event.dat",
-        "$CXX 06-area.cc -o 06-area $CXXFLAGS $LDFLAGS -lfastjet",
-        "./06-area < data/single-event.dat",
-        "$CXX 07-subtraction.cc -o 07-subtraction $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
-        "./07-subtraction < data/Pythia-Zp2jets-lhc-pileup-1ev.dat",
-        "$CXX 08-selector.cc -o 08-selector $CXXFLAGS $LDFLAGS -lfastjet",
-        "./08-selector < data/single-event.dat",
-        "$CXX 09-user_info.cc -o 09-user_info $CXXFLAGS $LDFLAGS -lfastjet",
-        "./09-user_info < data/Pythia-dijet-ptmin100-lhc-pileup-1ev.dat",
-        "$CXX 10-subjets.cc -o 10-subjets $CXXFLAGS $LDFLAGS -lfastjet",
-        "./10-subjets < data/single-event.dat",
-        "$CXX 11-filter.cc -o 11-filter $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
-        "./11-filter < data/single-event.dat",
-        "$CXX 12-boosted_higgs.cc -o 12-boosted_higgs $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
-        "./12-boosted_higgs < data/HZ-event-Hmass115.dat",
-        "$CXX 13-boosted_top.cc -o 13-boosted_top $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
-        "./13-boosted_top < data/boosted_top_event.dat",
-        "$CXX 14-groomers.cc -o 14-groomers $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
-        "./14-groomers < data/boosted_top_event.dat"
+    "schema_version": 1,
+    "source": {
+      "patches": [
+        "0001-use-conda-forge-siscone-for-plugin.patch"
       ],
-      "requires": [
-        "cxx_compiler_stub"
-      ],
-      "source_files": [
-        "example/fastjet_example.cc",
-        "example/fastjet_areas.cc",
-        "example/01-basic.cc",
-        "example/02-jetdef.cc",
-        "example/03-plugin.cc",
-        "example/04-constituents.cc",
-        "example/05-eplus_eminus.cc",
-        "example/06-area.cc",
-        "example/07-subtraction.cc",
-        "example/08-selector.cc",
-        "example/09-user_info.cc",
-        "example/10-subjets.cc",
-        "example/11-filter.cc",
-        "example/12-boosted_higgs.cc",
-        "example/13-boosted_top.cc",
-        "example/14-groomers.cc",
-        "example/data/single-event.dat",
-        "example/data/single-ee-event.dat",
-        "example/data/Pythia-Zp2jets-lhc-pileup-1ev.dat",
-        "example/data/Pythia-dijet-ptmin100-lhc-pileup-1ev.dat",
-        "example/data/HZ-event-Hmass115.dat",
-        "example/data/boosted_top_event.dat"
-      ]
+      "sha256": "8ce8b9be5cd0fba4f2fe914871eabe259dfa7524edf925635e20072cde2ae6a8",
+      "url": "https://gitlab.com/fastjet/fastjet/-/archive/fastjet-3.4.3/fastjet-fastjet-3.4.3.tar.gz"
     }
   },
   "name": "fastjet-cxx",
   "osx_64_meta_yaml": {
     "about": {
-      "description": "FastJet is a software package for jet finding in pp and e+e- collisions.\nIt includes fast native implementations of many sequential recombination\nclustering algorithms, plugins for access to a range of cone jet finders\nand tools for advanced jet manipulation.\n",
+      "description": "FastJet is a software package for jet finding in pp and e+e- collisions.\nIt includes fast native implementations of many sequential recombination\nclustering algorithms, plugins for access to a range of cone jet finders\nand tools for advanced jet manipulation.",
       "dev_url": "https://gitlab.com/fastjet/fastjet",
       "doc_url": "https://fastjet.fr/",
       "home": "https://gitlab.com/fastjet/fastjet",
       "license": "GPL-2.0-or-later",
-      "license_family": "GPL",
+      "license_family": "GPL-2.0-or-later",
       "license_file": "COPYING",
       "summary": "FastJet: jet finding in pp and e+e- collisions"
     },
     "build": {
-      "number": "1",
-      "run_exports": [
-        "fastjet-cxx"
-      ]
+      "number": "2",
+      "run_exports": {
+        "weak": [
+          "fastjet-cxx"
+        ]
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -726,6 +1302,123 @@
         "matthewfeickert"
       ]
     },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "fastjet-cxx"
+          ]
+        },
+        "name": "fastjet-cxx",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "automake",
+            "libtool",
+            "make",
+            "pkg-config",
+            "gnuconfig",
+            "cgal"
+          ],
+          "host": [
+            "siscone"
+          ],
+          "run": [
+            "siscone"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "source": [
+                "example/fastjet_example.cc",
+                "example/fastjet_areas.cc",
+                "example/01-basic.cc",
+                "example/02-jetdef.cc",
+                "example/03-plugin.cc",
+                "example/04-constituents.cc",
+                "example/05-eplus_eminus.cc",
+                "example/06-area.cc",
+                "example/07-subtraction.cc",
+                "example/08-selector.cc",
+                "example/09-user_info.cc",
+                "example/10-subjets.cc",
+                "example/11-filter.cc",
+                "example/12-boosted_higgs.cc",
+                "example/13-boosted_top.cc",
+                "example/14-groomers.cc",
+                "example/data/single-event.dat",
+                "example/data/single-ee-event.dat",
+                "example/data/Pythia-Zp2jets-lhc-pileup-1ev.dat",
+                "example/data/Pythia-dijet-ptmin100-lhc-pileup-1ev.dat",
+                "example/data/HZ-event-Hmass115.dat",
+                "example/data/boosted_top_event.dat"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "test -f $PREFIX/bin/fastjet-config",
+              "test -f $PREFIX/lib/libfastjet${SHLIB_EXT}",
+              "test -f $PREFIX/lib/libfastjetplugins${SHLIB_EXT}",
+              "test -f $PREFIX/lib/libfastjettools${SHLIB_EXT}",
+              "test -d $PREFIX/include/fastjet",
+              "test -d $PREFIX/include/fastjet/internal",
+              "test -d $PREFIX/include/fastjet/tools",
+              "fastjet-config --help",
+              "fastjet-config --version",
+              "fastjet-config --prefix",
+              "fastjet-config --cxxflags",
+              "fastjet-config --libs",
+              "fastjet-config --list-plugins",
+              "fastjet-config --libs --plugins",
+              "fastjet-config --config",
+              "fastjet-config --pythonpath",
+              "cd example/",
+              "$CXX fastjet_example.cc -o fastjet_example $CXXFLAGS $LDFLAGS -lfastjet",
+              "./fastjet_example < data/single-event.dat",
+              "$CXX fastjet_areas.cc -o fastjet_areas $CXXFLAGS $LDFLAGS -lfastjet",
+              "./fastjet_areas < data/single-event.dat",
+              "$CXX 01-basic.cc -o 01-basic $CXXFLAGS $LDFLAGS -lfastjet",
+              "./01-basic < data/single-event.dat",
+              "$CXX 02-jetdef.cc -o 02-jetdef $CXXFLAGS $LDFLAGS -lfastjet",
+              "./02-jetdef < data/single-event.dat",
+              "$CXX 03-plugin.cc -o 03-plugin $CXXFLAGS $LDFLAGS -lfastjet -lfastjetplugins",
+              "./03-plugin < data/single-event.dat",
+              "rm ./03-plugin",
+              "$CXX 03-plugin.cc -o 03-plugin $CXXFLAGS $LDFLAGS $(fastjet-config --libs --plugins)",
+              "$CXX 04-constituents.cc -o 04-constituents $CXXFLAGS $LDFLAGS -lfastjet",
+              "./04-constituents < data/single-event.dat",
+              "$CXX 05-eplus_eminus.cc -o 05-eplus_eminus $CXXFLAGS $LDFLAGS -lfastjet",
+              "./05-eplus_eminus < data/single-ee-event.dat",
+              "$CXX 06-area.cc -o 06-area $CXXFLAGS $LDFLAGS -lfastjet",
+              "./06-area < data/single-event.dat",
+              "$CXX 07-subtraction.cc -o 07-subtraction $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./07-subtraction < data/Pythia-Zp2jets-lhc-pileup-1ev.dat",
+              "$CXX 08-selector.cc -o 08-selector $CXXFLAGS $LDFLAGS -lfastjet",
+              "./08-selector < data/single-event.dat",
+              "$CXX 09-user_info.cc -o 09-user_info $CXXFLAGS $LDFLAGS -lfastjet",
+              "./09-user_info < data/Pythia-dijet-ptmin100-lhc-pileup-1ev.dat",
+              "$CXX 10-subjets.cc -o 10-subjets $CXXFLAGS $LDFLAGS -lfastjet",
+              "./10-subjets < data/single-event.dat",
+              "$CXX 11-filter.cc -o 11-filter $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./11-filter < data/single-event.dat",
+              "$CXX 12-boosted_higgs.cc -o 12-boosted_higgs $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./12-boosted_higgs < data/HZ-event-Hmass115.dat",
+              "$CXX 13-boosted_top.cc -o 13-boosted_top $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./13-boosted_top < data/boosted_top_event.dat",
+              "$CXX 14-groomers.cc -o 14-groomers $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./14-groomers < data/boosted_top_event.dat"
+            ]
+          }
+        ]
+      }
+    ],
     "package": {
       "name": "fastjet-cxx",
       "version": "3.4.3"
@@ -748,97 +1441,13 @@
         "siscone"
       ]
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "patches": [
-          "0001-use-conda-forge-siscone-for-plugin.patch"
-        ],
-        "sha256": "8ce8b9be5cd0fba4f2fe914871eabe259dfa7524edf925635e20072cde2ae6a8",
-        "url": "https://gitlab.com/fastjet/fastjet/-/archive/fastjet-3.4.3/fastjet-fastjet-3.4.3.tar.gz"
-      }
-    ],
-    "test": {
-      "commands": [
-        "test -f $PREFIX/bin/fastjet-config",
-        "test -f $PREFIX/lib/libfastjet${SHLIB_EXT}",
-        "test -f $PREFIX/lib/libfastjetplugins${SHLIB_EXT}",
-        "test -f $PREFIX/lib/libfastjettools${SHLIB_EXT}",
-        "test -d $PREFIX/include/fastjet",
-        "test -d $PREFIX/include/fastjet/internal",
-        "test -d $PREFIX/include/fastjet/tools",
-        "fastjet-config --help",
-        "fastjet-config --version",
-        "fastjet-config --prefix",
-        "fastjet-config --cxxflags",
-        "fastjet-config --libs",
-        "fastjet-config --list-plugins",
-        "fastjet-config --libs --plugins",
-        "fastjet-config --config",
-        "fastjet-config --pythonpath",
-        "cd example/",
-        "$CXX fastjet_example.cc -o fastjet_example $CXXFLAGS $LDFLAGS -lfastjet",
-        "./fastjet_example < data/single-event.dat",
-        "$CXX fastjet_areas.cc -o fastjet_areas $CXXFLAGS $LDFLAGS -lfastjet",
-        "./fastjet_areas < data/single-event.dat",
-        "$CXX 01-basic.cc -o 01-basic $CXXFLAGS $LDFLAGS -lfastjet",
-        "./01-basic < data/single-event.dat",
-        "$CXX 02-jetdef.cc -o 02-jetdef $CXXFLAGS $LDFLAGS -lfastjet",
-        "./02-jetdef < data/single-event.dat",
-        "$CXX 03-plugin.cc -o 03-plugin $CXXFLAGS $LDFLAGS -lfastjet -lfastjetplugins",
-        "./03-plugin < data/single-event.dat",
-        "rm ./03-plugin",
-        "$CXX 03-plugin.cc -o 03-plugin $CXXFLAGS $LDFLAGS $(fastjet-config --libs --plugins)",
-        "$CXX 04-constituents.cc -o 04-constituents $CXXFLAGS $LDFLAGS -lfastjet",
-        "./04-constituents < data/single-event.dat",
-        "$CXX 05-eplus_eminus.cc -o 05-eplus_eminus $CXXFLAGS $LDFLAGS -lfastjet",
-        "./05-eplus_eminus < data/single-ee-event.dat",
-        "$CXX 06-area.cc -o 06-area $CXXFLAGS $LDFLAGS -lfastjet",
-        "./06-area < data/single-event.dat",
-        "$CXX 07-subtraction.cc -o 07-subtraction $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
-        "./07-subtraction < data/Pythia-Zp2jets-lhc-pileup-1ev.dat",
-        "$CXX 08-selector.cc -o 08-selector $CXXFLAGS $LDFLAGS -lfastjet",
-        "./08-selector < data/single-event.dat",
-        "$CXX 09-user_info.cc -o 09-user_info $CXXFLAGS $LDFLAGS -lfastjet",
-        "./09-user_info < data/Pythia-dijet-ptmin100-lhc-pileup-1ev.dat",
-        "$CXX 10-subjets.cc -o 10-subjets $CXXFLAGS $LDFLAGS -lfastjet",
-        "./10-subjets < data/single-event.dat",
-        "$CXX 11-filter.cc -o 11-filter $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
-        "./11-filter < data/single-event.dat",
-        "$CXX 12-boosted_higgs.cc -o 12-boosted_higgs $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
-        "./12-boosted_higgs < data/HZ-event-Hmass115.dat",
-        "$CXX 13-boosted_top.cc -o 13-boosted_top $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
-        "./13-boosted_top < data/boosted_top_event.dat",
-        "$CXX 14-groomers.cc -o 14-groomers $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
-        "./14-groomers < data/boosted_top_event.dat"
+    "schema_version": 1,
+    "source": {
+      "patches": [
+        "0001-use-conda-forge-siscone-for-plugin.patch"
       ],
-      "requires": [
-        "cxx_compiler_stub"
-      ],
-      "source_files": [
-        "example/fastjet_example.cc",
-        "example/fastjet_areas.cc",
-        "example/01-basic.cc",
-        "example/02-jetdef.cc",
-        "example/03-plugin.cc",
-        "example/04-constituents.cc",
-        "example/05-eplus_eminus.cc",
-        "example/06-area.cc",
-        "example/07-subtraction.cc",
-        "example/08-selector.cc",
-        "example/09-user_info.cc",
-        "example/10-subjets.cc",
-        "example/11-filter.cc",
-        "example/12-boosted_higgs.cc",
-        "example/13-boosted_top.cc",
-        "example/14-groomers.cc",
-        "example/data/single-event.dat",
-        "example/data/single-ee-event.dat",
-        "example/data/Pythia-Zp2jets-lhc-pileup-1ev.dat",
-        "example/data/Pythia-dijet-ptmin100-lhc-pileup-1ev.dat",
-        "example/data/HZ-event-Hmass115.dat",
-        "example/data/boosted_top_event.dat"
-      ]
+      "sha256": "8ce8b9be5cd0fba4f2fe914871eabe259dfa7524edf925635e20072cde2ae6a8",
+      "url": "https://gitlab.com/fastjet/fastjet/-/archive/fastjet-3.4.3/fastjet-fastjet-3.4.3.tar.gz"
     }
   },
   "osx_64_requirements": {
@@ -876,20 +1485,22 @@
   },
   "osx_arm64_meta_yaml": {
     "about": {
-      "description": "FastJet is a software package for jet finding in pp and e+e- collisions.\nIt includes fast native implementations of many sequential recombination\nclustering algorithms, plugins for access to a range of cone jet finders\nand tools for advanced jet manipulation.\n",
+      "description": "FastJet is a software package for jet finding in pp and e+e- collisions.\nIt includes fast native implementations of many sequential recombination\nclustering algorithms, plugins for access to a range of cone jet finders\nand tools for advanced jet manipulation.",
       "dev_url": "https://gitlab.com/fastjet/fastjet",
       "doc_url": "https://fastjet.fr/",
       "home": "https://gitlab.com/fastjet/fastjet",
       "license": "GPL-2.0-or-later",
-      "license_family": "GPL",
+      "license_family": "GPL-2.0-or-later",
       "license_file": "COPYING",
       "summary": "FastJet: jet finding in pp and e+e- collisions"
     },
     "build": {
-      "number": "1",
-      "run_exports": [
-        "fastjet-cxx"
-      ]
+      "number": "2",
+      "run_exports": {
+        "weak": [
+          "fastjet-cxx"
+        ]
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -897,6 +1508,123 @@
         "matthewfeickert"
       ]
     },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "fastjet-cxx"
+          ]
+        },
+        "name": "fastjet-cxx",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "automake",
+            "libtool",
+            "make",
+            "pkg-config",
+            "gnuconfig",
+            "cgal"
+          ],
+          "host": [
+            "siscone"
+          ],
+          "run": [
+            "siscone"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "source": [
+                "example/fastjet_example.cc",
+                "example/fastjet_areas.cc",
+                "example/01-basic.cc",
+                "example/02-jetdef.cc",
+                "example/03-plugin.cc",
+                "example/04-constituents.cc",
+                "example/05-eplus_eminus.cc",
+                "example/06-area.cc",
+                "example/07-subtraction.cc",
+                "example/08-selector.cc",
+                "example/09-user_info.cc",
+                "example/10-subjets.cc",
+                "example/11-filter.cc",
+                "example/12-boosted_higgs.cc",
+                "example/13-boosted_top.cc",
+                "example/14-groomers.cc",
+                "example/data/single-event.dat",
+                "example/data/single-ee-event.dat",
+                "example/data/Pythia-Zp2jets-lhc-pileup-1ev.dat",
+                "example/data/Pythia-dijet-ptmin100-lhc-pileup-1ev.dat",
+                "example/data/HZ-event-Hmass115.dat",
+                "example/data/boosted_top_event.dat"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "test -f $PREFIX/bin/fastjet-config",
+              "test -f $PREFIX/lib/libfastjet${SHLIB_EXT}",
+              "test -f $PREFIX/lib/libfastjetplugins${SHLIB_EXT}",
+              "test -f $PREFIX/lib/libfastjettools${SHLIB_EXT}",
+              "test -d $PREFIX/include/fastjet",
+              "test -d $PREFIX/include/fastjet/internal",
+              "test -d $PREFIX/include/fastjet/tools",
+              "fastjet-config --help",
+              "fastjet-config --version",
+              "fastjet-config --prefix",
+              "fastjet-config --cxxflags",
+              "fastjet-config --libs",
+              "fastjet-config --list-plugins",
+              "fastjet-config --libs --plugins",
+              "fastjet-config --config",
+              "fastjet-config --pythonpath",
+              "cd example/",
+              "$CXX fastjet_example.cc -o fastjet_example $CXXFLAGS $LDFLAGS -lfastjet",
+              "./fastjet_example < data/single-event.dat",
+              "$CXX fastjet_areas.cc -o fastjet_areas $CXXFLAGS $LDFLAGS -lfastjet",
+              "./fastjet_areas < data/single-event.dat",
+              "$CXX 01-basic.cc -o 01-basic $CXXFLAGS $LDFLAGS -lfastjet",
+              "./01-basic < data/single-event.dat",
+              "$CXX 02-jetdef.cc -o 02-jetdef $CXXFLAGS $LDFLAGS -lfastjet",
+              "./02-jetdef < data/single-event.dat",
+              "$CXX 03-plugin.cc -o 03-plugin $CXXFLAGS $LDFLAGS -lfastjet -lfastjetplugins",
+              "./03-plugin < data/single-event.dat",
+              "rm ./03-plugin",
+              "$CXX 03-plugin.cc -o 03-plugin $CXXFLAGS $LDFLAGS $(fastjet-config --libs --plugins)",
+              "$CXX 04-constituents.cc -o 04-constituents $CXXFLAGS $LDFLAGS -lfastjet",
+              "./04-constituents < data/single-event.dat",
+              "$CXX 05-eplus_eminus.cc -o 05-eplus_eminus $CXXFLAGS $LDFLAGS -lfastjet",
+              "./05-eplus_eminus < data/single-ee-event.dat",
+              "$CXX 06-area.cc -o 06-area $CXXFLAGS $LDFLAGS -lfastjet",
+              "./06-area < data/single-event.dat",
+              "$CXX 07-subtraction.cc -o 07-subtraction $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./07-subtraction < data/Pythia-Zp2jets-lhc-pileup-1ev.dat",
+              "$CXX 08-selector.cc -o 08-selector $CXXFLAGS $LDFLAGS -lfastjet",
+              "./08-selector < data/single-event.dat",
+              "$CXX 09-user_info.cc -o 09-user_info $CXXFLAGS $LDFLAGS -lfastjet",
+              "./09-user_info < data/Pythia-dijet-ptmin100-lhc-pileup-1ev.dat",
+              "$CXX 10-subjets.cc -o 10-subjets $CXXFLAGS $LDFLAGS -lfastjet",
+              "./10-subjets < data/single-event.dat",
+              "$CXX 11-filter.cc -o 11-filter $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./11-filter < data/single-event.dat",
+              "$CXX 12-boosted_higgs.cc -o 12-boosted_higgs $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./12-boosted_higgs < data/HZ-event-Hmass115.dat",
+              "$CXX 13-boosted_top.cc -o 13-boosted_top $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./13-boosted_top < data/boosted_top_event.dat",
+              "$CXX 14-groomers.cc -o 14-groomers $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
+              "./14-groomers < data/boosted_top_event.dat"
+            ]
+          }
+        ]
+      }
+    ],
     "package": {
       "name": "fastjet-cxx",
       "version": "3.4.3"
@@ -919,97 +1647,13 @@
         "siscone"
       ]
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "patches": [
-          "0001-use-conda-forge-siscone-for-plugin.patch"
-        ],
-        "sha256": "8ce8b9be5cd0fba4f2fe914871eabe259dfa7524edf925635e20072cde2ae6a8",
-        "url": "https://gitlab.com/fastjet/fastjet/-/archive/fastjet-3.4.3/fastjet-fastjet-3.4.3.tar.gz"
-      }
-    ],
-    "test": {
-      "commands": [
-        "test -f $PREFIX/bin/fastjet-config",
-        "test -f $PREFIX/lib/libfastjet${SHLIB_EXT}",
-        "test -f $PREFIX/lib/libfastjetplugins${SHLIB_EXT}",
-        "test -f $PREFIX/lib/libfastjettools${SHLIB_EXT}",
-        "test -d $PREFIX/include/fastjet",
-        "test -d $PREFIX/include/fastjet/internal",
-        "test -d $PREFIX/include/fastjet/tools",
-        "fastjet-config --help",
-        "fastjet-config --version",
-        "fastjet-config --prefix",
-        "fastjet-config --cxxflags",
-        "fastjet-config --libs",
-        "fastjet-config --list-plugins",
-        "fastjet-config --libs --plugins",
-        "fastjet-config --config",
-        "fastjet-config --pythonpath",
-        "cd example/",
-        "$CXX fastjet_example.cc -o fastjet_example $CXXFLAGS $LDFLAGS -lfastjet",
-        "./fastjet_example < data/single-event.dat",
-        "$CXX fastjet_areas.cc -o fastjet_areas $CXXFLAGS $LDFLAGS -lfastjet",
-        "./fastjet_areas < data/single-event.dat",
-        "$CXX 01-basic.cc -o 01-basic $CXXFLAGS $LDFLAGS -lfastjet",
-        "./01-basic < data/single-event.dat",
-        "$CXX 02-jetdef.cc -o 02-jetdef $CXXFLAGS $LDFLAGS -lfastjet",
-        "./02-jetdef < data/single-event.dat",
-        "$CXX 03-plugin.cc -o 03-plugin $CXXFLAGS $LDFLAGS -lfastjet -lfastjetplugins",
-        "./03-plugin < data/single-event.dat",
-        "rm ./03-plugin",
-        "$CXX 03-plugin.cc -o 03-plugin $CXXFLAGS $LDFLAGS $(fastjet-config --libs --plugins)",
-        "$CXX 04-constituents.cc -o 04-constituents $CXXFLAGS $LDFLAGS -lfastjet",
-        "./04-constituents < data/single-event.dat",
-        "$CXX 05-eplus_eminus.cc -o 05-eplus_eminus $CXXFLAGS $LDFLAGS -lfastjet",
-        "./05-eplus_eminus < data/single-ee-event.dat",
-        "$CXX 06-area.cc -o 06-area $CXXFLAGS $LDFLAGS -lfastjet",
-        "./06-area < data/single-event.dat",
-        "$CXX 07-subtraction.cc -o 07-subtraction $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
-        "./07-subtraction < data/Pythia-Zp2jets-lhc-pileup-1ev.dat",
-        "$CXX 08-selector.cc -o 08-selector $CXXFLAGS $LDFLAGS -lfastjet",
-        "./08-selector < data/single-event.dat",
-        "$CXX 09-user_info.cc -o 09-user_info $CXXFLAGS $LDFLAGS -lfastjet",
-        "./09-user_info < data/Pythia-dijet-ptmin100-lhc-pileup-1ev.dat",
-        "$CXX 10-subjets.cc -o 10-subjets $CXXFLAGS $LDFLAGS -lfastjet",
-        "./10-subjets < data/single-event.dat",
-        "$CXX 11-filter.cc -o 11-filter $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
-        "./11-filter < data/single-event.dat",
-        "$CXX 12-boosted_higgs.cc -o 12-boosted_higgs $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
-        "./12-boosted_higgs < data/HZ-event-Hmass115.dat",
-        "$CXX 13-boosted_top.cc -o 13-boosted_top $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
-        "./13-boosted_top < data/boosted_top_event.dat",
-        "$CXX 14-groomers.cc -o 14-groomers $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet",
-        "./14-groomers < data/boosted_top_event.dat"
+    "schema_version": 1,
+    "source": {
+      "patches": [
+        "0001-use-conda-forge-siscone-for-plugin.patch"
       ],
-      "requires": [
-        "cxx_compiler_stub"
-      ],
-      "source_files": [
-        "example/fastjet_example.cc",
-        "example/fastjet_areas.cc",
-        "example/01-basic.cc",
-        "example/02-jetdef.cc",
-        "example/03-plugin.cc",
-        "example/04-constituents.cc",
-        "example/05-eplus_eminus.cc",
-        "example/06-area.cc",
-        "example/07-subtraction.cc",
-        "example/08-selector.cc",
-        "example/09-user_info.cc",
-        "example/10-subjets.cc",
-        "example/11-filter.cc",
-        "example/12-boosted_higgs.cc",
-        "example/13-boosted_top.cc",
-        "example/14-groomers.cc",
-        "example/data/single-event.dat",
-        "example/data/single-ee-event.dat",
-        "example/data/Pythia-Zp2jets-lhc-pileup-1ev.dat",
-        "example/data/Pythia-dijet-ptmin100-lhc-pileup-1ev.dat",
-        "example/data/HZ-event-Hmass115.dat",
-        "example/data/boosted_top_event.dat"
-      ]
+      "sha256": "8ce8b9be5cd0fba4f2fe914871eabe259dfa7524edf925635e20072cde2ae6a8",
+      "url": "https://gitlab.com/fastjet/fastjet/-/archive/fastjet-3.4.3/fastjet-fastjet-3.4.3.tar.gz"
     }
   },
   "osx_arm64_requirements": {
@@ -1062,7 +1706,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/fastjet-cxx.json"
   },
-  "raw_meta_yaml": "{% set name = \"fastjet-cxx\" %}\n{% set version = \"3.4.3\" %}\n\npackage:\n  name: {{ name }}\n  version: {{ version }}\n\nsource:\n  - url: https://gitlab.com/fastjet/fastjet/-/archive/fastjet-{{ version }}/fastjet-fastjet-{{ version }}.tar.gz\n    sha256: 8ce8b9be5cd0fba4f2fe914871eabe259dfa7524edf925635e20072cde2ae6a8\n    patches:\n      - 0001-use-conda-forge-siscone-for-plugin.patch\n\nbuild:\n  skip: true  # [win]\n  number: 1\n  run_exports:\n    - {{ pin_subpackage('fastjet-cxx', max_pin='x.x') }}\n\nrequirements:\n  build:\n    - {{ stdlib('c') }}\n    - {{ compiler('cxx') }}\n    - automake\n    - libtool\n    - make\n    - pkg-config\n    - gnuconfig\n    - cgal\n    - siscone  # [build_platform != target_platform]\n  host:\n    - siscone\n  run:\n    - siscone\n\ntest:\n  source_files:\n    - example/fastjet_example.cc\n    - example/fastjet_areas.cc\n    - example/01-basic.cc\n    - example/02-jetdef.cc\n    - example/03-plugin.cc\n    - example/04-constituents.cc\n    - example/05-eplus_eminus.cc\n    - example/06-area.cc\n    - example/07-subtraction.cc\n    - example/08-selector.cc\n    - example/09-user_info.cc\n    - example/10-subjets.cc\n    - example/11-filter.cc\n    - example/12-boosted_higgs.cc\n    - example/13-boosted_top.cc\n    - example/14-groomers.cc\n    - example/data/single-event.dat\n    - example/data/single-ee-event.dat\n    - example/data/Pythia-Zp2jets-lhc-pileup-1ev.dat\n    - example/data/Pythia-dijet-ptmin100-lhc-pileup-1ev.dat\n    - example/data/HZ-event-Hmass115.dat\n    - example/data/boosted_top_event.dat\n  requires:\n    - {{ compiler('cxx') }}\n  commands:\n    - test -f $PREFIX/bin/fastjet-config\n    - test -f $PREFIX/lib/libfastjet${SHLIB_EXT}\n    - test -f $PREFIX/lib/libfastjetplugins${SHLIB_EXT}\n    - test -f $PREFIX/lib/libfastjettools${SHLIB_EXT}\n    - test -d $PREFIX/include/fastjet\n    - test -d $PREFIX/include/fastjet/internal\n    - test -d $PREFIX/include/fastjet/tools\n\n    - fastjet-config --help\n    - fastjet-config --version\n    - fastjet-config --prefix\n    - fastjet-config --cxxflags\n    - fastjet-config --libs\n    - fastjet-config --list-plugins\n    - fastjet-config --libs --plugins\n    - fastjet-config --config\n    - fastjet-config --pythonpath\n\n    - cd example/\n    - $CXX fastjet_example.cc -o fastjet_example $CXXFLAGS $LDFLAGS -lfastjet\n    - ./fastjet_example < data/single-event.dat\n    - $CXX fastjet_areas.cc -o fastjet_areas $CXXFLAGS $LDFLAGS -lfastjet\n    - ./fastjet_areas < data/single-event.dat\n    - $CXX 01-basic.cc -o 01-basic $CXXFLAGS $LDFLAGS -lfastjet\n    - ./01-basic < data/single-event.dat\n    - $CXX 02-jetdef.cc -o 02-jetdef $CXXFLAGS $LDFLAGS -lfastjet\n    - ./02-jetdef < data/single-event.dat\n    - $CXX 03-plugin.cc -o 03-plugin $CXXFLAGS $LDFLAGS -lfastjet -lfastjetplugins\n    - ./03-plugin < data/single-event.dat\n    - rm ./03-plugin\n    - $CXX 03-plugin.cc -o 03-plugin $CXXFLAGS $LDFLAGS $(fastjet-config --libs --plugins)\n    - ./03-plugin < data/single-event.dat\n    - $CXX 04-constituents.cc -o 04-constituents $CXXFLAGS $LDFLAGS -lfastjet\n    - ./04-constituents < data/single-event.dat\n    - $CXX 05-eplus_eminus.cc -o 05-eplus_eminus $CXXFLAGS $LDFLAGS -lfastjet\n    - ./05-eplus_eminus < data/single-ee-event.dat\n    - $CXX 06-area.cc -o 06-area $CXXFLAGS $LDFLAGS -lfastjet\n    - ./06-area < data/single-event.dat\n    - $CXX 07-subtraction.cc -o 07-subtraction $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet\n    - ./07-subtraction < data/Pythia-Zp2jets-lhc-pileup-1ev.dat\n    - $CXX 08-selector.cc -o 08-selector $CXXFLAGS $LDFLAGS -lfastjet\n    - ./08-selector < data/single-event.dat\n    - $CXX 09-user_info.cc -o 09-user_info $CXXFLAGS $LDFLAGS -lfastjet\n    - ./09-user_info < data/Pythia-dijet-ptmin100-lhc-pileup-1ev.dat\n    - $CXX 10-subjets.cc -o 10-subjets $CXXFLAGS $LDFLAGS -lfastjet\n    - ./10-subjets < data/single-event.dat\n    - $CXX 11-filter.cc -o 11-filter $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet\n    - ./11-filter < data/single-event.dat\n    - $CXX 12-boosted_higgs.cc -o 12-boosted_higgs $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet\n    - ./12-boosted_higgs < data/HZ-event-Hmass115.dat\n    - $CXX 13-boosted_top.cc -o 13-boosted_top $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet\n    - ./13-boosted_top < data/boosted_top_event.dat\n    - $CXX 14-groomers.cc -o 14-groomers $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet\n    - ./14-groomers < data/boosted_top_event.dat\n\nabout:\n  home: https://gitlab.com/fastjet/fastjet\n  summary: 'FastJet: jet finding in pp and e+e- collisions'\n  description: |\n    FastJet is a software package for jet finding in pp and e+e- collisions.\n    It includes fast native implementations of many sequential recombination\n    clustering algorithms, plugins for access to a range of cone jet finders\n    and tools for advanced jet manipulation.\n  license: GPL-2.0-or-later\n  license_family: GPL\n  license_file: COPYING\n  dev_url: https://gitlab.com/fastjet/fastjet\n  doc_url: https://fastjet.fr/\n\nextra:\n  recipe-maintainers:\n    - kratsg\n    - matthewfeickert\n",
+  "raw_meta_yaml": "context:\n  name: \"fastjet-cxx\"\n  version: \"3.4.3\"\n\npackage:\n  name: ${{ name }}\n  version: ${{ version }}\n\nsource:\n  url: https://gitlab.com/fastjet/fastjet/-/archive/fastjet-${{ version }}/fastjet-fastjet-${{ version }}.tar.gz\n  sha256: 8ce8b9be5cd0fba4f2fe914871eabe259dfa7524edf925635e20072cde2ae6a8\n  patches: 0001-use-conda-forge-siscone-for-plugin.patch\n\nbuild:\n  number: 2\n  skip:\n    - win\n\nrequirements:\n  run_exports:\n    - ${{ pin_subpackage('fastjet-cxx', upper_bound='x.x') }}\n  build:\n    - ${{ stdlib('c') }}\n    - ${{ compiler('cxx') }}\n    - automake\n    - libtool\n    - make\n    - pkg-config\n    - gnuconfig\n    - cgal\n    - if: build_platform != target_platform\n      then: siscone\n  host:\n    - siscone\n  run:\n    - siscone\n\ntests:\n  - script:\n      - test -f $PREFIX/bin/fastjet-config\n      - test -f $PREFIX/lib/libfastjet${SHLIB_EXT}\n      - test -f $PREFIX/lib/libfastjetplugins${SHLIB_EXT}\n      - test -f $PREFIX/lib/libfastjettools${SHLIB_EXT}\n      - test -d $PREFIX/include/fastjet\n      - test -d $PREFIX/include/fastjet/internal\n      - test -d $PREFIX/include/fastjet/tools\n\n      - fastjet-config --help\n      - fastjet-config --version\n      - fastjet-config --prefix\n      - fastjet-config --cxxflags\n      - fastjet-config --libs\n      - fastjet-config --list-plugins\n      - fastjet-config --libs --plugins\n      - fastjet-config --config\n      - fastjet-config --pythonpath\n\n      - cd example/\n      - $CXX fastjet_example.cc -o fastjet_example $CXXFLAGS $LDFLAGS -lfastjet\n      - ./fastjet_example < data/single-event.dat\n      - $CXX fastjet_areas.cc -o fastjet_areas $CXXFLAGS $LDFLAGS -lfastjet\n      - ./fastjet_areas < data/single-event.dat\n      - $CXX 01-basic.cc -o 01-basic $CXXFLAGS $LDFLAGS -lfastjet\n      - ./01-basic < data/single-event.dat\n      - $CXX 02-jetdef.cc -o 02-jetdef $CXXFLAGS $LDFLAGS -lfastjet\n      - ./02-jetdef < data/single-event.dat\n      - $CXX 03-plugin.cc -o 03-plugin $CXXFLAGS $LDFLAGS -lfastjet -lfastjetplugins\n      - ./03-plugin < data/single-event.dat\n      - rm ./03-plugin\n      - $CXX 03-plugin.cc -o 03-plugin $CXXFLAGS $LDFLAGS $(fastjet-config --libs --plugins)\n      - ./03-plugin < data/single-event.dat\n      - $CXX 04-constituents.cc -o 04-constituents $CXXFLAGS $LDFLAGS -lfastjet\n      - ./04-constituents < data/single-event.dat\n      - $CXX 05-eplus_eminus.cc -o 05-eplus_eminus $CXXFLAGS $LDFLAGS -lfastjet\n      - ./05-eplus_eminus < data/single-ee-event.dat\n      - $CXX 06-area.cc -o 06-area $CXXFLAGS $LDFLAGS -lfastjet\n      - ./06-area < data/single-event.dat\n      - $CXX 07-subtraction.cc -o 07-subtraction $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet\n      - ./07-subtraction < data/Pythia-Zp2jets-lhc-pileup-1ev.dat\n      - $CXX 08-selector.cc -o 08-selector $CXXFLAGS $LDFLAGS -lfastjet\n      - ./08-selector < data/single-event.dat\n      - $CXX 09-user_info.cc -o 09-user_info $CXXFLAGS $LDFLAGS -lfastjet\n      - ./09-user_info < data/Pythia-dijet-ptmin100-lhc-pileup-1ev.dat\n      - $CXX 10-subjets.cc -o 10-subjets $CXXFLAGS $LDFLAGS -lfastjet\n      - ./10-subjets < data/single-event.dat\n      - $CXX 11-filter.cc -o 11-filter $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet\n      - ./11-filter < data/single-event.dat\n      - $CXX 12-boosted_higgs.cc -o 12-boosted_higgs $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet\n      - ./12-boosted_higgs < data/HZ-event-Hmass115.dat\n      - $CXX 13-boosted_top.cc -o 13-boosted_top $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet\n      - ./13-boosted_top < data/boosted_top_event.dat\n      - $CXX 14-groomers.cc -o 14-groomers $CXXFLAGS $LDFLAGS -lfastjettools -lfastjet\n      - ./14-groomers < data/boosted_top_event.dat\n    files:\n      source:\n        - example/fastjet_example.cc\n        - example/fastjet_areas.cc\n        - example/01-basic.cc\n        - example/02-jetdef.cc\n        - example/03-plugin.cc\n        - example/04-constituents.cc\n        - example/05-eplus_eminus.cc\n        - example/06-area.cc\n        - example/07-subtraction.cc\n        - example/08-selector.cc\n        - example/09-user_info.cc\n        - example/10-subjets.cc\n        - example/11-filter.cc\n        - example/12-boosted_higgs.cc\n        - example/13-boosted_top.cc\n        - example/14-groomers.cc\n        - example/data/single-event.dat\n        - example/data/single-ee-event.dat\n        - example/data/Pythia-Zp2jets-lhc-pileup-1ev.dat\n        - example/data/Pythia-dijet-ptmin100-lhc-pileup-1ev.dat\n        - example/data/HZ-event-Hmass115.dat\n        - example/data/boosted_top_event.dat\n    requirements:\n      run:\n        - ${{ compiler('cxx') }}\n\nabout:\n  homepage: https://gitlab.com/fastjet/fastjet\n  summary: 'FastJet: jet finding in pp and e+e- collisions'\n  description: |\n    FastJet is a software package for jet finding in pp and e+e- collisions.\n    It includes fast native implementations of many sequential recombination\n    clustering algorithms, plugins for access to a range of cone jet finders\n    and tools for advanced jet manipulation.\n  license: GPL-2.0-or-later\n  license_family: GPL\n  license_file: COPYING\n  repository: https://gitlab.com/fastjet/fastjet\n  documentation: https://fastjet.fr/\n\nextra:\n  recipe-maintainers:\n    - kratsg\n    - matthewfeickert\n",
   "req": {
     "__set__": true,
     "elements": [
