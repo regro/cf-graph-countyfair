@@ -6,11 +6,13 @@
       "store_build_artifacts": true
     },
     "bot": {
-      "automerge": true
+      "automerge": true,
+      "inspection": "hint-all"
     },
     "conda_build": {
       "pkg_format": "2"
     },
+    "conda_build_tool": "rattler-build",
     "conda_forge_output_validation": true,
     "github": {
       "branch_name": "main",
@@ -19,26 +21,24 @@
     "noarch_platforms": [
       "linux_64",
       "win_64"
-    ],
-    "provider": {
-      "linux_aarch64": "default",
-      "linux_ppc64le": "default",
-      "win": "azure"
-    }
+    ]
   },
   "feedstock_name": "jupyterhub",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
     "about": {
-      "doc_url": "https://jupyterhub.readthedocs.io",
-      "home": "https://github.com/jupyterhub/jupyterhub",
+      "dev_url": "https://github.com/jupyterhub/jupyterhub",
+      "doc_url": "https://jupyterhub.readthedocs.io/",
+      "home": "https://hub.jupyter.org/",
       "license": "BSD-3-Clause",
-      "license_file": "COPYING.md",
-      "summary": "Multi-user server for Jupyter notebooks"
+      "license_family": "BSD-3-Clause",
+      "license_file": "LICENSE",
+      "summary": "A multi-user server for Jupyter notebooks"
     },
     "build": {
       "noarch": "python",
-      "number": "0"
+      "number": "0",
+      "script": "python -m pip install . --no-deps -vv --no-build-isolation --disable-pip-version-check"
     },
     "extra": {
       "feedstock-name": "jupyterhub",
@@ -52,137 +52,181 @@
     },
     "outputs": [
       {
-        "build": {
-          "entry_points": [
-            "jupyterhub = jupyterhub.app:main",
-            "jupyterhub-singleuser = jupyterhub.singleuser:main"
-          ],
-          "noarch": "python",
-          "script": "python -m pip install . --no-deps -vv"
-        },
+        "build": null,
         "name": "jupyterhub-base",
         "requirements": {
+          "build": [],
           "host": [
-            "python >=3.8",
+            "pip",
+            "python 3.9.*",
             "setuptools",
-            "pip"
+            "setuptools-scm"
           ],
           "run": [
             "__unix",
             "alembic >=1.4",
             "async_generator >=1.9",
             "certipy >=0.1.2",
+            "idna",
             "importlib-metadata >=3.6",
             "jinja2 >=2.11.0",
             "jupyter_events",
             "oauthlib >=3.0",
             "packaging",
-            "pamela",
             "prometheus_client >=0.5.0",
             "pydantic >=2",
-            "python >=3.8",
+            "python >=3.9",
             "python-dateutil",
             "requests",
             "sqlalchemy >=1.4.1",
             "tornado >=5.1",
-            "traitlets >=4.3.2"
-          ],
-          "run_constrained": [
-            "psutil >=5.6.5"
+            "traitlets >=4.3.2",
+            "pamela"
           ]
         },
-        "test": {
-          "commands": [
-            "pip check",
-            "jupyterhub --help-all",
-            "test -f $PREFIX/share/jupyterhub/templates/page.html",
-            "test -f $PREFIX/share/jupyterhub/static/components/jquery/dist/jquery.min.js",
-            "test -f $PREFIX/share/jupyterhub/static/css/style.min.css",
-            "test -f $PREFIX/share/jupyterhub/static/js/home.js"
-          ],
-          "imports": [
-            "jupyterhub",
-            "jupyterhub.apihandlers",
-            "jupyterhub.handlers",
-            "jupyterhub.tests",
-            "jupyterhub.app"
-          ],
-          "requires": [
-            "pip"
-          ]
-        }
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "jupyterhub",
+                "jupyterhub.apihandlers",
+                "jupyterhub.handlers",
+                "jupyterhub.app"
+              ],
+              "python_version": [
+                "3.9.*",
+                "3.13.*"
+              ]
+            }
+          },
+          {
+            "requirements": {
+              "run": [
+                "pip",
+                "python 3.9.*"
+              ]
+            },
+            "script": [
+              "python -m pip list --format=freeze",
+              "python -m pip list --format=freeze | python -c \"import sys; assert 'jupyterhub==${{ version }}' in sys.stdin.read()\"",
+              "jupyterhub --version",
+              "jupyterhub --version | python -c \"import sys; assert sys.stdin.read().strip() == '${{ version }}'\"",
+              "jupyterhub --help-all",
+              "test -f $PREFIX/share/jupyterhub/templates/page.html",
+              "test -f $PREFIX/share/jupyterhub/static/components/jquery/dist/jquery.min.js",
+              "test -f $PREFIX/share/jupyterhub/static/css/style.min.css",
+              "test -f $PREFIX/share/jupyterhub/static/js/home.js"
+            ]
+          }
+        ]
       },
       {
-        "build": {
-          "noarch": "python"
-        },
-        "name": "jupyterhub-singleuser",
-        "requirements": {
-          "host": [
-            "python >=3.8"
-          ],
-          "run": [
-            "__unix",
-            "jupyterhub-base",
-            "jupyterlab >=3.1",
-            "python >=3.8"
-          ]
-        },
-        "test": {
-          "commands": [
-            "pip check",
-            "jupyterhub-singleuser --help-all"
-          ],
-          "imports": [
-            "jupyterhub.singleuser"
-          ],
-          "requires": [
-            "pip"
-          ]
-        }
-      },
-      {
-        "build": {
-          "noarch": "python"
-        },
+        "build": null,
         "name": "jupyterhub",
         "requirements": {
-          "host": [
-            "python >=3.8"
-          ],
+          "build": [],
+          "host": [],
           "run": [
             "__unix",
             "jupyterhub-base",
             "configurable-http-proxy >=4",
             "nodejs >=12",
             "psutil",
-            "pycurl",
-            "python >=3.8"
+            "pycurl"
           ]
         },
-        "test": {
-          "commands": [
-            "pip check",
-            "jupyterhub --help-all",
-            "configurable-http-proxy --help"
-          ],
-          "imports": [
-            "jupyterhub"
-          ],
-          "requires": [
-            "pip"
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "jupyterhub"
+              ],
+              "python_version": [
+                "3.9.*",
+                "3.13.*"
+              ]
+            }
+          },
+          {
+            "script": [
+              "jupyterhub --help-all",
+              "configurable-http-proxy --help"
+            ]
+          }
+        ]
+      },
+      {
+        "build": null,
+        "name": "jupyterhub-singleuser",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "__unix",
+            "jupyterhub-base",
+            "jupyterlab >=3.1"
           ]
-        }
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "jupyterhub.singleuser"
+              ],
+              "python_version": [
+                "3.9.*",
+                "3.13.*"
+              ]
+            }
+          },
+          {
+            "requirements": {
+              "run": [
+                "python 3.9.*"
+              ]
+            },
+            "script": "jupyterhub-singleuser --help-all"
+          }
+        ]
       }
     ],
     "package": {
-      "name": "jupyterhub-feedstock",
-      "version": "5.2.1"
+      "name": "jupyterhub-base",
+      "version": "5.3.0"
     },
-    "schema_version": 0,
+    "requirements": {
+      "host": [
+        "pip",
+        "python 3.9.*",
+        "setuptools",
+        "setuptools-scm"
+      ],
+      "run": [
+        "__unix",
+        "alembic >=1.4",
+        "async_generator >=1.9",
+        "certipy >=0.1.2",
+        "idna",
+        "importlib-metadata >=3.6",
+        "jinja2 >=2.11.0",
+        "jupyter_events",
+        "oauthlib >=3.0",
+        "packaging",
+        "prometheus_client >=0.5.0",
+        "pydantic >=2",
+        "python >=3.9",
+        "python-dateutil",
+        "requests",
+        "sqlalchemy >=1.4.1",
+        "tornado >=5.1",
+        "traitlets >=4.3.2",
+        "pamela"
+      ]
+    },
+    "schema_version": 1,
     "source": {
-      "sha256": "5b35444c2c254e60563887d1d59c2376813d16a166ec6e0a410c773cdbd37ebd",
-      "url": "https://pypi.io/packages/source/j/jupyterhub/jupyterhub-5.2.1.tar.gz"
+      "sha256": "57834b36e7db8f26f21d9aeba1e1d5b8c91b9ff14a7c144097178977aa1e723f",
+      "url": "https://pypi.org/packages/source/j/jupyterhub/jupyterhub-5.3.0.tar.gz"
     }
   },
   "linux_64_requirements": {
@@ -195,7 +239,8 @@
       "elements": [
         "pip",
         "python",
-        "setuptools"
+        "setuptools",
+        "setuptools-scm"
       ]
     },
     "run": {
@@ -206,6 +251,7 @@
         "async_generator",
         "certipy",
         "configurable-http-proxy",
+        "idna",
         "importlib-metadata",
         "jinja2",
         "jupyter_events",
@@ -230,21 +276,25 @@
     "test": {
       "__set__": true,
       "elements": [
-        "pip"
+        "pip",
+        "python"
       ]
     }
   },
   "meta_yaml": {
     "about": {
-      "doc_url": "https://jupyterhub.readthedocs.io",
-      "home": "https://github.com/jupyterhub/jupyterhub",
+      "dev_url": "https://github.com/jupyterhub/jupyterhub",
+      "doc_url": "https://jupyterhub.readthedocs.io/",
+      "home": "https://hub.jupyter.org/",
       "license": "BSD-3-Clause",
-      "license_file": "COPYING.md",
-      "summary": "Multi-user server for Jupyter notebooks"
+      "license_family": "BSD-3-Clause",
+      "license_file": "LICENSE",
+      "summary": "A multi-user server for Jupyter notebooks"
     },
     "build": {
       "noarch": "python",
-      "number": "0"
+      "number": "0",
+      "script": "python -m pip install . --no-deps -vv --no-build-isolation --disable-pip-version-check"
     },
     "extra": {
       "feedstock-name": "jupyterhub",
@@ -258,262 +308,321 @@
     },
     "outputs": [
       {
-        "build": {
-          "entry_points": [
-            "jupyterhub = jupyterhub.app:main",
-            "jupyterhub-singleuser = jupyterhub.singleuser:main"
-          ],
-          "noarch": "python",
-          "script": "python -m pip install . --no-deps -vv"
-        },
+        "build": null,
         "name": "jupyterhub-base",
         "requirements": {
+          "build": [],
           "host": [
-            "python >=3.8",
+            "pip",
+            "python 3.9.*",
             "setuptools",
-            "pip"
+            "setuptools-scm"
           ],
           "run": [
             "__unix",
             "alembic >=1.4",
             "async_generator >=1.9",
             "certipy >=0.1.2",
+            "idna",
             "importlib-metadata >=3.6",
             "jinja2 >=2.11.0",
             "jupyter_events",
             "oauthlib >=3.0",
             "packaging",
-            "pamela",
             "prometheus_client >=0.5.0",
             "pydantic >=2",
-            "python >=3.8",
+            "python >=3.9",
             "python-dateutil",
             "requests",
             "sqlalchemy >=1.4.1",
             "tornado >=5.1",
-            "traitlets >=4.3.2"
-          ],
-          "run_constrained": [
-            "psutil >=5.6.5"
+            "traitlets >=4.3.2",
+            "pamela"
           ]
         },
-        "test": {
-          "commands": [
-            "pip check",
-            "jupyterhub --help-all",
-            "test -f $PREFIX/share/jupyterhub/templates/page.html",
-            "test -f $PREFIX/share/jupyterhub/static/components/jquery/dist/jquery.min.js",
-            "test -f $PREFIX/share/jupyterhub/static/css/style.min.css",
-            "test -f $PREFIX/share/jupyterhub/static/js/home.js"
-          ],
-          "imports": [
-            "jupyterhub",
-            "jupyterhub.apihandlers",
-            "jupyterhub.handlers",
-            "jupyterhub.tests",
-            "jupyterhub.app"
-          ],
-          "requires": [
-            "pip"
-          ]
-        }
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "jupyterhub",
+                "jupyterhub.apihandlers",
+                "jupyterhub.handlers",
+                "jupyterhub.app"
+              ],
+              "python_version": [
+                "3.9.*",
+                "3.13.*"
+              ]
+            }
+          },
+          {
+            "requirements": {
+              "run": [
+                "pip",
+                "python 3.9.*"
+              ]
+            },
+            "script": [
+              "python -m pip list --format=freeze",
+              "python -m pip list --format=freeze | python -c \"import sys; assert 'jupyterhub==${{ version }}' in sys.stdin.read()\"",
+              "jupyterhub --version",
+              "jupyterhub --version | python -c \"import sys; assert sys.stdin.read().strip() == '${{ version }}'\"",
+              "jupyterhub --help-all",
+              "test -f $PREFIX/share/jupyterhub/templates/page.html",
+              "test -f $PREFIX/share/jupyterhub/static/components/jquery/dist/jquery.min.js",
+              "test -f $PREFIX/share/jupyterhub/static/css/style.min.css",
+              "test -f $PREFIX/share/jupyterhub/static/js/home.js"
+            ]
+          }
+        ]
       },
       {
-        "build": {
-          "noarch": "python"
-        },
-        "name": "jupyterhub-singleuser",
-        "requirements": {
-          "host": [
-            "python >=3.8"
-          ],
-          "run": [
-            "__unix",
-            "jupyterhub-base",
-            "jupyterlab >=3.1",
-            "python >=3.8"
-          ]
-        },
-        "test": {
-          "commands": [
-            "pip check",
-            "jupyterhub-singleuser --help-all"
-          ],
-          "imports": [
-            "jupyterhub.singleuser"
-          ],
-          "requires": [
-            "pip"
-          ]
-        }
-      },
-      {
-        "build": {
-          "noarch": "python"
-        },
+        "build": null,
         "name": "jupyterhub",
         "requirements": {
-          "host": [
-            "python >=3.8"
-          ],
+          "build": [],
+          "host": [],
           "run": [
             "__unix",
             "jupyterhub-base",
             "configurable-http-proxy >=4",
             "nodejs >=12",
             "psutil",
-            "pycurl",
-            "python >=3.8"
+            "pycurl"
           ]
         },
-        "test": {
-          "commands": [
-            "pip check",
-            "jupyterhub --help-all",
-            "configurable-http-proxy --help"
-          ],
-          "imports": [
-            "jupyterhub"
-          ],
-          "requires": [
-            "pip"
-          ]
-        }
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "jupyterhub"
+              ],
+              "python_version": [
+                "3.9.*",
+                "3.13.*"
+              ]
+            }
+          },
+          {
+            "script": [
+              "jupyterhub --help-all",
+              "configurable-http-proxy --help"
+            ]
+          }
+        ]
       },
       {
-        "build": {
-          "entry_points": [
-            "jupyterhub = jupyterhub.app:main",
-            "jupyterhub-singleuser = jupyterhub.singleuser:main"
-          ],
-          "noarch": "python",
-          "script": "python -m pip install . --no-deps -vv"
+        "build": null,
+        "name": "jupyterhub-singleuser",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "__unix",
+            "jupyterhub-base",
+            "jupyterlab >=3.1"
+          ]
         },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "jupyterhub.singleuser"
+              ],
+              "python_version": [
+                "3.9.*",
+                "3.13.*"
+              ]
+            }
+          },
+          {
+            "requirements": {
+              "run": [
+                "python 3.9.*"
+              ]
+            },
+            "script": "jupyterhub-singleuser --help-all"
+          }
+        ]
+      },
+      {
+        "build": null,
         "name": "jupyterhub-base",
         "requirements": {
+          "build": [],
           "host": [
-            "python >=3.8",
+            "pip",
+            "python 3.9.*",
             "setuptools",
-            "pip"
+            "setuptools-scm"
           ],
           "run": [
             "__win",
             "alembic >=1.4",
             "async_generator >=1.9",
             "certipy >=0.1.2",
+            "idna",
             "importlib-metadata >=3.6",
             "jinja2 >=2.11.0",
             "jupyter_events",
             "oauthlib >=3.0",
             "packaging",
-            "psutil",
             "prometheus_client >=0.5.0",
             "pydantic >=2",
-            "python >=3.8",
+            "python >=3.9",
             "python-dateutil",
             "requests",
             "sqlalchemy >=1.4.1",
             "tornado >=5.1",
-            "traitlets >=4.3.2"
-          ],
-          "run_constrained": [
-            "psutil >=5.6.5"
+            "traitlets >=4.3.2",
+            "psutil"
           ]
         },
-        "test": {
-          "commands": [
-            "pip check",
-            "jupyterhub --help-all",
-            "dir %PREFIX%\\share\\jupyterhub\\templates\\page.html || exit 1",
-            "dir %PREFIX%\\share\\jupyterhub\\static\\components\\jquery\\dist\\jquery.min.js || exit 1",
-            "dir %PREFIX%\\share\\jupyterhub\\static\\css\\style.min.css || exit 1",
-            "dir %PREFIX%\\share\\jupyterhub\\static\\js\\home.js || exit 1"
-          ],
-          "imports": [
-            "jupyterhub",
-            "jupyterhub.apihandlers",
-            "jupyterhub.handlers",
-            "jupyterhub.tests",
-            "jupyterhub.app"
-          ],
-          "requires": [
-            "pip"
-          ]
-        }
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "jupyterhub",
+                "jupyterhub.apihandlers",
+                "jupyterhub.handlers",
+                "jupyterhub.app"
+              ],
+              "python_version": [
+                "3.9.*",
+                "3.13.*"
+              ]
+            }
+          },
+          {
+            "requirements": {
+              "run": [
+                "pip",
+                "python 3.9.*"
+              ]
+            },
+            "script": [
+              "python -m pip list --format=freeze",
+              "python -m pip list --format=freeze | python -c \"import sys; assert 'jupyterhub==${{ version }}' in sys.stdin.read()\"",
+              "jupyterhub --version",
+              "jupyterhub --version | python -c \"import sys; assert sys.stdin.read().strip() == '${{ version }}'\"",
+              "jupyterhub --help-all",
+              "dir %PREFIX%\\share\\jupyterhub\\templates\\page.html                         || exit 1",
+              "dir %PREFIX%\\share\\jupyterhub\\static\\components\\jquery\\dist\\jquery.min.js || exit 1",
+              "dir %PREFIX%\\share\\jupyterhub\\static\\css\\style.min.css                    || exit 1",
+              "dir %PREFIX%\\share\\jupyterhub\\static\\js\\home.js                           || exit 1"
+            ]
+          }
+        ]
       },
       {
-        "build": {
-          "noarch": "python"
-        },
-        "name": "jupyterhub-singleuser",
-        "requirements": {
-          "host": [
-            "python >=3.8"
-          ],
-          "run": [
-            "__win",
-            "jupyterhub-base",
-            "jupyterlab >=3.1",
-            "python >=3.8"
-          ]
-        },
-        "test": {
-          "commands": [
-            "pip check",
-            "jupyterhub-singleuser --help-all"
-          ],
-          "imports": [
-            "jupyterhub.singleuser"
-          ],
-          "requires": [
-            "pip"
-          ]
-        }
-      },
-      {
-        "build": {
-          "noarch": "python"
-        },
+        "build": null,
         "name": "jupyterhub",
         "requirements": {
-          "host": [
-            "python >=3.8"
-          ],
+          "build": [],
+          "host": [],
           "run": [
             "__win",
             "jupyterhub-base",
             "configurable-http-proxy >=4",
             "nodejs >=12",
             "psutil",
-            "pycurl",
-            "python >=3.8"
+            "pycurl"
           ]
         },
-        "test": {
-          "commands": [
-            "pip check",
-            "jupyterhub --help-all"
-          ],
-          "imports": [
-            "jupyterhub"
-          ],
-          "requires": [
-            "pip"
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "jupyterhub"
+              ],
+              "python_version": [
+                "3.9.*",
+                "3.13.*"
+              ]
+            }
+          },
+          {
+            "script": "jupyterhub --help-all"
+          }
+        ]
+      },
+      {
+        "build": null,
+        "name": "jupyterhub-singleuser",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "__win",
+            "jupyterhub-base",
+            "jupyterlab >=3.1"
           ]
-        }
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "jupyterhub.singleuser"
+              ],
+              "python_version": [
+                "3.9.*",
+                "3.13.*"
+              ]
+            }
+          },
+          {
+            "requirements": {
+              "run": [
+                "python 3.9.*"
+              ]
+            },
+            "script": "jupyterhub-singleuser --help-all"
+          }
+        ]
       }
     ],
     "package": {
-      "name": "jupyterhub-feedstock",
-      "version": "5.2.1"
+      "name": "jupyterhub-base",
+      "version": "5.3.0"
     },
-    "schema_version": 0,
+    "requirements": {
+      "host": [
+        "pip",
+        "python 3.9.*",
+        "setuptools",
+        "setuptools-scm"
+      ],
+      "run": [
+        "__unix",
+        "alembic >=1.4",
+        "async_generator >=1.9",
+        "certipy >=0.1.2",
+        "idna",
+        "importlib-metadata >=3.6",
+        "jinja2 >=2.11.0",
+        "jupyter_events",
+        "oauthlib >=3.0",
+        "packaging",
+        "prometheus_client >=0.5.0",
+        "pydantic >=2",
+        "python >=3.9",
+        "python-dateutil",
+        "requests",
+        "sqlalchemy >=1.4.1",
+        "tornado >=5.1",
+        "traitlets >=4.3.2",
+        "pamela",
+        "__win",
+        "psutil"
+      ]
+    },
+    "schema_version": 1,
     "source": {
-      "sha256": "5b35444c2c254e60563887d1d59c2376813d16a166ec6e0a410c773cdbd37ebd",
-      "url": "https://pypi.io/packages/source/j/jupyterhub/jupyterhub-5.2.1.tar.gz"
+      "sha256": "57834b36e7db8f26f21d9aeba1e1d5b8c91b9ff14a7c144097178977aa1e723f",
+      "url": "https://pypi.org/packages/source/j/jupyterhub/jupyterhub-5.3.0.tar.gz"
     }
   },
-  "name": "jupyterhub-feedstock",
+  "name": "jupyterhub-base",
   "outputs_names": {
     "__set__": true,
     "elements": [
@@ -530,7 +639,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/jupyterhub.json"
   },
-  "raw_meta_yaml": "{% set version = \"5.2.1\" %}\n\npackage:\n  name: jupyterhub-feedstock\n  version: {{ version }}\n\nsource:\n  url: https://pypi.io/packages/source/j/jupyterhub/jupyterhub-{{ version }}.tar.gz\n  sha256: 5b35444c2c254e60563887d1d59c2376813d16a166ec6e0a410c773cdbd37ebd\n\nbuild:\n  number: 0\n  noarch: python\n\noutputs:\n  - name: jupyterhub-base\n    build:\n      noarch: python\n      script: python -m pip install . --no-deps -vv\n      entry_points:\n        - jupyterhub = jupyterhub.app:main\n        - jupyterhub-singleuser = jupyterhub.singleuser:main\n    requirements:\n      host:\n        - python >=3.8\n        - setuptools\n        - pip\n      run:\n        - __{{ noarch_platform }}\n        - alembic >=1.4\n        - async_generator >=1.9  # not actually required for Python >=3.10\n        - certipy >=0.1.2\n        - importlib-metadata >=3.6  # not actually required for Python >=3.10\n        - jinja2 >=2.11.0\n        - jupyter_events\n        - oauthlib >=3.0\n        - packaging\n        {% if noarch_platform == \"unix\" %}\n        - pamela\n        {% else %}\n        - psutil\n        {% endif %}\n        - prometheus_client >=0.5.0\n        - pydantic >=2\n        - python >=3.8\n        - python-dateutil\n        - requests\n        - sqlalchemy >=1.4.1\n        - tornado >=5.1\n        - traitlets >=4.3.2\n      run_constrained:\n        - psutil >=5.6.5\n\n    test:\n      requires:\n        - pip\n      imports:\n        - jupyterhub\n        - jupyterhub.apihandlers\n        - jupyterhub.handlers\n        - jupyterhub.tests\n        - jupyterhub.app\n      commands:\n        - pip check\n        - jupyterhub --help-all\n        {% if noarch_platform == \"unix\" %}\n        - test -f $PREFIX/share/jupyterhub/templates/page.html\n        - test -f $PREFIX/share/jupyterhub/static/components/jquery/dist/jquery.min.js\n        - test -f $PREFIX/share/jupyterhub/static/css/style.min.css\n        - test -f $PREFIX/share/jupyterhub/static/js/home.js\n        {% else %}\n        - dir %PREFIX%\\share\\jupyterhub\\templates\\page.html || exit 1\n        - dir %PREFIX%\\share\\jupyterhub\\static\\components\\jquery\\dist\\jquery.min.js || exit 1\n        - dir %PREFIX%\\share\\jupyterhub\\static\\css\\style.min.css || exit 1\n        - dir %PREFIX%\\share\\jupyterhub\\static\\js\\home.js || exit 1\n        {% endif %}\n\n  - name: jupyterhub-singleuser\n    build:\n      noarch: python\n    requirements:\n      host:\n        - python >=3.8\n      run:\n        - __{{ noarch_platform }}\n        - {{ pin_subpackage(\"jupyterhub-base\", exact=True) }}\n        - jupyterlab >=3.1\n        - python >=3.8\n    test:\n      requires:\n        - pip\n      imports:\n        - jupyterhub.singleuser\n      commands:\n        - pip check\n        - jupyterhub-singleuser --help-all\n\n  - name: jupyterhub\n    build:\n      noarch: python\n    requirements:\n      host:\n        - python >=3.8\n      run:\n        - __{{ noarch_platform }}\n        - {{ pin_subpackage(\"jupyterhub-base\", exact=True) }}\n        - configurable-http-proxy >=4\n        - nodejs >=12\n        - psutil  # undeclared extra, used preferentially for logging\n        - pycurl  # undeclared extra, used preferentially for performance\n        - python >=3.8\n    test:\n      requires:\n        - pip\n      imports:\n        - jupyterhub\n      commands:\n        - pip check\n        - jupyterhub --help-all\n        - configurable-http-proxy --help  # [not win]\n\nabout:\n  home: https://github.com/jupyterhub/jupyterhub\n  license: BSD-3-Clause\n  license_file: COPYING.md\n  summary: Multi-user server for Jupyter notebooks\n  doc_url: https://jupyterhub.readthedocs.io\n\nextra:\n  feedstock-name: jupyterhub\n  recipe-maintainers:\n    - minrk\n    - blink1073\n    - consideRatio\n    - manics\n    - bollwyvl\n",
+  "raw_meta_yaml": "# yaml-language-server: $schema=https://raw.githubusercontent.com/prefix-dev/recipe-format/main/schema.json\nschema_version: 1\n\ncontext:\n  version: 5.3.0\n  python_check_max: 3.13\n\nrecipe:\n  name: jupyterhub\n  version: ${{ version }}\n\nsource:\n  url: https://pypi.org/packages/source/j/jupyterhub/jupyterhub-${{ version }}.tar.gz\n  sha256: 57834b36e7db8f26f21d9aeba1e1d5b8c91b9ff14a7c144097178977aa1e723f\n\nbuild:\n  number: 0\n  noarch: python\n\noutputs:\n  - package:\n      name: jupyterhub-base\n      version: ${{ version }}\n    build:\n      noarch: python\n      script:\n        - python -m pip install . --no-deps -vv --no-build-isolation --disable-pip-version-check\n      python:\n        entry_points:\n          - jupyterhub = jupyterhub.app:main\n          - jupyterhub-singleuser = jupyterhub.singleuser:main\n    requirements:\n      host:\n        - pip\n        - python ${{ python_min }}.*\n        - setuptools\n        - setuptools-scm\n      run:\n        - __${{ noarch_platform }}\n        - alembic >=1.4\n        - async_generator >=1.9 # not actually required for Python >=3.10\n        - certipy >=0.1.2\n        - idna\n        - importlib-metadata >=3.6 # not actually required for Python >=3.10\n        - jinja2 >=2.11.0\n        - jupyter_events\n        - oauthlib >=3.0\n        - packaging\n        - prometheus_client >=0.5.0\n        - pydantic >=2\n        - python >=${{ python_min }}\n        - python-dateutil\n        - requests\n        - sqlalchemy >=1.4.1\n        - tornado >=5.1\n        - traitlets >=4.3.2\n        - if: noarch_platform == \"unix\"\n          then:\n            - pamela\n          else:\n            - psutil\n      run_constraints:\n        - psutil >=5.6.5\n        - pamela >=1.1.0\n    tests:\n      - python:\n          pip_check: true\n          python_version:\n            - ${{ python_min }}.*\n            - ${{ python_check_max }}.*\n          imports:\n            - jupyterhub\n            - jupyterhub.apihandlers\n            - jupyterhub.handlers\n            - jupyterhub.app\n      - requirements:\n          run:\n            - pip\n            - python ${{ python_min }}.*\n        script:\n          - python -m pip list --format=freeze\n          - python -m pip list --format=freeze | python -c \"import sys; assert 'jupyterhub==${{ version }}' in sys.stdin.read()\"\n          - jupyterhub --version\n          - jupyterhub --version | python -c \"import sys; assert sys.stdin.read().strip() == '${{ version }}'\"\n          - jupyterhub --help-all\n          - if: noarch_platform == \"unix\"\n            then:\n              - test -f $PREFIX/share/jupyterhub/templates/page.html\n              - test -f $PREFIX/share/jupyterhub/static/components/jquery/dist/jquery.min.js\n              - test -f $PREFIX/share/jupyterhub/static/css/style.min.css\n              - test -f $PREFIX/share/jupyterhub/static/js/home.js\n            else:\n              - dir %PREFIX%\\share\\jupyterhub\\templates\\page.html                         || exit 1\n              - dir %PREFIX%\\share\\jupyterhub\\static\\components\\jquery\\dist\\jquery.min.js || exit 1\n              - dir %PREFIX%\\share\\jupyterhub\\static\\css\\style.min.css                    || exit 1\n              - dir %PREFIX%\\share\\jupyterhub\\static\\js\\home.js                           || exit 1\n\n  - package:\n      name: jupyterhub-singleuser\n      version: ${{ version }}\n    build:\n      noarch: generic\n    requirements:\n      run:\n        - __${{ noarch_platform }}\n        - ${{ pin_subpackage(\"jupyterhub-base\", exact=True) }}\n        - jupyterlab >=3.1\n    tests:\n      - python:\n          imports: jupyterhub.singleuser\n          pip_check: true\n          python_version:\n            - ${{ python_min }}.*\n            - ${{ python_check_max }}.*\n      - requirements:\n          run:\n            - python ${{ python_min }}.*\n        script:\n          - jupyterhub-singleuser --help-all\n\n  - package:\n      name: jupyterhub\n      version: ${{ version }}\n    build:\n      noarch: generic\n    requirements:\n      run:\n        - __${{ noarch_platform }}\n        - ${{ pin_subpackage(\"jupyterhub-base\", exact=True) }}\n        - configurable-http-proxy >=4\n        - nodejs >=12\n        - psutil # undeclared extra, used preferentially for logging\n        - pycurl # undeclared extra, used preferentially for performance\n    tests:\n      - python:\n          imports: jupyterhub\n          pip_check: true\n          python_version:\n            - ${{ python_min }}.*\n            - ${{ python_check_max }}.*\n      - script:\n          - jupyterhub --help-all\n          - if: noarch_platform == \"unix\"\n            then:\n              - configurable-http-proxy --help\n\nabout:\n  homepage: https://hub.jupyter.org\n  license: BSD-3-Clause\n  license_file:\n    - LICENSE\n    - share/jupyterhub/static/components/@fortawesome/fontawesome-free/LICENSE.txt\n    - share/jupyterhub/static/components/bootstrap/LICENSE\n    - share/jupyterhub/static/components/jquery/LICENSE.txt\n    - share/jupyterhub/static/components/moment/LICENSE\n    - share/jupyterhub/static/js/admin-react.js.LICENSE.txt\n  summary: A multi-user server for Jupyter notebooks\n  repository: https://github.com/jupyterhub/jupyterhub\n  documentation: https://jupyterhub.readthedocs.io\n\nextra:\n  feedstock-name: jupyterhub\n  recipe-maintainers:\n    - minrk\n    - blink1073\n    - consideRatio\n    - manics\n    - bollwyvl\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -540,6 +649,7 @@
       "async_generator",
       "certipy",
       "configurable-http-proxy",
+      "idna",
       "importlib-metadata",
       "jinja2",
       "jupyter_events",
@@ -558,6 +668,7 @@
       "python-dateutil",
       "requests",
       "setuptools",
+      "setuptools-scm",
       "sqlalchemy",
       "tornado",
       "traitlets"
@@ -573,7 +684,8 @@
       "elements": [
         "pip",
         "python",
-        "setuptools"
+        "setuptools",
+        "setuptools-scm"
       ]
     },
     "run": {
@@ -585,6 +697,7 @@
         "async_generator",
         "certipy",
         "configurable-http-proxy",
+        "idna",
         "importlib-metadata",
         "jinja2",
         "jupyter_events",
@@ -609,7 +722,8 @@
     "test": {
       "__set__": true,
       "elements": [
-        "pip"
+        "pip",
+        "python"
       ]
     }
   },
@@ -623,8 +737,9 @@
       "__set__": true,
       "elements": [
         "pip",
-        "python >=3.8",
-        "setuptools"
+        "python 3.9.*",
+        "setuptools",
+        "setuptools-scm"
       ]
     },
     "run": {
@@ -636,6 +751,7 @@
         "async_generator >=1.9",
         "certipy >=0.1.2",
         "configurable-http-proxy >=4",
+        "idna",
         "importlib-metadata >=3.6",
         "jinja2 >=2.11.0",
         "jupyter_events",
@@ -649,7 +765,7 @@
         "psutil",
         "pycurl",
         "pydantic >=2",
-        "python >=3.8",
+        "python >=3.9",
         "python-dateutil",
         "requests",
         "sqlalchemy >=1.4.1",
@@ -660,26 +776,30 @@
     "test": {
       "__set__": true,
       "elements": [
-        "pip"
+        "pip",
+        "python 3.9.*"
       ]
     }
   },
-  "url": "https://pypi.io/packages/source/j/jupyterhub/jupyterhub-5.2.1.tar.gz",
-  "version": "5.2.1",
+  "url": "https://pypi.org/packages/source/j/jupyterhub/jupyterhub-5.3.0.tar.gz",
+  "version": "5.3.0",
   "version_pr_info": {
     "__lazy_json__": "version_pr_info/jupyterhub.json"
   },
   "win_64_meta_yaml": {
     "about": {
-      "doc_url": "https://jupyterhub.readthedocs.io",
-      "home": "https://github.com/jupyterhub/jupyterhub",
+      "dev_url": "https://github.com/jupyterhub/jupyterhub",
+      "doc_url": "https://jupyterhub.readthedocs.io/",
+      "home": "https://hub.jupyter.org/",
       "license": "BSD-3-Clause",
-      "license_file": "COPYING.md",
-      "summary": "Multi-user server for Jupyter notebooks"
+      "license_family": "BSD-3-Clause",
+      "license_file": "LICENSE",
+      "summary": "A multi-user server for Jupyter notebooks"
     },
     "build": {
       "noarch": "python",
-      "number": "0"
+      "number": "0",
+      "script": "python -m pip install . --no-deps -vv --no-build-isolation --disable-pip-version-check"
     },
     "extra": {
       "feedstock-name": "jupyterhub",
@@ -693,136 +813,178 @@
     },
     "outputs": [
       {
-        "build": {
-          "entry_points": [
-            "jupyterhub = jupyterhub.app:main",
-            "jupyterhub-singleuser = jupyterhub.singleuser:main"
-          ],
-          "noarch": "python",
-          "script": "python -m pip install . --no-deps -vv"
-        },
+        "build": null,
         "name": "jupyterhub-base",
         "requirements": {
+          "build": [],
           "host": [
-            "python >=3.8",
+            "pip",
+            "python 3.9.*",
             "setuptools",
-            "pip"
+            "setuptools-scm"
           ],
           "run": [
             "__win",
             "alembic >=1.4",
             "async_generator >=1.9",
             "certipy >=0.1.2",
+            "idna",
             "importlib-metadata >=3.6",
             "jinja2 >=2.11.0",
             "jupyter_events",
             "oauthlib >=3.0",
             "packaging",
-            "psutil",
             "prometheus_client >=0.5.0",
             "pydantic >=2",
-            "python >=3.8",
+            "python >=3.9",
             "python-dateutil",
             "requests",
             "sqlalchemy >=1.4.1",
             "tornado >=5.1",
-            "traitlets >=4.3.2"
-          ],
-          "run_constrained": [
-            "psutil >=5.6.5"
+            "traitlets >=4.3.2",
+            "psutil"
           ]
         },
-        "test": {
-          "commands": [
-            "pip check",
-            "jupyterhub --help-all",
-            "dir %PREFIX%\\share\\jupyterhub\\templates\\page.html || exit 1",
-            "dir %PREFIX%\\share\\jupyterhub\\static\\components\\jquery\\dist\\jquery.min.js || exit 1",
-            "dir %PREFIX%\\share\\jupyterhub\\static\\css\\style.min.css || exit 1",
-            "dir %PREFIX%\\share\\jupyterhub\\static\\js\\home.js || exit 1"
-          ],
-          "imports": [
-            "jupyterhub",
-            "jupyterhub.apihandlers",
-            "jupyterhub.handlers",
-            "jupyterhub.tests",
-            "jupyterhub.app"
-          ],
-          "requires": [
-            "pip"
-          ]
-        }
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "jupyterhub",
+                "jupyterhub.apihandlers",
+                "jupyterhub.handlers",
+                "jupyterhub.app"
+              ],
+              "python_version": [
+                "3.9.*",
+                "3.13.*"
+              ]
+            }
+          },
+          {
+            "requirements": {
+              "run": [
+                "pip",
+                "python 3.9.*"
+              ]
+            },
+            "script": [
+              "python -m pip list --format=freeze",
+              "python -m pip list --format=freeze | python -c \"import sys; assert 'jupyterhub==${{ version }}' in sys.stdin.read()\"",
+              "jupyterhub --version",
+              "jupyterhub --version | python -c \"import sys; assert sys.stdin.read().strip() == '${{ version }}'\"",
+              "jupyterhub --help-all",
+              "dir %PREFIX%\\share\\jupyterhub\\templates\\page.html                         || exit 1",
+              "dir %PREFIX%\\share\\jupyterhub\\static\\components\\jquery\\dist\\jquery.min.js || exit 1",
+              "dir %PREFIX%\\share\\jupyterhub\\static\\css\\style.min.css                    || exit 1",
+              "dir %PREFIX%\\share\\jupyterhub\\static\\js\\home.js                           || exit 1"
+            ]
+          }
+        ]
       },
       {
-        "build": {
-          "noarch": "python"
-        },
-        "name": "jupyterhub-singleuser",
-        "requirements": {
-          "host": [
-            "python >=3.8"
-          ],
-          "run": [
-            "__win",
-            "jupyterhub-base",
-            "jupyterlab >=3.1",
-            "python >=3.8"
-          ]
-        },
-        "test": {
-          "commands": [
-            "pip check",
-            "jupyterhub-singleuser --help-all"
-          ],
-          "imports": [
-            "jupyterhub.singleuser"
-          ],
-          "requires": [
-            "pip"
-          ]
-        }
-      },
-      {
-        "build": {
-          "noarch": "python"
-        },
+        "build": null,
         "name": "jupyterhub",
         "requirements": {
-          "host": [
-            "python >=3.8"
-          ],
+          "build": [],
+          "host": [],
           "run": [
             "__win",
             "jupyterhub-base",
             "configurable-http-proxy >=4",
             "nodejs >=12",
             "psutil",
-            "pycurl",
-            "python >=3.8"
+            "pycurl"
           ]
         },
-        "test": {
-          "commands": [
-            "pip check",
-            "jupyterhub --help-all"
-          ],
-          "imports": [
-            "jupyterhub"
-          ],
-          "requires": [
-            "pip"
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "jupyterhub"
+              ],
+              "python_version": [
+                "3.9.*",
+                "3.13.*"
+              ]
+            }
+          },
+          {
+            "script": "jupyterhub --help-all"
+          }
+        ]
+      },
+      {
+        "build": null,
+        "name": "jupyterhub-singleuser",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "__win",
+            "jupyterhub-base",
+            "jupyterlab >=3.1"
           ]
-        }
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "jupyterhub.singleuser"
+              ],
+              "python_version": [
+                "3.9.*",
+                "3.13.*"
+              ]
+            }
+          },
+          {
+            "requirements": {
+              "run": [
+                "python 3.9.*"
+              ]
+            },
+            "script": "jupyterhub-singleuser --help-all"
+          }
+        ]
       }
     ],
     "package": {
-      "name": "jupyterhub-feedstock",
-      "version": "5.2.1"
+      "name": "jupyterhub-base",
+      "version": "5.3.0"
     },
-    "schema_version": 0,
+    "requirements": {
+      "host": [
+        "pip",
+        "python 3.9.*",
+        "setuptools",
+        "setuptools-scm"
+      ],
+      "run": [
+        "__win",
+        "alembic >=1.4",
+        "async_generator >=1.9",
+        "certipy >=0.1.2",
+        "idna",
+        "importlib-metadata >=3.6",
+        "jinja2 >=2.11.0",
+        "jupyter_events",
+        "oauthlib >=3.0",
+        "packaging",
+        "prometheus_client >=0.5.0",
+        "pydantic >=2",
+        "python >=3.9",
+        "python-dateutil",
+        "requests",
+        "sqlalchemy >=1.4.1",
+        "tornado >=5.1",
+        "traitlets >=4.3.2",
+        "psutil"
+      ]
+    },
+    "schema_version": 1,
     "source": {
-      "sha256": "5b35444c2c254e60563887d1d59c2376813d16a166ec6e0a410c773cdbd37ebd",
-      "url": "https://pypi.io/packages/source/j/jupyterhub/jupyterhub-5.2.1.tar.gz"
+      "sha256": "57834b36e7db8f26f21d9aeba1e1d5b8c91b9ff14a7c144097178977aa1e723f",
+      "url": "https://pypi.org/packages/source/j/jupyterhub/jupyterhub-5.3.0.tar.gz"
     }
   },
   "win_64_requirements": {
@@ -835,7 +997,8 @@
       "elements": [
         "pip",
         "python",
-        "setuptools"
+        "setuptools",
+        "setuptools-scm"
       ]
     },
     "run": {
@@ -846,6 +1009,7 @@
         "async_generator",
         "certipy",
         "configurable-http-proxy",
+        "idna",
         "importlib-metadata",
         "jinja2",
         "jupyter_events",
@@ -869,7 +1033,8 @@
     "test": {
       "__set__": true,
       "elements": [
-        "pip"
+        "pip",
+        "python"
       ]
     }
   }
