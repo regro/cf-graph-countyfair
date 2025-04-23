@@ -13,7 +13,8 @@
     "build_platform": {
       "linux_aarch64": "linux_64",
       "linux_ppc64le": "linux_64",
-      "osx_arm64": "osx_64"
+      "osx_arm64": "osx_64",
+      "win_arm64": "win_64"
     },
     "conda_build": {
       "pkg_format": "2"
@@ -739,6 +740,60 @@
             "if not exist %LIBRARY_LIB%\\libssl_static.lib exit 1"
           ]
         }
+      },
+      {
+        "build": {
+          "run_exports": [
+            "openssl"
+          ]
+        },
+        "name": "openssl",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "make",
+            "perl *"
+          ],
+          "host": [],
+          "run": [
+            "ca-certificates"
+          ]
+        },
+        "script": "install_openssl.bat",
+        "test": {
+          "commands": [
+            "copy NUL checksum.txt",
+            "%LIBRARY_BIN%\\openssl sha256 checksum.txt",
+            "if not exist \"%SSL_CERT_FILE%\" exit 1",
+            "pkg-config --print-errors --exact-version \"3.5.0\" openssl",
+            "type %CONDA_PREFIX%\\etc\\conda\\activate.d\\openssl_activate-win.sh | rg \\r & if ERRORLEVEL ==1 (exit 0) else (exit 1)",
+            "type %CONDA_PREFIX%\\etc\\conda\\deactivate.d\\openssl_deactivate-win.sh | rg \\r & if ERRORLEVEL ==1 (exit 0) else (exit 1)"
+          ],
+          "requires": [
+            "pkg-config",
+            "ripgrep"
+          ]
+        }
+      },
+      {
+        "name": "libopenssl-static",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "run": [
+            "openssl"
+          ]
+        },
+        "script": "install_libopenssl-static.bat",
+        "test": {
+          "commands": [
+            "if not exist %LIBRARY_LIB%\\libcrypto_static.lib exit 1",
+            "if not exist %LIBRARY_LIB%\\libssl_static.lib exit 1"
+          ]
+        }
       }
     ],
     "package": {
@@ -1026,7 +1081,8 @@
     "linux_ppc64le",
     "osx_64",
     "osx_arm64",
-    "win_64"
+    "win_64",
+    "win_arm64"
   ],
   "pr_info": {
     "__lazy_json__": "pr_info/openssl.json"
@@ -1214,6 +1270,134 @@
     }
   },
   "win_64_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "make",
+        "nasm",
+        "perl"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": []
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "ca-certificates",
+        "openssl"
+      ]
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "pkg-config",
+        "ripgrep"
+      ]
+    }
+  },
+  "win_arm64_meta_yaml": {
+    "about": {
+      "dev_url": "https://github.com/openssl/openssl",
+      "doc_url": "https://docs.openssl.org/master/",
+      "home": "https://www.openssl.org/",
+      "license": "Apache-2.0",
+      "license_family": "Apache",
+      "license_file": "LICENSE.txt",
+      "summary": "OpenSSL is an open-source implementation of the SSL and TLS protocols"
+    },
+    "build": {
+      "number": "0"
+    },
+    "extra": {
+      "feedstock-name": "openssl",
+      "recipe-maintainers": [
+        "jakirkham",
+        "msarahan",
+        "ocefpaf",
+        "pelson",
+        "h-vetinari"
+      ]
+    },
+    "outputs": [
+      {
+        "build": {
+          "run_exports": [
+            "openssl"
+          ]
+        },
+        "name": "openssl",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "make",
+            "perl *"
+          ],
+          "host": [],
+          "run": [
+            "ca-certificates"
+          ]
+        },
+        "script": "install_openssl.bat",
+        "test": {
+          "commands": [
+            "copy NUL checksum.txt",
+            "%LIBRARY_BIN%\\openssl sha256 checksum.txt",
+            "if not exist \"%SSL_CERT_FILE%\" exit 1",
+            "pkg-config --print-errors --exact-version \"3.5.0\" openssl",
+            "type %CONDA_PREFIX%\\etc\\conda\\activate.d\\openssl_activate-win.sh | rg \\r & if ERRORLEVEL ==1 (exit 0) else (exit 1)",
+            "type %CONDA_PREFIX%\\etc\\conda\\deactivate.d\\openssl_deactivate-win.sh | rg \\r & if ERRORLEVEL ==1 (exit 0) else (exit 1)"
+          ],
+          "requires": [
+            "pkg-config",
+            "ripgrep"
+          ]
+        }
+      },
+      {
+        "name": "libopenssl-static",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "run": [
+            "openssl"
+          ]
+        },
+        "script": "install_libopenssl-static.bat",
+        "test": {
+          "commands": [
+            "if not exist %LIBRARY_LIB%\\libcrypto_static.lib exit 1",
+            "if not exist %LIBRARY_LIB%\\libssl_static.lib exit 1"
+          ]
+        }
+      }
+    ],
+    "package": {
+      "name": "openssl_split",
+      "version": "3.5.0"
+    },
+    "requirements": {
+      "build": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "nasm",
+        "perl *"
+      ],
+      "host": []
+    },
+    "schema_version": 0,
+    "source": {
+      "sha256": "344d0a79f1a9b08029b0744e2cc401a43f9c90acd1044d09a530b4885a8e9fc0",
+      "url": "https://github.com/openssl/openssl/releases/download/openssl-3.5.0/openssl-3.5.0.tar.gz"
+    }
+  },
+  "win_arm64_requirements": {
     "build": {
       "__set__": true,
       "elements": [
