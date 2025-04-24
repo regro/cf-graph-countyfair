@@ -34,7 +34,7 @@
       "summary": "Library for solving packages and reading repositories"
     },
     "build": {
-      "number": "1",
+      "number": "2",
       "run_exports": [
         "libsolv"
       ]
@@ -205,7 +205,7 @@
       "summary": "Library for solving packages and reading repositories"
     },
     "build": {
-      "number": "1",
+      "number": "2",
       "run_exports": [
         "libsolv"
       ]
@@ -376,7 +376,7 @@
       "summary": "Library for solving packages and reading repositories"
     },
     "build": {
-      "number": "1",
+      "number": "2",
       "run_exports": [
         "libsolv"
       ]
@@ -547,7 +547,7 @@
       "summary": "Library for solving packages and reading repositories"
     },
     "build": {
-      "number": "1",
+      "number": "2",
       "run_exports": [
         "libsolv"
       ]
@@ -1170,7 +1170,7 @@
       "summary": "Library for solving packages and reading repositories"
     },
     "build": {
-      "number": "1",
+      "number": "2",
       "run_exports": [
         "libsolv"
       ]
@@ -1340,7 +1340,7 @@
       "summary": "Library for solving packages and reading repositories"
     },
     "build": {
-      "number": "1",
+      "number": "2",
       "run_exports": [
         "libsolv"
       ]
@@ -1519,7 +1519,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/libsolv.json"
   },
-  "raw_meta_yaml": "{% set name = \"libsolv\" %}\n{% set version = \"0.7.32\" %}\n{% set sha256 = \"8c5957fb417823768d70e0faefa6f75f497f41289641256e4fdfecd1954fa16c\" %}\n\n# For dispatching between Unix and Windows\n{% set install_prefix = \".\" %}  # [unix]\n{% set install_prefix = \"Library\" %}  # [win]\n{% set shlib_ext = \"so\" %}  # [linux]\n{% set shlib_ext = \"dylib\" %}  # [unix and not linux]\n{% set shlib_ext = \"dll\" %}  # [win]\n\npackage:\n  # Setting a dummy name, because multi-output behaviour with similar name has surprising behaviour\n  name: {{ name|lower }}-split\n  version: {{ version }}\n\nsource:\n  fn: {{ name }}-{{ version }}.tar.gz\n  url: https://github.com/openSUSE/libsolv/archive/{{ version }}.tar.gz\n  sha256: {{ sha256 }}\n  patches:\n    - win_export_and_static_build.patch  # [win]\n    - conda_variant_priorization.patch\n    - no_error_subdir_mismatch.patch\n    - add-missing-headers.patch  # For libsolv<=0.7.32\n\nbuild:\n  number: 1\n  run_exports:\n    - {{ pin_subpackage(name, max_pin='x.x') }}\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ stdlib(\"c\") }}\n    - {{ compiler('cxx') }}\n    - ninja\n    - cmake\n  host:\n    - zlib\n\noutputs:\n  - name: libsolv\n    script: build_libsolv.sh  # [unix]\n    script: build_libsolv.bat  # [win]\n    build:\n      run_exports:\n        - {{ pin_subpackage('libsolv', max_pin='x.x') }}\n    requirements:\n      build:\n        - {{ compiler('c') }}\n        - {{ stdlib(\"c\") }}\n        - {{ compiler('cxx') }}\n        - ninja\n        - cmake\n      host:\n        - zlib\n    test:\n      requires:\n        - {{ compiler('c') }}\n        - {{ compiler('cxx') }}\n        - ninja\n        - cmake\n      files:\n        - test/*\n      commands:\n        - test -f \"${PREFIX}/lib/libsolv${SHLIB_EXT}\"         # [unix]\n        - test -f \"${PREFIX}/lib/libsolvext${SHLIB_EXT}\"      # [unix]\n        - test -f \"${PREFIX}/lib/libsolv.so.1\"                # [linux]\n        - test -f \"${PREFIX}/include/solv/repo.h\"             # [unix]\n        - if not exist %LIBRARY_INC%\\solv\\repo.h (exit 1)     # [win]\n        - if not exist %LIBRARY_BIN%\\solv.dll (exit 1)        # [win]\n        - if not exist %LIBRARY_LIB%\\solv.lib (exit 1)        # [win]\n        - if not exist %LIBRARY_BIN%\\solvext.dll (exit 1)     # [win]\n        - if not exist %LIBRARY_LIB%\\solvext.lib (exit 1)     # [win]\n        - if exist %LIBRARY_LIB%\\solv_static.lib (exit 1)     # [win]\n        - if exist %LIBRARY_LIB%\\solvext_static.lib (exit 1)  # [win]\n        # Running the executables\n        - dumpsolv.exe -h  # [win]\n        - dumpsolv -h      # [unix]\n        # Running a test trying to link to the library\n        - cmake -G Ninja -S test/ -B build/ -D LIB_NAME=\"libsolv${SHLIB_EXT}\" ${CMAKE_ARGS}  # [unix]\n        - cmake -G Ninja -S test/ -B build/ -D LIB_NAME=\"solv\" %CMAKE_ARGS%                  # [win]\n        - cmake --build build/\n        - cmake --build build --target test\n\n  - name: libsolv-static\n    script: build_libsolv.sh  # [unix]\n    script: build_libsolv.bat  # [win]\n    requirements:\n      build:\n        - {{ compiler('c') }}\n        - {{ stdlib(\"c\") }}\n        - {{ compiler('cxx') }}\n        - ninja\n        - cmake\n      host:\n        - zlib\n        - {{ pin_subpackage(\"libsolv\", exact=True) }}\n      run:\n        - {{ pin_subpackage(\"libsolv\", exact=True) }}\n    test:\n      requires:\n        - {{ compiler('c') }}\n        - {{ compiler('cxx') }}\n        - ninja\n        - cmake\n      files:\n        - test/*\n      commands:\n        - test -f \"${PREFIX}/lib/libsolv.a\"     # [unix]\n        - test -f \"${PREFIX}/lib/libsolvext.a\"  # [unix]\n        - if not exist %LIBRARY_LIB%\\solv_static.lib (exit 1)     # [win]\n        - if not exist %LIBRARY_LIB%\\solvext_static.lib (exit 1)  # [win]\n        # Running a test trying to link to the library\n        - cmake -G Ninja -S test/ -B build/ -D LIB_NAME=\"libsolv.a\" ${CMAKE_ARGS}   # [unix]\n        - cmake -G Ninja -S test/ -B build/ -D LIB_NAME=\"solv_static\" %CMAKE_ARGS%  # [win]\n        - cmake --build build/\n        - cmake --build build --target test\n\nabout:\n  home: https://github.com/openSUSE/libsolv\n  license: BSD-3-Clause\n  license_family: BSD\n  license_file: LICENSE.BSD\n  summary: Library for solving packages and reading repositories\n  description: libsolv, a free package dependency solver using a satisfiability algorithm.\n  dev_url: https://github.com/openSUSE/libsolv\n\nextra:\n  recipe-maintainers:\n    - AntoinePrv\n    - pavelzw\n    - SylvainCorlay\n    - JohanMabille\n    - wolfv\n    - davidbrochart\n    - adriendelsalle\n",
+  "raw_meta_yaml": "{% set name = \"libsolv\" %}\n{% set version = \"0.7.32\" %}\n{% set sha256 = \"8c5957fb417823768d70e0faefa6f75f497f41289641256e4fdfecd1954fa16c\" %}\n\n# For dispatching between Unix and Windows\n{% set install_prefix = \".\" %}  # [unix]\n{% set install_prefix = \"Library\" %}  # [win]\n{% set shlib_ext = \"so\" %}  # [linux]\n{% set shlib_ext = \"dylib\" %}  # [unix and not linux]\n{% set shlib_ext = \"dll\" %}  # [win]\n\npackage:\n  # Setting a dummy name, because multi-output behaviour with similar name has surprising behaviour\n  name: {{ name|lower }}-split\n  version: {{ version }}\n\nsource:\n  fn: {{ name }}-{{ version }}.tar.gz\n  url: https://github.com/openSUSE/libsolv/archive/{{ version }}.tar.gz\n  sha256: {{ sha256 }}\n  patches:\n    - win_export_and_static_build.patch  # [win]\n    - conda_variant_priorization.patch\n    - no_error_subdir_mismatch.patch\n    - add-missing-headers.patch  # For libsolv<=0.7.32\n\nbuild:\n  number: 2\n  run_exports:\n    - {{ pin_subpackage(name, max_pin='x.x.x') }}\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ stdlib(\"c\") }}\n    - {{ compiler('cxx') }}\n    - ninja\n    - cmake\n  host:\n    - zlib\n\noutputs:\n  - name: libsolv\n    script: build_libsolv.sh  # [unix]\n    script: build_libsolv.bat  # [win]\n    build:\n      run_exports:\n        - {{ pin_subpackage('libsolv', max_pin='x.x') }}\n    requirements:\n      build:\n        - {{ compiler('c') }}\n        - {{ stdlib(\"c\") }}\n        - {{ compiler('cxx') }}\n        - ninja\n        - cmake\n      host:\n        - zlib\n    test:\n      requires:\n        - {{ compiler('c') }}\n        - {{ compiler('cxx') }}\n        - ninja\n        - cmake\n      files:\n        - test/*\n      commands:\n        - test -f \"${PREFIX}/lib/libsolv${SHLIB_EXT}\"         # [unix]\n        - test -f \"${PREFIX}/lib/libsolvext${SHLIB_EXT}\"      # [unix]\n        - test -f \"${PREFIX}/lib/libsolv.so.1\"                # [linux]\n        - test -f \"${PREFIX}/include/solv/repo.h\"             # [unix]\n        - if not exist %LIBRARY_INC%\\solv\\repo.h (exit 1)     # [win]\n        - if not exist %LIBRARY_BIN%\\solv.dll (exit 1)        # [win]\n        - if not exist %LIBRARY_LIB%\\solv.lib (exit 1)        # [win]\n        - if not exist %LIBRARY_BIN%\\solvext.dll (exit 1)     # [win]\n        - if not exist %LIBRARY_LIB%\\solvext.lib (exit 1)     # [win]\n        - if exist %LIBRARY_LIB%\\solv_static.lib (exit 1)     # [win]\n        - if exist %LIBRARY_LIB%\\solvext_static.lib (exit 1)  # [win]\n        # Running the executables\n        - dumpsolv.exe -h  # [win]\n        - dumpsolv -h      # [unix]\n        # Running a test trying to link to the library\n        - cmake -G Ninja -S test/ -B build/ -D LIB_NAME=\"libsolv${SHLIB_EXT}\" ${CMAKE_ARGS}  # [unix]\n        - cmake -G Ninja -S test/ -B build/ -D LIB_NAME=\"solv\" %CMAKE_ARGS%                  # [win]\n        - cmake --build build/\n        - cmake --build build --target test\n\n  - name: libsolv-static\n    script: build_libsolv.sh  # [unix]\n    script: build_libsolv.bat  # [win]\n    requirements:\n      build:\n        - {{ compiler('c') }}\n        - {{ stdlib(\"c\") }}\n        - {{ compiler('cxx') }}\n        - ninja\n        - cmake\n      host:\n        - zlib\n        - {{ pin_subpackage(\"libsolv\", exact=True) }}\n      run:\n        - {{ pin_subpackage(\"libsolv\", exact=True) }}\n    test:\n      requires:\n        - {{ compiler('c') }}\n        - {{ compiler('cxx') }}\n        - ninja\n        - cmake\n      files:\n        - test/*\n      commands:\n        - test -f \"${PREFIX}/lib/libsolv.a\"     # [unix]\n        - test -f \"${PREFIX}/lib/libsolvext.a\"  # [unix]\n        - if not exist %LIBRARY_LIB%\\solv_static.lib (exit 1)     # [win]\n        - if not exist %LIBRARY_LIB%\\solvext_static.lib (exit 1)  # [win]\n        # Running a test trying to link to the library\n        - cmake -G Ninja -S test/ -B build/ -D LIB_NAME=\"libsolv.a\" ${CMAKE_ARGS}   # [unix]\n        - cmake -G Ninja -S test/ -B build/ -D LIB_NAME=\"solv_static\" %CMAKE_ARGS%  # [win]\n        - cmake --build build/\n        - cmake --build build --target test\n\nabout:\n  home: https://github.com/openSUSE/libsolv\n  license: BSD-3-Clause\n  license_family: BSD\n  license_file: LICENSE.BSD\n  summary: Library for solving packages and reading repositories\n  description: libsolv, a free package dependency solver using a satisfiability algorithm.\n  dev_url: https://github.com/openSUSE/libsolv\n\nextra:\n  recipe-maintainers:\n    - AntoinePrv\n    - pavelzw\n    - SylvainCorlay\n    - JohanMabille\n    - wolfv\n    - davidbrochart\n    - adriendelsalle\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -1623,7 +1623,7 @@
       "summary": "Library for solving packages and reading repositories"
     },
     "build": {
-      "number": "1",
+      "number": "2",
       "run_exports": [
         "libsolv"
       ]
@@ -1798,7 +1798,7 @@
       "summary": "Library for solving packages and reading repositories"
     },
     "build": {
-      "number": "1",
+      "number": "2",
       "run_exports": [
         "libsolv"
       ]
