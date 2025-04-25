@@ -2,55 +2,79 @@
   "archived": false,
   "branch": "main",
   "conda-forge.yml": {
-    "build_platform": {
-      "osx_arm64": "osx_64"
-    },
     "conda_build": {
       "pkg_format": "2"
     },
+    "conda_build_tool": "rattler-build",
     "conda_forge_output_validation": true,
+    "conda_install_tool": "pixi",
     "github": {
       "branch_name": "main",
       "tooling_branch_name": "main"
     },
-    "provider": {
-      "linux_aarch64": "default",
-      "linux_ppc64le": "default"
-    },
+    "noarch_platforms": "win_64",
     "test": "native_and_emulated"
   },
   "feedstock_name": "vswhere",
   "hash_type": "sha256",
   "meta_yaml": {
     "about": {
-      "description": "vswhere is designed to be a redistributable, single-file executable that\ncan be used in build or deployment scripts to find where Visual Studio\n- or other products in the Visual Studio family - is located.\n",
+      "description": "vswhere is designed to be a redistributable, single-file executable that\ncan be used in build or deployment scripts to find where Visual Studio\n- or other products in the Visual Studio family - is located.",
+      "dev_url": "https://github.com/microsoft/vswhere",
       "home": "https://github.com/microsoft/vswhere",
       "license": "MIT",
+      "license_family": "MIT",
       "license_file": "LICENSE.txt",
       "summary": "CLI tool to locate Visual Studio 2017 and newer installations"
     },
     "build": {
-      "number": "0",
-      "script": "MOVE vswhere.exe %LIBRARY_BIN%\\vswhere.exe"
+      "noarch": "generic",
+      "number": "1"
     },
     "extra": {
       "recipe-maintainers": [
-        "wolfv"
+        "wolfv",
+        "baszalmstra"
       ]
     },
+    "outputs": [
+      {
+        "build": null,
+        "name": "vswhere",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "__win"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "Library/bin/vswhere.exe"
+              ]
+            }
+          },
+          {
+            "script": "vswhere"
+          }
+        ]
+      }
+    ],
     "package": {
       "name": "vswhere",
       "version": "3.1.7"
     },
-    "schema_version": 0,
+    "requirements": {
+      "run": [
+        "__win"
+      ]
+    },
+    "schema_version": 1,
     "source": {
       "sha256": "c54f3b7c9164ea9a0db8641e81ecdda80c2664ef5a47c4191406f848cc07c662",
       "url": "https://github.com/microsoft/vswhere/releases/download/3.1.7/vswhere.exe"
-    },
-    "test": {
-      "commands": [
-        "vswhere"
-      ]
     }
   },
   "name": "vswhere",
@@ -67,10 +91,12 @@
   "pr_info": {
     "__lazy_json__": "pr_info/vswhere.json"
   },
-  "raw_meta_yaml": "{% set version = \"3.1.7\" %}\n\npackage:\n  name: vswhere\n  version: {{ version }}\n\nsource:\n  url: https://github.com/microsoft/vswhere/releases/download/{{ version }}/vswhere.exe\n  sha256: c54f3b7c9164ea9a0db8641e81ecdda80c2664ef5a47c4191406f848cc07c662\n\nbuild:\n  number: 0\n  script: MOVE vswhere.exe %LIBRARY_BIN%\\vswhere.exe\n  skip: true  # [not win]\n\ntest:\n  commands:\n    - vswhere\n\nabout:\n  home: https://github.com/microsoft/vswhere\n  license: MIT\n  license_file: LICENSE.txt\n  summary: CLI tool to locate Visual Studio 2017 and newer installations\n  description: |\n    vswhere is designed to be a redistributable, single-file executable that\n    can be used in build or deployment scripts to find where Visual Studio\n    - or other products in the Visual Studio family - is located.\n\nextra:\n  recipe-maintainers:\n    - wolfv\n",
+  "raw_meta_yaml": "context:\n  version: 3.1.7\n\npackage:\n  name: vswhere\n  version: ${{ version }}\n\nsource:\n  url: https://github.com/microsoft/vswhere/releases/download/${{ version }}/vswhere.exe\n  sha256: c54f3b7c9164ea9a0db8641e81ecdda80c2664ef5a47c4191406f848cc07c662\n\nbuild:\n  number: 1\n  # This is a noarch recipe because the binary provided can be run on `x86`, `x86_64` and `arm64`.\n  # The maintainers of the project do not provide builds for `x86_64` or `arm64`. It also does \n  # not seem like thats going to happen: \n  # https://github.com/microsoft/vswhere/issues/306\n  noarch: generic\n\nrequirements:\n  run:\n    - __win\n  \ntests:\n  - package_contents:\n      files:\n        - Library/bin/vswhere.exe\n  - script:\n      - vswhere\n\nabout:\n  homepage: https://github.com/microsoft/vswhere\n  repository: https://github.com/microsoft/vswhere\n  license: MIT\n  license_file: LICENSE.txt\n  summary: CLI tool to locate Visual Studio 2017 and newer installations\n  description: |\n    vswhere is designed to be a redistributable, single-file executable that\n    can be used in build or deployment scripts to find where Visual Studio\n    - or other products in the Visual Studio family - is located.\n\nextra:\n  recipe-maintainers:\n    - wolfv\n    - baszalmstra\n",
   "req": {
     "__set__": true,
-    "elements": []
+    "elements": [
+      "__win"
+    ]
   },
   "requirements": {
     "build": {
@@ -83,7 +109,9 @@
     },
     "run": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "__win"
+      ]
     },
     "test": {
       "__set__": true,
@@ -102,7 +130,9 @@
     },
     "run": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "__win"
+      ]
     },
     "test": {
       "__set__": true,
@@ -116,34 +146,62 @@
   },
   "win_64_meta_yaml": {
     "about": {
-      "description": "vswhere is designed to be a redistributable, single-file executable that\ncan be used in build or deployment scripts to find where Visual Studio\n- or other products in the Visual Studio family - is located.\n",
+      "description": "vswhere is designed to be a redistributable, single-file executable that\ncan be used in build or deployment scripts to find where Visual Studio\n- or other products in the Visual Studio family - is located.",
+      "dev_url": "https://github.com/microsoft/vswhere",
       "home": "https://github.com/microsoft/vswhere",
       "license": "MIT",
+      "license_family": "MIT",
       "license_file": "LICENSE.txt",
       "summary": "CLI tool to locate Visual Studio 2017 and newer installations"
     },
     "build": {
-      "number": "0",
-      "script": "MOVE vswhere.exe %LIBRARY_BIN%\\vswhere.exe"
+      "noarch": "generic",
+      "number": "1"
     },
     "extra": {
       "recipe-maintainers": [
-        "wolfv"
+        "wolfv",
+        "baszalmstra"
       ]
     },
+    "outputs": [
+      {
+        "build": null,
+        "name": "vswhere",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "__win"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "Library/bin/vswhere.exe"
+              ]
+            }
+          },
+          {
+            "script": "vswhere"
+          }
+        ]
+      }
+    ],
     "package": {
       "name": "vswhere",
       "version": "3.1.7"
     },
-    "schema_version": 0,
+    "requirements": {
+      "run": [
+        "__win"
+      ]
+    },
+    "schema_version": 1,
     "source": {
       "sha256": "c54f3b7c9164ea9a0db8641e81ecdda80c2664ef5a47c4191406f848cc07c662",
       "url": "https://github.com/microsoft/vswhere/releases/download/3.1.7/vswhere.exe"
-    },
-    "test": {
-      "commands": [
-        "vswhere"
-      ]
     }
   },
   "win_64_requirements": {
@@ -157,7 +215,9 @@
     },
     "run": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "__win"
+      ]
     },
     "test": {
       "__set__": true,
