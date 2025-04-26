@@ -8,6 +8,7 @@
     "conda_build": {
       "pkg_format": "2"
     },
+    "conda_build_tool": "rattler-build",
     "conda_forge_output_validation": true,
     "github": {
       "branch_name": "main",
@@ -18,23 +19,20 @@
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
     "about": {
-      "description": "The Jupyter NbClassic is a web application that allows you to create and\nshare documents that contain live code, equations, visualizations, and\nexplanatory text. The NbClassic has support for multiple programming\nlanguages, sharing, and interactive widgets.\n",
-      "doc_url": "https://jupyter-notebook.readthedocs.io",
-      "home": "http://github.com/jupyterlab/nbclassic",
+      "doc_url": "https://nbclassic.readthedocs.io/",
+      "home": "https://github.com/jupyter/nbclassic",
       "license": "BSD-3-Clause",
+      "license_family": "BSD-3-Clause",
       "license_file": "LICENSE",
-      "summary": "A web-based notebook environment for interactive computing"
+      "summary": "Jupyter Notebook as a Jupyter Server extension."
     },
     "build": {
-      "entry_points": [
-        "jupyter-nbclassic = nbclassic.notebookapp:main",
-        "jupyter-nbclassic-bundlerextension = nbclassic.bundler.bundlerextensions:main",
-        "jupyter-nbclassic-extension = nbclassic.nbextensions:main",
-        "jupyter-nbclassic-serverextension = nbclassic.serverextensions:main"
-      ],
       "noarch": "python",
       "number": "0",
-      "script": "PYTHON -m pip install . -vvv --no-deps --no-build-isolation"
+      "script": [
+        "yarn",
+        "${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation --disable-pip-version-check"
+      ]
     },
     "extra": {
       "recipe-maintainers": [
@@ -44,17 +42,97 @@
         "bollwyvl"
       ]
     },
+    "outputs": [
+      {
+        "build": null,
+        "name": "nbclassic",
+        "requirements": {
+          "build": [],
+          "host": [
+            "babel",
+            "hatch-jupyter-builder >=0.9.1",
+            "hatchling",
+            "jupyter_server >=1.17.0",
+            "pip",
+            "python 3.9.*",
+            "yarn <2"
+          ],
+          "run": [
+            "ipykernel",
+            "ipython_genutils",
+            "nest-asyncio >=1.5",
+            "notebook-shim >=0.2.3",
+            "python >=3.9"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "nbclassic"
+              ],
+              "python_version": [
+                "3.9.*",
+                "3.13.*"
+              ]
+            }
+          },
+          {
+            "requirements": {
+              "run": [
+                "python 3.9.*"
+              ]
+            },
+            "script": [
+              "jupyter nbclassic --help",
+              "jupyter nbclassic-extension --help",
+              "jupyter nbclassic-serverextension --help",
+              "jupyter nbclassic-bundlerextension --help",
+              "jupyter server extension list",
+              "jupyter server extension list 1>server_extensions 2>&1",
+              "cat server_extensions | grep -iE \"nbclassic.*enabled\"",
+              "cat server_extensions | grep -iE \"nbclassic.*${{ version | replace('.', '\\\\.') }}.*OK\""
+            ]
+          },
+          {
+            "files": {
+              "recipe": [
+                "run_test.py"
+              ],
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "nbval",
+                "pytest-cov",
+                "pytest-jupyter",
+                "pytest-tornasync",
+                "requests",
+                "testpath",
+                "python 3.9.*",
+                "requests-unixsocket"
+              ]
+            },
+            "script": "python run_test.py"
+          }
+        ]
+      }
+    ],
     "package": {
       "name": "nbclassic",
-      "version": "1.2.0"
+      "version": "1.3.0"
     },
     "requirements": {
       "host": [
         "babel",
-        "jupyter-packaging >=0.9,<1",
+        "hatch-jupyter-builder >=0.9.1",
+        "hatchling",
         "jupyter_server >=1.17.0",
         "pip",
-        "python 3.9"
+        "python 3.9.*",
+        "yarn <2"
       ],
       "run": [
         "ipykernel",
@@ -64,34 +142,10 @@
         "python >=3.9"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
-      "sha256": "736ec50483a54485971db213be9207e34e51fc144c78343625b69917423644ba",
-      "url": "https://pypi.org/packages/source/n/nbclassic/nbclassic-1.2.0.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "pip check",
-        "jupyter nbclassic --help",
-        "jupyter nbclassic-extension --help",
-        "jupyter nbclassic-serverextension --help",
-        "jupyter nbclassic-bundlerextension --help",
-        "jupyter server extension list",
-        "jupyter server extension list 1>server_extensions 2>&1",
-        "cat server_extensions | grep -iE \"nbclassic.*enabled\"",
-        "cat server_extensions | grep -iE \"nbclassic.*OK\""
-      ],
-      "downstreams": [
-        "jupyterlab",
-        "jupyterlab_server"
-      ],
-      "imports": [
-        "nbclassic"
-      ],
-      "requires": [
-        "pip",
-        "python 3.9"
-      ]
+      "sha256": "1ae3b30a4d051332559b6d0eaba34c20ada51a73c95a7f35954c126e6a5c80fd",
+      "url": "https://pypi.org/packages/source/n/nbclassic/nbclassic-1.3.0.tar.gz"
     }
   },
   "linux_64_requirements": {
@@ -103,10 +157,12 @@
       "__set__": true,
       "elements": [
         "babel",
-        "jupyter-packaging",
+        "hatch-jupyter-builder",
+        "hatchling",
         "jupyter_server",
         "pip",
-        "python"
+        "python",
+        "yarn"
       ]
     },
     "run": {
@@ -122,30 +178,34 @@
     "test": {
       "__set__": true,
       "elements": [
+        "nbval",
         "pip",
-        "python"
+        "pytest-cov",
+        "pytest-jupyter",
+        "pytest-tornasync",
+        "python",
+        "requests",
+        "requests-unixsocket",
+        "testpath"
       ]
     }
   },
   "meta_yaml": {
     "about": {
-      "description": "The Jupyter NbClassic is a web application that allows you to create and\nshare documents that contain live code, equations, visualizations, and\nexplanatory text. The NbClassic has support for multiple programming\nlanguages, sharing, and interactive widgets.\n",
-      "doc_url": "https://jupyter-notebook.readthedocs.io",
-      "home": "http://github.com/jupyterlab/nbclassic",
+      "doc_url": "https://nbclassic.readthedocs.io/",
+      "home": "https://github.com/jupyter/nbclassic",
       "license": "BSD-3-Clause",
+      "license_family": "BSD-3-Clause",
       "license_file": "LICENSE",
-      "summary": "A web-based notebook environment for interactive computing"
+      "summary": "Jupyter Notebook as a Jupyter Server extension."
     },
     "build": {
-      "entry_points": [
-        "jupyter-nbclassic = nbclassic.notebookapp:main",
-        "jupyter-nbclassic-bundlerextension = nbclassic.bundler.bundlerextensions:main",
-        "jupyter-nbclassic-extension = nbclassic.nbextensions:main",
-        "jupyter-nbclassic-serverextension = nbclassic.serverextensions:main"
-      ],
       "noarch": "python",
       "number": "0",
-      "script": "PYTHON -m pip install . -vvv --no-deps --no-build-isolation"
+      "script": [
+        "yarn",
+        "${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation --disable-pip-version-check"
+      ]
     },
     "extra": {
       "recipe-maintainers": [
@@ -155,17 +215,97 @@
         "bollwyvl"
       ]
     },
+    "outputs": [
+      {
+        "build": null,
+        "name": "nbclassic",
+        "requirements": {
+          "build": [],
+          "host": [
+            "babel",
+            "hatch-jupyter-builder >=0.9.1",
+            "hatchling",
+            "jupyter_server >=1.17.0",
+            "pip",
+            "python 3.9.*",
+            "yarn <2"
+          ],
+          "run": [
+            "ipykernel",
+            "ipython_genutils",
+            "nest-asyncio >=1.5",
+            "notebook-shim >=0.2.3",
+            "python >=3.9"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "nbclassic"
+              ],
+              "python_version": [
+                "3.9.*",
+                "3.13.*"
+              ]
+            }
+          },
+          {
+            "requirements": {
+              "run": [
+                "python 3.9.*"
+              ]
+            },
+            "script": [
+              "jupyter nbclassic --help",
+              "jupyter nbclassic-extension --help",
+              "jupyter nbclassic-serverextension --help",
+              "jupyter nbclassic-bundlerextension --help",
+              "jupyter server extension list",
+              "jupyter server extension list 1>server_extensions 2>&1",
+              "cat server_extensions | grep -iE \"nbclassic.*enabled\"",
+              "cat server_extensions | grep -iE \"nbclassic.*${{ version | replace('.', '\\\\.') }}.*OK\""
+            ]
+          },
+          {
+            "files": {
+              "recipe": [
+                "run_test.py"
+              ],
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "nbval",
+                "pytest-cov",
+                "pytest-jupyter",
+                "pytest-tornasync",
+                "requests",
+                "testpath",
+                "python 3.9.*",
+                "requests-unixsocket"
+              ]
+            },
+            "script": "python run_test.py"
+          }
+        ]
+      }
+    ],
     "package": {
       "name": "nbclassic",
-      "version": "1.2.0"
+      "version": "1.3.0"
     },
     "requirements": {
       "host": [
         "babel",
-        "jupyter-packaging >=0.9,<1",
+        "hatch-jupyter-builder >=0.9.1",
+        "hatchling",
         "jupyter_server >=1.17.0",
         "pip",
-        "python 3.9"
+        "python 3.9.*",
+        "yarn <2"
       ],
       "run": [
         "ipykernel",
@@ -175,34 +315,10 @@
         "python >=3.9"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
-      "sha256": "736ec50483a54485971db213be9207e34e51fc144c78343625b69917423644ba",
-      "url": "https://pypi.org/packages/source/n/nbclassic/nbclassic-1.2.0.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "pip check",
-        "jupyter nbclassic --help",
-        "jupyter nbclassic-extension --help",
-        "jupyter nbclassic-serverextension --help",
-        "jupyter nbclassic-bundlerextension --help",
-        "jupyter server extension list",
-        "jupyter server extension list 1>server_extensions 2>&1",
-        "cat server_extensions | grep -iE \"nbclassic.*enabled\"",
-        "cat server_extensions | grep -iE \"nbclassic.*OK\""
-      ],
-      "downstreams": [
-        "jupyterlab",
-        "jupyterlab_server"
-      ],
-      "imports": [
-        "nbclassic"
-      ],
-      "requires": [
-        "pip",
-        "python 3.9"
-      ]
+      "sha256": "1ae3b30a4d051332559b6d0eaba34c20ada51a73c95a7f35954c126e6a5c80fd",
+      "url": "https://pypi.org/packages/source/n/nbclassic/nbclassic-1.3.0.tar.gz"
     }
   },
   "name": "nbclassic",
@@ -219,19 +335,21 @@
   "pr_info": {
     "__lazy_json__": "pr_info/nbclassic.json"
   },
-  "raw_meta_yaml": "{% set version = \"1.2.0\" %}\n\npackage:\n  name: nbclassic\n  version: {{ version }}\n\nsource:\n  url: https://pypi.org/packages/source/n/nbclassic/nbclassic-{{ version }}.tar.gz\n  sha256: 736ec50483a54485971db213be9207e34e51fc144c78343625b69917423644ba\n\nbuild:\n  number: 0\n  noarch: python\n  script: {{ PYTHON }} -m pip install . -vvv --no-deps --no-build-isolation\n  entry_points:\n    - jupyter-nbclassic = nbclassic.notebookapp:main\n    - jupyter-nbclassic-bundlerextension = nbclassic.bundler.bundlerextensions:main\n    - jupyter-nbclassic-extension = nbclassic.nbextensions:main\n    - jupyter-nbclassic-serverextension = nbclassic.serverextensions:main\n\nrequirements:\n  host:\n    - babel\n    - jupyter-packaging >=0.9,<1\n    - jupyter_server >=1.17.0\n    - pip\n    - python {{ python_min }}\n  run:\n    - ipykernel\n    - ipython_genutils\n    - nest-asyncio >=1.5\n    - notebook-shim >=0.2.3\n    - python >={{ python_min }}\n\ntest:\n  imports:\n    - nbclassic\n  requires:\n    - pip\n    - python {{ python_min }}\n  commands:\n    - pip check\n    - jupyter nbclassic --help\n    - jupyter nbclassic-extension --help\n    - jupyter nbclassic-serverextension --help\n    - jupyter nbclassic-bundlerextension --help\n    - jupyter server extension list\n    - jupyter server extension list 1>server_extensions 2>&1\n    - cat server_extensions | grep -iE \"nbclassic.*enabled\"\n    - cat server_extensions | grep -iE \"nbclassic.*OK\"\n    # #27: is this expected?\n    # - cat server_extensions | grep -iE \"notebook_shim.*enabled\"\n    # - cat server_extensions | grep -iE \"notebook_shim.*OK\"\n  downstreams:\n    - jupyterlab\n    - jupyterlab_server\n    # breaks with some =cuda* stuff in condabuild, maybe mambabuild\n    # - notebook\n\nabout:\n  home: http://github.com/jupyterlab/nbclassic\n  license: BSD-3-Clause\n  license_file: LICENSE\n  summary: A web-based notebook environment for interactive computing\n  doc_url: https://jupyter-notebook.readthedocs.io\n  description: |\n    The Jupyter NbClassic is a web application that allows you to create and\n    share documents that contain live code, equations, visualizations, and\n    explanatory text. The NbClassic has support for multiple programming\n    languages, sharing, and interactive widgets.\n\nextra:\n  recipe-maintainers:\n    - jasongrout\n    - afshin\n    - jtpio\n    - bollwyvl\n",
+  "raw_meta_yaml": "# yaml-language-server: $schema=https://raw.githubusercontent.com/prefix-dev/recipe-format/main/schema.json\nschema_version: 1\n\ncontext:\n  version: \"1.3.0\"\n\npackage:\n  name: nbclassic\n  version: ${{ version }}\n\nsource:\n  url: https://pypi.org/packages/source/n/nbclassic/nbclassic-${{ version }}.tar.gz\n  sha256: 1ae3b30a4d051332559b6d0eaba34c20ada51a73c95a7f35954c126e6a5c80fd\n\nbuild:\n  number: 0\n  noarch: python\n  script:\n    - yarn\n    - ${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation --disable-pip-version-check\n  python:\n    entry_points:\n      - jupyter-nbclassic = nbclassic.notebookapp:main\n      - jupyter-nbclassic-bundlerextension = nbclassic.bundler.bundlerextensions:main\n      - jupyter-nbclassic-extension = nbclassic.nbextensions:main\n      - jupyter-nbclassic-serverextension = nbclassic.serverextensions:main\n\nrequirements:\n  host:\n    - babel\n    - hatch-jupyter-builder >=0.9.1\n    - hatchling\n    - jupyter_server >=1.17.0\n    - pip\n    - python ${{ python_min }}.*\n    - yarn <2\n  run:\n    - ipykernel\n    - ipython_genutils\n    - nest-asyncio >=1.5\n    - notebook-shim >=0.2.3\n    - python >=${{ python_min }}\n\ntests:\n  - python:\n      imports: nbclassic\n      pip_check: true\n      python_version:\n        - ${{ python_min }}.*\n        - 3.13.*\n  - requirements:\n      run:\n        - python ${{ python_min }}.*\n        - if: win\n          then:\n            - m2-grep\n    script:\n      - jupyter nbclassic --help\n      - jupyter nbclassic-extension --help\n      - jupyter nbclassic-serverextension --help\n      - jupyter nbclassic-bundlerextension --help\n      - jupyter server extension list\n      - jupyter server extension list 1>server_extensions 2>&1\n      - cat server_extensions | grep -iE \"nbclassic.*enabled\"\n      - cat server_extensions | grep -iE \"nbclassic.*${{ version | replace('.', '\\\\.') }}.*OK\"\n  - files:\n      recipe:\n        - run_test.py\n      source:\n        - tests/\n    requirements:\n      run:\n      - nbval\n      - pytest-cov\n      - pytest-jupyter\n      - pytest-tornasync\n      - requests\n      - testpath\n      - python ${{ python_min }}.*\n      - if: unix\n        then:\n          - requests-unixsocket\n    script:\n      - python run_test.py\n\nabout:\n  license: BSD-3-Clause\n  license_file:\n    - LICENSE\n    - node_modules/@bower_components/backbone/LICENSE\n    - node_modules/@bower_components/bootstrap/LICENSE\n    - node_modules/@bower_components/bootstrap-tour/LICENSE\n    - node_modules/@bower_components/codemirror/LICENSE\n    - node_modules/@bower_components/font-awesome/README.md\n    - node_modules/@bower_components/google-caja/README.md\n    - node_modules/@bower_components/jed/README.md\n    - node_modules/@bower_components/jquery-typeahead/LICENSE\n    - node_modules/@bower_components/jquery-ui/LICENSE\n    - node_modules/@bower_components/marked/LICENSE.md\n    - node_modules/@bower_components/MathJax/LICENSE\n    - node_modules/@bower_components/MathJax/fonts/HTML-CSS/STIX-Web/OFL.txt\n    - node_modules/@bower_components/moment/LICENSE\n    - node_modules/@bower_components/react/LICENSE\n    - node_modules/@bower_components/requirejs/LICENSE\n    - node_modules/@bower_components/requirejs-plugins/LICENSE.mdown\n    - node_modules/@bower_components/requirejs-text/LICENSE\n    - node_modules/@bower_components/text-encoding/LICENSE.md\n    - node_modules/@bower_components/underscore/LICENSE\n  summary: Jupyter Notebook as a Jupyter Server extension.\n  homepage: https://github.com/jupyter/nbclassic\n  documentation: https://nbclassic.readthedocs.io\n\nextra:\n  recipe-maintainers:\n    - jasongrout\n    - afshin\n    - jtpio\n    - bollwyvl\n",
   "req": {
     "__set__": true,
     "elements": [
       "babel",
+      "hatch-jupyter-builder",
+      "hatchling",
       "ipykernel",
       "ipython_genutils",
-      "jupyter-packaging",
       "jupyter_server",
       "nest-asyncio",
       "notebook-shim",
       "pip",
-      "python"
+      "python",
+      "yarn"
     ]
   },
   "requirements": {
@@ -243,10 +361,12 @@
       "__set__": true,
       "elements": [
         "babel",
-        "jupyter-packaging",
+        "hatch-jupyter-builder",
+        "hatchling",
         "jupyter_server",
         "pip",
-        "python"
+        "python",
+        "yarn"
       ]
     },
     "run": {
@@ -262,8 +382,15 @@
     "test": {
       "__set__": true,
       "elements": [
+        "nbval",
         "pip",
-        "python"
+        "pytest-cov",
+        "pytest-jupyter",
+        "pytest-tornasync",
+        "python",
+        "requests",
+        "requests-unixsocket",
+        "testpath"
       ]
     }
   },
@@ -277,10 +404,12 @@
       "__set__": true,
       "elements": [
         "babel",
-        "jupyter-packaging >=0.9,<1",
+        "hatch-jupyter-builder >=0.9.1",
+        "hatchling",
         "jupyter_server >=1.17.0",
         "pip",
-        "python 3.9"
+        "python 3.9.*",
+        "yarn <2"
       ]
     },
     "run": {
@@ -296,13 +425,20 @@
     "test": {
       "__set__": true,
       "elements": [
+        "nbval",
         "pip",
-        "python 3.9"
+        "pytest-cov",
+        "pytest-jupyter",
+        "pytest-tornasync",
+        "python 3.9.*",
+        "requests",
+        "requests-unixsocket",
+        "testpath"
       ]
     }
   },
-  "url": "https://pypi.org/packages/source/n/nbclassic/nbclassic-1.2.0.tar.gz",
-  "version": "1.2.0",
+  "url": "https://pypi.org/packages/source/n/nbclassic/nbclassic-1.3.0.tar.gz",
+  "version": "1.3.0",
   "version_pr_info": {
     "__lazy_json__": "version_pr_info/nbclassic.json"
   }
