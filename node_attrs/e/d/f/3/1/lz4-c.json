@@ -3,12 +3,16 @@
   "branch": "main",
   "conda-forge.yml": {
     "build_platform": {
-      "osx_arm64": "osx_64"
+      "linux_aarch64": "linux_64",
+      "linux_ppc64le": "linux_64",
+      "osx_arm64": "osx_64",
+      "win_arm64": "win_64"
     },
     "conda_build": {
       "pkg_format": "2"
     },
     "conda_forge_output_validation": true,
+    "conda_install_tool": "pixi",
     "github": {
       "branch_name": "main",
       "tooling_branch_name": "main"
@@ -770,6 +774,76 @@
             "ninja"
           ]
         }
+      },
+      {
+        "build": {
+          "run_exports": [
+            "lz4-c"
+          ]
+        },
+        "name": "lz4-c",
+        "test": {
+          "commands": [
+            "lz4 -h",
+            "if not exist %LIBRARY_INC%\\\\lz4.h exit 1",
+            "if not exist %LIBRARY_INC%\\\\lz4hc.h exit 1",
+            "if not exist %LIBRARY_INC%\\\\lz4frame.h exit 1",
+            "if not exist %LIBRARY_BIN%\\\\liblz4.dll exit 1",
+            "if not exist %LIBRARY_LIB%\\\\liblz4.lib exit 1",
+            "if exist %LIBRARY_LIB%\\\\liblz4_static.lib exit 1",
+            "pkg-config --cflags --libs liblz4",
+            "pushd test_shared_cmake",
+            "cmake -GNinja .",
+            "popd"
+          ],
+          "files": [
+            "test_shared_cmake"
+          ],
+          "requires": [
+            "pkg-config",
+            "cmake",
+            "ninja"
+          ]
+        }
+      },
+      {
+        "build": {
+          "activate_in_script": true,
+          "always_include_files": [
+            "Library/lib/cmake/lz4"
+          ]
+        },
+        "name": "lz4-c-static",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "ninja"
+          ],
+          "host": [
+            "lz4-c"
+          ],
+          "run": [
+            "lz4-c"
+          ]
+        },
+        "script": "bld_static.bat",
+        "test": {
+          "commands": [
+            "if not exist %LIBRARY_LIB%\\lz4_static.lib exit 1",
+            "pushd test_static_cmake",
+            "cmake -GNinja .",
+            "popd"
+          ],
+          "files": [
+            "test_static_cmake"
+          ],
+          "requires": [
+            "cmake",
+            "ninja"
+          ]
+        }
       }
     ],
     "package": {
@@ -1066,7 +1140,8 @@
     "linux_ppc64le",
     "osx_64",
     "osx_arm64",
-    "win_64"
+    "win_64",
+    "win_arm64"
   ],
   "pr_info": {
     "__lazy_json__": "pr_info/lz4-c.json"
@@ -1278,6 +1353,149 @@
     }
   },
   "win_64_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "cmake",
+        "ninja"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "lz4-c"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "lz4-c"
+      ]
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "cmake",
+        "ninja",
+        "pkg-config"
+      ]
+    }
+  },
+  "win_arm64_meta_yaml": {
+    "about": {
+      "description": "LZ4 is lossless compression algorithm, providing compression speed at 400\nMB/s per core (0.16 Bytes/cycle). It features an extremely fast decoder,\nwith speed in multiple GB/s per core (0.71 Bytes/cycle). A high compression\nderivative, called LZ4_HC, is available, trading customizable CPU time for\ncompression ratio. LZ4 library is provided as open source software using a\nBSD license.\n",
+      "dev_url": "https://github.com/lz4/lz4",
+      "home": "https://www.lz4.org",
+      "license": "BSD-2-Clause",
+      "license_file": "lib/LICENSE",
+      "summary": "Extremely Fast Compression algorithm"
+    },
+    "build": {
+      "number": "1"
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "mingwandroid",
+        "rmax",
+        "wesm",
+        "xhochy"
+      ]
+    },
+    "outputs": [
+      {
+        "build": {
+          "run_exports": [
+            "lz4-c"
+          ]
+        },
+        "name": "lz4-c",
+        "test": {
+          "commands": [
+            "lz4 -h",
+            "if not exist %LIBRARY_INC%\\\\lz4.h exit 1",
+            "if not exist %LIBRARY_INC%\\\\lz4hc.h exit 1",
+            "if not exist %LIBRARY_INC%\\\\lz4frame.h exit 1",
+            "if not exist %LIBRARY_BIN%\\\\liblz4.dll exit 1",
+            "if not exist %LIBRARY_LIB%\\\\liblz4.lib exit 1",
+            "if exist %LIBRARY_LIB%\\\\liblz4_static.lib exit 1",
+            "pkg-config --cflags --libs liblz4",
+            "pushd test_shared_cmake",
+            "cmake -GNinja .",
+            "popd"
+          ],
+          "files": [
+            "test_shared_cmake"
+          ],
+          "requires": [
+            "pkg-config",
+            "cmake",
+            "ninja"
+          ]
+        }
+      },
+      {
+        "build": {
+          "activate_in_script": true,
+          "always_include_files": [
+            "Library/lib/cmake/lz4"
+          ]
+        },
+        "name": "lz4-c-static",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "ninja"
+          ],
+          "host": [
+            "lz4-c"
+          ],
+          "run": [
+            "lz4-c"
+          ]
+        },
+        "script": "bld_static.bat",
+        "test": {
+          "commands": [
+            "if not exist %LIBRARY_LIB%\\lz4_static.lib exit 1",
+            "pushd test_static_cmake",
+            "cmake -GNinja .",
+            "popd"
+          ],
+          "files": [
+            "test_static_cmake"
+          ],
+          "requires": [
+            "cmake",
+            "ninja"
+          ]
+        }
+      }
+    ],
+    "package": {
+      "name": "lz4-c",
+      "version": "1.10.0"
+    },
+    "requirements": {
+      "build": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "cmake",
+        "ninja"
+      ],
+      "host": [],
+      "run": []
+    },
+    "schema_version": 0,
+    "source": {
+      "sha256": "537512904744b35e232912055ccf8ec66d768639ff3abe5788d90d792ec5f48b",
+      "url": "https://github.com/lz4/lz4/archive/v1.10.0.tar.gz"
+    }
+  },
+  "win_arm64_requirements": {
     "build": {
       "__set__": true,
       "elements": [
