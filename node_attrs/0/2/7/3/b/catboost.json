@@ -35,8 +35,8 @@
       "summary": "Gradient boosting on decision trees library"
     },
     "build": {
-      "number": "103",
-      "string": "cuda118_py39h1234567_103",
+      "number": "104",
+      "string": "cuda118_py313h1234567_104",
       "track_features": [
         "catboost_cpu"
       ]
@@ -191,8 +191,8 @@
       "summary": "Gradient boosting on decision trees library"
     },
     "build": {
-      "number": "103",
-      "string": "cuda118_py39h1234567_103",
+      "number": "104",
+      "string": "cuda118_py313h1234567_104",
       "track_features": [
         "catboost_cpu"
       ]
@@ -347,8 +347,8 @@
       "summary": "Gradient boosting on decision trees library"
     },
     "build": {
-      "number": "3",
-      "string": "cpu_py39h1234567_3",
+      "number": "4",
+      "string": "cpu_py313h1234567_4",
       "track_features": [
         "catboost_cpu"
       ]
@@ -448,8 +448,8 @@
       "summary": "Gradient boosting on decision trees library"
     },
     "build": {
-      "number": "3",
-      "string": "cpu_py39h1234567_3",
+      "number": "4",
+      "string": "cpu_py313h1234567_4",
       "track_features": [
         "catboost_cpu"
       ]
@@ -595,8 +595,8 @@
       "summary": "Gradient boosting on decision trees library"
     },
     "build": {
-      "number": "3",
-      "string": "cpu_py39h1234567_3",
+      "number": "4",
+      "string": "cpu_py313h1234567_4",
       "track_features": [
         "catboost_cpu"
       ]
@@ -746,7 +746,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/catboost.json"
   },
-  "raw_meta_yaml": "{% set version = \"1.2.8\" %}\n\n{% set build_num = 3 %}\n\n{% if cuda_compiler_version == \"None\" %}\n{% set cuda_major = 0 %}\n{% else %}\n{% set cuda_major = environ.get(\"cuda_compiler_version\", \"11.8\").split(\".\")[0] | int %}\n{% set build_num = build_num + 100 %}\n{% endif %}\n\npackage:\n  name: catboost\n  version: {{ version }}\n\nsource:\n  url: https://github.com/catboost/catboost/archive/refs/tags/v{{ version }}.tar.gz\n  sha256: 5b0c446cc48a1d1c38073cc20de0f191afd099222a97596d8bf148b04efbf7bd\n  patches:\n    - conda.diff\n\nbuild:\n  number: {{ build_num }}\n  # We build from source on Unix and re-package binaries on windows\n  #  Yandex supplies whl files on PyPI for:\n  # - Win-64: Python 3.8, 3.9, 3.10, 3.11, 3.12, 3.13\n\n  # TODO: support Linux on ppc64le: https://github.com/catboost/catboost/issues/2145\n  skip: true  # [ppc64le]\n  # Wheels from PyPI have a single version that already contains CUDA support so do not do separate builds on Windows,\n  # just have a single version for now\n  # TODO: build from source on Windows\n  skip: true  # [win and cuda_compiler_version != \"None\"]\n  string: cuda{{ cuda_compiler_version | replace('.', '') }}_py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [unix and cuda_compiler_version != \"None\"]\n  string: cpu_py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [unix and cuda_compiler_version == \"None\"]\n  # de-prioritize the CPU variants\n  track_features:   # [cuda_compiler_version == \"None\"]\n    - catboost_cpu    # [cuda_compiler_version == \"None\"]\n\nrequirements:\n  build:\n    - python                                 # [build_platform != target_platform]\n    - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n    - cython ~=3.0.10                        # [build_platform != target_platform]\n    - numpy                                  # [build_platform != target_platform]\n    - jupyterlab 3.0.6.*                     # [unix and build_platform != target_platform]\n    - ragel >=6.10                # [unix]\n    - yasm >=1.3.0                # [unix]\n    - swig >=4.0.2                # [unix]\n    - cmake >=3.24                # [unix]\n    - make                        # [unix]\n    - {{ compiler('cxx') }}       # [linux or osx]\n    # clang 14 on conda-forge is non-functional\n    - clangxx >=15,<16            # [linux and cuda_compiler_version != \"None\"]\n    - clangxx >=16                # [linux and cuda_compiler_version == \"None\" and x86_64]\n    - clangxx >=18                # [linux and cuda_compiler_version == \"None\" and aarch64]\n    - {{ stdlib('c') }}           # [unix]\n    - {{ compiler('cuda') }}      # [unix and cuda_compiler_version != \"None\"]\n    - lld >=7                     # [unix]\n    - yarn                        # [unix]\n  host:\n    - openssl                     # [unix]\n    - jupyterlab 3.0.6.*          # [unix]\n    - python\n    - pip\n    - setuptools\n    - cython ~=3.0.10\n    - numpy\n    - cuda-version {{ cuda_compiler_version }}  # [cuda_compiler_version != \"None\"]\n    {% if cuda_major >= 12 %}\n    - cuda-driver-dev\n    - cuda-cudart-dev\n    {% endif %}\n  run:\n    - python\n    - numpy >=1.16.0\n    - pandas >=0.24.0\n    - scipy\n    - six\n    - plotly\n    - matplotlib-base\n    - python-graphviz\n    #python-graphviz avoids the pip check error\n  run_constrained:\n    - __cuda  # [cuda_compiler != \"None\"]\n    # relax jupyterlab version constraints from those used in the build\n    # catboost only works properly with jupyterlab 3.x for now\n    # but we don't want to constrain users to these versions as it only affects catboost visualization\n    # and other versions might be preferable for other packages\n    - {{ pin_compatible(\"jupyterlab\", max_pin=None) }}   # [unix]\n\ntest:\n  imports:\n    - catboost\n  commands:\n    - pip check\n    - python catboost/pytest/smoke_tests/classification_tutorial_cpu.py\n  requires:\n    - pip\n    - scikit-learn\n    - traitlets\n    - ipython\n    - ipywidgets >=7.0,<9.0\n  source_files:\n    - catboost/pytest/smoke_tests/classification_tutorial_cpu.py\n\nabout:\n  home: http://catboost.ai\n  license: Apache-2.0\n  license_family: MIT\n  license_file: LICENSE\n  license_url: https://github.com/catboost/catboost/blob/master/LICENSE\n  summary: 'Gradient boosting on decision trees library'\n\n  description: |\n    General purpose gradient boosting on decision trees library with categorical features support out of the box.\n    It is easy to install, contains fast inference implementation and supports CPU and GPU (even multi-GPU) computation.\n  doc_url: https://catboost.ai/docs/\n  dev_url: https://github.com/catboost/catboost\n\nextra:\n  recipe-maintainers:\n    - sab\n    - kizill\n    - nikitxskv\n    - dbakshee\n    - andrey-khropov\n    - isuruf\n",
+  "raw_meta_yaml": "{% set version = \"1.2.8\" %}\n\n{% set build_num = 4 %}\n\n{% if cuda_compiler_version == \"None\" %}\n{% set cuda_major = 0 %}\n{% else %}\n{% set cuda_major = environ.get(\"cuda_compiler_version\", \"11.8\").split(\".\")[0] | int %}\n{% set build_num = build_num + 100 %}\n{% endif %}\n\npackage:\n  name: catboost\n  version: {{ version }}\n\nsource:\n  url: https://github.com/catboost/catboost/archive/refs/tags/v{{ version }}.tar.gz\n  sha256: 5b0c446cc48a1d1c38073cc20de0f191afd099222a97596d8bf148b04efbf7bd\n  patches:\n    - conda.diff\n\nbuild:\n  number: {{ build_num }}\n  # We build from source on Unix and re-package binaries on windows\n  #  Yandex supplies whl files on PyPI for:\n  # - Win-64: Python 3.8, 3.9, 3.10, 3.11, 3.12, 3.13\n\n  # TODO: support Linux on ppc64le: https://github.com/catboost/catboost/issues/2145\n  skip: true  # [ppc64le]\n  # Wheels from PyPI have a single version that already contains CUDA support so do not do separate builds on Windows,\n  # just have a single version for now\n  # TODO: build from source on Windows\n  skip: true  # [win and cuda_compiler_version != \"None\"]\n  string: cuda{{ cuda_compiler_version | replace('.', '') }}_py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [unix and cuda_compiler_version != \"None\"]\n  string: cpu_py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [unix and cuda_compiler_version == \"None\"]\n  # de-prioritize the CPU variants\n  track_features:   # [cuda_compiler_version == \"None\"]\n    - catboost_cpu    # [cuda_compiler_version == \"None\"]\n\nrequirements:\n  build:\n    - python                                 # [build_platform != target_platform]\n    - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n    - cython ~=3.0.10                        # [build_platform != target_platform]\n    - numpy                                  # [build_platform != target_platform]\n    - jupyterlab 3.0.6.*                     # [unix and build_platform != target_platform]\n    - ragel >=6.10                # [unix]\n    - yasm >=1.3.0                # [unix]\n    - swig >=4.0.2                # [unix]\n    - cmake >=3.24                # [unix]\n    - make                        # [unix]\n    - {{ compiler('cxx') }}       # [linux or osx]\n    # clang 14 on conda-forge is non-functional\n    - clangxx >=15,<16            # [linux and cuda_compiler_version != \"None\"]\n    - clangxx >=16                # [linux and cuda_compiler_version == \"None\" and x86_64]\n    - clangxx >=18                # [linux and cuda_compiler_version == \"None\" and aarch64]\n    - {{ stdlib('c') }}           # [unix]\n    - {{ compiler('cuda') }}      # [unix and cuda_compiler_version != \"None\"]\n    - lld >=7                     # [unix]\n    - yarn                        # [unix]\n  host:\n    - openssl                     # [unix]\n    - jupyterlab 3.0.6.*          # [unix]\n    - python\n    - pip\n    - setuptools\n    - cython ~=3.0.10\n    - numpy\n    - cuda-version {{ cuda_compiler_version }}  # [cuda_compiler_version != \"None\"]\n    {% if cuda_major >= 12 %}\n    - cuda-driver-dev\n    - cuda-cudart-dev\n    {% endif %}\n  run:\n    - python\n    - numpy >=1.16.0\n    - pandas >=0.24.0\n    - scipy\n    - six\n    - plotly\n    - matplotlib-base\n    - python-graphviz\n    #python-graphviz avoids the pip check error\n  run_constrained:\n    - __cuda  # [cuda_compiler != \"None\"]\n    # relax jupyterlab version constraints from those used in the build\n    # catboost only works properly with jupyterlab 3.x for now\n    # but we don't want to constrain users to these versions as it only affects catboost visualization\n    # and other versions might be preferable for other packages\n    - {{ pin_compatible(\"jupyterlab\", max_pin=None) }}   # [unix]\n\ntest:\n  imports:\n    - catboost\n  commands:\n    - pip check\n    - python catboost/pytest/smoke_tests/classification_tutorial_cpu.py\n  requires:\n    - pip\n    - scikit-learn\n    - traitlets\n    - ipython\n    - ipywidgets >=7.0,<9.0\n  source_files:\n    - catboost/pytest/smoke_tests/classification_tutorial_cpu.py\n\nabout:\n  home: http://catboost.ai\n  license: Apache-2.0\n  license_family: MIT\n  license_file: LICENSE\n  license_url: https://github.com/catboost/catboost/blob/master/LICENSE\n  summary: 'Gradient boosting on decision trees library'\n\n  description: |\n    General purpose gradient boosting on decision trees library with categorical features support out of the box.\n    It is easy to install, contains fast inference implementation and supports CPU and GPU (even multi-GPU) computation.\n  doc_url: https://catboost.ai/docs/\n  dev_url: https://github.com/catboost/catboost\n\nextra:\n  recipe-maintainers:\n    - sab\n    - kizill\n    - nikitxskv\n    - dbakshee\n    - andrey-khropov\n    - isuruf\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -914,7 +914,7 @@
       "summary": "Gradient boosting on decision trees library"
     },
     "build": {
-      "number": "3",
+      "number": "4",
       "track_features": [
         "catboost_cpu"
       ]
