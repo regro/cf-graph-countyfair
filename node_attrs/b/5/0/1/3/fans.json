@@ -2,6 +2,12 @@
   "archived": false,
   "branch": "main",
   "conda-forge.yml": {
+    "azure": {
+      "store_build_artifacts": true
+    },
+    "build_platform": {
+      "osx_arm64": "osx_64"
+    },
     "conda_build": {
       "error_overlinking": true
     },
@@ -10,13 +16,14 @@
     "github": {
       "branch_name": "main",
       "tooling_branch_name": "main"
-    }
+    },
+    "test": "native_and_emulated"
   },
   "feedstock_name": "fans",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
     "about": {
-      "description": "Fourier Accelerated Nodal Solvers (FANS) is an FFT-based homogenization solver designed to handle microscale multiphysics problems.\nThis repository contains a C++ implementation of FANS, built using CMake and MPI for parallel computations.",
+      "description": "Fourier-Accelerated Nodal Solver (FANS) is an FFT-based homogenization solver for microscale multiphysics problems.\nFANS is written in C++, built using CMake, and it has MPI parallelization.",
       "home": "https://github.com/DataAnalyticsEngineering/FANS",
       "license": "LGPL-3.0-only",
       "license_family": "LGPL-3.0-only",
@@ -24,12 +31,11 @@
       "summary": "FANS: an open-source, efficient, and parallel FFT-based homogenization solver designed to solve microscale multiphysics problems."
     },
     "build": {
-      "number": "1",
+      "number": "0",
       "script": [
-        "rm -rf build",
         "mkdir build",
         "cd build",
-        "cmake .. $CMAKE_ARGS -DCMAKE_C_COMPILER=$PREFIX/bin/mpicc -DCMAKE_CXX_COMPILER=$PREFIX/bin/mpicxx",
+        "cmake .. $CMAKE_ARGS",
         "cmake --build . -j",
         "cmake --install ."
       ]
@@ -85,16 +91,19 @@
               "JSON_FILE=\"$PREFIX/etc/conda/test-files/$PKG_NAME/0/test/input_files/test_LinearElastic.json\"",
               "MODIFIED_JSON_FILE=\"$PREFIX/etc/conda/test-files/$PKG_NAME/0/test/input_files/test_LinearElastic_mod.json\"",
               "NEW_MS_FILENAME=\"$PREFIX/etc/conda/test-files/$PKG_NAME/0/test/microstructures/sphere32.h5\"",
-              "jq --arg new_filename \"$NEW_MS_FILENAME\" '.ms_filename = $new_filename' \"$JSON_FILE\" > \"$MODIFIED_JSON_FILE\"",
+              "jq --arg new_filename \"$NEW_MS_FILENAME\" '.microstructure.filepath = $new_filename' \"$JSON_FILE\" > \"$MODIFIED_JSON_FILE\"",
               "mpiexec -n 2 FANS \"$MODIFIED_JSON_FILE\" \"$PREFIX/etc/conda/test-files/$PKG_NAME/0//test/test_results.h5\""
             ]
+          },
+          {
+            "script": "FANS --version"
           }
         ]
       }
     ],
     "package": {
       "name": "fans",
-      "version": "0.3.0"
+      "version": "0.4.1"
     },
     "requirements": {
       "build": [
@@ -114,11 +123,8 @@
     },
     "schema_version": 1,
     "source": {
-      "patches": [
-        "fix_gitignore_ms.patch"
-      ],
-      "sha256": "1573478d9acd27a9cfc126a4167ce3951ec26e9896bf19577b44cbc4bdc48b88",
-      "url": "https://github.com/DataAnalyticsEngineering/FANS/archive/refs/tags/v0.3.0.tar.gz"
+      "sha256": "2ce1d08bbe9dbe1d02e94f03d8d0cbbffa57b2e2a6d2a147b1829cb49782f0c4",
+      "url": "https://github.com/DataAnalyticsEngineering/FANS/archive/refs/tags/v0.4.1.tar.gz"
     }
   },
   "linux_64_requirements": {
@@ -155,7 +161,7 @@
   },
   "meta_yaml": {
     "about": {
-      "description": "Fourier Accelerated Nodal Solvers (FANS) is an FFT-based homogenization solver designed to handle microscale multiphysics problems.\nThis repository contains a C++ implementation of FANS, built using CMake and MPI for parallel computations.",
+      "description": "Fourier-Accelerated Nodal Solver (FANS) is an FFT-based homogenization solver for microscale multiphysics problems.\nFANS is written in C++, built using CMake, and it has MPI parallelization.",
       "home": "https://github.com/DataAnalyticsEngineering/FANS",
       "license": "LGPL-3.0-only",
       "license_family": "LGPL-3.0-only",
@@ -163,12 +169,11 @@
       "summary": "FANS: an open-source, efficient, and parallel FFT-based homogenization solver designed to solve microscale multiphysics problems."
     },
     "build": {
-      "number": "1",
+      "number": "0",
       "script": [
-        "rm -rf build",
         "mkdir build",
         "cd build",
-        "cmake .. $CMAKE_ARGS -DCMAKE_C_COMPILER=$PREFIX/bin/mpicc -DCMAKE_CXX_COMPILER=$PREFIX/bin/mpicxx",
+        "cmake .. $CMAKE_ARGS",
         "cmake --build . -j",
         "cmake --install ."
       ]
@@ -224,16 +229,123 @@
               "JSON_FILE=\"$PREFIX/etc/conda/test-files/$PKG_NAME/0/test/input_files/test_LinearElastic.json\"",
               "MODIFIED_JSON_FILE=\"$PREFIX/etc/conda/test-files/$PKG_NAME/0/test/input_files/test_LinearElastic_mod.json\"",
               "NEW_MS_FILENAME=\"$PREFIX/etc/conda/test-files/$PKG_NAME/0/test/microstructures/sphere32.h5\"",
-              "jq --arg new_filename \"$NEW_MS_FILENAME\" '.ms_filename = $new_filename' \"$JSON_FILE\" > \"$MODIFIED_JSON_FILE\"",
+              "jq --arg new_filename \"$NEW_MS_FILENAME\" '.microstructure.filepath = $new_filename' \"$JSON_FILE\" > \"$MODIFIED_JSON_FILE\"",
               "mpiexec -n 2 FANS \"$MODIFIED_JSON_FILE\" \"$PREFIX/etc/conda/test-files/$PKG_NAME/0//test/test_results.h5\""
             ]
+          },
+          {
+            "script": "FANS --version"
+          }
+        ]
+      },
+      {
+        "build": null,
+        "name": "fans",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "ninja"
+          ],
+          "host": [
+            "hdf5 * mpi_openmpi*",
+            "fftw * mpi_openmpi*",
+            "openmpi-mpicxx",
+            "eigen"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "bin": [
+                "FANS"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "test/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "jq"
+              ]
+            },
+            "script": [
+              "JSON_FILE=\"$PREFIX/etc/conda/test-files/$PKG_NAME/0/test/input_files/test_LinearElastic.json\"",
+              "MODIFIED_JSON_FILE=\"$PREFIX/etc/conda/test-files/$PKG_NAME/0/test/input_files/test_LinearElastic_mod.json\"",
+              "NEW_MS_FILENAME=\"$PREFIX/etc/conda/test-files/$PKG_NAME/0/test/microstructures/sphere32.h5\"",
+              "jq --arg new_filename \"$NEW_MS_FILENAME\" '.microstructure.filepath = $new_filename' \"$JSON_FILE\" > \"$MODIFIED_JSON_FILE\"",
+              "mpiexec -n 2 FANS \"$MODIFIED_JSON_FILE\" \"$PREFIX/etc/conda/test-files/$PKG_NAME/0//test/test_results.h5\""
+            ]
+          },
+          {
+            "script": "FANS --version"
+          }
+        ]
+      },
+      {
+        "build": null,
+        "name": "fans",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "ninja"
+          ],
+          "host": [
+            "hdf5 * mpi_openmpi*",
+            "fftw * mpi_openmpi*",
+            "openmpi-mpicxx",
+            "eigen"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "bin": [
+                "FANS"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "test/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "jq"
+              ]
+            },
+            "script": [
+              "JSON_FILE=\"$PREFIX/etc/conda/test-files/$PKG_NAME/0/test/input_files/test_LinearElastic.json\"",
+              "MODIFIED_JSON_FILE=\"$PREFIX/etc/conda/test-files/$PKG_NAME/0/test/input_files/test_LinearElastic_mod.json\"",
+              "NEW_MS_FILENAME=\"$PREFIX/etc/conda/test-files/$PKG_NAME/0/test/microstructures/sphere32.h5\"",
+              "jq --arg new_filename \"$NEW_MS_FILENAME\" '.microstructure.filepath = $new_filename' \"$JSON_FILE\" > \"$MODIFIED_JSON_FILE\"",
+              "mpiexec -n 2 FANS \"$MODIFIED_JSON_FILE\" \"$PREFIX/etc/conda/test-files/$PKG_NAME/0//test/test_results.h5\""
+            ]
+          },
+          {
+            "script": "FANS --version"
           }
         ]
       }
     ],
     "package": {
       "name": "fans",
-      "version": "0.3.0"
+      "version": "0.4.1"
     },
     "requirements": {
       "build": [
@@ -253,14 +365,287 @@
     },
     "schema_version": 1,
     "source": {
-      "patches": [
-        "fix_gitignore_ms.patch"
-      ],
-      "sha256": "1573478d9acd27a9cfc126a4167ce3951ec26e9896bf19577b44cbc4bdc48b88",
-      "url": "https://github.com/DataAnalyticsEngineering/FANS/archive/refs/tags/v0.3.0.tar.gz"
+      "sha256": "2ce1d08bbe9dbe1d02e94f03d8d0cbbffa57b2e2a6d2a147b1829cb49782f0c4",
+      "url": "https://github.com/DataAnalyticsEngineering/FANS/archive/refs/tags/v0.4.1.tar.gz"
     }
   },
   "name": "fans",
+  "osx_64_meta_yaml": {
+    "about": {
+      "description": "Fourier-Accelerated Nodal Solver (FANS) is an FFT-based homogenization solver for microscale multiphysics problems.\nFANS is written in C++, built using CMake, and it has MPI parallelization.",
+      "home": "https://github.com/DataAnalyticsEngineering/FANS",
+      "license": "LGPL-3.0-only",
+      "license_family": "LGPL-3.0-only",
+      "license_file": "LICENSE",
+      "summary": "FANS: an open-source, efficient, and parallel FFT-based homogenization solver designed to solve microscale multiphysics problems."
+    },
+    "build": {
+      "number": "0",
+      "script": [
+        "mkdir build",
+        "cd build",
+        "cmake .. $CMAKE_ARGS",
+        "cmake --build . -j",
+        "cmake --install ."
+      ]
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "sanathkeshav",
+        "claudiushaag",
+        "EMMAOpenSource"
+      ]
+    },
+    "outputs": [
+      {
+        "build": null,
+        "name": "fans",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "ninja"
+          ],
+          "host": [
+            "hdf5 * mpi_openmpi*",
+            "fftw * mpi_openmpi*",
+            "openmpi-mpicxx",
+            "eigen"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "bin": [
+                "FANS"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "test/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "jq"
+              ]
+            },
+            "script": [
+              "JSON_FILE=\"$PREFIX/etc/conda/test-files/$PKG_NAME/0/test/input_files/test_LinearElastic.json\"",
+              "MODIFIED_JSON_FILE=\"$PREFIX/etc/conda/test-files/$PKG_NAME/0/test/input_files/test_LinearElastic_mod.json\"",
+              "NEW_MS_FILENAME=\"$PREFIX/etc/conda/test-files/$PKG_NAME/0/test/microstructures/sphere32.h5\"",
+              "jq --arg new_filename \"$NEW_MS_FILENAME\" '.microstructure.filepath = $new_filename' \"$JSON_FILE\" > \"$MODIFIED_JSON_FILE\"",
+              "mpiexec -n 2 FANS \"$MODIFIED_JSON_FILE\" \"$PREFIX/etc/conda/test-files/$PKG_NAME/0//test/test_results.h5\""
+            ]
+          },
+          {
+            "script": "FANS --version"
+          }
+        ]
+      }
+    ],
+    "package": {
+      "name": "fans",
+      "version": "0.4.1"
+    },
+    "requirements": {
+      "build": [
+        "c_compiler_stub",
+        "cxx_compiler_stub",
+        "c_stdlib_stub",
+        "cmake",
+        "make",
+        "ninja"
+      ],
+      "host": [
+        "hdf5 * mpi_openmpi*",
+        "fftw * mpi_openmpi*",
+        "openmpi-mpicxx",
+        "eigen"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "sha256": "2ce1d08bbe9dbe1d02e94f03d8d0cbbffa57b2e2a6d2a147b1829cb49782f0c4",
+      "url": "https://github.com/DataAnalyticsEngineering/FANS/archive/refs/tags/v0.4.1.tar.gz"
+    }
+  },
+  "osx_64_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "cmake",
+        "cxx_compiler_stub",
+        "make",
+        "ninja"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "eigen",
+        "fftw",
+        "hdf5",
+        "openmpi-mpicxx"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": []
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "jq"
+      ]
+    }
+  },
+  "osx_arm64_meta_yaml": {
+    "about": {
+      "description": "Fourier-Accelerated Nodal Solver (FANS) is an FFT-based homogenization solver for microscale multiphysics problems.\nFANS is written in C++, built using CMake, and it has MPI parallelization.",
+      "home": "https://github.com/DataAnalyticsEngineering/FANS",
+      "license": "LGPL-3.0-only",
+      "license_family": "LGPL-3.0-only",
+      "license_file": "LICENSE",
+      "summary": "FANS: an open-source, efficient, and parallel FFT-based homogenization solver designed to solve microscale multiphysics problems."
+    },
+    "build": {
+      "number": "0",
+      "script": [
+        "mkdir build",
+        "cd build",
+        "cmake .. $CMAKE_ARGS",
+        "cmake --build . -j",
+        "cmake --install ."
+      ]
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "sanathkeshav",
+        "claudiushaag",
+        "EMMAOpenSource"
+      ]
+    },
+    "outputs": [
+      {
+        "build": null,
+        "name": "fans",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "ninja"
+          ],
+          "host": [
+            "hdf5 * mpi_openmpi*",
+            "fftw * mpi_openmpi*",
+            "openmpi-mpicxx",
+            "eigen"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "bin": [
+                "FANS"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "test/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "jq"
+              ]
+            },
+            "script": [
+              "JSON_FILE=\"$PREFIX/etc/conda/test-files/$PKG_NAME/0/test/input_files/test_LinearElastic.json\"",
+              "MODIFIED_JSON_FILE=\"$PREFIX/etc/conda/test-files/$PKG_NAME/0/test/input_files/test_LinearElastic_mod.json\"",
+              "NEW_MS_FILENAME=\"$PREFIX/etc/conda/test-files/$PKG_NAME/0/test/microstructures/sphere32.h5\"",
+              "jq --arg new_filename \"$NEW_MS_FILENAME\" '.microstructure.filepath = $new_filename' \"$JSON_FILE\" > \"$MODIFIED_JSON_FILE\"",
+              "mpiexec -n 2 FANS \"$MODIFIED_JSON_FILE\" \"$PREFIX/etc/conda/test-files/$PKG_NAME/0//test/test_results.h5\""
+            ]
+          },
+          {
+            "script": "FANS --version"
+          }
+        ]
+      }
+    ],
+    "package": {
+      "name": "fans",
+      "version": "0.4.1"
+    },
+    "requirements": {
+      "build": [
+        "c_compiler_stub",
+        "cxx_compiler_stub",
+        "c_stdlib_stub",
+        "cmake",
+        "make",
+        "ninja"
+      ],
+      "host": [
+        "hdf5 * mpi_openmpi*",
+        "fftw * mpi_openmpi*",
+        "openmpi-mpicxx",
+        "eigen"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "sha256": "2ce1d08bbe9dbe1d02e94f03d8d0cbbffa57b2e2a6d2a147b1829cb49782f0c4",
+      "url": "https://github.com/DataAnalyticsEngineering/FANS/archive/refs/tags/v0.4.1.tar.gz"
+    }
+  },
+  "osx_arm64_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "cmake",
+        "cxx_compiler_stub",
+        "make",
+        "ninja"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "eigen",
+        "fftw",
+        "hdf5",
+        "openmpi-mpicxx"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": []
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "jq"
+      ]
+    }
+  },
   "outputs_names": {
     "__set__": true,
     "elements": [
@@ -269,12 +654,14 @@
   },
   "parsing_error": false,
   "platforms": [
-    "linux_64"
+    "linux_64",
+    "osx_64",
+    "osx_arm64"
   ],
   "pr_info": {
     "__lazy_json__": "pr_info/fans.json"
   },
-  "raw_meta_yaml": "context:\n  version: \"0.3.0\"\n\npackage:\n  name: fans\n  version: ${{ version }}\n\nsource:\n  url: https://github.com/DataAnalyticsEngineering/FANS/archive/refs/tags/v${{ version }}.tar.gz\n  sha256: 1573478d9acd27a9cfc126a4167ce3951ec26e9896bf19577b44cbc4bdc48b88\n  patches:\n    - fix_gitignore_ms.patch  # modify so gitignore does not include the sphere32.h5 file\n\nbuild:\n  number: 1\n  skip:\n    - win\n    - osx\n  script:\n    - if: linux\n      then:\n        - rm -rf build\n        - mkdir build\n        - cd build\n        - cmake .. $CMAKE_ARGS -DCMAKE_C_COMPILER=$PREFIX/bin/mpicc -DCMAKE_CXX_COMPILER=$PREFIX/bin/mpicxx\n        - cmake --build . -j\n        - cmake --install .\n\nrequirements:\n  build:\n    - ${{ compiler('c') }}\n    - ${{ compiler('cxx') }}\n    - ${{ stdlib('c') }}\n    - cmake\n    - make\n    - ninja\n  host:\n    - hdf5 * mpi_openmpi*\n    - fftw * mpi_openmpi*\n    - openmpi-mpicxx\n    - eigen\n\ntests:\n  - package_contents:\n      bin:\n        - FANS\n  - script:\n      - JSON_FILE=\"$PREFIX/etc/conda/test-files/$PKG_NAME/0/test/input_files/test_LinearElastic.json\"\n      - MODIFIED_JSON_FILE=\"$PREFIX/etc/conda/test-files/$PKG_NAME/0/test/input_files/test_LinearElastic_mod.json\"\n      - NEW_MS_FILENAME=\"$PREFIX/etc/conda/test-files/$PKG_NAME/0/test/microstructures/sphere32.h5\"\n    # Use jq to create a modified copy of the JSON file\n      - jq --arg new_filename \"$NEW_MS_FILENAME\" '.ms_filename = $new_filename' \"$JSON_FILE\" > \"$MODIFIED_JSON_FILE\"\n    # Run tests\n      - mpiexec -n 2 FANS \"$MODIFIED_JSON_FILE\" \"$PREFIX/etc/conda/test-files/$PKG_NAME/0//test/test_results.h5\"\n    requirements:\n      run:\n        - jq\n    files:\n      source:\n        - test/\n\nabout:\n  homepage: https://github.com/DataAnalyticsEngineering/FANS\n  summary: \"FANS: an open-source, efficient, and parallel FFT-based homogenization solver designed to solve microscale multiphysics problems.\"\n  description: |\n    Fourier Accelerated Nodal Solvers (FANS) is an FFT-based homogenization solver designed to handle microscale multiphysics problems.\n    This repository contains a C++ implementation of FANS, built using CMake and MPI for parallel computations.\n  license: LGPL-3.0-only\n  license_family: LGPL\n  license_file: LICENSE\n\nextra:\n  recipe-maintainers:\n    - sanathkeshav\n    - claudiushaag\n    - EMMAOpenSource\n",
+  "raw_meta_yaml": "context:\n  version: \"0.4.1\"\n\npackage:\n  name: fans\n  version: ${{ version }}\n\nsource:\n  url: https://github.com/DataAnalyticsEngineering/FANS/archive/refs/tags/v${{ version }}.tar.gz\n  sha256: 2ce1d08bbe9dbe1d02e94f03d8d0cbbffa57b2e2a6d2a147b1829cb49782f0c4\n\nbuild:\n  number: 0\n  skip:\n    - win\n  script:\n    - if: unix\n      then:\n        - if: (build_platform != target_platform)\n          then:\n            # flags from https://conda-forge.org/docs/maintainer/knowledge_base/#cross-compilation and https://github.com/conda-forge/mumps-feedstock/blob/966474677d28486ef897b0d3bb2c10558dc9b5ca/recipe/build-mumps.sh\n            - export OMPI_CC=$CC\n            - export OMPI_CXX=$CXX\n            - export OMPI_FC=$FC\n            - export OPAL_PREFIX=\"$PREFIX\"\n            - export FFLAGS=\"${FFLAGS} -DAVOID_MPI_IN_PLACE\"\n            - export LDFLAGS=\"${LDFLAGS} -headerpad_max_install_names\"\n        - mkdir build\n        - cd build\n        - cmake .. $CMAKE_ARGS\n        - cmake --build . -j\n        - cmake --install .\n\nrequirements:\n  build:\n    - ${{ compiler('c') }}\n    - ${{ compiler('cxx') }}\n    - ${{ stdlib('c') }}\n    - cmake\n    - make\n    - ninja\n    - if: (build_platform != target_platform)\n      then:\n        - openmpi-mpicxx\n  host:\n    - hdf5 * mpi_openmpi*\n    - fftw * mpi_openmpi*\n    - openmpi-mpicxx\n    - eigen\n\ntests:\n  - package_contents:\n      bin:\n        - FANS\n  - script:\n      # JSON test file has relative path to h5 included - changing that\n      - JSON_FILE=\"$PREFIX/etc/conda/test-files/$PKG_NAME/0/test/input_files/test_LinearElastic.json\"\n      - MODIFIED_JSON_FILE=\"$PREFIX/etc/conda/test-files/$PKG_NAME/0/test/input_files/test_LinearElastic_mod.json\"\n      - NEW_MS_FILENAME=\"$PREFIX/etc/conda/test-files/$PKG_NAME/0/test/microstructures/sphere32.h5\"\n      # Use jq to create a modified copy of the JSON file\n      - jq --arg new_filename \"$NEW_MS_FILENAME\" '.microstructure.filepath = $new_filename' \"$JSON_FILE\" > \"$MODIFIED_JSON_FILE\"\n      # Run tests\n      - mpiexec -n 2 FANS \"$MODIFIED_JSON_FILE\" \"$PREFIX/etc/conda/test-files/$PKG_NAME/0//test/test_results.h5\"\n    requirements:\n      run:\n        - jq\n    files:\n      source:\n        - test/\n  - script:\n      - FANS --version\n\nabout:\n  homepage: https://github.com/DataAnalyticsEngineering/FANS\n  summary: \"FANS: an open-source, efficient, and parallel FFT-based homogenization solver designed to solve microscale multiphysics problems.\"\n  description: |\n    Fourier-Accelerated Nodal Solver (FANS) is an FFT-based homogenization solver for microscale multiphysics problems.\n    FANS is written in C++, built using CMake, and it has MPI parallelization.\n  license: LGPL-3.0-only\n  license_family: LGPL\n  license_file: LICENSE\n\nextra:\n  recipe-maintainers:\n    - sanathkeshav\n    - claudiushaag\n    - EMMAOpenSource\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -362,8 +749,8 @@
       ]
     }
   },
-  "url": "https://github.com/DataAnalyticsEngineering/FANS/archive/refs/tags/v0.3.0.tar.gz",
-  "version": "0.3.0",
+  "url": "https://github.com/DataAnalyticsEngineering/FANS/archive/refs/tags/v0.4.1.tar.gz",
+  "version": "0.4.1",
   "version_pr_info": {
     "__lazy_json__": "version_pr_info/fans.json"
   }
