@@ -35,7 +35,7 @@
       "summary": "YARP is a library and toolkit for communication and device interfaces, used on everything from humanoids to embedded devices."
     },
     "build": {
-      "number": "2"
+      "number": "3"
     },
     "extra": {
       "recipe-maintainers": [
@@ -791,7 +791,7 @@
       "summary": "YARP is a library and toolkit for communication and device interfaces, used on everything from humanoids to embedded devices."
     },
     "build": {
-      "number": "2"
+      "number": "3"
     },
     "extra": {
       "recipe-maintainers": [
@@ -1547,7 +1547,7 @@
       "summary": "YARP is a library and toolkit for communication and device interfaces, used on everything from humanoids to embedded devices."
     },
     "build": {
-      "number": "2"
+      "number": "3"
     },
     "extra": {
       "recipe-maintainers": [
@@ -2303,7 +2303,7 @@
       "summary": "YARP is a library and toolkit for communication and device interfaces, used on everything from humanoids to embedded devices."
     },
     "build": {
-      "number": "2"
+      "number": "3"
     },
     "extra": {
       "recipe-maintainers": [
@@ -6233,7 +6233,7 @@
       "summary": "YARP is a library and toolkit for communication and device interfaces, used on everything from humanoids to embedded devices."
     },
     "build": {
-      "number": "2"
+      "number": "3"
     },
     "extra": {
       "recipe-maintainers": [
@@ -6971,7 +6971,7 @@
       "summary": "YARP is a library and toolkit for communication and device interfaces, used on everything from humanoids to embedded devices."
     },
     "build": {
-      "number": "2"
+      "number": "3"
     },
     "extra": {
       "recipe-maintainers": [
@@ -7718,7 +7718,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/yarp.json"
   },
-  "raw_meta_yaml": "{% set name = \"yarp\" %}\n{% set namecxx = \"libyarp\" %}\n{% set namepython = \"yarp-python\" %}\n{% set version = \"3.11.2\" %}\n\npackage:\n  name: {{ name }}\n  version: {{ version }}\n\nsource:\n  url: https://github.com/robotology/yarp/archive/refs/tags/v{{ version }}.tar.gz\n  sha256: a07121e0ab3dcf63f95e68075933bde0570e8c49ffbf96647ee27a3d7a2553eb\n  patches:\n    - 2983.patch\n\nbuild:\n  number: 2\n\noutputs:\n  - name: {{ namecxx }}\n    script: build_cxx.sh  # [unix]\n    script: bld_cxx.bat  # [win]\n    build:\n      run_exports:\n        - {{ pin_subpackage(namecxx, max_pin='x.x.x') }}\n    requirements:\n      build:\n        - {{ compiler('c') }}\n        - {{ stdlib(\"c\") }}\n        - {{ compiler('cxx') }}\n        - cmake\n        - pkg-config\n        - ninja\n        - multisheller\n        - ycm-cmake-modules\n        - bison  # [not win]\n        - flex  # [not win]\n      host:\n        - ace\n        - tinyxml\n        - eigen\n        - sdl\n        - sqlite\n        - libjpeg-turbo\n        - bash-completion  # [not win]\n        - libi2c  # [linux]\n        - robot-testing-framework\n        - libgl-devel  # [linux]\n        - xorg-libxfixes  # [linux]\n        - libpng\n        - zlib\n        - soxr\n        - libedit  # [not win]\n        - libopencv\n        # Temporary workaround to avoid to update to vs2022, \n        # see https://github.com/conda-forge/yarp-feedstock/pull/70#issuecomment-2910021339\n        - libopencv 4.11.0=*_6\n        - portaudio\n        - qt-main\n        - ffmpeg\n\n      run:\n        # ycm and eigen are mentioned in the headers so needed when building\n        # against libyarp\n        - ycm-cmake-modules\n        - eigen\n\n    test:\n      commands:\n        - yarp help\n        - test -f ${PREFIX}/include/yarp/os/all.h  # [not win]\n        - test -f ${PREFIX}/include/yarp/cv/Cv.h  # [not win]\n        - test -f ${PREFIX}/lib/libYARP_os.so  # [linux]\n        - test -f ${PREFIX}/lib/libYARP_os.dylib  # [osx]\n        - test -f ${PREFIX}/lib/cmake/YARP_os/YARP_osConfig.cmake  # [not win]\n        - if not exist %PREFIX%\\\\Library\\\\include\\\\yarp\\\\os\\\\all.h exit 1  # [win]\n        # Regression test for https://github.com/conda-forge/yarp-feedstock/issues/69\n        - if not exist %PREFIX%\\\\Library\\\\include\\\\yarp\\\\cv\\\\Cv.h exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\lib\\\\YARP_os.lib exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\bin\\\\YARP_os.dll exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\lib\\\\cmake\\\\YARP_os\\\\YARP_osConfig.cmake exit 1  # [win]\n        # Regression test for https://github.com/conda-forge/yarp-feedstock/issues/66\n        - test -f ${PREFIX}/lib/yarp/yarp_pm_depthimage_compression_zlib.so  # [not win]\n        - if not exist %PREFIX%\\\\Library\\\\lib\\\\yarp\\\\yarp_pm_depthimage_compression_zlib.dll exit 1  # [win]\n\n\n  - name: {{ namepython }}\n    script: build_py.sh  # [unix]\n    script: bld_py.bat  # [win]\n    requirements:\n      build:\n        - {{ compiler('c') }}\n        - {{ stdlib(\"c\") }}\n        - {{ compiler('cxx') }}\n        - swig\n        - ninja\n        - cmake\n        - python                                 # [build_platform != target_platform]\n        - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n      host:\n        - {{ pin_subpackage(namecxx, exact=True) }}\n        - python\n        - openssl\n\n      run:\n        - {{ pin_subpackage(namecxx, exact=True) }}\n        - python\n        - numpy\n    test:\n      commands:\n        - test $(pip list | grep yarp | tr -s \" \" | grep $PKG_VERSION | wc -l) -eq 1  # [unix]\n        - pip check\n      requires:\n        - pip\n      imports:\n        - yarp\n\n  - name: {{ name }}\n    build:\n      run_exports:\n        - {{ pin_subpackage(namecxx, max_pin='x.x.x') }}\n    requirements:\n      run:\n        - {{ pin_subpackage(namecxx, exact=True) }}\n        - {{ pin_subpackage(namepython, max_pin='x.x.x') }}\n    test:\n      imports:\n        - yarp\n\n  - name: yarp-cxx\n    build:\n      run_exports:\n        - {{ pin_subpackage(namecxx, max_pin='x.x.x') }}\n    requirements:\n      run:\n        - {{ pin_subpackage(namecxx, exact=True) }}\n    test:\n      commands:\n        - yarp help\n\nabout:\n  home: https://github.com/robotology/yarp\n  license: BSD-3-Clause AND MIT AND GPL-3.0-or-later\n  license_file:\n    - COPYING\n    - extern/thrift/LICENSES/BSD-3-Clause.txt\n    - extern/dirent/dirent/LICENSE\n  summary: YARP is a library and toolkit for communication and device interfaces, used on everything from humanoids to embedded devices.\n\n\nextra:\n  recipe-maintainers:\n    - traversaro\n",
+  "raw_meta_yaml": "{% set name = \"yarp\" %}\n{% set namecxx = \"libyarp\" %}\n{% set namepython = \"yarp-python\" %}\n{% set version = \"3.11.2\" %}\n\npackage:\n  name: {{ name }}\n  version: {{ version }}\n\nsource:\n  url: https://github.com/robotology/yarp/archive/refs/tags/v{{ version }}.tar.gz\n  sha256: a07121e0ab3dcf63f95e68075933bde0570e8c49ffbf96647ee27a3d7a2553eb\n  patches:\n    - 2983.patch\n\nbuild:\n  number: 3\n\noutputs:\n  - name: {{ namecxx }}\n    script: build_cxx.sh  # [unix]\n    script: bld_cxx.bat  # [win]\n    build:\n      run_exports:\n        - {{ pin_subpackage(namecxx, max_pin='x.x.x') }}\n    requirements:\n      build:\n        - {{ compiler('c') }}\n        - {{ stdlib(\"c\") }}\n        - {{ compiler('cxx') }}\n        - cmake\n        - pkg-config\n        - ninja\n        - multisheller\n        - ycm-cmake-modules\n        - bison  # [not win]\n        - flex  # [not win]\n      host:\n        - ace\n        - tinyxml\n        - eigen\n        - sdl\n        - sqlite\n        - libjpeg-turbo\n        - bash-completion  # [not win]\n        - libi2c  # [linux]\n        - robot-testing-framework\n        - libgl-devel  # [linux]\n        - xorg-libxfixes  # [linux]\n        - libpng\n        - zlib\n        - soxr\n        - libedit  # [not win]\n        - libopencv\n        # Temporary workaround to avoid to update to vs2022, \n        # see https://github.com/conda-forge/yarp-feedstock/pull/70#issuecomment-2910021339\n        - libopencv 4.11.0=*_6\n        - portaudio\n        - qt-main\n        - ffmpeg\n\n      run:\n        # ycm and eigen are mentioned in the headers so needed when building\n        # against libyarp\n        - ycm-cmake-modules\n        - eigen\n\n    test:\n      commands:\n        - yarp help\n        - test -f ${PREFIX}/include/yarp/os/all.h  # [not win]\n        - test -f ${PREFIX}/include/yarp/cv/Cv.h  # [not win]\n        - test -f ${PREFIX}/lib/libYARP_os.so  # [linux]\n        - test -f ${PREFIX}/lib/libYARP_os.dylib  # [osx]\n        - test -f ${PREFIX}/lib/cmake/YARP_os/YARP_osConfig.cmake  # [not win]\n        - if not exist %PREFIX%\\\\Library\\\\include\\\\yarp\\\\os\\\\all.h exit 1  # [win]\n        # Regression test for https://github.com/conda-forge/yarp-feedstock/issues/69\n        - if not exist %PREFIX%\\\\Library\\\\include\\\\yarp\\\\cv\\\\Cv.h exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\lib\\\\YARP_os.lib exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\bin\\\\YARP_os.dll exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\lib\\\\cmake\\\\YARP_os\\\\YARP_osConfig.cmake exit 1  # [win]\n        # Regression test for https://github.com/conda-forge/yarp-feedstock/issues/66\n        - test -f ${PREFIX}/lib/yarp/yarp_pm_depthimage_compression_zlib.so  # [not win]\n        - if not exist %PREFIX%\\\\Library\\\\lib\\\\yarp\\\\yarp_pm_depthimage_compression_zlib.dll exit 1  # [win]\n\n\n  - name: {{ namepython }}\n    script: build_py.sh  # [unix]\n    script: bld_py.bat  # [win]\n    requirements:\n      build:\n        - {{ compiler('c') }}\n        - {{ stdlib(\"c\") }}\n        - {{ compiler('cxx') }}\n        - swig\n        - ninja\n        - cmake\n        - python                                 # [build_platform != target_platform]\n        - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n      host:\n        - {{ pin_subpackage(namecxx, exact=True) }}\n        - python\n        - openssl\n\n      run:\n        - {{ pin_subpackage(namecxx, exact=True) }}\n        - python\n        - numpy\n    test:\n      commands:\n        - test $(pip list | grep yarp | tr -s \" \" | grep $PKG_VERSION | wc -l) -eq 1  # [unix]\n        - pip check\n      requires:\n        - pip\n      imports:\n        - yarp\n\n  - name: {{ name }}\n    build:\n      run_exports:\n        - {{ pin_subpackage(namecxx, max_pin='x.x.x') }}\n    requirements:\n      run:\n        - {{ pin_subpackage(namecxx, exact=True) }}\n        - {{ pin_subpackage(namepython, max_pin='x.x.x') }}\n    test:\n      imports:\n        - yarp\n\n  - name: yarp-cxx\n    build:\n      run_exports:\n        - {{ pin_subpackage(namecxx, max_pin='x.x.x') }}\n    requirements:\n      run:\n        - {{ pin_subpackage(namecxx, exact=True) }}\n    test:\n      commands:\n        - yarp help\n\nabout:\n  home: https://github.com/robotology/yarp\n  license: BSD-3-Clause AND MIT AND GPL-3.0-or-later\n  license_file:\n    - COPYING\n    - extern/thrift/LICENSES/BSD-3-Clause.txt\n    - extern/dirent/dirent/LICENSE\n  summary: YARP is a library and toolkit for communication and device interfaces, used on everything from humanoids to embedded devices.\n\n\nextra:\n  recipe-maintainers:\n    - traversaro\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -7908,7 +7908,7 @@
       "summary": "YARP is a library and toolkit for communication and device interfaces, used on everything from humanoids to embedded devices."
     },
     "build": {
-      "number": "2"
+      "number": "3"
     },
     "extra": {
       "recipe-maintainers": [
