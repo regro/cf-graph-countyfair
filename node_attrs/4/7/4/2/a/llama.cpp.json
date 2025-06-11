@@ -12,7 +12,9 @@
     "conda_build": {
       "error_overlinking": true
     },
+    "conda_build_tool": "rattler-build",
     "conda_forge_output_validation": true,
+    "conda_install_tool": "pixi",
     "github": {
       "branch_name": "main",
       "tooling_branch_name": "main"
@@ -23,50 +25,106 @@
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
     "about": {
-      "home": "https://github.com/ggerganov/llama.cpp",
+      "dev_url": "https://github.com/ggml-org/llama.cpp",
+      "home": "https://github.com/ggml-org/llama.cpp",
       "license": "MIT",
       "license_family": "MIT",
       "license_file": "LICENSE",
       "summary": "Port of Facebook's LLaMA model in C/C++"
     },
     "build": {
-      "missing_dso_whitelist": [
-        "*/libcuda.so.1"
-      ],
-      "number": "1",
-      "script": [
-        "LLAMA_ARGS=\"-DLLAMA_BUILD_TESTS=OFF\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DBUILD_SHARED_LIBS=ON\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_NATIVE=OFF\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_AVX=OFF\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_AVX2=OFF\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_FMA=OFF\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_F16C=OFF\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_METAL=ON\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_METAL=OFF\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_ACCELERATE=ON\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_CUDA=ON\"",
-        "set LLAMA_ARGS=%LLAMA_ARGS% -DLLAMA_CUDA=ON",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DCMAKE_CUDA_ARCHITECTURES=all\"",
-        "set LLAMA_ARGS=%LLAMA_ARGS% -DCMAKE_CUDA_ARCHITECTURES=all",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_BLAS=ON\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_BLAS_VENDOR=Intel10_64_dyn\"",
-        "echo $LLAMA_ARGS",
-        "cmake -S . -B build -G Ninja ${CMAKE_ARGS} ${LLAMA_ARGS}",
-        "cmake --build build",
-        "cmake --install build",
-        "set LLAMA_ARGS=%LLAMA_ARGS% -DLLAMA_BLAS=ON",
-        "set LLAMA_ARGS=%LLAMA_ARGS% -DLLAMA_BLAS_VENDOR=Intel10_64_dyn"
-      ],
-      "string": "cpu_mkl_h1234567_1"
+      "number": "2",
+      "script": "echo hello\nLLAMA_ARGS=\"-DLLAMA_BUILD_TESTS=OFF\"\n{%- macro llama_args(value) %}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_${{ value }}\"\n{%- endmacro %}\n{%- macro cmake_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -D${{ value }}\"\n{%- endmacro %}\n${{ cmake_args(\"BUILD_SHARED_LIBS=ON\") }}\n{%- if osx and arm64 %}\n${{ llama_args(\"NATIVE=OFF\") }}\n${{ llama_args(\"AVX=OFF\") }}\n${{ llama_args(\"AVX2=OFF\") }}\n${{ llama_args(\"FMA=OFF\") }}\n${{ llama_args(\"F16C=OFF\") }}\n${{ llama_args(\"METAL=ON\") }}\n${{ llama_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n{%- if osx and x86_64 %}\n${{ llama_args(\"METAL=OFF\") }}\n${{ llama_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n{%- if cuda_compiler_version != \"None\" %}\n${{ llama_args(\"CUDA=ON\") }}\n${{ cmake_args(\"CMAKE_CUDA_ARCHITECTURES=all\") }}\n{%- endif %}\n{%- if not osx and cuda_compiler_version == \"None\" %}\n${{ llama_args(\"BLAS=ON\") }}\n{%- if blas_impl == \"mkl\" %}\n${{ llama_args(\"BLAS_VENDOR=Intel10_64_dyn\") }}\n{%- endif %}\n{%- endif %}\n\necho $LLAMA_ARGS\ncmake -S . -B build -G Ninja ${CMAKE_ARGS} ${LLAMA_ARGS}\ncmake --build build\ncmake --install build\n"
     },
     "extra": {
       "recipe-maintainers": [
         "jonashaag",
         "frankier",
-        "sodre"
+        "sodre",
+        "pavelzw"
       ]
     },
+    "outputs": [
+      {
+        "build": null,
+        "name": "llama.cpp",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "cuda_compiler_stub",
+            "cmake",
+            "git",
+            "ninja",
+            "pkgconfig"
+          ],
+          "host": [
+            "cuda-version 11.8.*"
+          ],
+          "run": [
+            "cuda-version 11.8.*",
+            "__cuda"
+          ]
+        },
+        "tests": []
+      },
+      {
+        "build": null,
+        "name": "llama.cpp",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "cmake",
+            "git",
+            "ninja",
+            "pkgconfig"
+          ],
+          "host": [
+            "blas-devel * *_mkl",
+            "mkl-devel 2024.*"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "main --help",
+              "server --help"
+            ]
+          }
+        ]
+      },
+      {
+        "build": null,
+        "name": "llama.cpp",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "cuda_compiler_stub",
+            "cmake",
+            "git",
+            "ninja",
+            "pkgconfig"
+          ],
+          "host": [
+            "cuda-version 12.6.*",
+            "cuda-cudart-dev 12.6.*",
+            "libcublas-dev 12.6.*"
+          ],
+          "run": [
+            "cuda-version 12.6.*",
+            "__cuda",
+            "cuda-nvcc-tools"
+          ]
+        },
+        "tests": []
+      }
+    ],
     "package": {
       "name": "llama.cpp",
       "version": "0.0.2646"
@@ -83,35 +141,27 @@
         "pkgconfig"
       ],
       "host": [
-        "cuda-version     11.8",
-        "cuda-version     12.0",
-        "cuda-cudart-dev  12.0",
-        "libcublas-dev    12.0",
-        "blas-devel * *mkl",
-        "mkl-devel 2024"
+        "cuda-version 11.8.*",
+        "blas-devel * *_mkl",
+        "mkl-devel 2024.*",
+        "cuda-version 12.6.*",
+        "cuda-cudart-dev 12.6.*",
+        "libcublas-dev 12.6.*"
       ],
       "run": [
-        "cuda-version 11.8",
+        "cuda-version 11.8.*",
         "__cuda",
-        "cuda-version 12.0",
-        "cuda-nvcc-tools",
-        "llvm-openmp"
+        "cuda-version 12.6.*",
+        "cuda-nvcc-tools"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "patches": [
         "mkl.patch"
       ],
       "sha256": "02953cc03455bac1fcb337ff841600654712f6f6bbed54c31078eead530ff1fa",
-      "url": "https://github.com/ggerganov/llama.cpp/archive/b2646.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "main --help",
-        "server --help"
-      ],
-      "requires": null
+      "url": "https://github.com/ggml-org/llama.cpp/archive/b2646.tar.gz"
     }
   },
   "linux_64_requirements": {
@@ -143,8 +193,7 @@
       "elements": [
         "__cuda",
         "cuda-nvcc-tools",
-        "cuda-version",
-        "llvm-openmp"
+        "cuda-version"
       ]
     },
     "test": {
@@ -154,49 +203,103 @@
   },
   "linux_aarch64_meta_yaml": {
     "about": {
-      "home": "https://github.com/ggerganov/llama.cpp",
+      "dev_url": "https://github.com/ggml-org/llama.cpp",
+      "home": "https://github.com/ggml-org/llama.cpp",
       "license": "MIT",
       "license_family": "MIT",
       "license_file": "LICENSE",
       "summary": "Port of Facebook's LLaMA model in C/C++"
     },
     "build": {
-      "missing_dso_whitelist": [
-        "*/libcuda.so.1"
-      ],
-      "number": "1",
-      "script": [
-        "LLAMA_ARGS=\"-DLLAMA_BUILD_TESTS=OFF\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DBUILD_SHARED_LIBS=ON\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_NATIVE=OFF\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_AVX=OFF\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_AVX2=OFF\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_FMA=OFF\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_F16C=OFF\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_METAL=ON\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_METAL=OFF\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_ACCELERATE=ON\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_CUDA=ON\"",
-        "set LLAMA_ARGS=%LLAMA_ARGS% -DLLAMA_CUDA=ON",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DCMAKE_CUDA_ARCHITECTURES=all\"",
-        "set LLAMA_ARGS=%LLAMA_ARGS% -DCMAKE_CUDA_ARCHITECTURES=all",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_BLAS=ON\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_BLAS_VENDOR=Intel10_64_dyn\"",
-        "echo $LLAMA_ARGS",
-        "cmake -S . -B build -G Ninja ${CMAKE_ARGS} ${LLAMA_ARGS}",
-        "cmake --build build",
-        "cmake --install build",
-        "set LLAMA_ARGS=%LLAMA_ARGS% -DLLAMA_BLAS=ON"
-      ],
-      "string": "cpu_openblas_h1234567_1"
+      "number": "2",
+      "script": "echo hello\nLLAMA_ARGS=\"-DLLAMA_BUILD_TESTS=OFF\"\n{%- macro llama_args(value) %}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_${{ value }}\"\n{%- endmacro %}\n{%- macro cmake_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -D${{ value }}\"\n{%- endmacro %}\n${{ cmake_args(\"BUILD_SHARED_LIBS=ON\") }}\n{%- if osx and arm64 %}\n${{ llama_args(\"NATIVE=OFF\") }}\n${{ llama_args(\"AVX=OFF\") }}\n${{ llama_args(\"AVX2=OFF\") }}\n${{ llama_args(\"FMA=OFF\") }}\n${{ llama_args(\"F16C=OFF\") }}\n${{ llama_args(\"METAL=ON\") }}\n${{ llama_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n{%- if osx and x86_64 %}\n${{ llama_args(\"METAL=OFF\") }}\n${{ llama_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n{%- if cuda_compiler_version != \"None\" %}\n${{ llama_args(\"CUDA=ON\") }}\n${{ cmake_args(\"CMAKE_CUDA_ARCHITECTURES=all\") }}\n{%- endif %}\n{%- if not osx and cuda_compiler_version == \"None\" %}\n${{ llama_args(\"BLAS=ON\") }}\n{%- if blas_impl == \"mkl\" %}\n${{ llama_args(\"BLAS_VENDOR=Intel10_64_dyn\") }}\n{%- endif %}\n{%- endif %}\n\necho $LLAMA_ARGS\ncmake -S . -B build -G Ninja ${CMAKE_ARGS} ${LLAMA_ARGS}\ncmake --build build\ncmake --install build\n"
     },
     "extra": {
       "recipe-maintainers": [
         "jonashaag",
         "frankier",
-        "sodre"
+        "sodre",
+        "pavelzw"
       ]
     },
+    "outputs": [
+      {
+        "build": null,
+        "name": "llama.cpp",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "cuda_compiler_stub",
+            "cmake",
+            "git",
+            "ninja",
+            "pkgconfig"
+          ],
+          "host": [
+            "cuda-version 11.8.*"
+          ],
+          "run": [
+            "cuda-version 11.8.*",
+            "__cuda"
+          ]
+        },
+        "tests": []
+      },
+      {
+        "build": null,
+        "name": "llama.cpp",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "cmake",
+            "git",
+            "ninja",
+            "pkgconfig"
+          ],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "main --help",
+              "server --help"
+            ]
+          }
+        ]
+      },
+      {
+        "build": null,
+        "name": "llama.cpp",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "cuda_compiler_stub",
+            "cmake",
+            "git",
+            "ninja",
+            "pkgconfig"
+          ],
+          "host": [
+            "cuda-version 12.6.*",
+            "cuda-cudart-dev 12.6.*",
+            "libcublas-dev 12.6.*"
+          ],
+          "run": [
+            "cuda-version 12.6.*",
+            "__cuda",
+            "cuda-nvcc-tools"
+          ]
+        },
+        "tests": []
+      }
+    ],
     "package": {
       "name": "llama.cpp",
       "version": "0.0.2646"
@@ -213,30 +316,22 @@
         "pkgconfig"
       ],
       "host": [
-        "cuda-version     11.8",
-        "cuda-version     12.0",
-        "cuda-cudart-dev  12.0",
-        "libcublas-dev    12.0"
+        "cuda-version 11.8.*",
+        "cuda-version 12.6.*",
+        "cuda-cudart-dev 12.6.*",
+        "libcublas-dev 12.6.*"
       ],
       "run": [
-        "cuda-version 11.8",
+        "cuda-version 11.8.*",
         "__cuda",
-        "cuda-version 12.0",
+        "cuda-version 12.6.*",
         "cuda-nvcc-tools"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
-      "patches": null,
       "sha256": "02953cc03455bac1fcb337ff841600654712f6f6bbed54c31078eead530ff1fa",
-      "url": "https://github.com/ggerganov/llama.cpp/archive/b2646.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "main --help",
-        "server --help"
-      ],
-      "requires": null
+      "url": "https://github.com/ggml-org/llama.cpp/archive/b2646.tar.gz"
     }
   },
   "linux_aarch64_requirements": {
@@ -276,62 +371,311 @@
   },
   "meta_yaml": {
     "about": {
-      "home": "https://github.com/ggerganov/llama.cpp",
+      "dev_url": "https://github.com/ggml-org/llama.cpp",
+      "home": "https://github.com/ggml-org/llama.cpp",
       "license": "MIT",
       "license_family": "MIT",
       "license_file": "LICENSE",
       "summary": "Port of Facebook's LLaMA model in C/C++"
     },
     "build": {
-      "missing_dso_whitelist": [
-        "*/nvcuda.dll"
-      ],
-      "number": "1",
-      "script": [
-        "LLAMA_ARGS=\"-DLLAMA_BUILD_TESTS=OFF\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DBUILD_SHARED_LIBS=ON\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_NATIVE=OFF\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_AVX=OFF\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_AVX2=OFF\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_FMA=OFF\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_F16C=OFF\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_METAL=ON\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_METAL=OFF\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_ACCELERATE=ON\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_CUDA=ON\"",
-        "set LLAMA_ARGS=%LLAMA_ARGS% -DLLAMA_CUDA=ON",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DCMAKE_CUDA_ARCHITECTURES=all\"",
-        "set LLAMA_ARGS=%LLAMA_ARGS% -DCMAKE_CUDA_ARCHITECTURES=all",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_BLAS=ON\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_BLAS_VENDOR=Intel10_64_dyn\"",
-        "echo $LLAMA_ARGS",
-        "cmake -S . -B build -G Ninja ${CMAKE_ARGS} ${LLAMA_ARGS}",
-        "cmake --build build",
-        "cmake --install build",
-        "set LLAMA_ARGS=%LLAMA_ARGS% -DLLAMA_BLAS=ON",
-        "set LLAMA_ARGS=%LLAMA_ARGS% -DLLAMA_BLAS_VENDOR=Intel10_64_dyn",
-        "set LLAMA_ARGS=%LLAMA_ARGS% -DLLAMA_METAL=OFF",
-        "set LLAMA_ARGS=%LLAMA_ARGS% -DLLAMA_ACCELERATE=ON",
-        "set LLAMA_ARGS=%LLAMA_ARGS% -DLLAMA_NATIVE=OFF",
-        "set LLAMA_ARGS=%LLAMA_ARGS% -DLLAMA_AVX=OFF",
-        "set LLAMA_ARGS=%LLAMA_ARGS% -DLLAMA_AVX2=OFF",
-        "set LLAMA_ARGS=%LLAMA_ARGS% -DLLAMA_FMA=OFF",
-        "set LLAMA_ARGS=%LLAMA_ARGS% -DLLAMA_F16C=OFF",
-        "set LLAMA_ARGS=%LLAMA_ARGS% -DLLAMA_METAL=ON",
-        "set LLAMA_ARGS=-DLLAMA_BUILD_TESTS=OFF",
-        "set LLAMA_ARGS=%LLAMA_ARGS% -DBUILD_SHARED_LIBS=ON",
-        "set LLAMA_ARGS",
-        "cmake -S . -B build -G Ninja %CMAKE_ARGS% %LLAMA_ARGS%"
-      ],
-      "string": "cpu_mkl_h1234567_1"
+      "number": "2",
+      "script": "echo hello\nLLAMA_ARGS=\"-DLLAMA_BUILD_TESTS=OFF\"\n{%- macro llama_args(value) %}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_${{ value }}\"\n{%- endmacro %}\n{%- macro cmake_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -D${{ value }}\"\n{%- endmacro %}\n${{ cmake_args(\"BUILD_SHARED_LIBS=ON\") }}\n{%- if osx and arm64 %}\n${{ llama_args(\"NATIVE=OFF\") }}\n${{ llama_args(\"AVX=OFF\") }}\n${{ llama_args(\"AVX2=OFF\") }}\n${{ llama_args(\"FMA=OFF\") }}\n${{ llama_args(\"F16C=OFF\") }}\n${{ llama_args(\"METAL=ON\") }}\n${{ llama_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n{%- if osx and x86_64 %}\n${{ llama_args(\"METAL=OFF\") }}\n${{ llama_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n{%- if cuda_compiler_version != \"None\" %}\n${{ llama_args(\"CUDA=ON\") }}\n${{ cmake_args(\"CMAKE_CUDA_ARCHITECTURES=all\") }}\n{%- endif %}\n{%- if not osx and cuda_compiler_version == \"None\" %}\n${{ llama_args(\"BLAS=ON\") }}\n{%- if blas_impl == \"mkl\" %}\n${{ llama_args(\"BLAS_VENDOR=Intel10_64_dyn\") }}\n{%- endif %}\n{%- endif %}\n\necho $LLAMA_ARGS\ncmake -S . -B build -G Ninja ${CMAKE_ARGS} ${LLAMA_ARGS}\ncmake --build build\ncmake --install build\n"
     },
     "extra": {
       "recipe-maintainers": [
         "jonashaag",
         "frankier",
-        "sodre"
+        "sodre",
+        "pavelzw"
       ]
     },
+    "outputs": [
+      {
+        "build": null,
+        "name": "llama.cpp",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "cuda_compiler_stub",
+            "cmake",
+            "git",
+            "ninja",
+            "pkgconfig"
+          ],
+          "host": [
+            "cuda-version 11.8.*"
+          ],
+          "run": [
+            "cuda-version 11.8.*",
+            "__cuda"
+          ]
+        },
+        "tests": []
+      },
+      {
+        "build": null,
+        "name": "llama.cpp",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "cmake",
+            "git",
+            "ninja",
+            "pkgconfig"
+          ],
+          "host": [
+            "blas-devel * *_mkl",
+            "mkl-devel 2024.*"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "main --help",
+              "server --help"
+            ]
+          }
+        ]
+      },
+      {
+        "build": null,
+        "name": "llama.cpp",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "cuda_compiler_stub",
+            "cmake",
+            "git",
+            "ninja",
+            "pkgconfig"
+          ],
+          "host": [
+            "cuda-version 12.6.*",
+            "cuda-cudart-dev 12.6.*",
+            "libcublas-dev 12.6.*"
+          ],
+          "run": [
+            "cuda-version 12.6.*",
+            "__cuda",
+            "cuda-nvcc-tools"
+          ]
+        },
+        "tests": []
+      },
+      {
+        "build": null,
+        "name": "llama.cpp",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "cuda_compiler_stub",
+            "cmake",
+            "git",
+            "ninja",
+            "pkgconfig"
+          ],
+          "host": [
+            "cuda-version 11.8.*"
+          ],
+          "run": [
+            "cuda-version 11.8.*",
+            "__cuda"
+          ]
+        },
+        "tests": []
+      },
+      {
+        "build": null,
+        "name": "llama.cpp",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "cmake",
+            "git",
+            "ninja",
+            "pkgconfig"
+          ],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "main --help",
+              "server --help"
+            ]
+          }
+        ]
+      },
+      {
+        "build": null,
+        "name": "llama.cpp",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "cuda_compiler_stub",
+            "cmake",
+            "git",
+            "ninja",
+            "pkgconfig"
+          ],
+          "host": [
+            "cuda-version 12.6.*",
+            "cuda-cudart-dev 12.6.*",
+            "libcublas-dev 12.6.*"
+          ],
+          "run": [
+            "cuda-version 12.6.*",
+            "__cuda",
+            "cuda-nvcc-tools"
+          ]
+        },
+        "tests": []
+      },
+      {
+        "build": null,
+        "name": "llama.cpp",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "cmake",
+            "git",
+            "ninja",
+            "pkgconfig"
+          ],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "main --help",
+              "server --help"
+            ]
+          }
+        ]
+      },
+      {
+        "build": null,
+        "name": "llama.cpp",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "cmake",
+            "git",
+            "ninja",
+            "pkgconfig"
+          ],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "main --help",
+              "server --help"
+            ]
+          }
+        ]
+      },
+      {
+        "build": null,
+        "name": "llama.cpp",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "cmake",
+            "git",
+            "ninja",
+            "pkgconfig"
+          ],
+          "host": [
+            "blas-devel * *_mkl",
+            "mkl-devel 2024.*"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "main --help",
+              "server --help"
+            ]
+          }
+        ]
+      },
+      {
+        "build": null,
+        "name": "llama.cpp",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "cuda_compiler_stub",
+            "cmake",
+            "git",
+            "ninja",
+            "pkgconfig"
+          ],
+          "host": [
+            "cuda-version 12.6.*",
+            "cuda-cudart-dev 12.6.*",
+            "libcublas-dev 12.6.*"
+          ],
+          "run": [
+            "cuda-version 12.6.*",
+            "__cuda",
+            "cuda-nvcc-tools"
+          ]
+        },
+        "tests": []
+      },
+      {
+        "build": null,
+        "name": "llama.cpp",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "cuda_compiler_stub",
+            "cmake",
+            "git",
+            "ninja",
+            "pkgconfig"
+          ],
+          "host": [
+            "cuda-version 11.8.*"
+          ],
+          "run": [
+            "cuda-version 11.8.*",
+            "__cuda"
+          ]
+        },
+        "tests": []
+      }
+    ],
     "package": {
       "name": "llama.cpp",
       "version": "0.0.2646"
@@ -348,80 +692,78 @@
         "pkgconfig"
       ],
       "host": [
-        "cuda-version     11.8",
-        "cuda-version     12.0",
-        "cuda-cudart-dev  12.0",
-        "libcublas-dev    12.0",
-        "blas-devel * *mkl",
-        "mkl-devel 2024"
+        "blas-devel * *_mkl",
+        "mkl-devel 2024.*",
+        "cuda-version 12.6.*",
+        "cuda-cudart-dev 12.6.*",
+        "libcublas-dev 12.6.*",
+        "cuda-version 11.8.*"
       ],
       "run": [
-        "cuda-version 11.8",
+        "cuda-version 12.6.*",
         "__cuda",
-        "cuda-version 12.0",
         "cuda-nvcc-tools",
-        "llvm-openmp"
+        "cuda-version 11.8.*"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "patches": [
         "mkl.patch"
       ],
       "sha256": "02953cc03455bac1fcb337ff841600654712f6f6bbed54c31078eead530ff1fa",
-      "url": "https://github.com/ggerganov/llama.cpp/archive/b2646.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "main --help",
-        "server --help"
-      ],
-      "requires": null
+      "url": "https://github.com/ggml-org/llama.cpp/archive/b2646.tar.gz"
     }
   },
   "name": "llama.cpp",
   "osx_64_meta_yaml": {
     "about": {
-      "home": "https://github.com/ggerganov/llama.cpp",
+      "dev_url": "https://github.com/ggml-org/llama.cpp",
+      "home": "https://github.com/ggml-org/llama.cpp",
       "license": "MIT",
       "license_family": "MIT",
       "license_file": "LICENSE",
       "summary": "Port of Facebook's LLaMA model in C/C++"
     },
     "build": {
-      "missing_dso_whitelist": null,
-      "number": "1",
-      "script": [
-        "LLAMA_ARGS=\"-DLLAMA_BUILD_TESTS=OFF\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DBUILD_SHARED_LIBS=ON\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_NATIVE=OFF\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_AVX=OFF\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_AVX2=OFF\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_FMA=OFF\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_F16C=OFF\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_METAL=ON\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_METAL=OFF\"",
-        "set LLAMA_ARGS=%LLAMA_ARGS% -DLLAMA_METAL=OFF",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_ACCELERATE=ON\"",
-        "set LLAMA_ARGS=%LLAMA_ARGS% -DLLAMA_ACCELERATE=ON",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_CUDA=ON\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DCMAKE_CUDA_ARCHITECTURES=all\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_BLAS=ON\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_BLAS_VENDOR=Intel10_64_dyn\"",
-        "echo $LLAMA_ARGS",
-        "cmake -S . -B build -G Ninja ${CMAKE_ARGS} ${LLAMA_ARGS}",
-        "cmake --build build",
-        "cmake --install build"
-      ],
-      "string": "cpu_accelerate_h1234567_1"
+      "number": "2",
+      "script": "echo hello\nLLAMA_ARGS=\"-DLLAMA_BUILD_TESTS=OFF\"\n{%- macro llama_args(value) %}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_${{ value }}\"\n{%- endmacro %}\n{%- macro cmake_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -D${{ value }}\"\n{%- endmacro %}\n${{ cmake_args(\"BUILD_SHARED_LIBS=ON\") }}\n{%- if osx and arm64 %}\n${{ llama_args(\"NATIVE=OFF\") }}\n${{ llama_args(\"AVX=OFF\") }}\n${{ llama_args(\"AVX2=OFF\") }}\n${{ llama_args(\"FMA=OFF\") }}\n${{ llama_args(\"F16C=OFF\") }}\n${{ llama_args(\"METAL=ON\") }}\n${{ llama_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n{%- if osx and x86_64 %}\n${{ llama_args(\"METAL=OFF\") }}\n${{ llama_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n{%- if cuda_compiler_version != \"None\" %}\n${{ llama_args(\"CUDA=ON\") }}\n${{ cmake_args(\"CMAKE_CUDA_ARCHITECTURES=all\") }}\n{%- endif %}\n{%- if not osx and cuda_compiler_version == \"None\" %}\n${{ llama_args(\"BLAS=ON\") }}\n{%- if blas_impl == \"mkl\" %}\n${{ llama_args(\"BLAS_VENDOR=Intel10_64_dyn\") }}\n{%- endif %}\n{%- endif %}\n\necho $LLAMA_ARGS\ncmake -S . -B build -G Ninja ${CMAKE_ARGS} ${LLAMA_ARGS}\ncmake --build build\ncmake --install build\n"
     },
     "extra": {
       "recipe-maintainers": [
         "jonashaag",
         "frankier",
-        "sodre"
+        "sodre",
+        "pavelzw"
       ]
     },
+    "outputs": [
+      {
+        "build": null,
+        "name": "llama.cpp",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "cmake",
+            "git",
+            "ninja",
+            "pkgconfig"
+          ],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "main --help",
+              "server --help"
+            ]
+          }
+        ]
+      }
+    ],
     "package": {
       "name": "llama.cpp",
       "version": "0.0.2646"
@@ -435,22 +777,12 @@
         "git",
         "ninja",
         "pkgconfig"
-      ],
-      "host": [],
-      "run": []
+      ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
-      "patches": null,
       "sha256": "02953cc03455bac1fcb337ff841600654712f6f6bbed54c31078eead530ff1fa",
-      "url": "https://github.com/ggerganov/llama.cpp/archive/b2646.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "main --help",
-        "server --help"
-      ],
-      "requires": null
+      "url": "https://github.com/ggml-org/llama.cpp/archive/b2646.tar.gz"
     }
   },
   "osx_64_requirements": {
@@ -481,51 +813,52 @@
   },
   "osx_arm64_meta_yaml": {
     "about": {
-      "home": "https://github.com/ggerganov/llama.cpp",
+      "dev_url": "https://github.com/ggml-org/llama.cpp",
+      "home": "https://github.com/ggml-org/llama.cpp",
       "license": "MIT",
       "license_family": "MIT",
       "license_file": "LICENSE",
       "summary": "Port of Facebook's LLaMA model in C/C++"
     },
     "build": {
-      "missing_dso_whitelist": null,
-      "number": "1",
-      "script": [
-        "LLAMA_ARGS=\"-DLLAMA_BUILD_TESTS=OFF\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DBUILD_SHARED_LIBS=ON\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_NATIVE=OFF\"",
-        "set LLAMA_ARGS=%LLAMA_ARGS% -DLLAMA_NATIVE=OFF",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_AVX=OFF\"",
-        "set LLAMA_ARGS=%LLAMA_ARGS% -DLLAMA_AVX=OFF",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_AVX2=OFF\"",
-        "set LLAMA_ARGS=%LLAMA_ARGS% -DLLAMA_AVX2=OFF",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_FMA=OFF\"",
-        "set LLAMA_ARGS=%LLAMA_ARGS% -DLLAMA_FMA=OFF",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_F16C=OFF\"",
-        "set LLAMA_ARGS=%LLAMA_ARGS% -DLLAMA_F16C=OFF",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_METAL=ON\"",
-        "set LLAMA_ARGS=%LLAMA_ARGS% -DLLAMA_METAL=ON",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_METAL=OFF\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_ACCELERATE=ON\"",
-        "set LLAMA_ARGS=%LLAMA_ARGS% -DLLAMA_ACCELERATE=ON",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_CUDA=ON\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DCMAKE_CUDA_ARCHITECTURES=all\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_BLAS=ON\"",
-        "LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_BLAS_VENDOR=Intel10_64_dyn\"",
-        "echo $LLAMA_ARGS",
-        "cmake -S . -B build -G Ninja ${CMAKE_ARGS} ${LLAMA_ARGS}",
-        "cmake --build build",
-        "cmake --install build"
-      ],
-      "string": "mps_h1234567_1"
+      "number": "2",
+      "script": "echo hello\nLLAMA_ARGS=\"-DLLAMA_BUILD_TESTS=OFF\"\n{%- macro llama_args(value) %}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_${{ value }}\"\n{%- endmacro %}\n{%- macro cmake_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -D${{ value }}\"\n{%- endmacro %}\n${{ cmake_args(\"BUILD_SHARED_LIBS=ON\") }}\n{%- if osx and arm64 %}\n${{ llama_args(\"NATIVE=OFF\") }}\n${{ llama_args(\"AVX=OFF\") }}\n${{ llama_args(\"AVX2=OFF\") }}\n${{ llama_args(\"FMA=OFF\") }}\n${{ llama_args(\"F16C=OFF\") }}\n${{ llama_args(\"METAL=ON\") }}\n${{ llama_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n{%- if osx and x86_64 %}\n${{ llama_args(\"METAL=OFF\") }}\n${{ llama_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n{%- if cuda_compiler_version != \"None\" %}\n${{ llama_args(\"CUDA=ON\") }}\n${{ cmake_args(\"CMAKE_CUDA_ARCHITECTURES=all\") }}\n{%- endif %}\n{%- if not osx and cuda_compiler_version == \"None\" %}\n${{ llama_args(\"BLAS=ON\") }}\n{%- if blas_impl == \"mkl\" %}\n${{ llama_args(\"BLAS_VENDOR=Intel10_64_dyn\") }}\n{%- endif %}\n{%- endif %}\n\necho $LLAMA_ARGS\ncmake -S . -B build -G Ninja ${CMAKE_ARGS} ${LLAMA_ARGS}\ncmake --build build\ncmake --install build\n"
     },
     "extra": {
       "recipe-maintainers": [
         "jonashaag",
         "frankier",
-        "sodre"
+        "sodre",
+        "pavelzw"
       ]
     },
+    "outputs": [
+      {
+        "build": null,
+        "name": "llama.cpp",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "cmake",
+            "git",
+            "ninja",
+            "pkgconfig"
+          ],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "main --help",
+              "server --help"
+            ]
+          }
+        ]
+      }
+    ],
     "package": {
       "name": "llama.cpp",
       "version": "0.0.2646"
@@ -539,22 +872,12 @@
         "git",
         "ninja",
         "pkgconfig"
-      ],
-      "host": [],
-      "run": []
+      ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
-      "patches": null,
       "sha256": "02953cc03455bac1fcb337ff841600654712f6f6bbed54c31078eead530ff1fa",
-      "url": "https://github.com/ggerganov/llama.cpp/archive/b2646.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "main --help",
-        "server --help"
-      ],
-      "requires": null
+      "url": "https://github.com/ggml-org/llama.cpp/archive/b2646.tar.gz"
     }
   },
   "osx_arm64_requirements": {
@@ -600,7 +923,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/llama.cpp.json"
   },
-  "raw_meta_yaml": "{% set name = \"llama.cpp\" %}\n{% set version = \"0.0.2646\" %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://github.com/ggerganov/llama.cpp/archive/b{{ version.split(\".\")[-1] }}.tar.gz\n  sha256: 02953cc03455bac1fcb337ff841600654712f6f6bbed54c31078eead530ff1fa\n  patches:\n    - mkl.patch                   # [blas_impl == \"mkl\"]\n\nbuild:\n  number: 1\n  string: cuda{{ cuda_compiler_version | replace('.', '') }}_h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version != \"None\"]\n  string: cpu_{{ blas_impl }}_h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}                                 # [(osx and x86_64) or cuda_compiler_version == \"None\"]\n  string: mps_h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}                                                 # [osx and arm64]\n\n  script:\n    - LLAMA_ARGS=\"-DLLAMA_BUILD_TESTS=OFF\"              # [unix]\n    - set LLAMA_ARGS=-DLLAMA_BUILD_TESTS=OFF            # [win]\n    {% macro llama_args(value) -%}\n    - LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_{{ value }}\"    # [unix]\n    - set LLAMA_ARGS=%LLAMA_ARGS% -DLLAMA_{{ value }}   # [win]\n    {%- endmacro %}\n    {% macro cmake_args(value) -%}\n    - LLAMA_ARGS=\"${LLAMA_ARGS} -D{{ value }}\"          # [unix]\n    - set LLAMA_ARGS=%LLAMA_ARGS% -D{{ value }}         # [win]\n    {%- endmacro %}\n\n    {{ cmake_args(\"BUILD_SHARED_LIBS=ON\") }}\n\n    {{ llama_args(\"NATIVE=OFF\") }}      # [(osx and arm64) or win]\n    {{ llama_args(\"AVX=OFF\") }}         # [osx and arm64]\n    {{ llama_args(\"AVX2=OFF\") }}        # [osx and arm64]\n    {{ llama_args(\"FMA=OFF\") }}         # [osx and arm64]\n    {{ llama_args(\"F16C=OFF\") }}        # [osx and arm64]\n    {{ llama_args(\"METAL=ON\") }}        # [osx and arm64]\n    {{ llama_args(\"METAL=OFF\") }}       # [osx and x86_64]\n    {{ llama_args(\"ACCELERATE=ON\") }}   # [osx]\n\n    {{ llama_args(\"CUDA=ON\") }}                       # [cuda_compiler_version != \"None\"]\n    {{ cmake_args(\"CMAKE_CUDA_ARCHITECTURES=all\") }}  # [cuda_compiler_version != \"None\"]\n\n    {{ llama_args(\"BLAS=ON\") }}                     # [not osx and cuda_compiler_version == \"None\"]\n    {{ llama_args(\"BLAS_VENDOR=Intel10_64_dyn\") }}  # [not osx and cuda_compiler_version == \"None\" and blas_impl == \"mkl\"]\n\n    - echo $LLAMA_ARGS  # [unix]\n    - set LLAMA_ARGS    # [win]\n\n    - cmake -S . -B build -G Ninja %CMAKE_ARGS% %LLAMA_ARGS%    # [win]\n    - cmake -S . -B build -G Ninja ${CMAKE_ARGS} ${LLAMA_ARGS}  # [unix]\n    - cmake --build build\n    - cmake --install build \n  \n  missing_dso_whitelist:\n    - \"*/nvcuda.dll\"    # [win]\n    - \"*/libcuda.so.1\"  # [linux]\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ stdlib('c') }}\n    - {{ compiler('cxx') }}\n    - {{ compiler('cuda') }}                        # [cuda_compiler_version != \"None\"]\n    - cmake\n    - git\n    - ninja\n    - pkgconfig\n  host:\n    # NOTE: Without cuda-version, we are installing cuda-toolkit 11.8 instead of 11.2!\n    - cuda-version     {{ cuda_compiler_version }}  # [cuda_compiler_version != \"None\"]\n    - cuda-cudart-dev  {{ cuda_compiler_version }}  # [(cuda_compiler_version or \"\").startswith(\"12\")]\n    - libcublas-dev    {{ cuda_compiler_version }}  # [(cuda_compiler_version or \"\").startswith(\"12\")]\n\n    - blas-devel * *{{ blas_impl }}                 # [not osx and cuda_compiler_version == \"None\" and blas_impl == \"mkl\"]\n    - mkl-devel {{ mkl }}                           # [not osx and cuda_compiler_version == \"None\" and blas_impl == \"mkl\"]\n  run:\n    - cuda-version {{ cuda_compiler_version }}      # [cuda_compiler_version != \"None\"]\n\n    - llvm-openmp                                   # [linux and cuda_compiler_version == \"None\" and blas_impl == \"mkl\"]\n    - __cuda                                        # [cuda_compiler_version != \"None\"]\n    - cuda-nvcc-tools                               # [(cuda_compiler_version or \"\").startswith(\"12\")]\n\ntest:\n  requires:\n    - cuda-version     {{ cuda_compiler_version }}  # [cuda_compiler_version != \"None\"]\n  commands:\n    - main --help                                   # [build_platform == target_platform and cuda_compiler_version == \"None\"]\n    - server --help                                 # [build_platform == target_platform and cuda_compiler_version == \"None\"]\n\nabout:\n  home: https://github.com/ggerganov/llama.cpp\n  summary: Port of Facebook's LLaMA model in C/C++\n  license: MIT\n  license_family: MIT\n  license_file: LICENSE\n\nextra:\n  recipe-maintainers:\n    - jonashaag\n    - frankier\n    - sodre\n",
+  "raw_meta_yaml": "context:\n  name: llama.cpp\n  version: \"0.0.2646\"\n  build: 2\n\npackage:\n  name: ${{ name|lower }}\n  version: ${{ version }}\n\nsource:\n  url: https://github.com/ggml-org/${{ name }}/archive/b${{ version | split(\".\") | list | last }}.tar.gz\n  sha256: 02953cc03455bac1fcb337ff841600654712f6f6bbed54c31078eead530ff1fa\n  patches:\n    - if: blas_impl == \"mkl\"\n      then:\n        - mkl.patch\n\nbuild:\n  number: ${{ build }}\n  string: '{%- if cuda_compiler_version != \"None\" -%}cuda${{ cuda_compiler_version | replace(\".\", \"\") }}_h${{ hash }}_${{ build }}{%- elif (osx and x86_64) or cuda_compiler_version == \"None\" -%}cpu_${{ blas_impl }}_h${{ hash }}_${{ build }}{%- elif osx and arm64 -%}mps_h${{ hash }}_${{ build }}{%- endif -%}'\n\n  script:\n    - if: unix\n      then: |\n        echo hello\n        LLAMA_ARGS=\"-DLLAMA_BUILD_TESTS=OFF\"\n        {%- macro llama_args(value) %}\n        LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_${{ value }}\"\n        {%- endmacro %}\n        {%- macro cmake_args(value) -%}\n        LLAMA_ARGS=\"${LLAMA_ARGS} -D${{ value }}\"\n        {%- endmacro %}\n        ${{ cmake_args(\"BUILD_SHARED_LIBS=ON\") }}\n        {%- if osx and arm64 %}\n        ${{ llama_args(\"NATIVE=OFF\") }}\n        ${{ llama_args(\"AVX=OFF\") }}\n        ${{ llama_args(\"AVX2=OFF\") }}\n        ${{ llama_args(\"FMA=OFF\") }}\n        ${{ llama_args(\"F16C=OFF\") }}\n        ${{ llama_args(\"METAL=ON\") }}\n        ${{ llama_args(\"ACCELERATE=ON\") }}\n        {%- endif %}\n        {%- if osx and x86_64 %}\n        ${{ llama_args(\"METAL=OFF\") }}\n        ${{ llama_args(\"ACCELERATE=ON\") }}\n        {%- endif %}\n        {%- if cuda_compiler_version != \"None\" %}\n        ${{ llama_args(\"CUDA=ON\") }}\n        ${{ cmake_args(\"CMAKE_CUDA_ARCHITECTURES=all\") }}\n        {%- endif %}\n        {%- if not osx and cuda_compiler_version == \"None\" %}\n        ${{ llama_args(\"BLAS=ON\") }}\n        {%- if blas_impl == \"mkl\" %}\n        ${{ llama_args(\"BLAS_VENDOR=Intel10_64_dyn\") }}\n        {%- endif %}\n        {%- endif %}\n\n        echo $LLAMA_ARGS\n        cmake -S . -B build -G Ninja ${CMAKE_ARGS} ${LLAMA_ARGS}\n        cmake --build build\n        cmake --install build\n    - if: win\n      then: |\n        echo hello\n        set LLAMA_ARGS=-DLLAMA_BUILD_TESTS=OFF\n        {% macro llama_args(value) -%}\n        set LLAMA_ARGS=%LLAMA_ARGS% -DLLAMA_${{ value }}\n        {%- endmacro %}\n        {% macro cmake_args(value) -%}\n        set LLAMA_ARGS=%LLAMA_ARGS% -D${{ value }}\n        {%- endmacro %}\n\n        ${{ cmake_args(\"BUILD_SHARED_LIBS=ON\") }}\n        ${{ llama_args(\"NATIVE=OFF\") }}\n\n        {%- if cuda_compiler_version == \"None\" %}\n        ${{ llama_args(\"BLAS=ON\") }}\n        {%- if blas_impl == \"mkl\" %}\n        ${{ llama_args(\"BLAS_VENDOR=Intel10_64_dyn\") }}\n        {%- endif %}\n        {%- endif %}\n\n        set LLAMA_ARGS\n        cmake -S . -B build -G Ninja %CMAKE_ARGS% %LLAMA_ARGS%\n        cmake --build build\n        cmake --install build\n  dynamic_linking:\n    missing_dso_allowlist:\n      - if: win\n        then:\n          - \"*/nvcuda.dll\"\n      - if: linux\n        then:\n          - \"*/libcuda.so.1\"\n\nrequirements:\n  build:\n    - ${{ compiler('c') }}\n    - ${{ stdlib('c') }}\n    - ${{ compiler('cxx') }}\n    - if: cuda_compiler_version != \"None\"\n      then:\n        - ${{ compiler('cuda') }}\n    - cmake\n    - git\n    - ninja\n    - pkgconfig\n  host:\n    - if: cuda_compiler_version != \"None\"\n      then:\n        # NOTE: Without cuda-version, we are installing cuda-toolkit 11.8 instead of 11.2!\n        - cuda-version ${{ cuda_compiler_version }}.*\n        - if: match(cuda_compiler_version, \"12.*\")\n          then:\n            - cuda-cudart-dev ${{ cuda_compiler_version }}.*\n            - libcublas-dev ${{ cuda_compiler_version }}.*\n\n    - if: (not osx) and (cuda_compiler_version == \"None\") and (blas_impl == \"mkl\")\n      then:\n        - blas-devel * *_${{ blas_impl }}\n        - mkl-devel ${{ mkl }}.*\n  run:\n    - if: cuda_compiler_version != \"None\"\n      then:\n        - cuda-version ${{ cuda_compiler_version }}.*\n        - __cuda\n        - if: match(cuda_compiler_version, \"12.*\")\n          then:\n            - cuda-nvcc-tools\n    - if: linux and (cuda_compiler_vedrsion == \"None\") and (blas_impl == \"mkl\")\n      then:\n        - llvm-openmp\n  run_constraints:\n    # whisper.cpp also vendors ggml\n    - whisper.cpp <0.0.0a0\n\ntests:\n  - if: (build_platform == target_platform) and (cuda_compiler_version == \"None\")\n    then:\n      - script:\n          - main --help\n          - server --help\n        requirements:\n          run:\n            - if: cuda_compiler_version != \"None\"\n              then:\n                - cuda-version ${{ cuda_compiler_version }}\n\nabout:\n  homepage: https://github.com/ggml-org/llama.cpp\n  repository: https://github.com/ggml-org/llama.cpp\n  summary: Port of Facebook's LLaMA model in C/C++\n  license: MIT\n  license_file: LICENSE\n\nextra:\n  recipe-maintainers:\n    - jonashaag\n    - frankier\n    - sodre\n    - pavelzw\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -616,7 +939,6 @@
       "cxx_compiler_stub",
       "git",
       "libcublas-dev",
-      "llvm-openmp",
       "mkl-devel",
       "ninja",
       "pkgconfig"
@@ -647,8 +969,7 @@
         "cuda_compiler_stub",
         "cxx_compiler_stub",
         "libcublas-dev",
-        "mkl-devel",
-        "openmp"
+        "mkl-devel"
       ]
     },
     "run": {
@@ -660,9 +981,7 @@
         "cuda-nvcc-tools",
         "cuda-version",
         "cuda_compiler_stub",
-        "cxx_compiler_stub",
-        "llvm-openmp",
-        "openmp"
+        "cxx_compiler_stub"
       ]
     },
     "test": {
@@ -688,12 +1007,12 @@
     "host": {
       "__set__": true,
       "elements": [
-        "blas-devel * *mkl",
-        "cuda-cudart-dev  12.0",
-        "cuda-version     11.8",
-        "cuda-version     12.0",
-        "libcublas-dev    12.0",
-        "mkl-devel 2024"
+        "blas-devel * *_mkl",
+        "cuda-cudart-dev 12.6.*",
+        "cuda-version 11.8.*",
+        "cuda-version 12.6.*",
+        "libcublas-dev 12.6.*",
+        "mkl-devel 2024.*"
       ]
     },
     "run": {
@@ -701,9 +1020,8 @@
       "elements": [
         "__cuda",
         "cuda-nvcc-tools",
-        "cuda-version 11.8",
-        "cuda-version 12.0",
-        "llvm-openmp"
+        "cuda-version 11.8.*",
+        "cuda-version 12.6.*"
       ]
     },
     "test": {
@@ -711,46 +1029,113 @@
       "elements": []
     }
   },
-  "url": "https://github.com/ggerganov/llama.cpp/archive/b2646.tar.gz",
+  "url": "https://github.com/ggml-org/llama.cpp/archive/b2646.tar.gz",
   "version": "0.0.2646",
   "version_pr_info": {
     "__lazy_json__": "version_pr_info/llama.cpp.json"
   },
   "win_64_meta_yaml": {
     "about": {
-      "home": "https://github.com/ggerganov/llama.cpp",
+      "dev_url": "https://github.com/ggml-org/llama.cpp",
+      "home": "https://github.com/ggml-org/llama.cpp",
       "license": "MIT",
       "license_family": "MIT",
       "license_file": "LICENSE",
       "summary": "Port of Facebook's LLaMA model in C/C++"
     },
     "build": {
-      "missing_dso_whitelist": [
-        "*/nvcuda.dll"
-      ],
-      "number": "1",
-      "script": [
-        "set LLAMA_ARGS=-DLLAMA_BUILD_TESTS=OFF",
-        "set LLAMA_ARGS=%LLAMA_ARGS% -DBUILD_SHARED_LIBS=ON",
-        "set LLAMA_ARGS=%LLAMA_ARGS% -DLLAMA_NATIVE=OFF",
-        "set LLAMA_ARGS=%LLAMA_ARGS% -DLLAMA_CUDA=ON",
-        "set LLAMA_ARGS=%LLAMA_ARGS% -DCMAKE_CUDA_ARCHITECTURES=all",
-        "set LLAMA_ARGS",
-        "cmake -S . -B build -G Ninja %CMAKE_ARGS% %LLAMA_ARGS%",
-        "cmake --build build",
-        "cmake --install build",
-        "set LLAMA_ARGS=%LLAMA_ARGS% -DLLAMA_BLAS=ON",
-        "set LLAMA_ARGS=%LLAMA_ARGS% -DLLAMA_BLAS_VENDOR=Intel10_64_dyn"
-      ],
-      "string": "cpu_mkl_h1234567_1"
+      "number": "2",
+      "script": "echo hello\nLLAMA_ARGS=\"-DLLAMA_BUILD_TESTS=OFF\"\n{%- macro llama_args(value) %}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_${{ value }}\"\n{%- endmacro %}\n{%- macro cmake_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -D${{ value }}\"\n{%- endmacro %}\n${{ cmake_args(\"BUILD_SHARED_LIBS=ON\") }}\n{%- if osx and arm64 %}\n${{ llama_args(\"NATIVE=OFF\") }}\n${{ llama_args(\"AVX=OFF\") }}\n${{ llama_args(\"AVX2=OFF\") }}\n${{ llama_args(\"FMA=OFF\") }}\n${{ llama_args(\"F16C=OFF\") }}\n${{ llama_args(\"METAL=ON\") }}\n${{ llama_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n{%- if osx and x86_64 %}\n${{ llama_args(\"METAL=OFF\") }}\n${{ llama_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n{%- if cuda_compiler_version != \"None\" %}\n${{ llama_args(\"CUDA=ON\") }}\n${{ cmake_args(\"CMAKE_CUDA_ARCHITECTURES=all\") }}\n{%- endif %}\n{%- if not osx and cuda_compiler_version == \"None\" %}\n${{ llama_args(\"BLAS=ON\") }}\n{%- if blas_impl == \"mkl\" %}\n${{ llama_args(\"BLAS_VENDOR=Intel10_64_dyn\") }}\n{%- endif %}\n{%- endif %}\n\necho $LLAMA_ARGS\ncmake -S . -B build -G Ninja ${CMAKE_ARGS} ${LLAMA_ARGS}\ncmake --build build\ncmake --install build\n"
     },
     "extra": {
       "recipe-maintainers": [
         "jonashaag",
         "frankier",
-        "sodre"
+        "sodre",
+        "pavelzw"
       ]
     },
+    "outputs": [
+      {
+        "build": null,
+        "name": "llama.cpp",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "cmake",
+            "git",
+            "ninja",
+            "pkgconfig"
+          ],
+          "host": [
+            "blas-devel * *_mkl",
+            "mkl-devel 2024.*"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "main --help",
+              "server --help"
+            ]
+          }
+        ]
+      },
+      {
+        "build": null,
+        "name": "llama.cpp",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "cuda_compiler_stub",
+            "cmake",
+            "git",
+            "ninja",
+            "pkgconfig"
+          ],
+          "host": [
+            "cuda-version 12.6.*",
+            "cuda-cudart-dev 12.6.*",
+            "libcublas-dev 12.6.*"
+          ],
+          "run": [
+            "cuda-version 12.6.*",
+            "__cuda",
+            "cuda-nvcc-tools"
+          ]
+        },
+        "tests": []
+      },
+      {
+        "build": null,
+        "name": "llama.cpp",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "cuda_compiler_stub",
+            "cmake",
+            "git",
+            "ninja",
+            "pkgconfig"
+          ],
+          "host": [
+            "cuda-version 11.8.*"
+          ],
+          "run": [
+            "cuda-version 11.8.*",
+            "__cuda"
+          ]
+        },
+        "tests": []
+      }
+    ],
     "package": {
       "name": "llama.cpp",
       "version": "0.0.2646"
@@ -760,41 +1145,34 @@
         "c_compiler_stub",
         "c_stdlib_stub",
         "cxx_compiler_stub",
-        "cuda_compiler_stub",
         "cmake",
         "git",
         "ninja",
-        "pkgconfig"
+        "pkgconfig",
+        "cuda_compiler_stub"
       ],
       "host": [
-        "cuda-version     11.8",
-        "cuda-version     12.0",
-        "cuda-cudart-dev  12.0",
-        "libcublas-dev    12.0",
-        "blas-devel * *mkl",
-        "mkl-devel 2024"
+        "blas-devel * *_mkl",
+        "mkl-devel 2024.*",
+        "cuda-version 12.6.*",
+        "cuda-cudart-dev 12.6.*",
+        "libcublas-dev 12.6.*",
+        "cuda-version 11.8.*"
       ],
       "run": [
-        "cuda-version 11.8",
+        "cuda-version 12.6.*",
         "__cuda",
-        "cuda-version 12.0",
-        "cuda-nvcc-tools"
+        "cuda-nvcc-tools",
+        "cuda-version 11.8.*"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "patches": [
         "mkl.patch"
       ],
       "sha256": "02953cc03455bac1fcb337ff841600654712f6f6bbed54c31078eead530ff1fa",
-      "url": "https://github.com/ggerganov/llama.cpp/archive/b2646.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "main --help",
-        "server --help"
-      ],
-      "requires": null
+      "url": "https://github.com/ggml-org/llama.cpp/archive/b2646.tar.gz"
     }
   },
   "win_64_requirements": {
