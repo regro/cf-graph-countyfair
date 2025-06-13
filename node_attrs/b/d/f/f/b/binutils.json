@@ -5,7 +5,7 @@
     "build_platform": {
       "linux_aarch64": "linux_64",
       "linux_ppc64le": "linux_64",
-      "linux_s390x": "linux_64",
+      "osx_arm64": "osx_64",
       "win_64": "linux_64"
     },
     "conda_build": {
@@ -15,9 +15,6 @@
     "github": {
       "branch_name": "main",
       "tooling_branch_name": "main"
-    },
-    "os_version": {
-      "linux_64": "cos7"
     },
     "provider": {
       "linux_aarch64": "default",
@@ -76,7 +73,7 @@
         "test": {
           "commands": [
             "x86_64-conda-linux-gnu-ld --help",
-            "echo \"conda_cos6\""
+            "echo \"conda\""
           ]
         }
       },
@@ -211,7 +208,7 @@
         "test": {
           "commands": [
             "aarch64-conda-linux-gnu-ld --help",
-            "echo \"conda_cos7\""
+            "echo \"conda\""
           ]
         }
       },
@@ -347,7 +344,7 @@
         "test": {
           "commands": [
             "powerpc64le-conda-linux-gnu-ld --help",
-            "echo \"conda_cos7\""
+            "echo \"conda\""
           ]
         }
       },
@@ -483,7 +480,7 @@
         "test": {
           "commands": [
             "s390x-conda-linux-gnu-ld --help",
-            "echo \"conda_cos7\""
+            "echo \"conda\""
           ]
         }
       },
@@ -601,9 +598,10 @@
           "ignore_run_exports_from": [
             "cxx_compiler_stub"
           ],
-          "merge_build_host": false
+          "merge_build_host": false,
+          "skip": true
         },
-        "name": "ld_impl_win-64",
+        "name": "ld_impl_osx-64",
         "requirements": {
           "build": [
             "cxx_compiler_stub",
@@ -612,13 +610,13 @@
           "host": [],
           "run": [],
           "run_constrained": [
-            "binutils_impl_win-64 2.43"
+            "binutils_impl_osx-64 2.43"
           ]
         },
         "script": "install_ld.sh",
         "test": {
           "commands": [
-            "x86_64-w64-mingw32-ld --help",
+            "x86_64-apple-darwin13.4.0-ld --help",
             "echo \"none\""
           ]
         }
@@ -634,55 +632,47 @@
           ],
           "merge_build_host": false
         },
-        "name": "binutils_impl_win-64",
+        "name": "binutils_impl_osx-64",
         "requirements": {
           "build": [
             "cxx_compiler_stub",
             "c_stdlib_stub"
           ],
-          "host": [
-            "ld_impl_win-64 2.43"
-          ],
-          "run": [
-            "ld_impl_win-64",
-            "m2w64-sysroot_win-64 >=12.0.0.r0"
-          ]
+          "host": [],
+          "run": []
         },
         "script": "install_binutils.sh",
         "test": {
           "commands": [
-            "x86_64-w64-mingw32-addr2line --help",
-            "x86_64-w64-mingw32-ar --help",
-            "x86_64-w64-mingw32-as --help",
-            "x86_64-w64-mingw32-c++filt --help",
-            "x86_64-w64-mingw32-elfedit --help",
-            "x86_64-w64-mingw32-gprof --help",
-            "x86_64-w64-mingw32-ld --help",
-            "x86_64-w64-mingw32-ld --verbose | grep SEARCH",
-            "x86_64-w64-mingw32-ld.bfd --help",
-            "x86_64-w64-mingw32-nm --help",
-            "x86_64-w64-mingw32-objcopy --help",
-            "x86_64-w64-mingw32-objdump --help",
-            "x86_64-w64-mingw32-ranlib --help",
-            "x86_64-w64-mingw32-readelf --help",
-            "x86_64-w64-mingw32-size --help",
-            "x86_64-w64-mingw32-strings --help",
-            "x86_64-w64-mingw32-strip --help"
+            "x86_64-apple-darwin13.4.0-addr2line --help",
+            "x86_64-apple-darwin13.4.0-ar --help",
+            "x86_64-apple-darwin13.4.0-c++filt --help",
+            "x86_64-apple-darwin13.4.0-elfedit --help",
+            "x86_64-apple-darwin13.4.0-nm --help",
+            "x86_64-apple-darwin13.4.0-objcopy --help",
+            "x86_64-apple-darwin13.4.0-objdump --help",
+            "x86_64-apple-darwin13.4.0-ranlib --help",
+            "x86_64-apple-darwin13.4.0-readelf --help",
+            "x86_64-apple-darwin13.4.0-size --help",
+            "x86_64-apple-darwin13.4.0-strings --help",
+            "x86_64-apple-darwin13.4.0-strip --help"
           ],
-          "downstreams": null
+          "downstreams": [
+            "gfortran_impl_osx-64",
+            "gcc_impl_osx-64"
+          ]
         }
       },
       {
-        "name": "binutils_win-64",
+        "name": "binutils_osx-64",
         "requirements": {
           "run": [
-            "binutils_impl_win-64"
+            "binutils_impl_osx-64"
           ]
         },
         "script": "install_activation.sh",
         "test": {
           "commands": [
-            "$LD --help",
             "$AR --help"
           ]
         }
@@ -697,10 +687,10 @@
         "requirements": {
           "build": [],
           "host": [
-            "binutils_impl_win-64"
+            "binutils_impl_osx-64"
           ],
           "run": [
-            "binutils_impl_win-64"
+            "binutils_impl_osx-64"
           ]
         },
         "script": "install_binutils_symlinks.sh",
@@ -708,12 +698,8 @@
           "commands": [
             "$PREFIX/bin/addr2line --help",
             "$PREFIX/bin/ar --help",
-            "$PREFIX/bin/as --help",
             "$PREFIX/bin/c++filt --help",
             "$PREFIX/bin/elfedit --help",
-            "$PREFIX/bin/gprof --help",
-            "$PREFIX/bin/ld --help",
-            "$PREFIX/bin/ld.bfd --help",
             "$PREFIX/bin/nm --help",
             "$PREFIX/bin/objcopy --help",
             "$PREFIX/bin/objdump --help",
@@ -731,9 +717,10 @@
           "ignore_run_exports_from": [
             "cxx_compiler_stub"
           ],
-          "merge_build_host": false
+          "merge_build_host": false,
+          "skip": true
         },
-        "name": "ld_impl_linux-64",
+        "name": "ld_impl_osx-arm64",
         "requirements": {
           "build": [
             "cxx_compiler_stub",
@@ -742,14 +729,14 @@
           "host": [],
           "run": [],
           "run_constrained": [
-            "binutils_impl_linux-64 2.43"
+            "binutils_impl_osx-arm64 2.43"
           ]
         },
         "script": "install_ld.sh",
         "test": {
           "commands": [
-            "x86_64-conda-linux-gnu-ld --help",
-            "echo \"conda_cos6\""
+            "arm64-apple-darwin20.0.0-ld --help",
+            "echo \"none\""
           ]
         }
       },
@@ -764,59 +751,47 @@
           ],
           "merge_build_host": false
         },
-        "name": "binutils_impl_linux-64",
+        "name": "binutils_impl_osx-arm64",
         "requirements": {
           "build": [
             "cxx_compiler_stub",
             "c_stdlib_stub"
           ],
-          "host": [
-            "ld_impl_linux-64 2.43"
-          ],
-          "run": [
-            "ld_impl_linux-64",
-            "sysroot_linux-64"
-          ]
+          "host": [],
+          "run": []
         },
         "script": "install_binutils.sh",
         "test": {
           "commands": [
-            "x86_64-conda-linux-gnu-addr2line --help",
-            "x86_64-conda-linux-gnu-ar --help",
-            "x86_64-conda-linux-gnu-as --help",
-            "x86_64-conda-linux-gnu-c++filt --help",
-            "x86_64-conda-linux-gnu-elfedit --help",
-            "x86_64-conda-linux-gnu-gprof --help",
-            "x86_64-conda-linux-gnu-ld --help",
-            "x86_64-conda-linux-gnu-ld --verbose | grep SEARCH",
-            "x86_64-conda-linux-gnu-ld.bfd --help",
-            "x86_64-conda-linux-gnu-ld.gold --help",
-            "x86_64-conda-linux-gnu-nm --help",
-            "x86_64-conda-linux-gnu-objcopy --help",
-            "x86_64-conda-linux-gnu-objdump --help",
-            "x86_64-conda-linux-gnu-ranlib --help",
-            "x86_64-conda-linux-gnu-readelf --help",
-            "x86_64-conda-linux-gnu-size --help",
-            "x86_64-conda-linux-gnu-strings --help",
-            "x86_64-conda-linux-gnu-strip --help"
+            "arm64-apple-darwin20.0.0-addr2line --help",
+            "arm64-apple-darwin20.0.0-ar --help",
+            "arm64-apple-darwin20.0.0-c++filt --help",
+            "arm64-apple-darwin20.0.0-elfedit --help",
+            "arm64-apple-darwin20.0.0-nm --help",
+            "arm64-apple-darwin20.0.0-objcopy --help",
+            "arm64-apple-darwin20.0.0-objdump --help",
+            "arm64-apple-darwin20.0.0-ranlib --help",
+            "arm64-apple-darwin20.0.0-readelf --help",
+            "arm64-apple-darwin20.0.0-size --help",
+            "arm64-apple-darwin20.0.0-strings --help",
+            "arm64-apple-darwin20.0.0-strip --help"
           ],
           "downstreams": [
-            "gfortran_impl_linux-64",
-            "gcc_impl_linux-64"
+            "gfortran_impl_osx-arm64",
+            "gcc_impl_osx-arm64"
           ]
         }
       },
       {
-        "name": "binutils_linux-64",
+        "name": "binutils_osx-arm64",
         "requirements": {
           "run": [
-            "binutils_impl_linux-64"
+            "binutils_impl_osx-arm64"
           ]
         },
         "script": "install_activation.sh",
         "test": {
           "commands": [
-            "$LD --help",
             "$AR --help"
           ]
         }
@@ -831,10 +806,10 @@
         "requirements": {
           "build": [],
           "host": [
-            "binutils_impl_linux-64"
+            "binutils_impl_osx-arm64"
           ],
           "run": [
-            "binutils_impl_linux-64"
+            "binutils_impl_osx-arm64"
           ]
         },
         "script": "install_binutils_symlinks.sh",
@@ -842,421 +817,8 @@
           "commands": [
             "$PREFIX/bin/addr2line --help",
             "$PREFIX/bin/ar --help",
-            "$PREFIX/bin/as --help",
             "$PREFIX/bin/c++filt --help",
             "$PREFIX/bin/elfedit --help",
-            "$PREFIX/bin/gold --help",
-            "$PREFIX/bin/gprof --help",
-            "$PREFIX/bin/ld --help",
-            "$PREFIX/bin/ld.bfd --help",
-            "$PREFIX/bin/ld.gold --help",
-            "$PREFIX/bin/nm --help",
-            "$PREFIX/bin/objcopy --help",
-            "$PREFIX/bin/objdump --help",
-            "$PREFIX/bin/ranlib --help",
-            "$PREFIX/bin/readelf --help",
-            "$PREFIX/bin/size --help",
-            "$PREFIX/bin/strings --help",
-            "$PREFIX/bin/strip --help"
-          ]
-        }
-      },
-      {
-        "build": {
-          "detect_binary_files_with_prefix": true,
-          "ignore_run_exports_from": [
-            "cxx_compiler_stub"
-          ],
-          "merge_build_host": false
-        },
-        "name": "ld_impl_linux-aarch64",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [],
-          "run": [],
-          "run_constrained": [
-            "binutils_impl_linux-aarch64 2.43"
-          ]
-        },
-        "script": "install_ld.sh",
-        "test": {
-          "commands": [
-            "aarch64-conda-linux-gnu-ld --help",
-            "echo \"conda_cos7\""
-          ]
-        }
-      },
-      {
-        "build": {
-          "detect_binary_files_with_prefix": false,
-          "ignore_run_exports": [
-            "__glibc"
-          ],
-          "ignore_run_exports_from": [
-            "cxx_compiler_stub"
-          ],
-          "merge_build_host": false
-        },
-        "name": "binutils_impl_linux-aarch64",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "ld_impl_linux-aarch64 2.43"
-          ],
-          "run": [
-            "ld_impl_linux-aarch64",
-            "sysroot_linux-aarch64"
-          ]
-        },
-        "script": "install_binutils.sh",
-        "test": {
-          "commands": [
-            "aarch64-conda-linux-gnu-addr2line --help",
-            "aarch64-conda-linux-gnu-ar --help",
-            "aarch64-conda-linux-gnu-as --help",
-            "aarch64-conda-linux-gnu-c++filt --help",
-            "aarch64-conda-linux-gnu-elfedit --help",
-            "aarch64-conda-linux-gnu-gprof --help",
-            "aarch64-conda-linux-gnu-ld --help",
-            "aarch64-conda-linux-gnu-ld --verbose | grep SEARCH",
-            "aarch64-conda-linux-gnu-ld.bfd --help",
-            "aarch64-conda-linux-gnu-ld.gold --help",
-            "aarch64-conda-linux-gnu-nm --help",
-            "aarch64-conda-linux-gnu-objcopy --help",
-            "aarch64-conda-linux-gnu-objdump --help",
-            "aarch64-conda-linux-gnu-ranlib --help",
-            "aarch64-conda-linux-gnu-readelf --help",
-            "aarch64-conda-linux-gnu-size --help",
-            "aarch64-conda-linux-gnu-strings --help",
-            "aarch64-conda-linux-gnu-strip --help"
-          ],
-          "downstreams": [
-            "gfortran_impl_linux-aarch64",
-            "gcc_impl_linux-aarch64"
-          ]
-        }
-      },
-      {
-        "name": "binutils_linux-aarch64",
-        "requirements": {
-          "run": [
-            "binutils_impl_linux-aarch64"
-          ]
-        },
-        "script": "install_activation.sh",
-        "test": {
-          "commands": [
-            "$LD --help",
-            "$AR --help"
-          ]
-        }
-      },
-      {
-        "build": {
-          "detect_binary_files_with_prefix": false,
-          "merge_build_host": false,
-          "skip": true
-        },
-        "name": "binutils",
-        "requirements": {
-          "build": [],
-          "host": [
-            "binutils_impl_linux-aarch64"
-          ],
-          "run": [
-            "binutils_impl_linux-aarch64"
-          ]
-        },
-        "script": "install_binutils_symlinks.sh",
-        "test": {
-          "commands": [
-            "$PREFIX/bin/addr2line --help",
-            "$PREFIX/bin/ar --help",
-            "$PREFIX/bin/as --help",
-            "$PREFIX/bin/c++filt --help",
-            "$PREFIX/bin/elfedit --help",
-            "$PREFIX/bin/gold --help",
-            "$PREFIX/bin/gprof --help",
-            "$PREFIX/bin/ld --help",
-            "$PREFIX/bin/ld.bfd --help",
-            "$PREFIX/bin/ld.gold --help",
-            "$PREFIX/bin/nm --help",
-            "$PREFIX/bin/objcopy --help",
-            "$PREFIX/bin/objdump --help",
-            "$PREFIX/bin/ranlib --help",
-            "$PREFIX/bin/readelf --help",
-            "$PREFIX/bin/size --help",
-            "$PREFIX/bin/strings --help",
-            "$PREFIX/bin/strip --help"
-          ]
-        }
-      },
-      {
-        "build": {
-          "detect_binary_files_with_prefix": true,
-          "ignore_run_exports_from": [
-            "cxx_compiler_stub"
-          ],
-          "merge_build_host": false
-        },
-        "name": "ld_impl_linux-ppc64le",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [],
-          "run": [],
-          "run_constrained": [
-            "binutils_impl_linux-ppc64le 2.43"
-          ]
-        },
-        "script": "install_ld.sh",
-        "test": {
-          "commands": [
-            "powerpc64le-conda-linux-gnu-ld --help",
-            "echo \"conda_cos7\""
-          ]
-        }
-      },
-      {
-        "build": {
-          "detect_binary_files_with_prefix": false,
-          "ignore_run_exports": [
-            "__glibc"
-          ],
-          "ignore_run_exports_from": [
-            "cxx_compiler_stub"
-          ],
-          "merge_build_host": false
-        },
-        "name": "binutils_impl_linux-ppc64le",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "ld_impl_linux-ppc64le 2.43"
-          ],
-          "run": [
-            "ld_impl_linux-ppc64le",
-            "sysroot_linux-ppc64le"
-          ]
-        },
-        "script": "install_binutils.sh",
-        "test": {
-          "commands": [
-            "powerpc64le-conda-linux-gnu-addr2line --help",
-            "powerpc64le-conda-linux-gnu-ar --help",
-            "powerpc64le-conda-linux-gnu-as --help",
-            "powerpc64le-conda-linux-gnu-c++filt --help",
-            "powerpc64le-conda-linux-gnu-elfedit --help",
-            "powerpc64le-conda-linux-gnu-gprof --help",
-            "powerpc64le-conda-linux-gnu-ld --help",
-            "powerpc64le-conda-linux-gnu-ld --verbose | grep SEARCH",
-            "powerpc64le-conda-linux-gnu-ld.bfd --help",
-            "powerpc64le-conda-linux-gnu-ld.gold --help",
-            "powerpc64le-conda-linux-gnu-nm --help",
-            "powerpc64le-conda-linux-gnu-objcopy --help",
-            "powerpc64le-conda-linux-gnu-objdump --help",
-            "powerpc64le-conda-linux-gnu-ranlib --help",
-            "powerpc64le-conda-linux-gnu-readelf --help",
-            "powerpc64le-conda-linux-gnu-size --help",
-            "powerpc64le-conda-linux-gnu-strings --help",
-            "powerpc64le-conda-linux-gnu-strip --help"
-          ],
-          "downstreams": [
-            "gfortran_impl_linux-ppc64le",
-            "gcc_impl_linux-ppc64le"
-          ]
-        }
-      },
-      {
-        "name": "binutils_linux-ppc64le",
-        "requirements": {
-          "run": [
-            "binutils_impl_linux-ppc64le"
-          ]
-        },
-        "script": "install_activation.sh",
-        "test": {
-          "commands": [
-            "$LD --help",
-            "$AR --help"
-          ]
-        }
-      },
-      {
-        "build": {
-          "detect_binary_files_with_prefix": false,
-          "merge_build_host": false,
-          "skip": true
-        },
-        "name": "binutils",
-        "requirements": {
-          "build": [],
-          "host": [
-            "binutils_impl_linux-ppc64le"
-          ],
-          "run": [
-            "binutils_impl_linux-ppc64le"
-          ]
-        },
-        "script": "install_binutils_symlinks.sh",
-        "test": {
-          "commands": [
-            "$PREFIX/bin/addr2line --help",
-            "$PREFIX/bin/ar --help",
-            "$PREFIX/bin/as --help",
-            "$PREFIX/bin/c++filt --help",
-            "$PREFIX/bin/elfedit --help",
-            "$PREFIX/bin/gold --help",
-            "$PREFIX/bin/gprof --help",
-            "$PREFIX/bin/ld --help",
-            "$PREFIX/bin/ld.bfd --help",
-            "$PREFIX/bin/ld.gold --help",
-            "$PREFIX/bin/nm --help",
-            "$PREFIX/bin/objcopy --help",
-            "$PREFIX/bin/objdump --help",
-            "$PREFIX/bin/ranlib --help",
-            "$PREFIX/bin/readelf --help",
-            "$PREFIX/bin/size --help",
-            "$PREFIX/bin/strings --help",
-            "$PREFIX/bin/strip --help"
-          ]
-        }
-      },
-      {
-        "build": {
-          "detect_binary_files_with_prefix": true,
-          "ignore_run_exports_from": [
-            "cxx_compiler_stub"
-          ],
-          "merge_build_host": false
-        },
-        "name": "ld_impl_linux-s390x",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [],
-          "run": [],
-          "run_constrained": [
-            "binutils_impl_linux-s390x 2.43"
-          ]
-        },
-        "script": "install_ld.sh",
-        "test": {
-          "commands": [
-            "s390x-conda-linux-gnu-ld --help",
-            "echo \"conda_cos7\""
-          ]
-        }
-      },
-      {
-        "build": {
-          "detect_binary_files_with_prefix": false,
-          "ignore_run_exports": [
-            "__glibc"
-          ],
-          "ignore_run_exports_from": [
-            "cxx_compiler_stub"
-          ],
-          "merge_build_host": false
-        },
-        "name": "binutils_impl_linux-s390x",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "ld_impl_linux-s390x 2.43"
-          ],
-          "run": [
-            "ld_impl_linux-s390x",
-            "sysroot_linux-s390x"
-          ]
-        },
-        "script": "install_binutils.sh",
-        "test": {
-          "commands": [
-            "s390x-conda-linux-gnu-addr2line --help",
-            "s390x-conda-linux-gnu-ar --help",
-            "s390x-conda-linux-gnu-as --help",
-            "s390x-conda-linux-gnu-c++filt --help",
-            "s390x-conda-linux-gnu-elfedit --help",
-            "s390x-conda-linux-gnu-gprof --help",
-            "s390x-conda-linux-gnu-ld --help",
-            "s390x-conda-linux-gnu-ld --verbose | grep SEARCH",
-            "s390x-conda-linux-gnu-ld.bfd --help",
-            "s390x-conda-linux-gnu-ld.gold --help",
-            "s390x-conda-linux-gnu-nm --help",
-            "s390x-conda-linux-gnu-objcopy --help",
-            "s390x-conda-linux-gnu-objdump --help",
-            "s390x-conda-linux-gnu-ranlib --help",
-            "s390x-conda-linux-gnu-readelf --help",
-            "s390x-conda-linux-gnu-size --help",
-            "s390x-conda-linux-gnu-strings --help",
-            "s390x-conda-linux-gnu-strip --help"
-          ],
-          "downstreams": [
-            "gfortran_impl_linux-s390x",
-            "gcc_impl_linux-s390x"
-          ]
-        }
-      },
-      {
-        "name": "binutils_linux-s390x",
-        "requirements": {
-          "run": [
-            "binutils_impl_linux-s390x"
-          ]
-        },
-        "script": "install_activation.sh",
-        "test": {
-          "commands": [
-            "$LD --help",
-            "$AR --help"
-          ]
-        }
-      },
-      {
-        "build": {
-          "detect_binary_files_with_prefix": false,
-          "merge_build_host": false
-        },
-        "name": "binutils",
-        "requirements": {
-          "build": [],
-          "host": [
-            "binutils_impl_linux-s390x"
-          ],
-          "run": [
-            "binutils_impl_linux-s390x"
-          ]
-        },
-        "script": "install_binutils_symlinks.sh",
-        "test": {
-          "commands": [
-            "$PREFIX/bin/addr2line --help",
-            "$PREFIX/bin/ar --help",
-            "$PREFIX/bin/as --help",
-            "$PREFIX/bin/c++filt --help",
-            "$PREFIX/bin/elfedit --help",
-            "$PREFIX/bin/gold --help",
-            "$PREFIX/bin/gprof --help",
-            "$PREFIX/bin/ld --help",
-            "$PREFIX/bin/ld.bfd --help",
-            "$PREFIX/bin/ld.gold --help",
             "$PREFIX/bin/nm --help",
             "$PREFIX/bin/objcopy --help",
             "$PREFIX/bin/objdump --help",
@@ -1355,7 +917,6 @@
         "script": "install_activation.sh",
         "test": {
           "commands": [
-            "$LD --help",
             "$AR --help"
           ]
         }
@@ -1461,27 +1022,6 @@
         ],
         "sha256": "fed3c3077f0df7a4a1aa47b080b8c53277593ccbb4e5e78b73ffb4e3f265e750",
         "url": "https://ftp.gnu.org/gnu/binutils/binutils-2.43.tar.bz2"
-      },
-      {
-        "patches": [
-          "patches/0001-fallback-sysroot.diff"
-        ],
-        "sha256": "fed3c3077f0df7a4a1aa47b080b8c53277593ccbb4e5e78b73ffb4e3f265e750",
-        "url": "https://ftp.gnu.org/gnu/binutils/binutils-2.43.tar.bz2"
-      },
-      {
-        "patches": [
-          "patches/0001-fallback-sysroot.diff"
-        ],
-        "sha256": "fed3c3077f0df7a4a1aa47b080b8c53277593ccbb4e5e78b73ffb4e3f265e750",
-        "url": "https://ftp.gnu.org/gnu/binutils/binutils-2.43.tar.bz2"
-      },
-      {
-        "patches": [
-          "patches/0001-fallback-sysroot.diff"
-        ],
-        "sha256": "fed3c3077f0df7a4a1aa47b080b8c53277593ccbb4e5e78b73ffb4e3f265e750",
-        "url": "https://ftp.gnu.org/gnu/binutils/binutils-2.43.tar.bz2"
       }
     ]
   },
@@ -1500,6 +1040,8 @@
         "binutils_impl_linux-aarch64",
         "binutils_impl_linux-ppc64le",
         "binutils_impl_linux-s390x",
+        "binutils_impl_osx-64",
+        "binutils_impl_osx-arm64",
         "binutils_impl_win-64",
         "ld_impl_linux-64",
         "ld_impl_linux-aarch64",
@@ -1515,6 +1057,8 @@
         "binutils_impl_linux-aarch64",
         "binutils_impl_linux-ppc64le",
         "binutils_impl_linux-s390x",
+        "binutils_impl_osx-64",
+        "binutils_impl_osx-arm64",
         "binutils_impl_win-64",
         "ld_impl_linux-64",
         "ld_impl_linux-aarch64",
@@ -1582,7 +1126,7 @@
         "test": {
           "commands": [
             "x86_64-conda-linux-gnu-ld --help",
-            "echo \"conda_cos6\""
+            "echo \"conda\""
           ]
         }
       },
@@ -1718,7 +1262,7 @@
         "test": {
           "commands": [
             "aarch64-conda-linux-gnu-ld --help",
-            "echo \"conda_cos7\""
+            "echo \"conda\""
           ]
         }
       },
@@ -1853,7 +1397,7 @@
         "test": {
           "commands": [
             "powerpc64le-conda-linux-gnu-ld --help",
-            "echo \"conda_cos7\""
+            "echo \"conda\""
           ]
         }
       },
@@ -1989,7 +1533,7 @@
         "test": {
           "commands": [
             "s390x-conda-linux-gnu-ld --help",
-            "echo \"conda_cos7\""
+            "echo \"conda\""
           ]
         }
       },
@@ -2107,6 +1651,244 @@
           "ignore_run_exports_from": [
             "cxx_compiler_stub"
           ],
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "ld_impl_osx-64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": [],
+          "run_constrained": [
+            "binutils_impl_osx-64 2.43"
+          ]
+        },
+        "script": "install_ld.sh",
+        "test": {
+          "commands": [
+            "x86_64-apple-darwin13.4.0-ld --help",
+            "echo \"none\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "ignore_run_exports": [
+            "__glibc"
+          ],
+          "ignore_run_exports_from": [
+            "cxx_compiler_stub"
+          ],
+          "merge_build_host": false
+        },
+        "name": "binutils_impl_osx-64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": []
+        },
+        "script": "install_binutils.sh",
+        "test": {
+          "commands": [
+            "x86_64-apple-darwin13.4.0-addr2line --help",
+            "x86_64-apple-darwin13.4.0-ar --help",
+            "x86_64-apple-darwin13.4.0-c++filt --help",
+            "x86_64-apple-darwin13.4.0-elfedit --help",
+            "x86_64-apple-darwin13.4.0-nm --help",
+            "x86_64-apple-darwin13.4.0-objcopy --help",
+            "x86_64-apple-darwin13.4.0-objdump --help",
+            "x86_64-apple-darwin13.4.0-ranlib --help",
+            "x86_64-apple-darwin13.4.0-readelf --help",
+            "x86_64-apple-darwin13.4.0-size --help",
+            "x86_64-apple-darwin13.4.0-strings --help",
+            "x86_64-apple-darwin13.4.0-strip --help"
+          ],
+          "downstreams": [
+            "gfortran_impl_osx-64",
+            "gcc_impl_osx-64"
+          ]
+        }
+      },
+      {
+        "name": "binutils_osx-64",
+        "requirements": {
+          "run": [
+            "binutils_impl_osx-64"
+          ]
+        },
+        "script": "install_activation.sh",
+        "test": {
+          "commands": [
+            "$AR --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "binutils",
+        "requirements": {
+          "build": [],
+          "host": [
+            "binutils_impl_osx-64"
+          ],
+          "run": [
+            "binutils_impl_osx-64"
+          ]
+        },
+        "script": "install_binutils_symlinks.sh",
+        "test": {
+          "commands": [
+            "$PREFIX/bin/addr2line --help",
+            "$PREFIX/bin/ar --help",
+            "$PREFIX/bin/c++filt --help",
+            "$PREFIX/bin/elfedit --help",
+            "$PREFIX/bin/nm --help",
+            "$PREFIX/bin/objcopy --help",
+            "$PREFIX/bin/objdump --help",
+            "$PREFIX/bin/ranlib --help",
+            "$PREFIX/bin/readelf --help",
+            "$PREFIX/bin/size --help",
+            "$PREFIX/bin/strings --help",
+            "$PREFIX/bin/strip --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": true,
+          "ignore_run_exports_from": [
+            "cxx_compiler_stub"
+          ],
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "ld_impl_osx-arm64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": [],
+          "run_constrained": [
+            "binutils_impl_osx-arm64 2.43"
+          ]
+        },
+        "script": "install_ld.sh",
+        "test": {
+          "commands": [
+            "arm64-apple-darwin20.0.0-ld --help",
+            "echo \"none\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "ignore_run_exports": [
+            "__glibc"
+          ],
+          "ignore_run_exports_from": [
+            "cxx_compiler_stub"
+          ],
+          "merge_build_host": false
+        },
+        "name": "binutils_impl_osx-arm64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": []
+        },
+        "script": "install_binutils.sh",
+        "test": {
+          "commands": [
+            "arm64-apple-darwin20.0.0-addr2line --help",
+            "arm64-apple-darwin20.0.0-ar --help",
+            "arm64-apple-darwin20.0.0-c++filt --help",
+            "arm64-apple-darwin20.0.0-elfedit --help",
+            "arm64-apple-darwin20.0.0-nm --help",
+            "arm64-apple-darwin20.0.0-objcopy --help",
+            "arm64-apple-darwin20.0.0-objdump --help",
+            "arm64-apple-darwin20.0.0-ranlib --help",
+            "arm64-apple-darwin20.0.0-readelf --help",
+            "arm64-apple-darwin20.0.0-size --help",
+            "arm64-apple-darwin20.0.0-strings --help",
+            "arm64-apple-darwin20.0.0-strip --help"
+          ],
+          "downstreams": [
+            "gfortran_impl_osx-arm64",
+            "gcc_impl_osx-arm64"
+          ]
+        }
+      },
+      {
+        "name": "binutils_osx-arm64",
+        "requirements": {
+          "run": [
+            "binutils_impl_osx-arm64"
+          ]
+        },
+        "script": "install_activation.sh",
+        "test": {
+          "commands": [
+            "$AR --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "binutils",
+        "requirements": {
+          "build": [],
+          "host": [
+            "binutils_impl_osx-arm64"
+          ],
+          "run": [
+            "binutils_impl_osx-arm64"
+          ]
+        },
+        "script": "install_binutils_symlinks.sh",
+        "test": {
+          "commands": [
+            "$PREFIX/bin/addr2line --help",
+            "$PREFIX/bin/ar --help",
+            "$PREFIX/bin/c++filt --help",
+            "$PREFIX/bin/elfedit --help",
+            "$PREFIX/bin/nm --help",
+            "$PREFIX/bin/objcopy --help",
+            "$PREFIX/bin/objdump --help",
+            "$PREFIX/bin/ranlib --help",
+            "$PREFIX/bin/readelf --help",
+            "$PREFIX/bin/size --help",
+            "$PREFIX/bin/strings --help",
+            "$PREFIX/bin/strip --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": true,
+          "ignore_run_exports_from": [
+            "cxx_compiler_stub"
+          ],
           "merge_build_host": false
         },
         "name": "ld_impl_win-64",
@@ -2188,7 +1970,6 @@
         "script": "install_activation.sh",
         "test": {
           "commands": [
-            "$LD --help",
             "$AR --help"
           ]
         }
@@ -2280,6 +2061,20 @@
         ],
         "sha256": "fed3c3077f0df7a4a1aa47b080b8c53277593ccbb4e5e78b73ffb4e3f265e750",
         "url": "https://ftp.gnu.org/gnu/binutils/binutils-2.43.tar.bz2"
+      },
+      {
+        "patches": [
+          "patches/0001-fallback-sysroot.diff"
+        ],
+        "sha256": "fed3c3077f0df7a4a1aa47b080b8c53277593ccbb4e5e78b73ffb4e3f265e750",
+        "url": "https://ftp.gnu.org/gnu/binutils/binutils-2.43.tar.bz2"
+      },
+      {
+        "patches": [
+          "patches/0001-fallback-sysroot.diff"
+        ],
+        "sha256": "fed3c3077f0df7a4a1aa47b080b8c53277593ccbb4e5e78b73ffb4e3f265e750",
+        "url": "https://ftp.gnu.org/gnu/binutils/binutils-2.43.tar.bz2"
       }
     ]
   },
@@ -2298,6 +2093,8 @@
         "binutils_impl_linux-aarch64",
         "binutils_impl_linux-ppc64le",
         "binutils_impl_linux-s390x",
+        "binutils_impl_osx-64",
+        "binutils_impl_osx-arm64",
         "binutils_impl_win-64",
         "ld_impl_linux-64",
         "ld_impl_linux-aarch64",
@@ -2313,6 +2110,8 @@
         "binutils_impl_linux-aarch64",
         "binutils_impl_linux-ppc64le",
         "binutils_impl_linux-s390x",
+        "binutils_impl_osx-64",
+        "binutils_impl_osx-arm64",
         "binutils_impl_win-64",
         "ld_impl_linux-64",
         "ld_impl_linux-aarch64",
@@ -2380,7 +2179,7 @@
         "test": {
           "commands": [
             "x86_64-conda-linux-gnu-ld --help",
-            "echo \"conda_cos6\""
+            "echo \"conda\""
           ]
         }
       },
@@ -2516,7 +2315,7 @@
         "test": {
           "commands": [
             "aarch64-conda-linux-gnu-ld --help",
-            "echo \"conda_cos7\""
+            "echo \"conda\""
           ]
         }
       },
@@ -2652,7 +2451,7 @@
         "test": {
           "commands": [
             "powerpc64le-conda-linux-gnu-ld --help",
-            "echo \"conda_cos7\""
+            "echo \"conda\""
           ]
         }
       },
@@ -2787,7 +2586,7 @@
         "test": {
           "commands": [
             "s390x-conda-linux-gnu-ld --help",
-            "echo \"conda_cos7\""
+            "echo \"conda\""
           ]
         }
       },
@@ -2905,6 +2704,244 @@
           "ignore_run_exports_from": [
             "cxx_compiler_stub"
           ],
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "ld_impl_osx-64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": [],
+          "run_constrained": [
+            "binutils_impl_osx-64 2.43"
+          ]
+        },
+        "script": "install_ld.sh",
+        "test": {
+          "commands": [
+            "x86_64-apple-darwin13.4.0-ld --help",
+            "echo \"none\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "ignore_run_exports": [
+            "__glibc"
+          ],
+          "ignore_run_exports_from": [
+            "cxx_compiler_stub"
+          ],
+          "merge_build_host": false
+        },
+        "name": "binutils_impl_osx-64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": []
+        },
+        "script": "install_binutils.sh",
+        "test": {
+          "commands": [
+            "x86_64-apple-darwin13.4.0-addr2line --help",
+            "x86_64-apple-darwin13.4.0-ar --help",
+            "x86_64-apple-darwin13.4.0-c++filt --help",
+            "x86_64-apple-darwin13.4.0-elfedit --help",
+            "x86_64-apple-darwin13.4.0-nm --help",
+            "x86_64-apple-darwin13.4.0-objcopy --help",
+            "x86_64-apple-darwin13.4.0-objdump --help",
+            "x86_64-apple-darwin13.4.0-ranlib --help",
+            "x86_64-apple-darwin13.4.0-readelf --help",
+            "x86_64-apple-darwin13.4.0-size --help",
+            "x86_64-apple-darwin13.4.0-strings --help",
+            "x86_64-apple-darwin13.4.0-strip --help"
+          ],
+          "downstreams": [
+            "gfortran_impl_osx-64",
+            "gcc_impl_osx-64"
+          ]
+        }
+      },
+      {
+        "name": "binutils_osx-64",
+        "requirements": {
+          "run": [
+            "binutils_impl_osx-64"
+          ]
+        },
+        "script": "install_activation.sh",
+        "test": {
+          "commands": [
+            "$AR --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "binutils",
+        "requirements": {
+          "build": [],
+          "host": [
+            "binutils_impl_osx-64"
+          ],
+          "run": [
+            "binutils_impl_osx-64"
+          ]
+        },
+        "script": "install_binutils_symlinks.sh",
+        "test": {
+          "commands": [
+            "$PREFIX/bin/addr2line --help",
+            "$PREFIX/bin/ar --help",
+            "$PREFIX/bin/c++filt --help",
+            "$PREFIX/bin/elfedit --help",
+            "$PREFIX/bin/nm --help",
+            "$PREFIX/bin/objcopy --help",
+            "$PREFIX/bin/objdump --help",
+            "$PREFIX/bin/ranlib --help",
+            "$PREFIX/bin/readelf --help",
+            "$PREFIX/bin/size --help",
+            "$PREFIX/bin/strings --help",
+            "$PREFIX/bin/strip --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": true,
+          "ignore_run_exports_from": [
+            "cxx_compiler_stub"
+          ],
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "ld_impl_osx-arm64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": [],
+          "run_constrained": [
+            "binutils_impl_osx-arm64 2.43"
+          ]
+        },
+        "script": "install_ld.sh",
+        "test": {
+          "commands": [
+            "arm64-apple-darwin20.0.0-ld --help",
+            "echo \"none\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "ignore_run_exports": [
+            "__glibc"
+          ],
+          "ignore_run_exports_from": [
+            "cxx_compiler_stub"
+          ],
+          "merge_build_host": false
+        },
+        "name": "binutils_impl_osx-arm64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": []
+        },
+        "script": "install_binutils.sh",
+        "test": {
+          "commands": [
+            "arm64-apple-darwin20.0.0-addr2line --help",
+            "arm64-apple-darwin20.0.0-ar --help",
+            "arm64-apple-darwin20.0.0-c++filt --help",
+            "arm64-apple-darwin20.0.0-elfedit --help",
+            "arm64-apple-darwin20.0.0-nm --help",
+            "arm64-apple-darwin20.0.0-objcopy --help",
+            "arm64-apple-darwin20.0.0-objdump --help",
+            "arm64-apple-darwin20.0.0-ranlib --help",
+            "arm64-apple-darwin20.0.0-readelf --help",
+            "arm64-apple-darwin20.0.0-size --help",
+            "arm64-apple-darwin20.0.0-strings --help",
+            "arm64-apple-darwin20.0.0-strip --help"
+          ],
+          "downstreams": [
+            "gfortran_impl_osx-arm64",
+            "gcc_impl_osx-arm64"
+          ]
+        }
+      },
+      {
+        "name": "binutils_osx-arm64",
+        "requirements": {
+          "run": [
+            "binutils_impl_osx-arm64"
+          ]
+        },
+        "script": "install_activation.sh",
+        "test": {
+          "commands": [
+            "$AR --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "binutils",
+        "requirements": {
+          "build": [],
+          "host": [
+            "binutils_impl_osx-arm64"
+          ],
+          "run": [
+            "binutils_impl_osx-arm64"
+          ]
+        },
+        "script": "install_binutils_symlinks.sh",
+        "test": {
+          "commands": [
+            "$PREFIX/bin/addr2line --help",
+            "$PREFIX/bin/ar --help",
+            "$PREFIX/bin/c++filt --help",
+            "$PREFIX/bin/elfedit --help",
+            "$PREFIX/bin/nm --help",
+            "$PREFIX/bin/objcopy --help",
+            "$PREFIX/bin/objdump --help",
+            "$PREFIX/bin/ranlib --help",
+            "$PREFIX/bin/readelf --help",
+            "$PREFIX/bin/size --help",
+            "$PREFIX/bin/strings --help",
+            "$PREFIX/bin/strip --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": true,
+          "ignore_run_exports_from": [
+            "cxx_compiler_stub"
+          ],
           "merge_build_host": false
         },
         "name": "ld_impl_win-64",
@@ -2986,7 +3023,6 @@
         "script": "install_activation.sh",
         "test": {
           "commands": [
-            "$LD --help",
             "$AR --help"
           ]
         }
@@ -3078,6 +3114,20 @@
         ],
         "sha256": "fed3c3077f0df7a4a1aa47b080b8c53277593ccbb4e5e78b73ffb4e3f265e750",
         "url": "https://ftp.gnu.org/gnu/binutils/binutils-2.43.tar.bz2"
+      },
+      {
+        "patches": [
+          "patches/0001-fallback-sysroot.diff"
+        ],
+        "sha256": "fed3c3077f0df7a4a1aa47b080b8c53277593ccbb4e5e78b73ffb4e3f265e750",
+        "url": "https://ftp.gnu.org/gnu/binutils/binutils-2.43.tar.bz2"
+      },
+      {
+        "patches": [
+          "patches/0001-fallback-sysroot.diff"
+        ],
+        "sha256": "fed3c3077f0df7a4a1aa47b080b8c53277593ccbb4e5e78b73ffb4e3f265e750",
+        "url": "https://ftp.gnu.org/gnu/binutils/binutils-2.43.tar.bz2"
       }
     ]
   },
@@ -3096,6 +3146,8 @@
         "binutils_impl_linux-aarch64",
         "binutils_impl_linux-ppc64le",
         "binutils_impl_linux-s390x",
+        "binutils_impl_osx-64",
+        "binutils_impl_osx-arm64",
         "binutils_impl_win-64",
         "ld_impl_linux-64",
         "ld_impl_linux-aarch64",
@@ -3111,6 +3163,8 @@
         "binutils_impl_linux-aarch64",
         "binutils_impl_linux-ppc64le",
         "binutils_impl_linux-s390x",
+        "binutils_impl_osx-64",
+        "binutils_impl_osx-arm64",
         "binutils_impl_win-64",
         "ld_impl_linux-64",
         "ld_impl_linux-aarch64",
@@ -3178,7 +3232,7 @@
         "test": {
           "commands": [
             "x86_64-conda-linux-gnu-ld --help",
-            "echo \"conda_cos6\""
+            "echo \"conda\""
           ]
         }
       },
@@ -3313,7 +3367,7 @@
         "test": {
           "commands": [
             "aarch64-conda-linux-gnu-ld --help",
-            "echo \"conda_cos7\""
+            "echo \"conda\""
           ]
         }
       },
@@ -3449,7 +3503,7 @@
         "test": {
           "commands": [
             "powerpc64le-conda-linux-gnu-ld --help",
-            "echo \"conda_cos7\""
+            "echo \"conda\""
           ]
         }
       },
@@ -3585,7 +3639,7 @@
         "test": {
           "commands": [
             "s390x-conda-linux-gnu-ld --help",
-            "echo \"conda_cos7\""
+            "echo \"conda\""
           ]
         }
       },
@@ -3703,6 +3757,244 @@
           "ignore_run_exports_from": [
             "cxx_compiler_stub"
           ],
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "ld_impl_osx-64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": [],
+          "run_constrained": [
+            "binutils_impl_osx-64 2.43"
+          ]
+        },
+        "script": "install_ld.sh",
+        "test": {
+          "commands": [
+            "x86_64-apple-darwin13.4.0-ld --help",
+            "echo \"none\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "ignore_run_exports": [
+            "__glibc"
+          ],
+          "ignore_run_exports_from": [
+            "cxx_compiler_stub"
+          ],
+          "merge_build_host": false
+        },
+        "name": "binutils_impl_osx-64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": []
+        },
+        "script": "install_binutils.sh",
+        "test": {
+          "commands": [
+            "x86_64-apple-darwin13.4.0-addr2line --help",
+            "x86_64-apple-darwin13.4.0-ar --help",
+            "x86_64-apple-darwin13.4.0-c++filt --help",
+            "x86_64-apple-darwin13.4.0-elfedit --help",
+            "x86_64-apple-darwin13.4.0-nm --help",
+            "x86_64-apple-darwin13.4.0-objcopy --help",
+            "x86_64-apple-darwin13.4.0-objdump --help",
+            "x86_64-apple-darwin13.4.0-ranlib --help",
+            "x86_64-apple-darwin13.4.0-readelf --help",
+            "x86_64-apple-darwin13.4.0-size --help",
+            "x86_64-apple-darwin13.4.0-strings --help",
+            "x86_64-apple-darwin13.4.0-strip --help"
+          ],
+          "downstreams": [
+            "gfortran_impl_osx-64",
+            "gcc_impl_osx-64"
+          ]
+        }
+      },
+      {
+        "name": "binutils_osx-64",
+        "requirements": {
+          "run": [
+            "binutils_impl_osx-64"
+          ]
+        },
+        "script": "install_activation.sh",
+        "test": {
+          "commands": [
+            "$AR --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "binutils",
+        "requirements": {
+          "build": [],
+          "host": [
+            "binutils_impl_osx-64"
+          ],
+          "run": [
+            "binutils_impl_osx-64"
+          ]
+        },
+        "script": "install_binutils_symlinks.sh",
+        "test": {
+          "commands": [
+            "$PREFIX/bin/addr2line --help",
+            "$PREFIX/bin/ar --help",
+            "$PREFIX/bin/c++filt --help",
+            "$PREFIX/bin/elfedit --help",
+            "$PREFIX/bin/nm --help",
+            "$PREFIX/bin/objcopy --help",
+            "$PREFIX/bin/objdump --help",
+            "$PREFIX/bin/ranlib --help",
+            "$PREFIX/bin/readelf --help",
+            "$PREFIX/bin/size --help",
+            "$PREFIX/bin/strings --help",
+            "$PREFIX/bin/strip --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": true,
+          "ignore_run_exports_from": [
+            "cxx_compiler_stub"
+          ],
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "ld_impl_osx-arm64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": [],
+          "run_constrained": [
+            "binutils_impl_osx-arm64 2.43"
+          ]
+        },
+        "script": "install_ld.sh",
+        "test": {
+          "commands": [
+            "arm64-apple-darwin20.0.0-ld --help",
+            "echo \"none\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "ignore_run_exports": [
+            "__glibc"
+          ],
+          "ignore_run_exports_from": [
+            "cxx_compiler_stub"
+          ],
+          "merge_build_host": false
+        },
+        "name": "binutils_impl_osx-arm64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": []
+        },
+        "script": "install_binutils.sh",
+        "test": {
+          "commands": [
+            "arm64-apple-darwin20.0.0-addr2line --help",
+            "arm64-apple-darwin20.0.0-ar --help",
+            "arm64-apple-darwin20.0.0-c++filt --help",
+            "arm64-apple-darwin20.0.0-elfedit --help",
+            "arm64-apple-darwin20.0.0-nm --help",
+            "arm64-apple-darwin20.0.0-objcopy --help",
+            "arm64-apple-darwin20.0.0-objdump --help",
+            "arm64-apple-darwin20.0.0-ranlib --help",
+            "arm64-apple-darwin20.0.0-readelf --help",
+            "arm64-apple-darwin20.0.0-size --help",
+            "arm64-apple-darwin20.0.0-strings --help",
+            "arm64-apple-darwin20.0.0-strip --help"
+          ],
+          "downstreams": [
+            "gfortran_impl_osx-arm64",
+            "gcc_impl_osx-arm64"
+          ]
+        }
+      },
+      {
+        "name": "binutils_osx-arm64",
+        "requirements": {
+          "run": [
+            "binutils_impl_osx-arm64"
+          ]
+        },
+        "script": "install_activation.sh",
+        "test": {
+          "commands": [
+            "$AR --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "binutils",
+        "requirements": {
+          "build": [],
+          "host": [
+            "binutils_impl_osx-arm64"
+          ],
+          "run": [
+            "binutils_impl_osx-arm64"
+          ]
+        },
+        "script": "install_binutils_symlinks.sh",
+        "test": {
+          "commands": [
+            "$PREFIX/bin/addr2line --help",
+            "$PREFIX/bin/ar --help",
+            "$PREFIX/bin/c++filt --help",
+            "$PREFIX/bin/elfedit --help",
+            "$PREFIX/bin/nm --help",
+            "$PREFIX/bin/objcopy --help",
+            "$PREFIX/bin/objdump --help",
+            "$PREFIX/bin/ranlib --help",
+            "$PREFIX/bin/readelf --help",
+            "$PREFIX/bin/size --help",
+            "$PREFIX/bin/strings --help",
+            "$PREFIX/bin/strip --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": true,
+          "ignore_run_exports_from": [
+            "cxx_compiler_stub"
+          ],
           "merge_build_host": false
         },
         "name": "ld_impl_win-64",
@@ -3784,7 +4076,6 @@
         "script": "install_activation.sh",
         "test": {
           "commands": [
-            "$LD --help",
             "$AR --help"
           ]
         }
@@ -3851,7 +4142,7 @@
         "test": {
           "commands": [
             "x86_64-conda-linux-gnu-ld --help",
-            "echo \"conda_cos6\""
+            "echo \"conda\""
           ]
         }
       },
@@ -3987,7 +4278,7 @@
         "test": {
           "commands": [
             "aarch64-conda-linux-gnu-ld --help",
-            "echo \"conda_cos7\""
+            "echo \"conda\""
           ]
         }
       },
@@ -4062,8 +4353,7 @@
       {
         "build": {
           "detect_binary_files_with_prefix": false,
-          "merge_build_host": false,
-          "skip": true
+          "merge_build_host": false
         },
         "name": "binutils",
         "requirements": {
@@ -4123,7 +4413,7 @@
         "test": {
           "commands": [
             "powerpc64le-conda-linux-gnu-ld --help",
-            "echo \"conda_cos7\""
+            "echo \"conda\""
           ]
         }
       },
@@ -4259,7 +4549,7 @@
         "test": {
           "commands": [
             "s390x-conda-linux-gnu-ld --help",
-            "echo \"conda_cos7\""
+            "echo \"conda\""
           ]
         }
       },
@@ -4334,7 +4624,8 @@
       {
         "build": {
           "detect_binary_files_with_prefix": false,
-          "merge_build_host": false
+          "merge_build_host": false,
+          "skip": true
         },
         "name": "binutils",
         "requirements": {
@@ -4359,6 +4650,244 @@
             "$PREFIX/bin/ld --help",
             "$PREFIX/bin/ld.bfd --help",
             "$PREFIX/bin/ld.gold --help",
+            "$PREFIX/bin/nm --help",
+            "$PREFIX/bin/objcopy --help",
+            "$PREFIX/bin/objdump --help",
+            "$PREFIX/bin/ranlib --help",
+            "$PREFIX/bin/readelf --help",
+            "$PREFIX/bin/size --help",
+            "$PREFIX/bin/strings --help",
+            "$PREFIX/bin/strip --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": true,
+          "ignore_run_exports_from": [
+            "cxx_compiler_stub"
+          ],
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "ld_impl_osx-64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": [],
+          "run_constrained": [
+            "binutils_impl_osx-64 2.43"
+          ]
+        },
+        "script": "install_ld.sh",
+        "test": {
+          "commands": [
+            "x86_64-apple-darwin13.4.0-ld --help",
+            "echo \"none\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "ignore_run_exports": [
+            "__glibc"
+          ],
+          "ignore_run_exports_from": [
+            "cxx_compiler_stub"
+          ],
+          "merge_build_host": false
+        },
+        "name": "binutils_impl_osx-64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": []
+        },
+        "script": "install_binutils.sh",
+        "test": {
+          "commands": [
+            "x86_64-apple-darwin13.4.0-addr2line --help",
+            "x86_64-apple-darwin13.4.0-ar --help",
+            "x86_64-apple-darwin13.4.0-c++filt --help",
+            "x86_64-apple-darwin13.4.0-elfedit --help",
+            "x86_64-apple-darwin13.4.0-nm --help",
+            "x86_64-apple-darwin13.4.0-objcopy --help",
+            "x86_64-apple-darwin13.4.0-objdump --help",
+            "x86_64-apple-darwin13.4.0-ranlib --help",
+            "x86_64-apple-darwin13.4.0-readelf --help",
+            "x86_64-apple-darwin13.4.0-size --help",
+            "x86_64-apple-darwin13.4.0-strings --help",
+            "x86_64-apple-darwin13.4.0-strip --help"
+          ],
+          "downstreams": [
+            "gfortran_impl_osx-64",
+            "gcc_impl_osx-64"
+          ]
+        }
+      },
+      {
+        "name": "binutils_osx-64",
+        "requirements": {
+          "run": [
+            "binutils_impl_osx-64"
+          ]
+        },
+        "script": "install_activation.sh",
+        "test": {
+          "commands": [
+            "$AR --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "binutils",
+        "requirements": {
+          "build": [],
+          "host": [
+            "binutils_impl_osx-64"
+          ],
+          "run": [
+            "binutils_impl_osx-64"
+          ]
+        },
+        "script": "install_binutils_symlinks.sh",
+        "test": {
+          "commands": [
+            "$PREFIX/bin/addr2line --help",
+            "$PREFIX/bin/ar --help",
+            "$PREFIX/bin/c++filt --help",
+            "$PREFIX/bin/elfedit --help",
+            "$PREFIX/bin/nm --help",
+            "$PREFIX/bin/objcopy --help",
+            "$PREFIX/bin/objdump --help",
+            "$PREFIX/bin/ranlib --help",
+            "$PREFIX/bin/readelf --help",
+            "$PREFIX/bin/size --help",
+            "$PREFIX/bin/strings --help",
+            "$PREFIX/bin/strip --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": true,
+          "ignore_run_exports_from": [
+            "cxx_compiler_stub"
+          ],
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "ld_impl_osx-arm64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": [],
+          "run_constrained": [
+            "binutils_impl_osx-arm64 2.43"
+          ]
+        },
+        "script": "install_ld.sh",
+        "test": {
+          "commands": [
+            "arm64-apple-darwin20.0.0-ld --help",
+            "echo \"none\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "ignore_run_exports": [
+            "__glibc"
+          ],
+          "ignore_run_exports_from": [
+            "cxx_compiler_stub"
+          ],
+          "merge_build_host": false
+        },
+        "name": "binutils_impl_osx-arm64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": []
+        },
+        "script": "install_binutils.sh",
+        "test": {
+          "commands": [
+            "arm64-apple-darwin20.0.0-addr2line --help",
+            "arm64-apple-darwin20.0.0-ar --help",
+            "arm64-apple-darwin20.0.0-c++filt --help",
+            "arm64-apple-darwin20.0.0-elfedit --help",
+            "arm64-apple-darwin20.0.0-nm --help",
+            "arm64-apple-darwin20.0.0-objcopy --help",
+            "arm64-apple-darwin20.0.0-objdump --help",
+            "arm64-apple-darwin20.0.0-ranlib --help",
+            "arm64-apple-darwin20.0.0-readelf --help",
+            "arm64-apple-darwin20.0.0-size --help",
+            "arm64-apple-darwin20.0.0-strings --help",
+            "arm64-apple-darwin20.0.0-strip --help"
+          ],
+          "downstreams": [
+            "gfortran_impl_osx-arm64",
+            "gcc_impl_osx-arm64"
+          ]
+        }
+      },
+      {
+        "name": "binutils_osx-arm64",
+        "requirements": {
+          "run": [
+            "binutils_impl_osx-arm64"
+          ]
+        },
+        "script": "install_activation.sh",
+        "test": {
+          "commands": [
+            "$AR --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "binutils",
+        "requirements": {
+          "build": [],
+          "host": [
+            "binutils_impl_osx-arm64"
+          ],
+          "run": [
+            "binutils_impl_osx-arm64"
+          ]
+        },
+        "script": "install_binutils_symlinks.sh",
+        "test": {
+          "commands": [
+            "$PREFIX/bin/addr2line --help",
+            "$PREFIX/bin/ar --help",
+            "$PREFIX/bin/c++filt --help",
+            "$PREFIX/bin/elfedit --help",
             "$PREFIX/bin/nm --help",
             "$PREFIX/bin/objcopy --help",
             "$PREFIX/bin/objdump --help",
@@ -4457,7 +4986,6 @@
         "script": "install_activation.sh",
         "test": {
           "commands": [
-            "$LD --help",
             "$AR --help"
           ]
         }
@@ -4524,7 +5052,7 @@
         "test": {
           "commands": [
             "x86_64-conda-linux-gnu-ld --help",
-            "echo \"conda_cos6\""
+            "echo \"conda\""
           ]
         }
       },
@@ -4660,680 +5188,7 @@
         "test": {
           "commands": [
             "aarch64-conda-linux-gnu-ld --help",
-            "echo \"conda_cos7\""
-          ]
-        }
-      },
-      {
-        "build": {
-          "detect_binary_files_with_prefix": false,
-          "ignore_run_exports": [
-            "__glibc"
-          ],
-          "ignore_run_exports_from": [
-            "cxx_compiler_stub"
-          ],
-          "merge_build_host": false
-        },
-        "name": "binutils_impl_linux-aarch64",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "ld_impl_linux-aarch64 2.43"
-          ],
-          "run": [
-            "ld_impl_linux-aarch64",
-            "sysroot_linux-aarch64"
-          ]
-        },
-        "script": "install_binutils.sh",
-        "test": {
-          "commands": [
-            "aarch64-conda-linux-gnu-addr2line --help",
-            "aarch64-conda-linux-gnu-ar --help",
-            "aarch64-conda-linux-gnu-as --help",
-            "aarch64-conda-linux-gnu-c++filt --help",
-            "aarch64-conda-linux-gnu-elfedit --help",
-            "aarch64-conda-linux-gnu-gprof --help",
-            "aarch64-conda-linux-gnu-ld --help",
-            "aarch64-conda-linux-gnu-ld --verbose | grep SEARCH",
-            "aarch64-conda-linux-gnu-ld.bfd --help",
-            "aarch64-conda-linux-gnu-ld.gold --help",
-            "aarch64-conda-linux-gnu-nm --help",
-            "aarch64-conda-linux-gnu-objcopy --help",
-            "aarch64-conda-linux-gnu-objdump --help",
-            "aarch64-conda-linux-gnu-ranlib --help",
-            "aarch64-conda-linux-gnu-readelf --help",
-            "aarch64-conda-linux-gnu-size --help",
-            "aarch64-conda-linux-gnu-strings --help",
-            "aarch64-conda-linux-gnu-strip --help"
-          ],
-          "downstreams": [
-            "gfortran_impl_linux-aarch64",
-            "gcc_impl_linux-aarch64"
-          ]
-        }
-      },
-      {
-        "name": "binutils_linux-aarch64",
-        "requirements": {
-          "run": [
-            "binutils_impl_linux-aarch64"
-          ]
-        },
-        "script": "install_activation.sh",
-        "test": {
-          "commands": [
-            "$LD --help",
-            "$AR --help"
-          ]
-        }
-      },
-      {
-        "build": {
-          "detect_binary_files_with_prefix": false,
-          "merge_build_host": false
-        },
-        "name": "binutils",
-        "requirements": {
-          "build": [],
-          "host": [
-            "binutils_impl_linux-aarch64"
-          ],
-          "run": [
-            "binutils_impl_linux-aarch64"
-          ]
-        },
-        "script": "install_binutils_symlinks.sh",
-        "test": {
-          "commands": [
-            "$PREFIX/bin/addr2line --help",
-            "$PREFIX/bin/ar --help",
-            "$PREFIX/bin/as --help",
-            "$PREFIX/bin/c++filt --help",
-            "$PREFIX/bin/elfedit --help",
-            "$PREFIX/bin/gold --help",
-            "$PREFIX/bin/gprof --help",
-            "$PREFIX/bin/ld --help",
-            "$PREFIX/bin/ld.bfd --help",
-            "$PREFIX/bin/ld.gold --help",
-            "$PREFIX/bin/nm --help",
-            "$PREFIX/bin/objcopy --help",
-            "$PREFIX/bin/objdump --help",
-            "$PREFIX/bin/ranlib --help",
-            "$PREFIX/bin/readelf --help",
-            "$PREFIX/bin/size --help",
-            "$PREFIX/bin/strings --help",
-            "$PREFIX/bin/strip --help"
-          ]
-        }
-      },
-      {
-        "build": {
-          "detect_binary_files_with_prefix": true,
-          "ignore_run_exports_from": [
-            "cxx_compiler_stub"
-          ],
-          "merge_build_host": false
-        },
-        "name": "ld_impl_linux-ppc64le",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [],
-          "run": [],
-          "run_constrained": [
-            "binutils_impl_linux-ppc64le 2.43"
-          ]
-        },
-        "script": "install_ld.sh",
-        "test": {
-          "commands": [
-            "powerpc64le-conda-linux-gnu-ld --help",
-            "echo \"conda_cos7\""
-          ]
-        }
-      },
-      {
-        "build": {
-          "detect_binary_files_with_prefix": false,
-          "ignore_run_exports": [
-            "__glibc"
-          ],
-          "ignore_run_exports_from": [
-            "cxx_compiler_stub"
-          ],
-          "merge_build_host": false
-        },
-        "name": "binutils_impl_linux-ppc64le",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "ld_impl_linux-ppc64le 2.43"
-          ],
-          "run": [
-            "ld_impl_linux-ppc64le",
-            "sysroot_linux-ppc64le"
-          ]
-        },
-        "script": "install_binutils.sh",
-        "test": {
-          "commands": [
-            "powerpc64le-conda-linux-gnu-addr2line --help",
-            "powerpc64le-conda-linux-gnu-ar --help",
-            "powerpc64le-conda-linux-gnu-as --help",
-            "powerpc64le-conda-linux-gnu-c++filt --help",
-            "powerpc64le-conda-linux-gnu-elfedit --help",
-            "powerpc64le-conda-linux-gnu-gprof --help",
-            "powerpc64le-conda-linux-gnu-ld --help",
-            "powerpc64le-conda-linux-gnu-ld --verbose | grep SEARCH",
-            "powerpc64le-conda-linux-gnu-ld.bfd --help",
-            "powerpc64le-conda-linux-gnu-ld.gold --help",
-            "powerpc64le-conda-linux-gnu-nm --help",
-            "powerpc64le-conda-linux-gnu-objcopy --help",
-            "powerpc64le-conda-linux-gnu-objdump --help",
-            "powerpc64le-conda-linux-gnu-ranlib --help",
-            "powerpc64le-conda-linux-gnu-readelf --help",
-            "powerpc64le-conda-linux-gnu-size --help",
-            "powerpc64le-conda-linux-gnu-strings --help",
-            "powerpc64le-conda-linux-gnu-strip --help"
-          ],
-          "downstreams": [
-            "gfortran_impl_linux-ppc64le",
-            "gcc_impl_linux-ppc64le"
-          ]
-        }
-      },
-      {
-        "name": "binutils_linux-ppc64le",
-        "requirements": {
-          "run": [
-            "binutils_impl_linux-ppc64le"
-          ]
-        },
-        "script": "install_activation.sh",
-        "test": {
-          "commands": [
-            "$LD --help",
-            "$AR --help"
-          ]
-        }
-      },
-      {
-        "build": {
-          "detect_binary_files_with_prefix": false,
-          "merge_build_host": false,
-          "skip": true
-        },
-        "name": "binutils",
-        "requirements": {
-          "build": [],
-          "host": [
-            "binutils_impl_linux-ppc64le"
-          ],
-          "run": [
-            "binutils_impl_linux-ppc64le"
-          ]
-        },
-        "script": "install_binutils_symlinks.sh",
-        "test": {
-          "commands": [
-            "$PREFIX/bin/addr2line --help",
-            "$PREFIX/bin/ar --help",
-            "$PREFIX/bin/as --help",
-            "$PREFIX/bin/c++filt --help",
-            "$PREFIX/bin/elfedit --help",
-            "$PREFIX/bin/gold --help",
-            "$PREFIX/bin/gprof --help",
-            "$PREFIX/bin/ld --help",
-            "$PREFIX/bin/ld.bfd --help",
-            "$PREFIX/bin/ld.gold --help",
-            "$PREFIX/bin/nm --help",
-            "$PREFIX/bin/objcopy --help",
-            "$PREFIX/bin/objdump --help",
-            "$PREFIX/bin/ranlib --help",
-            "$PREFIX/bin/readelf --help",
-            "$PREFIX/bin/size --help",
-            "$PREFIX/bin/strings --help",
-            "$PREFIX/bin/strip --help"
-          ]
-        }
-      },
-      {
-        "build": {
-          "detect_binary_files_with_prefix": true,
-          "ignore_run_exports_from": [
-            "cxx_compiler_stub"
-          ],
-          "merge_build_host": false
-        },
-        "name": "ld_impl_linux-s390x",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [],
-          "run": [],
-          "run_constrained": [
-            "binutils_impl_linux-s390x 2.43"
-          ]
-        },
-        "script": "install_ld.sh",
-        "test": {
-          "commands": [
-            "s390x-conda-linux-gnu-ld --help",
-            "echo \"conda_cos7\""
-          ]
-        }
-      },
-      {
-        "build": {
-          "detect_binary_files_with_prefix": false,
-          "ignore_run_exports": [
-            "__glibc"
-          ],
-          "ignore_run_exports_from": [
-            "cxx_compiler_stub"
-          ],
-          "merge_build_host": false
-        },
-        "name": "binutils_impl_linux-s390x",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "ld_impl_linux-s390x 2.43"
-          ],
-          "run": [
-            "ld_impl_linux-s390x",
-            "sysroot_linux-s390x"
-          ]
-        },
-        "script": "install_binutils.sh",
-        "test": {
-          "commands": [
-            "s390x-conda-linux-gnu-addr2line --help",
-            "s390x-conda-linux-gnu-ar --help",
-            "s390x-conda-linux-gnu-as --help",
-            "s390x-conda-linux-gnu-c++filt --help",
-            "s390x-conda-linux-gnu-elfedit --help",
-            "s390x-conda-linux-gnu-gprof --help",
-            "s390x-conda-linux-gnu-ld --help",
-            "s390x-conda-linux-gnu-ld --verbose | grep SEARCH",
-            "s390x-conda-linux-gnu-ld.bfd --help",
-            "s390x-conda-linux-gnu-ld.gold --help",
-            "s390x-conda-linux-gnu-nm --help",
-            "s390x-conda-linux-gnu-objcopy --help",
-            "s390x-conda-linux-gnu-objdump --help",
-            "s390x-conda-linux-gnu-ranlib --help",
-            "s390x-conda-linux-gnu-readelf --help",
-            "s390x-conda-linux-gnu-size --help",
-            "s390x-conda-linux-gnu-strings --help",
-            "s390x-conda-linux-gnu-strip --help"
-          ],
-          "downstreams": [
-            "gfortran_impl_linux-s390x",
-            "gcc_impl_linux-s390x"
-          ]
-        }
-      },
-      {
-        "name": "binutils_linux-s390x",
-        "requirements": {
-          "run": [
-            "binutils_impl_linux-s390x"
-          ]
-        },
-        "script": "install_activation.sh",
-        "test": {
-          "commands": [
-            "$LD --help",
-            "$AR --help"
-          ]
-        }
-      },
-      {
-        "build": {
-          "detect_binary_files_with_prefix": false,
-          "merge_build_host": false,
-          "skip": true
-        },
-        "name": "binutils",
-        "requirements": {
-          "build": [],
-          "host": [
-            "binutils_impl_linux-s390x"
-          ],
-          "run": [
-            "binutils_impl_linux-s390x"
-          ]
-        },
-        "script": "install_binutils_symlinks.sh",
-        "test": {
-          "commands": [
-            "$PREFIX/bin/addr2line --help",
-            "$PREFIX/bin/ar --help",
-            "$PREFIX/bin/as --help",
-            "$PREFIX/bin/c++filt --help",
-            "$PREFIX/bin/elfedit --help",
-            "$PREFIX/bin/gold --help",
-            "$PREFIX/bin/gprof --help",
-            "$PREFIX/bin/ld --help",
-            "$PREFIX/bin/ld.bfd --help",
-            "$PREFIX/bin/ld.gold --help",
-            "$PREFIX/bin/nm --help",
-            "$PREFIX/bin/objcopy --help",
-            "$PREFIX/bin/objdump --help",
-            "$PREFIX/bin/ranlib --help",
-            "$PREFIX/bin/readelf --help",
-            "$PREFIX/bin/size --help",
-            "$PREFIX/bin/strings --help",
-            "$PREFIX/bin/strip --help"
-          ]
-        }
-      },
-      {
-        "build": {
-          "detect_binary_files_with_prefix": true,
-          "ignore_run_exports_from": [
-            "cxx_compiler_stub"
-          ],
-          "merge_build_host": false
-        },
-        "name": "ld_impl_win-64",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [],
-          "run": [],
-          "run_constrained": [
-            "binutils_impl_win-64 2.43"
-          ]
-        },
-        "script": "install_ld.sh",
-        "test": {
-          "commands": [
-            "x86_64-w64-mingw32-ld --help",
-            "echo \"none\""
-          ]
-        }
-      },
-      {
-        "build": {
-          "detect_binary_files_with_prefix": false,
-          "ignore_run_exports": [
-            "__glibc"
-          ],
-          "ignore_run_exports_from": [
-            "cxx_compiler_stub"
-          ],
-          "merge_build_host": false
-        },
-        "name": "binutils_impl_win-64",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "ld_impl_win-64 2.43"
-          ],
-          "run": [
-            "ld_impl_win-64",
-            "m2w64-sysroot_win-64 >=12.0.0.r0"
-          ]
-        },
-        "script": "install_binutils.sh",
-        "test": {
-          "commands": [
-            "x86_64-w64-mingw32-addr2line --help",
-            "x86_64-w64-mingw32-ar --help",
-            "x86_64-w64-mingw32-as --help",
-            "x86_64-w64-mingw32-c++filt --help",
-            "x86_64-w64-mingw32-elfedit --help",
-            "x86_64-w64-mingw32-gprof --help",
-            "x86_64-w64-mingw32-ld --help",
-            "x86_64-w64-mingw32-ld --verbose | grep SEARCH",
-            "x86_64-w64-mingw32-ld.bfd --help",
-            "x86_64-w64-mingw32-nm --help",
-            "x86_64-w64-mingw32-objcopy --help",
-            "x86_64-w64-mingw32-objdump --help",
-            "x86_64-w64-mingw32-ranlib --help",
-            "x86_64-w64-mingw32-readelf --help",
-            "x86_64-w64-mingw32-size --help",
-            "x86_64-w64-mingw32-strings --help",
-            "x86_64-w64-mingw32-strip --help"
-          ],
-          "downstreams": null
-        }
-      },
-      {
-        "name": "binutils_win-64",
-        "requirements": {
-          "run": [
-            "binutils_impl_win-64"
-          ]
-        },
-        "script": "install_activation.sh",
-        "test": {
-          "commands": [
-            "$LD --help",
-            "$AR --help"
-          ]
-        }
-      },
-      {
-        "build": {
-          "detect_binary_files_with_prefix": false,
-          "merge_build_host": false,
-          "skip": true
-        },
-        "name": "binutils",
-        "requirements": {
-          "build": [],
-          "host": [
-            "binutils_impl_win-64"
-          ],
-          "run": [
-            "binutils_impl_win-64"
-          ]
-        },
-        "script": "install_binutils_symlinks.sh",
-        "test": {
-          "commands": [
-            "$PREFIX/bin/addr2line --help",
-            "$PREFIX/bin/ar --help",
-            "$PREFIX/bin/as --help",
-            "$PREFIX/bin/c++filt --help",
-            "$PREFIX/bin/elfedit --help",
-            "$PREFIX/bin/gprof --help",
-            "$PREFIX/bin/ld --help",
-            "$PREFIX/bin/ld.bfd --help",
-            "$PREFIX/bin/nm --help",
-            "$PREFIX/bin/objcopy --help",
-            "$PREFIX/bin/objdump --help",
-            "$PREFIX/bin/ranlib --help",
-            "$PREFIX/bin/readelf --help",
-            "$PREFIX/bin/size --help",
-            "$PREFIX/bin/strings --help",
-            "$PREFIX/bin/strip --help"
-          ]
-        }
-      },
-      {
-        "build": {
-          "detect_binary_files_with_prefix": true,
-          "ignore_run_exports_from": [
-            "cxx_compiler_stub"
-          ],
-          "merge_build_host": false
-        },
-        "name": "ld_impl_linux-64",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [],
-          "run": [],
-          "run_constrained": [
-            "binutils_impl_linux-64 2.43"
-          ]
-        },
-        "script": "install_ld.sh",
-        "test": {
-          "commands": [
-            "x86_64-conda-linux-gnu-ld --help",
-            "echo \"conda_cos6\""
-          ]
-        }
-      },
-      {
-        "build": {
-          "detect_binary_files_with_prefix": false,
-          "ignore_run_exports": [
-            "__glibc"
-          ],
-          "ignore_run_exports_from": [
-            "cxx_compiler_stub"
-          ],
-          "merge_build_host": false
-        },
-        "name": "binutils_impl_linux-64",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "ld_impl_linux-64 2.43"
-          ],
-          "run": [
-            "ld_impl_linux-64",
-            "sysroot_linux-64"
-          ]
-        },
-        "script": "install_binutils.sh",
-        "test": {
-          "commands": [
-            "x86_64-conda-linux-gnu-addr2line --help",
-            "x86_64-conda-linux-gnu-ar --help",
-            "x86_64-conda-linux-gnu-as --help",
-            "x86_64-conda-linux-gnu-c++filt --help",
-            "x86_64-conda-linux-gnu-elfedit --help",
-            "x86_64-conda-linux-gnu-gprof --help",
-            "x86_64-conda-linux-gnu-ld --help",
-            "x86_64-conda-linux-gnu-ld --verbose | grep SEARCH",
-            "x86_64-conda-linux-gnu-ld.bfd --help",
-            "x86_64-conda-linux-gnu-ld.gold --help",
-            "x86_64-conda-linux-gnu-nm --help",
-            "x86_64-conda-linux-gnu-objcopy --help",
-            "x86_64-conda-linux-gnu-objdump --help",
-            "x86_64-conda-linux-gnu-ranlib --help",
-            "x86_64-conda-linux-gnu-readelf --help",
-            "x86_64-conda-linux-gnu-size --help",
-            "x86_64-conda-linux-gnu-strings --help",
-            "x86_64-conda-linux-gnu-strip --help"
-          ],
-          "downstreams": [
-            "gfortran_impl_linux-64",
-            "gcc_impl_linux-64"
-          ]
-        }
-      },
-      {
-        "name": "binutils_linux-64",
-        "requirements": {
-          "run": [
-            "binutils_impl_linux-64"
-          ]
-        },
-        "script": "install_activation.sh",
-        "test": {
-          "commands": [
-            "$LD --help",
-            "$AR --help"
-          ]
-        }
-      },
-      {
-        "build": {
-          "detect_binary_files_with_prefix": false,
-          "merge_build_host": false,
-          "skip": true
-        },
-        "name": "binutils",
-        "requirements": {
-          "build": [],
-          "host": [
-            "binutils_impl_linux-64"
-          ],
-          "run": [
-            "binutils_impl_linux-64"
-          ]
-        },
-        "script": "install_binutils_symlinks.sh",
-        "test": {
-          "commands": [
-            "$PREFIX/bin/addr2line --help",
-            "$PREFIX/bin/ar --help",
-            "$PREFIX/bin/as --help",
-            "$PREFIX/bin/c++filt --help",
-            "$PREFIX/bin/elfedit --help",
-            "$PREFIX/bin/gold --help",
-            "$PREFIX/bin/gprof --help",
-            "$PREFIX/bin/ld --help",
-            "$PREFIX/bin/ld.bfd --help",
-            "$PREFIX/bin/ld.gold --help",
-            "$PREFIX/bin/nm --help",
-            "$PREFIX/bin/objcopy --help",
-            "$PREFIX/bin/objdump --help",
-            "$PREFIX/bin/ranlib --help",
-            "$PREFIX/bin/readelf --help",
-            "$PREFIX/bin/size --help",
-            "$PREFIX/bin/strings --help",
-            "$PREFIX/bin/strip --help"
-          ]
-        }
-      },
-      {
-        "build": {
-          "detect_binary_files_with_prefix": true,
-          "ignore_run_exports_from": [
-            "cxx_compiler_stub"
-          ],
-          "merge_build_host": false
-        },
-        "name": "ld_impl_linux-aarch64",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [],
-          "run": [],
-          "run_constrained": [
-            "binutils_impl_linux-aarch64 2.43"
-          ]
-        },
-        "script": "install_ld.sh",
-        "test": {
-          "commands": [
-            "aarch64-conda-linux-gnu-ld --help",
-            "echo \"conda_cos7\""
+            "echo \"conda\""
           ]
         }
       },
@@ -5469,7 +5324,7 @@
         "test": {
           "commands": [
             "powerpc64le-conda-linux-gnu-ld --help",
-            "echo \"conda_cos7\""
+            "echo \"conda\""
           ]
         }
       },
@@ -5604,7 +5459,7 @@
         "test": {
           "commands": [
             "s390x-conda-linux-gnu-ld --help",
-            "echo \"conda_cos7\""
+            "echo \"conda\""
           ]
         }
       },
@@ -5722,6 +5577,244 @@
           "ignore_run_exports_from": [
             "cxx_compiler_stub"
           ],
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "ld_impl_osx-64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": [],
+          "run_constrained": [
+            "binutils_impl_osx-64 2.43"
+          ]
+        },
+        "script": "install_ld.sh",
+        "test": {
+          "commands": [
+            "x86_64-apple-darwin13.4.0-ld --help",
+            "echo \"none\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "ignore_run_exports": [
+            "__glibc"
+          ],
+          "ignore_run_exports_from": [
+            "cxx_compiler_stub"
+          ],
+          "merge_build_host": false
+        },
+        "name": "binutils_impl_osx-64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": []
+        },
+        "script": "install_binutils.sh",
+        "test": {
+          "commands": [
+            "x86_64-apple-darwin13.4.0-addr2line --help",
+            "x86_64-apple-darwin13.4.0-ar --help",
+            "x86_64-apple-darwin13.4.0-c++filt --help",
+            "x86_64-apple-darwin13.4.0-elfedit --help",
+            "x86_64-apple-darwin13.4.0-nm --help",
+            "x86_64-apple-darwin13.4.0-objcopy --help",
+            "x86_64-apple-darwin13.4.0-objdump --help",
+            "x86_64-apple-darwin13.4.0-ranlib --help",
+            "x86_64-apple-darwin13.4.0-readelf --help",
+            "x86_64-apple-darwin13.4.0-size --help",
+            "x86_64-apple-darwin13.4.0-strings --help",
+            "x86_64-apple-darwin13.4.0-strip --help"
+          ],
+          "downstreams": [
+            "gfortran_impl_osx-64",
+            "gcc_impl_osx-64"
+          ]
+        }
+      },
+      {
+        "name": "binutils_osx-64",
+        "requirements": {
+          "run": [
+            "binutils_impl_osx-64"
+          ]
+        },
+        "script": "install_activation.sh",
+        "test": {
+          "commands": [
+            "$AR --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "binutils",
+        "requirements": {
+          "build": [],
+          "host": [
+            "binutils_impl_osx-64"
+          ],
+          "run": [
+            "binutils_impl_osx-64"
+          ]
+        },
+        "script": "install_binutils_symlinks.sh",
+        "test": {
+          "commands": [
+            "$PREFIX/bin/addr2line --help",
+            "$PREFIX/bin/ar --help",
+            "$PREFIX/bin/c++filt --help",
+            "$PREFIX/bin/elfedit --help",
+            "$PREFIX/bin/nm --help",
+            "$PREFIX/bin/objcopy --help",
+            "$PREFIX/bin/objdump --help",
+            "$PREFIX/bin/ranlib --help",
+            "$PREFIX/bin/readelf --help",
+            "$PREFIX/bin/size --help",
+            "$PREFIX/bin/strings --help",
+            "$PREFIX/bin/strip --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": true,
+          "ignore_run_exports_from": [
+            "cxx_compiler_stub"
+          ],
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "ld_impl_osx-arm64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": [],
+          "run_constrained": [
+            "binutils_impl_osx-arm64 2.43"
+          ]
+        },
+        "script": "install_ld.sh",
+        "test": {
+          "commands": [
+            "arm64-apple-darwin20.0.0-ld --help",
+            "echo \"none\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "ignore_run_exports": [
+            "__glibc"
+          ],
+          "ignore_run_exports_from": [
+            "cxx_compiler_stub"
+          ],
+          "merge_build_host": false
+        },
+        "name": "binutils_impl_osx-arm64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": []
+        },
+        "script": "install_binutils.sh",
+        "test": {
+          "commands": [
+            "arm64-apple-darwin20.0.0-addr2line --help",
+            "arm64-apple-darwin20.0.0-ar --help",
+            "arm64-apple-darwin20.0.0-c++filt --help",
+            "arm64-apple-darwin20.0.0-elfedit --help",
+            "arm64-apple-darwin20.0.0-nm --help",
+            "arm64-apple-darwin20.0.0-objcopy --help",
+            "arm64-apple-darwin20.0.0-objdump --help",
+            "arm64-apple-darwin20.0.0-ranlib --help",
+            "arm64-apple-darwin20.0.0-readelf --help",
+            "arm64-apple-darwin20.0.0-size --help",
+            "arm64-apple-darwin20.0.0-strings --help",
+            "arm64-apple-darwin20.0.0-strip --help"
+          ],
+          "downstreams": [
+            "gfortran_impl_osx-arm64",
+            "gcc_impl_osx-arm64"
+          ]
+        }
+      },
+      {
+        "name": "binutils_osx-arm64",
+        "requirements": {
+          "run": [
+            "binutils_impl_osx-arm64"
+          ]
+        },
+        "script": "install_activation.sh",
+        "test": {
+          "commands": [
+            "$AR --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "binutils",
+        "requirements": {
+          "build": [],
+          "host": [
+            "binutils_impl_osx-arm64"
+          ],
+          "run": [
+            "binutils_impl_osx-arm64"
+          ]
+        },
+        "script": "install_binutils_symlinks.sh",
+        "test": {
+          "commands": [
+            "$PREFIX/bin/addr2line --help",
+            "$PREFIX/bin/ar --help",
+            "$PREFIX/bin/c++filt --help",
+            "$PREFIX/bin/elfedit --help",
+            "$PREFIX/bin/nm --help",
+            "$PREFIX/bin/objcopy --help",
+            "$PREFIX/bin/objdump --help",
+            "$PREFIX/bin/ranlib --help",
+            "$PREFIX/bin/readelf --help",
+            "$PREFIX/bin/size --help",
+            "$PREFIX/bin/strings --help",
+            "$PREFIX/bin/strip --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": true,
+          "ignore_run_exports_from": [
+            "cxx_compiler_stub"
+          ],
           "merge_build_host": false
         },
         "name": "ld_impl_win-64",
@@ -5803,7 +5896,6 @@
         "script": "install_activation.sh",
         "test": {
           "commands": [
-            "$LD --help",
             "$AR --help"
           ]
         }
@@ -5867,7 +5959,7 @@
         "test": {
           "commands": [
             "x86_64-conda-linux-gnu-ld --help",
-            "echo \"conda_cos6\""
+            "echo \"conda\""
           ]
         }
       },
@@ -5997,7 +6089,7 @@
         "test": {
           "commands": [
             "aarch64-conda-linux-gnu-ld --help",
-            "echo \"conda_cos7\""
+            "echo \"conda\""
           ]
         }
       },
@@ -6127,7 +6219,7 @@
         "test": {
           "commands": [
             "powerpc64le-conda-linux-gnu-ld --help",
-            "echo \"conda_cos7\""
+            "echo \"conda\""
           ]
         }
       },
@@ -6257,7 +6349,7 @@
         "test": {
           "commands": [
             "s390x-conda-linux-gnu-ld --help",
-            "echo \"conda_cos7\""
+            "echo \"conda\""
           ]
         }
       },
@@ -6369,6 +6461,231 @@
       {
         "build": {
           "detect_binary_files_with_prefix": true,
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "ld_impl_osx-64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": [],
+          "run_constrained": [
+            "binutils_impl_osx-64 2.43"
+          ]
+        },
+        "script": "install_ld.sh",
+        "test": {
+          "commands": [
+            "x86_64-apple-darwin13.4.0-ld --help",
+            "echo \"none\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "ignore_run_exports": [
+            "__glibc"
+          ],
+          "merge_build_host": false
+        },
+        "name": "binutils_impl_osx-64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": []
+        },
+        "script": "install_binutils.sh",
+        "test": {
+          "commands": [
+            "x86_64-apple-darwin13.4.0-addr2line --help",
+            "x86_64-apple-darwin13.4.0-ar --help",
+            "x86_64-apple-darwin13.4.0-c++filt --help",
+            "x86_64-apple-darwin13.4.0-elfedit --help",
+            "x86_64-apple-darwin13.4.0-nm --help",
+            "x86_64-apple-darwin13.4.0-objcopy --help",
+            "x86_64-apple-darwin13.4.0-objdump --help",
+            "x86_64-apple-darwin13.4.0-ranlib --help",
+            "x86_64-apple-darwin13.4.0-readelf --help",
+            "x86_64-apple-darwin13.4.0-size --help",
+            "x86_64-apple-darwin13.4.0-strings --help",
+            "x86_64-apple-darwin13.4.0-strip --help"
+          ],
+          "downstreams": [
+            "gfortran_impl_osx-64",
+            "gcc_impl_osx-64"
+          ]
+        }
+      },
+      {
+        "name": "binutils_osx-64",
+        "requirements": {
+          "run": [
+            "binutils_impl_osx-64"
+          ]
+        },
+        "script": "install_activation.sh",
+        "test": {
+          "commands": [
+            "$AR --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "merge_build_host": false
+        },
+        "name": "binutils",
+        "requirements": {
+          "build": [],
+          "host": [
+            "binutils_impl_osx-64"
+          ],
+          "run": [
+            "binutils_impl_osx-64"
+          ]
+        },
+        "script": "install_binutils_symlinks.sh",
+        "test": {
+          "commands": [
+            "$PREFIX/bin/addr2line --help",
+            "$PREFIX/bin/ar --help",
+            "$PREFIX/bin/c++filt --help",
+            "$PREFIX/bin/elfedit --help",
+            "$PREFIX/bin/nm --help",
+            "$PREFIX/bin/objcopy --help",
+            "$PREFIX/bin/objdump --help",
+            "$PREFIX/bin/ranlib --help",
+            "$PREFIX/bin/readelf --help",
+            "$PREFIX/bin/size --help",
+            "$PREFIX/bin/strings --help",
+            "$PREFIX/bin/strip --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": true,
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "ld_impl_osx-arm64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": [],
+          "run_constrained": [
+            "binutils_impl_osx-arm64 2.43"
+          ]
+        },
+        "script": "install_ld.sh",
+        "test": {
+          "commands": [
+            "arm64-apple-darwin20.0.0-ld --help",
+            "echo \"none\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "ignore_run_exports": [
+            "__glibc"
+          ],
+          "merge_build_host": false
+        },
+        "name": "binutils_impl_osx-arm64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": []
+        },
+        "script": "install_binutils.sh",
+        "test": {
+          "commands": [
+            "arm64-apple-darwin20.0.0-addr2line --help",
+            "arm64-apple-darwin20.0.0-ar --help",
+            "arm64-apple-darwin20.0.0-c++filt --help",
+            "arm64-apple-darwin20.0.0-elfedit --help",
+            "arm64-apple-darwin20.0.0-nm --help",
+            "arm64-apple-darwin20.0.0-objcopy --help",
+            "arm64-apple-darwin20.0.0-objdump --help",
+            "arm64-apple-darwin20.0.0-ranlib --help",
+            "arm64-apple-darwin20.0.0-readelf --help",
+            "arm64-apple-darwin20.0.0-size --help",
+            "arm64-apple-darwin20.0.0-strings --help",
+            "arm64-apple-darwin20.0.0-strip --help"
+          ],
+          "downstreams": [
+            "gfortran_impl_osx-arm64",
+            "gcc_impl_osx-arm64"
+          ]
+        }
+      },
+      {
+        "name": "binutils_osx-arm64",
+        "requirements": {
+          "run": [
+            "binutils_impl_osx-arm64"
+          ]
+        },
+        "script": "install_activation.sh",
+        "test": {
+          "commands": [
+            "$AR --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "binutils",
+        "requirements": {
+          "build": [],
+          "host": [
+            "binutils_impl_osx-arm64"
+          ],
+          "run": [
+            "binutils_impl_osx-arm64"
+          ]
+        },
+        "script": "install_binutils_symlinks.sh",
+        "test": {
+          "commands": [
+            "$PREFIX/bin/addr2line --help",
+            "$PREFIX/bin/ar --help",
+            "$PREFIX/bin/c++filt --help",
+            "$PREFIX/bin/elfedit --help",
+            "$PREFIX/bin/nm --help",
+            "$PREFIX/bin/objcopy --help",
+            "$PREFIX/bin/objdump --help",
+            "$PREFIX/bin/ranlib --help",
+            "$PREFIX/bin/readelf --help",
+            "$PREFIX/bin/size --help",
+            "$PREFIX/bin/strings --help",
+            "$PREFIX/bin/strip --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": true,
           "merge_build_host": false
         },
         "name": "ld_impl_win-64",
@@ -6447,7 +6764,874 @@
         "script": "install_activation.sh",
         "test": {
           "commands": [
+            "$AR --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "binutils",
+        "requirements": {
+          "build": [],
+          "host": [
+            "binutils_impl_win-64"
+          ],
+          "run": [
+            "binutils_impl_win-64"
+          ]
+        },
+        "script": "install_binutils_symlinks.sh",
+        "test": {
+          "commands": [
+            "$PREFIX/bin/addr2line --help",
+            "$PREFIX/bin/ar --help",
+            "$PREFIX/bin/as --help",
+            "$PREFIX/bin/c++filt --help",
+            "$PREFIX/bin/elfedit --help",
+            "$PREFIX/bin/gprof --help",
+            "$PREFIX/bin/ld --help",
+            "$PREFIX/bin/ld.bfd --help",
+            "$PREFIX/bin/nm --help",
+            "$PREFIX/bin/objcopy --help",
+            "$PREFIX/bin/objdump --help",
+            "$PREFIX/bin/ranlib --help",
+            "$PREFIX/bin/readelf --help",
+            "$PREFIX/bin/size --help",
+            "$PREFIX/bin/strings --help",
+            "$PREFIX/bin/strip --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": true,
+          "merge_build_host": false
+        },
+        "name": "ld_impl_linux-64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": [],
+          "run_constrained": [
+            "binutils_impl_linux-64 2.43"
+          ]
+        },
+        "script": "install_ld.sh",
+        "test": {
+          "commands": [
+            "x86_64-conda-linux-gnu-ld --help",
+            "echo \"conda\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "ignore_run_exports": [
+            "__glibc"
+          ],
+          "merge_build_host": false
+        },
+        "name": "binutils_impl_linux-64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [
+            "ld_impl_linux-64 2.43"
+          ],
+          "run": [
+            "ld_impl_linux-64",
+            "sysroot_linux-64"
+          ]
+        },
+        "script": "install_binutils.sh",
+        "test": {
+          "commands": [
+            "x86_64-conda-linux-gnu-addr2line --help",
+            "x86_64-conda-linux-gnu-ar --help",
+            "x86_64-conda-linux-gnu-as --help",
+            "x86_64-conda-linux-gnu-c++filt --help",
+            "x86_64-conda-linux-gnu-elfedit --help",
+            "x86_64-conda-linux-gnu-gprof --help",
+            "x86_64-conda-linux-gnu-ld --help",
+            "x86_64-conda-linux-gnu-ld --verbose | grep SEARCH",
+            "x86_64-conda-linux-gnu-ld.bfd --help",
+            "x86_64-conda-linux-gnu-ld.gold --help",
+            "x86_64-conda-linux-gnu-nm --help",
+            "x86_64-conda-linux-gnu-objcopy --help",
+            "x86_64-conda-linux-gnu-objdump --help",
+            "x86_64-conda-linux-gnu-ranlib --help",
+            "x86_64-conda-linux-gnu-readelf --help",
+            "x86_64-conda-linux-gnu-size --help",
+            "x86_64-conda-linux-gnu-strings --help",
+            "x86_64-conda-linux-gnu-strip --help"
+          ],
+          "downstreams": [
+            "gfortran_impl_linux-64",
+            "gcc_impl_linux-64"
+          ]
+        }
+      },
+      {
+        "name": "binutils_linux-64",
+        "requirements": {
+          "run": [
+            "binutils_impl_linux-64"
+          ]
+        },
+        "script": "install_activation.sh",
+        "test": {
+          "commands": [
             "$LD --help",
+            "$AR --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "binutils",
+        "requirements": {
+          "build": [],
+          "host": [
+            "binutils_impl_linux-64"
+          ],
+          "run": [
+            "binutils_impl_linux-64"
+          ]
+        },
+        "script": "install_binutils_symlinks.sh",
+        "test": {
+          "commands": [
+            "$PREFIX/bin/addr2line --help",
+            "$PREFIX/bin/ar --help",
+            "$PREFIX/bin/as --help",
+            "$PREFIX/bin/c++filt --help",
+            "$PREFIX/bin/elfedit --help",
+            "$PREFIX/bin/gold --help",
+            "$PREFIX/bin/gprof --help",
+            "$PREFIX/bin/ld --help",
+            "$PREFIX/bin/ld.bfd --help",
+            "$PREFIX/bin/ld.gold --help",
+            "$PREFIX/bin/nm --help",
+            "$PREFIX/bin/objcopy --help",
+            "$PREFIX/bin/objdump --help",
+            "$PREFIX/bin/ranlib --help",
+            "$PREFIX/bin/readelf --help",
+            "$PREFIX/bin/size --help",
+            "$PREFIX/bin/strings --help",
+            "$PREFIX/bin/strip --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": true,
+          "merge_build_host": false
+        },
+        "name": "ld_impl_linux-aarch64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": [],
+          "run_constrained": [
+            "binutils_impl_linux-aarch64 2.43"
+          ]
+        },
+        "script": "install_ld.sh",
+        "test": {
+          "commands": [
+            "aarch64-conda-linux-gnu-ld --help",
+            "echo \"conda\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "ignore_run_exports": [
+            "__glibc"
+          ],
+          "merge_build_host": false
+        },
+        "name": "binutils_impl_linux-aarch64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [
+            "ld_impl_linux-aarch64 2.43"
+          ],
+          "run": [
+            "ld_impl_linux-aarch64",
+            "sysroot_linux-aarch64"
+          ]
+        },
+        "script": "install_binutils.sh",
+        "test": {
+          "commands": [
+            "aarch64-conda-linux-gnu-addr2line --help",
+            "aarch64-conda-linux-gnu-ar --help",
+            "aarch64-conda-linux-gnu-as --help",
+            "aarch64-conda-linux-gnu-c++filt --help",
+            "aarch64-conda-linux-gnu-elfedit --help",
+            "aarch64-conda-linux-gnu-gprof --help",
+            "aarch64-conda-linux-gnu-ld --help",
+            "aarch64-conda-linux-gnu-ld --verbose | grep SEARCH",
+            "aarch64-conda-linux-gnu-ld.bfd --help",
+            "aarch64-conda-linux-gnu-ld.gold --help",
+            "aarch64-conda-linux-gnu-nm --help",
+            "aarch64-conda-linux-gnu-objcopy --help",
+            "aarch64-conda-linux-gnu-objdump --help",
+            "aarch64-conda-linux-gnu-ranlib --help",
+            "aarch64-conda-linux-gnu-readelf --help",
+            "aarch64-conda-linux-gnu-size --help",
+            "aarch64-conda-linux-gnu-strings --help",
+            "aarch64-conda-linux-gnu-strip --help"
+          ],
+          "downstreams": [
+            "gfortran_impl_linux-aarch64",
+            "gcc_impl_linux-aarch64"
+          ]
+        }
+      },
+      {
+        "name": "binutils_linux-aarch64",
+        "requirements": {
+          "run": [
+            "binutils_impl_linux-aarch64"
+          ]
+        },
+        "script": "install_activation.sh",
+        "test": {
+          "commands": [
+            "$LD --help",
+            "$AR --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "binutils",
+        "requirements": {
+          "build": [],
+          "host": [
+            "binutils_impl_linux-aarch64"
+          ],
+          "run": [
+            "binutils_impl_linux-aarch64"
+          ]
+        },
+        "script": "install_binutils_symlinks.sh",
+        "test": {
+          "commands": [
+            "$PREFIX/bin/addr2line --help",
+            "$PREFIX/bin/ar --help",
+            "$PREFIX/bin/as --help",
+            "$PREFIX/bin/c++filt --help",
+            "$PREFIX/bin/elfedit --help",
+            "$PREFIX/bin/gold --help",
+            "$PREFIX/bin/gprof --help",
+            "$PREFIX/bin/ld --help",
+            "$PREFIX/bin/ld.bfd --help",
+            "$PREFIX/bin/ld.gold --help",
+            "$PREFIX/bin/nm --help",
+            "$PREFIX/bin/objcopy --help",
+            "$PREFIX/bin/objdump --help",
+            "$PREFIX/bin/ranlib --help",
+            "$PREFIX/bin/readelf --help",
+            "$PREFIX/bin/size --help",
+            "$PREFIX/bin/strings --help",
+            "$PREFIX/bin/strip --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": true,
+          "merge_build_host": false
+        },
+        "name": "ld_impl_linux-ppc64le",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": [],
+          "run_constrained": [
+            "binutils_impl_linux-ppc64le 2.43"
+          ]
+        },
+        "script": "install_ld.sh",
+        "test": {
+          "commands": [
+            "powerpc64le-conda-linux-gnu-ld --help",
+            "echo \"conda\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "ignore_run_exports": [
+            "__glibc"
+          ],
+          "merge_build_host": false
+        },
+        "name": "binutils_impl_linux-ppc64le",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [
+            "ld_impl_linux-ppc64le 2.43"
+          ],
+          "run": [
+            "ld_impl_linux-ppc64le",
+            "sysroot_linux-ppc64le"
+          ]
+        },
+        "script": "install_binutils.sh",
+        "test": {
+          "commands": [
+            "powerpc64le-conda-linux-gnu-addr2line --help",
+            "powerpc64le-conda-linux-gnu-ar --help",
+            "powerpc64le-conda-linux-gnu-as --help",
+            "powerpc64le-conda-linux-gnu-c++filt --help",
+            "powerpc64le-conda-linux-gnu-elfedit --help",
+            "powerpc64le-conda-linux-gnu-gprof --help",
+            "powerpc64le-conda-linux-gnu-ld --help",
+            "powerpc64le-conda-linux-gnu-ld --verbose | grep SEARCH",
+            "powerpc64le-conda-linux-gnu-ld.bfd --help",
+            "powerpc64le-conda-linux-gnu-ld.gold --help",
+            "powerpc64le-conda-linux-gnu-nm --help",
+            "powerpc64le-conda-linux-gnu-objcopy --help",
+            "powerpc64le-conda-linux-gnu-objdump --help",
+            "powerpc64le-conda-linux-gnu-ranlib --help",
+            "powerpc64le-conda-linux-gnu-readelf --help",
+            "powerpc64le-conda-linux-gnu-size --help",
+            "powerpc64le-conda-linux-gnu-strings --help",
+            "powerpc64le-conda-linux-gnu-strip --help"
+          ],
+          "downstreams": [
+            "gfortran_impl_linux-ppc64le",
+            "gcc_impl_linux-ppc64le"
+          ]
+        }
+      },
+      {
+        "name": "binutils_linux-ppc64le",
+        "requirements": {
+          "run": [
+            "binutils_impl_linux-ppc64le"
+          ]
+        },
+        "script": "install_activation.sh",
+        "test": {
+          "commands": [
+            "$LD --help",
+            "$AR --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "binutils",
+        "requirements": {
+          "build": [],
+          "host": [
+            "binutils_impl_linux-ppc64le"
+          ],
+          "run": [
+            "binutils_impl_linux-ppc64le"
+          ]
+        },
+        "script": "install_binutils_symlinks.sh",
+        "test": {
+          "commands": [
+            "$PREFIX/bin/addr2line --help",
+            "$PREFIX/bin/ar --help",
+            "$PREFIX/bin/as --help",
+            "$PREFIX/bin/c++filt --help",
+            "$PREFIX/bin/elfedit --help",
+            "$PREFIX/bin/gold --help",
+            "$PREFIX/bin/gprof --help",
+            "$PREFIX/bin/ld --help",
+            "$PREFIX/bin/ld.bfd --help",
+            "$PREFIX/bin/ld.gold --help",
+            "$PREFIX/bin/nm --help",
+            "$PREFIX/bin/objcopy --help",
+            "$PREFIX/bin/objdump --help",
+            "$PREFIX/bin/ranlib --help",
+            "$PREFIX/bin/readelf --help",
+            "$PREFIX/bin/size --help",
+            "$PREFIX/bin/strings --help",
+            "$PREFIX/bin/strip --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": true,
+          "merge_build_host": false
+        },
+        "name": "ld_impl_linux-s390x",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": [],
+          "run_constrained": [
+            "binutils_impl_linux-s390x 2.43"
+          ]
+        },
+        "script": "install_ld.sh",
+        "test": {
+          "commands": [
+            "s390x-conda-linux-gnu-ld --help",
+            "echo \"conda\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "ignore_run_exports": [
+            "__glibc"
+          ],
+          "merge_build_host": false
+        },
+        "name": "binutils_impl_linux-s390x",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [
+            "ld_impl_linux-s390x 2.43"
+          ],
+          "run": [
+            "ld_impl_linux-s390x",
+            "sysroot_linux-s390x"
+          ]
+        },
+        "script": "install_binutils.sh",
+        "test": {
+          "commands": [
+            "s390x-conda-linux-gnu-addr2line --help",
+            "s390x-conda-linux-gnu-ar --help",
+            "s390x-conda-linux-gnu-as --help",
+            "s390x-conda-linux-gnu-c++filt --help",
+            "s390x-conda-linux-gnu-elfedit --help",
+            "s390x-conda-linux-gnu-gprof --help",
+            "s390x-conda-linux-gnu-ld --help",
+            "s390x-conda-linux-gnu-ld --verbose | grep SEARCH",
+            "s390x-conda-linux-gnu-ld.bfd --help",
+            "s390x-conda-linux-gnu-ld.gold --help",
+            "s390x-conda-linux-gnu-nm --help",
+            "s390x-conda-linux-gnu-objcopy --help",
+            "s390x-conda-linux-gnu-objdump --help",
+            "s390x-conda-linux-gnu-ranlib --help",
+            "s390x-conda-linux-gnu-readelf --help",
+            "s390x-conda-linux-gnu-size --help",
+            "s390x-conda-linux-gnu-strings --help",
+            "s390x-conda-linux-gnu-strip --help"
+          ],
+          "downstreams": [
+            "gfortran_impl_linux-s390x",
+            "gcc_impl_linux-s390x"
+          ]
+        }
+      },
+      {
+        "name": "binutils_linux-s390x",
+        "requirements": {
+          "run": [
+            "binutils_impl_linux-s390x"
+          ]
+        },
+        "script": "install_activation.sh",
+        "test": {
+          "commands": [
+            "$LD --help",
+            "$AR --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "binutils",
+        "requirements": {
+          "build": [],
+          "host": [
+            "binutils_impl_linux-s390x"
+          ],
+          "run": [
+            "binutils_impl_linux-s390x"
+          ]
+        },
+        "script": "install_binutils_symlinks.sh",
+        "test": {
+          "commands": [
+            "$PREFIX/bin/addr2line --help",
+            "$PREFIX/bin/ar --help",
+            "$PREFIX/bin/as --help",
+            "$PREFIX/bin/c++filt --help",
+            "$PREFIX/bin/elfedit --help",
+            "$PREFIX/bin/gold --help",
+            "$PREFIX/bin/gprof --help",
+            "$PREFIX/bin/ld --help",
+            "$PREFIX/bin/ld.bfd --help",
+            "$PREFIX/bin/ld.gold --help",
+            "$PREFIX/bin/nm --help",
+            "$PREFIX/bin/objcopy --help",
+            "$PREFIX/bin/objdump --help",
+            "$PREFIX/bin/ranlib --help",
+            "$PREFIX/bin/readelf --help",
+            "$PREFIX/bin/size --help",
+            "$PREFIX/bin/strings --help",
+            "$PREFIX/bin/strip --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": true,
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "ld_impl_osx-64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": [],
+          "run_constrained": [
+            "binutils_impl_osx-64 2.43"
+          ]
+        },
+        "script": "install_ld.sh",
+        "test": {
+          "commands": [
+            "x86_64-apple-darwin13.4.0-ld --help",
+            "echo \"none\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "ignore_run_exports": [
+            "__glibc"
+          ],
+          "merge_build_host": false
+        },
+        "name": "binutils_impl_osx-64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": []
+        },
+        "script": "install_binutils.sh",
+        "test": {
+          "commands": [
+            "x86_64-apple-darwin13.4.0-addr2line --help",
+            "x86_64-apple-darwin13.4.0-ar --help",
+            "x86_64-apple-darwin13.4.0-c++filt --help",
+            "x86_64-apple-darwin13.4.0-elfedit --help",
+            "x86_64-apple-darwin13.4.0-nm --help",
+            "x86_64-apple-darwin13.4.0-objcopy --help",
+            "x86_64-apple-darwin13.4.0-objdump --help",
+            "x86_64-apple-darwin13.4.0-ranlib --help",
+            "x86_64-apple-darwin13.4.0-readelf --help",
+            "x86_64-apple-darwin13.4.0-size --help",
+            "x86_64-apple-darwin13.4.0-strings --help",
+            "x86_64-apple-darwin13.4.0-strip --help"
+          ],
+          "downstreams": [
+            "gfortran_impl_osx-64",
+            "gcc_impl_osx-64"
+          ]
+        }
+      },
+      {
+        "name": "binutils_osx-64",
+        "requirements": {
+          "run": [
+            "binutils_impl_osx-64"
+          ]
+        },
+        "script": "install_activation.sh",
+        "test": {
+          "commands": [
+            "$AR --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "binutils",
+        "requirements": {
+          "build": [],
+          "host": [
+            "binutils_impl_osx-64"
+          ],
+          "run": [
+            "binutils_impl_osx-64"
+          ]
+        },
+        "script": "install_binutils_symlinks.sh",
+        "test": {
+          "commands": [
+            "$PREFIX/bin/addr2line --help",
+            "$PREFIX/bin/ar --help",
+            "$PREFIX/bin/c++filt --help",
+            "$PREFIX/bin/elfedit --help",
+            "$PREFIX/bin/nm --help",
+            "$PREFIX/bin/objcopy --help",
+            "$PREFIX/bin/objdump --help",
+            "$PREFIX/bin/ranlib --help",
+            "$PREFIX/bin/readelf --help",
+            "$PREFIX/bin/size --help",
+            "$PREFIX/bin/strings --help",
+            "$PREFIX/bin/strip --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": true,
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "ld_impl_osx-arm64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": [],
+          "run_constrained": [
+            "binutils_impl_osx-arm64 2.43"
+          ]
+        },
+        "script": "install_ld.sh",
+        "test": {
+          "commands": [
+            "arm64-apple-darwin20.0.0-ld --help",
+            "echo \"none\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "ignore_run_exports": [
+            "__glibc"
+          ],
+          "merge_build_host": false
+        },
+        "name": "binutils_impl_osx-arm64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": []
+        },
+        "script": "install_binutils.sh",
+        "test": {
+          "commands": [
+            "arm64-apple-darwin20.0.0-addr2line --help",
+            "arm64-apple-darwin20.0.0-ar --help",
+            "arm64-apple-darwin20.0.0-c++filt --help",
+            "arm64-apple-darwin20.0.0-elfedit --help",
+            "arm64-apple-darwin20.0.0-nm --help",
+            "arm64-apple-darwin20.0.0-objcopy --help",
+            "arm64-apple-darwin20.0.0-objdump --help",
+            "arm64-apple-darwin20.0.0-ranlib --help",
+            "arm64-apple-darwin20.0.0-readelf --help",
+            "arm64-apple-darwin20.0.0-size --help",
+            "arm64-apple-darwin20.0.0-strings --help",
+            "arm64-apple-darwin20.0.0-strip --help"
+          ],
+          "downstreams": [
+            "gfortran_impl_osx-arm64",
+            "gcc_impl_osx-arm64"
+          ]
+        }
+      },
+      {
+        "name": "binutils_osx-arm64",
+        "requirements": {
+          "run": [
+            "binutils_impl_osx-arm64"
+          ]
+        },
+        "script": "install_activation.sh",
+        "test": {
+          "commands": [
+            "$AR --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "merge_build_host": false
+        },
+        "name": "binutils",
+        "requirements": {
+          "build": [],
+          "host": [
+            "binutils_impl_osx-arm64"
+          ],
+          "run": [
+            "binutils_impl_osx-arm64"
+          ]
+        },
+        "script": "install_binutils_symlinks.sh",
+        "test": {
+          "commands": [
+            "$PREFIX/bin/addr2line --help",
+            "$PREFIX/bin/ar --help",
+            "$PREFIX/bin/c++filt --help",
+            "$PREFIX/bin/elfedit --help",
+            "$PREFIX/bin/nm --help",
+            "$PREFIX/bin/objcopy --help",
+            "$PREFIX/bin/objdump --help",
+            "$PREFIX/bin/ranlib --help",
+            "$PREFIX/bin/readelf --help",
+            "$PREFIX/bin/size --help",
+            "$PREFIX/bin/strings --help",
+            "$PREFIX/bin/strip --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": true,
+          "merge_build_host": false
+        },
+        "name": "ld_impl_win-64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": [],
+          "run_constrained": [
+            "binutils_impl_win-64 2.43"
+          ]
+        },
+        "script": "install_ld.sh",
+        "test": {
+          "commands": [
+            "x86_64-w64-mingw32-ld --help",
+            "echo \"none\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "ignore_run_exports": [
+            "__glibc"
+          ],
+          "merge_build_host": false
+        },
+        "name": "binutils_impl_win-64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [
+            "ld_impl_win-64 2.43"
+          ],
+          "run": [
+            "ld_impl_win-64",
+            "m2w64-sysroot_win-64 >=12.0.0.r0"
+          ]
+        },
+        "script": "install_binutils.sh",
+        "test": {
+          "commands": [
+            "x86_64-w64-mingw32-addr2line --help",
+            "x86_64-w64-mingw32-ar --help",
+            "x86_64-w64-mingw32-as --help",
+            "x86_64-w64-mingw32-c++filt --help",
+            "x86_64-w64-mingw32-elfedit --help",
+            "x86_64-w64-mingw32-gprof --help",
+            "x86_64-w64-mingw32-ld --help",
+            "x86_64-w64-mingw32-ld --verbose | grep SEARCH",
+            "x86_64-w64-mingw32-ld.bfd --help",
+            "x86_64-w64-mingw32-nm --help",
+            "x86_64-w64-mingw32-objcopy --help",
+            "x86_64-w64-mingw32-objdump --help",
+            "x86_64-w64-mingw32-ranlib --help",
+            "x86_64-w64-mingw32-readelf --help",
+            "x86_64-w64-mingw32-size --help",
+            "x86_64-w64-mingw32-strings --help",
+            "x86_64-w64-mingw32-strip --help"
+          ],
+          "downstreams": null
+        }
+      },
+      {
+        "name": "binutils_win-64",
+        "requirements": {
+          "run": [
+            "binutils_impl_win-64"
+          ]
+        },
+        "script": "install_activation.sh",
+        "test": {
+          "commands": [
             "$AR --help"
           ]
         }
@@ -6574,7 +7758,6 @@
         "script": "install_activation.sh",
         "test": {
           "commands": [
-            "$LD --help",
             "$AR --help"
           ]
         }
@@ -6626,13 +7809,84 @@
         "cxx_compiler_stub",
         "c_stdlib_stub",
         "make",
-        "texinfo"
+        "texinfo",
+        "flex"
       ],
       "host": [],
       "run": []
     },
     "schema_version": 0,
     "source": [
+      {
+        "patches": [
+          "patches/0001-fallback-sysroot.diff"
+        ],
+        "sha256": "fed3c3077f0df7a4a1aa47b080b8c53277593ccbb4e5e78b73ffb4e3f265e750",
+        "url": "https://ftp.gnu.org/gnu/binutils/binutils-2.43.tar.bz2"
+      },
+      {
+        "patches": [
+          "patches/0001-fallback-sysroot.diff"
+        ],
+        "sha256": "fed3c3077f0df7a4a1aa47b080b8c53277593ccbb4e5e78b73ffb4e3f265e750",
+        "url": "https://ftp.gnu.org/gnu/binutils/binutils-2.43.tar.bz2"
+      },
+      {
+        "patches": [
+          "patches/0001-fallback-sysroot.diff"
+        ],
+        "sha256": "fed3c3077f0df7a4a1aa47b080b8c53277593ccbb4e5e78b73ffb4e3f265e750",
+        "url": "https://ftp.gnu.org/gnu/binutils/binutils-2.43.tar.bz2"
+      },
+      {
+        "patches": [
+          "patches/0001-fallback-sysroot.diff"
+        ],
+        "sha256": "fed3c3077f0df7a4a1aa47b080b8c53277593ccbb4e5e78b73ffb4e3f265e750",
+        "url": "https://ftp.gnu.org/gnu/binutils/binutils-2.43.tar.bz2"
+      },
+      {
+        "patches": [
+          "patches/0001-fallback-sysroot.diff"
+        ],
+        "sha256": "fed3c3077f0df7a4a1aa47b080b8c53277593ccbb4e5e78b73ffb4e3f265e750",
+        "url": "https://ftp.gnu.org/gnu/binutils/binutils-2.43.tar.bz2"
+      },
+      {
+        "patches": [
+          "patches/0001-fallback-sysroot.diff"
+        ],
+        "sha256": "fed3c3077f0df7a4a1aa47b080b8c53277593ccbb4e5e78b73ffb4e3f265e750",
+        "url": "https://ftp.gnu.org/gnu/binutils/binutils-2.43.tar.bz2"
+      },
+      {
+        "patches": [
+          "patches/0001-fallback-sysroot.diff"
+        ],
+        "sha256": "fed3c3077f0df7a4a1aa47b080b8c53277593ccbb4e5e78b73ffb4e3f265e750",
+        "url": "https://ftp.gnu.org/gnu/binutils/binutils-2.43.tar.bz2"
+      },
+      {
+        "patches": [
+          "patches/0001-fallback-sysroot.diff"
+        ],
+        "sha256": "fed3c3077f0df7a4a1aa47b080b8c53277593ccbb4e5e78b73ffb4e3f265e750",
+        "url": "https://ftp.gnu.org/gnu/binutils/binutils-2.43.tar.bz2"
+      },
+      {
+        "patches": [
+          "patches/0001-fallback-sysroot.diff"
+        ],
+        "sha256": "fed3c3077f0df7a4a1aa47b080b8c53277593ccbb4e5e78b73ffb4e3f265e750",
+        "url": "https://ftp.gnu.org/gnu/binutils/binutils-2.43.tar.bz2"
+      },
+      {
+        "patches": [
+          "patches/0001-fallback-sysroot.diff"
+        ],
+        "sha256": "fed3c3077f0df7a4a1aa47b080b8c53277593ccbb4e5e78b73ffb4e3f265e750",
+        "url": "https://ftp.gnu.org/gnu/binutils/binutils-2.43.tar.bz2"
+      },
       {
         "patches": [
           "patches/0001-fallback-sysroot.diff"
@@ -6864,7 +8118,7 @@
         "test": {
           "commands": [
             "x86_64-conda-linux-gnu-ld --help",
-            "echo \"conda_cos6\""
+            "echo \"conda\""
           ]
         }
       },
@@ -6994,7 +8248,7 @@
         "test": {
           "commands": [
             "aarch64-conda-linux-gnu-ld --help",
-            "echo \"conda_cos7\""
+            "echo \"conda\""
           ]
         }
       },
@@ -7124,7 +8378,7 @@
         "test": {
           "commands": [
             "powerpc64le-conda-linux-gnu-ld --help",
-            "echo \"conda_cos7\""
+            "echo \"conda\""
           ]
         }
       },
@@ -7254,7 +8508,7 @@
         "test": {
           "commands": [
             "s390x-conda-linux-gnu-ld --help",
-            "echo \"conda_cos7\""
+            "echo \"conda\""
           ]
         }
       },
@@ -7366,6 +8620,231 @@
       {
         "build": {
           "detect_binary_files_with_prefix": true,
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "ld_impl_osx-64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": [],
+          "run_constrained": [
+            "binutils_impl_osx-64 2.43"
+          ]
+        },
+        "script": "install_ld.sh",
+        "test": {
+          "commands": [
+            "x86_64-apple-darwin13.4.0-ld --help",
+            "echo \"none\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "ignore_run_exports": [
+            "__glibc"
+          ],
+          "merge_build_host": false
+        },
+        "name": "binutils_impl_osx-64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": []
+        },
+        "script": "install_binutils.sh",
+        "test": {
+          "commands": [
+            "x86_64-apple-darwin13.4.0-addr2line --help",
+            "x86_64-apple-darwin13.4.0-ar --help",
+            "x86_64-apple-darwin13.4.0-c++filt --help",
+            "x86_64-apple-darwin13.4.0-elfedit --help",
+            "x86_64-apple-darwin13.4.0-nm --help",
+            "x86_64-apple-darwin13.4.0-objcopy --help",
+            "x86_64-apple-darwin13.4.0-objdump --help",
+            "x86_64-apple-darwin13.4.0-ranlib --help",
+            "x86_64-apple-darwin13.4.0-readelf --help",
+            "x86_64-apple-darwin13.4.0-size --help",
+            "x86_64-apple-darwin13.4.0-strings --help",
+            "x86_64-apple-darwin13.4.0-strip --help"
+          ],
+          "downstreams": [
+            "gfortran_impl_osx-64",
+            "gcc_impl_osx-64"
+          ]
+        }
+      },
+      {
+        "name": "binutils_osx-64",
+        "requirements": {
+          "run": [
+            "binutils_impl_osx-64"
+          ]
+        },
+        "script": "install_activation.sh",
+        "test": {
+          "commands": [
+            "$AR --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "merge_build_host": false
+        },
+        "name": "binutils",
+        "requirements": {
+          "build": [],
+          "host": [
+            "binutils_impl_osx-64"
+          ],
+          "run": [
+            "binutils_impl_osx-64"
+          ]
+        },
+        "script": "install_binutils_symlinks.sh",
+        "test": {
+          "commands": [
+            "$PREFIX/bin/addr2line --help",
+            "$PREFIX/bin/ar --help",
+            "$PREFIX/bin/c++filt --help",
+            "$PREFIX/bin/elfedit --help",
+            "$PREFIX/bin/nm --help",
+            "$PREFIX/bin/objcopy --help",
+            "$PREFIX/bin/objdump --help",
+            "$PREFIX/bin/ranlib --help",
+            "$PREFIX/bin/readelf --help",
+            "$PREFIX/bin/size --help",
+            "$PREFIX/bin/strings --help",
+            "$PREFIX/bin/strip --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": true,
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "ld_impl_osx-arm64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": [],
+          "run_constrained": [
+            "binutils_impl_osx-arm64 2.43"
+          ]
+        },
+        "script": "install_ld.sh",
+        "test": {
+          "commands": [
+            "arm64-apple-darwin20.0.0-ld --help",
+            "echo \"none\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "ignore_run_exports": [
+            "__glibc"
+          ],
+          "merge_build_host": false
+        },
+        "name": "binutils_impl_osx-arm64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": []
+        },
+        "script": "install_binutils.sh",
+        "test": {
+          "commands": [
+            "arm64-apple-darwin20.0.0-addr2line --help",
+            "arm64-apple-darwin20.0.0-ar --help",
+            "arm64-apple-darwin20.0.0-c++filt --help",
+            "arm64-apple-darwin20.0.0-elfedit --help",
+            "arm64-apple-darwin20.0.0-nm --help",
+            "arm64-apple-darwin20.0.0-objcopy --help",
+            "arm64-apple-darwin20.0.0-objdump --help",
+            "arm64-apple-darwin20.0.0-ranlib --help",
+            "arm64-apple-darwin20.0.0-readelf --help",
+            "arm64-apple-darwin20.0.0-size --help",
+            "arm64-apple-darwin20.0.0-strings --help",
+            "arm64-apple-darwin20.0.0-strip --help"
+          ],
+          "downstreams": [
+            "gfortran_impl_osx-arm64",
+            "gcc_impl_osx-arm64"
+          ]
+        }
+      },
+      {
+        "name": "binutils_osx-arm64",
+        "requirements": {
+          "run": [
+            "binutils_impl_osx-arm64"
+          ]
+        },
+        "script": "install_activation.sh",
+        "test": {
+          "commands": [
+            "$AR --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "binutils",
+        "requirements": {
+          "build": [],
+          "host": [
+            "binutils_impl_osx-arm64"
+          ],
+          "run": [
+            "binutils_impl_osx-arm64"
+          ]
+        },
+        "script": "install_binutils_symlinks.sh",
+        "test": {
+          "commands": [
+            "$PREFIX/bin/addr2line --help",
+            "$PREFIX/bin/ar --help",
+            "$PREFIX/bin/c++filt --help",
+            "$PREFIX/bin/elfedit --help",
+            "$PREFIX/bin/nm --help",
+            "$PREFIX/bin/objcopy --help",
+            "$PREFIX/bin/objdump --help",
+            "$PREFIX/bin/ranlib --help",
+            "$PREFIX/bin/readelf --help",
+            "$PREFIX/bin/size --help",
+            "$PREFIX/bin/strings --help",
+            "$PREFIX/bin/strip --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": true,
           "merge_build_host": false
         },
         "name": "ld_impl_win-64",
@@ -7444,7 +8923,6 @@
         "script": "install_activation.sh",
         "test": {
           "commands": [
-            "$LD --help",
             "$AR --help"
           ]
         }
@@ -7497,13 +8975,28 @@
         "cxx_compiler_stub",
         "c_stdlib_stub",
         "make",
-        "texinfo"
+        "texinfo",
+        "flex"
       ],
       "host": [],
       "run": []
     },
     "schema_version": 0,
     "source": [
+      {
+        "patches": [
+          "patches/0001-fallback-sysroot.diff"
+        ],
+        "sha256": "fed3c3077f0df7a4a1aa47b080b8c53277593ccbb4e5e78b73ffb4e3f265e750",
+        "url": "https://ftp.gnu.org/gnu/binutils/binutils-2.43.tar.bz2"
+      },
+      {
+        "patches": [
+          "patches/0001-fallback-sysroot.diff"
+        ],
+        "sha256": "fed3c3077f0df7a4a1aa47b080b8c53277593ccbb4e5e78b73ffb4e3f265e750",
+        "url": "https://ftp.gnu.org/gnu/binutils/binutils-2.43.tar.bz2"
+      },
       {
         "patches": [
           "patches/0001-fallback-sysroot.diff"
@@ -7547,6 +9040,7 @@
       "elements": [
         "c_stdlib_stub",
         "cxx_compiler_stub",
+        "flex",
         "make",
         "texinfo"
       ]
@@ -7558,6 +9052,8 @@
         "binutils_impl_linux-aarch64",
         "binutils_impl_linux-ppc64le",
         "binutils_impl_linux-s390x",
+        "binutils_impl_osx-64",
+        "binutils_impl_osx-arm64",
         "binutils_impl_win-64",
         "ld_impl_linux-64",
         "ld_impl_linux-aarch64",
@@ -7573,6 +9069,1025 @@
         "binutils_impl_linux-aarch64",
         "binutils_impl_linux-ppc64le",
         "binutils_impl_linux-s390x",
+        "binutils_impl_osx-64",
+        "binutils_impl_osx-arm64",
+        "binutils_impl_win-64",
+        "ld_impl_linux-64",
+        "ld_impl_linux-aarch64",
+        "ld_impl_linux-ppc64le",
+        "ld_impl_linux-s390x",
+        "ld_impl_win-64",
+        "m2w64-sysroot_win-64",
+        "sysroot_linux-64",
+        "sysroot_linux-aarch64",
+        "sysroot_linux-ppc64le",
+        "sysroot_linux-s390x"
+      ]
+    },
+    "test": {
+      "__set__": true,
+      "elements": []
+    }
+  },
+  "osx_arm64_meta_yaml": {
+    "about": {
+      "home": "https://www.gnu.org/software/binutils/",
+      "license": "GPL-3.0-only",
+      "license_file": [
+        "COPYING",
+        "COPYING.LIB",
+        "COPYING3",
+        "COPYING3.LIB"
+      ],
+      "summary": "A set of programming tools for creating and managing binary programs, object files,\nlibraries, profile data, and assembly source code.\n"
+    },
+    "build": {
+      "detect_binary_files_with_prefix": false,
+      "number": "5"
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "frol",
+        "isuruf",
+        "jjhelmus",
+        "beckermr"
+      ]
+    },
+    "outputs": [
+      {
+        "build": {
+          "detect_binary_files_with_prefix": true,
+          "merge_build_host": false
+        },
+        "name": "ld_impl_linux-64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": [],
+          "run_constrained": [
+            "binutils_impl_linux-64 2.43"
+          ]
+        },
+        "script": "install_ld.sh",
+        "test": {
+          "commands": [
+            "x86_64-conda-linux-gnu-ld --help",
+            "echo \"conda\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "ignore_run_exports": [
+            "__glibc"
+          ],
+          "merge_build_host": false
+        },
+        "name": "binutils_impl_linux-64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [
+            "ld_impl_linux-64 2.43"
+          ],
+          "run": [
+            "ld_impl_linux-64",
+            "sysroot_linux-64"
+          ]
+        },
+        "script": "install_binutils.sh",
+        "test": {
+          "commands": [
+            "x86_64-conda-linux-gnu-addr2line --help",
+            "x86_64-conda-linux-gnu-ar --help",
+            "x86_64-conda-linux-gnu-as --help",
+            "x86_64-conda-linux-gnu-c++filt --help",
+            "x86_64-conda-linux-gnu-elfedit --help",
+            "x86_64-conda-linux-gnu-gprof --help",
+            "x86_64-conda-linux-gnu-ld --help",
+            "x86_64-conda-linux-gnu-ld --verbose | grep SEARCH",
+            "x86_64-conda-linux-gnu-ld.bfd --help",
+            "x86_64-conda-linux-gnu-ld.gold --help",
+            "x86_64-conda-linux-gnu-nm --help",
+            "x86_64-conda-linux-gnu-objcopy --help",
+            "x86_64-conda-linux-gnu-objdump --help",
+            "x86_64-conda-linux-gnu-ranlib --help",
+            "x86_64-conda-linux-gnu-readelf --help",
+            "x86_64-conda-linux-gnu-size --help",
+            "x86_64-conda-linux-gnu-strings --help",
+            "x86_64-conda-linux-gnu-strip --help"
+          ],
+          "downstreams": [
+            "gfortran_impl_linux-64",
+            "gcc_impl_linux-64"
+          ]
+        }
+      },
+      {
+        "name": "binutils_linux-64",
+        "requirements": {
+          "run": [
+            "binutils_impl_linux-64"
+          ]
+        },
+        "script": "install_activation.sh",
+        "test": {
+          "commands": [
+            "$LD --help",
+            "$AR --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "binutils",
+        "requirements": {
+          "build": [],
+          "host": [
+            "binutils_impl_linux-64"
+          ],
+          "run": [
+            "binutils_impl_linux-64"
+          ]
+        },
+        "script": "install_binutils_symlinks.sh",
+        "test": {
+          "commands": [
+            "$PREFIX/bin/addr2line --help",
+            "$PREFIX/bin/ar --help",
+            "$PREFIX/bin/as --help",
+            "$PREFIX/bin/c++filt --help",
+            "$PREFIX/bin/elfedit --help",
+            "$PREFIX/bin/gold --help",
+            "$PREFIX/bin/gprof --help",
+            "$PREFIX/bin/ld --help",
+            "$PREFIX/bin/ld.bfd --help",
+            "$PREFIX/bin/ld.gold --help",
+            "$PREFIX/bin/nm --help",
+            "$PREFIX/bin/objcopy --help",
+            "$PREFIX/bin/objdump --help",
+            "$PREFIX/bin/ranlib --help",
+            "$PREFIX/bin/readelf --help",
+            "$PREFIX/bin/size --help",
+            "$PREFIX/bin/strings --help",
+            "$PREFIX/bin/strip --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": true,
+          "merge_build_host": false
+        },
+        "name": "ld_impl_linux-aarch64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": [],
+          "run_constrained": [
+            "binutils_impl_linux-aarch64 2.43"
+          ]
+        },
+        "script": "install_ld.sh",
+        "test": {
+          "commands": [
+            "aarch64-conda-linux-gnu-ld --help",
+            "echo \"conda\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "ignore_run_exports": [
+            "__glibc"
+          ],
+          "merge_build_host": false
+        },
+        "name": "binutils_impl_linux-aarch64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [
+            "ld_impl_linux-aarch64 2.43"
+          ],
+          "run": [
+            "ld_impl_linux-aarch64",
+            "sysroot_linux-aarch64"
+          ]
+        },
+        "script": "install_binutils.sh",
+        "test": {
+          "commands": [
+            "aarch64-conda-linux-gnu-addr2line --help",
+            "aarch64-conda-linux-gnu-ar --help",
+            "aarch64-conda-linux-gnu-as --help",
+            "aarch64-conda-linux-gnu-c++filt --help",
+            "aarch64-conda-linux-gnu-elfedit --help",
+            "aarch64-conda-linux-gnu-gprof --help",
+            "aarch64-conda-linux-gnu-ld --help",
+            "aarch64-conda-linux-gnu-ld --verbose | grep SEARCH",
+            "aarch64-conda-linux-gnu-ld.bfd --help",
+            "aarch64-conda-linux-gnu-ld.gold --help",
+            "aarch64-conda-linux-gnu-nm --help",
+            "aarch64-conda-linux-gnu-objcopy --help",
+            "aarch64-conda-linux-gnu-objdump --help",
+            "aarch64-conda-linux-gnu-ranlib --help",
+            "aarch64-conda-linux-gnu-readelf --help",
+            "aarch64-conda-linux-gnu-size --help",
+            "aarch64-conda-linux-gnu-strings --help",
+            "aarch64-conda-linux-gnu-strip --help"
+          ],
+          "downstreams": [
+            "gfortran_impl_linux-aarch64",
+            "gcc_impl_linux-aarch64"
+          ]
+        }
+      },
+      {
+        "name": "binutils_linux-aarch64",
+        "requirements": {
+          "run": [
+            "binutils_impl_linux-aarch64"
+          ]
+        },
+        "script": "install_activation.sh",
+        "test": {
+          "commands": [
+            "$LD --help",
+            "$AR --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "binutils",
+        "requirements": {
+          "build": [],
+          "host": [
+            "binutils_impl_linux-aarch64"
+          ],
+          "run": [
+            "binutils_impl_linux-aarch64"
+          ]
+        },
+        "script": "install_binutils_symlinks.sh",
+        "test": {
+          "commands": [
+            "$PREFIX/bin/addr2line --help",
+            "$PREFIX/bin/ar --help",
+            "$PREFIX/bin/as --help",
+            "$PREFIX/bin/c++filt --help",
+            "$PREFIX/bin/elfedit --help",
+            "$PREFIX/bin/gold --help",
+            "$PREFIX/bin/gprof --help",
+            "$PREFIX/bin/ld --help",
+            "$PREFIX/bin/ld.bfd --help",
+            "$PREFIX/bin/ld.gold --help",
+            "$PREFIX/bin/nm --help",
+            "$PREFIX/bin/objcopy --help",
+            "$PREFIX/bin/objdump --help",
+            "$PREFIX/bin/ranlib --help",
+            "$PREFIX/bin/readelf --help",
+            "$PREFIX/bin/size --help",
+            "$PREFIX/bin/strings --help",
+            "$PREFIX/bin/strip --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": true,
+          "merge_build_host": false
+        },
+        "name": "ld_impl_linux-ppc64le",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": [],
+          "run_constrained": [
+            "binutils_impl_linux-ppc64le 2.43"
+          ]
+        },
+        "script": "install_ld.sh",
+        "test": {
+          "commands": [
+            "powerpc64le-conda-linux-gnu-ld --help",
+            "echo \"conda\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "ignore_run_exports": [
+            "__glibc"
+          ],
+          "merge_build_host": false
+        },
+        "name": "binutils_impl_linux-ppc64le",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [
+            "ld_impl_linux-ppc64le 2.43"
+          ],
+          "run": [
+            "ld_impl_linux-ppc64le",
+            "sysroot_linux-ppc64le"
+          ]
+        },
+        "script": "install_binutils.sh",
+        "test": {
+          "commands": [
+            "powerpc64le-conda-linux-gnu-addr2line --help",
+            "powerpc64le-conda-linux-gnu-ar --help",
+            "powerpc64le-conda-linux-gnu-as --help",
+            "powerpc64le-conda-linux-gnu-c++filt --help",
+            "powerpc64le-conda-linux-gnu-elfedit --help",
+            "powerpc64le-conda-linux-gnu-gprof --help",
+            "powerpc64le-conda-linux-gnu-ld --help",
+            "powerpc64le-conda-linux-gnu-ld --verbose | grep SEARCH",
+            "powerpc64le-conda-linux-gnu-ld.bfd --help",
+            "powerpc64le-conda-linux-gnu-ld.gold --help",
+            "powerpc64le-conda-linux-gnu-nm --help",
+            "powerpc64le-conda-linux-gnu-objcopy --help",
+            "powerpc64le-conda-linux-gnu-objdump --help",
+            "powerpc64le-conda-linux-gnu-ranlib --help",
+            "powerpc64le-conda-linux-gnu-readelf --help",
+            "powerpc64le-conda-linux-gnu-size --help",
+            "powerpc64le-conda-linux-gnu-strings --help",
+            "powerpc64le-conda-linux-gnu-strip --help"
+          ],
+          "downstreams": [
+            "gfortran_impl_linux-ppc64le",
+            "gcc_impl_linux-ppc64le"
+          ]
+        }
+      },
+      {
+        "name": "binutils_linux-ppc64le",
+        "requirements": {
+          "run": [
+            "binutils_impl_linux-ppc64le"
+          ]
+        },
+        "script": "install_activation.sh",
+        "test": {
+          "commands": [
+            "$LD --help",
+            "$AR --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "binutils",
+        "requirements": {
+          "build": [],
+          "host": [
+            "binutils_impl_linux-ppc64le"
+          ],
+          "run": [
+            "binutils_impl_linux-ppc64le"
+          ]
+        },
+        "script": "install_binutils_symlinks.sh",
+        "test": {
+          "commands": [
+            "$PREFIX/bin/addr2line --help",
+            "$PREFIX/bin/ar --help",
+            "$PREFIX/bin/as --help",
+            "$PREFIX/bin/c++filt --help",
+            "$PREFIX/bin/elfedit --help",
+            "$PREFIX/bin/gold --help",
+            "$PREFIX/bin/gprof --help",
+            "$PREFIX/bin/ld --help",
+            "$PREFIX/bin/ld.bfd --help",
+            "$PREFIX/bin/ld.gold --help",
+            "$PREFIX/bin/nm --help",
+            "$PREFIX/bin/objcopy --help",
+            "$PREFIX/bin/objdump --help",
+            "$PREFIX/bin/ranlib --help",
+            "$PREFIX/bin/readelf --help",
+            "$PREFIX/bin/size --help",
+            "$PREFIX/bin/strings --help",
+            "$PREFIX/bin/strip --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": true,
+          "merge_build_host": false
+        },
+        "name": "ld_impl_linux-s390x",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": [],
+          "run_constrained": [
+            "binutils_impl_linux-s390x 2.43"
+          ]
+        },
+        "script": "install_ld.sh",
+        "test": {
+          "commands": [
+            "s390x-conda-linux-gnu-ld --help",
+            "echo \"conda\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "ignore_run_exports": [
+            "__glibc"
+          ],
+          "merge_build_host": false
+        },
+        "name": "binutils_impl_linux-s390x",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [
+            "ld_impl_linux-s390x 2.43"
+          ],
+          "run": [
+            "ld_impl_linux-s390x",
+            "sysroot_linux-s390x"
+          ]
+        },
+        "script": "install_binutils.sh",
+        "test": {
+          "commands": [
+            "s390x-conda-linux-gnu-addr2line --help",
+            "s390x-conda-linux-gnu-ar --help",
+            "s390x-conda-linux-gnu-as --help",
+            "s390x-conda-linux-gnu-c++filt --help",
+            "s390x-conda-linux-gnu-elfedit --help",
+            "s390x-conda-linux-gnu-gprof --help",
+            "s390x-conda-linux-gnu-ld --help",
+            "s390x-conda-linux-gnu-ld --verbose | grep SEARCH",
+            "s390x-conda-linux-gnu-ld.bfd --help",
+            "s390x-conda-linux-gnu-ld.gold --help",
+            "s390x-conda-linux-gnu-nm --help",
+            "s390x-conda-linux-gnu-objcopy --help",
+            "s390x-conda-linux-gnu-objdump --help",
+            "s390x-conda-linux-gnu-ranlib --help",
+            "s390x-conda-linux-gnu-readelf --help",
+            "s390x-conda-linux-gnu-size --help",
+            "s390x-conda-linux-gnu-strings --help",
+            "s390x-conda-linux-gnu-strip --help"
+          ],
+          "downstreams": [
+            "gfortran_impl_linux-s390x",
+            "gcc_impl_linux-s390x"
+          ]
+        }
+      },
+      {
+        "name": "binutils_linux-s390x",
+        "requirements": {
+          "run": [
+            "binutils_impl_linux-s390x"
+          ]
+        },
+        "script": "install_activation.sh",
+        "test": {
+          "commands": [
+            "$LD --help",
+            "$AR --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "binutils",
+        "requirements": {
+          "build": [],
+          "host": [
+            "binutils_impl_linux-s390x"
+          ],
+          "run": [
+            "binutils_impl_linux-s390x"
+          ]
+        },
+        "script": "install_binutils_symlinks.sh",
+        "test": {
+          "commands": [
+            "$PREFIX/bin/addr2line --help",
+            "$PREFIX/bin/ar --help",
+            "$PREFIX/bin/as --help",
+            "$PREFIX/bin/c++filt --help",
+            "$PREFIX/bin/elfedit --help",
+            "$PREFIX/bin/gold --help",
+            "$PREFIX/bin/gprof --help",
+            "$PREFIX/bin/ld --help",
+            "$PREFIX/bin/ld.bfd --help",
+            "$PREFIX/bin/ld.gold --help",
+            "$PREFIX/bin/nm --help",
+            "$PREFIX/bin/objcopy --help",
+            "$PREFIX/bin/objdump --help",
+            "$PREFIX/bin/ranlib --help",
+            "$PREFIX/bin/readelf --help",
+            "$PREFIX/bin/size --help",
+            "$PREFIX/bin/strings --help",
+            "$PREFIX/bin/strip --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": true,
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "ld_impl_osx-64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": [],
+          "run_constrained": [
+            "binutils_impl_osx-64 2.43"
+          ]
+        },
+        "script": "install_ld.sh",
+        "test": {
+          "commands": [
+            "x86_64-apple-darwin13.4.0-ld --help",
+            "echo \"none\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "ignore_run_exports": [
+            "__glibc"
+          ],
+          "merge_build_host": false
+        },
+        "name": "binutils_impl_osx-64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": []
+        },
+        "script": "install_binutils.sh",
+        "test": {
+          "commands": [
+            "x86_64-apple-darwin13.4.0-addr2line --help",
+            "x86_64-apple-darwin13.4.0-ar --help",
+            "x86_64-apple-darwin13.4.0-c++filt --help",
+            "x86_64-apple-darwin13.4.0-elfedit --help",
+            "x86_64-apple-darwin13.4.0-nm --help",
+            "x86_64-apple-darwin13.4.0-objcopy --help",
+            "x86_64-apple-darwin13.4.0-objdump --help",
+            "x86_64-apple-darwin13.4.0-ranlib --help",
+            "x86_64-apple-darwin13.4.0-readelf --help",
+            "x86_64-apple-darwin13.4.0-size --help",
+            "x86_64-apple-darwin13.4.0-strings --help",
+            "x86_64-apple-darwin13.4.0-strip --help"
+          ],
+          "downstreams": [
+            "gfortran_impl_osx-64",
+            "gcc_impl_osx-64"
+          ]
+        }
+      },
+      {
+        "name": "binutils_osx-64",
+        "requirements": {
+          "run": [
+            "binutils_impl_osx-64"
+          ]
+        },
+        "script": "install_activation.sh",
+        "test": {
+          "commands": [
+            "$AR --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "binutils",
+        "requirements": {
+          "build": [],
+          "host": [
+            "binutils_impl_osx-64"
+          ],
+          "run": [
+            "binutils_impl_osx-64"
+          ]
+        },
+        "script": "install_binutils_symlinks.sh",
+        "test": {
+          "commands": [
+            "$PREFIX/bin/addr2line --help",
+            "$PREFIX/bin/ar --help",
+            "$PREFIX/bin/c++filt --help",
+            "$PREFIX/bin/elfedit --help",
+            "$PREFIX/bin/nm --help",
+            "$PREFIX/bin/objcopy --help",
+            "$PREFIX/bin/objdump --help",
+            "$PREFIX/bin/ranlib --help",
+            "$PREFIX/bin/readelf --help",
+            "$PREFIX/bin/size --help",
+            "$PREFIX/bin/strings --help",
+            "$PREFIX/bin/strip --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": true,
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "ld_impl_osx-arm64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": [],
+          "run_constrained": [
+            "binutils_impl_osx-arm64 2.43"
+          ]
+        },
+        "script": "install_ld.sh",
+        "test": {
+          "commands": [
+            "arm64-apple-darwin20.0.0-ld --help",
+            "echo \"none\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "ignore_run_exports": [
+            "__glibc"
+          ],
+          "merge_build_host": false
+        },
+        "name": "binutils_impl_osx-arm64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": []
+        },
+        "script": "install_binutils.sh",
+        "test": {
+          "commands": [
+            "arm64-apple-darwin20.0.0-addr2line --help",
+            "arm64-apple-darwin20.0.0-ar --help",
+            "arm64-apple-darwin20.0.0-c++filt --help",
+            "arm64-apple-darwin20.0.0-elfedit --help",
+            "arm64-apple-darwin20.0.0-nm --help",
+            "arm64-apple-darwin20.0.0-objcopy --help",
+            "arm64-apple-darwin20.0.0-objdump --help",
+            "arm64-apple-darwin20.0.0-ranlib --help",
+            "arm64-apple-darwin20.0.0-readelf --help",
+            "arm64-apple-darwin20.0.0-size --help",
+            "arm64-apple-darwin20.0.0-strings --help",
+            "arm64-apple-darwin20.0.0-strip --help"
+          ],
+          "downstreams": [
+            "gfortran_impl_osx-arm64",
+            "gcc_impl_osx-arm64"
+          ]
+        }
+      },
+      {
+        "name": "binutils_osx-arm64",
+        "requirements": {
+          "run": [
+            "binutils_impl_osx-arm64"
+          ]
+        },
+        "script": "install_activation.sh",
+        "test": {
+          "commands": [
+            "$AR --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "merge_build_host": false
+        },
+        "name": "binutils",
+        "requirements": {
+          "build": [],
+          "host": [
+            "binutils_impl_osx-arm64"
+          ],
+          "run": [
+            "binutils_impl_osx-arm64"
+          ]
+        },
+        "script": "install_binutils_symlinks.sh",
+        "test": {
+          "commands": [
+            "$PREFIX/bin/addr2line --help",
+            "$PREFIX/bin/ar --help",
+            "$PREFIX/bin/c++filt --help",
+            "$PREFIX/bin/elfedit --help",
+            "$PREFIX/bin/nm --help",
+            "$PREFIX/bin/objcopy --help",
+            "$PREFIX/bin/objdump --help",
+            "$PREFIX/bin/ranlib --help",
+            "$PREFIX/bin/readelf --help",
+            "$PREFIX/bin/size --help",
+            "$PREFIX/bin/strings --help",
+            "$PREFIX/bin/strip --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": true,
+          "merge_build_host": false
+        },
+        "name": "ld_impl_win-64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": [],
+          "run_constrained": [
+            "binutils_impl_win-64 2.43"
+          ]
+        },
+        "script": "install_ld.sh",
+        "test": {
+          "commands": [
+            "x86_64-w64-mingw32-ld --help",
+            "echo \"none\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "ignore_run_exports": [
+            "__glibc"
+          ],
+          "merge_build_host": false
+        },
+        "name": "binutils_impl_win-64",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [
+            "ld_impl_win-64 2.43"
+          ],
+          "run": [
+            "ld_impl_win-64",
+            "m2w64-sysroot_win-64 >=12.0.0.r0"
+          ]
+        },
+        "script": "install_binutils.sh",
+        "test": {
+          "commands": [
+            "x86_64-w64-mingw32-addr2line --help",
+            "x86_64-w64-mingw32-ar --help",
+            "x86_64-w64-mingw32-as --help",
+            "x86_64-w64-mingw32-c++filt --help",
+            "x86_64-w64-mingw32-elfedit --help",
+            "x86_64-w64-mingw32-gprof --help",
+            "x86_64-w64-mingw32-ld --help",
+            "x86_64-w64-mingw32-ld --verbose | grep SEARCH",
+            "x86_64-w64-mingw32-ld.bfd --help",
+            "x86_64-w64-mingw32-nm --help",
+            "x86_64-w64-mingw32-objcopy --help",
+            "x86_64-w64-mingw32-objdump --help",
+            "x86_64-w64-mingw32-ranlib --help",
+            "x86_64-w64-mingw32-readelf --help",
+            "x86_64-w64-mingw32-size --help",
+            "x86_64-w64-mingw32-strings --help",
+            "x86_64-w64-mingw32-strip --help"
+          ],
+          "downstreams": null
+        }
+      },
+      {
+        "name": "binutils_win-64",
+        "requirements": {
+          "run": [
+            "binutils_impl_win-64"
+          ]
+        },
+        "script": "install_activation.sh",
+        "test": {
+          "commands": [
+            "$AR --help"
+          ]
+        }
+      },
+      {
+        "build": {
+          "detect_binary_files_with_prefix": false,
+          "merge_build_host": false,
+          "skip": true
+        },
+        "name": "binutils",
+        "requirements": {
+          "build": [],
+          "host": [
+            "binutils_impl_win-64"
+          ],
+          "run": [
+            "binutils_impl_win-64"
+          ]
+        },
+        "script": "install_binutils_symlinks.sh",
+        "test": {
+          "commands": [
+            "$PREFIX/bin/addr2line --help",
+            "$PREFIX/bin/ar --help",
+            "$PREFIX/bin/as --help",
+            "$PREFIX/bin/c++filt --help",
+            "$PREFIX/bin/elfedit --help",
+            "$PREFIX/bin/gprof --help",
+            "$PREFIX/bin/ld --help",
+            "$PREFIX/bin/ld.bfd --help",
+            "$PREFIX/bin/nm --help",
+            "$PREFIX/bin/objcopy --help",
+            "$PREFIX/bin/objdump --help",
+            "$PREFIX/bin/ranlib --help",
+            "$PREFIX/bin/readelf --help",
+            "$PREFIX/bin/size --help",
+            "$PREFIX/bin/strings --help",
+            "$PREFIX/bin/strip --help"
+          ]
+        }
+      }
+    ],
+    "package": {
+      "name": "binutils_split",
+      "version": "2.43"
+    },
+    "requirements": {
+      "build": [
+        "cxx_compiler_stub",
+        "c_stdlib_stub",
+        "make",
+        "texinfo",
+        "flex"
+      ],
+      "host": [],
+      "run": []
+    },
+    "schema_version": 0,
+    "source": [
+      {
+        "patches": [
+          "patches/0001-fallback-sysroot.diff"
+        ],
+        "sha256": "fed3c3077f0df7a4a1aa47b080b8c53277593ccbb4e5e78b73ffb4e3f265e750",
+        "url": "https://ftp.gnu.org/gnu/binutils/binutils-2.43.tar.bz2"
+      },
+      {
+        "patches": [
+          "patches/0001-fallback-sysroot.diff"
+        ],
+        "sha256": "fed3c3077f0df7a4a1aa47b080b8c53277593ccbb4e5e78b73ffb4e3f265e750",
+        "url": "https://ftp.gnu.org/gnu/binutils/binutils-2.43.tar.bz2"
+      },
+      {
+        "patches": [
+          "patches/0001-fallback-sysroot.diff"
+        ],
+        "sha256": "fed3c3077f0df7a4a1aa47b080b8c53277593ccbb4e5e78b73ffb4e3f265e750",
+        "url": "https://ftp.gnu.org/gnu/binutils/binutils-2.43.tar.bz2"
+      },
+      {
+        "patches": [
+          "patches/0001-fallback-sysroot.diff"
+        ],
+        "sha256": "fed3c3077f0df7a4a1aa47b080b8c53277593ccbb4e5e78b73ffb4e3f265e750",
+        "url": "https://ftp.gnu.org/gnu/binutils/binutils-2.43.tar.bz2"
+      },
+      {
+        "patches": [
+          "patches/0001-fallback-sysroot.diff"
+        ],
+        "sha256": "fed3c3077f0df7a4a1aa47b080b8c53277593ccbb4e5e78b73ffb4e3f265e750",
+        "url": "https://ftp.gnu.org/gnu/binutils/binutils-2.43.tar.bz2"
+      },
+      {
+        "patches": [
+          "patches/0001-fallback-sysroot.diff"
+        ],
+        "sha256": "fed3c3077f0df7a4a1aa47b080b8c53277593ccbb4e5e78b73ffb4e3f265e750",
+        "url": "https://ftp.gnu.org/gnu/binutils/binutils-2.43.tar.bz2"
+      },
+      {
+        "patches": [
+          "patches/0001-fallback-sysroot.diff"
+        ],
+        "sha256": "fed3c3077f0df7a4a1aa47b080b8c53277593ccbb4e5e78b73ffb4e3f265e750",
+        "url": "https://ftp.gnu.org/gnu/binutils/binutils-2.43.tar.bz2"
+      }
+    ]
+  },
+  "osx_arm64_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "cxx_compiler_stub",
+        "flex",
+        "make",
+        "texinfo"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "binutils_impl_linux-64",
+        "binutils_impl_linux-aarch64",
+        "binutils_impl_linux-ppc64le",
+        "binutils_impl_linux-s390x",
+        "binutils_impl_osx-64",
+        "binutils_impl_osx-arm64",
+        "binutils_impl_win-64",
+        "ld_impl_linux-64",
+        "ld_impl_linux-aarch64",
+        "ld_impl_linux-ppc64le",
+        "ld_impl_linux-s390x",
+        "ld_impl_win-64"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "binutils_impl_linux-64",
+        "binutils_impl_linux-aarch64",
+        "binutils_impl_linux-ppc64le",
+        "binutils_impl_linux-s390x",
+        "binutils_impl_osx-64",
+        "binutils_impl_osx-arm64",
         "binutils_impl_win-64",
         "ld_impl_linux-64",
         "ld_impl_linux-aarch64",
@@ -7599,17 +10114,23 @@
       "binutils_impl_linux-aarch64",
       "binutils_impl_linux-ppc64le",
       "binutils_impl_linux-s390x",
+      "binutils_impl_osx-64",
+      "binutils_impl_osx-arm64",
       "binutils_impl_win-64",
       "binutils_linux-64",
       "binutils_linux-aarch64",
       "binutils_linux-ppc64le",
       "binutils_linux-s390x",
+      "binutils_osx-64",
+      "binutils_osx-arm64",
       "binutils_split",
       "binutils_win-64",
       "ld_impl_linux-64",
       "ld_impl_linux-aarch64",
       "ld_impl_linux-ppc64le",
       "ld_impl_linux-s390x",
+      "ld_impl_osx-64",
+      "ld_impl_osx-arm64",
       "ld_impl_win-64"
     ]
   },
@@ -7619,12 +10140,13 @@
     "linux_aarch64",
     "linux_ppc64le",
     "osx_64",
+    "osx_arm64",
     "win_64"
   ],
   "pr_info": {
     "__lazy_json__": "pr_info/binutils.json"
   },
-  "raw_meta_yaml": "{% set name = \"binutils\" %}\n{% set version = \"2.43\" %}\n\npackage:\n  name: binutils_split\n  version: {{ version }}\n\nsource:\n  - url: https://ftp.gnu.org/gnu/binutils/binutils-{{ version }}.tar.bz2\n    sha256: fed3c3077f0df7a4a1aa47b080b8c53277593ccbb4e5e78b73ffb4e3f265e750\n    patches:\n      - patches/0001-fallback-sysroot.diff\n\nbuild:\n  number: 5\n  skip: true  # [win64 and cross_target_platform != \"win-64\"]\n  detect_binary_files_with_prefix: false\n\nrequirements:\n  build:\n    - {{ compiler('cxx') }}\n    - {{ stdlib('c') }}\n    - make                    # [osx]\n    - texinfo                 # [osx]\n  host:\n  run:\n\noutputs:\n  - name: ld_impl_{{ cross_target_platform }}\n    script: install_ld.sh\n    build:\n      merge_build_host: false\n      # ld binaries have host prefix search paths embeded in them\n      detect_binary_files_with_prefix: true\n      ignore_run_exports_from:   # [linux]\n        - {{ compiler('cxx') }}   # [linux]\n      ignore_run_exports:   # [win]\n        - libwinpthread           # [win]\n    requirements:\n      build:\n        - {{ compiler('cxx') }}\n        - {{ stdlib('c') }}\n      host:\n      run:\n      run_constrained:\n        - binutils_impl_{{ cross_target_platform }} {{ version }}\n    test:\n      commands:\n        - {{ triplet }}-ld --help\n        - echo \"{{ ctng_vendor }}\"\n\n  - name: binutils_impl_{{ cross_target_platform }}\n    script: install_binutils.sh\n    build:\n      merge_build_host: false\n      detect_binary_files_with_prefix: false\n      ignore_run_exports:\n        - __glibc\n      ignore_run_exports_from:   # [linux]\n        - {{ compiler('cxx') }}   # [linux]\n      ignore_run_exports:   # [win]\n        - libwinpthread           # [win]\n    requirements:\n      build:\n        - {{ compiler('cxx') }}\n        - {{ stdlib('c') }}\n      host:\n        - ld_impl_{{ cross_target_platform }} {{ version }}\n      run:\n        - {{ pin_subpackage(\"ld_impl_\" ~ cross_target_platform, exact=True) }}\n        - sysroot_{{ cross_target_platform }}  # [cross_target_platform != \"win-64\"]\n        - m2w64-sysroot_{{ cross_target_platform }} >=12.0.0.r0  # [cross_target_platform == \"win-64\"]\n    test:\n      downstreams:\n        - gfortran_impl_{{ cross_target_platform }}  # [cross_target_platform != \"win-64\"]\n        - gcc_impl_{{ cross_target_platform }}       # [cross_target_platform != \"win-64\"]\n      commands:\n        - {{ triplet }}-addr2line --help\n        - {{ triplet }}-ar --help\n        - {{ triplet }}-as --help\n        - {{ triplet }}-c++filt --help\n        - {{ triplet }}-elfedit --help\n        - {{ triplet }}-gprof --help\n        - {{ triplet }}-ld --help\n        # Look here to check that search path prefixes have been replaced\n        - {{ triplet }}-ld --verbose | grep SEARCH\n        - {{ triplet }}-ld.bfd --help\n        - {{ triplet }}-ld.gold --help  # [cross_target_platform != \"win-64\"]\n        - {{ triplet }}-nm --help\n        - {{ triplet }}-objcopy --help\n        - {{ triplet }}-objdump --help\n        - {{ triplet }}-ranlib --help\n        - {{ triplet }}-readelf --help\n        - {{ triplet }}-size --help\n        - {{ triplet }}-strings --help\n        - {{ triplet }}-strip --help\n\n  - name: binutils_{{ cross_target_platform }}\n    script: install_activation.sh\n    requirements:\n      run:\n        - {{ pin_subpackage(\"binutils_impl_\" ~ cross_target_platform, exact=True) }}\n    test:\n      commands:\n        - $LD --help\n        - $AR --help\n\n  - name: binutils\n    script: install_binutils_symlinks.sh\n    build:\n      merge_build_host: false\n      detect_binary_files_with_prefix: false\n      skip: true  # [cross_target_platform != target_platform]\n    requirements:\n      build:\n      host:\n        - binutils_impl_{{ cross_target_platform }}\n      run:\n        - {{ pin_subpackage(\"binutils_impl_\" ~ cross_target_platform, max_pin=\"x.x.x\") }}\n    test:\n      commands:\n        - $PREFIX/bin/addr2line --help\n        - $PREFIX/bin/ar --help\n        - $PREFIX/bin/as --help\n        - $PREFIX/bin/c++filt --help\n        - $PREFIX/bin/elfedit --help\n        - $PREFIX/bin/gold --help  # [cross_target_platform != \"win-64\"]\n        - $PREFIX/bin/gprof --help\n        - $PREFIX/bin/ld --help\n        - $PREFIX/bin/ld.bfd --help\n        - $PREFIX/bin/ld.gold --help  # [cross_target_platform != \"win-64\"]\n        - $PREFIX/bin/nm --help\n        - $PREFIX/bin/objcopy --help\n        - $PREFIX/bin/objdump --help\n        - $PREFIX/bin/ranlib --help\n        - $PREFIX/bin/readelf --help\n        - $PREFIX/bin/size --help\n        - $PREFIX/bin/strings --help\n        - $PREFIX/bin/strip --help\n\nabout:\n  home: https://www.gnu.org/software/binutils/\n  license: GPL-3.0-only\n  license_file:\n    - COPYING\n    - COPYING.LIB\n    - COPYING3\n    - COPYING3.LIB\n  summary: |\n    A set of programming tools for creating and managing binary programs, object files,\n    libraries, profile data, and assembly source code.\n\nextra:\n  recipe-maintainers:\n    - frol\n    - isuruf\n    - jjhelmus\n    - beckermr\n",
+  "raw_meta_yaml": "{% set name = \"binutils\" %}\n{% set version = \"2.43\" %}\n\npackage:\n  name: binutils_split\n  version: {{ version }}\n\nsource:\n  - url: https://ftp.gnu.org/gnu/binutils/binutils-{{ version }}.tar.bz2\n    sha256: fed3c3077f0df7a4a1aa47b080b8c53277593ccbb4e5e78b73ffb4e3f265e750\n    patches:\n      - patches/0001-fallback-sysroot.diff\n\nbuild:\n  number: 5\n  skip: true  # [win64 and cross_target_platform != \"win-64\"]\n  detect_binary_files_with_prefix: false\n\nrequirements:\n  build:\n    - {{ compiler('cxx') }}\n    - {{ stdlib('c') }}\n    - make                    # [osx]\n    - texinfo                 # [osx]\n    - flex                    # [osx]\n  host:\n  run:\n\noutputs:\n  - name: ld_impl_{{ cross_target_platform }}\n    script: install_ld.sh\n    build:\n      skip: true  # [cross_target_platform in (\"osx-arm64\", \"osx-64\")]\n      merge_build_host: false\n      # ld binaries have host prefix search paths embeded in them\n      detect_binary_files_with_prefix: true\n      ignore_run_exports_from:   # [linux]\n        - {{ compiler('cxx') }}   # [linux]\n      ignore_run_exports:   # [win]\n        - libwinpthread           # [win]\n    requirements:\n      build:\n        - {{ compiler('cxx') }}\n        - {{ stdlib('c') }}\n      host:\n      run:\n      run_constrained:\n        - binutils_impl_{{ cross_target_platform }} {{ version }}\n    test:\n      commands:\n        - {{ triplet }}-ld --help\n        - echo \"{{ ctng_vendor }}\"\n\n  - name: binutils_impl_{{ cross_target_platform }}\n    script: install_binutils.sh\n    build:\n      merge_build_host: false\n      detect_binary_files_with_prefix: false\n      ignore_run_exports:\n        - __glibc\n      ignore_run_exports_from:   # [linux]\n        - {{ compiler('cxx') }}   # [linux]\n      ignore_run_exports:   # [win]\n        - libwinpthread           # [win]\n    requirements:\n      build:\n        - {{ compiler('cxx') }}\n        - {{ stdlib('c') }}\n      host:\n        - ld_impl_{{ cross_target_platform }} {{ version }}  # [cross_target_platform not in (\"osx-arm64\", \"osx-64\")]\n      run:\n        - {{ pin_subpackage(\"ld_impl_\" ~ cross_target_platform, exact=True) }}  # [cross_target_platform not in (\"osx-arm64\", \"osx-64\")]\n        - sysroot_{{ cross_target_platform }}  # [cross_target_platform not in (\"win-64\", \"osx-arm64\", \"osx-64\")]\n        - m2w64-sysroot_{{ cross_target_platform }} >=12.0.0.r0  # [cross_target_platform == \"win-64\"]\n    test:\n      downstreams:\n        - gfortran_impl_{{ cross_target_platform }}  # [cross_target_platform != \"win-64\"]\n        - gcc_impl_{{ cross_target_platform }}       # [cross_target_platform != \"win-64\"]\n      commands:\n        - {{ triplet }}-addr2line --help\n        - {{ triplet }}-ar --help\n        - {{ triplet }}-as --help                   # [cross_target_platform not in (\"osx-arm64\", \"osx-64\")]\n        - {{ triplet }}-c++filt --help\n        - {{ triplet }}-elfedit --help\n        - {{ triplet }}-gprof --help                # [cross_target_platform not in (\"osx-arm64\", \"osx-64\")]\n        - {{ triplet }}-ld --help                   # [cross_target_platform not in (\"osx-arm64\", \"osx-64\")]\n        # Look here to check that search path prefixes have been replaced\n        - {{ triplet }}-ld --verbose | grep SEARCH  # [cross_target_platform not in (\"osx-arm64\", \"osx-64\")]\n        - {{ triplet }}-ld.bfd --help               # [cross_target_platform not in (\"osx-arm64\", \"osx-64\")]\n        - {{ triplet }}-ld.gold --help  # [cross_target_platform not in (\"win-64\", \"osx-arm64\", \"osx-64\")]\n        - {{ triplet }}-nm --help\n        - {{ triplet }}-objcopy --help\n        - {{ triplet }}-objdump --help\n        - {{ triplet }}-ranlib --help\n        - {{ triplet }}-readelf --help\n        - {{ triplet }}-size --help\n        - {{ triplet }}-strings --help\n        - {{ triplet }}-strip --help\n\n  - name: binutils_{{ cross_target_platform }}\n    script: install_activation.sh\n    requirements:\n      run:\n        - {{ pin_subpackage(\"binutils_impl_\" ~ cross_target_platform, exact=True) }}\n    test:\n      commands:\n        - $LD --help  # [cross_target_platform not in (\"win-64\", \"osx-arm64\", \"osx-64\")]\n        - $AR --help\n\n  - name: binutils\n    script: install_binutils_symlinks.sh\n    build:\n      merge_build_host: false\n      detect_binary_files_with_prefix: false\n      skip: true  # [cross_target_platform != target_platform]\n    requirements:\n      build:\n      host:\n        - binutils_impl_{{ cross_target_platform }}\n      run:\n        - {{ pin_subpackage(\"binutils_impl_\" ~ cross_target_platform, max_pin=\"x.x.x\") }}\n    test:\n      commands:\n        - $PREFIX/bin/addr2line --help\n        - $PREFIX/bin/ar --help\n        - $PREFIX/bin/as --help       # [cross_target_platform not in (\"osx-arm64\", \"osx-64\")]\n        - $PREFIX/bin/c++filt --help\n        - $PREFIX/bin/elfedit --help\n        - $PREFIX/bin/gold --help     # [cross_target_platform not in (\"win-64\", \"osx-arm64\", \"osx-64\")]\n        - $PREFIX/bin/gprof --help    # [cross_target_platform not in (\"osx-arm64\", \"osx-64\")]\n        - $PREFIX/bin/ld --help       # [cross_target_platform not in (\"osx-arm64\", \"osx-64\")]\n        - $PREFIX/bin/ld.bfd --help   # [cross_target_platform not in (\"osx-arm64\", \"osx-64\")]\n        - $PREFIX/bin/ld.gold --help  # [cross_target_platform not in (\"win-64\", \"osx-arm64\", \"osx-64\")]\n        - $PREFIX/bin/nm --help\n        - $PREFIX/bin/objcopy --help\n        - $PREFIX/bin/objdump --help\n        - $PREFIX/bin/ranlib --help\n        - $PREFIX/bin/readelf --help\n        - $PREFIX/bin/size --help\n        - $PREFIX/bin/strings --help\n        - $PREFIX/bin/strip --help\n\nabout:\n  home: https://www.gnu.org/software/binutils/\n  license: GPL-3.0-only\n  license_file:\n    - COPYING\n    - COPYING.LIB\n    - COPYING3\n    - COPYING3.LIB\n  summary: |\n    A set of programming tools for creating and managing binary programs, object files,\n    libraries, profile data, and assembly source code.\n\nextra:\n  recipe-maintainers:\n    - frol\n    - isuruf\n    - jjhelmus\n    - beckermr\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -7632,9 +10154,12 @@
       "binutils_impl_linux-aarch64",
       "binutils_impl_linux-ppc64le",
       "binutils_impl_linux-s390x",
+      "binutils_impl_osx-64",
+      "binutils_impl_osx-arm64",
       "binutils_impl_win-64",
       "c_stdlib_stub",
       "cxx_compiler_stub",
+      "flex",
       "ld_impl_linux-64",
       "ld_impl_linux-aarch64",
       "ld_impl_linux-ppc64le",
@@ -7655,6 +10180,7 @@
       "elements": [
         "c_stdlib_stub",
         "cxx_compiler_stub",
+        "flex",
         "make",
         "texinfo"
       ]
@@ -7666,6 +10192,8 @@
         "binutils_impl_linux-aarch64",
         "binutils_impl_linux-ppc64le",
         "binutils_impl_linux-s390x",
+        "binutils_impl_osx-64",
+        "binutils_impl_osx-arm64",
         "binutils_impl_win-64",
         "c_stdlib_stub",
         "cxx_compiler_stub",
@@ -7684,6 +10212,8 @@
         "binutils_impl_linux-aarch64",
         "binutils_impl_linux-ppc64le",
         "binutils_impl_linux-s390x",
+        "binutils_impl_osx-64",
+        "binutils_impl_osx-arm64",
         "binutils_impl_win-64",
         "c_stdlib_stub",
         "cxx_compiler_stub",
@@ -7712,6 +10242,7 @@
       "elements": [
         "c_stdlib_stub",
         "cxx_compiler_stub",
+        "flex",
         "make",
         "texinfo"
       ]
@@ -7723,6 +10254,8 @@
         "binutils_impl_linux-aarch64",
         "binutils_impl_linux-ppc64le",
         "binutils_impl_linux-s390x",
+        "binutils_impl_osx-64",
+        "binutils_impl_osx-arm64",
         "binutils_impl_win-64",
         "ld_impl_linux-64 2.43",
         "ld_impl_linux-aarch64 2.43",
@@ -7738,6 +10271,8 @@
         "binutils_impl_linux-aarch64",
         "binutils_impl_linux-ppc64le",
         "binutils_impl_linux-s390x",
+        "binutils_impl_osx-64",
+        "binutils_impl_osx-arm64",
         "binutils_impl_win-64",
         "ld_impl_linux-64",
         "ld_impl_linux-aarch64",
@@ -7870,7 +10405,6 @@
         "script": "install_activation.sh",
         "test": {
           "commands": [
-            "$LD --help",
             "$AR --help"
           ]
         }
