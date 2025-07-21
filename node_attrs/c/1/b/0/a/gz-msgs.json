@@ -4,7 +4,6 @@
   "conda-forge.yml": {
     "bot": {
       "abi_migration_branches": [
-        "v9",
         "v10"
       ],
       "automerge": true
@@ -17,7 +16,9 @@
     "conda_build": {
       "pkg_format": "2"
     },
+    "conda_build_tool": "rattler-build",
     "conda_forge_output_validation": true,
+    "conda_install_tool": "pixi",
     "github": {
       "branch_name": "main",
       "tooling_branch_name": "main"
@@ -32,16 +33,19 @@
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
     "about": {
+      "dev_url": "https://github.com/gazebosim/gz-msgs",
       "home": "https://github.com/gazebosim/gz-msgs",
       "license": "Apache-2.0",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "Messages for Gazebo robot simulation."
     },
     "build": {
-      "number": "0"
+      "noarch": "python",
+      "number": "1",
+      "script": "build_py.sh"
     },
     "extra": {
-      "feedstock-name": "gz-msgs",
       "recipe-maintainers": [
         "wolfv",
         "traversaro",
@@ -51,8 +55,48 @@
     },
     "outputs": [
       {
+        "build": null,
+        "name": "gz-msgs11-python",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "ninja",
+            "cmake",
+            "pkg-config",
+            "python"
+          ],
+          "host": [
+            "libgz-math8",
+            "libgz-tools2",
+            "tinyxml2",
+            "libabseil",
+            "libprotobuf",
+            "python 3.9.*",
+            "protobuf 5.29.3.*",
+            "pytest"
+          ],
+          "run": [
+            "python >=3.9",
+            "protobuf >=5.29.3,<6.0a0"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "gz.msgs11"
+              ],
+              "python_version": "3.9.*"
+            }
+          }
+        ]
+      },
+      {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libgz-msgs11"
           ]
         },
@@ -65,9 +109,10 @@
             "ninja",
             "cmake",
             "pkg-config",
-            "python 3.9"
+            "python 3.9.*"
           ],
           "host": [
+            "python 3.9.*",
             "libgz-cmake4",
             "libgz-utils3",
             "libgz-math8",
@@ -80,68 +125,26 @@
             "python"
           ]
         },
-        "script": "build_cxx.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/msgs11/gz/msgs.hh",
-            "test -f ${PREFIX}/lib/libgz-msgs11.so",
-            "test -f ${PREFIX}/lib/cmake/gz-msgs11/gz-msgs11-config.cmake"
-          ]
-        }
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake"
+            ]
+          }
+        ]
       },
       {
         "build": {
-          "noarch": "python",
-          "string": "protobuf5h1234567_0"
-        },
-        "name": "gz-msgs11-python",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_compiler_stub",
-            "c_stdlib_stub",
-            "ninja",
-            "cmake",
-            "pkg-config",
-            "python 3.9"
-          ],
-          "host": [
-            "libgz-math8",
-            "libgz-tools2",
-            "tinyxml2",
-            "libabseil",
-            "libprotobuf",
-            "python 3.9",
-            "protobuf 5.29.3",
-            "pytest"
-          ],
-          "run": [
-            "python  >=3.9",
-            "protobuf >=5.29.3,<6.0a0"
-          ]
-        },
-        "script": "build_py.sh",
-        "test": {
-          "commands": [
-            "pip check"
-          ],
-          "imports": [
-            "gz.msgs11"
-          ],
-          "requires": [
-            "python 3.9",
-            "pip"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libgz-msgs11"
           ]
         },
         "name": "gz-msgs11",
         "requirements": {
+          "build": [],
           "host": [
             "libabseil",
             "libprotobuf"
@@ -151,35 +154,61 @@
             "gz-msgs11-python"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/msgs11/gz/msgs.hh",
-            "test -f ${PREFIX}/lib/libgz-msgs11.so",
-            "test -f ${PREFIX}/lib/cmake/gz-msgs11/gz-msgs11-config.cmake"
-          ],
-          "imports": [
-            "gz.msgs11"
-          ],
-          "requires": [
-            "pip"
-          ]
-        }
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake"
+            ]
+          },
+          {
+            "python": {
+              "imports": [
+                "gz.msgs11"
+              ]
+            }
+          }
+        ]
       }
     ],
     "package": {
-      "name": "gz-msgs11",
+      "name": "gz-msgs11-python",
       "version": "11.1.0"
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "patches": [
-          "win_enable_py_tests.patch"
-        ],
-        "sha256": "1eaa47500aa8a6fa65bcf76cf8d03c78d298e6da730ee2371b119dff732b639d",
-        "url": "https://github.com/gazebosim/gz-msgs/archive/gz-msgs11_11.1.0.tar.gz"
-      }
-    ]
+    "requirements": {
+      "build": [
+        "cxx_compiler_stub",
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "ninja",
+        "cmake",
+        "pkg-config",
+        "python"
+      ],
+      "host": [
+        "libgz-math8",
+        "libgz-tools2",
+        "tinyxml2",
+        "libabseil",
+        "libprotobuf",
+        "python 3.9.*",
+        "protobuf 5.29.3.*",
+        "pytest"
+      ],
+      "run": [
+        "python >=3.9",
+        "protobuf >=5.29.3,<6.0a0"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "patches": [
+        "win_enable_py_tests.patch"
+      ],
+      "sha256": "1eaa47500aa8a6fa65bcf76cf8d03c78d298e6da730ee2371b119dff732b639d",
+      "url": "https://github.com/gazebosim/gz-msgs/archive/gz-msgs11_11.1.0.tar.gz"
+    }
   },
   "linux_64_requirements": {
     "build": {
@@ -221,23 +250,25 @@
     "test": {
       "__set__": true,
       "elements": [
-        "pip",
-        "python"
+        "pip"
       ]
     }
   },
   "linux_aarch64_meta_yaml": {
     "about": {
+      "dev_url": "https://github.com/gazebosim/gz-msgs",
       "home": "https://github.com/gazebosim/gz-msgs",
       "license": "Apache-2.0",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "Messages for Gazebo robot simulation."
     },
     "build": {
-      "number": "0"
+      "noarch": "python",
+      "number": "1",
+      "script": "build_py.sh"
     },
     "extra": {
-      "feedstock-name": "gz-msgs",
       "recipe-maintainers": [
         "wolfv",
         "traversaro",
@@ -247,8 +278,48 @@
     },
     "outputs": [
       {
+        "build": null,
+        "name": "gz-msgs11-python",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "ninja",
+            "cmake",
+            "pkg-config",
+            "python"
+          ],
+          "host": [
+            "libgz-math8",
+            "libgz-tools2",
+            "tinyxml2",
+            "libabseil",
+            "libprotobuf",
+            "python 3.9.*",
+            "protobuf 5.29.3.*",
+            "pytest"
+          ],
+          "run": [
+            "python >=3.9",
+            "protobuf >=5.29.3,<6.0a0"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "gz.msgs11"
+              ],
+              "python_version": "3.9.*"
+            }
+          }
+        ]
+      },
+      {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libgz-msgs11"
           ]
         },
@@ -261,9 +332,10 @@
             "ninja",
             "cmake",
             "pkg-config",
-            "python 3.9"
+            "python 3.9.*"
           ],
           "host": [
+            "python 3.9.*",
             "libgz-cmake4",
             "libgz-utils3",
             "libgz-math8",
@@ -276,68 +348,26 @@
             "python"
           ]
         },
-        "script": "build_cxx.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/msgs11/gz/msgs.hh",
-            "test -f ${PREFIX}/lib/libgz-msgs11.so",
-            "test -f ${PREFIX}/lib/cmake/gz-msgs11/gz-msgs11-config.cmake"
-          ]
-        }
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake"
+            ]
+          }
+        ]
       },
       {
         "build": {
-          "noarch": "python",
-          "string": "protobuf5h1234567_0"
-        },
-        "name": "gz-msgs11-python",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_compiler_stub",
-            "c_stdlib_stub",
-            "ninja",
-            "cmake",
-            "pkg-config",
-            "python 3.9"
-          ],
-          "host": [
-            "libgz-math8",
-            "libgz-tools2",
-            "tinyxml2",
-            "libabseil",
-            "libprotobuf",
-            "python 3.9",
-            "protobuf 5.29.3",
-            "pytest"
-          ],
-          "run": [
-            "python  >=3.9",
-            "protobuf >=5.29.3,<6.0a0"
-          ]
-        },
-        "script": "build_py.sh",
-        "test": {
-          "commands": [
-            "pip check"
-          ],
-          "imports": [
-            "gz.msgs11"
-          ],
-          "requires": [
-            "python 3.9",
-            "pip"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libgz-msgs11"
           ]
         },
         "name": "gz-msgs11",
         "requirements": {
+          "build": [],
           "host": [
             "libabseil",
             "libprotobuf"
@@ -347,35 +377,61 @@
             "gz-msgs11-python"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/msgs11/gz/msgs.hh",
-            "test -f ${PREFIX}/lib/libgz-msgs11.so",
-            "test -f ${PREFIX}/lib/cmake/gz-msgs11/gz-msgs11-config.cmake"
-          ],
-          "imports": [
-            "gz.msgs11"
-          ],
-          "requires": [
-            "pip"
-          ]
-        }
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake"
+            ]
+          },
+          {
+            "python": {
+              "imports": [
+                "gz.msgs11"
+              ]
+            }
+          }
+        ]
       }
     ],
     "package": {
-      "name": "gz-msgs11",
+      "name": "gz-msgs11-python",
       "version": "11.1.0"
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "patches": [
-          "win_enable_py_tests.patch"
-        ],
-        "sha256": "1eaa47500aa8a6fa65bcf76cf8d03c78d298e6da730ee2371b119dff732b639d",
-        "url": "https://github.com/gazebosim/gz-msgs/archive/gz-msgs11_11.1.0.tar.gz"
-      }
-    ]
+    "requirements": {
+      "build": [
+        "cxx_compiler_stub",
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "ninja",
+        "cmake",
+        "pkg-config",
+        "python"
+      ],
+      "host": [
+        "libgz-math8",
+        "libgz-tools2",
+        "tinyxml2",
+        "libabseil",
+        "libprotobuf",
+        "python 3.9.*",
+        "protobuf 5.29.3.*",
+        "pytest"
+      ],
+      "run": [
+        "python >=3.9",
+        "protobuf >=5.29.3,<6.0a0"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "patches": [
+        "win_enable_py_tests.patch"
+      ],
+      "sha256": "1eaa47500aa8a6fa65bcf76cf8d03c78d298e6da730ee2371b119dff732b639d",
+      "url": "https://github.com/gazebosim/gz-msgs/archive/gz-msgs11_11.1.0.tar.gz"
+    }
   },
   "linux_aarch64_requirements": {
     "build": {
@@ -417,23 +473,25 @@
     "test": {
       "__set__": true,
       "elements": [
-        "pip",
-        "python"
+        "pip"
       ]
     }
   },
   "linux_ppc64le_meta_yaml": {
     "about": {
+      "dev_url": "https://github.com/gazebosim/gz-msgs",
       "home": "https://github.com/gazebosim/gz-msgs",
       "license": "Apache-2.0",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "Messages for Gazebo robot simulation."
     },
     "build": {
-      "number": "0"
+      "noarch": "python",
+      "number": "1",
+      "script": "build_py.sh"
     },
     "extra": {
-      "feedstock-name": "gz-msgs",
       "recipe-maintainers": [
         "wolfv",
         "traversaro",
@@ -443,8 +501,48 @@
     },
     "outputs": [
       {
+        "build": null,
+        "name": "gz-msgs11-python",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "ninja",
+            "cmake",
+            "pkg-config",
+            "python"
+          ],
+          "host": [
+            "libgz-math8",
+            "libgz-tools2",
+            "tinyxml2",
+            "libabseil",
+            "libprotobuf",
+            "python 3.9.*",
+            "protobuf 5.29.3.*",
+            "pytest"
+          ],
+          "run": [
+            "python >=3.9",
+            "protobuf >=5.29.3,<6.0a0"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "gz.msgs11"
+              ],
+              "python_version": "3.9.*"
+            }
+          }
+        ]
+      },
+      {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libgz-msgs11"
           ]
         },
@@ -457,9 +555,10 @@
             "ninja",
             "cmake",
             "pkg-config",
-            "python 3.9"
+            "python 3.9.*"
           ],
           "host": [
+            "python 3.9.*",
             "libgz-cmake4",
             "libgz-utils3",
             "libgz-math8",
@@ -472,68 +571,26 @@
             "python"
           ]
         },
-        "script": "build_cxx.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/msgs11/gz/msgs.hh",
-            "test -f ${PREFIX}/lib/libgz-msgs11.so",
-            "test -f ${PREFIX}/lib/cmake/gz-msgs11/gz-msgs11-config.cmake"
-          ]
-        }
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake"
+            ]
+          }
+        ]
       },
       {
         "build": {
-          "noarch": "python",
-          "string": "protobuf5h1234567_0"
-        },
-        "name": "gz-msgs11-python",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_compiler_stub",
-            "c_stdlib_stub",
-            "ninja",
-            "cmake",
-            "pkg-config",
-            "python 3.9"
-          ],
-          "host": [
-            "libgz-math8",
-            "libgz-tools2",
-            "tinyxml2",
-            "libabseil",
-            "libprotobuf",
-            "python 3.9",
-            "protobuf 5.29.3",
-            "pytest"
-          ],
-          "run": [
-            "python  >=3.9",
-            "protobuf >=5.29.3,<6.0a0"
-          ]
-        },
-        "script": "build_py.sh",
-        "test": {
-          "commands": [
-            "pip check"
-          ],
-          "imports": [
-            "gz.msgs11"
-          ],
-          "requires": [
-            "python 3.9",
-            "pip"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libgz-msgs11"
           ]
         },
         "name": "gz-msgs11",
         "requirements": {
+          "build": [],
           "host": [
             "libabseil",
             "libprotobuf"
@@ -543,35 +600,61 @@
             "gz-msgs11-python"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/msgs11/gz/msgs.hh",
-            "test -f ${PREFIX}/lib/libgz-msgs11.so",
-            "test -f ${PREFIX}/lib/cmake/gz-msgs11/gz-msgs11-config.cmake"
-          ],
-          "imports": [
-            "gz.msgs11"
-          ],
-          "requires": [
-            "pip"
-          ]
-        }
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake"
+            ]
+          },
+          {
+            "python": {
+              "imports": [
+                "gz.msgs11"
+              ]
+            }
+          }
+        ]
       }
     ],
     "package": {
-      "name": "gz-msgs11",
+      "name": "gz-msgs11-python",
       "version": "11.1.0"
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "patches": [
-          "win_enable_py_tests.patch"
-        ],
-        "sha256": "1eaa47500aa8a6fa65bcf76cf8d03c78d298e6da730ee2371b119dff732b639d",
-        "url": "https://github.com/gazebosim/gz-msgs/archive/gz-msgs11_11.1.0.tar.gz"
-      }
-    ]
+    "requirements": {
+      "build": [
+        "cxx_compiler_stub",
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "ninja",
+        "cmake",
+        "pkg-config",
+        "python"
+      ],
+      "host": [
+        "libgz-math8",
+        "libgz-tools2",
+        "tinyxml2",
+        "libabseil",
+        "libprotobuf",
+        "python 3.9.*",
+        "protobuf 5.29.3.*",
+        "pytest"
+      ],
+      "run": [
+        "python >=3.9",
+        "protobuf >=5.29.3,<6.0a0"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "patches": [
+        "win_enable_py_tests.patch"
+      ],
+      "sha256": "1eaa47500aa8a6fa65bcf76cf8d03c78d298e6da730ee2371b119dff732b639d",
+      "url": "https://github.com/gazebosim/gz-msgs/archive/gz-msgs11_11.1.0.tar.gz"
+    }
   },
   "linux_ppc64le_requirements": {
     "build": {
@@ -613,23 +696,25 @@
     "test": {
       "__set__": true,
       "elements": [
-        "pip",
-        "python"
+        "pip"
       ]
     }
   },
   "meta_yaml": {
     "about": {
+      "dev_url": "https://github.com/gazebosim/gz-msgs",
       "home": "https://github.com/gazebosim/gz-msgs",
       "license": "Apache-2.0",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "Messages for Gazebo robot simulation."
     },
     "build": {
-      "number": "0"
+      "noarch": "python",
+      "number": "1",
+      "script": "build_py.sh"
     },
     "extra": {
-      "feedstock-name": "gz-msgs",
       "recipe-maintainers": [
         "wolfv",
         "traversaro",
@@ -639,49 +724,7 @@
     },
     "outputs": [
       {
-        "build": {
-          "run_exports": [
-            "libgz-msgs11"
-          ]
-        },
-        "name": "libgz-msgs11",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_compiler_stub",
-            "c_stdlib_stub",
-            "ninja",
-            "cmake",
-            "pkg-config",
-            "python 3.9"
-          ],
-          "host": [
-            "libgz-cmake4",
-            "libgz-utils3",
-            "libgz-math8",
-            "libgz-tools2",
-            "tinyxml2",
-            "libabseil",
-            "libprotobuf"
-          ],
-          "run": [
-            "python"
-          ]
-        },
-        "script": "build_cxx.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/msgs11/gz/msgs.hh",
-            "test -f ${PREFIX}/lib/libgz-msgs11.so",
-            "test -f ${PREFIX}/lib/cmake/gz-msgs11/gz-msgs11-config.cmake"
-          ]
-        }
-      },
-      {
-        "build": {
-          "noarch": "python",
-          "string": "protobuf5h1234567_0"
-        },
+        "build": null,
         "name": "gz-msgs11-python",
         "requirements": {
           "build": [
@@ -691,7 +734,7 @@
             "ninja",
             "cmake",
             "pkg-config",
-            "python 3.9"
+            "python"
           ],
           "host": [
             "libgz-math8",
@@ -699,63 +742,30 @@
             "tinyxml2",
             "libabseil",
             "libprotobuf",
-            "python 3.9",
-            "protobuf 5.29.3",
+            "python 3.9.*",
+            "protobuf 5.29.3.*",
             "pytest"
           ],
           "run": [
-            "python  >=3.9",
+            "python >=3.9",
             "protobuf >=5.29.3,<6.0a0"
           ]
         },
-        "script": "build_py.sh",
-        "test": {
-          "commands": [
-            "pip check"
-          ],
-          "imports": [
-            "gz.msgs11"
-          ],
-          "requires": [
-            "python 3.9",
-            "pip"
-          ]
-        }
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "gz.msgs11"
+              ],
+              "python_version": "3.9.*"
+            }
+          }
+        ]
       },
       {
         "build": {
-          "run_exports": [
-            "libgz-msgs11"
-          ]
-        },
-        "name": "gz-msgs11",
-        "requirements": {
-          "host": [
-            "libabseil",
-            "libprotobuf"
-          ],
-          "run": [
-            "libgz-msgs11",
-            "gz-msgs11-python"
-          ]
-        },
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/msgs11/gz/msgs.hh",
-            "test -f ${PREFIX}/lib/libgz-msgs11.so",
-            "test -f ${PREFIX}/lib/cmake/gz-msgs11/gz-msgs11-config.cmake"
-          ],
-          "imports": [
-            "gz.msgs11"
-          ],
-          "requires": [
-            "pip"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libgz-msgs11"
           ]
         },
@@ -768,9 +778,10 @@
             "ninja",
             "cmake",
             "pkg-config",
-            "python 3.9"
+            "python 3.9.*"
           ],
           "host": [
+            "python 3.9.*",
             "libgz-cmake4",
             "libgz-utils3",
             "libgz-math8",
@@ -783,20 +794,54 @@
             "python"
           ]
         },
-        "script": "build_cxx.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/msgs11/gz/msgs.hh",
-            "test -f ${PREFIX}/lib/libgz-msgs11.so",
-            "test -f ${PREFIX}/lib/cmake/gz-msgs11/gz-msgs11-config.cmake"
-          ]
-        }
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake"
+            ]
+          }
+        ]
       },
       {
         "build": {
-          "noarch": "python",
-          "string": "protobuf5h1234567_0"
+          "strong": [],
+          "weak": [
+            "libgz-msgs11"
+          ]
         },
+        "name": "gz-msgs11",
+        "requirements": {
+          "build": [],
+          "host": [
+            "libabseil",
+            "libprotobuf"
+          ],
+          "run": [
+            "libgz-msgs11",
+            "gz-msgs11-python"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake"
+            ]
+          },
+          {
+            "python": {
+              "imports": [
+                "gz.msgs11"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "build": null,
         "name": "gz-msgs11-python",
         "requirements": {
           "build": [
@@ -806,7 +851,7 @@
             "ninja",
             "cmake",
             "pkg-config",
-            "python 3.9"
+            "python"
           ],
           "host": [
             "libgz-math8",
@@ -814,63 +859,30 @@
             "tinyxml2",
             "libabseil",
             "libprotobuf",
-            "python 3.9",
-            "protobuf 5.29.3",
+            "python 3.9.*",
+            "protobuf 5.29.3.*",
             "pytest"
           ],
           "run": [
-            "python  >=3.9",
+            "python >=3.9",
             "protobuf >=5.29.3,<6.0a0"
           ]
         },
-        "script": "build_py.sh",
-        "test": {
-          "commands": [
-            "pip check"
-          ],
-          "imports": [
-            "gz.msgs11"
-          ],
-          "requires": [
-            "python 3.9",
-            "pip"
-          ]
-        }
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "gz.msgs11"
+              ],
+              "python_version": "3.9.*"
+            }
+          }
+        ]
       },
       {
         "build": {
-          "run_exports": [
-            "libgz-msgs11"
-          ]
-        },
-        "name": "gz-msgs11",
-        "requirements": {
-          "host": [
-            "libabseil",
-            "libprotobuf"
-          ],
-          "run": [
-            "libgz-msgs11",
-            "gz-msgs11-python"
-          ]
-        },
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/msgs11/gz/msgs.hh",
-            "test -f ${PREFIX}/lib/libgz-msgs11.so",
-            "test -f ${PREFIX}/lib/cmake/gz-msgs11/gz-msgs11-config.cmake"
-          ],
-          "imports": [
-            "gz.msgs11"
-          ],
-          "requires": [
-            "pip"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libgz-msgs11"
           ]
         },
@@ -883,9 +895,10 @@
             "ninja",
             "cmake",
             "pkg-config",
-            "python 3.9"
+            "python 3.9.*"
           ],
           "host": [
+            "python 3.9.*",
             "libgz-cmake4",
             "libgz-utils3",
             "libgz-math8",
@@ -898,20 +911,54 @@
             "python"
           ]
         },
-        "script": "build_cxx.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/msgs11/gz/msgs.hh",
-            "test -f ${PREFIX}/lib/libgz-msgs11.so",
-            "test -f ${PREFIX}/lib/cmake/gz-msgs11/gz-msgs11-config.cmake"
-          ]
-        }
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake"
+            ]
+          }
+        ]
       },
       {
         "build": {
-          "noarch": "python",
-          "string": "protobuf5h1234567_0"
+          "strong": [],
+          "weak": [
+            "libgz-msgs11"
+          ]
         },
+        "name": "gz-msgs11",
+        "requirements": {
+          "build": [],
+          "host": [
+            "libabseil",
+            "libprotobuf"
+          ],
+          "run": [
+            "libgz-msgs11",
+            "gz-msgs11-python"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake"
+            ]
+          },
+          {
+            "python": {
+              "imports": [
+                "gz.msgs11"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "build": null,
         "name": "gz-msgs11-python",
         "requirements": {
           "build": [
@@ -921,7 +968,7 @@
             "ninja",
             "cmake",
             "pkg-config",
-            "python 3.9"
+            "python"
           ],
           "host": [
             "libgz-math8",
@@ -929,63 +976,30 @@
             "tinyxml2",
             "libabseil",
             "libprotobuf",
-            "python 3.9",
-            "protobuf 5.29.3",
+            "python 3.9.*",
+            "protobuf 5.29.3.*",
             "pytest"
           ],
           "run": [
-            "python  >=3.9",
+            "python >=3.9",
             "protobuf >=5.29.3,<6.0a0"
           ]
         },
-        "script": "build_py.sh",
-        "test": {
-          "commands": [
-            "pip check"
-          ],
-          "imports": [
-            "gz.msgs11"
-          ],
-          "requires": [
-            "python 3.9",
-            "pip"
-          ]
-        }
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "gz.msgs11"
+              ],
+              "python_version": "3.9.*"
+            }
+          }
+        ]
       },
       {
         "build": {
-          "run_exports": [
-            "libgz-msgs11"
-          ]
-        },
-        "name": "gz-msgs11",
-        "requirements": {
-          "host": [
-            "libabseil",
-            "libprotobuf"
-          ],
-          "run": [
-            "libgz-msgs11",
-            "gz-msgs11-python"
-          ]
-        },
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/msgs11/gz/msgs.hh",
-            "test -f ${PREFIX}/lib/libgz-msgs11.so",
-            "test -f ${PREFIX}/lib/cmake/gz-msgs11/gz-msgs11-config.cmake"
-          ],
-          "imports": [
-            "gz.msgs11"
-          ],
-          "requires": [
-            "pip"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libgz-msgs11"
           ]
         },
@@ -998,9 +1012,10 @@
             "ninja",
             "cmake",
             "pkg-config",
-            "python 3.9"
+            "python 3.9.*"
           ],
           "host": [
+            "python 3.9.*",
             "libgz-cmake4",
             "libgz-utils3",
             "libgz-math8",
@@ -1013,20 +1028,54 @@
             "python"
           ]
         },
-        "script": "build_cxx.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/msgs11/gz/msgs.hh",
-            "test -f ${PREFIX}/lib/libgz-msgs11.dylib",
-            "test -f ${PREFIX}/lib/cmake/gz-msgs11/gz-msgs11-config.cmake"
-          ]
-        }
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake"
+            ]
+          }
+        ]
       },
       {
         "build": {
-          "noarch": "python",
-          "string": "protobuf5h1234567_0"
+          "strong": [],
+          "weak": [
+            "libgz-msgs11"
+          ]
         },
+        "name": "gz-msgs11",
+        "requirements": {
+          "build": [],
+          "host": [
+            "libabseil",
+            "libprotobuf"
+          ],
+          "run": [
+            "libgz-msgs11",
+            "gz-msgs11-python"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake"
+            ]
+          },
+          {
+            "python": {
+              "imports": [
+                "gz.msgs11"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "build": null,
         "name": "gz-msgs11-python",
         "requirements": {
           "build": [
@@ -1036,7 +1085,7 @@
             "ninja",
             "cmake",
             "pkg-config",
-            "python 3.9"
+            "python"
           ],
           "host": [
             "libgz-math8",
@@ -1044,63 +1093,30 @@
             "tinyxml2",
             "libabseil",
             "libprotobuf",
-            "python 3.9",
-            "protobuf 5.29.3",
+            "python 3.9.*",
+            "protobuf 5.29.3.*",
             "pytest"
           ],
           "run": [
-            "python  >=3.9",
+            "python >=3.9",
             "protobuf >=5.29.3,<6.0a0"
           ]
         },
-        "script": "build_py.sh",
-        "test": {
-          "commands": [
-            "pip check"
-          ],
-          "imports": [
-            "gz.msgs11"
-          ],
-          "requires": [
-            "python 3.9",
-            "pip"
-          ]
-        }
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "gz.msgs11"
+              ],
+              "python_version": "3.9.*"
+            }
+          }
+        ]
       },
       {
         "build": {
-          "run_exports": [
-            "libgz-msgs11"
-          ]
-        },
-        "name": "gz-msgs11",
-        "requirements": {
-          "host": [
-            "libabseil",
-            "libprotobuf"
-          ],
-          "run": [
-            "libgz-msgs11",
-            "gz-msgs11-python"
-          ]
-        },
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/msgs11/gz/msgs.hh",
-            "test -f ${PREFIX}/lib/libgz-msgs11.dylib",
-            "test -f ${PREFIX}/lib/cmake/gz-msgs11/gz-msgs11-config.cmake"
-          ],
-          "imports": [
-            "gz.msgs11"
-          ],
-          "requires": [
-            "pip"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libgz-msgs11"
           ]
         },
@@ -1113,9 +1129,10 @@
             "ninja",
             "cmake",
             "pkg-config",
-            "python 3.9"
+            "python 3.9.*"
           ],
           "host": [
+            "python 3.9.*",
             "libgz-cmake4",
             "libgz-utils3",
             "libgz-math8",
@@ -1128,20 +1145,54 @@
             "python"
           ]
         },
-        "script": "build_cxx.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/msgs11/gz/msgs.hh",
-            "test -f ${PREFIX}/lib/libgz-msgs11.dylib",
-            "test -f ${PREFIX}/lib/cmake/gz-msgs11/gz-msgs11-config.cmake"
-          ]
-        }
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake"
+            ]
+          }
+        ]
       },
       {
         "build": {
-          "noarch": "python",
-          "string": "protobuf5h1234567_0"
+          "strong": [],
+          "weak": [
+            "libgz-msgs11"
+          ]
         },
+        "name": "gz-msgs11",
+        "requirements": {
+          "build": [],
+          "host": [
+            "libabseil",
+            "libprotobuf"
+          ],
+          "run": [
+            "libgz-msgs11",
+            "gz-msgs11-python"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake"
+            ]
+          },
+          {
+            "python": {
+              "imports": [
+                "gz.msgs11"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "build": null,
         "name": "gz-msgs11-python",
         "requirements": {
           "build": [
@@ -1151,7 +1202,7 @@
             "ninja",
             "cmake",
             "pkg-config",
-            "python 3.9"
+            "python"
           ],
           "host": [
             "libgz-math8",
@@ -1159,63 +1210,30 @@
             "tinyxml2",
             "libabseil",
             "libprotobuf",
-            "python 3.9",
-            "protobuf 5.29.3",
+            "python 3.9.*",
+            "protobuf 5.29.3.*",
             "pytest"
           ],
           "run": [
-            "python  >=3.9",
+            "python >=3.9",
             "protobuf >=5.29.3,<6.0a0"
           ]
         },
-        "script": "build_py.sh",
-        "test": {
-          "commands": [
-            "pip check"
-          ],
-          "imports": [
-            "gz.msgs11"
-          ],
-          "requires": [
-            "python 3.9",
-            "pip"
-          ]
-        }
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "gz.msgs11"
+              ],
+              "python_version": "3.9.*"
+            }
+          }
+        ]
       },
       {
         "build": {
-          "run_exports": [
-            "libgz-msgs11"
-          ]
-        },
-        "name": "gz-msgs11",
-        "requirements": {
-          "host": [
-            "libabseil",
-            "libprotobuf"
-          ],
-          "run": [
-            "libgz-msgs11",
-            "gz-msgs11-python"
-          ]
-        },
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/msgs11/gz/msgs.hh",
-            "test -f ${PREFIX}/lib/libgz-msgs11.dylib",
-            "test -f ${PREFIX}/lib/cmake/gz-msgs11/gz-msgs11-config.cmake"
-          ],
-          "imports": [
-            "gz.msgs11"
-          ],
-          "requires": [
-            "pip"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libgz-msgs11"
           ]
         },
@@ -1228,86 +1246,42 @@
             "ninja",
             "cmake",
             "pkg-config",
-            "python 3.9"
+            "python 3.9.*"
           ],
           "host": [
+            "python 3.9.*",
             "libgz-cmake4",
             "libgz-utils3",
             "libgz-math8",
             "libgz-tools2",
             "tinyxml2",
             "libabseil",
-            "libprotobuf",
-            "dlfcn-win32"
+            "libprotobuf"
           ],
           "run": [
             "python"
           ]
         },
-        "script": "bld_cxx.bat",
-        "test": {
-          "commands": [
-            "if not exist %PREFIX%\\\\Library\\\\include\\\\gz\\\\msgs11\\\\gz\\\\msgs.hh exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\lib\\\\gz-msgs11.lib exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\bin\\\\gz-msgs11.dll exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\lib\\\\cmake\\\\gz-msgs11\\\\gz-msgs11-config.cmake exit 1"
-          ]
-        }
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake"
+            ]
+          }
+        ]
       },
       {
         "build": {
-          "noarch": "python",
-          "string": "protobuf5h1234567_0"
-        },
-        "name": "gz-msgs11-python",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_compiler_stub",
-            "c_stdlib_stub",
-            "ninja",
-            "cmake",
-            "pkg-config",
-            "python 3.9"
-          ],
-          "host": [
-            "libgz-math8",
-            "libgz-tools2",
-            "tinyxml2",
-            "libabseil",
-            "libprotobuf",
-            "python 3.9",
-            "protobuf 5.29.3",
-            "pytest",
-            "dlfcn-win32"
-          ],
-          "run": [
-            "python  >=3.9",
-            "protobuf >=5.29.3,<6.0a0"
-          ]
-        },
-        "script": "bld_py.bat",
-        "test": {
-          "commands": [
-            "pip check"
-          ],
-          "imports": [
-            "gz.msgs11"
-          ],
-          "requires": [
-            "python 3.9",
-            "pip"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libgz-msgs11"
           ]
         },
         "name": "gz-msgs11",
         "requirements": {
+          "build": [],
           "host": [
             "libabseil",
             "libprotobuf"
@@ -1317,85 +1291,195 @@
             "gz-msgs11-python"
           ]
         },
-        "test": {
-          "commands": [
-            "if not exist %PREFIX%\\\\Library\\\\include\\\\gz\\\\msgs11\\\\gz\\\\msgs.hh exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\lib\\\\gz-msgs11.lib exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\bin\\\\gz-msgs11.dll exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\lib\\\\cmake\\\\gz-msgs11\\\\gz-msgs11-config.cmake exit 1"
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake"
+            ]
+          },
+          {
+            "python": {
+              "imports": [
+                "gz.msgs11"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "build": null,
+        "name": "gz-msgs11-python",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "ninja",
+            "cmake",
+            "pkg-config",
+            "python"
           ],
-          "imports": [
-            "gz.msgs11"
+          "host": [
+            "libgz-math8",
+            "libgz-tools2",
+            "tinyxml2",
+            "libabseil",
+            "libprotobuf",
+            "python 3.9.*",
+            "protobuf 5.29.3.*",
+            "pytest"
           ],
-          "requires": [
-            "pip"
+          "run": [
+            "python >=3.9",
+            "protobuf >=5.29.3,<6.0a0"
           ]
-        }
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "gz.msgs11"
+              ],
+              "python_version": "3.9.*"
+            }
+          }
+        ]
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "libgz-msgs11"
+          ]
+        },
+        "name": "libgz-msgs11",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "ninja",
+            "cmake",
+            "pkg-config",
+            "python 3.9.*"
+          ],
+          "host": [
+            "python 3.9.*",
+            "libgz-cmake4",
+            "libgz-utils3",
+            "libgz-math8",
+            "libgz-tools2",
+            "tinyxml2",
+            "libabseil",
+            "libprotobuf"
+          ],
+          "run": [
+            "python"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake"
+            ]
+          }
+        ]
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "libgz-msgs11"
+          ]
+        },
+        "name": "gz-msgs11",
+        "requirements": {
+          "build": [],
+          "host": [
+            "libabseil",
+            "libprotobuf"
+          ],
+          "run": [
+            "libgz-msgs11",
+            "gz-msgs11-python"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake"
+            ]
+          },
+          {
+            "python": {
+              "imports": [
+                "gz.msgs11"
+              ]
+            }
+          }
+        ]
       }
     ],
     "package": {
-      "name": "gz-msgs11",
+      "name": "gz-msgs11-python",
       "version": "11.1.0"
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "patches": [
-          "win_enable_py_tests.patch"
-        ],
-        "sha256": "1eaa47500aa8a6fa65bcf76cf8d03c78d298e6da730ee2371b119dff732b639d",
-        "url": "https://github.com/gazebosim/gz-msgs/archive/gz-msgs11_11.1.0.tar.gz"
-      },
-      {
-        "patches": [
-          "win_enable_py_tests.patch"
-        ],
-        "sha256": "1eaa47500aa8a6fa65bcf76cf8d03c78d298e6da730ee2371b119dff732b639d",
-        "url": "https://github.com/gazebosim/gz-msgs/archive/gz-msgs11_11.1.0.tar.gz"
-      },
-      {
-        "patches": [
-          "win_enable_py_tests.patch"
-        ],
-        "sha256": "1eaa47500aa8a6fa65bcf76cf8d03c78d298e6da730ee2371b119dff732b639d",
-        "url": "https://github.com/gazebosim/gz-msgs/archive/gz-msgs11_11.1.0.tar.gz"
-      },
-      {
-        "patches": [
-          "win_enable_py_tests.patch"
-        ],
-        "sha256": "1eaa47500aa8a6fa65bcf76cf8d03c78d298e6da730ee2371b119dff732b639d",
-        "url": "https://github.com/gazebosim/gz-msgs/archive/gz-msgs11_11.1.0.tar.gz"
-      },
-      {
-        "patches": [
-          "win_enable_py_tests.patch"
-        ],
-        "sha256": "1eaa47500aa8a6fa65bcf76cf8d03c78d298e6da730ee2371b119dff732b639d",
-        "url": "https://github.com/gazebosim/gz-msgs/archive/gz-msgs11_11.1.0.tar.gz"
-      },
-      {
-        "patches": [
-          "win_enable_py_tests.patch"
-        ],
-        "sha256": "1eaa47500aa8a6fa65bcf76cf8d03c78d298e6da730ee2371b119dff732b639d",
-        "url": "https://github.com/gazebosim/gz-msgs/archive/gz-msgs11_11.1.0.tar.gz"
-      }
-    ]
+    "requirements": {
+      "build": [
+        "cxx_compiler_stub",
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "ninja",
+        "cmake",
+        "pkg-config",
+        "python"
+      ],
+      "host": [
+        "libgz-math8",
+        "libgz-tools2",
+        "tinyxml2",
+        "libabseil",
+        "libprotobuf",
+        "python 3.9.*",
+        "protobuf 5.29.3.*",
+        "pytest"
+      ],
+      "run": [
+        "python >=3.9",
+        "protobuf >=5.29.3,<6.0a0"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "patches": [
+        "win_enable_py_tests.patch"
+      ],
+      "sha256": "1eaa47500aa8a6fa65bcf76cf8d03c78d298e6da730ee2371b119dff732b639d",
+      "url": "https://github.com/gazebosim/gz-msgs/archive/gz-msgs11_11.1.0.tar.gz"
+    }
   },
-  "name": "gz-msgs11",
+  "name": "gz-msgs11-python",
   "osx_64_meta_yaml": {
     "about": {
+      "dev_url": "https://github.com/gazebosim/gz-msgs",
       "home": "https://github.com/gazebosim/gz-msgs",
       "license": "Apache-2.0",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "Messages for Gazebo robot simulation."
     },
     "build": {
-      "number": "0"
+      "noarch": "python",
+      "number": "1",
+      "script": "build_py.sh"
     },
     "extra": {
-      "feedstock-name": "gz-msgs",
       "recipe-maintainers": [
         "wolfv",
         "traversaro",
@@ -1405,8 +1489,48 @@
     },
     "outputs": [
       {
+        "build": null,
+        "name": "gz-msgs11-python",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "ninja",
+            "cmake",
+            "pkg-config",
+            "python"
+          ],
+          "host": [
+            "libgz-math8",
+            "libgz-tools2",
+            "tinyxml2",
+            "libabseil",
+            "libprotobuf",
+            "python 3.9.*",
+            "protobuf 5.29.3.*",
+            "pytest"
+          ],
+          "run": [
+            "python >=3.9",
+            "protobuf >=5.29.3,<6.0a0"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "gz.msgs11"
+              ],
+              "python_version": "3.9.*"
+            }
+          }
+        ]
+      },
+      {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libgz-msgs11"
           ]
         },
@@ -1419,9 +1543,10 @@
             "ninja",
             "cmake",
             "pkg-config",
-            "python 3.9"
+            "python 3.9.*"
           ],
           "host": [
+            "python 3.9.*",
             "libgz-cmake4",
             "libgz-utils3",
             "libgz-math8",
@@ -1434,68 +1559,26 @@
             "python"
           ]
         },
-        "script": "build_cxx.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/msgs11/gz/msgs.hh",
-            "test -f ${PREFIX}/lib/libgz-msgs11.dylib",
-            "test -f ${PREFIX}/lib/cmake/gz-msgs11/gz-msgs11-config.cmake"
-          ]
-        }
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake"
+            ]
+          }
+        ]
       },
       {
         "build": {
-          "noarch": "python",
-          "string": "protobuf5h1234567_0"
-        },
-        "name": "gz-msgs11-python",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_compiler_stub",
-            "c_stdlib_stub",
-            "ninja",
-            "cmake",
-            "pkg-config",
-            "python 3.9"
-          ],
-          "host": [
-            "libgz-math8",
-            "libgz-tools2",
-            "tinyxml2",
-            "libabseil",
-            "libprotobuf",
-            "python 3.9",
-            "protobuf 5.29.3",
-            "pytest"
-          ],
-          "run": [
-            "python  >=3.9",
-            "protobuf >=5.29.3,<6.0a0"
-          ]
-        },
-        "script": "build_py.sh",
-        "test": {
-          "commands": [
-            "pip check"
-          ],
-          "imports": [
-            "gz.msgs11"
-          ],
-          "requires": [
-            "python 3.9",
-            "pip"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libgz-msgs11"
           ]
         },
         "name": "gz-msgs11",
         "requirements": {
+          "build": [],
           "host": [
             "libabseil",
             "libprotobuf"
@@ -1505,35 +1588,61 @@
             "gz-msgs11-python"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/msgs11/gz/msgs.hh",
-            "test -f ${PREFIX}/lib/libgz-msgs11.dylib",
-            "test -f ${PREFIX}/lib/cmake/gz-msgs11/gz-msgs11-config.cmake"
-          ],
-          "imports": [
-            "gz.msgs11"
-          ],
-          "requires": [
-            "pip"
-          ]
-        }
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake"
+            ]
+          },
+          {
+            "python": {
+              "imports": [
+                "gz.msgs11"
+              ]
+            }
+          }
+        ]
       }
     ],
     "package": {
-      "name": "gz-msgs11",
+      "name": "gz-msgs11-python",
       "version": "11.1.0"
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "patches": [
-          "win_enable_py_tests.patch"
-        ],
-        "sha256": "1eaa47500aa8a6fa65bcf76cf8d03c78d298e6da730ee2371b119dff732b639d",
-        "url": "https://github.com/gazebosim/gz-msgs/archive/gz-msgs11_11.1.0.tar.gz"
-      }
-    ]
+    "requirements": {
+      "build": [
+        "cxx_compiler_stub",
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "ninja",
+        "cmake",
+        "pkg-config",
+        "python"
+      ],
+      "host": [
+        "libgz-math8",
+        "libgz-tools2",
+        "tinyxml2",
+        "libabseil",
+        "libprotobuf",
+        "python 3.9.*",
+        "protobuf 5.29.3.*",
+        "pytest"
+      ],
+      "run": [
+        "python >=3.9",
+        "protobuf >=5.29.3,<6.0a0"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "patches": [
+        "win_enable_py_tests.patch"
+      ],
+      "sha256": "1eaa47500aa8a6fa65bcf76cf8d03c78d298e6da730ee2371b119dff732b639d",
+      "url": "https://github.com/gazebosim/gz-msgs/archive/gz-msgs11_11.1.0.tar.gz"
+    }
   },
   "osx_64_requirements": {
     "build": {
@@ -1575,23 +1684,25 @@
     "test": {
       "__set__": true,
       "elements": [
-        "pip",
-        "python"
+        "pip"
       ]
     }
   },
   "osx_arm64_meta_yaml": {
     "about": {
+      "dev_url": "https://github.com/gazebosim/gz-msgs",
       "home": "https://github.com/gazebosim/gz-msgs",
       "license": "Apache-2.0",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "Messages for Gazebo robot simulation."
     },
     "build": {
-      "number": "0"
+      "noarch": "python",
+      "number": "1",
+      "script": "build_py.sh"
     },
     "extra": {
-      "feedstock-name": "gz-msgs",
       "recipe-maintainers": [
         "wolfv",
         "traversaro",
@@ -1601,8 +1712,48 @@
     },
     "outputs": [
       {
+        "build": null,
+        "name": "gz-msgs11-python",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "ninja",
+            "cmake",
+            "pkg-config",
+            "python"
+          ],
+          "host": [
+            "libgz-math8",
+            "libgz-tools2",
+            "tinyxml2",
+            "libabseil",
+            "libprotobuf",
+            "python 3.9.*",
+            "protobuf 5.29.3.*",
+            "pytest"
+          ],
+          "run": [
+            "python >=3.9",
+            "protobuf >=5.29.3,<6.0a0"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "gz.msgs11"
+              ],
+              "python_version": "3.9.*"
+            }
+          }
+        ]
+      },
+      {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libgz-msgs11"
           ]
         },
@@ -1615,9 +1766,10 @@
             "ninja",
             "cmake",
             "pkg-config",
-            "python 3.9"
+            "python 3.9.*"
           ],
           "host": [
+            "python 3.9.*",
             "libgz-cmake4",
             "libgz-utils3",
             "libgz-math8",
@@ -1630,68 +1782,26 @@
             "python"
           ]
         },
-        "script": "build_cxx.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/msgs11/gz/msgs.hh",
-            "test -f ${PREFIX}/lib/libgz-msgs11.dylib",
-            "test -f ${PREFIX}/lib/cmake/gz-msgs11/gz-msgs11-config.cmake"
-          ]
-        }
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake"
+            ]
+          }
+        ]
       },
       {
         "build": {
-          "noarch": "python",
-          "string": "protobuf5h1234567_0"
-        },
-        "name": "gz-msgs11-python",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_compiler_stub",
-            "c_stdlib_stub",
-            "ninja",
-            "cmake",
-            "pkg-config",
-            "python 3.9"
-          ],
-          "host": [
-            "libgz-math8",
-            "libgz-tools2",
-            "tinyxml2",
-            "libabseil",
-            "libprotobuf",
-            "python 3.9",
-            "protobuf 5.29.3",
-            "pytest"
-          ],
-          "run": [
-            "python  >=3.9",
-            "protobuf >=5.29.3,<6.0a0"
-          ]
-        },
-        "script": "build_py.sh",
-        "test": {
-          "commands": [
-            "pip check"
-          ],
-          "imports": [
-            "gz.msgs11"
-          ],
-          "requires": [
-            "python 3.9",
-            "pip"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libgz-msgs11"
           ]
         },
         "name": "gz-msgs11",
         "requirements": {
+          "build": [],
           "host": [
             "libabseil",
             "libprotobuf"
@@ -1701,35 +1811,61 @@
             "gz-msgs11-python"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/msgs11/gz/msgs.hh",
-            "test -f ${PREFIX}/lib/libgz-msgs11.dylib",
-            "test -f ${PREFIX}/lib/cmake/gz-msgs11/gz-msgs11-config.cmake"
-          ],
-          "imports": [
-            "gz.msgs11"
-          ],
-          "requires": [
-            "pip"
-          ]
-        }
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake"
+            ]
+          },
+          {
+            "python": {
+              "imports": [
+                "gz.msgs11"
+              ]
+            }
+          }
+        ]
       }
     ],
     "package": {
-      "name": "gz-msgs11",
+      "name": "gz-msgs11-python",
       "version": "11.1.0"
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "patches": [
-          "win_enable_py_tests.patch"
-        ],
-        "sha256": "1eaa47500aa8a6fa65bcf76cf8d03c78d298e6da730ee2371b119dff732b639d",
-        "url": "https://github.com/gazebosim/gz-msgs/archive/gz-msgs11_11.1.0.tar.gz"
-      }
-    ]
+    "requirements": {
+      "build": [
+        "cxx_compiler_stub",
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "ninja",
+        "cmake",
+        "pkg-config",
+        "python"
+      ],
+      "host": [
+        "libgz-math8",
+        "libgz-tools2",
+        "tinyxml2",
+        "libabseil",
+        "libprotobuf",
+        "python 3.9.*",
+        "protobuf 5.29.3.*",
+        "pytest"
+      ],
+      "run": [
+        "python >=3.9",
+        "protobuf >=5.29.3,<6.0a0"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "patches": [
+        "win_enable_py_tests.patch"
+      ],
+      "sha256": "1eaa47500aa8a6fa65bcf76cf8d03c78d298e6da730ee2371b119dff732b639d",
+      "url": "https://github.com/gazebosim/gz-msgs/archive/gz-msgs11_11.1.0.tar.gz"
+    }
   },
   "osx_arm64_requirements": {
     "build": {
@@ -1771,8 +1907,7 @@
     "test": {
       "__set__": true,
       "elements": [
-        "pip",
-        "python"
+        "pip"
       ]
     }
   },
@@ -1796,7 +1931,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/gz-msgs.json"
   },
-  "raw_meta_yaml": "{% set component_name = \"msgs\" %}\n{% set repo_name = \"gz-\" + component_name %}\n{% set version = \"11.1.0\" %}\n{% set major_version = version.split('.')[0] %}\n{% set name = repo_name + major_version %}\n{% set component_version = component_name + major_version %}\n{% set cxx_name = \"lib\" + name %}\n{% set python_name = name + \"-python\" %}\n{% set protobuf_version = \"5.29.3\" %}\n{% set protobuf_major_version = protobuf_version.split('.')[0] %}\n{% set next_protobuf_major_version = \"6\" %}\n\npackage:\n  name: {{ name }}\n  version: {{ version }}\n\nsource:\n  - url: https://github.com/gazebosim/{{ repo_name }}/archive/{{ repo_name }}{{ major_version }}_{{ version }}.tar.gz\n    sha256: 1eaa47500aa8a6fa65bcf76cf8d03c78d298e6da730ee2371b119dff732b639d\n    patches:\n      - win_enable_py_tests.patch\n\nbuild:\n  number: 0\n  skip: true  # [not is_python_min]\n\noutputs:\n  - name: {{ cxx_name }}\n    script: build_cxx.sh  # [unix]\n    script: bld_cxx.bat  # [win]\n    build:\n      run_exports:\n        - {{ pin_subpackage(cxx_name, max_pin='x') }}\n    requirements:\n      build:\n        - {{ compiler('cxx') }}\n        - {{ compiler('c') }}\n        - {{ stdlib('c') }}\n        - ninja\n        - cmake\n        - pkg-config\n        - python {{ python_min }}\n        # We need all host deps also in build for cross-compiling\n        - libgz-cmake4  # [build_platform != target_platform]\n        - libgz-math8  # [build_platform != target_platform]\n        - libgz-tools2  # [build_platform != target_platform]\n        - tinyxml2  # [build_platform != target_platform]\n        - libabseil  # [build_platform != target_platform]\n        - libprotobuf  # [build_platform != target_platform]\n      host:\n        - libgz-cmake4\n        - libgz-utils3\n        - libgz-math8\n        - libgz-tools2\n        - tinyxml2\n        - libabseil\n        - libprotobuf\n        - dlfcn-win32  # [win]\n      run:\n        - python\n    test:\n      commands:\n        - test -f ${PREFIX}/include/gz/{{ component_version }}/gz/{{ component_name }}.hh  # [not win]\n        - test -f ${PREFIX}/lib/lib{{ name }}.so  # [linux]\n        - test -f ${PREFIX}/lib/lib{{ name }}.dylib  # [osx]\n        - test -f ${PREFIX}/lib/cmake/{{ name }}/{{ name }}-config.cmake  # [not win]\n        - if not exist %PREFIX%\\\\Library\\\\include\\\\gz\\\\{{ component_version }}\\\\gz\\\\{{ component_name }}.hh exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\lib\\\\{{ name }}.lib exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\bin\\\\{{ name }}.dll exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\lib\\\\cmake\\\\{{ name }}\\\\{{ name }}-config.cmake exit 1  # [win]\n\n  - name: {{ python_name }}\n    build:\n      noarch: python\n      string: protobuf{{ protobuf_major_version }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}\n    script: build_py.sh  # [unix]\n    script: bld_py.bat  # [win]\n    requirements:\n      build:\n        - {{ compiler('cxx') }}\n        - {{ compiler('c') }}\n        - {{ stdlib(\"c\") }}\n        - ninja\n        - cmake\n        - pkg-config\n        - python {{ python_min }}\n        # We need all host deps also in build for cross-compiling\n        - libgz-math8  # [build_platform != target_platform]\n        - libgz-tools2  # [build_platform != target_platform]\n        - tinyxml2  # [build_platform != target_platform]\n        - libabseil  # [build_platform != target_platform]\n        - libprotobuf  # [build_platform != target_platform]\n      host:\n        - libgz-math8\n        - libgz-tools2\n        - tinyxml2\n        - libabseil\n        - libprotobuf\n        - python {{ python_min }}\n        - protobuf {{ protobuf_version }}\n        - pytest\n        - dlfcn-win32  # [win]\n      run:\n        - python  >={{ python_min }}\n        # See https://protobuf.dev/support/cross-version-runtime-guarantee/\n        - protobuf >={{ protobuf_version }},<{{ next_protobuf_major_version }}.0a0\n    test:\n      commands:\n        - pip check\n      requires:\n        - python {{ python_min }}\n        - pip\n      imports:\n        - gz.msgs11\n\n  - name: {{ name }}\n    build:\n      run_exports:\n        - {{ pin_subpackage(cxx_name, max_pin='x') }}\n    requirements:\n      host:\n        # Manually ensure that libabseil and libprotobuf end up in the hash\n        - libabseil\n        - libprotobuf\n      run:\n        - {{ pin_subpackage(cxx_name, exact=True) }}\n        - {{ pin_subpackage(python_name, max_pin='x.x.x') }}\n    test:\n      commands:\n        - test -f ${PREFIX}/include/gz/{{ component_version }}/gz/{{ component_name }}.hh  # [not win]\n        - test -f ${PREFIX}/lib/lib{{ name }}.so  # [linux]\n        - test -f ${PREFIX}/lib/lib{{ name }}.dylib  # [osx]\n        - test -f ${PREFIX}/lib/cmake/{{ name }}/{{ name }}-config.cmake  # [not win]\n        - if not exist %PREFIX%\\\\Library\\\\include\\\\gz\\\\{{ component_version }}\\\\gz\\\\{{ component_name }}.hh exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\lib\\\\{{ name }}.lib exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\bin\\\\{{ name }}.dll exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\lib\\\\cmake\\\\{{ name }}\\\\{{ name }}-config.cmake exit 1  # [win]\n      requires:\n        - pip\n      imports:\n        - gz.msgs11\n\nabout:\n  home: https://github.com/gazebosim/{{ repo_name }}\n  license: Apache-2.0\n  license_file: LICENSE\n  summary: Messages for Gazebo robot simulation.\n\nextra:\n  feedstock-name: {{ repo_name }}\n  recipe-maintainers:\n    - wolfv\n    - traversaro\n    - j-rivero\n    - Tobias-Fischer\n",
+  "raw_meta_yaml": "context:\n  version: \"11.1.0\"\n  major_version: \"11\"\n  component_name: \"msgs\"\n  component_version: \"msgs11\"\n  repo_name: \"gz-msgs\"\n  name: \"gz-msgs11\"\n  cxx_name: \"libgz-msgs11\"\n  python_name: \"gz-msgs11-python\"\n  protobuf_version: \"5.29.3\"\n  protobuf_major_version: \"5\"\n  next_protobuf_major_version: \"6\"\n\nrecipe:\n  name: ${{ name }}\n  version: ${{ version }}\n\nsource:\n  - url: \"https://github.com/gazebosim/${{ repo_name }}/archive/${{ repo_name }}${{ major_version }}_${{ version }}.tar.gz\"\n    sha256: \"1eaa47500aa8a6fa65bcf76cf8d03c78d298e6da730ee2371b119dff732b639d\"\n    patches:\n      - win_enable_py_tests.patch\n\nbuild:\n  number: 1\n\noutputs:\n  - package:\n      name: ${{ cxx_name }}\n    build:\n      script:\n        - if: unix\n          then: build_cxx.sh\n        - if: win\n          then: bld_cxx.bat\n    requirements:\n      build:\n        - ${{ compiler('cxx') }}\n        - ${{ compiler('c') }}\n        - ${{ stdlib('c') }}\n        - ninja\n        - cmake\n        - pkg-config\n        - python ${{ python_min }}.*\n        # Cross-compiling dependencies\n        - if: build_platform != target_platform\n          then:\n            - libgz-cmake4\n            - libgz-math8\n            - libgz-tools2\n            - tinyxml2\n            - libabseil\n            - libprotobuf\n      host:\n        - python ${{ python_min }}.*\n        - libgz-cmake4\n        - libgz-utils3\n        - libgz-math8\n        - libgz-tools2\n        - tinyxml2\n        - libabseil\n        - libprotobuf\n        - if: win\n          then:\n            - dlfcn-win32\n      run:\n        - python\n      run_exports:\n        - ${{ pin_subpackage(cxx_name, upper_bound='x') }}\n  \n    tests:\n      - script:\n        - if: not win\n          then: \n            - test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh\n            - test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}\n            - test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake\n        - if: win\n          then: \n            - if not exist %PREFIX%\\\\Library\\\\include\\\\gz\\\\${{ component_version }}\\\\gz\\\\${{ component_name }}.hh exit 1\n            - if not exist %PREFIX%\\\\Library\\\\lib\\\\${{ name }}.lib exit 1\n            - if not exist %PREFIX%\\\\Library\\\\bin\\\\${{ name }}.dll exit 1\n            - if not exist %PREFIX%\\\\Library\\\\lib\\\\cmake\\\\${{ name }}\\\\${{ name }}-config.cmake exit 1\n\n  - package:\n      name: ${{ python_name }}\n    build:\n      noarch: python\n      string: protobuf${{ protobuf_major_version }}h${{ PKG_HASH }}_${{ PKG_BUILDNUM }}\n      script:\n        - if: unix\n          then: build_py.sh\n        - if: win\n          then: bld_py.bat\n    requirements:\n      build:\n        - ${{ compiler('cxx') }}\n        - ${{ compiler('c') }}\n        - ${{ stdlib('c') }}\n        - ninja\n        - cmake\n        - pkg-config\n        - python\n        # Cross-compiling dependencies\n        - if: build_platform != target_platform\n          then:\n            - libgz-math8\n            - libgz-tools2\n            - tinyxml2\n            - libabseil\n            - libprotobuf\n      host:\n        - libgz-math8\n        - libgz-tools2\n        - tinyxml2\n        - libabseil\n        - libprotobuf\n        - python ${{ python_min }}.*\n        - protobuf ${{ protobuf_version }}.*\n        - pytest\n        - if: win\n          then:\n            - dlfcn-win32\n      run:\n        - python >=${{ python_min }}\n        # See https://protobuf.dev/support/cross-version-runtime-guarantee/\n        - protobuf >=${{ protobuf_version }},<${{ next_protobuf_major_version }}.0a0\n\n    tests:\n      - python:\n          imports:\n            - gz.msgs11\n          python_version: ${{ python_min }}.*\n\n  - package:\n      name: ${{ name }}\n    requirements:\n      host:\n        # Manually ensure that libabseil and libprotobuf end up in the hash\n        - libabseil\n        - libprotobuf\n      run:\n        - ${{ pin_subpackage(cxx_name, exact=true) }}\n        - ${{ pin_subpackage(python_name, upper_bound='x.x.x') }}\n      run_exports:\n        - ${{ pin_subpackage(cxx_name, upper_bound='x') }}\n    \n    tests:\n      - script:\n        - if: not win\n          then: \n            - test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh\n            - test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}\n            - test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake\n        - if: win\n          then: \n            - if not exist %PREFIX%\\\\Library\\\\include\\\\gz\\\\${{ component_version }}\\\\gz\\\\${{ component_name }}.hh exit 1\n            - if not exist %PREFIX%\\\\Library\\\\lib\\\\${{ name }}.lib exit 1\n            - if not exist %PREFIX%\\\\Library\\\\bin\\\\${{ name }}.dll exit 1\n            - if not exist %PREFIX%\\\\Library\\\\lib\\\\cmake\\\\${{ name }}\\\\${{ name }}-config.cmake exit 1\n      - python:\n          imports:\n            - gz.msgs11\n\nabout:\n  homepage: https://github.com/gazebosim/${{ repo_name }}\n  repository: https://github.com/gazebosim/${{ repo_name }}\n  license: \"Apache-2.0\"\n  license_file: \"LICENSE\"\n  summary: \"Messages for Gazebo robot simulation.\"\n\nextra:\n  recipe-maintainers:\n    - wolfv\n    - traversaro\n    - j-rivero\n    - Tobias-Fischer\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -1804,7 +1939,6 @@
       "c_stdlib_stub",
       "cmake",
       "cxx_compiler_stub",
-      "dlfcn-win32",
       "gz-msgs11-python",
       "libabseil",
       "libgz-cmake4",
@@ -1840,7 +1974,6 @@
         "c_compiler_stub",
         "c_stdlib_stub",
         "cxx_compiler_stub",
-        "dlfcn-win32",
         "libabseil",
         "libgz-cmake4",
         "libgz-math8",
@@ -1868,8 +2001,7 @@
     "test": {
       "__set__": true,
       "elements": [
-        "pip",
-        "python"
+        "pip"
       ]
     }
   },
@@ -1884,22 +2016,22 @@
         "cxx_compiler_stub",
         "ninja",
         "pkg-config",
-        "python 3.9"
+        "python",
+        "python 3.9.*"
       ]
     },
     "host": {
       "__set__": true,
       "elements": [
-        "dlfcn-win32",
         "libabseil",
         "libgz-cmake4",
         "libgz-math8",
         "libgz-tools2",
         "libgz-utils3",
         "libprotobuf",
-        "protobuf 5.29.3",
+        "protobuf 5.29.3.*",
         "pytest",
-        "python 3.9",
+        "python 3.9.*",
         "tinyxml2"
       ]
     },
@@ -1910,14 +2042,13 @@
         "libgz-msgs11",
         "protobuf >=5.29.3,<6.0a0",
         "python",
-        "python  >=3.9"
+        "python >=3.9"
       ]
     },
     "test": {
       "__set__": true,
       "elements": [
-        "pip",
-        "python 3.9"
+        "pip"
       ]
     }
   },
@@ -1928,16 +2059,19 @@
   },
   "win_64_meta_yaml": {
     "about": {
+      "dev_url": "https://github.com/gazebosim/gz-msgs",
       "home": "https://github.com/gazebosim/gz-msgs",
       "license": "Apache-2.0",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "Messages for Gazebo robot simulation."
     },
     "build": {
-      "number": "0"
+      "noarch": "python",
+      "number": "1",
+      "script": "build_py.sh"
     },
     "extra": {
-      "feedstock-name": "gz-msgs",
       "recipe-maintainers": [
         "wolfv",
         "traversaro",
@@ -1947,8 +2081,48 @@
     },
     "outputs": [
       {
+        "build": null,
+        "name": "gz-msgs11-python",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "ninja",
+            "cmake",
+            "pkg-config",
+            "python"
+          ],
+          "host": [
+            "libgz-math8",
+            "libgz-tools2",
+            "tinyxml2",
+            "libabseil",
+            "libprotobuf",
+            "python 3.9.*",
+            "protobuf 5.29.3.*",
+            "pytest"
+          ],
+          "run": [
+            "python >=3.9",
+            "protobuf >=5.29.3,<6.0a0"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "gz.msgs11"
+              ],
+              "python_version": "3.9.*"
+            }
+          }
+        ]
+      },
+      {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libgz-msgs11"
           ]
         },
@@ -1961,86 +2135,42 @@
             "ninja",
             "cmake",
             "pkg-config",
-            "python 3.9"
+            "python 3.9.*"
           ],
           "host": [
+            "python 3.9.*",
             "libgz-cmake4",
             "libgz-utils3",
             "libgz-math8",
             "libgz-tools2",
             "tinyxml2",
             "libabseil",
-            "libprotobuf",
-            "dlfcn-win32"
+            "libprotobuf"
           ],
           "run": [
             "python"
           ]
         },
-        "script": "bld_cxx.bat",
-        "test": {
-          "commands": [
-            "if not exist %PREFIX%\\\\Library\\\\include\\\\gz\\\\msgs11\\\\gz\\\\msgs.hh exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\lib\\\\gz-msgs11.lib exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\bin\\\\gz-msgs11.dll exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\lib\\\\cmake\\\\gz-msgs11\\\\gz-msgs11-config.cmake exit 1"
-          ]
-        }
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake"
+            ]
+          }
+        ]
       },
       {
         "build": {
-          "noarch": "python",
-          "string": "protobuf5h1234567_0"
-        },
-        "name": "gz-msgs11-python",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_compiler_stub",
-            "c_stdlib_stub",
-            "ninja",
-            "cmake",
-            "pkg-config",
-            "python 3.9"
-          ],
-          "host": [
-            "libgz-math8",
-            "libgz-tools2",
-            "tinyxml2",
-            "libabseil",
-            "libprotobuf",
-            "python 3.9",
-            "protobuf 5.29.3",
-            "pytest",
-            "dlfcn-win32"
-          ],
-          "run": [
-            "python  >=3.9",
-            "protobuf >=5.29.3,<6.0a0"
-          ]
-        },
-        "script": "bld_py.bat",
-        "test": {
-          "commands": [
-            "pip check"
-          ],
-          "imports": [
-            "gz.msgs11"
-          ],
-          "requires": [
-            "python 3.9",
-            "pip"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libgz-msgs11"
           ]
         },
         "name": "gz-msgs11",
         "requirements": {
+          "build": [],
           "host": [
             "libabseil",
             "libprotobuf"
@@ -2050,36 +2180,61 @@
             "gz-msgs11-python"
           ]
         },
-        "test": {
-          "commands": [
-            "if not exist %PREFIX%\\\\Library\\\\include\\\\gz\\\\msgs11\\\\gz\\\\msgs.hh exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\lib\\\\gz-msgs11.lib exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\bin\\\\gz-msgs11.dll exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\lib\\\\cmake\\\\gz-msgs11\\\\gz-msgs11-config.cmake exit 1"
-          ],
-          "imports": [
-            "gz.msgs11"
-          ],
-          "requires": [
-            "pip"
-          ]
-        }
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake"
+            ]
+          },
+          {
+            "python": {
+              "imports": [
+                "gz.msgs11"
+              ]
+            }
+          }
+        ]
       }
     ],
     "package": {
-      "name": "gz-msgs11",
+      "name": "gz-msgs11-python",
       "version": "11.1.0"
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "patches": [
-          "win_enable_py_tests.patch"
-        ],
-        "sha256": "1eaa47500aa8a6fa65bcf76cf8d03c78d298e6da730ee2371b119dff732b639d",
-        "url": "https://github.com/gazebosim/gz-msgs/archive/gz-msgs11_11.1.0.tar.gz"
-      }
-    ]
+    "requirements": {
+      "build": [
+        "cxx_compiler_stub",
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "ninja",
+        "cmake",
+        "pkg-config",
+        "python"
+      ],
+      "host": [
+        "libgz-math8",
+        "libgz-tools2",
+        "tinyxml2",
+        "libabseil",
+        "libprotobuf",
+        "python 3.9.*",
+        "protobuf 5.29.3.*",
+        "pytest"
+      ],
+      "run": [
+        "python >=3.9",
+        "protobuf >=5.29.3,<6.0a0"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "patches": [
+        "win_enable_py_tests.patch"
+      ],
+      "sha256": "1eaa47500aa8a6fa65bcf76cf8d03c78d298e6da730ee2371b119dff732b639d",
+      "url": "https://github.com/gazebosim/gz-msgs/archive/gz-msgs11_11.1.0.tar.gz"
+    }
   },
   "win_64_requirements": {
     "build": {
@@ -2097,7 +2252,6 @@
     "host": {
       "__set__": true,
       "elements": [
-        "dlfcn-win32",
         "libabseil",
         "libgz-cmake4",
         "libgz-math8",
@@ -2122,8 +2276,7 @@
     "test": {
       "__set__": true,
       "elements": [
-        "pip",
-        "python"
+        "pip"
       ]
     }
   }
