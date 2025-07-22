@@ -35,8 +35,8 @@
       "ignore_run_exports_from": [
         "cxx_compiler_stub",
         "cuda_compiler_stub",
-        "nccl",
-        "cuda-cudart-dev"
+        "cuda-cudart-dev",
+        "nccl"
       ],
       "missing_dso_whitelist": [
         "*libcuda.so*",
@@ -44,7 +44,7 @@
         "*libnvidia-ml.so*",
         "*libnccl.so*"
       ],
-      "number": "0",
+      "number": "1",
       "run_exports": [
         "ucc"
       ]
@@ -74,21 +74,18 @@
       ],
       "host": [
         "ucx",
-        "cuda-version 11.8",
-        "cudatoolkit",
-        "nccl",
         "cuda-version 12.9",
         "cuda-cudart-dev",
-        "cuda-nvml-dev"
+        "cuda-nvml-dev",
+        "nccl"
       ],
       "run": [
         "ucx"
       ],
       "run_constrained": [
         "cuda-version",
-        "cudatoolkit",
-        "nccl",
-        "cuda-cudart"
+        "cuda-cudart",
+        "nccl"
       ]
     },
     "schema_version": 0,
@@ -139,7 +136,6 @@
         "cuda-cudart-dev",
         "cuda-nvml-dev",
         "cuda-version",
-        "cudatoolkit",
         "nccl",
         "ucx"
       ]
@@ -168,8 +164,8 @@
       "ignore_run_exports_from": [
         "cxx_compiler_stub",
         "cuda_compiler_stub",
-        "nccl",
-        "cuda-cudart-dev"
+        "cuda-cudart-dev",
+        "nccl"
       ],
       "missing_dso_whitelist": [
         "*libcuda.so*",
@@ -177,7 +173,7 @@
         "*libnvidia-ml.so*",
         "*libnccl.so*"
       ],
-      "number": "0",
+      "number": "1",
       "run_exports": [
         "ucc"
       ]
@@ -207,21 +203,18 @@
       ],
       "host": [
         "ucx",
-        "cuda-version 11.8",
-        "cudatoolkit",
-        "nccl",
         "cuda-version 12.9",
         "cuda-cudart-dev",
-        "cuda-nvml-dev"
+        "cuda-nvml-dev",
+        "nccl"
       ],
       "run": [
         "ucx"
       ],
       "run_constrained": [
         "cuda-version",
-        "cudatoolkit",
-        "nccl",
-        "cuda-cudart"
+        "cuda-cudart",
+        "nccl"
       ]
     },
     "schema_version": 0,
@@ -272,7 +265,6 @@
         "cuda-cudart-dev",
         "cuda-nvml-dev",
         "cuda-version",
-        "cudatoolkit",
         "nccl",
         "ucx"
       ]
@@ -301,8 +293,8 @@
       "ignore_run_exports_from": [
         "cxx_compiler_stub",
         "cuda_compiler_stub",
-        "nccl",
-        "cuda-cudart-dev"
+        "cuda-cudart-dev",
+        "nccl"
       ],
       "missing_dso_whitelist": [
         "*libcuda.so*",
@@ -310,7 +302,7 @@
         "*libnvidia-ml.so*",
         "*libnccl.so*"
       ],
-      "number": "0",
+      "number": "1",
       "run_exports": [
         "ucc"
       ]
@@ -340,21 +332,18 @@
       ],
       "host": [
         "ucx",
-        "cuda-version 11.8",
-        "cudatoolkit",
-        "nccl",
         "cuda-version 12.9",
         "cuda-cudart-dev",
-        "cuda-nvml-dev"
+        "cuda-nvml-dev",
+        "nccl"
       ],
       "run": [
         "ucx"
       ],
       "run_constrained": [
         "cuda-version",
-        "cudatoolkit",
-        "nccl",
-        "cuda-cudart"
+        "cuda-cudart",
+        "nccl"
       ]
     },
     "schema_version": 0,
@@ -400,7 +389,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/ucc.json"
   },
-  "raw_meta_yaml": "{% set version = \"1.4.4\" %}\n\npackage:\n  name: ucc\n  version: {{ version }}\n\nsource:\n  url: https://github.com/openucx/ucc/archive/refs/tags/v{{ version }}.tar.gz\n  sha256: e098e427c7b72b5434ae1e0da2258ab3bc271142c136b0bf4cf40ef9948b70d0\n\nbuild:\n  skip: true  # [not linux]\n  skip: true  # [cuda_compiler_version not in (\"11.8\", \"12.9\")]\n  number: 0\n  run_exports:\n    - {{ pin_subpackage(\"ucc\") }}\n  missing_dso_whitelist:\n    - '*libcuda.so*'\n    - '*libcudart.so*'\n    - '*libnvidia-ml.so*'\n    - '*libnccl.so*'\n  ignore_run_exports_from:\n    # CXX standard library is unused\n    - {{ compiler('cxx') }}\n    # allow CPU-only use cases (xref: conda-forge/ucx-split-feedstock#173)\n    - {{ compiler(\"cuda\") }}\n    - cuda-cudart-dev          # [(cuda_compiler_version or \"None\").startswith(\"12\")]\n    - nccl\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ stdlib('c') }}\n    - {{ compiler('cxx') }}\n    - {{ compiler('cuda') }}\n    - automake\n    - autoconf !=2.72  # work around conda-forge/autoconf-feedstock#41\n    - libtool\n    - make\n  host:\n    - ucx\n    - cuda-version {{ cuda_compiler_version }}\n    - cudatoolkit      # [(cuda_compiler_version or \"None\").startswith(\"11\")]\n    - cuda-cudart-dev  # [(cuda_compiler_version or \"None\").startswith(\"12\")]\n    - cuda-nvml-dev    # [(cuda_compiler_version or \"None\").startswith(\"12\")]\n    - nccl\n  run:\n    - {{ pin_compatible(\"ucx\", max_pin=\"x.x.x\") }}\n  run_constrained:\n    - {{ pin_compatible(\"cuda-version\", min_pin=\"x\", max_pin=\"x\") }}\n    # The actual version constraint comes from cuda-version, so below we explicit list\n    # them only to codify that these are expected (but optional) dependencies when CUDA\n    # is in use, otherwise the solver gets confused (conda-forge/ucc-feedstock#19).\n    - cudatoolkit                                               # [cuda_compiler == \"nvcc\"]\n    - cuda-cudart                                               # [cuda_compiler == \"cuda-nvcc\"]\n    - {{ pin_compatible(\"nccl\", max_pin=\"x\") }}\n\ntest:\n  commands:\n    - test -f $PREFIX/bin/ucc_info\n    - test -f $PREFIX/include/ucc/api/ucc_def.h\n    - test -f $PREFIX/include/ucc/api/ucc_status.h\n    - test -f $PREFIX/include/ucc/api/ucc_version.h\n    - test -f $PREFIX/include/ucc/api/ucc.h\n    - test -f $PREFIX/lib/cmake/ucc/ucc-targets.cmake\n    - test -f $PREFIX/lib/cmake/ucc/ucc-config-version.cmake\n    - test -f $PREFIX/lib/cmake/ucc/ucc-config.cmake\n    - test -f $PREFIX/lib/libucc.so.1\n    - test -f $PREFIX/lib/ucc/libucc_mc_cuda.so.1\n    - test -f $PREFIX/lib/ucc/libucc_mc_cpu.so.1\n    - test -f $PREFIX/lib/ucc/libucc_tl_self.so.1\n    - test -f $PREFIX/lib/ucc/libucc_tl_ucp.so.1\n    - test -f $PREFIX/lib/ucc/libucc_cl_basic.so.1\n    - test -f $PREFIX/lib/ucc/libucc_cl_hier.so.1\n    - test -f $PREFIX/lib/ucc/libucc_ec_cuda.so.1\n    - test -f $PREFIX/lib/ucc/libucc_ec_cpu.so.1\n    - test -f $PREFIX/bin/.ucc-post-link.sh\n\n\nabout:\n  home: https://github.com/openucx/ucc\n  summary: 'UCC is a collective communication operations API and library.'\n  description: |\n    UCC is a collective communication operations API and library that is\n    flexible, complete, and feature-rich for current and emerging\n    programming models and runtimes.\n  license: BSD-3-Clause\n  license_family: BSD\n  license_file: LICENSE\n\nextra:\n  recipe-maintainers:\n    - marcinz\n    - m3vaz\n    - sandeepd-nv\n    - leofang\n",
+  "raw_meta_yaml": "{% set version = \"1.4.4\" %}\n\npackage:\n  name: ucc\n  version: {{ version }}\n\nsource:\n  url: https://github.com/openucx/ucc/archive/refs/tags/v{{ version }}.tar.gz\n  sha256: e098e427c7b72b5434ae1e0da2258ab3bc271142c136b0bf4cf40ef9948b70d0\n\nbuild:\n  skip: true  # [not linux]\n  skip: true  # [cuda_compiler_version not in (\"11.8\", \"12.9\")]\n  number: 1\n  run_exports:\n    - {{ pin_subpackage(\"ucc\") }}\n  missing_dso_whitelist:\n    - '*libcuda.so*'\n    - '*libcudart.so*'\n    - '*libnvidia-ml.so*'\n    - '*libnccl.so*'\n  ignore_run_exports_from:\n    # CXX standard library is unused\n    - {{ compiler('cxx') }}\n    # allow CPU-only use cases (xref: conda-forge/ucx-split-feedstock#173)\n    - {{ compiler(\"cuda\") }}\n    - cuda-cudart-dev          # [(cuda_compiler_version or \"None\").startswith(\"12\")]\n    - nccl\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ stdlib('c') }}\n    - {{ compiler('cxx') }}\n    - {{ compiler('cuda') }}\n    - automake\n    - autoconf !=2.72  # work around conda-forge/autoconf-feedstock#41\n    - libtool\n    - make\n  host:\n    - ucx\n    - cuda-version {{ cuda_compiler_version }}\n    - cudatoolkit      # [(cuda_compiler_version or \"None\").startswith(\"11\")]\n    - cuda-cudart-dev  # [(cuda_compiler_version or \"None\").startswith(\"12\")]\n    - cuda-nvml-dev    # [(cuda_compiler_version or \"None\").startswith(\"12\")]\n    - nccl\n  run:\n    - {{ pin_compatible(\"ucx\", max_pin=\"x.x.x\") }}\n  run_constrained:\n    - {{ pin_compatible(\"cuda-version\", min_pin=\"x\", max_pin=\"x\") }}\n    # The actual version constraint comes from cuda-version, so below we explicit list\n    # them only to codify that these are expected (but optional) dependencies when CUDA\n    # is in use, otherwise the solver gets confused (conda-forge/ucc-feedstock#19).\n    - cudatoolkit                                               # [cuda_compiler == \"nvcc\"]\n    - cuda-cudart                                               # [cuda_compiler == \"cuda-nvcc\"]\n    - {{ pin_compatible(\"nccl\", max_pin=\"x\") }}\n\ntest:\n  commands:\n    - test -f $PREFIX/bin/ucc_info\n    - test -f $PREFIX/include/ucc/api/ucc_def.h\n    - test -f $PREFIX/include/ucc/api/ucc_status.h\n    - test -f $PREFIX/include/ucc/api/ucc_version.h\n    - test -f $PREFIX/include/ucc/api/ucc.h\n    - test -f $PREFIX/lib/cmake/ucc/ucc-targets.cmake\n    - test -f $PREFIX/lib/cmake/ucc/ucc-config-version.cmake\n    - test -f $PREFIX/lib/cmake/ucc/ucc-config.cmake\n    - test -f $PREFIX/lib/libucc.so.1\n    - test -f $PREFIX/lib/ucc/libucc_mc_cuda.so.1\n    - test -f $PREFIX/lib/ucc/libucc_mc_cpu.so.1\n    - test -f $PREFIX/lib/ucc/libucc_tl_self.so.1\n    - test -f $PREFIX/lib/ucc/libucc_tl_ucp.so.1\n    - test -f $PREFIX/lib/ucc/libucc_cl_basic.so.1\n    - test -f $PREFIX/lib/ucc/libucc_cl_hier.so.1\n    - test -f $PREFIX/lib/ucc/libucc_ec_cuda.so.1\n    - test -f $PREFIX/lib/ucc/libucc_ec_cpu.so.1\n    - test -f $PREFIX/bin/.ucc-post-link.sh\n\n\nabout:\n  home: https://github.com/openucx/ucc\n  summary: 'UCC is a collective communication operations API and library.'\n  description: |\n    UCC is a collective communication operations API and library that is\n    flexible, complete, and feature-rich for current and emerging\n    programming models and runtimes.\n  license: BSD-3-Clause\n  license_family: BSD\n  license_file: LICENSE\n\nextra:\n  recipe-maintainers:\n    - marcinz\n    - m3vaz\n    - sandeepd-nv\n    - leofang\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -412,7 +401,6 @@
       "cuda-nvml-dev",
       "cuda-version",
       "cuda_compiler_stub",
-      "cudatoolkit",
       "cxx_compiler_stub",
       "libtool",
       "make",
@@ -443,7 +431,6 @@
         "cuda-nvml-dev",
         "cuda-version",
         "cuda_compiler_stub",
-        "cudatoolkit",
         "cxx_compiler_stub",
         "nccl",
         "ucx"
@@ -484,9 +471,7 @@
       "elements": [
         "cuda-cudart-dev",
         "cuda-nvml-dev",
-        "cuda-version 11.8",
         "cuda-version 12.9",
-        "cudatoolkit",
         "nccl",
         "ucx"
       ]
