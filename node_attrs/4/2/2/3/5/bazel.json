@@ -48,7 +48,7 @@
     "build": {
       "binary_relocation": false,
       "ignore_prefix_files": true,
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "recipe-maintainers": [
@@ -71,7 +71,7 @@
         "cxx_compiler_stub",
         "sed",
         "openjdk 21.*",
-        "grpc_java_plugin <1.70",
+        "grpc_java_plugin",
         "libgrpc",
         "libprotobuf",
         "ijar 8.3.1",
@@ -180,7 +180,7 @@
     "build": {
       "binary_relocation": false,
       "ignore_prefix_files": true,
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "recipe-maintainers": [
@@ -203,7 +203,7 @@
         "cxx_compiler_stub",
         "sed",
         "openjdk 21.*",
-        "grpc_java_plugin <1.70",
+        "grpc_java_plugin",
         "libgrpc",
         "libprotobuf",
         "ijar 8.3.1",
@@ -312,7 +312,7 @@
     "build": {
       "binary_relocation": false,
       "ignore_prefix_files": true,
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "recipe-maintainers": [
@@ -335,7 +335,7 @@
         "cxx_compiler_stub",
         "sed",
         "openjdk 21.*",
-        "grpc_java_plugin <1.70",
+        "grpc_java_plugin",
         "libgrpc",
         "libprotobuf",
         "ijar 8.3.1",
@@ -464,7 +464,7 @@
     "build": {
       "binary_relocation": false,
       "ignore_prefix_files": true,
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "recipe-maintainers": [
@@ -487,7 +487,7 @@
         "cxx_compiler_stub",
         "sed",
         "openjdk 21.*",
-        "grpc_java_plugin <1.70",
+        "grpc_java_plugin",
         "libgrpc",
         "libprotobuf",
         "ijar 8.3.1",
@@ -593,7 +593,7 @@
     "build": {
       "binary_relocation": false,
       "ignore_prefix_files": true,
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "recipe-maintainers": [
@@ -616,7 +616,7 @@
         "cxx_compiler_stub",
         "sed",
         "openjdk 21.*",
-        "grpc_java_plugin <1.70",
+        "grpc_java_plugin",
         "libgrpc",
         "libprotobuf",
         "ijar 8.3.1",
@@ -727,7 +727,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/bazel.json"
   },
-  "raw_meta_yaml": "{% set version = \"8.3.1\" %}\n{% set base_url = \"https://github.com/bazelbuild/bazel/releases/download\" %}\n\npackage:\n  name: bazel\n  version: {{ version }}\n\nsource:\n  - url: {{ base_url }}/{{ version }}/bazel-{{ version }}-dist.zip\n    sha256: 79da863df05fa4de79a82c4f9d4e710766f040bc519fd8b184a4d4d51345d5ba\n    patches:\n      # bazel depends on https://github.com/conda-forge/singlejar-feedstock to build,\n      # which patches the same sources; the patches from singlejar should either be\n      # taken over here, or synced back if change is necessary\n      - patches/0001-allow-args-to-be-passed-to-bazel_build.patch  # [unix]\n      - patches/0002-Build-with-native-dependencies.patch          # [unix]\n      - patches/0003-use-C-17.patch                                # [unix]\n      - patches/0004-Use-conda-packages-for-build-tools.patch      # [unix]\n      - patches/0005-grpc-java-plugin-from-build.patch             # [unix]\n      - patches/0006-bazel-bin-loader-path.patch                   # [osx]\n      - patches/0007-Adjust-cross-bazel-resultpath.patch           # [unix]\n      - patches/0008-Install-protobuf-via-maven.patch              # [unix]\n      - patches/0009-Adopt-system-libprotobuf.patch                # [unix]\n      - patches/0010-Enable-new-protobuf-major-release.patch       # [unix]\n      - patches/0011-Add-missing-absl-dependency.patch             # [unix]\n  - url: {{ base_url }}/{{ version }}/bazel-{{ version }}-windows-x86_64.exe  # [win]\n    sha256: a3349d1d9e2327e03344c47244d4832ab14fc78142d050aa5599d85ee26b5f79  # [win]\n\nbuild:\n  number: 0\n  ignore_prefix_files: true\n  binary_relocation: false\n  # We are currently unable to select a JDK toolchain for the build.\n  # This can be re-enabled once someone finds the correct option.\n  skip: true  # [ppc64le]\n\nrequirements:\n  build:\n    - {{ stdlib('c') }}\n    - {{ compiler('c') }}\n    - {{ compiler('cxx') }}\n    - m2-sed                   # [win]\n    - sed                      # [unix]\n    - openjdk 21.*             # [unix]\n    # we need $BUILD_PREFIX/bin/{grpc_cpp_plugin,grpc_java_plugin,protoc}\n    # bazel vendors & expects quite an old grpc-java-plugin; avoid pulling in versions with\n    # https://github.com/grpc/grpc-java/commit/ea8c31c305eac5a6ac9a09de5ea2edb9ed719a31\n    - grpc_java_plugin <1.70   # [unix]\n    - libgrpc                  # [unix]\n    - libprotobuf              # [unix]\n    - ijar {{ version }}       # [unix]\n    - singlejar {{ version }}  # [unix]\n    - bazel-toolchain >=0.2.0  # [unix]\n    - zip                      # [linux]\n    - unzip                    # [linux]\n    - python *                 # [win]\n  host:\n    - libabseil             # [unix]\n    - libgrpc               # [unix]\n    - libprotobuf           # [unix]\n    - protobuf-bazel-rules  # [unix]\n    - openjdk 21.*          # [win]\n    - posix                 # [win]\n  run:\n    - openjdk >=21\n    - posix                    # [win]\n    - ijar {{ version }}       # [unix]\n    - singlejar {{ version }}  # [unix]\n\ntest:\n  requires:\n    - {{ compiler('c') }}\n    - {{ compiler('cxx') }}\n    - bazel-toolchain >=0.2  # [unix]\n  commands:\n    - bazel -h\n    - bazel version\n\nabout:\n  home: https://bazel.build/\n  summary: a fast, scalable, multi-language and extensible build system\n  dev_url: https://github.com/bazelbuild/bazel\n  license: Apache-2.0\n  license_family: Apache\n  license_file: LICENSE\n\nextra:\n  recipe-maintainers:\n    - h-vetinari\n    - nehaljwani\n    - abhi18av\n    - jschueller\n    - adrianchia\n    - xhochy\n",
+  "raw_meta_yaml": "{% set version = \"8.3.1\" %}\n{% set base_url = \"https://github.com/bazelbuild/bazel/releases/download\" %}\n\npackage:\n  name: bazel\n  version: {{ version }}\n\nsource:\n  - url: {{ base_url }}/{{ version }}/bazel-{{ version }}-dist.zip\n    sha256: 79da863df05fa4de79a82c4f9d4e710766f040bc519fd8b184a4d4d51345d5ba\n    patches:\n      # bazel depends on https://github.com/conda-forge/singlejar-feedstock to build,\n      # which patches the same sources; the patches from singlejar should either be\n      # taken over here, or synced back if change is necessary\n      - patches/0001-allow-args-to-be-passed-to-bazel_build.patch  # [unix]\n      - patches/0002-Build-with-native-dependencies.patch          # [unix]\n      - patches/0003-use-C-17.patch                                # [unix]\n      - patches/0004-Use-conda-packages-for-build-tools.patch      # [unix]\n      - patches/0005-grpc-java-plugin-from-build.patch             # [unix]\n      - patches/0006-bazel-bin-loader-path.patch                   # [osx]\n      - patches/0007-Adjust-cross-bazel-resultpath.patch           # [unix]\n      - patches/0008-Install-protobuf-via-maven.patch              # [unix]\n      - patches/0009-Adopt-system-libprotobuf.patch                # [unix]\n      - patches/0010-Enable-new-protobuf-major-release.patch       # [unix]\n      - patches/0011-Add-missing-absl-dependency.patch             # [unix]\n  - url: {{ base_url }}/{{ version }}/bazel-{{ version }}-windows-x86_64.exe  # [win]\n    sha256: a3349d1d9e2327e03344c47244d4832ab14fc78142d050aa5599d85ee26b5f79  # [win]\n\nbuild:\n  number: 1\n  ignore_prefix_files: true\n  binary_relocation: false\n  # We are currently unable to select a JDK toolchain for the build.\n  # This can be re-enabled once someone finds the correct option.\n  skip: true  # [ppc64le]\n\nrequirements:\n  build:\n    - {{ stdlib('c') }}\n    - {{ compiler('c') }}\n    - {{ compiler('cxx') }}\n    - m2-sed                   # [win]\n    - sed                      # [unix]\n    - openjdk 21.*             # [unix]\n    # we need $BUILD_PREFIX/bin/{grpc_cpp_plugin,grpc_java_plugin,protoc}\n    - grpc_java_plugin         # [unix]\n    - libgrpc                  # [unix]\n    - libprotobuf              # [unix]\n    - ijar {{ version }}       # [unix]\n    - singlejar {{ version }}  # [unix]\n    - bazel-toolchain >=0.2.0  # [unix]\n    - zip                      # [linux]\n    - unzip                    # [linux]\n    - python *                 # [win]\n  host:\n    - libabseil             # [unix]\n    - libgrpc               # [unix]\n    - libprotobuf           # [unix]\n    - protobuf-bazel-rules  # [unix]\n    - openjdk 21.*          # [win]\n    - posix                 # [win]\n  run:\n    - openjdk >=21\n    - posix                    # [win]\n    - ijar {{ version }}       # [unix]\n    - singlejar {{ version }}  # [unix]\n\ntest:\n  requires:\n    - {{ compiler('c') }}\n    - {{ compiler('cxx') }}\n    - bazel-toolchain >=0.2  # [unix]\n  commands:\n    - bazel -h\n    - bazel version\n\nabout:\n  home: https://bazel.build/\n  summary: a fast, scalable, multi-language and extensible build system\n  dev_url: https://github.com/bazelbuild/bazel\n  license: Apache-2.0\n  license_family: Apache\n  license_file: LICENSE\n\nextra:\n  recipe-maintainers:\n    - h-vetinari\n    - nehaljwani\n    - abhi18av\n    - jschueller\n    - adrianchia\n    - xhochy\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -816,7 +816,7 @@
         "c_compiler_stub",
         "c_stdlib_stub",
         "cxx_compiler_stub",
-        "grpc_java_plugin <1.70",
+        "grpc_java_plugin",
         "ijar 8.3.1",
         "libgrpc",
         "libprotobuf",
@@ -875,7 +875,7 @@
     "build": {
       "binary_relocation": false,
       "ignore_prefix_files": true,
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "recipe-maintainers": [
