@@ -42,7 +42,7 @@
     },
     "build": {
       "noarch": "python",
-      "number": "3",
+      "number": "4",
       "script": "build_py.sh"
     },
     "extra": {
@@ -265,7 +265,7 @@
     },
     "build": {
       "noarch": "python",
-      "number": "3",
+      "number": "4",
       "script": "build_py.sh"
     },
     "extra": {
@@ -488,7 +488,7 @@
     },
     "build": {
       "noarch": "python",
-      "number": "3",
+      "number": "4",
       "script": "build_py.sh"
     },
     "extra": {
@@ -711,7 +711,7 @@
     },
     "build": {
       "noarch": "python",
-      "number": "3",
+      "number": "4",
       "script": "build_py.sh"
     },
     "extra": {
@@ -1476,7 +1476,7 @@
     },
     "build": {
       "noarch": "python",
-      "number": "3",
+      "number": "4",
       "script": "build_py.sh"
     },
     "extra": {
@@ -1699,7 +1699,7 @@
     },
     "build": {
       "noarch": "python",
-      "number": "3",
+      "number": "4",
       "script": "build_py.sh"
     },
     "extra": {
@@ -1931,7 +1931,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/gz-msgs.json"
   },
-  "raw_meta_yaml": "context:\n  version: \"11.1.0\"\n  major_version: \"11\"\n  component_name: \"msgs\"\n  component_version: \"msgs11\"\n  repo_name: \"gz-msgs\"\n  name: \"gz-msgs11\"\n  cxx_name: \"libgz-msgs11\"\n  python_name: \"gz-msgs11-python\"\n  protobuf_version: \"5.29.3\"\n  protobuf_major_version: \"5\"\n  next_protobuf_major_version: \"6\"\n  build_number: \"3\"\n\nrecipe:\n  name: ${{ name }}\n  version: ${{ version }}\n\nsource:\n  - url: \"https://github.com/gazebosim/${{ repo_name }}/archive/${{ repo_name }}${{ major_version }}_${{ version }}.tar.gz\"\n    sha256: \"1eaa47500aa8a6fa65bcf76cf8d03c78d298e6da730ee2371b119dff732b639d\"\n    patches:\n      - win_enable_py_tests.patch\n\nbuild:\n  number: ${{ build_number }}\n\noutputs:\n  - package:\n      name: ${{ cxx_name }}\n    build:\n      script:\n        - if: unix\n          then: build_cxx.sh\n        - if: win\n          then: bld_cxx.bat\n    requirements:\n      ignore_run_exports:\n        by_name:\n          - python\n          - python_abi\n      build:\n        - ${{ compiler('cxx') }}\n        - ${{ compiler('c') }}\n        - ${{ stdlib('c') }}\n        - ninja\n        - cmake\n        - pkg-config\n        - python ${{ python_min }}.*\n        # Cross-compiling dependencies\n        - if: build_platform != target_platform\n          then:\n            - libgz-cmake4\n            - libgz-math8\n            - libgz-tools2\n            - tinyxml2\n            - libabseil\n            - libprotobuf\n      host:\n        - python ${{ python_min }}.*\n        - libgz-cmake4\n        - libgz-utils3\n        - libgz-math8\n        - libgz-tools2\n        - tinyxml2\n        - libabseil\n        - libprotobuf\n        - if: win\n          then:\n            - dlfcn-win32\n      run:\n        - python\n      run_exports:\n        - ${{ pin_subpackage(cxx_name, upper_bound='x') }}\n  \n    tests:\n      - script:\n        - if: not win\n          then: \n            - test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh\n            - test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}\n            - test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake\n        - if: win\n          then: \n            - if not exist %PREFIX%\\\\Library\\\\include\\\\gz\\\\${{ component_version }}\\\\gz\\\\${{ component_name }}.hh exit 1\n            - if not exist %PREFIX%\\\\Library\\\\lib\\\\${{ name }}.lib exit 1\n            - if not exist %PREFIX%\\\\Library\\\\bin\\\\${{ name }}.dll exit 1\n            - if not exist %PREFIX%\\\\Library\\\\lib\\\\cmake\\\\${{ name }}\\\\${{ name }}-config.cmake exit 1\n\n  - package:\n      name: ${{ python_name }}\n    build:\n      noarch: python\n      string: protobuf${{ protobuf_major_version }}h${{ hash }}_${{ build_number }}\n      script:\n        - if: unix\n          then: build_py.sh\n        - if: win\n          then: bld_py.bat\n    requirements:\n      build:\n        - ${{ compiler('cxx') }}\n        - ${{ compiler('c') }}\n        - ${{ stdlib('c') }}\n        - ninja\n        - cmake\n        - pkg-config\n        - python\n        # Cross-compiling dependencies\n        - if: build_platform != target_platform\n          then:\n            - libgz-math8\n            - libgz-tools2\n            - tinyxml2\n            - libabseil\n            - libprotobuf\n      host:\n        - libgz-math8\n        - libgz-tools2\n        - tinyxml2\n        - libabseil\n        - libprotobuf\n        - python ${{ python_min }}.*\n        - protobuf ${{ protobuf_version }}.*\n        - pytest\n        - if: win\n          then:\n            - dlfcn-win32\n      run:\n        - python >=${{ python_min }}\n        # See https://protobuf.dev/support/cross-version-runtime-guarantee/\n        - protobuf >=${{ protobuf_version }},<${{ next_protobuf_major_version }}.0a0\n\n    tests:\n      - python:\n          imports:\n            - gz.msgs11\n          python_version: ${{ python_min }}.*\n\n  - package:\n      name: ${{ name }}\n    requirements:\n      host:\n        # Manually ensure that libabseil and libprotobuf end up in the hash\n        - libabseil\n        - libprotobuf\n      run:\n        - ${{ pin_subpackage(cxx_name, exact=true) }}\n        - ${{ pin_subpackage(python_name, upper_bound='x.x.x') }}\n      run_exports:\n        - ${{ pin_subpackage(cxx_name, upper_bound='x') }}\n    \n    tests:\n      - script:\n        - if: not win\n          then: \n            - test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh\n            - test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}\n            - test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake\n        - if: win\n          then: \n            - if not exist %PREFIX%\\\\Library\\\\include\\\\gz\\\\${{ component_version }}\\\\gz\\\\${{ component_name }}.hh exit 1\n            - if not exist %PREFIX%\\\\Library\\\\lib\\\\${{ name }}.lib exit 1\n            - if not exist %PREFIX%\\\\Library\\\\bin\\\\${{ name }}.dll exit 1\n            - if not exist %PREFIX%\\\\Library\\\\lib\\\\cmake\\\\${{ name }}\\\\${{ name }}-config.cmake exit 1\n      - python:\n          imports:\n            - gz.msgs11\n      # Regression test for https://github.com/conda-forge/gz-transport-feedstock/pull/68#issuecomment-3106484363\n      # Failed with Error,  Test failed: Failed to copy test files: FileSystem error: 'Path \"/var/folders/vk/nx37ffx50hv5djclhltc26vw0000gn/T/.tmpC44c2n/\" already exists!'\n      # disabled for now\n      # - downstream: gz-transport14-python\n\nabout:\n  homepage: https://github.com/gazebosim/${{ repo_name }}\n  repository: https://github.com/gazebosim/${{ repo_name }}\n  license: \"Apache-2.0\"\n  license_file: \"LICENSE\"\n  summary: \"Messages for Gazebo robot simulation.\"\n\nextra:\n  recipe-maintainers:\n    - wolfv\n    - traversaro\n    - j-rivero\n    - Tobias-Fischer\n",
+  "raw_meta_yaml": "context:\n  version: \"11.1.0\"\n  major_version: \"11\"\n  component_name: \"msgs\"\n  component_version: \"msgs11\"\n  repo_name: \"gz-msgs\"\n  name: \"gz-msgs11\"\n  cxx_name: \"libgz-msgs11\"\n  python_name: \"gz-msgs11-python\"\n  protobuf_version: \"5.29.3\"\n  protobuf_major_version: \"5\"\n  next_protobuf_major_version: \"6\"\n  build_number: \"4\"\n\nrecipe:\n  name: ${{ name }}\n  version: ${{ version }}\n\nsource:\n  - url: \"https://github.com/gazebosim/${{ repo_name }}/archive/${{ repo_name }}${{ major_version }}_${{ version }}.tar.gz\"\n    sha256: \"1eaa47500aa8a6fa65bcf76cf8d03c78d298e6da730ee2371b119dff732b639d\"\n    patches:\n      - win_enable_py_tests.patch\n\nbuild:\n  number: ${{ build_number }}\n\noutputs:\n  - package:\n      name: ${{ cxx_name }}\n    build:\n      script:\n        - if: unix\n          then: build_cxx.sh\n        - if: win\n          then: bld_cxx.bat\n    requirements:\n      ignore_run_exports:\n        by_name:\n          - python\n          - python_abi\n      build:\n        - ${{ compiler('cxx') }}\n        - ${{ compiler('c') }}\n        - ${{ stdlib('c') }}\n        - ninja\n        - cmake\n        - pkg-config\n        - python ${{ python_min }}.*\n        # Cross-compiling dependencies\n        - if: build_platform != target_platform\n          then:\n            - libgz-cmake4\n            - libgz-math8\n            - libgz-tools2\n            - tinyxml2\n            - libabseil\n            - libprotobuf\n      host:\n        - python ${{ python_min }}.*\n        - libgz-cmake4\n        - libgz-utils3\n        - libgz-math8\n        - libgz-tools2\n        - tinyxml2\n        - libabseil\n        - libprotobuf\n        - if: win\n          then:\n            - dlfcn-win32\n      run:\n        - python\n      run_exports:\n        - ${{ pin_subpackage(cxx_name, upper_bound='x') }}\n  \n    tests:\n      - script:\n        - if: not win\n          then: \n            - test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh\n            - test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}\n            - test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake\n        - if: win\n          then: \n            - if not exist %PREFIX%\\\\Library\\\\include\\\\gz\\\\${{ component_version }}\\\\gz\\\\${{ component_name }}.hh exit 1\n            - if not exist %PREFIX%\\\\Library\\\\lib\\\\${{ name }}.lib exit 1\n            - if not exist %PREFIX%\\\\Library\\\\bin\\\\${{ name }}.dll exit 1\n            - if not exist %PREFIX%\\\\Library\\\\lib\\\\cmake\\\\${{ name }}\\\\${{ name }}-config.cmake exit 1\n\n  - package:\n      name: ${{ python_name }}\n    build:\n      noarch: python\n      string: protobuf${{ protobuf_major_version }}h${{ hash }}_${{ build_number }}\n      script:\n        - if: unix\n          then: build_py.sh\n        - if: win\n          then: bld_py.bat\n    requirements:\n      build:\n        - ${{ compiler('cxx') }}\n        - ${{ compiler('c') }}\n        - ${{ stdlib('c') }}\n        - ninja\n        - cmake\n        - pkg-config\n        - python\n        # Cross-compiling dependencies\n        - if: build_platform != target_platform\n          then:\n            - libgz-math8\n            - libgz-tools2\n            - tinyxml2\n            - libabseil\n            - libprotobuf\n      host:\n        - libgz-math8\n        - libgz-tools2\n        - tinyxml2\n        - libabseil\n        - libprotobuf\n        - python ${{ python_min }}.*\n        - protobuf ${{ protobuf_version }}.*\n        - pytest\n        - if: win\n          then:\n            - dlfcn-win32\n      run:\n        - python >=${{ python_min }}\n        # See https://protobuf.dev/support/cross-version-runtime-guarantee/\n        - protobuf >=${{ protobuf_version }},<${{ next_protobuf_major_version }}.0a0\n\n    tests:\n      - python:\n          imports:\n            - gz.msgs11\n          python_version: ${{ python_min }}.*\n\n  - package:\n      name: ${{ name }}\n    requirements:\n      host:\n        # Manually ensure that libabseil and libprotobuf end up in the hash\n        - libabseil\n        - libprotobuf\n      run:\n        - ${{ pin_subpackage(cxx_name, exact=true) }}\n        - ${{ pin_subpackage(python_name, upper_bound='x.x.x') }}\n      run_exports:\n        - ${{ pin_subpackage(cxx_name, upper_bound='x') }}\n    \n    tests:\n      - script:\n        - if: not win\n          then: \n            - test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh\n            - test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}\n            - test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake\n        - if: win\n          then: \n            - if not exist %PREFIX%\\\\Library\\\\include\\\\gz\\\\${{ component_version }}\\\\gz\\\\${{ component_name }}.hh exit 1\n            - if not exist %PREFIX%\\\\Library\\\\lib\\\\${{ name }}.lib exit 1\n            - if not exist %PREFIX%\\\\Library\\\\bin\\\\${{ name }}.dll exit 1\n            - if not exist %PREFIX%\\\\Library\\\\lib\\\\cmake\\\\${{ name }}\\\\${{ name }}-config.cmake exit 1\n      - python:\n          imports:\n            - gz.msgs11\n      # Regression test for https://github.com/conda-forge/gz-transport-feedstock/pull/68#issuecomment-3106484363\n      # Failed with Error,  Test failed: Failed to copy test files: FileSystem error: 'Path \"/var/folders/vk/nx37ffx50hv5djclhltc26vw0000gn/T/.tmpC44c2n/\" already exists!'\n      # disabled for now\n      # - downstream: gz-transport14-python\n\nabout:\n  homepage: https://github.com/gazebosim/${{ repo_name }}\n  repository: https://github.com/gazebosim/${{ repo_name }}\n  license: \"Apache-2.0\"\n  license_file: \"LICENSE\"\n  summary: \"Messages for Gazebo robot simulation.\"\n\nextra:\n  recipe-maintainers:\n    - wolfv\n    - traversaro\n    - j-rivero\n    - Tobias-Fischer\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -2068,7 +2068,7 @@
     },
     "build": {
       "noarch": "python",
-      "number": "3",
+      "number": "4",
       "script": "build_py.sh"
     },
     "extra": {
