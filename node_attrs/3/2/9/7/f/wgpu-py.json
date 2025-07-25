@@ -48,21 +48,25 @@
     },
     "requirements": {
       "host": [
-        "python 3.9",
+        "python 3.10",
         "pip",
         "hatchling"
       ],
       "run": [
-        "python >=3.9",
+        "python >=3.10",
         "cffi >=1.15.0",
         "sniffio",
         "wgpu-native 25.0.2.1",
         "webgpu-headers",
-        "__linux"
+        "__linux",
+        "imgui-bundle >=1.92.0,<2.0a"
       ]
     },
     "schema_version": 0,
     "source": {
+      "patches": [
+        "725.diff"
+      ],
       "sha256": "62be1fbd08295f618d4aaca6c288eea446f532f13218b9545af07fe48b9068c4",
       "url": "https://pypi.org/packages/source/w/wgpu/wgpu-0.23.0.tar.gz"
     },
@@ -76,7 +80,7 @@
       ],
       "requires": [
         "pip",
-        "python 3.9"
+        "python 3.10"
       ]
     }
   },
@@ -98,6 +102,7 @@
       "elements": [
         "__linux",
         "cffi",
+        "imgui-bundle",
         "python",
         "sniffio",
         "webgpu-headers",
@@ -144,27 +149,32 @@
     },
     "requirements": {
       "host": [
-        "python 3.9",
+        "python 3.10",
         "pip",
         "hatchling"
       ],
       "run": [
-        "python >=3.9",
+        "python >=3.10",
         "cffi >=1.15.0",
         "sniffio",
         "wgpu-native 25.0.2.1",
         "webgpu-headers",
         "__linux",
+        "imgui-bundle >=1.92.0,<2.0a",
         "rubicon-objc >=0.4.1",
         "__osx",
         "__win"
       ],
       "run_constrained": [
-        "python *=*_cpython"
+        "python *=*_cpython",
+        "imgui-bundle >=1.92.0,<2.0a"
       ]
     },
     "schema_version": 0,
     "source": {
+      "patches": [
+        "725.diff"
+      ],
       "sha256": "62be1fbd08295f618d4aaca6c288eea446f532f13218b9545af07fe48b9068c4",
       "url": "https://pypi.org/packages/source/w/wgpu/wgpu-0.23.0.tar.gz"
     },
@@ -178,7 +188,7 @@
       ],
       "requires": [
         "pip",
-        "python 3.9"
+        "python 3.10"
       ]
     }
   },
@@ -213,12 +223,12 @@
     },
     "requirements": {
       "host": [
-        "python 3.9",
+        "python 3.10",
         "pip",
         "hatchling"
       ],
       "run": [
-        "python >=3.9",
+        "python >=3.10",
         "cffi >=1.15.0",
         "rubicon-objc >=0.4.1",
         "sniffio",
@@ -227,11 +237,15 @@
         "__osx"
       ],
       "run_constrained": [
-        "python *=*_cpython"
+        "python *=*_cpython",
+        "imgui-bundle >=1.92.0,<2.0a"
       ]
     },
     "schema_version": 0,
     "source": {
+      "patches": [
+        "725.diff"
+      ],
       "sha256": "62be1fbd08295f618d4aaca6c288eea446f532f13218b9545af07fe48b9068c4",
       "url": "https://pypi.org/packages/source/w/wgpu/wgpu-0.23.0.tar.gz"
     },
@@ -245,7 +259,7 @@
       ],
       "requires": [
         "pip",
-        "python 3.9"
+        "python 3.10"
       ]
     }
   },
@@ -297,7 +311,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/wgpu-py.json"
   },
-  "raw_meta_yaml": "{% set version = \"0.23.0\" %}\n\npackage:\n  name: wgpu-py\n  version: {{ version }}\n\nsource:\n  url: https://pypi.org/packages/source/w/wgpu/wgpu-{{ version }}.tar.gz\n  sha256: 62be1fbd08295f618d4aaca6c288eea446f532f13218b9545af07fe48b9068c4\n\nbuild:\n  noarch: python\n  script_env:\n    # Avoid pulling in any binary files during the hatchling building process\n    # https://github.com/pygfx/wgpu-py/pull/669\n    - WGPU_PY_BUILD_NOARCH=1\n  script:\n    # Don't vendor the headers, let them get pulled in by webgpu-headers at runtime\n    - rm wgpu/resources/webgpu.h   # [unix]\n    - rm wgpu/resources/wgpu.h     # [unix]\n    - del wgpu\\resources\\webgpu.h  # [win]\n    - del wgpu\\resources\\wgpu.h    # [win]\n    - {{ PYTHON }} -m pip install . -vv\n  number: 0\n\nrequirements:\n  host:\n    - python {{ python_min }}\n    - pip\n    - hatchling\n  run:\n    - python >={{ python_min }}\n    - cffi >=1.15.0\n    - rubicon-objc >=0.4.1  # [osx]\n    - sniffio\n    # https://github.com/pygfx/wgpu-py/blob/main/wgpu/backends/wgpu_native/__init__.py\n    - wgpu-native 25.0.2.1\n    - webgpu-headers\n    - __linux  # [linux]\n    - __win    # [win]\n    - __osx    # [osx]\n  run_constrained:   # [osx]\n    # seems like rubicon-objc doesn't support pypy...\n    - python *=*_cpython    # [osx]\n\ntest:\n  imports:\n    - wgpu\n    - wgpu.backends.wgpu_native\n  requires:\n    - pip\n    - python {{ python_min }}\n  commands:\n    - pip check\n\nabout:\n  home: https://github.com/pygfx/wgpu-py\n  summary: next generation GPU API for Python\n  license: BSD-2-Clause\n  license_file: LICENSE\n\nextra:\n  recipe-maintainers:\n    - hmaarrfk\n",
+  "raw_meta_yaml": "{% set python_min = \"3.10\" %}\n{% set version = \"0.23.0\" %}\n\npackage:\n  name: wgpu-py\n  version: {{ version }}\n\nsource:\n  url: https://pypi.org/packages/source/w/wgpu/wgpu-{{ version }}.tar.gz\n  sha256: 62be1fbd08295f618d4aaca6c288eea446f532f13218b9545af07fe48b9068c4\n  patches:\n    # Compatibility with imgui-bundle>=1.92\n    - 725.diff\n\nbuild:\n  noarch: python\n  script_env:\n    # Avoid pulling in any binary files during the hatchling building process\n    # https://github.com/pygfx/wgpu-py/pull/669\n    - WGPU_PY_BUILD_NOARCH=1\n  script:\n    # Don't vendor the headers, let them get pulled in by webgpu-headers at runtime\n    - rm wgpu/resources/webgpu.h   # [unix]\n    - rm wgpu/resources/wgpu.h     # [unix]\n    - del wgpu\\resources\\webgpu.h  # [win]\n    - del wgpu\\resources\\wgpu.h    # [win]\n    - {{ PYTHON }} -m pip install . -vv\n  number: 0\n\nrequirements:\n  host:\n    - python {{ python_min }}\n    - pip\n    - hatchling\n  run:\n    - python >={{ python_min }}\n    - cffi >=1.15.0\n    - rubicon-objc >=0.4.1  # [osx]\n    - sniffio\n    # https://github.com/pygfx/wgpu-py/blob/main/wgpu/backends/wgpu_native/__init__.py\n    - wgpu-native 25.0.2.1\n    - webgpu-headers\n    - __linux  # [linux]\n    - __win    # [win]\n    - __osx    # [osx]\n  run_constrained:   # [osx]\n    # seems like rubicon-objc doesn't support pypy...\n    - python *=*_cpython    # [osx]\n    - imgui-bundle >=1.92.0,<2.0a\n\ntest:\n  imports:\n    - wgpu\n    - wgpu.backends.wgpu_native\n  requires:\n    - pip\n    - python {{ python_min }}\n  commands:\n    - pip check\n\nabout:\n  home: https://github.com/pygfx/wgpu-py\n  summary: next generation GPU API for Python\n  license: BSD-2-Clause\n  license_file: LICENSE\n\nextra:\n  recipe-maintainers:\n    - hmaarrfk\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -306,6 +320,7 @@
       "__win",
       "cffi",
       "hatchling",
+      "imgui-bundle",
       "pip",
       "python",
       "rubicon-objc",
@@ -334,6 +349,7 @@
         "__osx",
         "__win",
         "cffi",
+        "imgui-bundle",
         "python",
         "rubicon-objc",
         "sniffio",
@@ -360,7 +376,7 @@
       "elements": [
         "hatchling",
         "pip",
-        "python 3.9"
+        "python 3.10"
       ]
     },
     "run": {
@@ -370,7 +386,8 @@
         "__osx",
         "__win",
         "cffi >=1.15.0",
-        "python >=3.9",
+        "imgui-bundle >=1.92.0,<2.0a",
+        "python >=3.10",
         "rubicon-objc >=0.4.1",
         "sniffio",
         "webgpu-headers",
@@ -381,7 +398,7 @@
       "__set__": true,
       "elements": [
         "pip",
-        "python 3.9"
+        "python 3.10"
       ]
     }
   },
@@ -420,21 +437,25 @@
     },
     "requirements": {
       "host": [
-        "python 3.9",
+        "python 3.10",
         "pip",
         "hatchling"
       ],
       "run": [
-        "python >=3.9",
+        "python >=3.10",
         "cffi >=1.15.0",
         "sniffio",
         "wgpu-native 25.0.2.1",
         "webgpu-headers",
-        "__win"
+        "__win",
+        "imgui-bundle >=1.92.0,<2.0a"
       ]
     },
     "schema_version": 0,
     "source": {
+      "patches": [
+        "725.diff"
+      ],
       "sha256": "62be1fbd08295f618d4aaca6c288eea446f532f13218b9545af07fe48b9068c4",
       "url": "https://pypi.org/packages/source/w/wgpu/wgpu-0.23.0.tar.gz"
     },
@@ -448,7 +469,7 @@
       ],
       "requires": [
         "pip",
-        "python 3.9"
+        "python 3.10"
       ]
     }
   },
@@ -470,6 +491,7 @@
       "elements": [
         "__win",
         "cffi",
+        "imgui-bundle",
         "python",
         "sniffio",
         "webgpu-headers",
