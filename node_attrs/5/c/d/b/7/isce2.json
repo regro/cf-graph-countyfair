@@ -25,7 +25,7 @@
       "summary": "InSAR Scientific Computing Environment"
     },
     "build": {
-      "number": "1"
+      "number": "2"
     },
     "extra": {
       "recipe-maintainers": [
@@ -48,11 +48,11 @@
       ],
       "host": [
         "python",
-        "numpy <2",
+        "numpy",
         "cython",
         "scons",
         "hdf5",
-        "libgdal <3.11",
+        "libgdal",
         "fftw",
         "opencv",
         "libacl",
@@ -64,7 +64,6 @@
       ],
       "run": [
         "python",
-        "numpy",
         "scikit-image",
         "scipy",
         "h5py",
@@ -172,7 +171,6 @@
       "elements": [
         "gdal",
         "h5py",
-        "numpy",
         "openmotif",
         "python",
         "requests",
@@ -201,7 +199,7 @@
       "summary": "InSAR Scientific Computing Environment"
     },
     "build": {
-      "number": "1"
+      "number": "2"
     },
     "extra": {
       "recipe-maintainers": [
@@ -224,11 +222,11 @@
       ],
       "host": [
         "python",
-        "numpy <2",
+        "numpy",
         "cython",
         "scons",
         "hdf5",
-        "libgdal <3.11",
+        "libgdal",
         "fftw",
         "opencv",
         "libacl",
@@ -240,7 +238,6 @@
       ],
       "run": [
         "python",
-        "numpy",
         "scikit-image",
         "scipy",
         "h5py",
@@ -368,7 +365,7 @@
       "summary": "InSAR Scientific Computing Environment"
     },
     "build": {
-      "number": "1"
+      "number": "2"
     },
     "extra": {
       "recipe-maintainers": [
@@ -391,11 +388,11 @@
       ],
       "host": [
         "python",
-        "numpy <2",
+        "numpy",
         "cython",
         "scons",
         "hdf5",
-        "libgdal <3.11",
+        "libgdal",
         "fftw",
         "opencv",
         "openmotif-dev",
@@ -405,7 +402,6 @@
       ],
       "run": [
         "python",
-        "numpy",
         "scikit-image",
         "scipy",
         "h5py",
@@ -511,7 +507,6 @@
       "elements": [
         "gdal",
         "h5py",
-        "numpy",
         "openmotif",
         "python",
         "requests",
@@ -543,7 +538,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/isce2.json"
   },
-  "raw_meta_yaml": "{% set name = \"isce2\" %}\n{% set version = \"2.6.4\" %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  - url: https://github.com/isce-framework/isce2/archive/v{{ version }}.tar.gz\n    sha256: 3b2be8efebb2fce40d9360c90670e02353719c3fdadfcb7cc280beb34fe2ab85\n    folder: isce2\n    patches:\n      # Use LDFLAGS from conda build environment\n      - env-ldflags.patch\n      # Allow argument missmatch for gfortran\n      - argument-missmatch.patch\n      # Fix ` ld: in .../libs/libcosar.a(Cosar.hh), archive member 'Cosar.hh' with length 440 is not mach-o or llvm bitcode file`\n      - cosar-sources.patch\n\nbuild:\n  number: 1\n  skip: true  # [win or py2k]\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ stdlib(\"c\") }}\n    - {{ compiler('cxx') }}\n    - {{ compiler('fortran') }}\n  host:\n    - python\n    - numpy <2  # Pinned in conda_build_config.yml\n    - cython\n    - scons\n    - hdf5\n    - libgdal <3.11  # Pinned in conda_build_config.yml\n    - fftw\n    - opencv\n    - libacl  # [linux]\n    - libgl-devel  # [linux]\n    - openmotif-dev\n    - xorg-libxt\n    - xorg-libxft\n    - xorg-libxmu\n  run:\n    - python\n    - {{ pin_compatible('numpy') }}\n    - scikit-image\n    - scipy\n    - h5py\n    - gdal\n    - xorg-libxt\n    - xorg-libxft\n    - xorg-libxmu\n    - xorg-libxdmcp\n    - openmotif\n    - requests\n    - zstd  # [osx]\n\ntest:\n  imports:\n    - isce\n  commands:\n    - ISCEHOME=`$PYTHON -c \"import isce, os; print(os.path.dirname(isce.__file__))\" | tail -n 1`\n    - ${ISCEHOME}/applications/topsApp.py --help --steps\n    - ${ISCEHOME}/applications/stripmapApp.py --help --steps\n    - ${ISCEHOME}/applications/dem.py --help\n    - ${ISCEHOME}/applications/isce2gis.py -h\n    - ${ISCEHOME}/applications/imageMath.py -h\n    - ${ISCEHOME}/applications/alos2App.py --help --steps\n    - ${ISCEHOME}/applications/alos2burstApp.py --help --steps\n    - python {{ RECIPE_DIR }}/run_test.py\n    - ${ISCEHOME}/bin/mdx  # [not osx]\n\nabout:\n  home: http://github.com/isce-framework/isce2\n  license: Apache-2.0\n  license_family: Apache\n  license_file: isce2/LICENSE-2.0.txt\n  summary: InSAR Scientific Computing Environment\n\n  description: |\n    InSAR Scientific Computing Environment (ISCE) is a framework designed\n    for processing Synthetic Aperture Radar (SAR) And Interferometric SAR\n    (InSAR) data. Currently, ISCE supports processing of data acquired by\n    following platforms - ALOS, ALOS2, COSMO-SkyMed, EnviSAT, ERS,\n    KOMPSAT5,  RadarSAT2, RISAT1, Sentinel1, TerraSAR-X, Tandem-X, \n    and UAVSAR. ISCE can also read some SICD format data.\n\n  doc_url: https://github.com/isce-framework/isce2-docs\n  dev_url: https://github.com/isce-framework/isce2\n\nextra:\n  recipe-maintainers:\n    - jhkennedy\n    - bryanvriel\n    - piyushrpt\n    - rtburns-jpl\n",
+  "raw_meta_yaml": "{% set name = \"isce2\" %}\n{% set version = \"2.6.4\" %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  - url: https://github.com/isce-framework/isce2/archive/v{{ version }}.tar.gz\n    sha256: 3b2be8efebb2fce40d9360c90670e02353719c3fdadfcb7cc280beb34fe2ab85\n    folder: isce2\n    patches:\n      # Use LDFLAGS from conda build environment\n      - env-ldflags.patch\n      # Allow argument missmatch for gfortran\n      - argument-missmatch.patch\n      # Fix ` ld: in .../libs/libcosar.a(Cosar.hh), archive member 'Cosar.hh' with length 440 is not mach-o or llvm bitcode file`\n      - cosar-sources.patch\n\nbuild:\n  number: 2\n  skip: true  # [win]\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ stdlib(\"c\") }}\n    - {{ compiler('cxx') }}\n    - {{ compiler('fortran') }}\n  host:\n    - python\n    - numpy     # Pinned in conda_build_config.yml\n    - cython\n    - scons\n    - hdf5\n    - libgdal   # Pinned in conda_build_config.yml\n    - fftw\n    - opencv\n    - libacl  # [linux]\n    - libgl-devel  # [linux]\n    - openmotif-dev\n    - xorg-libxt\n    - xorg-libxft\n    - xorg-libxmu\n  run:\n    - python\n    - scikit-image\n    - scipy\n    - h5py\n    - gdal\n    - xorg-libxt\n    - xorg-libxft\n    - xorg-libxmu\n    - xorg-libxdmcp\n    - openmotif\n    - requests\n    - zstd  # [osx]\n\ntest:\n  imports:\n    - isce\n  commands:\n    - ISCEHOME=`$PYTHON -c \"import isce, os; print(os.path.dirname(isce.__file__))\" | tail -n 1`\n    - ${ISCEHOME}/applications/topsApp.py --help --steps\n    - ${ISCEHOME}/applications/stripmapApp.py --help --steps\n    - ${ISCEHOME}/applications/dem.py --help\n    - ${ISCEHOME}/applications/isce2gis.py -h\n    - ${ISCEHOME}/applications/imageMath.py -h\n    - ${ISCEHOME}/applications/alos2App.py --help --steps\n    - ${ISCEHOME}/applications/alos2burstApp.py --help --steps\n    - python {{ RECIPE_DIR }}/run_test.py\n    - ${ISCEHOME}/bin/mdx  # [not osx]\n\nabout:\n  home: http://github.com/isce-framework/isce2\n  license: Apache-2.0\n  license_family: Apache\n  license_file: isce2/LICENSE-2.0.txt\n  summary: InSAR Scientific Computing Environment\n\n  description: |\n    InSAR Scientific Computing Environment (ISCE) is a framework designed\n    for processing Synthetic Aperture Radar (SAR) And Interferometric SAR\n    (InSAR) data. Currently, ISCE supports processing of data acquired by\n    following platforms - ALOS, ALOS2, COSMO-SkyMed, EnviSAT, ERS,\n    KOMPSAT5,  RadarSAT2, RISAT1, Sentinel1, TerraSAR-X, Tandem-X, \n    and UAVSAR. ISCE can also read some SICD format data.\n\n  doc_url: https://github.com/isce-framework/isce2-docs\n  dev_url: https://github.com/isce-framework/isce2\n\nextra:\n  recipe-maintainers:\n    - jhkennedy\n    - bryanvriel\n    - piyushrpt\n    - rtburns-jpl\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -617,7 +612,6 @@
         "fortran_compiler_stub",
         "gdal",
         "h5py",
-        "numpy",
         "openmotif",
         "python",
         "requests",
@@ -653,9 +647,9 @@
         "fftw",
         "hdf5",
         "libacl",
-        "libgdal <3.11",
+        "libgdal",
         "libgl-devel",
-        "numpy <2",
+        "numpy",
         "opencv",
         "openmotif-dev",
         "python",
@@ -670,7 +664,6 @@
       "elements": [
         "gdal",
         "h5py",
-        "numpy",
         "openmotif",
         "python",
         "requests",
