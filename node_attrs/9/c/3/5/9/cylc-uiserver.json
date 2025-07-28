@@ -26,7 +26,7 @@
     },
     "build": {
       "noarch": "python",
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "recipe-maintainers": [
@@ -52,7 +52,7 @@
           ],
           "run": [
             "__unix",
-            "python >=3.9,<3.10",
+            "python >=3.9",
             "cylc-flow-base >=8.5,<8.6",
             "ansimarkup >=1",
             "jupyter_server >=2.13",
@@ -180,7 +180,7 @@
       ],
       "run": [
         "__unix",
-        "python >=3.9,<3.10"
+        "python >=3.9"
       ]
     },
     "schema_version": 0,
@@ -243,7 +243,7 @@
     },
     "build": {
       "noarch": "python",
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "recipe-maintainers": [
@@ -269,7 +269,7 @@
           ],
           "run": [
             "__unix",
-            "python >=3.9,<3.10",
+            "python >=3.9",
             "cylc-flow-base >=8.5,<8.6",
             "ansimarkup >=1",
             "jupyter_server >=2.13",
@@ -397,7 +397,7 @@
       ],
       "run": [
         "__unix",
-        "python >=3.9,<3.10"
+        "python >=3.9"
       ]
     },
     "schema_version": 0,
@@ -422,7 +422,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/cylc-uiserver.json"
   },
-  "raw_meta_yaml": "{% set name = \"cylc-uiserver\" %}\n{% set version = \"1.7.0\" %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name.replace('-', '_') }}-{{ version }}.tar.gz\n  sha256: d412d6bd3f8c2df0acc410b5ddffed90cb1611410b1f19566b89095bfc4b96bb\n\nbuild:\n  number: 0\n  noarch: python\n\nrequirements:\n  host:\n    - __unix\n    - python {{ python_min }}\n    - pip\n    - setuptools\n  run:\n    - __unix\n    - python >={{ python_min }},<3.10\n\noutputs:\n  # base package with only required dependencies\n  # (e.g. for single-user setups)\n  - name: {{ name }}-base\n    build:\n      script: python -m pip install . --no-deps --ignore-installed -vv\n      noarch: python\n    requirements:\n      host:\n        - __unix\n        - python {{ python_min }}\n        - pip\n        - setuptools\n      run:\n        - __unix\n        - python >={{ python_min }},<3.10\n        - cylc-flow-base >=8.5,<8.6\n        - ansimarkup >=1\n        - jupyter_server >=2.13\n        - packaging\n        - psutil\n        - tornado >=6.5\n        - traitlets >=5.2.1\n\n        # Transitive dependencies that we directly (lightly) use:\n        - pyzmq\n        - graphene\n        - requests\n\n    test:\n      requires:\n        - python {{ python_min }}\n      files:\n        - tests/test_packaging.py\n      imports:\n        - cylc.flow\n        - cylc.uiserver\n      commands:\n        - cylc version --long\n        - cylc gui --help\n        - command -v jupyter-cylc\n        - ./tests/test_packaging.py ui\n        - ./tests/test_packaging.py py.typed\n\n  # UIS with the JupyterHub \"base\" package\n  # (e.g. for sites that provide their own configurable HTTP proxy)\n  - name: {{ name }}-hub-base\n    build:\n      script: python -m pip install .[hub] --no-deps --ignore-installed -vv\n      noarch: python\n    requirements:\n      host:\n        - __unix\n        - python {{ python_min }}\n        - pip\n        - setuptools\n      run:\n        - {{ pin_subpackage(name + \"-base\", exact=True) }}\n        - jupyterhub-base >=4.0.0\n    test:\n      requires:\n        - python {{ python_min }}\n      files:\n        - tests/test_packaging.py\n      imports:\n        - cylc.flow\n        - cylc.uiserver\n      commands:\n        - cylc version --long\n        - cylc gui --help\n        - cylc hubapp --help\n        - command -v jupyter-cylc\n        - command -v jupyter-cylchubapp\n        - ./tests/test_packaging.py ui\n        - ./tests/test_packaging.py py.typed\n\n  # UIS with the full JupyterHub package\n  # (recommended)\n  - name: {{ name }}\n    build:\n      script: python -m pip install .[hub] --no-deps --ignore-installed -vv\n      noarch: python\n    requirements:\n      host:\n        - __unix\n        - python {{ python_min }}\n        - pip\n        - setuptools\n      run:\n        - {{ pin_subpackage(name + \"-base\", exact=True) }}\n        - jupyterhub >=4.0.0\n    test:\n      requires:\n        - python {{ python_min }}\n      files:\n        - tests/test_packaging.py\n      imports:\n        - cylc.flow\n        - cylc.uiserver\n      commands:\n        - cylc version --long\n        - cylc gui --help\n        - cylc hubapp --help\n        - configurable-http-proxy --help\n        - command -v jupyter-cylc\n        - command -v jupyter-cylchubapp\n        - ./tests/test_packaging.py ui\n        - ./tests/test_packaging.py py.typed\n\nabout:\n  home: https://github.com/cylc/cylc-uiserver\n  license: GPL-3.0-only\n  license_family: GPL\n  license_file: COPYING\n  summary: Cylc UI Server\n  description: |\n    This project contains the Cylc UI Server.\n    A JupyterHub-compatible application, used to display\n    the Cylc UI (or simply UI) to users, and to communicate\n    with Workflow Services (WFS).\n  doc_url: https://github.com/cylc/cylc-uiserver\n  dev_url: https://github.com/cylc/cylc-uiserver\n\nextra:\n  recipe-maintainers:\n    - hjoliver\n    - oliver-sanders\n    - MetRonnie\n    - wxtim\n",
+  "raw_meta_yaml": "{% set name = \"cylc-uiserver\" %}\n{% set version = \"1.7.0\" %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name.replace('-', '_') }}-{{ version }}.tar.gz\n  sha256: d412d6bd3f8c2df0acc410b5ddffed90cb1611410b1f19566b89095bfc4b96bb\n\nbuild:\n  number: 1\n  noarch: python\n\nrequirements:\n  host:\n    - __unix\n    - python {{ python_min }}\n    - pip\n    - setuptools\n  run:\n    - __unix\n    - python >={{ python_min }}\n\noutputs:\n  # base package with only required dependencies\n  # (e.g. for single-user setups)\n  - name: {{ name }}-base\n    build:\n      script: python -m pip install . --no-deps --ignore-installed -vv\n      noarch: python\n    requirements:\n      host:\n        - __unix\n        - python {{ python_min }}\n        - pip\n        - setuptools\n      run:\n        - __unix\n        - python >={{ python_min }}\n        - cylc-flow-base >=8.5,<8.6\n        - ansimarkup >=1\n        - jupyter_server >=2.13\n        - packaging\n        - psutil\n        - tornado >=6.5\n        - traitlets >=5.2.1\n\n        # Transitive dependencies that we directly (lightly) use:\n        - pyzmq\n        - graphene\n        - requests\n\n    test:\n      requires:\n        - python {{ python_min }}\n      files:\n        - tests/test_packaging.py\n      imports:\n        - cylc.flow\n        - cylc.uiserver\n      commands:\n        - cylc version --long\n        - cylc gui --help\n        - command -v jupyter-cylc\n        - ./tests/test_packaging.py ui\n        - ./tests/test_packaging.py py.typed\n\n  # UIS with the JupyterHub \"base\" package\n  # (e.g. for sites that provide their own configurable HTTP proxy)\n  - name: {{ name }}-hub-base\n    build:\n      script: python -m pip install .[hub] --no-deps --ignore-installed -vv\n      noarch: python\n    requirements:\n      host:\n        - __unix\n        - python {{ python_min }}\n        - pip\n        - setuptools\n      run:\n        - {{ pin_subpackage(name + \"-base\", exact=True) }}\n        - jupyterhub-base >=4.0.0\n    test:\n      requires:\n        - python {{ python_min }}\n      files:\n        - tests/test_packaging.py\n      imports:\n        - cylc.flow\n        - cylc.uiserver\n      commands:\n        - cylc version --long\n        - cylc gui --help\n        - cylc hubapp --help\n        - command -v jupyter-cylc\n        - command -v jupyter-cylchubapp\n        - ./tests/test_packaging.py ui\n        - ./tests/test_packaging.py py.typed\n\n  # UIS with the full JupyterHub package\n  # (recommended)\n  - name: {{ name }}\n    build:\n      script: python -m pip install .[hub] --no-deps --ignore-installed -vv\n      noarch: python\n    requirements:\n      host:\n        - __unix\n        - python {{ python_min }}\n        - pip\n        - setuptools\n      run:\n        - {{ pin_subpackage(name + \"-base\", exact=True) }}\n        - jupyterhub >=4.0.0\n    test:\n      requires:\n        - python {{ python_min }}\n      files:\n        - tests/test_packaging.py\n      imports:\n        - cylc.flow\n        - cylc.uiserver\n      commands:\n        - cylc version --long\n        - cylc gui --help\n        - cylc hubapp --help\n        - configurable-http-proxy --help\n        - command -v jupyter-cylc\n        - command -v jupyter-cylchubapp\n        - ./tests/test_packaging.py ui\n        - ./tests/test_packaging.py py.typed\n\nabout:\n  home: https://github.com/cylc/cylc-uiserver\n  license: GPL-3.0-only\n  license_family: GPL\n  license_file: COPYING\n  summary: Cylc UI Server\n  description: |\n    This project contains the Cylc UI Server.\n    A JupyterHub-compatible application, used to display\n    the Cylc UI (or simply UI) to users, and to communicate\n    with Workflow Services (WFS).\n  doc_url: https://github.com/cylc/cylc-uiserver\n  dev_url: https://github.com/cylc/cylc-uiserver\n\nextra:\n  recipe-maintainers:\n    - hjoliver\n    - oliver-sanders\n    - MetRonnie\n    - wxtim\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -514,7 +514,7 @@
         "jupyterhub-base >=4.0.0",
         "packaging",
         "psutil",
-        "python >=3.9,<3.10",
+        "python >=3.9",
         "pyzmq",
         "requests",
         "tornado >=6.5",
