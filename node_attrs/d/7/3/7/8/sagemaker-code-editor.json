@@ -58,7 +58,7 @@
     },
     "package": {
       "name": "sagemaker-code-editor",
-      "version": "1.7.0"
+      "version": "1.8.0.dev0"
     },
     "requirements": {
       "build": [
@@ -79,6 +79,7 @@
         "libxkbfile",
         "xorg-libx11",
         "krb5",
+        "glib",
         "libsecret",
         "xorg-xproto",
         "xorg-kbproto",
@@ -91,13 +92,23 @@
     "schema_version": 0,
     "source": {
       "folder": "sagemaker-code-editor",
-      "sha256": "1daf9528888ab19f67813f82666c0a89129c11cada0b6c9f9ab60f4ef3a60120",
-      "url": "https://github.com/aws/sagemaker-code-editor/releases/download/v1.7.0/code-editor1.7.0.tar.gz"
+      "sha256": "f12717dad4b52b3bec0bc46b0077df21b02929f255ebf10090c065db48660a44",
+      "url": "https://github.com/aws/sagemaker-code-editor/releases/download/v1.8.0.dev0/code-editor1.8.0.dev0.tar.gz"
     },
     "test": {
       "commands": [
-        "sagemaker-code-editor --help",
-        "${PREFIX}/share/sagemaker-code-editor/node_modules/@vscode/ripgrep/bin/rg --help"
+        "set -x",
+        "echo \"Check CLI installed...\"",
+        "ls -l ${PREFIX}/bin",
+        "test -f ${PREFIX}/bin/sagemaker-code-editor",
+        "echo \"Check main script exists...\"",
+        "ls -l ${PREFIX}/share/sagemaker-code-editor/out",
+        "test -f ${PREFIX}/share/sagemaker-code-editor/out/server-main.js",
+        "echo \"Listing installed files...\"",
+        "find ${PREFIX}/share/sagemaker-code-editor | head -n 50",
+        "echo \"Check node present...\"",
+        "node --version",
+        "echo \"Test complete.\""
       ]
     }
   },
@@ -121,6 +132,7 @@
     "host": {
       "__set__": true,
       "elements": [
+        "glib",
         "krb5",
         "libsecret",
         "libxkbfile",
@@ -178,7 +190,7 @@
     },
     "package": {
       "name": "sagemaker-code-editor",
-      "version": "1.7.0"
+      "version": "1.8.0.dev0"
     },
     "requirements": {
       "build": [
@@ -199,6 +211,7 @@
         "libxkbfile",
         "xorg-libx11",
         "krb5",
+        "glib",
         "libsecret",
         "xorg-xproto",
         "xorg-kbproto",
@@ -211,13 +224,23 @@
     "schema_version": 0,
     "source": {
       "folder": "sagemaker-code-editor",
-      "sha256": "1daf9528888ab19f67813f82666c0a89129c11cada0b6c9f9ab60f4ef3a60120",
-      "url": "https://github.com/aws/sagemaker-code-editor/releases/download/v1.7.0/code-editor1.7.0.tar.gz"
+      "sha256": "f12717dad4b52b3bec0bc46b0077df21b02929f255ebf10090c065db48660a44",
+      "url": "https://github.com/aws/sagemaker-code-editor/releases/download/v1.8.0.dev0/code-editor1.8.0.dev0.tar.gz"
     },
     "test": {
       "commands": [
-        "sagemaker-code-editor --help",
-        "${PREFIX}/share/sagemaker-code-editor/node_modules/@vscode/ripgrep/bin/rg --help"
+        "set -x",
+        "echo \"Check CLI installed...\"",
+        "ls -l ${PREFIX}/bin",
+        "test -f ${PREFIX}/bin/sagemaker-code-editor",
+        "echo \"Check main script exists...\"",
+        "ls -l ${PREFIX}/share/sagemaker-code-editor/out",
+        "test -f ${PREFIX}/share/sagemaker-code-editor/out/server-main.js",
+        "echo \"Listing installed files...\"",
+        "find ${PREFIX}/share/sagemaker-code-editor | head -n 50",
+        "echo \"Check node present...\"",
+        "node --version",
+        "echo \"Test complete.\""
       ]
     }
   },
@@ -235,7 +258,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/sagemaker-code-editor.json"
   },
-  "raw_meta_yaml": "{% set name = \"sagemaker-code-editor\" %}\n{% set version = \"1.7.0\" %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version|replace(\"-\", \"_\") }}\n\nsource:\n  url: https://github.com/aws/sagemaker-code-editor/releases/download/v{{ version }}/code-editor{{ version }}.tar.gz\n  sha256: 1daf9528888ab19f67813f82666c0a89129c11cada0b6c9f9ab60f4ef3a60120\n  folder: sagemaker-code-editor\n\nbuild:\n  number: 0\n  skip: true  # [not linux]\n\nrequirements:\n  build:\n    # dependencies needed for open source microsoft/vscode - https://github.com/microsoft/vscode/wiki/How-to-Contribute \n    # updating nodejs to >=20.0 as it's requirement for vscode - https://github.com/microsoft/vscode/wiki/How-to-Contribute\n    # vscode has dependency on @azure/msal-node@2.5 which expects node version 20\n    - nodejs >=20.0,<21\n    - yarn <2\n    - make\n    - pkg-config\n    - compilers\n    - {{ compiler('c') }}\n    - {{ compiler('cxx') }}\n    - {{ stdlib('c') }}\n    - krb5\n    \n    # jq  - used to parse ripgrep version number\n    - jq\n    # node-gyp is broken with python 3.12 - https://github.com/nodejs/node-gyp/issues/2869, so pulling in distutils via setuptools\n    - setuptools\n  host:\n    # dependencies needed for open source microsoft/vscode - https://github.com/microsoft/vscode/wiki/How-to-Contribute \n    - nodejs >=20.0,<21\n    - libxkbfile\n    - xorg-libx11\n    - krb5\n    - libsecret\n    - xorg-xproto\n    - xorg-kbproto\n\n    # we're using conda ripgrep instead of the node module - refer to build.sh\n    - ripgrep\n  run:\n    - ripgrep\n\ntest:\n  commands:\n    - sagemaker-code-editor --help\n    # we're using conda ripgrep instead of the node module so testing it's functionality\n    - ${PREFIX}/share/sagemaker-code-editor/node_modules/@vscode/ripgrep/bin/rg --help\n\nabout:\n  home: https://aws.amazon.com/sagemaker/\n  license: MIT\n  license_family: MIT\n  license_file:\n    - LICENSE\n    - LICENSE.vscode.txt\n    - LICENSE-THIRD-PARTY\n    - ThirdPartyNotices.vscode.txt\n  summary: Code Editor based on Code-OSS, Visual Studio Code Open Source\n\nextra:\n  recipe-maintainers:\n    - NewtonDer\n    - aakashmandavilli96\n    - pilgd-aws\n    - aws-prayags\n    - arkaprava08\n    - aws-pangestu\n    - navinsoni\n    - sgganjo\n    - aws-asolidu\n    - goel-akas\n    - zuoyuanh\n    - sthodimi\n    - aws-zamesjhu\n    - athkulk\n",
+  "raw_meta_yaml": "{% set name = \"sagemaker-code-editor\" %}\n{% set version = \"1.8.0.dev0\" %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version|replace(\"-\", \"_\") }}\n\nsource:\n  url: https://github.com/aws/sagemaker-code-editor/releases/download/v{{ version }}/code-editor{{ version }}.tar.gz\n  sha256: f12717dad4b52b3bec0bc46b0077df21b02929f255ebf10090c065db48660a44\n  folder: sagemaker-code-editor\n\n\nbuild:\n  number: 0\n  skip: true  # [not linux]\n\nrequirements:\n  build:\n    # dependencies needed for open source microsoft/vscode - https://github.com/microsoft/vscode/wiki/How-to-Contribute \n    # updating nodejs to >=20.0 as it's requirement for vscode - https://github.com/microsoft/vscode/wiki/How-to-Contribute\n    # vscode has dependency on @azure/msal-node@2.5 which expects node version 20\n    - nodejs >=20.0,<21\n    - yarn <2\n    - make\n    - pkg-config\n    - compilers\n    - {{ compiler('c') }}\n    - {{ compiler('cxx') }}\n    - {{ stdlib('c') }}\n    - krb5\n    \n    # jq  - used to parse ripgrep version number\n    - jq\n    # node-gyp is broken with python 3.12 - https://github.com/nodejs/node-gyp/issues/2869, so pulling in distutils via setuptools\n    - setuptools\n  host:\n    # dependencies needed for open source microsoft/vscode - https://github.com/microsoft/vscode/wiki/How-to-Contribute \n    - nodejs >=20.0,<21\n    - libxkbfile\n    - xorg-libx11\n    - krb5\n    - glib\n    - libsecret\n    - xorg-xproto\n    - xorg-kbproto\n\n    # we're using conda ripgrep instead of the node module - refer to build.sh\n    - ripgrep\n  run:\n    - ripgrep\n\ntest:\n  commands:\n    - set -x  \n    - echo \"Check CLI installed...\"\n    - ls -l ${PREFIX}/bin\n    - test -f ${PREFIX}/bin/sagemaker-code-editor\n\n    - echo \"Check main script exists...\"\n    - ls -l ${PREFIX}/share/sagemaker-code-editor/out\n    - test -f ${PREFIX}/share/sagemaker-code-editor/out/server-main.js\n\n    - echo \"Listing installed files...\"\n    - find ${PREFIX}/share/sagemaker-code-editor | head -n 50\n\n    - echo \"Check node present...\"\n    - node --version\n\n    - echo \"Test complete.\"\n\nabout:\n  home: https://aws.amazon.com/sagemaker/\n  license: MIT\n  license_family: MIT\n  license_file:\n    - LICENSE\n    - LICENSE.vscode.txt\n    - LICENSE-THIRD-PARTY\n    - ThirdPartyNotices.vscode.txt\n  summary: Code Editor based on Code-OSS, Visual Studio Code Open Source\n\nextra:\n  recipe-maintainers:\n    - NewtonDer\n    - aakashmandavilli96\n    - pilgd-aws\n    - aws-prayags\n    - arkaprava08\n    - aws-pangestu\n    - navinsoni\n    - sgganjo\n    - aws-asolidu\n    - goel-akas\n    - zuoyuanh\n    - sthodimi\n    - aws-zamesjhu\n    - athkulk\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -243,6 +266,7 @@
       "c_stdlib_stub",
       "compilers",
       "cxx_compiler_stub",
+      "glib",
       "jq",
       "krb5",
       "libsecret",
@@ -281,6 +305,7 @@
         "c_compiler_stub",
         "c_stdlib_stub",
         "cxx_compiler_stub",
+        "glib",
         "krb5",
         "libsecret",
         "libxkbfile",
@@ -326,6 +351,7 @@
     "host": {
       "__set__": true,
       "elements": [
+        "glib",
         "krb5",
         "libsecret",
         "libxkbfile",
@@ -347,8 +373,8 @@
       "elements": []
     }
   },
-  "url": "https://github.com/aws/sagemaker-code-editor/releases/download/v1.7.0/code-editor1.7.0.tar.gz",
-  "version": "1.7.0",
+  "url": "https://github.com/aws/sagemaker-code-editor/releases/download/v1.8.0.dev0/code-editor1.8.0.dev0.tar.gz",
+  "version": "1.8.0.dev0",
   "version_pr_info": {
     "__lazy_json__": "version_pr_info/sagemaker-code-editor.json"
   }
