@@ -33,7 +33,7 @@
     },
     "build": {
       "error_overlinking": true,
-      "number": "6"
+      "number": "7"
     },
     "extra": {
       "recipe-maintainers": [
@@ -220,7 +220,7 @@
     },
     "build": {
       "error_overlinking": true,
-      "number": "6"
+      "number": "7"
     },
     "extra": {
       "recipe-maintainers": [
@@ -407,7 +407,7 @@
     },
     "build": {
       "error_overlinking": true,
-      "number": "6"
+      "number": "7"
     },
     "extra": {
       "recipe-maintainers": [
@@ -594,7 +594,7 @@
     },
     "build": {
       "error_overlinking": true,
-      "number": "6"
+      "number": "7"
     },
     "extra": {
       "recipe-maintainers": [
@@ -1189,7 +1189,7 @@
     },
     "build": {
       "error_overlinking": true,
-      "number": "6"
+      "number": "7"
     },
     "extra": {
       "recipe-maintainers": [
@@ -1374,7 +1374,7 @@
     },
     "build": {
       "error_overlinking": true,
-      "number": "6"
+      "number": "7"
     },
     "extra": {
       "recipe-maintainers": [
@@ -1567,7 +1567,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/nds2-client-swig.json"
   },
-  "raw_meta_yaml": "{% set name = \"nds2-client-swig\" %}\n{% set version = \"0.16.12\" %}\n\n{% set nds2_client_version = \"0.16.8\" %}\n\npackage:\n  name: {{ name }}\n  version: {{ version }}\n\nsource:\n  url: http://software.ligo.org/lscsoft/source/{{ name }}-{{ version }}.tar.bz2\n  sha256: d356296f4a137d5e95401b1279e8dbce8b4b7dc8d87d319b09d1a57331caca06\n  patches:\n    - 0001-python-add-linker-flag-for-the-directory-containing-.patch\n    - 0002-python-fix-linking-issues-with-ndscxx.patch\n    - 0003-python-use-undefined-dynamic_lookup-on-macos.patch\n    - 0004-java-fix-linking-issues-with-ndscxx.patch\n    - 0005-Added-JAVA-compatibility-detection-code-to-configura.patch\n    - 0006-cx_python-use-sysconfig-instead-of-distutils.patch\n\nbuild:\n  error_overlinking: true  # [not win]\n  number: 6\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ stdlib(\"c\") }}\n    - {{ compiler('cxx') }}\n    - cmake >=3.6\n    - make  # [unix]\n    - pkg-config\n    - swig >=3.0.7,<4.1.0a0\n  host:\n    - nds2-client {{ nds2_client_version }}\n\ntest:\n  commands:\n    - test -f ${PREFIX}/include/nds2-client/nds.i  # [unix]\n    - test -f ${PREFIX}/include/nds2-client/nds_swig.hh  # [unix]\n\noutputs:\n  - name: nds2-client-swig\n\n  - name: nds2-client-java\n    script: build-java.sh  # [not win]\n    script: build-java.bat  # [win]\n    build:\n      error_overlinking: true\n      ignore_run_exports_from:\n        # we want to ignore libstdcxx, but not libgcc; the latter also comes in through\n        # compiler('c'), and conda keeps that despite ignoring the cxx run-exports\n        - {{ compiler('cxx') }}  # [not osx]\n      # see https://git.ligo.org/nds/nds2-client/-/issues/141\n      skip: true  # [win]\n    requirements:\n      build:\n        - {{ compiler('c') }}\n        - {{ stdlib(\"c\") }}\n        - {{ compiler('cxx') }}\n        - cmake >=3.6\n        - make  # [not win]\n        - openjdk  # [build_platform != target_platform]\n        - pkg-config  # [not win]\n        - swig >=3.0.7,<4.1.0a0\n      host:\n        - openjdk\n        - nds2-client {{ nds2_client_version }}\n        - {{ pin_subpackage('nds2-client-swig', exact=True) }}\n      run:\n        - nds2-client >={{ nds2_client_version }}\n    test:\n      commands:\n        - if not exist %LIBRARY_LIB%\\nds2-client\\java\\nds2.jar exit 1  # [win]\n        - test $(nds-client-config --javaclasspath) == ${PREFIX}/lib/nds2-client/java/nds2.jar  # [unix]\n    about:\n      home: https://wiki.ligo.org/Computing/NDSClient\n      dev_url: https://git.ligo.org/nds/nds2-client.git\n      license: GPL-3.0-or-later\n      license_family: GPL\n      license_file: COPYING\n      summary: Java extensions for NDS2\n      description: This provides Java wrappers for the nds2 client.\n\n  - name: python-nds2-client\n    script: build-python.sh  # [not win]\n    script: build-python.bat  # [win]\n    build:\n      error_overlinking: true\n      ignore_run_exports_from:\n        - {{ compiler('cxx') }}  # [win]\n      skip: true  # [python_impl != 'cpython']\n    requirements:\n      build:\n        - {{ compiler('c') }}\n        - {{ stdlib(\"c\") }}\n        - {{ compiler('cxx') }}\n        - cmake >=3.6\n        - make  # [unix]\n        - pkg-config\n        - swig >=3.0.7,<4.1.0a0\n        # extras for cross-compiling\n        - cross-python_{{ target_platform }}  # [build_platform != target_platform]\n        - numpy                               # [build_platform != target_platform]\n        - python                              # [build_platform != target_platform]\n      host:\n        - libpython  # [win]\n        - nds2-client {{ nds2_client_version }}\n        - {{ pin_subpackage('nds2-client-swig', exact=True) }}\n        - numpy\n        - python\n      run:\n        - nds2-client >={{ nds2_client_version }}\n        - python\n    test:\n      requires:\n        - pytest\n      script: test_nds2.py\n    about:\n      home: https://wiki.ligo.org/Computing/NDSClient\n      dev_url: https://git.ligo.org/nds/nds2-client.git\n      license: GPL-3.0-or-later\n      license_family: GPL\n      license_file: COPYING\n      summary: Python extensions for NDS2\n      description: This provides python wrappers for the nds2 client.\n\nabout:\n  home: https://wiki.ligo.org/Computing/NDSClient\n  dev_url: https://git.ligo.org/nds/nds2-client.git\n  license: GPL-3.0-or-later\n  license_family: GPL\n  license_file: COPYING\n  summary: NDS2 Client interface SWIG wrappings\n  description: This provides SWIG interface files for the NDS2 client.\n\nextra:\n  recipe-maintainers:\n    - duncanmmacleod\n    - emaros\n",
+  "raw_meta_yaml": "{% set name = \"nds2-client-swig\" %}\n{% set version = \"0.16.12\" %}\n\n{% set nds2_client_version = \"0.16.8\" %}\n\npackage:\n  name: {{ name }}\n  version: {{ version }}\n\nsource:\n  url: http://software.ligo.org/lscsoft/source/{{ name }}-{{ version }}.tar.bz2\n  sha256: d356296f4a137d5e95401b1279e8dbce8b4b7dc8d87d319b09d1a57331caca06\n  patches:\n    - 0001-python-add-linker-flag-for-the-directory-containing-.patch\n    - 0002-python-fix-linking-issues-with-ndscxx.patch\n    - 0003-python-use-undefined-dynamic_lookup-on-macos.patch\n    - 0004-java-fix-linking-issues-with-ndscxx.patch\n    - 0005-Added-JAVA-compatibility-detection-code-to-configura.patch\n    - 0006-cx_python-use-sysconfig-instead-of-distutils.patch\n\nbuild:\n  error_overlinking: true  # [not win]\n  number: 7\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ stdlib(\"c\") }}\n    - {{ compiler('cxx') }}\n    - cmake >=3.6\n    - make  # [unix]\n    - pkg-config\n    - swig >=3.0.7,<4.1.0a0\n  host:\n    - nds2-client {{ nds2_client_version }}\n\ntest:\n  commands:\n    - test -f ${PREFIX}/include/nds2-client/nds.i  # [unix]\n    - test -f ${PREFIX}/include/nds2-client/nds_swig.hh  # [unix]\n\noutputs:\n  - name: nds2-client-swig\n\n  - name: nds2-client-java\n    script: build-java.sh  # [not win]\n    script: build-java.bat  # [win]\n    build:\n      error_overlinking: true\n      ignore_run_exports_from:\n        # we want to ignore libstdcxx, but not libgcc; the latter also comes in through\n        # compiler('c'), and conda keeps that despite ignoring the cxx run-exports\n        - {{ compiler('cxx') }}  # [not osx]\n      # see https://git.ligo.org/nds/nds2-client/-/issues/141\n      skip: true  # [win]\n    requirements:\n      build:\n        - {{ compiler('c') }}\n        - {{ stdlib(\"c\") }}\n        - {{ compiler('cxx') }}\n        - cmake >=3.6\n        - make  # [not win]\n        - openjdk  # [build_platform != target_platform]\n        - pkg-config  # [not win]\n        - swig >=3.0.7,<4.1.0a0\n      host:\n        - openjdk\n        - nds2-client {{ nds2_client_version }}\n        - {{ pin_subpackage('nds2-client-swig', exact=True) }}\n      run:\n        - nds2-client >={{ nds2_client_version }}\n    test:\n      commands:\n        - if not exist %LIBRARY_LIB%\\nds2-client\\java\\nds2.jar exit 1  # [win]\n        - test $(nds-client-config --javaclasspath) == ${PREFIX}/lib/nds2-client/java/nds2.jar  # [unix]\n    about:\n      home: https://wiki.ligo.org/Computing/NDSClient\n      dev_url: https://git.ligo.org/nds/nds2-client.git\n      license: GPL-3.0-or-later\n      license_family: GPL\n      license_file: COPYING\n      summary: Java extensions for NDS2\n      description: This provides Java wrappers for the nds2 client.\n\n  - name: python-nds2-client\n    script: build-python.sh  # [not win]\n    script: build-python.bat  # [win]\n    build:\n      error_overlinking: true\n      ignore_run_exports_from:\n        - {{ compiler('cxx') }}  # [win]\n      skip: true  # [python_impl != 'cpython']\n    requirements:\n      build:\n        - {{ compiler('c') }}\n        - {{ stdlib(\"c\") }}\n        - {{ compiler('cxx') }}\n        - cmake >=3.6\n        - make  # [unix]\n        - pkg-config\n        - swig >=3.0.7,<4.1.0a0\n        # extras for cross-compiling\n        - cross-python_{{ target_platform }}  # [build_platform != target_platform]\n        - numpy                               # [build_platform != target_platform]\n        - python                              # [build_platform != target_platform]\n      host:\n        - libpython  # [win]\n        - nds2-client {{ nds2_client_version }}\n        - {{ pin_subpackage('nds2-client-swig', exact=True) }}\n        - numpy\n        - python\n      run:\n        - nds2-client >={{ nds2_client_version }}\n        - python\n    test:\n      requires:\n        - pytest\n      script: test_nds2.py\n    about:\n      home: https://wiki.ligo.org/Computing/NDSClient\n      dev_url: https://git.ligo.org/nds/nds2-client.git\n      license: GPL-3.0-or-later\n      license_family: GPL\n      license_file: COPYING\n      summary: Python extensions for NDS2\n      description: This provides python wrappers for the nds2 client.\n\nabout:\n  home: https://wiki.ligo.org/Computing/NDSClient\n  dev_url: https://git.ligo.org/nds/nds2-client.git\n  license: GPL-3.0-or-later\n  license_family: GPL\n  license_file: COPYING\n  summary: NDS2 Client interface SWIG wrappings\n  description: This provides SWIG interface files for the NDS2 client.\n\nextra:\n  recipe-maintainers:\n    - duncanmmacleod\n    - emaros\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -1685,7 +1685,7 @@
       "summary": "NDS2 Client interface SWIG wrappings"
     },
     "build": {
-      "number": "6"
+      "number": "7"
     },
     "extra": {
       "recipe-maintainers": [
