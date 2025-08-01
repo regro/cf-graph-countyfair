@@ -41,7 +41,7 @@
     "build": {
       "ignore_run_exports_from": null,
       "missing_dso_whitelist": null,
-      "number": "0",
+      "number": "1",
       "rpaths": [
         "lib/R/lib/",
         "lib/"
@@ -72,8 +72,7 @@
       ],
       "run": [
         "r-base"
-      ],
-      "run_constrained": null
+      ]
     },
     "schema_version": 0,
     "source": {
@@ -154,7 +153,7 @@
     "build": {
       "ignore_run_exports_from": null,
       "missing_dso_whitelist": null,
-      "number": "0",
+      "number": "1",
       "rpaths": [
         "lib/R/lib/",
         "lib/"
@@ -185,8 +184,7 @@
       ],
       "run": [
         "r-base"
-      ],
-      "run_constrained": null
+      ]
     },
     "schema_version": 0,
     "source": {
@@ -267,7 +265,7 @@
     "build": {
       "ignore_run_exports_from": null,
       "missing_dso_whitelist": null,
-      "number": "0",
+      "number": "1",
       "rpaths": [
         "lib/R/lib/",
         "lib/"
@@ -298,8 +296,7 @@
       ],
       "run": [
         "r-base"
-      ],
-      "run_constrained": null
+      ]
     },
     "schema_version": 0,
     "source": {
@@ -384,7 +381,7 @@
         "*/Rblas.dll",
         "*/Rlapack.dll"
       ],
-      "number": "0",
+      "number": "1",
       "rpaths": [
         "lib/R/lib/",
         "lib/"
@@ -424,9 +421,6 @@
       ],
       "run": [
         "r-base"
-      ],
-      "run_constrained": [
-        "libstdcxx !=14.3.0,!=15.1.0"
       ]
     },
     "schema_version": 0,
@@ -474,7 +468,7 @@
     "build": {
       "ignore_run_exports_from": null,
       "missing_dso_whitelist": null,
-      "number": "0",
+      "number": "1",
       "rpaths": [
         "lib/R/lib/",
         "lib/"
@@ -505,8 +499,7 @@
       ],
       "run": [
         "r-base"
-      ],
-      "run_constrained": null
+      ]
     },
     "schema_version": 0,
     "source": {
@@ -587,7 +580,7 @@
     "build": {
       "ignore_run_exports_from": null,
       "missing_dso_whitelist": null,
-      "number": "0",
+      "number": "1",
       "rpaths": [
         "lib/R/lib/",
         "lib/"
@@ -618,8 +611,7 @@
       ],
       "run": [
         "r-base"
-      ],
-      "run_constrained": null
+      ]
     },
     "schema_version": 0,
     "source": {
@@ -704,7 +696,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/r-curl.json"
   },
-  "raw_meta_yaml": "{% set version = \"6.4.0\" %}\n{% set posix = 'm2-' if win else '' %}\n\npackage:\n  name: r-curl\n  version: {{ version|replace(\"-\", \"_\") }}\n\nsource:\n  url:\n    - {{ cran_mirror }}/src/contrib/curl_{{ version }}.tar.gz\n    - {{ cran_mirror }}/src/contrib/Archive/curl/curl_{{ version }}.tar.gz\n  sha256: 3bb4dbf892d2c3b4449d67553f2b3b31d9fa23c71fa6af0a287930ae8377ecdb\n  patches:\n    - patches/0001-min-win-libs.patch\n\nbuild:\n  number: 0\n  rpaths:\n    - lib/R/lib/\n    - lib/\n  ignore_run_exports_from:\n    # TODO: See below. Remove explicit dependency when workaround is not needed anymore.\n    - openssl <3.2.0a0  # [unix and r_base != \"4.4\"]\n  missing_dso_whitelist:\n    - '*/R.dll'        # [win]\n    - '*/Rblas.dll'    # [win]\n    - '*/Rlapack.dll'  # [win]\n\nrequirements:\n  build:\n    - cross-r-base {{ r_base }}      # [build_platform != target_platform]\n    - {{ compiler('c') }}            # [not win]\n    - {{ stdlib(\"c\") }}              # [not win]\n    - {{ compiler('m2w64_c') }}      # [win]\n    - {{ stdlib(\"m2w64_c\") }}        # [win]\n    - {{ posix }}filesystem          # [win]\n    - {{ posix }}sed                 # [win]\n    - {{ posix }}grep                # [win]\n    - {{ posix }}autoconf\n    - {{ posix }}automake            # [not win]\n    - {{ posix }}automake-wrapper    # [win]\n    - {{ posix }}pkg-config\n    - {{ posix }}make\n    - {{ posix }}coreutils           # [win]\n    - {{ posix }}zip                 # [win]\n  host:\n    - r-base\n    - libcurl\n    - libnghttp2                     # [win]\n    # Test below (connecting to rest.kegg.jp) triggers upstream issue described in\n    # https://github.com/curl/curl/issues/13389 and https://github.com/openssl/openssl/issues/11378\n    # Building against libcurl built against openssl<3.2 allows to circumvent that issue if needed.\n    # TODO: Remove explicit dependency when workaround is not needed anymore.\n    - openssl <3.2.0a0  # [unix and r_base != \"4.4\"]\n  run:\n    - r-base\n  run_constrained:\n    - libstdcxx !=14.3.0,!=15.1.0           # [win]\n\ntest:\n  requires:\n    - r-httpuv\n    - r-testthat\n    - r-webutils\n    # TODO: See above. Remove explicit dependency when is workaround not needed anymore.\n    - openssl <3.2.0a0  # [unix and r_base != \"4.4\"]\n  source_files:\n    - tests/\n    - tests/testthat\n  commands:\n    - R -e \"library('curl');data.frame(curl_options())\"\n    - R -e \"testthat::test_file('tests/testthat.R', stop_on_failure=TRUE)\"   # [not win]\n    # NB: A couple inconsequential tests failed in the past. Please diligently review logs.\n    - R -e \"testthat::test_file('tests/testthat.R', stop_on_failure=FALSE)\"  # [win]\n    # skip for win or r_base == \"4.4\" because all win and r-base=4.4 build against newer libcurl with openssl>=3.3 dep.\n    - R -e \"invisible(curl::curl_fetch_memory('http://rest.kegg.jp/conv/ncbi-geneid/dme'))\"  # [unix and r_base != \"4.4\"]\nabout:\n  home: https://github.com/jeroen/curl#readme\n  license: MIT\n  summary: The curl() and curl_download() functions provide highly configurable drop-in replacements for base url() and download.file() with better performance, support for encryption (https, ftps), gzip compression, authentication, and other 'libcurl' goodies. The core of the package implements a framework for performing\n    fully customized requests where data can be processed either in memory, on disk, or streaming via the callback or connection interfaces. Some knowledge of 'libcurl' is recommended; for a more-user-friendly web client see the 'httr' package which builds on this package with http specific tools and logic.\n  license_family: MIT\n  license_file:\n    - {{ environ[\"PREFIX\"] }}/lib/R/share/licenses/MIT\n    - LICENSE\n\nextra:\n  recipe-maintainers:\n    - conda-forge/r\n",
+  "raw_meta_yaml": "{% set version = \"6.4.0\" %}\n{% set posix = 'm2-' if win else '' %}\n\npackage:\n  name: r-curl\n  version: {{ version|replace(\"-\", \"_\") }}\n\nsource:\n  url:\n    - {{ cran_mirror }}/src/contrib/curl_{{ version }}.tar.gz\n    - {{ cran_mirror }}/src/contrib/Archive/curl/curl_{{ version }}.tar.gz\n  sha256: 3bb4dbf892d2c3b4449d67553f2b3b31d9fa23c71fa6af0a287930ae8377ecdb\n  patches:\n    - patches/0001-min-win-libs.patch\n\nbuild:\n  number: 1\n  rpaths:\n    - lib/R/lib/\n    - lib/\n  ignore_run_exports_from:\n    # TODO: See below. Remove explicit dependency when workaround is not needed anymore.\n    - openssl <3.2.0a0  # [unix and r_base != \"4.4\"]\n  missing_dso_whitelist:\n    - '*/R.dll'        # [win]\n    - '*/Rblas.dll'    # [win]\n    - '*/Rlapack.dll'  # [win]\n\nrequirements:\n  build:\n    - cross-r-base {{ r_base }}      # [build_platform != target_platform]\n    - {{ compiler('c') }}            # [not win]\n    - {{ stdlib(\"c\") }}              # [not win]\n    - {{ compiler('m2w64_c') }}      # [win]\n    - {{ stdlib(\"m2w64_c\") }}        # [win]\n    - {{ posix }}filesystem          # [win]\n    - {{ posix }}sed                 # [win]\n    - {{ posix }}grep                # [win]\n    - {{ posix }}autoconf\n    - {{ posix }}automake            # [not win]\n    - {{ posix }}automake-wrapper    # [win]\n    - {{ posix }}pkg-config\n    - {{ posix }}make\n    - {{ posix }}coreutils           # [win]\n    - {{ posix }}zip                 # [win]\n  host:\n    - r-base\n    - libcurl\n    - libnghttp2                     # [win]\n    # Test below (connecting to rest.kegg.jp) triggers upstream issue described in\n    # https://github.com/curl/curl/issues/13389 and https://github.com/openssl/openssl/issues/11378\n    # Building against libcurl built against openssl<3.2 allows to circumvent that issue if needed.\n    # TODO: Remove explicit dependency when workaround is not needed anymore.\n    - openssl <3.2.0a0  # [unix and r_base != \"4.4\"]\n  run:\n    - r-base\n\ntest:\n  requires:\n    - r-httpuv\n    - r-testthat\n    - r-webutils\n    # TODO: See above. Remove explicit dependency when is workaround not needed anymore.\n    - openssl <3.2.0a0  # [unix and r_base != \"4.4\"]\n  source_files:\n    - tests/\n    - tests/testthat\n  commands:\n    - R -e \"library('curl');data.frame(curl_options())\"\n    - R -e \"testthat::test_file('tests/testthat.R', stop_on_failure=TRUE)\"   # [not win]\n    # NB: A couple inconsequential tests failed in the past. Please diligently review logs.\n    - R -e \"testthat::test_file('tests/testthat.R', stop_on_failure=FALSE)\"  # [win]\n    # skip for win or r_base == \"4.4\" because all win and r-base=4.4 build against newer libcurl with openssl>=3.3 dep.\n    - R -e \"invisible(curl::curl_fetch_memory('http://rest.kegg.jp/conv/ncbi-geneid/dme'))\"  # [unix and r_base != \"4.4\"]\nabout:\n  home: https://github.com/jeroen/curl#readme\n  license: MIT\n  summary: The curl() and curl_download() functions provide highly configurable drop-in replacements for base url() and download.file() with better performance, support for encryption (https, ftps), gzip compression, authentication, and other 'libcurl' goodies. The core of the package implements a framework for performing\n    fully customized requests where data can be processed either in memory, on disk, or streaming via the callback or connection interfaces. Some knowledge of 'libcurl' is recommended; for a more-user-friendly web client see the 'httr' package which builds on this package with http specific tools and logic.\n  license_family: MIT\n  license_file:\n    - {{ environ[\"PREFIX\"] }}/lib/R/share/licenses/MIT\n    - LICENSE\n\nextra:\n  recipe-maintainers:\n    - conda-forge/r\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -859,7 +851,7 @@
         "*/Rblas.dll",
         "*/Rlapack.dll"
       ],
-      "number": "0",
+      "number": "1",
       "rpaths": [
         "lib/R/lib/",
         "lib/"
@@ -895,9 +887,6 @@
       ],
       "run": [
         "r-base"
-      ],
-      "run_constrained": [
-        "libstdcxx !=14.3.0,!=15.1.0"
       ]
     },
     "schema_version": 0,
