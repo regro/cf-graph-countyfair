@@ -22,12 +22,12 @@
       "summary": "Direct Accelerated Geometry Toolkit"
     },
     "build": {
-      "number": "1",
+      "number": "2",
       "run_exports": [
         "dagmc * mpi_mpich_*",
         "dagmc * mpi_openmpi_*"
       ],
-      "string": "mpi_openmpi_nodoubledown_py311h1234567_1"
+      "string": "mpi_openmpi_nodoubledown_h1234567_2"
     },
     "extra": {
       "recipe-maintainers": [
@@ -147,12 +147,12 @@
       "summary": "Direct Accelerated Geometry Toolkit"
     },
     "build": {
-      "number": "1",
+      "number": "2",
       "run_exports": [
         "dagmc * mpi_mpich_*",
         "dagmc * mpi_openmpi_*"
       ],
-      "string": "mpi_openmpi_nodoubledown_py311h1234567_1"
+      "string": "mpi_openmpi_nodoubledown_h1234567_2"
     },
     "extra": {
       "recipe-maintainers": [
@@ -192,7 +192,10 @@
         "moab * nompi_tempest_*",
         "hdf5 * mpi_openmpi_*",
         "moab * mpi_openmpi_tempest_*",
-        "openmpi"
+        "openmpi",
+        "moab * mpi_mpich_notempest_*",
+        "moab * nompi_notempest_*",
+        "moab * mpi_openmpi_notempest_*"
       ],
       "run": [
         "eigen",
@@ -205,7 +208,10 @@
         "moab * nompi_tempest_*",
         "hdf5 * mpi_openmpi_*",
         "moab * mpi_openmpi_tempest_*",
-        "openmpi"
+        "openmpi",
+        "moab * mpi_mpich_notempest_*",
+        "moab * nompi_notempest_*",
+        "moab * mpi_openmpi_notempest_*"
       ]
     },
     "schema_version": 0,
@@ -231,12 +237,12 @@
       "summary": "Direct Accelerated Geometry Toolkit"
     },
     "build": {
-      "number": "1",
+      "number": "2",
       "run_exports": [
         "dagmc * mpi_mpich_*",
         "dagmc * mpi_openmpi_*"
       ],
-      "string": "mpi_openmpi_nodoubledown_py311h1234567_1"
+      "string": "mpi_openmpi_nodoubledown_h1234567_2"
     },
     "extra": {
       "recipe-maintainers": [
@@ -270,25 +276,25 @@
         "embree",
         "hdf5",
         "hdf5 * mpi_mpich_*",
-        "moab * mpi_mpich_tempest_*",
+        "moab * mpi_mpich_notempest_*",
         "mpich",
         "hdf5 * nompi_*",
-        "moab * nompi_tempest_*",
+        "moab * nompi_notempest_*",
         "hdf5 * mpi_openmpi_*",
-        "moab * mpi_openmpi_tempest_*",
+        "moab * mpi_openmpi_notempest_*",
         "openmpi"
       ],
       "run": [
         "eigen",
         "embree",
         "hdf5 * mpi_mpich_*",
-        "moab * mpi_mpich_tempest_*",
+        "moab * mpi_mpich_notempest_*",
         "zlib",
         "mpich",
         "hdf5 * nompi_*",
-        "moab * nompi_tempest_*",
+        "moab * nompi_notempest_*",
         "hdf5 * mpi_openmpi_*",
-        "moab * mpi_openmpi_tempest_*",
+        "moab * mpi_openmpi_notempest_*",
         "openmpi"
       ]
     },
@@ -360,7 +366,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/dagmc.json"
   },
-  "raw_meta_yaml": "{% set name = \"dagmc\" %}\n{% set version = \"3.2.4\" %}\n{% set build = 1 %}\n\n# ensure mpi is defined (needed for conda-smithy recipe-lint)\n{% set mpi = mpi or 'nompi' %}\n\n{% if mpi == 'nompi' %}\n# prioritize nompi variant via build number\n{% set build = build + 100 %}\n{% endif %}\n\n# ensure doubledown is defined \n{% set dd = dd or 'nodoubledown' %}\n\npackage:\n  name: {{ name }}\n  version: {{ version }}\n\nsource:\n  git_url: https://github.com/svalinn/DAGMC.git\n  git_rev: v{{ version }}\n\nbuild:\n  number: {{ build }}\n\n  # add build string so packages can depend on\n  # mpi or nompi variants explicitly:\n  # `dagmc * mpi_mpich_*` for mpich\n  # `dagmc * mpi_openmpi_*` for openmpi\n  # `dagmc * nompi_*` for no mpi\n\n  {% if mpi != 'nompi' %}\n  {% set mpi_prefix = \"mpi_\" + mpi %}\n  {% else %}\n  {% set mpi_prefix = \"nompi\" %}\n  {% endif %}\n\n  {% if dd != 'nodoubledown' %}\n  {% set doubledown_prefix = \"doubledown\" %}\n  {% else %}\n  {% set doubledown_prefix = \"nodoubledown\" %}\n  {% endif %}\n  \n  string: {{ mpi_prefix }}_{{ doubledown_prefix }}_py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ build }}\n\n  {% if mpi != 'nompi' %}\n  run_exports:\n    - {{ name }} * {{ mpi_prefix }}_*\n  {% endif %}\n\n  skip: True  # [win]\n\nrequirements:\n  build:\n    - cmake\n    - make\n    - embree  # [dd != \"nodoubledown\"]\n    - {{ compiler('c') }}\n    - {{ stdlib(\"c\") }}\n    - {{ compiler('cxx') }}\n    - {{ mpi }}  # [mpi != 'nompi']\n  host:\n    - eigen\n    - embree  # [dd != \"nodoubledown\"]\n    # matching MOAB HDF5 host requirements to ensure matched pinning of HDF5 versions\n    - hdf5\n    - hdf5 * {{ mpi_prefix }}_*\n    - moab * {{ mpi_prefix }}_tempest_*\n    - {{ mpi }}  # [mpi != 'nompi']\n  run:\n    - eigen\n    - embree  # [dd != \"nodoubledown\"]\n    - hdf5 * {{ mpi_prefix }}_*\n    - moab * {{ mpi_prefix }}_tempest_*\n    - zlib\n    - {{ mpi }}  # [mpi != 'nompi']\n\ntest:\n   commands:\n     - test -f \"${PREFIX}/bin/make_watertight\"\n     - make_watertight --help\n\nabout:\n  home: https://svalinn.github.io/DAGMC/\n  license: BSD-2-Clause\n  license_file: LICENSE.txt\n  summary: 'Direct Accelerated Geometry Toolkit'\n  description: |\n    Direct Accelerated Geometry Monte Carlo (DAGMC) is a software package that\n    allows users to perform Monte Carlo radiation transport directly on CAD\n    models.\n  dev_url: https://github.com/svalinn/DAGMC\n\nextra:\n  recipe-maintainers:\n    - gonuke\n    - pshriwise\n    - ljacobson64\n    - kkiesling\n    - bam241\n    - ngranda\n    - shimwell\n    - bquan0\n",
+  "raw_meta_yaml": "{% set name = \"dagmc\" %}\n{% set version = \"3.2.4\" %}\n{% set build = 2 %}\n\n# ensure mpi is defined (needed for conda-smithy recipe-lint)\n{% set mpi = mpi or 'nompi' %}\n\n{% if mpi == 'nompi' %}\n# prioritize nompi variant via build number\n{% set build = build + 100 %}\n{% endif %}\n\n# ensure doubledown is defined \n{% set dd = dd or 'nodoubledown' %}\n\npackage:\n  name: {{ name }}\n  version: {{ version }}\n\nsource:\n  git_url: https://github.com/svalinn/DAGMC.git\n  git_rev: v{{ version }}\n\nbuild:\n  number: {{ build }}\n\n  # add build string so packages can depend on\n  # mpi or nompi variants explicitly:\n  # `dagmc * mpi_mpich_*` for mpich\n  # `dagmc * mpi_openmpi_*` for openmpi\n  # `dagmc * nompi_*` for no mpi\n\n  {% if mpi != 'nompi' %}\n  {% set mpi_prefix = \"mpi_\" + mpi %}\n  {% else %}\n  {% set mpi_prefix = \"nompi\" %}\n  {% endif %}\n\n  {% if dd != 'nodoubledown' %}\n  {% set doubledown_prefix = \"doubledown\" %}\n  {% else %}\n  {% set doubledown_prefix = \"nodoubledown\" %}\n  {% endif %}\n  \n  string: {{ mpi_prefix }}_{{ doubledown_prefix }}_h{{ PKG_HASH }}_{{ build }}\n\n  {% if mpi != 'nompi' %}\n  run_exports:\n    - {{ name }} * {{ mpi_prefix }}_*\n  {% endif %}\n\n  skip: True  # [win]\n\nrequirements:\n  build:\n    - cmake\n    - make\n    - embree  # [dd != \"nodoubledown\"]\n    - {{ compiler('c') }}\n    - {{ stdlib(\"c\") }}\n    - {{ compiler('cxx') }}\n    - {{ mpi }}  # [mpi != 'nompi']\n  host:\n    - eigen\n    - embree  # [dd != \"nodoubledown\"]\n    # matching MOAB HDF5 host requirements to ensure matched pinning of HDF5 versions\n    - hdf5\n    - hdf5 * {{ mpi_prefix }}_*\n    - moab * {{ mpi_prefix }}_tempest_*  # [linux]\n    - moab * {{ mpi_prefix }}_notempest_*  # [osx]\n    - {{ mpi }}  # [mpi != 'nompi']\n  run:\n    - eigen\n    - embree  # [dd != \"nodoubledown\"]\n    - hdf5 * {{ mpi_prefix }}_*\n    - moab * {{ mpi_prefix }}_tempest_*  # [linux]\n    - moab * {{ mpi_prefix }}_notempest_*  # [osx]\n    - zlib\n    - {{ mpi }}  # [mpi != 'nompi']\n\ntest:\n   commands:\n     - test -f \"${PREFIX}/bin/make_watertight\"\n     - make_watertight --help\n\nabout:\n  home: https://svalinn.github.io/DAGMC/\n  license: BSD-2-Clause\n  license_file: LICENSE.txt\n  summary: 'Direct Accelerated Geometry Toolkit'\n  description: |\n    Direct Accelerated Geometry Monte Carlo (DAGMC) is a software package that\n    allows users to perform Monte Carlo radiation transport directly on CAD\n    models.\n  dev_url: https://github.com/svalinn/DAGMC\n\nextra:\n  recipe-maintainers:\n    - gonuke\n    - pshriwise\n    - ljacobson64\n    - kkiesling\n    - bam241\n    - ngranda\n    - shimwell\n    - bquan0\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -450,8 +456,11 @@
         "hdf5 * mpi_mpich_*",
         "hdf5 * mpi_openmpi_*",
         "hdf5 * nompi_*",
+        "moab * mpi_mpich_notempest_*",
         "moab * mpi_mpich_tempest_*",
+        "moab * mpi_openmpi_notempest_*",
         "moab * mpi_openmpi_tempest_*",
+        "moab * nompi_notempest_*",
         "moab * nompi_tempest_*",
         "mpich",
         "openmpi"
@@ -465,8 +474,11 @@
         "hdf5 * mpi_mpich_*",
         "hdf5 * mpi_openmpi_*",
         "hdf5 * nompi_*",
+        "moab * mpi_mpich_notempest_*",
         "moab * mpi_mpich_tempest_*",
+        "moab * mpi_openmpi_notempest_*",
         "moab * mpi_openmpi_tempest_*",
+        "moab * nompi_notempest_*",
         "moab * nompi_tempest_*",
         "mpich",
         "openmpi",
