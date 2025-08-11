@@ -34,7 +34,7 @@
       "summary": "Split feedstock providing iconv and libiconv for systems which don't have one (or that cannot convert from/to Unicode.)"
     },
     "build": {
-      "number": "1"
+      "number": "2"
     },
     "extra": {
       "feedstock-name": "libiconv",
@@ -177,7 +177,7 @@
       "summary": "Split feedstock providing iconv and libiconv for systems which don't have one (or that cannot convert from/to Unicode.)"
     },
     "build": {
-      "number": "1"
+      "number": "2"
     },
     "extra": {
       "feedstock-name": "libiconv",
@@ -320,7 +320,7 @@
       "summary": "Split feedstock providing iconv and libiconv for systems which don't have one (or that cannot convert from/to Unicode.)"
     },
     "build": {
-      "number": "1"
+      "number": "2"
     },
     "extra": {
       "feedstock-name": "libiconv",
@@ -463,7 +463,7 @@
       "summary": "Split feedstock providing iconv and libiconv for systems which don't have one (or that cannot convert from/to Unicode.)"
     },
     "build": {
-      "number": "1"
+      "number": "2"
     },
     "extra": {
       "feedstock-name": "libiconv",
@@ -1007,7 +1007,7 @@
       "summary": "Split feedstock providing iconv and libiconv for systems which don't have one (or that cannot convert from/to Unicode.)"
     },
     "build": {
-      "number": "1"
+      "number": "2"
     },
     "extra": {
       "feedstock-name": "libiconv",
@@ -1160,7 +1160,7 @@
       "summary": "Split feedstock providing iconv and libiconv for systems which don't have one (or that cannot convert from/to Unicode.)"
     },
     "build": {
-      "number": "1"
+      "number": "2"
     },
     "extra": {
       "feedstock-name": "libiconv",
@@ -1322,7 +1322,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/libiconv.json"
   },
-  "raw_meta_yaml": "{% set version = \"1.18\" %}\n\npackage:\n  name: libiconv-split\n  version: {{ version }}\n\nsource:\n  url: http://ftp.gnu.org/pub/gnu/libiconv/libiconv-{{ version }}.tar.gz\n  sha256: 3b08f5f4f9b4eb82f151a7040bfd6fe6c6fb922efe4b1659c66ea933276965e8\n  patches:\n    - glibc.patch  # [linux]\n    - CMakeLists.txt.patch  # [win]\n    - config.h.patch  # [win]\n    - configure.cmake.patch  # [win]\n    - utf_8_mac.patch  # [osx]\n\nbuild:\n  number: 1\n\nrequirements:\n  build:\n    - automake  # [osx]\n    - autoconf  # [osx]\n    - groff     # [osx]\n    - gperf     # [osx]\n    - libtool   # [unix]\n    - {{ compiler('c') }}\n    - {{ stdlib('c') }}\n    - cmake <4  # [win]\n    - ninja     # [win]\n    - m2-patch  # [win]\n    - make      # [unix]\n\noutputs:\n  - name: libiconv\n    script: install.sh  # [not win]\n    script: install.bat  # [win]\n    build:\n      run_exports:\n        # Pretty good recently, let's trust them.\n        #   https://abi-laboratory.pro/tracker/timeline/libiconv/\n        - {{ pin_subpackage('libiconv') }}\n    requirements:\n      build:\n        - libtool   # [unix]\n        - {{ compiler('c') }}\n        - {{ stdlib('c') }}\n        - cmake <4  # [win]\n        - ninja     # [win]\n        - m2-patch  # [win]\n        - make      # [unix]\n\n    test:\n      requires:\n        - jq          # [unix]\n        - pkg-config  # [win]\n      commands:\n        # Ensuring iconv executable is not present.\n        # Otherwise the included license is wrong and should be GPL-3.0-only.\n        - test ! -f ${PREFIX}/bin/iconv                   # [unix]\n        - if exist %LIBRARY_PREFIX%\\bin\\iconv.exe exit 1  # [win]\n        # Ensuring libiconv documentation and man pages is not present.\n        # Otherwise inlcuded license is wrong and should be GPL-3.0-only.\n        - test_man_files=$(jq '.files[] | select( . | startswith(\"share/man\"))' $CONDA_PREFIX/conda-meta/{{ PKG_NAME }}-{{ PKG_VERSION }}-${PKG_BUILD_STRING}.json)  # [unix]\n        - if [[ ${test_man_files} ]]; then echo \"found GPL licensed files being packaged ${test_man_files}\"; exit 1; fi  # [unix]\n        - test_doc_files=$(jq '.files[] | select( . | startswith(\"share/doc\"))' $CONDA_PREFIX/conda-meta/{{ PKG_NAME }}-{{ PKG_VERSION }}-${PKG_BUILD_STRING}.json)  # [unix]\n        - if [[ ${test_doc_files} ]]; then echo \"found GPL licensed files being packaged ${test_doc_files}\"; exit 1; fi  # [unix]\n        - if exist \"%LIBRARY_PREFIX%\\share\\man\\man3\\iconv*\" exit 1   # [win]\n        - if exist \"%LIBRARY_PREFIX%\\share\\doc\\iconv*\" exit 1        # [win]\n        # Assert libraries are present\n        - test -f $CONDA_PREFIX/lib/libiconv${SHLIB_EXT}    # [unix]\n        - test -f $CONDA_PREFIX/lib/libcharset${SHLIB_EXT}  # [unix]\n        - if not exist %LIBRARY_PREFIX%\\lib\\iconv.lib exit 1    # [win]\n        - if not exist %LIBRARY_PREFIX%\\lib\\charset.lib exit 1  # [win]\n        - if not exist %LIBRARY_PREFIX%\\bin\\iconv.dll exit 1    # [win]\n        - if not exist %LIBRARY_PREFIX%\\bin\\charset.dll exit 1  # [win]\n        # Regression test for https://github.com/conda-forge/libiconv-feedstock/issues/48\n        - pkg-config --help  # [win]\n    about:\n      home: https://www.gnu.org/software/libiconv/\n      license: LGPL-2.1-only\n      license_file: COPYING.LIB\n      summary: Provides iconv for systems which don't have one (or that cannot convert from/to Unicode.)\n\n  - name: iconv\n    script: install.sh\n    # there is no executable available on windows, see\n    # https://github.com/conda-forge/libiconv-feedstock/pull/7#issuecomment-224392000\n    build:\n      skip: true  # [win]\n    requirements:\n      build:\n        - libtool\n        - {{ compiler('c') }}\n        - {{ stdlib('c') }}\n        - make\n      host:\n        - {{ pin_subpackage('libiconv', exact=True) }}\n      run:\n        - {{ pin_subpackage('libiconv', exact=True) }}\n    test:\n      commands:\n        - iconv --help\n        # print all supported encodings\n        - iconv -l | grep \"UTF-8-MAC\"  # [osx]\n        # Ensure we run the built iconv and not the one from the base system.\n        - test \"$(command -v iconv)\" = \"${PREFIX}/bin/iconv\"  # [unix]\n        # Test working patched-in UTF-8-MAC encoding.\n        - test \"$(printf '\\xc3\\xa4' | iconv --from-code=UTF-8 --to-code=UTF-8-MAC)\" = \"$(printf '\\x61\\xcc\\x88')\"  # [osx]        \n    about:\n      home: https://www.gnu.org/software/libiconv/\n      license: GPL-3.0-only\n      license_file: COPYING\n      summary: Provides iconv for systems which don't have one (or that cannot convert from/to Unicode.)\n\nabout:\n  home: https://www.gnu.org/software/libiconv/\n  license: GPL-3.0-only AND LGPL-2.1-only\n  license_file:\n    - COPYING\n    - COPYING.LIB\n  summary: Split feedstock providing iconv and libiconv for systems which don't have one (or that cannot convert from/to Unicode.)\n\nextra:\n  feedstock-name: libiconv\n  recipe-maintainers:\n    - ocefpaf\n    - jakirkham\n    - jhamman\n    - scopatz\n    - mbargull\n",
+  "raw_meta_yaml": "{% set version = \"1.18\" %}\n\npackage:\n  name: libiconv-split\n  version: {{ version }}\n\nsource:\n  url: http://ftp.gnu.org/pub/gnu/libiconv/libiconv-{{ version }}.tar.gz\n  sha256: 3b08f5f4f9b4eb82f151a7040bfd6fe6c6fb922efe4b1659c66ea933276965e8\n  patches:\n    - glibc.patch  # [linux]\n    - CMakeLists.txt.patch  # [win]\n    - config.h.patch  # [win]\n    - configure.cmake.patch  # [win]\n    - utf_8_mac.patch  # [osx]\n\nbuild:\n  number: 2\n\nrequirements:\n  build:\n    - automake  # [osx]\n    - autoconf  # [osx]\n    - groff     # [osx]\n    - gperf     # [osx]\n    - libtool   # [unix]\n    - {{ compiler('c') }}\n    - {{ stdlib('c') }}\n    - cmake <4  # [win]\n    - ninja     # [win]\n    - m2-patch  # [win]\n    - make      # [unix]\n\noutputs:\n  - name: libiconv\n    script: install.sh  # [not win]\n    script: install.bat  # [win]\n    build:\n      run_exports:\n        # Pretty good recently, let's trust them.\n        #   https://abi-laboratory.pro/tracker/timeline/libiconv/\n        - {{ pin_subpackage('libiconv') }}\n    requirements:\n      build:\n        - libtool   # [unix]\n        - {{ compiler('c') }}\n        - {{ stdlib('c') }}\n        - cmake <4  # [win]\n        - ninja     # [win]\n        - m2-patch  # [win]\n        - make      # [unix]\n\n    test:\n      requires:\n        - jq          # [unix]\n        - pkg-config  # [win]\n      commands:\n        # Ensuring iconv executable is not present.\n        # Otherwise the included license is wrong and should be GPL-3.0-only.\n        - test ! -f ${PREFIX}/bin/iconv                   # [unix]\n        - if exist %LIBRARY_PREFIX%\\bin\\iconv.exe exit 1  # [win]\n        # Ensuring libiconv documentation and man pages is not present.\n        # Otherwise inlcuded license is wrong and should be GPL-3.0-only.\n        - test_man_files=$(jq '.files[] | select( . | startswith(\"share/man\"))' $CONDA_PREFIX/conda-meta/{{ PKG_NAME }}-{{ PKG_VERSION }}-${PKG_BUILD_STRING}.json)  # [unix]\n        - if [[ ${test_man_files} ]]; then echo \"found GPL licensed files being packaged ${test_man_files}\"; exit 1; fi  # [unix]\n        - test_doc_files=$(jq '.files[] | select( . | startswith(\"share/doc\"))' $CONDA_PREFIX/conda-meta/{{ PKG_NAME }}-{{ PKG_VERSION }}-${PKG_BUILD_STRING}.json)  # [unix]\n        - if [[ ${test_doc_files} ]]; then echo \"found GPL licensed files being packaged ${test_doc_files}\"; exit 1; fi  # [unix]\n        - if exist \"%LIBRARY_PREFIX%\\share\\man\\man3\\iconv*\" exit 1   # [win]\n        - if exist \"%LIBRARY_PREFIX%\\share\\doc\\iconv*\" exit 1        # [win]\n        # Assert libraries are present\n        - test -f $CONDA_PREFIX/lib/libiconv${SHLIB_EXT}    # [unix]\n        - test -f $CONDA_PREFIX/lib/libcharset${SHLIB_EXT}  # [unix]\n        - if not exist %LIBRARY_PREFIX%\\lib\\iconv.lib exit 1    # [win]\n        - if not exist %LIBRARY_PREFIX%\\lib\\charset.lib exit 1  # [win]\n        - if not exist %LIBRARY_PREFIX%\\bin\\iconv.dll exit 1    # [win]\n        - if not exist %LIBRARY_PREFIX%\\bin\\charset.dll exit 1  # [win]\n        # Regression test for https://github.com/conda-forge/libiconv-feedstock/issues/48\n        - pkg-config --help  # [win]\n    about:\n      home: https://www.gnu.org/software/libiconv/\n      license: LGPL-2.1-only\n      license_file: COPYING.LIB\n      summary: Provides iconv for systems which don't have one (or that cannot convert from/to Unicode.)\n\n  - name: iconv\n    script: install.sh\n    # there is no executable available on windows, see\n    # https://github.com/conda-forge/libiconv-feedstock/pull/7#issuecomment-224392000\n    build:\n      skip: true  # [win]\n    requirements:\n      build:\n        - libtool\n        - {{ compiler('c') }}\n        - {{ stdlib('c') }}\n        - make\n      host:\n        - {{ pin_subpackage('libiconv', exact=True) }}\n      run:\n        - {{ pin_subpackage('libiconv', exact=True) }}\n    test:\n      commands:\n        - iconv --help\n        # print all supported encodings\n        - iconv -l | grep \"UTF-8-MAC\"  # [osx]\n        # Ensure we run the built iconv and not the one from the base system.\n        - test \"$(command -v iconv)\" = \"${PREFIX}/bin/iconv\"  # [unix]\n        # Test working patched-in UTF-8-MAC encoding.\n        - test \"$(printf '\\xc3\\xa4' | iconv --from-code=UTF-8 --to-code=UTF-8-MAC)\" = \"$(printf '\\x61\\xcc\\x88')\"  # [osx]        \n    about:\n      home: https://www.gnu.org/software/libiconv/\n      license: GPL-3.0-only\n      license_file: COPYING\n      summary: Provides iconv for systems which don't have one (or that cannot convert from/to Unicode.)\n\nabout:\n  home: https://www.gnu.org/software/libiconv/\n  license: GPL-3.0-only AND LGPL-2.1-only\n  license_file:\n    - COPYING\n    - COPYING.LIB\n  summary: Split feedstock providing iconv and libiconv for systems which don't have one (or that cannot convert from/to Unicode.)\n\nextra:\n  feedstock-name: libiconv\n  recipe-maintainers:\n    - ocefpaf\n    - jakirkham\n    - jhamman\n    - scopatz\n    - mbargull\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -1435,7 +1435,7 @@
       "summary": "Split feedstock providing iconv and libiconv for systems which don't have one (or that cannot convert from/to Unicode.)"
     },
     "build": {
-      "number": "1"
+      "number": "2"
     },
     "extra": {
       "feedstock-name": "libiconv",
@@ -1587,7 +1587,7 @@
       "summary": "Split feedstock providing iconv and libiconv for systems which don't have one (or that cannot convert from/to Unicode.)"
     },
     "build": {
-      "number": "1"
+      "number": "2"
     },
     "extra": {
       "feedstock-name": "libiconv",
