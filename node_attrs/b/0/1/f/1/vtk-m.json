@@ -43,7 +43,7 @@
       "summary": "Visualization ToolKit for Many-cores (vtk-m)"
     },
     "build": {
-      "number": "1",
+      "number": "2",
       "run_exports": [
         "vtk-m"
       ],
@@ -56,7 +56,7 @@
         "./smoke_test_build/smoke_test",
         "cmake -GNinja -S $SRC_DIR  -B build $CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=$PREFIX -DCMAKE_BUILD_TYPE=Release -DVTKm_ENABLE_EXAMPLES=OFF -DVTKm_INSTALL_EXAMPLES=OFF -DVTKm_ENABLE_CUDA=OFF  -DVTKm_ENABLE_OPENMP=ON"
       ],
-      "string": "cpu_h1234567_1"
+      "string": "cpu_h1234567_2"
     },
     "extra": {
       "feedstock-name": "vtk-m",
@@ -163,7 +163,7 @@
       "summary": "Visualization ToolKit for Many-cores (vtk-m)"
     },
     "build": {
-      "number": "1",
+      "number": "2",
       "run_exports": [
         "vtk-m"
       ],
@@ -178,7 +178,7 @@
         "cmake -GNinja -S %SRC_DIR% -B build %CMAKE_ARGS% -DCMAKE_INSTALL_PREFIX=%LIBRARY_PREFIX% -DCMAKE_BUILD_TYPE=Release -DVTKm_ENABLE_EXAMPLES=OFF -DVTKm_INSTALL_EXAMPLES=OFF -DVTKm_ENABLE_CUDA=OFF  -DVTKm_ENABLE_OPENMP=ON",
         "cmake --build build -j%CPU_COUNT%"
       ],
-      "string": "cpu_h1234567_1"
+      "string": "cpu_h1234567_2"
     },
     "extra": {
       "feedstock-name": "vtk-m",
@@ -324,7 +324,7 @@
       "summary": "Visualization ToolKit for Many-cores (vtk-m)"
     },
     "build": {
-      "number": "1",
+      "number": "2",
       "run_exports": [
         "vtk-m"
       ],
@@ -336,7 +336,7 @@
         "cmake --build smoke_test_build",
         "./smoke_test_build/smoke_test"
       ],
-      "string": "cpu_h1234567_1"
+      "string": "cpu_h1234567_2"
     },
     "extra": {
       "feedstock-name": "vtk-m",
@@ -439,7 +439,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/vtk-m.json"
   },
-  "raw_meta_yaml": "{% set platform_dependent_flags = \" -DVTKm_ENABLE_OPENMP=ON\" %}  # [unix]\n{% set name = \"vtk-m\" %}\n{% set version = \"2.3.0\" %}\n{% set build = 1 %}\n{% set sha256 = \"63f1a0273227463a1be38c046630ea6f606ed958543fe6ff64eb6bb6513a6013\" %}\n{% set soversion = version.split('.')[0] + \".\" + version.split('.')[1] %}\n{% set platform_dependent_flags = \"\" %}\n{% set platform_dependent_flags = \" -DVTKm_ENABLE_OPENMP=ON\" %}  # [unix]\n{% set enable_cuda = \"-DVTKm_ENABLE_CUDA=OFF\" %}\n{% if cuda_compiler_version != \"None\" %}\n  {% set enable_cuda = \"-DCMAKE_CUDA_SEPARABLE_COMPILATION=ON -DVTKm_ENABLE_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES='70-real;86-virtual'\" %}\n{% endif %}\n{% set common_flags = \"-DCMAKE_BUILD_TYPE=Release -DVTKm_ENABLE_EXAMPLES=OFF -DVTKm_INSTALL_EXAMPLES=OFF\" + \" \" + enable_cuda + \" \" + platform_dependent_flags %}\n{% set vtkm_modules = [\n       'cont',\n       'filter_clean_grid',\n       'filter_connected_components',\n       'filter_contour',\n       'filter_core',\n       'filter_density_estimate',\n       'filter_entity_extraction',\n       'filter_field_conversion',\n       'filter_field_transform',\n       'filter_flow',\n       'filter_geometry_refinement',\n       'filter_image_processing',\n       'filter_mesh_info',\n       'filter_multi_block',\n       'filter_resampling',\n       'filter_scalar_topology',\n       'filter_vector_analysis',\n       'filter_zfp',\n       'io',\n       'rendering',\n       'source',\n       'worklet',\n] %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://gitlab.kitware.com/vtk/vtk-m/-/archive/v{{ version }}/{{ name }}-v{{ version }}.tar.gz\n  sha256: {{ sha256 }}\n\nbuild:\n  number: {{ build }}\n  skip: true  # [cuda_compiler_version != \"None\" and not linux64]\n  skip: true  # [cuda_compiler_version == \"12.6\"]\n  string: \"cuda{{ cuda_compiler_version | replace('.', '') }}_h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}\"  # [cuda_compiler_version != \"None\"]\n  string: \"cpu_h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}\"  # [cuda_compiler_version == \"None\"]\n  script:\n    - cmake -GNinja -S $SRC_DIR  -B build $CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=$PREFIX {{ common_flags }}  # [unix]\n    - cmake -GNinja -S %SRC_DIR% -B build %CMAKE_ARGS% -DCMAKE_INSTALL_PREFIX=%LIBRARY_PREFIX% {{ common_flags }}  # [win]\n    - cmake --build build -j$CPU_COUNT  # [unix]\n    - cmake --build build -j%CPU_COUNT%  # [win]\n    - cmake --install build\n    - VTKm_DIR=$PREFIX cmake -GNinja -S $SRC_DIR/examples/smoke_test/ -B smoke_test_build  # [unix]\n    - cmake --build smoke_test_build  # [unix]\n    - ./smoke_test_build/smoke_test  # [unix]\n  run_exports:\n    - {{ pin_subpackage(name|lower, max_pin='x.x') }}\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ stdlib(\"c\") }}\n    - {{ compiler('cxx') }}\n    - {{ compiler('cuda') }}  # [cuda_compiler_version != \"None\"]\n    - cmake >=3.23\n    - gnuconfig\n    - libgomp      # [linux]\n    - llvm-openmp  # [osx]\n    - ninja\n    - pkg-config\n  host:\n    - hdf5\n\ntest:\n  commands:\n    {% for module in vtkm_modules %}\n    - test -f $PREFIX/lib/libvtkm_{{ module }}-{{ soversion }}.so.{{ version }}  # [linux]\n    - test -f $PREFIX/lib/libvtkm_{{ module }}-{{ soversion }}.{{ version }}.dylib  # [osx]\n    - if not exist %LIBRARY_PREFIX%\\bin\\vtkm_{{ module }}-{{ soversion }}.dll exit 1  # [win]\n    - if not exist %LIBRARY_PREFIX%\\lib\\vtkm_{{ module }}-{{ soversion }}.lib exit 1  # [win]\n    {% endfor %}\n    - if not exist %LIBRARY_PREFIX%\\include\\vtkm-{{ soversion }} exit 1  # [win]\n\nabout:\n  home: https://m.vtk.org/\n  summary: 'Visualization ToolKit for Many-cores (vtk-m)'\n  description: |\n    VTK-m is a toolkit of scientific visualization algorithms for emerging\n    processor architectures. VTK-m supports the fine-grained concurrency for\n    data analysis and visualization algorithms required to drive extreme scale\n    computing by providing abstract models for data and execution that can be\n    applied to a variety of algorithms across many different processor\n    architectures.\n  license: BSD-3-Clause\n  license_family: BSD\n  license_file:\n    - LICENSE.txt\n    - vtkm/thirdparty/diy/vtkmdiy/LICENSE.txt\n    - vtkm/thirdparty/lcl/vtkmlcl/LICENSE.md\n    - vtkm/thirdparty/lodepng/vtkmlodepng/LICENSE\n  doc_url: https://docs-m.vtk.org/latest/\n  dev_url: https://gitlab.kitware.com/vtk/vtk-m\n\nextra:\n  feedstock-name: vtk-m\n  recipe-maintainers:\n    - vicentebolea\n",
+  "raw_meta_yaml": "{% set platform_dependent_flags = \" -DVTKm_ENABLE_OPENMP=ON\" %}  # [unix]\n{% set name = \"vtk-m\" %}\n{% set version = \"2.3.0\" %}\n{% set build = 2 %}\n{% set sha256 = \"63f1a0273227463a1be38c046630ea6f606ed958543fe6ff64eb6bb6513a6013\" %}\n{% set soversion = version.split('.')[0] + \".\" + version.split('.')[1] %}\n{% set platform_dependent_flags = \"\" %}\n{% set platform_dependent_flags = \" -DVTKm_ENABLE_OPENMP=ON\" %}  # [unix]\n{% set enable_cuda = \"-DVTKm_ENABLE_CUDA=OFF\" %}\n{% if cuda_compiler_version != \"None\" %}\n  {% set enable_cuda = \"-DCMAKE_CUDA_SEPARABLE_COMPILATION=ON -DVTKm_ENABLE_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES='70-real;86-virtual'\" %}\n{% endif %}\n{% set common_flags = \"-DCMAKE_BUILD_TYPE=Release -DVTKm_ENABLE_EXAMPLES=OFF -DVTKm_INSTALL_EXAMPLES=OFF\" + \" \" + enable_cuda + \" \" + platform_dependent_flags %}\n{% set vtkm_modules = [\n       'cont',\n       'filter_clean_grid',\n       'filter_connected_components',\n       'filter_contour',\n       'filter_core',\n       'filter_density_estimate',\n       'filter_entity_extraction',\n       'filter_field_conversion',\n       'filter_field_transform',\n       'filter_flow',\n       'filter_geometry_refinement',\n       'filter_image_processing',\n       'filter_mesh_info',\n       'filter_multi_block',\n       'filter_resampling',\n       'filter_scalar_topology',\n       'filter_vector_analysis',\n       'filter_zfp',\n       'io',\n       'rendering',\n       'source',\n       'worklet',\n] %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://gitlab.kitware.com/vtk/vtk-m/-/archive/v{{ version }}/{{ name }}-v{{ version }}.tar.gz\n  sha256: {{ sha256 }}\n\nbuild:\n  number: {{ build }}\n  skip: true  # [cuda_compiler_version != \"None\" and not linux64]\n  skip: true  # [cuda_compiler_version == \"12.6\"]\n  string: \"cuda{{ cuda_compiler_version | replace('.', '') }}_h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}\"  # [cuda_compiler_version != \"None\"]\n  string: \"cpu_h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}\"  # [cuda_compiler_version == \"None\"]\n  script:\n    - cmake -GNinja -S $SRC_DIR  -B build $CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=$PREFIX {{ common_flags }}  # [unix]\n    - cmake -GNinja -S %SRC_DIR% -B build %CMAKE_ARGS% -DCMAKE_INSTALL_PREFIX=%LIBRARY_PREFIX% {{ common_flags }}  # [win]\n    - cmake --build build -j$CPU_COUNT  # [unix]\n    - cmake --build build -j%CPU_COUNT%  # [win]\n    - cmake --install build\n    - VTKm_DIR=$PREFIX cmake -GNinja -S $SRC_DIR/examples/smoke_test/ -B smoke_test_build  # [unix]\n    - cmake --build smoke_test_build  # [unix]\n    - ./smoke_test_build/smoke_test  # [unix]\n  run_exports:\n    - {{ pin_subpackage(name|lower, max_pin='x.x') }}\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ stdlib(\"c\") }}\n    - {{ compiler('cxx') }}\n    - {{ compiler('cuda') }}  # [cuda_compiler_version != \"None\"]\n    - cmake >=3.23\n    - gnuconfig\n    - libgomp  # [linux]\n    - llvm-openmp  # [osx]\n    - ninja\n    - pkg-config\n  host:\n    - hdf5\n\ntest:\n  commands:\n    {% for module in vtkm_modules %}\n    - test -f $PREFIX/lib/libvtkm_{{ module }}-{{ soversion }}.so.{{ version }}  # [linux]\n    - test -f $PREFIX/lib/libvtkm_{{ module }}-{{ soversion }}.{{ version }}.dylib  # [osx]\n    - if not exist %LIBRARY_PREFIX%\\bin\\vtkm_{{ module }}-{{ soversion }}.dll exit 1  # [win]\n    - if not exist %LIBRARY_PREFIX%\\lib\\vtkm_{{ module }}-{{ soversion }}.lib exit 1  # [win]\n    {% endfor %}\n    - if not exist %LIBRARY_PREFIX%\\include\\vtkm-{{ soversion }} exit 1  # [win]\n\nabout:\n  home: https://m.vtk.org/\n  summary: 'Visualization ToolKit for Many-cores (vtk-m)'\n  description: |\n    VTK-m is a toolkit of scientific visualization algorithms for emerging\n    processor architectures. VTK-m supports the fine-grained concurrency for\n    data analysis and visualization algorithms required to drive extreme scale\n    computing by providing abstract models for data and execution that can be\n    applied to a variety of algorithms across many different processor\n    architectures.\n  license: BSD-3-Clause\n  license_family: BSD\n  license_file:\n    - LICENSE.txt\n    - vtkm/thirdparty/diy/vtkmdiy/LICENSE.txt\n    - vtkm/thirdparty/lcl/vtkmlcl/LICENSE.md\n    - vtkm/thirdparty/lodepng/vtkmlodepng/LICENSE\n  doc_url: https://docs-m.vtk.org/latest/\n  dev_url: https://gitlab.kitware.com/vtk/vtk-m\n\nextra:\n  feedstock-name: vtk-m\n  recipe-maintainers:\n    - vicentebolea\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -554,7 +554,7 @@
       "summary": "Visualization ToolKit for Many-cores (vtk-m)"
     },
     "build": {
-      "number": "1",
+      "number": "2",
       "run_exports": [
         "vtk-m"
       ],
@@ -563,7 +563,7 @@
         "cmake --build build -j%CPU_COUNT%",
         "cmake --install build"
       ],
-      "string": "cpu_h1234567_1"
+      "string": "cpu_h1234567_2"
     },
     "extra": {
       "feedstock-name": "vtk-m",
