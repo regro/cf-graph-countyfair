@@ -26,7 +26,7 @@
       "summary": "Ab initio Random Structure Searching (AIRSS) is a very simple, yet powerful and highly parallel, approach to structure prediction."
     },
     "build": {
-      "number": "1"
+      "number": "2"
     },
     "extra": {
       "feedstock-name": "airss",
@@ -44,13 +44,13 @@
         "name": "airss",
         "requirements": {
           "build": [
+            "c_stdlib_stub",
             "c_compiler_stub",
             "fortran_compiler_stub",
             "make",
             "patch"
           ],
           "host": [
-            "spglib 1.16.*",
             "libblas",
             "liblapack"
           ],
@@ -111,6 +111,7 @@
       "__set__": true,
       "elements": [
         "c_compiler_stub",
+        "c_stdlib_stub",
         "fortran_compiler_stub",
         "make",
         "patch"
@@ -120,8 +121,7 @@
       "__set__": true,
       "elements": [
         "libblas",
-        "liblapack",
-        "spglib"
+        "liblapack"
       ]
     },
     "run": {
@@ -150,7 +150,7 @@
       "summary": "Ab initio Random Structure Searching (AIRSS) is a very simple, yet powerful and highly parallel, approach to structure prediction."
     },
     "build": {
-      "number": "1"
+      "number": "2"
     },
     "extra": {
       "feedstock-name": "airss",
@@ -168,13 +168,13 @@
         "name": "airss",
         "requirements": {
           "build": [
+            "c_stdlib_stub",
             "c_compiler_stub",
             "fortran_compiler_stub",
             "make",
             "patch"
           ],
           "host": [
-            "spglib 1.16.*",
             "libblas",
             "liblapack"
           ],
@@ -245,12 +245,13 @@
   "pr_info": {
     "__lazy_json__": "pr_info/airss.json"
   },
-  "raw_meta_yaml": "{% set name = \"airss\" %}\n{% set version = \"0.9.3\" %}\n\npackage:\n  name: {{ name|lower }}-pkg\n  version: {{ version }}\n\nsource:\n  - url: https://www.mtg.msm.cam.ac.uk/files/airss-{{ version }}.tgz \n    sha256: b54c61b2988b3e6ee6d01e8b73fc60d76f36ad47eeb459d1a0358e486195cc13\n    patches:\n      - patches/makefile.patch\n      - patches/no-symmol.patch\n  - url: https://github.com/spglib/spglib/archive/refs/tags/v1.16.5.zip\n    sha256: fa8f6eb0dc7bb0410f517038e3a165ce74549d19c41a8bdbb34864c7141304a1\n    folder: external/spglib/spglib-1.16.5\n\nbuild:\n  number: 1\n  skip: true  # [not linux]\n\noutputs:\n  - name: {{ name }}\n    script: build_airss.sh\n    build:\n      ignore_run_exports:\n        - libblas\n    requirements:\n      build:\n        - {{ compiler('c') }}\n        - {{ compiler('fortran') }}\n        - make\n        - patch\n      host:\n        - spglib 1.16.*\n        - libblas  # needed for proper pinning\n        - liblapack\n      run:\n        - perl\n        - {{ pin_compatible('spglib', max_pin='x.x') }}\n    test:\n      commands:\n        - airss\n        - airss version\n        - test ! -f ${PREFIX}/bin/symmol\n        - test -d ${PREFIX}/libexec/airss\n        - test ! -f ${PREFIX}/libexec/airss/symmol\n\n  - name: {{ name }}-with-default-names\n    script: build_default.sh\n    requirements:\n      run:\n        - {{ pin_subpackage(name, exact=True) }}\n    test:\n      commands:\n        - for bin in $(cat ${RECIPE_DIR}/airss-bin.txt); do test -x ${PREFIX}/bin/$bin; done\n\nabout:\n  home: https://www.mtg.msm.cam.ac.uk/Codes/AIRSS\n  doc_url: https://airss-docs.github.io/\n  summary: >-\n    Ab initio Random Structure Searching (AIRSS) is a very simple,\n    yet powerful and highly parallel, approach to structure prediction.\n  license: GPL-2.0-only\n  license_family: GPL\n  license_file:\n    - LICENCE\n    - external/spglib/spglib-1.16.5/COPYING\n\nextra:\n  recipe-maintainers:\n    - awvwgk\n  feedstock-name: {{ name }}\n",
+  "raw_meta_yaml": "{% set name = \"airss\" %}\n{% set version = \"0.9.3\" %}\n\npackage:\n  name: {{ name|lower }}-pkg\n  version: {{ version }}\n\nsource:\n  - url: https://www.mtg.msm.cam.ac.uk/files/airss-{{ version }}.tgz \n    sha256: b54c61b2988b3e6ee6d01e8b73fc60d76f36ad47eeb459d1a0358e486195cc13\n    patches:\n      - patches/makefile.patch\n      - patches/no-symmol.patch\n  - url: https://github.com/spglib/spglib/archive/refs/tags/v1.16.5.zip\n    sha256: fa8f6eb0dc7bb0410f517038e3a165ce74549d19c41a8bdbb34864c7141304a1\n    folder: external/spglib/spglib-1.16.5\n\nbuild:\n  number: 2\n  skip: true  # [not linux]\n\noutputs:\n  - name: {{ name }}\n    script: build_airss.sh\n    build:\n      ignore_run_exports:\n        - libblas\n    requirements:\n      build:\n        - {{ stdlib('c') }}\n        - {{ compiler('c') }}\n        - {{ compiler('fortran') }}\n        - make\n        - patch\n      host:\n        - libblas  # needed for proper pinning\n        - liblapack\n      run:\n        - perl\n        - {{ pin_compatible('spglib', max_pin='x.x') }}\n    test:\n      commands:\n        - airss\n        - airss version\n        - test ! -f ${PREFIX}/bin/symmol\n        - test -d ${PREFIX}/libexec/airss\n        - test ! -f ${PREFIX}/libexec/airss/symmol\n\n  - name: {{ name }}-with-default-names\n    script: build_default.sh\n    requirements:\n      run:\n        - {{ pin_subpackage(name, exact=True) }}\n    test:\n      commands:\n        - for bin in $(cat ${RECIPE_DIR}/airss-bin.txt); do test -x ${PREFIX}/bin/$bin; done\n\nabout:\n  home: https://www.mtg.msm.cam.ac.uk/Codes/AIRSS\n  doc_url: https://airss-docs.github.io/\n  summary: >-\n    Ab initio Random Structure Searching (AIRSS) is a very simple,\n    yet powerful and highly parallel, approach to structure prediction.\n  license: GPL-2.0-only\n  license_family: GPL\n  license_file:\n    - LICENCE\n    - external/spglib/spglib-1.16.5/COPYING\n\nextra:\n  recipe-maintainers:\n    - awvwgk\n  feedstock-name: {{ name }}\n",
   "req": {
     "__set__": true,
     "elements": [
       "airss",
       "c_compiler_stub",
+      "c_stdlib_stub",
       "fortran_compiler_stub",
       "libblas",
       "liblapack",
@@ -265,6 +266,7 @@
       "__set__": true,
       "elements": [
         "c_compiler_stub",
+        "c_stdlib_stub",
         "fortran_compiler_stub",
         "make",
         "patch"
@@ -274,10 +276,10 @@
       "__set__": true,
       "elements": [
         "c_compiler_stub",
+        "c_stdlib_stub",
         "fortran_compiler_stub",
         "libblas",
-        "liblapack",
-        "spglib"
+        "liblapack"
       ]
     },
     "run": {
@@ -285,6 +287,7 @@
       "elements": [
         "airss",
         "c_compiler_stub",
+        "c_stdlib_stub",
         "fortran_compiler_stub",
         "perl",
         "spglib"
@@ -301,6 +304,7 @@
       "__set__": true,
       "elements": [
         "c_compiler_stub",
+        "c_stdlib_stub",
         "fortran_compiler_stub",
         "make",
         "patch"
@@ -310,8 +314,7 @@
       "__set__": true,
       "elements": [
         "libblas",
-        "liblapack",
-        "spglib 1.16.*"
+        "liblapack"
       ]
     },
     "run": {
