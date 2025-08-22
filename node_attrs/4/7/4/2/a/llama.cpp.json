@@ -33,7 +33,7 @@
       "summary": "Port of Facebook's LLaMA model in C/C++"
     },
     "build": {
-      "number": "1",
+      "number": "0",
       "script": "echo hello\nLLAMA_ARGS=\"-DLLAMA_BUILD_TESTS=OFF\"\n\n{%- macro llama_args(value) %}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_${{ value }}\"\n{%- endmacro %}\n\n{%- macro cmake_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -D${{ value }}\"\n{%- endmacro %}\n\n{% macro ggml_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DGGML_${{ value }}\"\n{%- endmacro %}\n\n${{ cmake_args(\"BUILD_SHARED_LIBS=ON\") }}\n${{ llama_args(\"CURL=OFF\") }}\n\n{%- if osx and arm64 %}\n${{ ggml_args(\"NATIVE=OFF\") }}\n${{ ggml_args(\"AVX=OFF\") }}\n${{ ggml_args(\"AVX2=OFF\") }}\n${{ ggml_args(\"FMA=OFF\") }}\n${{ ggml_args(\"F16C=OFF\") }}\n${{ ggml_args(\"METAL=ON\") }}\n${{ ggml_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n\n{%- if osx and x86_64 %}\n${{ ggml_args(\"METAL=OFF\") }}\n${{ ggml_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n\n{%- if cuda_compiler_version != \"None\" %}\n${{ ggml_args(\"CUDA=ON\") }}\n${{ cmake_args(\"CMAKE_CUDA_ARCHITECTURES=all\") }}\n{%- endif %}\n\n{%- if linux and x86_64 and cuda_compiler_version == \"None\" %}\n${{ ggml_args(\"BLAS=ON\") }}\n\n{%- if blas_impl == \"mkl\" %}\n${{ ggml_args(\"BLAS_VENDOR=Intel10_64_dyn\") }}\n{%- endif %}\n\n{%- endif %}\n\necho $LLAMA_ARGS\ncmake -S . -B build -G Ninja ${CMAKE_ARGS} ${LLAMA_ARGS}\ncmake --build build\ncmake --install build\n"
     },
     "extra": {
@@ -84,6 +84,7 @@
               "check_file \"$PREFIX/bin/llama-convert-llama2c-to-ggml\" \"llama-convert-llama2c-to-ggml\"",
               "check_file \"$PREFIX/bin/llama-cvector-generator\" \"llama-cvector-generator\"",
               "check_file \"$PREFIX/bin/llama-embedding\" \"llama-embedding\"",
+              "check_file \"$PREFIX/bin/llama-diffusion-cli\" \"llama-diffusion-cli\"",
               "check_file \"$PREFIX/bin/llama-eval-callback\" \"llama-eval-callback\"",
               "check_file \"$PREFIX/bin/llama-export-lora\" \"llama-export-lora\"",
               "check_file \"$PREFIX/bin/llama-finetune\" \"llama-finetune\"",
@@ -121,12 +122,12 @@
               "check_file \"$PREFIX/include/ggml-cpp.h\" \"ggml-cpp.h\"",
               "check_file \"$PREFIX/include/ggml-cpu.h\" \"ggml-cpu.h\"",
               "check_file \"$PREFIX/include/ggml-cuda.h\" \"ggml-cuda.h\"",
-              "check_file \"$PREFIX/include/ggml-kompute.h\" \"ggml-kompute.h\"",
               "check_file \"$PREFIX/include/ggml-metal.h\" \"ggml-metal.h\"",
               "check_file \"$PREFIX/include/ggml-opt.h\" \"ggml-opt.h\"",
               "check_file \"$PREFIX/include/ggml-rpc.h\" \"ggml-rpc.h\"",
               "check_file \"$PREFIX/include/ggml-sycl.h\" \"ggml-sycl.h\"",
               "check_file \"$PREFIX/include/ggml-vulkan.h\" \"ggml-vulkan.h\"",
+              "check_file \"$PREFIX/include/ggml-webgpu.h\" \"ggml-webgpu.h\"",
               "check_file \"$PREFIX/include/ggml.h\" \"ggml.h\"",
               "check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"",
               "check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"",
@@ -144,12 +145,13 @@
               "check_file \"$PREFIX/lib/libggml${SHLIB_EXT}\" \"libggml${SHLIB_EXT}\"",
               "check_file \"$PREFIX/lib/libllama${SHLIB_EXT}\" \"libllama${SHLIB_EXT}\"",
               "check_file \"$PREFIX/lib/libmtmd${SHLIB_EXT}\" \"libmtmd${SHLIB_EXT}\"",
+              "check_file \"$PREFIX/lib/libggml-cuda${SHLIB_EXT}\" \"libggml-cuda${SHLIB_EXT}\"",
               "echo \"Checking pkg-config file...\"",
               "check_file \"$PREFIX/lib/pkgconfig/llama.pc\" \"llama.pc\""
             ]
           }
         ],
-        "version": "5649"
+        "version": "6191"
       },
       {
         "build": null,
@@ -183,6 +185,7 @@
               "check_file \"$PREFIX/bin/llama-convert-llama2c-to-ggml\" \"llama-convert-llama2c-to-ggml\"",
               "check_file \"$PREFIX/bin/llama-cvector-generator\" \"llama-cvector-generator\"",
               "check_file \"$PREFIX/bin/llama-embedding\" \"llama-embedding\"",
+              "check_file \"$PREFIX/bin/llama-diffusion-cli\" \"llama-diffusion-cli\"",
               "check_file \"$PREFIX/bin/llama-eval-callback\" \"llama-eval-callback\"",
               "check_file \"$PREFIX/bin/llama-export-lora\" \"llama-export-lora\"",
               "check_file \"$PREFIX/bin/llama-finetune\" \"llama-finetune\"",
@@ -220,12 +223,12 @@
               "check_file \"$PREFIX/include/ggml-cpp.h\" \"ggml-cpp.h\"",
               "check_file \"$PREFIX/include/ggml-cpu.h\" \"ggml-cpu.h\"",
               "check_file \"$PREFIX/include/ggml-cuda.h\" \"ggml-cuda.h\"",
-              "check_file \"$PREFIX/include/ggml-kompute.h\" \"ggml-kompute.h\"",
               "check_file \"$PREFIX/include/ggml-metal.h\" \"ggml-metal.h\"",
               "check_file \"$PREFIX/include/ggml-opt.h\" \"ggml-opt.h\"",
               "check_file \"$PREFIX/include/ggml-rpc.h\" \"ggml-rpc.h\"",
               "check_file \"$PREFIX/include/ggml-sycl.h\" \"ggml-sycl.h\"",
               "check_file \"$PREFIX/include/ggml-vulkan.h\" \"ggml-vulkan.h\"",
+              "check_file \"$PREFIX/include/ggml-webgpu.h\" \"ggml-webgpu.h\"",
               "check_file \"$PREFIX/include/ggml.h\" \"ggml.h\"",
               "check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"",
               "check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"",
@@ -243,6 +246,7 @@
               "check_file \"$PREFIX/lib/libggml${SHLIB_EXT}\" \"libggml${SHLIB_EXT}\"",
               "check_file \"$PREFIX/lib/libllama${SHLIB_EXT}\" \"libllama${SHLIB_EXT}\"",
               "check_file \"$PREFIX/lib/libmtmd${SHLIB_EXT}\" \"libmtmd${SHLIB_EXT}\"",
+              "check_file \"$PREFIX/lib/libggml-blas${SHLIB_EXT}\" \"libggml-blas${SHLIB_EXT}\"",
               "echo \"Checking pkg-config file...\"",
               "check_file \"$PREFIX/lib/pkgconfig/llama.pc\" \"llama.pc\""
             ]
@@ -254,12 +258,12 @@
             ]
           }
         ],
-        "version": "5649"
+        "version": "6191"
       }
     ],
     "package": {
       "name": "llama.cpp",
-      "version": "5649"
+      "version": "6191"
     },
     "requirements": {
       "build": [
@@ -287,8 +291,8 @@
     },
     "schema_version": 1,
     "source": {
-      "sha256": "4e76e8a320d207bd5bfd75dae77d6e3b81dec950832a07a7e9441e30bcd95d96",
-      "url": "https://github.com/ggml-org/llama.cpp/archive/b5649.tar.gz"
+      "sha256": "2383b5ed5096bdc560b64484d6924599bb95367c145544f041caaa3ed7bdb990",
+      "url": "https://github.com/ggml-org/llama.cpp/archive/b6191.tar.gz"
     }
   },
   "linux_64_requirements": {
@@ -338,7 +342,7 @@
       "summary": "Port of Facebook's LLaMA model in C/C++"
     },
     "build": {
-      "number": "1",
+      "number": "0",
       "script": "echo hello\nLLAMA_ARGS=\"-DLLAMA_BUILD_TESTS=OFF\"\n\n{%- macro llama_args(value) %}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_${{ value }}\"\n{%- endmacro %}\n\n{%- macro cmake_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -D${{ value }}\"\n{%- endmacro %}\n\n{% macro ggml_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DGGML_${{ value }}\"\n{%- endmacro %}\n\n${{ cmake_args(\"BUILD_SHARED_LIBS=ON\") }}\n${{ llama_args(\"CURL=OFF\") }}\n\n{%- if osx and arm64 %}\n${{ ggml_args(\"NATIVE=OFF\") }}\n${{ ggml_args(\"AVX=OFF\") }}\n${{ ggml_args(\"AVX2=OFF\") }}\n${{ ggml_args(\"FMA=OFF\") }}\n${{ ggml_args(\"F16C=OFF\") }}\n${{ ggml_args(\"METAL=ON\") }}\n${{ ggml_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n\n{%- if osx and x86_64 %}\n${{ ggml_args(\"METAL=OFF\") }}\n${{ ggml_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n\n{%- if cuda_compiler_version != \"None\" %}\n${{ ggml_args(\"CUDA=ON\") }}\n${{ cmake_args(\"CMAKE_CUDA_ARCHITECTURES=all\") }}\n{%- endif %}\n\n{%- if linux and x86_64 and cuda_compiler_version == \"None\" %}\n${{ ggml_args(\"BLAS=ON\") }}\n\n{%- if blas_impl == \"mkl\" %}\n${{ ggml_args(\"BLAS_VENDOR=Intel10_64_dyn\") }}\n{%- endif %}\n\n{%- endif %}\n\necho $LLAMA_ARGS\ncmake -S . -B build -G Ninja ${CMAKE_ARGS} ${LLAMA_ARGS}\ncmake --build build\ncmake --install build\n"
     },
     "extra": {
@@ -389,6 +393,7 @@
               "check_file \"$PREFIX/bin/llama-convert-llama2c-to-ggml\" \"llama-convert-llama2c-to-ggml\"",
               "check_file \"$PREFIX/bin/llama-cvector-generator\" \"llama-cvector-generator\"",
               "check_file \"$PREFIX/bin/llama-embedding\" \"llama-embedding\"",
+              "check_file \"$PREFIX/bin/llama-diffusion-cli\" \"llama-diffusion-cli\"",
               "check_file \"$PREFIX/bin/llama-eval-callback\" \"llama-eval-callback\"",
               "check_file \"$PREFIX/bin/llama-export-lora\" \"llama-export-lora\"",
               "check_file \"$PREFIX/bin/llama-finetune\" \"llama-finetune\"",
@@ -426,12 +431,12 @@
               "check_file \"$PREFIX/include/ggml-cpp.h\" \"ggml-cpp.h\"",
               "check_file \"$PREFIX/include/ggml-cpu.h\" \"ggml-cpu.h\"",
               "check_file \"$PREFIX/include/ggml-cuda.h\" \"ggml-cuda.h\"",
-              "check_file \"$PREFIX/include/ggml-kompute.h\" \"ggml-kompute.h\"",
               "check_file \"$PREFIX/include/ggml-metal.h\" \"ggml-metal.h\"",
               "check_file \"$PREFIX/include/ggml-opt.h\" \"ggml-opt.h\"",
               "check_file \"$PREFIX/include/ggml-rpc.h\" \"ggml-rpc.h\"",
               "check_file \"$PREFIX/include/ggml-sycl.h\" \"ggml-sycl.h\"",
               "check_file \"$PREFIX/include/ggml-vulkan.h\" \"ggml-vulkan.h\"",
+              "check_file \"$PREFIX/include/ggml-webgpu.h\" \"ggml-webgpu.h\"",
               "check_file \"$PREFIX/include/ggml.h\" \"ggml.h\"",
               "check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"",
               "check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"",
@@ -449,12 +454,13 @@
               "check_file \"$PREFIX/lib/libggml${SHLIB_EXT}\" \"libggml${SHLIB_EXT}\"",
               "check_file \"$PREFIX/lib/libllama${SHLIB_EXT}\" \"libllama${SHLIB_EXT}\"",
               "check_file \"$PREFIX/lib/libmtmd${SHLIB_EXT}\" \"libmtmd${SHLIB_EXT}\"",
+              "check_file \"$PREFIX/lib/libggml-cuda${SHLIB_EXT}\" \"libggml-cuda${SHLIB_EXT}\"",
               "echo \"Checking pkg-config file...\"",
               "check_file \"$PREFIX/lib/pkgconfig/llama.pc\" \"llama.pc\""
             ]
           }
         ],
-        "version": "5649"
+        "version": "6191"
       },
       {
         "build": null,
@@ -485,6 +491,7 @@
               "check_file \"$PREFIX/bin/llama-convert-llama2c-to-ggml\" \"llama-convert-llama2c-to-ggml\"",
               "check_file \"$PREFIX/bin/llama-cvector-generator\" \"llama-cvector-generator\"",
               "check_file \"$PREFIX/bin/llama-embedding\" \"llama-embedding\"",
+              "check_file \"$PREFIX/bin/llama-diffusion-cli\" \"llama-diffusion-cli\"",
               "check_file \"$PREFIX/bin/llama-eval-callback\" \"llama-eval-callback\"",
               "check_file \"$PREFIX/bin/llama-export-lora\" \"llama-export-lora\"",
               "check_file \"$PREFIX/bin/llama-finetune\" \"llama-finetune\"",
@@ -522,12 +529,12 @@
               "check_file \"$PREFIX/include/ggml-cpp.h\" \"ggml-cpp.h\"",
               "check_file \"$PREFIX/include/ggml-cpu.h\" \"ggml-cpu.h\"",
               "check_file \"$PREFIX/include/ggml-cuda.h\" \"ggml-cuda.h\"",
-              "check_file \"$PREFIX/include/ggml-kompute.h\" \"ggml-kompute.h\"",
               "check_file \"$PREFIX/include/ggml-metal.h\" \"ggml-metal.h\"",
               "check_file \"$PREFIX/include/ggml-opt.h\" \"ggml-opt.h\"",
               "check_file \"$PREFIX/include/ggml-rpc.h\" \"ggml-rpc.h\"",
               "check_file \"$PREFIX/include/ggml-sycl.h\" \"ggml-sycl.h\"",
               "check_file \"$PREFIX/include/ggml-vulkan.h\" \"ggml-vulkan.h\"",
+              "check_file \"$PREFIX/include/ggml-webgpu.h\" \"ggml-webgpu.h\"",
               "check_file \"$PREFIX/include/ggml.h\" \"ggml.h\"",
               "check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"",
               "check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"",
@@ -545,6 +552,7 @@
               "check_file \"$PREFIX/lib/libggml${SHLIB_EXT}\" \"libggml${SHLIB_EXT}\"",
               "check_file \"$PREFIX/lib/libllama${SHLIB_EXT}\" \"libllama${SHLIB_EXT}\"",
               "check_file \"$PREFIX/lib/libmtmd${SHLIB_EXT}\" \"libmtmd${SHLIB_EXT}\"",
+              "check_file \"$PREFIX/lib/libggml-blas${SHLIB_EXT}\" \"libggml-blas${SHLIB_EXT}\"",
               "echo \"Checking pkg-config file...\"",
               "check_file \"$PREFIX/lib/pkgconfig/llama.pc\" \"llama.pc\""
             ]
@@ -556,12 +564,12 @@
             ]
           }
         ],
-        "version": "5649"
+        "version": "6191"
       }
     ],
     "package": {
       "name": "llama.cpp",
-      "version": "5649"
+      "version": "6191"
     },
     "requirements": {
       "build": [
@@ -587,8 +595,8 @@
     },
     "schema_version": 1,
     "source": {
-      "sha256": "4e76e8a320d207bd5bfd75dae77d6e3b81dec950832a07a7e9441e30bcd95d96",
-      "url": "https://github.com/ggml-org/llama.cpp/archive/b5649.tar.gz"
+      "sha256": "2383b5ed5096bdc560b64484d6924599bb95367c145544f041caaa3ed7bdb990",
+      "url": "https://github.com/ggml-org/llama.cpp/archive/b6191.tar.gz"
     }
   },
   "linux_aarch64_requirements": {
@@ -636,7 +644,7 @@
       "summary": "Port of Facebook's LLaMA model in C/C++"
     },
     "build": {
-      "number": "1",
+      "number": "0",
       "script": "echo hello\nLLAMA_ARGS=\"-DLLAMA_BUILD_TESTS=OFF\"\n\n{%- macro llama_args(value) %}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_${{ value }}\"\n{%- endmacro %}\n\n{%- macro cmake_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -D${{ value }}\"\n{%- endmacro %}\n\n{% macro ggml_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DGGML_${{ value }}\"\n{%- endmacro %}\n\n${{ cmake_args(\"BUILD_SHARED_LIBS=ON\") }}\n${{ llama_args(\"CURL=OFF\") }}\n\n{%- if osx and arm64 %}\n${{ ggml_args(\"NATIVE=OFF\") }}\n${{ ggml_args(\"AVX=OFF\") }}\n${{ ggml_args(\"AVX2=OFF\") }}\n${{ ggml_args(\"FMA=OFF\") }}\n${{ ggml_args(\"F16C=OFF\") }}\n${{ ggml_args(\"METAL=ON\") }}\n${{ ggml_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n\n{%- if osx and x86_64 %}\n${{ ggml_args(\"METAL=OFF\") }}\n${{ ggml_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n\n{%- if cuda_compiler_version != \"None\" %}\n${{ ggml_args(\"CUDA=ON\") }}\n${{ cmake_args(\"CMAKE_CUDA_ARCHITECTURES=all\") }}\n{%- endif %}\n\n{%- if linux and x86_64 and cuda_compiler_version == \"None\" %}\n${{ ggml_args(\"BLAS=ON\") }}\n\n{%- if blas_impl == \"mkl\" %}\n${{ ggml_args(\"BLAS_VENDOR=Intel10_64_dyn\") }}\n{%- endif %}\n\n{%- endif %}\n\necho $LLAMA_ARGS\ncmake -S . -B build -G Ninja ${CMAKE_ARGS} ${LLAMA_ARGS}\ncmake --build build\ncmake --install build\n"
     },
     "extra": {
@@ -687,6 +695,7 @@
               "check_file \"$PREFIX/bin/llama-convert-llama2c-to-ggml\" \"llama-convert-llama2c-to-ggml\"",
               "check_file \"$PREFIX/bin/llama-cvector-generator\" \"llama-cvector-generator\"",
               "check_file \"$PREFIX/bin/llama-embedding\" \"llama-embedding\"",
+              "check_file \"$PREFIX/bin/llama-diffusion-cli\" \"llama-diffusion-cli\"",
               "check_file \"$PREFIX/bin/llama-eval-callback\" \"llama-eval-callback\"",
               "check_file \"$PREFIX/bin/llama-export-lora\" \"llama-export-lora\"",
               "check_file \"$PREFIX/bin/llama-finetune\" \"llama-finetune\"",
@@ -724,12 +733,12 @@
               "check_file \"$PREFIX/include/ggml-cpp.h\" \"ggml-cpp.h\"",
               "check_file \"$PREFIX/include/ggml-cpu.h\" \"ggml-cpu.h\"",
               "check_file \"$PREFIX/include/ggml-cuda.h\" \"ggml-cuda.h\"",
-              "check_file \"$PREFIX/include/ggml-kompute.h\" \"ggml-kompute.h\"",
               "check_file \"$PREFIX/include/ggml-metal.h\" \"ggml-metal.h\"",
               "check_file \"$PREFIX/include/ggml-opt.h\" \"ggml-opt.h\"",
               "check_file \"$PREFIX/include/ggml-rpc.h\" \"ggml-rpc.h\"",
               "check_file \"$PREFIX/include/ggml-sycl.h\" \"ggml-sycl.h\"",
               "check_file \"$PREFIX/include/ggml-vulkan.h\" \"ggml-vulkan.h\"",
+              "check_file \"$PREFIX/include/ggml-webgpu.h\" \"ggml-webgpu.h\"",
               "check_file \"$PREFIX/include/ggml.h\" \"ggml.h\"",
               "check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"",
               "check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"",
@@ -747,12 +756,13 @@
               "check_file \"$PREFIX/lib/libggml${SHLIB_EXT}\" \"libggml${SHLIB_EXT}\"",
               "check_file \"$PREFIX/lib/libllama${SHLIB_EXT}\" \"libllama${SHLIB_EXT}\"",
               "check_file \"$PREFIX/lib/libmtmd${SHLIB_EXT}\" \"libmtmd${SHLIB_EXT}\"",
+              "check_file \"$PREFIX/lib/libggml-cuda${SHLIB_EXT}\" \"libggml-cuda${SHLIB_EXT}\"",
               "echo \"Checking pkg-config file...\"",
               "check_file \"$PREFIX/lib/pkgconfig/llama.pc\" \"llama.pc\""
             ]
           }
         ],
-        "version": "5649"
+        "version": "6191"
       },
       {
         "build": null,
@@ -786,6 +796,7 @@
               "check_file \"$PREFIX/bin/llama-convert-llama2c-to-ggml\" \"llama-convert-llama2c-to-ggml\"",
               "check_file \"$PREFIX/bin/llama-cvector-generator\" \"llama-cvector-generator\"",
               "check_file \"$PREFIX/bin/llama-embedding\" \"llama-embedding\"",
+              "check_file \"$PREFIX/bin/llama-diffusion-cli\" \"llama-diffusion-cli\"",
               "check_file \"$PREFIX/bin/llama-eval-callback\" \"llama-eval-callback\"",
               "check_file \"$PREFIX/bin/llama-export-lora\" \"llama-export-lora\"",
               "check_file \"$PREFIX/bin/llama-finetune\" \"llama-finetune\"",
@@ -823,12 +834,12 @@
               "check_file \"$PREFIX/include/ggml-cpp.h\" \"ggml-cpp.h\"",
               "check_file \"$PREFIX/include/ggml-cpu.h\" \"ggml-cpu.h\"",
               "check_file \"$PREFIX/include/ggml-cuda.h\" \"ggml-cuda.h\"",
-              "check_file \"$PREFIX/include/ggml-kompute.h\" \"ggml-kompute.h\"",
               "check_file \"$PREFIX/include/ggml-metal.h\" \"ggml-metal.h\"",
               "check_file \"$PREFIX/include/ggml-opt.h\" \"ggml-opt.h\"",
               "check_file \"$PREFIX/include/ggml-rpc.h\" \"ggml-rpc.h\"",
               "check_file \"$PREFIX/include/ggml-sycl.h\" \"ggml-sycl.h\"",
               "check_file \"$PREFIX/include/ggml-vulkan.h\" \"ggml-vulkan.h\"",
+              "check_file \"$PREFIX/include/ggml-webgpu.h\" \"ggml-webgpu.h\"",
               "check_file \"$PREFIX/include/ggml.h\" \"ggml.h\"",
               "check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"",
               "check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"",
@@ -846,6 +857,7 @@
               "check_file \"$PREFIX/lib/libggml${SHLIB_EXT}\" \"libggml${SHLIB_EXT}\"",
               "check_file \"$PREFIX/lib/libllama${SHLIB_EXT}\" \"libllama${SHLIB_EXT}\"",
               "check_file \"$PREFIX/lib/libmtmd${SHLIB_EXT}\" \"libmtmd${SHLIB_EXT}\"",
+              "check_file \"$PREFIX/lib/libggml-blas${SHLIB_EXT}\" \"libggml-blas${SHLIB_EXT}\"",
               "echo \"Checking pkg-config file...\"",
               "check_file \"$PREFIX/lib/pkgconfig/llama.pc\" \"llama.pc\""
             ]
@@ -857,7 +869,7 @@
             ]
           }
         ],
-        "version": "5649"
+        "version": "6191"
       },
       {
         "build": null,
@@ -897,6 +909,7 @@
               "check_file \"$PREFIX/bin/llama-convert-llama2c-to-ggml\" \"llama-convert-llama2c-to-ggml\"",
               "check_file \"$PREFIX/bin/llama-cvector-generator\" \"llama-cvector-generator\"",
               "check_file \"$PREFIX/bin/llama-embedding\" \"llama-embedding\"",
+              "check_file \"$PREFIX/bin/llama-diffusion-cli\" \"llama-diffusion-cli\"",
               "check_file \"$PREFIX/bin/llama-eval-callback\" \"llama-eval-callback\"",
               "check_file \"$PREFIX/bin/llama-export-lora\" \"llama-export-lora\"",
               "check_file \"$PREFIX/bin/llama-finetune\" \"llama-finetune\"",
@@ -934,12 +947,12 @@
               "check_file \"$PREFIX/include/ggml-cpp.h\" \"ggml-cpp.h\"",
               "check_file \"$PREFIX/include/ggml-cpu.h\" \"ggml-cpu.h\"",
               "check_file \"$PREFIX/include/ggml-cuda.h\" \"ggml-cuda.h\"",
-              "check_file \"$PREFIX/include/ggml-kompute.h\" \"ggml-kompute.h\"",
               "check_file \"$PREFIX/include/ggml-metal.h\" \"ggml-metal.h\"",
               "check_file \"$PREFIX/include/ggml-opt.h\" \"ggml-opt.h\"",
               "check_file \"$PREFIX/include/ggml-rpc.h\" \"ggml-rpc.h\"",
               "check_file \"$PREFIX/include/ggml-sycl.h\" \"ggml-sycl.h\"",
               "check_file \"$PREFIX/include/ggml-vulkan.h\" \"ggml-vulkan.h\"",
+              "check_file \"$PREFIX/include/ggml-webgpu.h\" \"ggml-webgpu.h\"",
               "check_file \"$PREFIX/include/ggml.h\" \"ggml.h\"",
               "check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"",
               "check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"",
@@ -957,12 +970,13 @@
               "check_file \"$PREFIX/lib/libggml${SHLIB_EXT}\" \"libggml${SHLIB_EXT}\"",
               "check_file \"$PREFIX/lib/libllama${SHLIB_EXT}\" \"libllama${SHLIB_EXT}\"",
               "check_file \"$PREFIX/lib/libmtmd${SHLIB_EXT}\" \"libmtmd${SHLIB_EXT}\"",
+              "check_file \"$PREFIX/lib/libggml-cuda${SHLIB_EXT}\" \"libggml-cuda${SHLIB_EXT}\"",
               "echo \"Checking pkg-config file...\"",
               "check_file \"$PREFIX/lib/pkgconfig/llama.pc\" \"llama.pc\""
             ]
           }
         ],
-        "version": "5649"
+        "version": "6191"
       },
       {
         "build": null,
@@ -993,6 +1007,7 @@
               "check_file \"$PREFIX/bin/llama-convert-llama2c-to-ggml\" \"llama-convert-llama2c-to-ggml\"",
               "check_file \"$PREFIX/bin/llama-cvector-generator\" \"llama-cvector-generator\"",
               "check_file \"$PREFIX/bin/llama-embedding\" \"llama-embedding\"",
+              "check_file \"$PREFIX/bin/llama-diffusion-cli\" \"llama-diffusion-cli\"",
               "check_file \"$PREFIX/bin/llama-eval-callback\" \"llama-eval-callback\"",
               "check_file \"$PREFIX/bin/llama-export-lora\" \"llama-export-lora\"",
               "check_file \"$PREFIX/bin/llama-finetune\" \"llama-finetune\"",
@@ -1030,12 +1045,12 @@
               "check_file \"$PREFIX/include/ggml-cpp.h\" \"ggml-cpp.h\"",
               "check_file \"$PREFIX/include/ggml-cpu.h\" \"ggml-cpu.h\"",
               "check_file \"$PREFIX/include/ggml-cuda.h\" \"ggml-cuda.h\"",
-              "check_file \"$PREFIX/include/ggml-kompute.h\" \"ggml-kompute.h\"",
               "check_file \"$PREFIX/include/ggml-metal.h\" \"ggml-metal.h\"",
               "check_file \"$PREFIX/include/ggml-opt.h\" \"ggml-opt.h\"",
               "check_file \"$PREFIX/include/ggml-rpc.h\" \"ggml-rpc.h\"",
               "check_file \"$PREFIX/include/ggml-sycl.h\" \"ggml-sycl.h\"",
               "check_file \"$PREFIX/include/ggml-vulkan.h\" \"ggml-vulkan.h\"",
+              "check_file \"$PREFIX/include/ggml-webgpu.h\" \"ggml-webgpu.h\"",
               "check_file \"$PREFIX/include/ggml.h\" \"ggml.h\"",
               "check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"",
               "check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"",
@@ -1053,6 +1068,7 @@
               "check_file \"$PREFIX/lib/libggml${SHLIB_EXT}\" \"libggml${SHLIB_EXT}\"",
               "check_file \"$PREFIX/lib/libllama${SHLIB_EXT}\" \"libllama${SHLIB_EXT}\"",
               "check_file \"$PREFIX/lib/libmtmd${SHLIB_EXT}\" \"libmtmd${SHLIB_EXT}\"",
+              "check_file \"$PREFIX/lib/libggml-blas${SHLIB_EXT}\" \"libggml-blas${SHLIB_EXT}\"",
               "echo \"Checking pkg-config file...\"",
               "check_file \"$PREFIX/lib/pkgconfig/llama.pc\" \"llama.pc\""
             ]
@@ -1064,7 +1080,7 @@
             ]
           }
         ],
-        "version": "5649"
+        "version": "6191"
       },
       {
         "build": null,
@@ -1095,6 +1111,7 @@
               "check_file \"$PREFIX/bin/llama-convert-llama2c-to-ggml\" \"llama-convert-llama2c-to-ggml\"",
               "check_file \"$PREFIX/bin/llama-cvector-generator\" \"llama-cvector-generator\"",
               "check_file \"$PREFIX/bin/llama-embedding\" \"llama-embedding\"",
+              "check_file \"$PREFIX/bin/llama-diffusion-cli\" \"llama-diffusion-cli\"",
               "check_file \"$PREFIX/bin/llama-eval-callback\" \"llama-eval-callback\"",
               "check_file \"$PREFIX/bin/llama-export-lora\" \"llama-export-lora\"",
               "check_file \"$PREFIX/bin/llama-finetune\" \"llama-finetune\"",
@@ -1132,12 +1149,12 @@
               "check_file \"$PREFIX/include/ggml-cpp.h\" \"ggml-cpp.h\"",
               "check_file \"$PREFIX/include/ggml-cpu.h\" \"ggml-cpu.h\"",
               "check_file \"$PREFIX/include/ggml-cuda.h\" \"ggml-cuda.h\"",
-              "check_file \"$PREFIX/include/ggml-kompute.h\" \"ggml-kompute.h\"",
               "check_file \"$PREFIX/include/ggml-metal.h\" \"ggml-metal.h\"",
               "check_file \"$PREFIX/include/ggml-opt.h\" \"ggml-opt.h\"",
               "check_file \"$PREFIX/include/ggml-rpc.h\" \"ggml-rpc.h\"",
               "check_file \"$PREFIX/include/ggml-sycl.h\" \"ggml-sycl.h\"",
               "check_file \"$PREFIX/include/ggml-vulkan.h\" \"ggml-vulkan.h\"",
+              "check_file \"$PREFIX/include/ggml-webgpu.h\" \"ggml-webgpu.h\"",
               "check_file \"$PREFIX/include/ggml.h\" \"ggml.h\"",
               "check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"",
               "check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"",
@@ -1155,6 +1172,7 @@
               "check_file \"$PREFIX/lib/libggml${SHLIB_EXT}\" \"libggml${SHLIB_EXT}\"",
               "check_file \"$PREFIX/lib/libllama${SHLIB_EXT}\" \"libllama${SHLIB_EXT}\"",
               "check_file \"$PREFIX/lib/libmtmd${SHLIB_EXT}\" \"libmtmd${SHLIB_EXT}\"",
+              "check_file \"$PREFIX/lib/libggml-blas${SHLIB_EXT}\" \"libggml-blas${SHLIB_EXT}\"",
               "echo \"Checking pkg-config file...\"",
               "check_file \"$PREFIX/lib/pkgconfig/llama.pc\" \"llama.pc\""
             ]
@@ -1166,7 +1184,7 @@
             ]
           }
         ],
-        "version": "5649"
+        "version": "6191"
       },
       {
         "build": null,
@@ -1197,6 +1215,7 @@
               "check_file \"$PREFIX/bin/llama-convert-llama2c-to-ggml\" \"llama-convert-llama2c-to-ggml\"",
               "check_file \"$PREFIX/bin/llama-cvector-generator\" \"llama-cvector-generator\"",
               "check_file \"$PREFIX/bin/llama-embedding\" \"llama-embedding\"",
+              "check_file \"$PREFIX/bin/llama-diffusion-cli\" \"llama-diffusion-cli\"",
               "check_file \"$PREFIX/bin/llama-eval-callback\" \"llama-eval-callback\"",
               "check_file \"$PREFIX/bin/llama-export-lora\" \"llama-export-lora\"",
               "check_file \"$PREFIX/bin/llama-finetune\" \"llama-finetune\"",
@@ -1234,12 +1253,12 @@
               "check_file \"$PREFIX/include/ggml-cpp.h\" \"ggml-cpp.h\"",
               "check_file \"$PREFIX/include/ggml-cpu.h\" \"ggml-cpu.h\"",
               "check_file \"$PREFIX/include/ggml-cuda.h\" \"ggml-cuda.h\"",
-              "check_file \"$PREFIX/include/ggml-kompute.h\" \"ggml-kompute.h\"",
               "check_file \"$PREFIX/include/ggml-metal.h\" \"ggml-metal.h\"",
               "check_file \"$PREFIX/include/ggml-opt.h\" \"ggml-opt.h\"",
               "check_file \"$PREFIX/include/ggml-rpc.h\" \"ggml-rpc.h\"",
               "check_file \"$PREFIX/include/ggml-sycl.h\" \"ggml-sycl.h\"",
               "check_file \"$PREFIX/include/ggml-vulkan.h\" \"ggml-vulkan.h\"",
+              "check_file \"$PREFIX/include/ggml-webgpu.h\" \"ggml-webgpu.h\"",
               "check_file \"$PREFIX/include/ggml.h\" \"ggml.h\"",
               "check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"",
               "check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"",
@@ -1257,6 +1276,7 @@
               "check_file \"$PREFIX/lib/libggml${SHLIB_EXT}\" \"libggml${SHLIB_EXT}\"",
               "check_file \"$PREFIX/lib/libllama${SHLIB_EXT}\" \"libllama${SHLIB_EXT}\"",
               "check_file \"$PREFIX/lib/libmtmd${SHLIB_EXT}\" \"libmtmd${SHLIB_EXT}\"",
+              "check_file \"$PREFIX/lib/libggml-blas${SHLIB_EXT}\" \"libggml-blas${SHLIB_EXT}\"",
               "echo \"Checking pkg-config file...\"",
               "check_file \"$PREFIX/lib/pkgconfig/llama.pc\" \"llama.pc\""
             ]
@@ -1268,7 +1288,7 @@
             ]
           }
         ],
-        "version": "5649"
+        "version": "6191"
       },
       {
         "build": null,
@@ -1308,6 +1328,7 @@
               "check_file \"$PREFIX/bin/llama-convert-llama2c-to-ggml\" \"llama-convert-llama2c-to-ggml\"",
               "check_file \"$PREFIX/bin/llama-cvector-generator\" \"llama-cvector-generator\"",
               "check_file \"$PREFIX/bin/llama-embedding\" \"llama-embedding\"",
+              "check_file \"$PREFIX/bin/llama-diffusion-cli\" \"llama-diffusion-cli\"",
               "check_file \"$PREFIX/bin/llama-eval-callback\" \"llama-eval-callback\"",
               "check_file \"$PREFIX/bin/llama-export-lora\" \"llama-export-lora\"",
               "check_file \"$PREFIX/bin/llama-finetune\" \"llama-finetune\"",
@@ -1345,12 +1366,12 @@
               "check_file \"$PREFIX/include/ggml-cpp.h\" \"ggml-cpp.h\"",
               "check_file \"$PREFIX/include/ggml-cpu.h\" \"ggml-cpu.h\"",
               "check_file \"$PREFIX/include/ggml-cuda.h\" \"ggml-cuda.h\"",
-              "check_file \"$PREFIX/include/ggml-kompute.h\" \"ggml-kompute.h\"",
               "check_file \"$PREFIX/include/ggml-metal.h\" \"ggml-metal.h\"",
               "check_file \"$PREFIX/include/ggml-opt.h\" \"ggml-opt.h\"",
               "check_file \"$PREFIX/include/ggml-rpc.h\" \"ggml-rpc.h\"",
               "check_file \"$PREFIX/include/ggml-sycl.h\" \"ggml-sycl.h\"",
               "check_file \"$PREFIX/include/ggml-vulkan.h\" \"ggml-vulkan.h\"",
+              "check_file \"$PREFIX/include/ggml-webgpu.h\" \"ggml-webgpu.h\"",
               "check_file \"$PREFIX/include/ggml.h\" \"ggml.h\"",
               "check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"",
               "check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"",
@@ -1368,12 +1389,13 @@
               "check_file \"$PREFIX/lib/libggml${SHLIB_EXT}\" \"libggml${SHLIB_EXT}\"",
               "check_file \"$PREFIX/lib/libllama${SHLIB_EXT}\" \"libllama${SHLIB_EXT}\"",
               "check_file \"$PREFIX/lib/libmtmd${SHLIB_EXT}\" \"libmtmd${SHLIB_EXT}\"",
+              "check_file \"$PREFIX/lib/libggml-cuda${SHLIB_EXT}\" \"libggml-cuda${SHLIB_EXT}\"",
               "echo \"Checking pkg-config file...\"",
               "check_file \"$PREFIX/lib/pkgconfig/llama.pc\" \"llama.pc\""
             ]
           }
         ],
-        "version": "5649"
+        "version": "6191"
       },
       {
         "build": null,
@@ -1407,6 +1429,7 @@
               "check_file \"$PREFIX/bin/llama-convert-llama2c-to-ggml\" \"llama-convert-llama2c-to-ggml\"",
               "check_file \"$PREFIX/bin/llama-cvector-generator\" \"llama-cvector-generator\"",
               "check_file \"$PREFIX/bin/llama-embedding\" \"llama-embedding\"",
+              "check_file \"$PREFIX/bin/llama-diffusion-cli\" \"llama-diffusion-cli\"",
               "check_file \"$PREFIX/bin/llama-eval-callback\" \"llama-eval-callback\"",
               "check_file \"$PREFIX/bin/llama-export-lora\" \"llama-export-lora\"",
               "check_file \"$PREFIX/bin/llama-finetune\" \"llama-finetune\"",
@@ -1444,12 +1467,12 @@
               "check_file \"$PREFIX/include/ggml-cpp.h\" \"ggml-cpp.h\"",
               "check_file \"$PREFIX/include/ggml-cpu.h\" \"ggml-cpu.h\"",
               "check_file \"$PREFIX/include/ggml-cuda.h\" \"ggml-cuda.h\"",
-              "check_file \"$PREFIX/include/ggml-kompute.h\" \"ggml-kompute.h\"",
               "check_file \"$PREFIX/include/ggml-metal.h\" \"ggml-metal.h\"",
               "check_file \"$PREFIX/include/ggml-opt.h\" \"ggml-opt.h\"",
               "check_file \"$PREFIX/include/ggml-rpc.h\" \"ggml-rpc.h\"",
               "check_file \"$PREFIX/include/ggml-sycl.h\" \"ggml-sycl.h\"",
               "check_file \"$PREFIX/include/ggml-vulkan.h\" \"ggml-vulkan.h\"",
+              "check_file \"$PREFIX/include/ggml-webgpu.h\" \"ggml-webgpu.h\"",
               "check_file \"$PREFIX/include/ggml.h\" \"ggml.h\"",
               "check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"",
               "check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"",
@@ -1467,6 +1490,7 @@
               "check_file \"$PREFIX/lib/libggml${SHLIB_EXT}\" \"libggml${SHLIB_EXT}\"",
               "check_file \"$PREFIX/lib/libllama${SHLIB_EXT}\" \"libllama${SHLIB_EXT}\"",
               "check_file \"$PREFIX/lib/libmtmd${SHLIB_EXT}\" \"libmtmd${SHLIB_EXT}\"",
+              "check_file \"$PREFIX/lib/libggml-blas${SHLIB_EXT}\" \"libggml-blas${SHLIB_EXT}\"",
               "echo \"Checking pkg-config file...\"",
               "check_file \"$PREFIX/lib/pkgconfig/llama.pc\" \"llama.pc\""
             ]
@@ -1478,12 +1502,12 @@
             ]
           }
         ],
-        "version": "5649"
+        "version": "6191"
       }
     ],
     "package": {
       "name": "llama.cpp",
-      "version": "5649"
+      "version": "6191"
     },
     "requirements": {
       "build": [
@@ -1511,8 +1535,8 @@
     },
     "schema_version": 1,
     "source": {
-      "sha256": "4e76e8a320d207bd5bfd75dae77d6e3b81dec950832a07a7e9441e30bcd95d96",
-      "url": "https://github.com/ggml-org/llama.cpp/archive/b5649.tar.gz"
+      "sha256": "2383b5ed5096bdc560b64484d6924599bb95367c145544f041caaa3ed7bdb990",
+      "url": "https://github.com/ggml-org/llama.cpp/archive/b6191.tar.gz"
     }
   },
   "name": "llama.cpp",
@@ -1526,7 +1550,7 @@
       "summary": "Port of Facebook's LLaMA model in C/C++"
     },
     "build": {
-      "number": "1",
+      "number": "0",
       "script": "echo hello\nLLAMA_ARGS=\"-DLLAMA_BUILD_TESTS=OFF\"\n\n{%- macro llama_args(value) %}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_${{ value }}\"\n{%- endmacro %}\n\n{%- macro cmake_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -D${{ value }}\"\n{%- endmacro %}\n\n{% macro ggml_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DGGML_${{ value }}\"\n{%- endmacro %}\n\n${{ cmake_args(\"BUILD_SHARED_LIBS=ON\") }}\n${{ llama_args(\"CURL=OFF\") }}\n\n{%- if osx and arm64 %}\n${{ ggml_args(\"NATIVE=OFF\") }}\n${{ ggml_args(\"AVX=OFF\") }}\n${{ ggml_args(\"AVX2=OFF\") }}\n${{ ggml_args(\"FMA=OFF\") }}\n${{ ggml_args(\"F16C=OFF\") }}\n${{ ggml_args(\"METAL=ON\") }}\n${{ ggml_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n\n{%- if osx and x86_64 %}\n${{ ggml_args(\"METAL=OFF\") }}\n${{ ggml_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n\n{%- if cuda_compiler_version != \"None\" %}\n${{ ggml_args(\"CUDA=ON\") }}\n${{ cmake_args(\"CMAKE_CUDA_ARCHITECTURES=all\") }}\n{%- endif %}\n\n{%- if linux and x86_64 and cuda_compiler_version == \"None\" %}\n${{ ggml_args(\"BLAS=ON\") }}\n\n{%- if blas_impl == \"mkl\" %}\n${{ ggml_args(\"BLAS_VENDOR=Intel10_64_dyn\") }}\n{%- endif %}\n\n{%- endif %}\n\necho $LLAMA_ARGS\ncmake -S . -B build -G Ninja ${CMAKE_ARGS} ${LLAMA_ARGS}\ncmake --build build\ncmake --install build\n"
     },
     "extra": {
@@ -1568,6 +1592,7 @@
               "check_file \"$PREFIX/bin/llama-convert-llama2c-to-ggml\" \"llama-convert-llama2c-to-ggml\"",
               "check_file \"$PREFIX/bin/llama-cvector-generator\" \"llama-cvector-generator\"",
               "check_file \"$PREFIX/bin/llama-embedding\" \"llama-embedding\"",
+              "check_file \"$PREFIX/bin/llama-diffusion-cli\" \"llama-diffusion-cli\"",
               "check_file \"$PREFIX/bin/llama-eval-callback\" \"llama-eval-callback\"",
               "check_file \"$PREFIX/bin/llama-export-lora\" \"llama-export-lora\"",
               "check_file \"$PREFIX/bin/llama-finetune\" \"llama-finetune\"",
@@ -1605,12 +1630,12 @@
               "check_file \"$PREFIX/include/ggml-cpp.h\" \"ggml-cpp.h\"",
               "check_file \"$PREFIX/include/ggml-cpu.h\" \"ggml-cpu.h\"",
               "check_file \"$PREFIX/include/ggml-cuda.h\" \"ggml-cuda.h\"",
-              "check_file \"$PREFIX/include/ggml-kompute.h\" \"ggml-kompute.h\"",
               "check_file \"$PREFIX/include/ggml-metal.h\" \"ggml-metal.h\"",
               "check_file \"$PREFIX/include/ggml-opt.h\" \"ggml-opt.h\"",
               "check_file \"$PREFIX/include/ggml-rpc.h\" \"ggml-rpc.h\"",
               "check_file \"$PREFIX/include/ggml-sycl.h\" \"ggml-sycl.h\"",
               "check_file \"$PREFIX/include/ggml-vulkan.h\" \"ggml-vulkan.h\"",
+              "check_file \"$PREFIX/include/ggml-webgpu.h\" \"ggml-webgpu.h\"",
               "check_file \"$PREFIX/include/ggml.h\" \"ggml.h\"",
               "check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"",
               "check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"",
@@ -1628,6 +1653,7 @@
               "check_file \"$PREFIX/lib/libggml${SHLIB_EXT}\" \"libggml${SHLIB_EXT}\"",
               "check_file \"$PREFIX/lib/libllama${SHLIB_EXT}\" \"libllama${SHLIB_EXT}\"",
               "check_file \"$PREFIX/lib/libmtmd${SHLIB_EXT}\" \"libmtmd${SHLIB_EXT}\"",
+              "check_file \"$PREFIX/lib/libggml-blas${SHLIB_EXT}\" \"libggml-blas${SHLIB_EXT}\"",
               "echo \"Checking pkg-config file...\"",
               "check_file \"$PREFIX/lib/pkgconfig/llama.pc\" \"llama.pc\""
             ]
@@ -1639,12 +1665,12 @@
             ]
           }
         ],
-        "version": "5649"
+        "version": "6191"
       }
     ],
     "package": {
       "name": "llama.cpp",
-      "version": "5649"
+      "version": "6191"
     },
     "requirements": {
       "build": [
@@ -1659,8 +1685,8 @@
     },
     "schema_version": 1,
     "source": {
-      "sha256": "4e76e8a320d207bd5bfd75dae77d6e3b81dec950832a07a7e9441e30bcd95d96",
-      "url": "https://github.com/ggml-org/llama.cpp/archive/b5649.tar.gz"
+      "sha256": "2383b5ed5096bdc560b64484d6924599bb95367c145544f041caaa3ed7bdb990",
+      "url": "https://github.com/ggml-org/llama.cpp/archive/b6191.tar.gz"
     }
   },
   "osx_64_requirements": {
@@ -1699,7 +1725,7 @@
       "summary": "Port of Facebook's LLaMA model in C/C++"
     },
     "build": {
-      "number": "1",
+      "number": "0",
       "script": "echo hello\nLLAMA_ARGS=\"-DLLAMA_BUILD_TESTS=OFF\"\n\n{%- macro llama_args(value) %}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_${{ value }}\"\n{%- endmacro %}\n\n{%- macro cmake_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -D${{ value }}\"\n{%- endmacro %}\n\n{% macro ggml_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DGGML_${{ value }}\"\n{%- endmacro %}\n\n${{ cmake_args(\"BUILD_SHARED_LIBS=ON\") }}\n${{ llama_args(\"CURL=OFF\") }}\n\n{%- if osx and arm64 %}\n${{ ggml_args(\"NATIVE=OFF\") }}\n${{ ggml_args(\"AVX=OFF\") }}\n${{ ggml_args(\"AVX2=OFF\") }}\n${{ ggml_args(\"FMA=OFF\") }}\n${{ ggml_args(\"F16C=OFF\") }}\n${{ ggml_args(\"METAL=ON\") }}\n${{ ggml_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n\n{%- if osx and x86_64 %}\n${{ ggml_args(\"METAL=OFF\") }}\n${{ ggml_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n\n{%- if cuda_compiler_version != \"None\" %}\n${{ ggml_args(\"CUDA=ON\") }}\n${{ cmake_args(\"CMAKE_CUDA_ARCHITECTURES=all\") }}\n{%- endif %}\n\n{%- if linux and x86_64 and cuda_compiler_version == \"None\" %}\n${{ ggml_args(\"BLAS=ON\") }}\n\n{%- if blas_impl == \"mkl\" %}\n${{ ggml_args(\"BLAS_VENDOR=Intel10_64_dyn\") }}\n{%- endif %}\n\n{%- endif %}\n\necho $LLAMA_ARGS\ncmake -S . -B build -G Ninja ${CMAKE_ARGS} ${LLAMA_ARGS}\ncmake --build build\ncmake --install build\n"
     },
     "extra": {
@@ -1741,6 +1767,7 @@
               "check_file \"$PREFIX/bin/llama-convert-llama2c-to-ggml\" \"llama-convert-llama2c-to-ggml\"",
               "check_file \"$PREFIX/bin/llama-cvector-generator\" \"llama-cvector-generator\"",
               "check_file \"$PREFIX/bin/llama-embedding\" \"llama-embedding\"",
+              "check_file \"$PREFIX/bin/llama-diffusion-cli\" \"llama-diffusion-cli\"",
               "check_file \"$PREFIX/bin/llama-eval-callback\" \"llama-eval-callback\"",
               "check_file \"$PREFIX/bin/llama-export-lora\" \"llama-export-lora\"",
               "check_file \"$PREFIX/bin/llama-finetune\" \"llama-finetune\"",
@@ -1778,12 +1805,12 @@
               "check_file \"$PREFIX/include/ggml-cpp.h\" \"ggml-cpp.h\"",
               "check_file \"$PREFIX/include/ggml-cpu.h\" \"ggml-cpu.h\"",
               "check_file \"$PREFIX/include/ggml-cuda.h\" \"ggml-cuda.h\"",
-              "check_file \"$PREFIX/include/ggml-kompute.h\" \"ggml-kompute.h\"",
               "check_file \"$PREFIX/include/ggml-metal.h\" \"ggml-metal.h\"",
               "check_file \"$PREFIX/include/ggml-opt.h\" \"ggml-opt.h\"",
               "check_file \"$PREFIX/include/ggml-rpc.h\" \"ggml-rpc.h\"",
               "check_file \"$PREFIX/include/ggml-sycl.h\" \"ggml-sycl.h\"",
               "check_file \"$PREFIX/include/ggml-vulkan.h\" \"ggml-vulkan.h\"",
+              "check_file \"$PREFIX/include/ggml-webgpu.h\" \"ggml-webgpu.h\"",
               "check_file \"$PREFIX/include/ggml.h\" \"ggml.h\"",
               "check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"",
               "check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"",
@@ -1801,6 +1828,7 @@
               "check_file \"$PREFIX/lib/libggml${SHLIB_EXT}\" \"libggml${SHLIB_EXT}\"",
               "check_file \"$PREFIX/lib/libllama${SHLIB_EXT}\" \"libllama${SHLIB_EXT}\"",
               "check_file \"$PREFIX/lib/libmtmd${SHLIB_EXT}\" \"libmtmd${SHLIB_EXT}\"",
+              "check_file \"$PREFIX/lib/libggml-blas${SHLIB_EXT}\" \"libggml-blas${SHLIB_EXT}\"",
               "echo \"Checking pkg-config file...\"",
               "check_file \"$PREFIX/lib/pkgconfig/llama.pc\" \"llama.pc\""
             ]
@@ -1812,12 +1840,12 @@
             ]
           }
         ],
-        "version": "5649"
+        "version": "6191"
       }
     ],
     "package": {
       "name": "llama.cpp",
-      "version": "5649"
+      "version": "6191"
     },
     "requirements": {
       "build": [
@@ -1832,8 +1860,8 @@
     },
     "schema_version": 1,
     "source": {
-      "sha256": "4e76e8a320d207bd5bfd75dae77d6e3b81dec950832a07a7e9441e30bcd95d96",
-      "url": "https://github.com/ggml-org/llama.cpp/archive/b5649.tar.gz"
+      "sha256": "2383b5ed5096bdc560b64484d6924599bb95367c145544f041caaa3ed7bdb990",
+      "url": "https://github.com/ggml-org/llama.cpp/archive/b6191.tar.gz"
     }
   },
   "osx_arm64_requirements": {
@@ -1879,7 +1907,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/llama.cpp.json"
   },
-  "raw_meta_yaml": "context:\n  name: llama.cpp\n  version: \"5649\"\n  build: 1\n\npackage:\n  name: ${{ name|lower }}\n  version: ${{ version }}\n\nsource:\n  url: https://github.com/ggml-org/${{ name }}/archive/b${{ version | split(\".\") | list | last }}.tar.gz\n  sha256: 4e76e8a320d207bd5bfd75dae77d6e3b81dec950832a07a7e9441e30bcd95d96\n\nbuild:\n  number: ${{ build }}\n  string: '{%- if cuda_compiler_version != \"None\" -%}cuda${{ cuda_compiler_version | replace(\".\", \"\") }}_h${{ hash }}_${{ build }}{%- elif (osx and x86_64) or cuda_compiler_version == \"None\" -%}cpu_${{ blas_impl }}_h${{ hash }}_${{ build }}{%- elif osx and arm64 -%}mps_h${{ hash }}_${{ build }}{%- endif -%}'\n\n  script:\n    - if: unix\n      then: |\n        echo hello\n        LLAMA_ARGS=\"-DLLAMA_BUILD_TESTS=OFF\"\n\n        {%- macro llama_args(value) %}\n        LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_${{ value }}\"\n        {%- endmacro %}\n\n        {%- macro cmake_args(value) -%}\n        LLAMA_ARGS=\"${LLAMA_ARGS} -D${{ value }}\"\n        {%- endmacro %}\n\n        {% macro ggml_args(value) -%}\n        LLAMA_ARGS=\"${LLAMA_ARGS} -DGGML_${{ value }}\"\n        {%- endmacro %}\n\n        ${{ cmake_args(\"BUILD_SHARED_LIBS=ON\") }}\n        ${{ llama_args(\"CURL=OFF\") }}\n\n        {%- if osx and arm64 %}\n        ${{ ggml_args(\"NATIVE=OFF\") }}\n        ${{ ggml_args(\"AVX=OFF\") }}\n        ${{ ggml_args(\"AVX2=OFF\") }}\n        ${{ ggml_args(\"FMA=OFF\") }}\n        ${{ ggml_args(\"F16C=OFF\") }}\n        ${{ ggml_args(\"METAL=ON\") }}\n        ${{ ggml_args(\"ACCELERATE=ON\") }}\n        {%- endif %}\n\n        {%- if osx and x86_64 %}\n        ${{ ggml_args(\"METAL=OFF\") }}\n        ${{ ggml_args(\"ACCELERATE=ON\") }}\n        {%- endif %}\n\n        {%- if cuda_compiler_version != \"None\" %}\n        ${{ ggml_args(\"CUDA=ON\") }}\n        ${{ cmake_args(\"CMAKE_CUDA_ARCHITECTURES=all\") }}\n        {%- endif %}\n\n        {%- if linux and x86_64 and cuda_compiler_version == \"None\" %}\n        ${{ ggml_args(\"BLAS=ON\") }}\n\n        {%- if blas_impl == \"mkl\" %}\n        ${{ ggml_args(\"BLAS_VENDOR=Intel10_64_dyn\") }}\n        {%- endif %}\n\n        {%- endif %}\n\n        echo $LLAMA_ARGS\n        cmake -S . -B build -G Ninja ${CMAKE_ARGS} ${LLAMA_ARGS}\n        cmake --build build\n        cmake --install build\n    - if: win\n      then: |\n        echo hello\n        set LLAMA_ARGS=-DLLAMA_BUILD_TESTS=OFF\n\n        {% macro llama_args(value) -%}\n        set LLAMA_ARGS=%LLAMA_ARGS% -DLLAMA_${{ value }}\n        {%- endmacro %}\n\n        {% macro cmake_args(value) -%}\n        set LLAMA_ARGS=%LLAMA_ARGS% -D${{ value }}\n        {%- endmacro %}\n\n        {% macro ggml_args(value) -%}\n        set LLAMA_ARGS=%LLAMA_ARGS% -DGGML_${{ value }}\n        {%- endmacro %}\n\n        ${{ cmake_args(\"BUILD_SHARED_LIBS=ON\") }}\n        ${{ llama_args(\"CURL=OFF\") }}\n\n        ${{ ggml_args(\"NATIVE=OFF\") }}\n\n        {%- if cuda_compiler_version != \"None\" %}\n        ${{ ggml_args(\"CUDA=ON\") }}\n\n        :: NOTE: is it necessary to set `CMAKE_CUDA_ARCHITECTURES=all`\n        :: on Windows, or is it a nice-to-have?\n        :: ${{ cmake_args(\"CMAKE_CUDA_ARCHITECTURES=all\") }}\n\n        {%- else %}\n\n        ${{ ggml_args(\"BLAS=ON\") }}\n\n        {%- if blas_impl == \"mkl\" %}\n        ${{ ggml_args(\"BLAS_VENDOR=Intel10_64_dyn\") }}\n        {%- endif %}\n\n        {%- endif %}\n\n        set LLAMA_ARGS\n        cmake -S . -B build -G Ninja %CMAKE_ARGS% %LLAMA_ARGS%\n        cmake --build build\n        cmake --install build\n  dynamic_linking:\n    missing_dso_allowlist:\n      - if: win\n        then:\n          - \"*/nvcuda.dll\"\n      - if: linux\n        then:\n          - \"*/libcuda.so.1\"\n\nrequirements:\n  build:\n    - ${{ compiler('c') }}\n    - ${{ stdlib('c') }}\n    - ${{ compiler('cxx') }}\n    - if: cuda_compiler_version != \"None\"\n      then:\n        - ${{ compiler('cuda') }}\n    - cmake\n    - git\n    - ninja\n    - pkgconfig\n  host:\n    - if: cuda_compiler_version != \"None\"\n      then:\n        # NOTE: Without cuda-version, we are installing cuda-toolkit 11.8 instead of 11.2!\n        - cuda-version ${{ cuda_compiler_version }}.*\n        - if: match(cuda_compiler_version, \"12.*\")\n          then:\n            - cuda-cudart-dev ${{ cuda_compiler_version }}.*\n            - libcublas-dev ${{ cuda_compiler_version }}.*\n\n    - if: (not osx) and (cuda_compiler_version == \"None\") and (blas_impl == \"mkl\")\n      then:\n        - blas-devel * *_${{ blas_impl }}\n        - mkl-devel ${{ mkl }}.*\n  run:\n    - if: cuda_compiler_version != \"None\"\n      then:\n        - cuda-version ${{ cuda_compiler_version }}.*\n        - __cuda\n        - if: match(cuda_compiler_version, \"12.*\")\n          then:\n            - cuda-nvcc-tools\n  run_constraints:\n    # whisper.cpp also vendors ggml\n    - whisper.cpp <0.0.0a0\n\ntests:\n  # Test for presence of header files, libraries, and configuration files\n  - if: unix\n    then:\n      - script:\n        # Define function to check file existence with verbose output\n        - |\n          check_file() {\n            local file=\"$1\"\n            local description=\"$2\"\n            if test -f \"$file\"; then\n              echo \"✓ Found: $description\"\n            else\n              echo \"✗ Missing: $description\"\n              return 1\n            fi\n          }\n\n        # Check binaries\n        - echo \"Checking binary files...\"\n        - check_file \"$PREFIX/bin/convert_hf_to_gguf.py\" \"convert_hf_to_gguf.py\"\n        - check_file \"$PREFIX/bin/llama-batched\" \"llama-batched\"\n        - check_file \"$PREFIX/bin/llama-batched-bench\" \"llama-batched-bench\"\n        - check_file \"$PREFIX/bin/llama-bench\" \"llama-bench\"\n        - check_file \"$PREFIX/bin/llama-cli\" \"llama-cli\"\n        - check_file \"$PREFIX/bin/llama-convert-llama2c-to-ggml\" \"llama-convert-llama2c-to-ggml\"\n        - check_file \"$PREFIX/bin/llama-cvector-generator\" \"llama-cvector-generator\"\n        - check_file \"$PREFIX/bin/llama-embedding\" \"llama-embedding\"\n        - check_file \"$PREFIX/bin/llama-eval-callback\" \"llama-eval-callback\"\n        - check_file \"$PREFIX/bin/llama-export-lora\" \"llama-export-lora\"\n        - check_file \"$PREFIX/bin/llama-finetune\" \"llama-finetune\"\n        - check_file \"$PREFIX/bin/llama-gen-docs\" \"llama-gen-docs\"\n        - check_file \"$PREFIX/bin/llama-gguf\" \"llama-gguf\"\n        - check_file \"$PREFIX/bin/llama-gguf-hash\" \"llama-gguf-hash\"\n        - check_file \"$PREFIX/bin/llama-gguf-split\" \"llama-gguf-split\"\n        - check_file \"$PREFIX/bin/llama-gritlm\" \"llama-gritlm\"\n        - check_file \"$PREFIX/bin/llama-imatrix\" \"llama-imatrix\"\n        - check_file \"$PREFIX/bin/llama-lookahead\" \"llama-lookahead\"\n        - check_file \"$PREFIX/bin/llama-lookup\" \"llama-lookup\"\n        - check_file \"$PREFIX/bin/llama-lookup-create\" \"llama-lookup-create\"\n        - check_file \"$PREFIX/bin/llama-lookup-merge\" \"llama-lookup-merge\"\n        - check_file \"$PREFIX/bin/llama-lookup-stats\" \"llama-lookup-stats\"\n        - check_file \"$PREFIX/bin/llama-mtmd-cli\" \"llama-mtmd-cli\"\n        - check_file \"$PREFIX/bin/llama-parallel\" \"llama-parallel\"\n        - check_file \"$PREFIX/bin/llama-passkey\" \"llama-passkey\"\n        - check_file \"$PREFIX/bin/llama-perplexity\" \"llama-perplexity\"\n        - check_file \"$PREFIX/bin/llama-quantize\" \"llama-quantize\"\n        - check_file \"$PREFIX/bin/llama-retrieval\" \"llama-retrieval\"\n        - check_file \"$PREFIX/bin/llama-run\" \"llama-run\"\n        - check_file \"$PREFIX/bin/llama-save-load-state\" \"llama-save-load-state\"\n        - check_file \"$PREFIX/bin/llama-server\" \"llama-server\"\n        - check_file \"$PREFIX/bin/llama-simple\" \"llama-simple\"\n        - check_file \"$PREFIX/bin/llama-simple-chat\" \"llama-simple-chat\"\n        - check_file \"$PREFIX/bin/llama-speculative\" \"llama-speculative\"\n        - check_file \"$PREFIX/bin/llama-speculative-simple\" \"llama-speculative-simple\"\n        - check_file \"$PREFIX/bin/llama-tokenize\" \"llama-tokenize\"\n        - check_file \"$PREFIX/bin/llama-tts\" \"llama-tts\"\n\n        # Check header files\n        - echo \"Checking header files...\"\n        - check_file \"$PREFIX/include/ggml-alloc.h\" \"ggml-alloc.h\"\n        - check_file \"$PREFIX/include/ggml-backend.h\" \"ggml-backend.h\"\n        - check_file \"$PREFIX/include/ggml-blas.h\" \"ggml-blas.h\"\n        - check_file \"$PREFIX/include/ggml-cann.h\" \"ggml-cann.h\"\n        - check_file \"$PREFIX/include/ggml-cpp.h\" \"ggml-cpp.h\"\n        - check_file \"$PREFIX/include/ggml-cpu.h\" \"ggml-cpu.h\"\n        - check_file \"$PREFIX/include/ggml-cuda.h\" \"ggml-cuda.h\"\n        - check_file \"$PREFIX/include/ggml-kompute.h\" \"ggml-kompute.h\"\n        - check_file \"$PREFIX/include/ggml-metal.h\" \"ggml-metal.h\"\n        - check_file \"$PREFIX/include/ggml-opt.h\" \"ggml-opt.h\"\n        - check_file \"$PREFIX/include/ggml-rpc.h\" \"ggml-rpc.h\"\n        - check_file \"$PREFIX/include/ggml-sycl.h\" \"ggml-sycl.h\"\n        - check_file \"$PREFIX/include/ggml-vulkan.h\" \"ggml-vulkan.h\"\n        - check_file \"$PREFIX/include/ggml.h\" \"ggml.h\"\n        - check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"\n        - check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"\n        - check_file \"$PREFIX/include/llama.h\" \"llama.h\"\n        - check_file \"$PREFIX/include/mtmd-helper.h\" \"mtmd-helper.h\"\n        - check_file \"$PREFIX/include/mtmd.h\" \"mtmd.h\"\n\n        # Check CMake configuration files\n        - echo \"Checking CMake configuration files...\"\n        - check_file \"$PREFIX/lib/cmake/ggml/ggml-config.cmake\" \"ggml-config.cmake\"\n        - check_file \"$PREFIX/lib/cmake/ggml/ggml-version.cmake\" \"ggml-version.cmake\"\n        - check_file \"$PREFIX/lib/cmake/llama/llama-config.cmake\" \"llama-config.cmake\"\n        - check_file \"$PREFIX/lib/cmake/llama/llama-version.cmake\" \"llama-version.cmake\"\n\n        # Check libraries\n        - echo \"Checking library files...\"\n        - check_file \"$PREFIX/lib/libggml-base${SHLIB_EXT}\" \"libggml-base${SHLIB_EXT}\"\n        - check_file \"$PREFIX/lib/libggml-cpu${SHLIB_EXT}\" \"libggml-cpu${SHLIB_EXT}\"\n        - check_file \"$PREFIX/lib/libggml${SHLIB_EXT}\" \"libggml${SHLIB_EXT}\"\n        - check_file \"$PREFIX/lib/libllama${SHLIB_EXT}\" \"libllama${SHLIB_EXT}\"\n        - check_file \"$PREFIX/lib/libmtmd${SHLIB_EXT}\" \"libmtmd${SHLIB_EXT}\"\n\n        # Check pkg-config file\n        - echo \"Checking pkg-config file...\"\n        - check_file \"$PREFIX/lib/pkgconfig/llama.pc\" \"llama.pc\"\n\n  - if: (build_platform == target_platform) and (cuda_compiler_version == \"None\")\n    then:\n      - script:\n          - llama-cli --help\n          - llama-server --help\n        requirements:\n          run:\n            - if: cuda_compiler_version != \"None\"\n              then:\n                - cuda-version ${{ cuda_compiler_version }}\n\nabout:\n  homepage: https://github.com/ggml-org/llama.cpp\n  repository: https://github.com/ggml-org/llama.cpp\n  summary: Port of Facebook's LLaMA model in C/C++\n  license: MIT\n  license_file: LICENSE\n\nextra:\n  recipe-maintainers:\n    - jjerphan\n    - jonashaag\n    - frankier\n    - sodre\n    - pavelzw\n",
+  "raw_meta_yaml": "context:\n  name: llama.cpp\n  version: \"6191\"\n  build: 0\n\npackage:\n  name: ${{ name|lower }}\n  version: ${{ version }}\n\nsource:\n  url: https://github.com/ggml-org/${{ name }}/archive/b${{ version | split(\".\") | list | last }}.tar.gz\n  sha256: 2383b5ed5096bdc560b64484d6924599bb95367c145544f041caaa3ed7bdb990\n\nbuild:\n  number: ${{ build }}\n  string: '{%- if cuda_compiler_version != \"None\" -%}cuda${{ cuda_compiler_version | replace(\".\", \"\") }}_h${{ hash }}_${{ build }}{%- elif (osx and x86_64) or cuda_compiler_version == \"None\" -%}cpu_${{ blas_impl }}_h${{ hash }}_${{ build }}{%- elif osx and arm64 -%}mps_h${{ hash }}_${{ build }}{%- endif -%}'\n\n  script:\n    - if: unix\n      then: |\n        echo hello\n        LLAMA_ARGS=\"-DLLAMA_BUILD_TESTS=OFF\"\n\n        {%- macro llama_args(value) %}\n        LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_${{ value }}\"\n        {%- endmacro %}\n\n        {%- macro cmake_args(value) -%}\n        LLAMA_ARGS=\"${LLAMA_ARGS} -D${{ value }}\"\n        {%- endmacro %}\n\n        {% macro ggml_args(value) -%}\n        LLAMA_ARGS=\"${LLAMA_ARGS} -DGGML_${{ value }}\"\n        {%- endmacro %}\n\n        ${{ cmake_args(\"BUILD_SHARED_LIBS=ON\") }}\n        ${{ llama_args(\"CURL=OFF\") }}\n\n        {%- if osx and arm64 %}\n        ${{ ggml_args(\"NATIVE=OFF\") }}\n        ${{ ggml_args(\"AVX=OFF\") }}\n        ${{ ggml_args(\"AVX2=OFF\") }}\n        ${{ ggml_args(\"FMA=OFF\") }}\n        ${{ ggml_args(\"F16C=OFF\") }}\n        ${{ ggml_args(\"METAL=ON\") }}\n        ${{ ggml_args(\"ACCELERATE=ON\") }}\n        {%- endif %}\n\n        {%- if osx and x86_64 %}\n        ${{ ggml_args(\"METAL=OFF\") }}\n        ${{ ggml_args(\"ACCELERATE=ON\") }}\n        {%- endif %}\n\n        {%- if cuda_compiler_version != \"None\" %}\n        ${{ ggml_args(\"CUDA=ON\") }}\n        ${{ cmake_args(\"CMAKE_CUDA_ARCHITECTURES=all\") }}\n        {%- endif %}\n\n        {%- if linux and x86_64 and cuda_compiler_version == \"None\" %}\n        ${{ ggml_args(\"BLAS=ON\") }}\n\n        {%- if blas_impl == \"mkl\" %}\n        ${{ ggml_args(\"BLAS_VENDOR=Intel10_64_dyn\") }}\n        {%- endif %}\n\n        {%- endif %}\n\n        echo $LLAMA_ARGS\n        cmake -S . -B build -G Ninja ${CMAKE_ARGS} ${LLAMA_ARGS}\n        cmake --build build\n        cmake --install build\n    - if: win\n      then: |\n        echo hello\n        set LLAMA_ARGS=-DLLAMA_BUILD_TESTS=OFF\n\n        {% macro llama_args(value) -%}\n        set LLAMA_ARGS=%LLAMA_ARGS% -DLLAMA_${{ value }}\n        {%- endmacro %}\n\n        {% macro cmake_args(value) -%}\n        set LLAMA_ARGS=%LLAMA_ARGS% -D${{ value }}\n        {%- endmacro %}\n\n        {% macro ggml_args(value) -%}\n        set LLAMA_ARGS=%LLAMA_ARGS% -DGGML_${{ value }}\n        {%- endmacro %}\n\n        ${{ cmake_args(\"BUILD_SHARED_LIBS=ON\") }}\n        ${{ llama_args(\"CURL=OFF\") }}\n\n        ${{ ggml_args(\"NATIVE=OFF\") }}\n\n        {%- if cuda_compiler_version != \"None\" %}\n        ${{ ggml_args(\"CUDA=ON\") }}\n\n        :: NOTE: is it necessary to set `CMAKE_CUDA_ARCHITECTURES=all`\n        :: on Windows, or is it a nice-to-have?\n        :: ${{ cmake_args(\"CMAKE_CUDA_ARCHITECTURES=all\") }}\n\n        {%- else %}\n\n        ${{ ggml_args(\"BLAS=ON\") }}\n\n        {%- if blas_impl == \"mkl\" %}\n        ${{ ggml_args(\"BLAS_VENDOR=Intel10_64_dyn\") }}\n        {%- endif %}\n\n        {%- endif %}\n\n        set LLAMA_ARGS\n        cmake -S . -B build -G Ninja %CMAKE_ARGS% %LLAMA_ARGS%\n        cmake --build build\n        cmake --install build\n  dynamic_linking:\n    missing_dso_allowlist:\n      - if: win\n        then:\n          - \"*/nvcuda.dll\"\n      - if: linux\n        then:\n          - \"*/libcuda.so.1\"\n\nrequirements:\n  build:\n    - ${{ compiler('c') }}\n    - ${{ stdlib('c') }}\n    - ${{ compiler('cxx') }}\n    - if: cuda_compiler_version != \"None\"\n      then:\n        - ${{ compiler('cuda') }}\n    - cmake\n    - git\n    - ninja\n    - pkgconfig\n  host:\n    - if: cuda_compiler_version != \"None\"\n      then:\n        # NOTE: Without cuda-version, we are installing cuda-toolkit 11.8 instead of 11.2!\n        - cuda-version ${{ cuda_compiler_version }}.*\n        - if: match(cuda_compiler_version, \"12.*\")\n          then:\n            - cuda-cudart-dev ${{ cuda_compiler_version }}.*\n            - libcublas-dev ${{ cuda_compiler_version }}.*\n\n    - if: (not osx) and (cuda_compiler_version == \"None\") and (blas_impl == \"mkl\")\n      then:\n        - blas-devel * *_${{ blas_impl }}\n        - mkl-devel ${{ mkl }}.*\n  run:\n    - if: cuda_compiler_version != \"None\"\n      then:\n        - cuda-version ${{ cuda_compiler_version }}.*\n        - __cuda\n        - if: match(cuda_compiler_version, \"12.*\")\n          then:\n            - cuda-nvcc-tools\n  run_constraints:\n    # whisper.cpp also vendors ggml\n    - whisper.cpp <0.0.0a0\n\ntests:\n  # Test for presence of header files, libraries, and configuration files\n  - if: unix\n    then:\n      - script:\n        # Define function to check file existence with verbose output\n        - |\n          check_file() {\n            local file=\"$1\"\n            local description=\"$2\"\n            if test -f \"$file\"; then\n              echo \"✓ Found: $description\"\n            else\n              echo \"✗ Missing: $description\"\n              return 1\n            fi\n          }\n\n        # Check binaries\n        - echo \"Checking binary files...\"\n        - check_file \"$PREFIX/bin/convert_hf_to_gguf.py\" \"convert_hf_to_gguf.py\"\n        - check_file \"$PREFIX/bin/llama-batched\" \"llama-batched\"\n        - check_file \"$PREFIX/bin/llama-batched-bench\" \"llama-batched-bench\"\n        - check_file \"$PREFIX/bin/llama-bench\" \"llama-bench\"\n        - check_file \"$PREFIX/bin/llama-cli\" \"llama-cli\"\n        - check_file \"$PREFIX/bin/llama-convert-llama2c-to-ggml\" \"llama-convert-llama2c-to-ggml\"\n        - check_file \"$PREFIX/bin/llama-cvector-generator\" \"llama-cvector-generator\"\n        - check_file \"$PREFIX/bin/llama-embedding\" \"llama-embedding\"\n        - check_file \"$PREFIX/bin/llama-diffusion-cli\" \"llama-diffusion-cli\"\n        - check_file \"$PREFIX/bin/llama-eval-callback\" \"llama-eval-callback\"\n        - check_file \"$PREFIX/bin/llama-export-lora\" \"llama-export-lora\"\n        - check_file \"$PREFIX/bin/llama-finetune\" \"llama-finetune\"\n        - check_file \"$PREFIX/bin/llama-gen-docs\" \"llama-gen-docs\"\n        - check_file \"$PREFIX/bin/llama-gguf\" \"llama-gguf\"\n        - check_file \"$PREFIX/bin/llama-gguf-hash\" \"llama-gguf-hash\"\n        - check_file \"$PREFIX/bin/llama-gguf-split\" \"llama-gguf-split\"\n        - check_file \"$PREFIX/bin/llama-gritlm\" \"llama-gritlm\"\n        - check_file \"$PREFIX/bin/llama-imatrix\" \"llama-imatrix\"\n        - check_file \"$PREFIX/bin/llama-lookahead\" \"llama-lookahead\"\n        - check_file \"$PREFIX/bin/llama-lookup\" \"llama-lookup\"\n        - check_file \"$PREFIX/bin/llama-lookup-create\" \"llama-lookup-create\"\n        - check_file \"$PREFIX/bin/llama-lookup-merge\" \"llama-lookup-merge\"\n        - check_file \"$PREFIX/bin/llama-lookup-stats\" \"llama-lookup-stats\"\n        - check_file \"$PREFIX/bin/llama-mtmd-cli\" \"llama-mtmd-cli\"\n        - check_file \"$PREFIX/bin/llama-parallel\" \"llama-parallel\"\n        - check_file \"$PREFIX/bin/llama-passkey\" \"llama-passkey\"\n        - check_file \"$PREFIX/bin/llama-perplexity\" \"llama-perplexity\"\n        - check_file \"$PREFIX/bin/llama-quantize\" \"llama-quantize\"\n        - check_file \"$PREFIX/bin/llama-retrieval\" \"llama-retrieval\"\n        - check_file \"$PREFIX/bin/llama-run\" \"llama-run\"\n        - check_file \"$PREFIX/bin/llama-save-load-state\" \"llama-save-load-state\"\n        - check_file \"$PREFIX/bin/llama-server\" \"llama-server\"\n        - check_file \"$PREFIX/bin/llama-simple\" \"llama-simple\"\n        - check_file \"$PREFIX/bin/llama-simple-chat\" \"llama-simple-chat\"\n        - check_file \"$PREFIX/bin/llama-speculative\" \"llama-speculative\"\n        - check_file \"$PREFIX/bin/llama-speculative-simple\" \"llama-speculative-simple\"\n        - check_file \"$PREFIX/bin/llama-tokenize\" \"llama-tokenize\"\n        - check_file \"$PREFIX/bin/llama-tts\" \"llama-tts\"\n\n        # Check header files\n        - echo \"Checking header files...\"\n        - check_file \"$PREFIX/include/ggml-alloc.h\" \"ggml-alloc.h\"\n        - check_file \"$PREFIX/include/ggml-backend.h\" \"ggml-backend.h\"\n        - check_file \"$PREFIX/include/ggml-blas.h\" \"ggml-blas.h\"\n        - check_file \"$PREFIX/include/ggml-cann.h\" \"ggml-cann.h\"\n        - check_file \"$PREFIX/include/ggml-cpp.h\" \"ggml-cpp.h\"\n        - check_file \"$PREFIX/include/ggml-cpu.h\" \"ggml-cpu.h\"\n        - check_file \"$PREFIX/include/ggml-cuda.h\" \"ggml-cuda.h\"\n        - check_file \"$PREFIX/include/ggml-metal.h\" \"ggml-metal.h\"\n        - check_file \"$PREFIX/include/ggml-opt.h\" \"ggml-opt.h\"\n        - check_file \"$PREFIX/include/ggml-rpc.h\" \"ggml-rpc.h\"\n        - check_file \"$PREFIX/include/ggml-sycl.h\" \"ggml-sycl.h\"\n        - check_file \"$PREFIX/include/ggml-vulkan.h\" \"ggml-vulkan.h\"\n        - check_file \"$PREFIX/include/ggml-webgpu.h\" \"ggml-webgpu.h\"\n        - check_file \"$PREFIX/include/ggml.h\" \"ggml.h\"\n        - check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"\n        - check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"\n        - check_file \"$PREFIX/include/llama.h\" \"llama.h\"\n        - check_file \"$PREFIX/include/mtmd-helper.h\" \"mtmd-helper.h\"\n        - check_file \"$PREFIX/include/mtmd.h\" \"mtmd.h\"\n\n        # Check CMake configuration files\n        - echo \"Checking CMake configuration files...\"\n        - check_file \"$PREFIX/lib/cmake/ggml/ggml-config.cmake\" \"ggml-config.cmake\"\n        - check_file \"$PREFIX/lib/cmake/ggml/ggml-version.cmake\" \"ggml-version.cmake\"\n        - check_file \"$PREFIX/lib/cmake/llama/llama-config.cmake\" \"llama-config.cmake\"\n        - check_file \"$PREFIX/lib/cmake/llama/llama-version.cmake\" \"llama-version.cmake\"\n\n        # Check libraries\n        - echo \"Checking library files...\"\n        - check_file \"$PREFIX/lib/libggml-base${SHLIB_EXT}\" \"libggml-base${SHLIB_EXT}\"\n        - check_file \"$PREFIX/lib/libggml-cpu${SHLIB_EXT}\" \"libggml-cpu${SHLIB_EXT}\"\n        - check_file \"$PREFIX/lib/libggml${SHLIB_EXT}\" \"libggml${SHLIB_EXT}\"\n        - check_file \"$PREFIX/lib/libllama${SHLIB_EXT}\" \"libllama${SHLIB_EXT}\"\n        - check_file \"$PREFIX/lib/libmtmd${SHLIB_EXT}\" \"libmtmd${SHLIB_EXT}\"\n\n        # CUDA libraries\n        - if: cuda_compiler_version != \"None\"\n          then:\n            - check_file \"$PREFIX/lib/libggml-cuda${SHLIB_EXT}\" \"libggml-cuda${SHLIB_EXT}\"\n\n        # Packaged everywhere but for CUDA builds and on linux_aarch64\n        - if: (not (linux and aarch64)) and (cuda_compiler_version == \"None\")\n          then:\n            - check_file \"$PREFIX/lib/libggml-blas${SHLIB_EXT}\" \"libggml-blas${SHLIB_EXT}\"\n\n        # Check pkg-config file\n        - echo \"Checking pkg-config file...\"\n        - check_file \"$PREFIX/lib/pkgconfig/llama.pc\" \"llama.pc\"\n\n  - if: (build_platform == target_platform) and (cuda_compiler_version == \"None\")\n    then:\n      - script:\n          - llama-cli --help\n          - llama-server --help\n        requirements:\n          run:\n            - if: cuda_compiler_version != \"None\"\n              then:\n                - cuda-version ${{ cuda_compiler_version }}\n\nabout:\n  homepage: https://github.com/ggml-org/llama.cpp\n  repository: https://github.com/ggml-org/llama.cpp\n  summary: Port of Facebook's LLaMA model in C/C++\n  license: MIT\n  license_file: LICENSE\n\nextra:\n  recipe-maintainers:\n    - jjerphan\n    - jonashaag\n    - frankier\n    - sodre\n    - pavelzw\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -1983,8 +2011,8 @@
       "elements": []
     }
   },
-  "url": "https://github.com/ggml-org/llama.cpp/archive/b5649.tar.gz",
-  "version": "5649",
+  "url": "https://github.com/ggml-org/llama.cpp/archive/b6191.tar.gz",
+  "version": "6191",
   "version_pr_info": {
     "__lazy_json__": "version_pr_info/llama.cpp.json"
   },
@@ -1998,7 +2026,7 @@
       "summary": "Port of Facebook's LLaMA model in C/C++"
     },
     "build": {
-      "number": "1",
+      "number": "0",
       "script": "echo hello\nLLAMA_ARGS=\"-DLLAMA_BUILD_TESTS=OFF\"\n\n{%- macro llama_args(value) %}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_${{ value }}\"\n{%- endmacro %}\n\n{%- macro cmake_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -D${{ value }}\"\n{%- endmacro %}\n\n{% macro ggml_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DGGML_${{ value }}\"\n{%- endmacro %}\n\n${{ cmake_args(\"BUILD_SHARED_LIBS=ON\") }}\n${{ llama_args(\"CURL=OFF\") }}\n\n{%- if osx and arm64 %}\n${{ ggml_args(\"NATIVE=OFF\") }}\n${{ ggml_args(\"AVX=OFF\") }}\n${{ ggml_args(\"AVX2=OFF\") }}\n${{ ggml_args(\"FMA=OFF\") }}\n${{ ggml_args(\"F16C=OFF\") }}\n${{ ggml_args(\"METAL=ON\") }}\n${{ ggml_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n\n{%- if osx and x86_64 %}\n${{ ggml_args(\"METAL=OFF\") }}\n${{ ggml_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n\n{%- if cuda_compiler_version != \"None\" %}\n${{ ggml_args(\"CUDA=ON\") }}\n${{ cmake_args(\"CMAKE_CUDA_ARCHITECTURES=all\") }}\n{%- endif %}\n\n{%- if linux and x86_64 and cuda_compiler_version == \"None\" %}\n${{ ggml_args(\"BLAS=ON\") }}\n\n{%- if blas_impl == \"mkl\" %}\n${{ ggml_args(\"BLAS_VENDOR=Intel10_64_dyn\") }}\n{%- endif %}\n\n{%- endif %}\n\necho $LLAMA_ARGS\ncmake -S . -B build -G Ninja ${CMAKE_ARGS} ${LLAMA_ARGS}\ncmake --build build\ncmake --install build\n"
     },
     "extra": {
@@ -2049,6 +2077,7 @@
               "check_file \"$PREFIX/bin/llama-convert-llama2c-to-ggml\" \"llama-convert-llama2c-to-ggml\"",
               "check_file \"$PREFIX/bin/llama-cvector-generator\" \"llama-cvector-generator\"",
               "check_file \"$PREFIX/bin/llama-embedding\" \"llama-embedding\"",
+              "check_file \"$PREFIX/bin/llama-diffusion-cli\" \"llama-diffusion-cli\"",
               "check_file \"$PREFIX/bin/llama-eval-callback\" \"llama-eval-callback\"",
               "check_file \"$PREFIX/bin/llama-export-lora\" \"llama-export-lora\"",
               "check_file \"$PREFIX/bin/llama-finetune\" \"llama-finetune\"",
@@ -2086,12 +2115,12 @@
               "check_file \"$PREFIX/include/ggml-cpp.h\" \"ggml-cpp.h\"",
               "check_file \"$PREFIX/include/ggml-cpu.h\" \"ggml-cpu.h\"",
               "check_file \"$PREFIX/include/ggml-cuda.h\" \"ggml-cuda.h\"",
-              "check_file \"$PREFIX/include/ggml-kompute.h\" \"ggml-kompute.h\"",
               "check_file \"$PREFIX/include/ggml-metal.h\" \"ggml-metal.h\"",
               "check_file \"$PREFIX/include/ggml-opt.h\" \"ggml-opt.h\"",
               "check_file \"$PREFIX/include/ggml-rpc.h\" \"ggml-rpc.h\"",
               "check_file \"$PREFIX/include/ggml-sycl.h\" \"ggml-sycl.h\"",
               "check_file \"$PREFIX/include/ggml-vulkan.h\" \"ggml-vulkan.h\"",
+              "check_file \"$PREFIX/include/ggml-webgpu.h\" \"ggml-webgpu.h\"",
               "check_file \"$PREFIX/include/ggml.h\" \"ggml.h\"",
               "check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"",
               "check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"",
@@ -2109,12 +2138,13 @@
               "check_file \"$PREFIX/lib/libggml${SHLIB_EXT}\" \"libggml${SHLIB_EXT}\"",
               "check_file \"$PREFIX/lib/libllama${SHLIB_EXT}\" \"libllama${SHLIB_EXT}\"",
               "check_file \"$PREFIX/lib/libmtmd${SHLIB_EXT}\" \"libmtmd${SHLIB_EXT}\"",
+              "check_file \"$PREFIX/lib/libggml-cuda${SHLIB_EXT}\" \"libggml-cuda${SHLIB_EXT}\"",
               "echo \"Checking pkg-config file...\"",
               "check_file \"$PREFIX/lib/pkgconfig/llama.pc\" \"llama.pc\""
             ]
           }
         ],
-        "version": "5649"
+        "version": "6191"
       },
       {
         "build": null,
@@ -2148,6 +2178,7 @@
               "check_file \"$PREFIX/bin/llama-convert-llama2c-to-ggml\" \"llama-convert-llama2c-to-ggml\"",
               "check_file \"$PREFIX/bin/llama-cvector-generator\" \"llama-cvector-generator\"",
               "check_file \"$PREFIX/bin/llama-embedding\" \"llama-embedding\"",
+              "check_file \"$PREFIX/bin/llama-diffusion-cli\" \"llama-diffusion-cli\"",
               "check_file \"$PREFIX/bin/llama-eval-callback\" \"llama-eval-callback\"",
               "check_file \"$PREFIX/bin/llama-export-lora\" \"llama-export-lora\"",
               "check_file \"$PREFIX/bin/llama-finetune\" \"llama-finetune\"",
@@ -2185,12 +2216,12 @@
               "check_file \"$PREFIX/include/ggml-cpp.h\" \"ggml-cpp.h\"",
               "check_file \"$PREFIX/include/ggml-cpu.h\" \"ggml-cpu.h\"",
               "check_file \"$PREFIX/include/ggml-cuda.h\" \"ggml-cuda.h\"",
-              "check_file \"$PREFIX/include/ggml-kompute.h\" \"ggml-kompute.h\"",
               "check_file \"$PREFIX/include/ggml-metal.h\" \"ggml-metal.h\"",
               "check_file \"$PREFIX/include/ggml-opt.h\" \"ggml-opt.h\"",
               "check_file \"$PREFIX/include/ggml-rpc.h\" \"ggml-rpc.h\"",
               "check_file \"$PREFIX/include/ggml-sycl.h\" \"ggml-sycl.h\"",
               "check_file \"$PREFIX/include/ggml-vulkan.h\" \"ggml-vulkan.h\"",
+              "check_file \"$PREFIX/include/ggml-webgpu.h\" \"ggml-webgpu.h\"",
               "check_file \"$PREFIX/include/ggml.h\" \"ggml.h\"",
               "check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"",
               "check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"",
@@ -2208,6 +2239,7 @@
               "check_file \"$PREFIX/lib/libggml${SHLIB_EXT}\" \"libggml${SHLIB_EXT}\"",
               "check_file \"$PREFIX/lib/libllama${SHLIB_EXT}\" \"libllama${SHLIB_EXT}\"",
               "check_file \"$PREFIX/lib/libmtmd${SHLIB_EXT}\" \"libmtmd${SHLIB_EXT}\"",
+              "check_file \"$PREFIX/lib/libggml-blas${SHLIB_EXT}\" \"libggml-blas${SHLIB_EXT}\"",
               "echo \"Checking pkg-config file...\"",
               "check_file \"$PREFIX/lib/pkgconfig/llama.pc\" \"llama.pc\""
             ]
@@ -2219,12 +2251,12 @@
             ]
           }
         ],
-        "version": "5649"
+        "version": "6191"
       }
     ],
     "package": {
       "name": "llama.cpp",
-      "version": "5649"
+      "version": "6191"
     },
     "requirements": {
       "build": [
@@ -2252,8 +2284,8 @@
     },
     "schema_version": 1,
     "source": {
-      "sha256": "4e76e8a320d207bd5bfd75dae77d6e3b81dec950832a07a7e9441e30bcd95d96",
-      "url": "https://github.com/ggml-org/llama.cpp/archive/b5649.tar.gz"
+      "sha256": "2383b5ed5096bdc560b64484d6924599bb95367c145544f041caaa3ed7bdb990",
+      "url": "https://github.com/ggml-org/llama.cpp/archive/b6191.tar.gz"
     }
   },
   "win_64_requirements": {
