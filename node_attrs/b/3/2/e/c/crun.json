@@ -17,7 +17,7 @@
     "about": {
       "description": "crun is a command line program for running Linux containers that follow the Open Container Initiative (OCI) format.\n",
       "dev_url": "https://github.com/containers/crun",
-      "doc_url": "https://github.com/containers/crun/blob/0.16/crun.1.md",
+      "doc_url": "https://github.com/containers/crun/blob/1.23.1/crun.1.md",
       "home": "https://github.com/containers/crun",
       "license": "GPL-2.0-or-later AND LGPL-2.0-or-later",
       "license_file": "COPYING",
@@ -29,16 +29,18 @@
     },
     "extra": {
       "recipe-maintainers": [
-        "mbargull"
+        "mbargull",
+        "2themaxx"
       ]
     },
     "package": {
       "name": "crun",
-      "version": "0.16"
+      "version": "1.23.1"
     },
     "requirements": {
       "build": [
         "c_compiler_stub",
+        "c_stdlib_stub",
         "autoconf >=2.69",
         "automake >=1.11.2",
         "gperf",
@@ -59,11 +61,8 @@
     },
     "schema_version": 0,
     "source": {
-      "patches": [
-        "0001-Add-missing-defines-for-CentOS-6.patch"
-      ],
-      "sha256": "0c2d1af85d27bd1e7263e8be1384643629e3cbacc598437a811587db8e86027d",
-      "url": "https://github.com/containers/crun/releases/download/0.16/crun-0.16.tar.xz"
+      "sha256": "d752b7cee413d2cb9463cb6995fd50801a0a1574507ebfb550ea9f26d07743f8",
+      "url": "https://github.com/containers/crun/releases/download/1.23.1/crun-1.23.1.tar.gz"
     },
     "test": {
       "commands": [
@@ -80,6 +79,7 @@
         "autoconf",
         "automake",
         "c_compiler_stub",
+        "c_stdlib_stub",
         "gperf",
         "libtool",
         "make",
@@ -110,7 +110,7 @@
     "about": {
       "description": "crun is a command line program for running Linux containers that follow the Open Container Initiative (OCI) format.\n",
       "dev_url": "https://github.com/containers/crun",
-      "doc_url": "https://github.com/containers/crun/blob/0.16/crun.1.md",
+      "doc_url": "https://github.com/containers/crun/blob/1.23.1/crun.1.md",
       "home": "https://github.com/containers/crun",
       "license": "GPL-2.0-or-later AND LGPL-2.0-or-later",
       "license_file": "COPYING",
@@ -122,16 +122,18 @@
     },
     "extra": {
       "recipe-maintainers": [
-        "mbargull"
+        "mbargull",
+        "2themaxx"
       ]
     },
     "package": {
       "name": "crun",
-      "version": "0.16"
+      "version": "1.23.1"
     },
     "requirements": {
       "build": [
         "c_compiler_stub",
+        "c_stdlib_stub",
         "autoconf >=2.69",
         "automake >=1.11.2",
         "gperf",
@@ -152,11 +154,8 @@
     },
     "schema_version": 0,
     "source": {
-      "patches": [
-        "0001-Add-missing-defines-for-CentOS-6.patch"
-      ],
-      "sha256": "0c2d1af85d27bd1e7263e8be1384643629e3cbacc598437a811587db8e86027d",
-      "url": "https://github.com/containers/crun/releases/download/0.16/crun-0.16.tar.xz"
+      "sha256": "d752b7cee413d2cb9463cb6995fd50801a0a1574507ebfb550ea9f26d07743f8",
+      "url": "https://github.com/containers/crun/releases/download/1.23.1/crun-1.23.1.tar.gz"
     },
     "test": {
       "commands": [
@@ -180,13 +179,14 @@
   "pr_info": {
     "__lazy_json__": "pr_info/crun.json"
   },
-  "raw_meta_yaml": "{% set version = \"0.16\" %}\n\npackage:\n  name: crun\n  version: {{ version }}\n\nsource:\n  url: https://github.com/containers/crun/releases/download/{{ version }}/crun-{{ version }}.tar.xz\n  sha256: 0c2d1af85d27bd1e7263e8be1384643629e3cbacc598437a811587db8e86027d\n  patches:\n    # NOTE: This add syscalls only available from Linux 3.0 (setns) and 3.17 (seccomp, memfd_create) onward.\n    - 0001-Add-missing-defines-for-CentOS-6.patch\n\nbuild:\n  number: 0\n  skip: true  # [not linux]\n  # Binary relocation causes:\n  #   crun: error while loading shared libraries: libyajl.so.2: cannot open shared object file: No such file or directory\n  # because of https://github.com/containers/crun/commit/ce4dfbb97a8a05bef125030eaa6c46c07a5f9344\n  binary_relocation: false\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - autoconf >=2.69\n    - automake >=1.11.2\n    - gperf\n    - libtool\n    - make\n    - pkg-config >=0.9.0\n    # Unless you are also building the Python bindings, Python is needed only by libocispec to generate the C parser at build time, it won't be used afterwards.\n    - python >=3\n    # We build with --disable-systemd because we do not have systemd/sd-bus.h\n    # which is only available in systemd v221 onward but CentOS 7 has v219.\n    # - {{ cdt('systemd-devel') }}\n  host:\n    - libcap\n    - libseccomp\n    - yajl >=2.1.0\n    - yajl\n  run:\n    - {{ pin_compatible('yajl') }}\n\ntest:\n  commands:\n    - crun --help\n    - crun --version\n    - test -f \"${PREFIX}/lib/libcrun${SHLIB_EXT}\"\n\nabout:\n  home: https://github.com/containers/crun\n  dev_url: https://github.com/containers/crun\n  doc_url: https://github.com/containers/crun/blob/{{ version }}/crun.1.md\n  # NOTE: This also bundles https://github.com/containers/libocispec.\n  #       However, no further license conditions seem to be necessary, see\n  #       https://github.com/containers/libocispec/pull/46\n  license: GPL-2.0-or-later AND LGPL-2.0-or-later\n  license_file: COPYING\n  # TODO: Maybe create a split package for libcrun and Python binding.\n  #       License for a libcrun output would then be:\n  # license: LGPL-2.0-or-later\n  # license_file: COPYING.libcrun\n  summary: crun - a fast and lightweight OCI runtime\n  description: >\n    crun is a command line program for running Linux containers that follow the Open Container Initiative (OCI) format.\n\nextra:\n  recipe-maintainers:\n    - mbargull\n",
+  "raw_meta_yaml": "{% set version = \"1.23.1\" %}\n\npackage:\n  name: crun\n  version: {{ version }}\n\nsource:\n  url: https://github.com/containers/crun/releases/download/{{ version }}/crun-{{ version }}.tar.gz\n  sha256: d752b7cee413d2cb9463cb6995fd50801a0a1574507ebfb550ea9f26d07743f8\n\nbuild:\n  number: 0\n  skip: true  # [not linux]\n  # Binary relocation causes:\n  #   crun: error while loading shared libraries: libyajl.so.2: cannot open shared object file: No such file or directory\n  # because of https://github.com/containers/crun/commit/ce4dfbb97a8a05bef125030eaa6c46c07a5f9344\n  binary_relocation: false\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ stdlib(\"c\") }}\n    - autoconf >=2.69\n    - automake >=1.11.2\n    - gperf\n    - libtool\n    - make\n    - pkg-config >=0.9.0\n    # Unless you are also building the Python bindings, Python is needed only by libocispec to generate the C parser at build time, it won't be used afterwards.\n    - python >=3\n    # We build with --disable-systemd because we do not have systemd/sd-bus.h\n    # which is only available in systemd v221 onward but CentOS 7 has v219.\n    # - {{ cdt('systemd-devel') }}\n  host:\n    - libcap\n    - libseccomp\n    - yajl >=2.1.0\n    - yajl\n  run:\n    - {{ pin_compatible('yajl') }}\n\ntest:\n  commands:\n    - crun --help\n    - crun --version\n    - test -f \"${PREFIX}/lib/libcrun${SHLIB_EXT}\"\n\nabout:\n  home: https://github.com/containers/crun\n  dev_url: https://github.com/containers/crun\n  doc_url: https://github.com/containers/crun/blob/{{ version }}/crun.1.md\n  # NOTE: This also bundles https://github.com/containers/libocispec.\n  #       However, no further license conditions seem to be necessary, see\n  #       https://github.com/containers/libocispec/pull/46\n  license: GPL-2.0-or-later AND LGPL-2.0-or-later\n  license_file: COPYING\n  # TODO: Maybe create a split package for libcrun and Python binding.\n  #       License for a libcrun output would then be:\n  # license: LGPL-2.0-or-later\n  # license_file: COPYING.libcrun\n  summary: crun - a fast and lightweight OCI runtime\n  description: >\n    crun is a command line program for running Linux containers that follow the Open Container Initiative (OCI) format.\n\nextra:\n  recipe-maintainers:\n    - mbargull\n    - 2themaxx\n",
   "req": {
     "__set__": true,
     "elements": [
       "autoconf",
       "automake",
       "c_compiler_stub",
+      "c_stdlib_stub",
       "gperf",
       "libcap",
       "libseccomp",
@@ -204,6 +204,7 @@
         "autoconf",
         "automake",
         "c_compiler_stub",
+        "c_stdlib_stub",
         "gperf",
         "libtool",
         "make",
@@ -215,6 +216,7 @@
       "__set__": true,
       "elements": [
         "c_compiler_stub",
+        "c_stdlib_stub",
         "libcap",
         "libseccomp",
         "yajl"
@@ -224,6 +226,7 @@
       "__set__": true,
       "elements": [
         "c_compiler_stub",
+        "c_stdlib_stub",
         "yajl"
       ]
     },
@@ -240,6 +243,7 @@
         "autoconf >=2.69",
         "automake >=1.11.2",
         "c_compiler_stub",
+        "c_stdlib_stub",
         "gperf",
         "libtool",
         "make",
@@ -267,8 +271,8 @@
       "elements": []
     }
   },
-  "url": "https://github.com/containers/crun/releases/download/0.16/crun-0.16.tar.xz",
-  "version": "0.16",
+  "url": "https://github.com/containers/crun/releases/download/1.23.1/crun-1.23.1.tar.gz",
+  "version": "1.23.1",
   "version_pr_info": {
     "__lazy_json__": "version_pr_info/crun.json"
   }
