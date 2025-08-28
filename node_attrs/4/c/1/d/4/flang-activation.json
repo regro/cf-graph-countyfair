@@ -22,7 +22,7 @@
       "summary": "Flang is a Fortran compiler targeting LLVM."
     },
     "build": {
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "recipe-maintainers": [
@@ -63,10 +63,13 @@
         "test": {
           "commands": [
             "$FC hello_world.f90",
-            "./a.out"
+            "./a.out",
+            "$FC sanitycheckf.f -o sanitycheckf $FFLAGS",
+            "./sanitycheckf"
           ],
           "files": [
-            "hello_world.f90"
+            "hello_world.f90",
+            "sanitycheckf.f"
           ]
         }
       }
@@ -114,7 +117,7 @@
       "summary": "Flang is a Fortran compiler targeting LLVM."
     },
     "build": {
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "recipe-maintainers": [
@@ -155,10 +158,13 @@
         "test": {
           "commands": [
             "$FC hello_world.f90",
-            "./a.out"
+            "./a.out",
+            "$FC sanitycheckf.f -o sanitycheckf $FFLAGS",
+            "./sanitycheckf"
           ],
           "files": [
-            "hello_world.f90"
+            "hello_world.f90",
+            "sanitycheckf.f"
           ]
         }
       },
@@ -189,10 +195,13 @@
         "test": {
           "commands": [
             "%FC% hello_world.f90",
-            "a.exe"
+            "a.exe",
+            "%FC% sanitycheckf.f -o sanitycheckf.exe %FFLAGS%",
+            "sanitycheckf.exe"
           ],
           "files": [
-            "hello_world.f90"
+            "hello_world.f90",
+            "sanitycheckf.f"
           ]
         }
       }
@@ -225,7 +234,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/flang-activation.json"
   },
-  "raw_meta_yaml": "{% set version = \"20.1.8\" %}\n\npackage:\n  name: flang-activation\n  version: {{ version }}\n\nsource:\n  # unused, but helpful so the bot creates updates automatically;\n  # we use the _signature_, which is tiny and thus much faster to download\n  url: https://github.com/llvm/llvm-project/releases/download/llvmorg-{{ version.replace(\".rc\", \"-rc\") }}/llvm-project-{{ version.replace(\".rc\", \"-rc\") }}.src.tar.xz.sig\n  sha256: ceb97d827cfd2e517b7d486381cb6e3183d8aee71947e7022c389259bb260696\n\nbuild:\n  number: 0\n  # intentionally only windows (main target) & linux (debuggability)\n  skip: true  # [osx]\n\noutputs:\n  - name: flang_impl_{{ cross_target_platform }}\n    script: install_flang_impl.sh  # [unix]\n    # we don't cross-compile on windows -> no symlinks\n    requirements:\n      - flang ={{ version }}\n      - lld                     # [win]\n      # for llvm-ar.exe\n      - llvm-tools              # [win]\n      - compiler-rt_{{ cross_target_platform }} ={{ version }}\n    test:\n      commands:\n        - {{ CBUILD }}-flang --version  # [unix]\n        - {{ CHOST }}-flang --version   # [unix]\n\n  - name: flang_{{ cross_target_platform }}\n    script: install_flang.sh  # [unix]\n    script: install_flang.bat  # [win]\n    run_exports:\n      strong:   # [unix]\n        - libflang >={{ version }}  # [unix]\n    requirements:\n      build:\n        - sed       # [unix]\n        - m2-sed    # [win]\n      run:\n        - {{ pin_subpackage(\"flang_impl_\" ~ cross_target_platform, exact=True) }}\n    test:\n      files:\n        - hello_world.f90\n      commands:\n        # on linux we point FC to the symlink; on windows, we point to the binary\n        - $FC hello_world.f90       # [unix]\n        - \"%FC% hello_world.f90\"    # [win]\n        - ./a.out   # [unix]\n        - a.exe     # [win]\n\nabout:\n  home: https://flang.llvm.org\n  license: BSD-3-Clause\n  license_file: LICENSE\n  summary: Flang is a Fortran compiler targeting LLVM.\n  dev_url: https://github.com/llvm/llvm-project\n\nextra:\n  recipe-maintainers:\n    - isuruf\n    - h-vetinari\n",
+  "raw_meta_yaml": "{% set version = \"20.1.8\" %}\n\npackage:\n  name: flang-activation\n  version: {{ version }}\n\nsource:\n  # unused, but helpful so the bot creates updates automatically;\n  # we use the _signature_, which is tiny and thus much faster to download\n  url: https://github.com/llvm/llvm-project/releases/download/llvmorg-{{ version.replace(\".rc\", \"-rc\") }}/llvm-project-{{ version.replace(\".rc\", \"-rc\") }}.src.tar.xz.sig\n  sha256: ceb97d827cfd2e517b7d486381cb6e3183d8aee71947e7022c389259bb260696\n\nbuild:\n  number: 1\n  # intentionally only windows (main target) & linux (debuggability)\n  skip: true  # [osx]\n\noutputs:\n  - name: flang_impl_{{ cross_target_platform }}\n    script: install_flang_impl.sh  # [unix]\n    # we don't cross-compile on windows -> no symlinks\n    requirements:\n      - flang ={{ version }}\n      - lld                     # [win]\n      # for llvm-ar.exe\n      - llvm-tools              # [win]\n      - compiler-rt_{{ cross_target_platform }} ={{ version }}\n    test:\n      commands:\n        - {{ CBUILD }}-flang --version  # [unix]\n        - {{ CHOST }}-flang --version   # [unix]\n\n  - name: flang_{{ cross_target_platform }}\n    script: install_flang.sh  # [unix]\n    script: install_flang.bat  # [win]\n    run_exports:\n      strong:   # [unix]\n        - libflang >={{ version }}  # [unix]\n    requirements:\n      build:\n        - sed       # [unix]\n        - m2-sed    # [win]\n      run:\n        - {{ pin_subpackage(\"flang_impl_\" ~ cross_target_platform, exact=True) }}\n    test:\n      files:\n        - hello_world.f90\n        - sanitycheckf.f\n      commands:\n        # on linux we point FC to the symlink; on windows, we point to the binary\n        - $FC hello_world.f90       # [unix]\n        - \"%FC% hello_world.f90\"    # [win]\n        - ./a.out   # [unix]\n        - a.exe     # [win]\n        # as used by meson\n        - $FC sanitycheckf.f -o sanitycheckf $FFLAGS            # [unix]\n        - \"%FC% sanitycheckf.f -o sanitycheckf.exe %FFLAGS%\"    # [win]\n        - ./sanitycheckf    # [unix]\n        - sanitycheckf.exe  # [win]\n\nabout:\n  home: https://flang.llvm.org\n  license: BSD-3-Clause\n  license_file: LICENSE\n  summary: Flang is a Fortran compiler targeting LLVM.\n  dev_url: https://github.com/llvm/llvm-project\n\nextra:\n  recipe-maintainers:\n    - isuruf\n    - h-vetinari\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -313,7 +322,7 @@
       "summary": "Flang is a Fortran compiler targeting LLVM."
     },
     "build": {
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "recipe-maintainers": [
@@ -349,10 +358,13 @@
         "test": {
           "commands": [
             "%FC% hello_world.f90",
-            "a.exe"
+            "a.exe",
+            "%FC% sanitycheckf.f -o sanitycheckf.exe %FFLAGS%",
+            "sanitycheckf.exe"
           ],
           "files": [
-            "hello_world.f90"
+            "hello_world.f90",
+            "sanitycheckf.f"
           ]
         }
       }
