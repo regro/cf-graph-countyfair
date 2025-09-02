@@ -38,7 +38,7 @@
       "summary": "Basix is a finite element definition and tabulation runtime library"
     },
     "build": {
-      "number": "3",
+      "number": "4",
       "run_exports": {
         "weak": [
           "fenics-basix-nanobind-abi ==0.2.8.14"
@@ -707,7 +707,7 @@
       "summary": "Basix is a finite element definition and tabulation runtime library"
     },
     "build": {
-      "number": "3",
+      "number": "4",
       "run_exports": {
         "weak": [
           "fenics-basix-nanobind-abi ==0.2.8.14"
@@ -1376,7 +1376,7 @@
       "summary": "Basix is a finite element definition and tabulation runtime library"
     },
     "build": {
-      "number": "3",
+      "number": "4",
       "run_exports": {
         "weak": [
           "fenics-basix-nanobind-abi ==0.2.8.14"
@@ -2045,7 +2045,7 @@
       "summary": "Basix is a finite element definition and tabulation runtime library"
     },
     "build": {
-      "number": "3",
+      "number": "4",
       "run_exports": {
         "weak": [
           "fenics-basix-nanobind-abi ==0.2.8.14",
@@ -5499,7 +5499,7 @@
       "summary": "Basix is a finite element definition and tabulation runtime library"
     },
     "build": {
-      "number": "3",
+      "number": "4",
       "run_exports": {
         "weak": [
           "fenics-basix-nanobind-abi ==0.2.8.19"
@@ -6168,7 +6168,7 @@
       "summary": "Basix is a finite element definition and tabulation runtime library"
     },
     "build": {
-      "number": "3",
+      "number": "4",
       "run_exports": {
         "weak": [
           "fenics-basix-nanobind-abi ==0.2.8.19"
@@ -6846,7 +6846,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/fenics-basix.json"
   },
-  "raw_meta_yaml": "schema_version: 1\n\ncontext:\n  name: fenics-basix\n  version: 0.9.0\n  # cxx_compiler_version not specified on Windows\n  # extract from cxx_compiler\n  cxx_compiler_version: ${{ cxx_compiler_version | default(cxx_compiler | replace(\"vs\", \"\")) }}\n  # abi_version: 1.${{ nanobind_abi }}.${{ cxx_compiler_version }}\n  abi_version: 0.${{ nanobind }}.${{ cxx_compiler_version }}\n\nrecipe:\n  name: ${{ name|lower }}-meta\n  version: ${{ version }}\n\nsource:\n  url: https://github.com/fenics/basix/archive/refs/tags/v${{ version }}.tar.gz\n  sha256: 60e96b2393084729b261cb10370f0e44d12735ab3dbd1f15890dec23b9e85329\n\nbuild:\n  number: 3\n  variant:\n    use_keys:\n      - python\n\noutputs:\n  - package:\n      name: fenics-libbasix\n    build:\n      script: build-libbasix\n    requirements:\n      build:\n        - ${{ compiler(\"cxx\") }}\n        - ${{ stdlib(\"c\") }}\n        - cmake\n        - if: unix\n          then: make\n        - pkg-config\n      host:\n        - libblas\n        - libcblas  # not linked, but needed for FindLAPACK during build\n        - liblapack\n      run_exports:\n        - ${{ pin_subpackage(\"fenics-libbasix\", upper_bound=\"x.x.x\") }}\n    tests:\n      - package_contents:\n          lib: basix\n  - package:\n      name: fenics-basix\n    build:\n      script: build-basix-py\n    requirements:\n      build:\n        - ${{ compiler(\"cxx\") }}\n        - ${{ stdlib(\"c\") }}\n        - cmake\n        - make\n        - pkg-config\n        - if: build_platform != target_platform\n          then: \n            - python\n            - cross-python_${{ target_platform }}\n            - nanobind\n            # - nanobind-abi\n      host:\n        - scikit-build-core\n        - python\n        - pip\n        - nanobind\n        # - nanobind-abi\n        - ${{ pin_subpackage('fenics-libbasix', exact=True) }}\n      run:\n        - python\n        - ${{ pin_subpackage('fenics-libbasix', exact=True) }}\n        - numpy >=1.21\n        - fenics-basix-nanobind-abi ==${{ abi_version }}\n      run_exports:\n        - fenics-basix-nanobind-abi ==${{ abi_version }}\n    tests:\n      - python:\n          imports:\n            - basix\n          pip_check: true\n      - files:\n          source:\n            - test\n        requirements:\n          run:\n            - pip\n            - pytest\n            - pytest-xdist\n            - if: not win\n              then:\n                - ${{ cxx_compiler }}\n                - ${{ cxx_compiler }}_impl_${{ target_platform }}\n              else:\n                - vs_${{ target_platform }}\n                - blas * openblas\n            - ${{ compiler(\"cxx\") }}\n        script:\n          - pytest -v test/test_create.py\n\n  - package:\n      name: fenics-basix-nanobind-abi\n      version: ${{ abi_version }}\n    requirements:\n      run_exports:\n        strong:\n          - fenics-basix-nanobind-abi ==${{ abi_version }}\n      run_constraints:\n        - nanobind ${{ nanobind }}.*\n        # - nanobind-abi ${{ nanobind_abi }}.*\n        # confine to nanobind builds with nanobind_abi constraints\n        - nanobind >=2.4\n        - if: not win\n          then:\n            - ${{ cxx_compiler }} ${{ cxx_compiler_version }}.*\n            - ${{ cxx_compiler }}_impl_${{ target_platform }} ${{ cxx_compiler_version }}.*\n          else:\n          - vs_${{ target_platform }} ${{ cxx_compiler_version }}.*\n    tests:\n      - script:\n          - echo 'ok'\n\nabout:\n  summary: Basix is a finite element definition and tabulation runtime library\n  license: MIT\n  license_file: LICENSE\n  homepage: https://fenicsproject.org\n  repository: https://github.com/fenics/basix\n  documentation: https://docs.fenicsproject.org/basix/main/\n\nextra:\n  feedstock-name: fenics-basix\n  recipe-maintainers:\n    - minrk\n",
+  "raw_meta_yaml": "schema_version: 1\n\ncontext:\n  name: fenics-basix\n  version: 0.9.0\n  # cxx_compiler_version not specified on Windows\n  # extract from cxx_compiler\n  cxx_compiler_version: ${{ cxx_compiler_version | default(cxx_compiler | replace(\"vs\", \"\")) }}\n  # abi_version: 1.${{ nanobind_abi }}.${{ cxx_compiler_version }}\n  abi_version: 0.${{ nanobind }}.${{ cxx_compiler_version }}\n\nrecipe:\n  name: ${{ name|lower }}-meta\n  version: ${{ version }}\n\nsource:\n  url: https://github.com/fenics/basix/archive/refs/tags/v${{ version }}.tar.gz\n  sha256: 60e96b2393084729b261cb10370f0e44d12735ab3dbd1f15890dec23b9e85329\n\nbuild:\n  number: 4\n  variant:\n    use_keys:\n      - python\n\noutputs:\n  - package:\n      name: fenics-libbasix\n    build:\n      script: build-libbasix\n    requirements:\n      build:\n        - ${{ compiler(\"cxx\") }}\n        - ${{ stdlib(\"c\") }}\n        - cmake\n        - if: unix\n          then: make\n        - pkg-config\n      host:\n        - libblas\n        - libcblas  # not linked, but needed for FindLAPACK during build\n        - liblapack\n      run_exports:\n        - ${{ pin_subpackage(\"fenics-libbasix\", upper_bound=\"x.x.x\") }}\n    tests:\n      - package_contents:\n          lib: basix\n  - package:\n      name: fenics-basix\n    build:\n      script: build-basix-py\n    requirements:\n      build:\n        - ${{ compiler(\"cxx\") }}\n        - ${{ stdlib(\"c\") }}\n        - cmake\n        - make\n        - pkg-config\n        - if: build_platform != target_platform\n          then:\n            - python\n            - cross-python_${{ target_platform }}\n            - nanobind\n            # - nanobind-abi\n      host:\n        - scikit-build-core\n        - python\n        - pip\n        - nanobind\n        # - nanobind-abi\n        - ${{ pin_subpackage('fenics-libbasix', exact=True) }}\n      run:\n        - python\n        - ${{ pin_subpackage('fenics-libbasix', exact=True) }}\n        - numpy >=1.21\n        - fenics-basix-nanobind-abi ==${{ abi_version }}\n      run_exports:\n        - fenics-basix-nanobind-abi ==${{ abi_version }}\n    tests:\n      - python:\n          imports:\n            - basix\n          pip_check: true\n      - files:\n          source:\n            - test\n        requirements:\n          run:\n            - pip\n            - pytest\n            - pytest-xdist\n            - if: not win\n              then:\n                - ${{ cxx_compiler }}\n                - ${{ cxx_compiler }}_impl_${{ target_platform }}\n              else:\n                - vs_${{ target_platform }}\n                - blas * openblas\n            - ${{ compiler(\"cxx\") }}\n        script:\n          - pytest -v test/test_create.py\n\n  - package:\n      name: fenics-basix-nanobind-abi\n      version: ${{ abi_version }}\n    requirements:\n      run_exports:\n        strong:\n          - fenics-basix-nanobind-abi ==${{ abi_version }}\n      run_constraints:\n        - nanobind ${{ nanobind }}.*\n        # - nanobind-abi ${{ nanobind_abi }}.*\n        # confine to nanobind builds with nanobind_abi constraints\n        - nanobind >=2.4\n        - if: not win\n          then:\n            - ${{ cxx_compiler }} ${{ cxx_compiler_version }}.*\n            - ${{ cxx_compiler }}_impl_${{ target_platform }} ${{ cxx_compiler_version }}.*\n          else:\n            - vs_${{ target_platform }} ${{ cxx_compiler_version }}.*\n    tests:\n      - script:\n          - echo 'ok'\n\nabout:\n  summary: Basix is a finite element definition and tabulation runtime library\n  license: MIT\n  license_file: LICENSE\n  homepage: https://fenicsproject.org\n  repository: https://github.com/fenics/basix\n  documentation: https://docs.fenicsproject.org/basix/main/\n\nextra:\n  feedstock-name: fenics-basix\n  recipe-maintainers:\n    - minrk\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -6994,7 +6994,7 @@
       "summary": "Basix is a finite element definition and tabulation runtime library"
     },
     "build": {
-      "number": "3",
+      "number": "4",
       "run_exports": {
         "weak": [
           "fenics-basix-nanobind-abi ==0.2.8.2022"
