@@ -118,7 +118,7 @@
     ],
     "package": {
       "name": "cuda-opencl-split",
-      "version": "13.0.39"
+      "version": "13.0.85"
     },
     "requirements": {
       "build": [
@@ -127,8 +127,8 @@
     },
     "schema_version": 0,
     "source": {
-      "sha256": "b590a6cd9ec45467c91601f9008f7e36cfcd22ec8153fb351d577d500d673d6a",
-      "url": "https://developer.download.nvidia.com/compute/cuda/redist/cuda_opencl/windows-x86_64/cuda_opencl-windows-x86_64-13.0.39-archive.zip"
+      "sha256": "f48040e3054d561484e4ba136650cec68eeebaf4ff4d70d1d704dcdc5f38cf90",
+      "url": "https://developer.download.nvidia.com/compute/cuda/redist/cuda_opencl/windows-x86_64/cuda_opencl-windows-x86_64-13.0.85-archive.zip"
     }
   },
   "linux_64_requirements": {
@@ -342,7 +342,7 @@
     ],
     "package": {
       "name": "cuda-opencl-split",
-      "version": "13.0.39"
+      "version": "13.0.85"
     },
     "requirements": {
       "build": [
@@ -351,8 +351,8 @@
     },
     "schema_version": 0,
     "source": {
-      "sha256": "7d82a080bffca524e60ab6f65421d6247520f70eaaad62bae5cf7ffc2903c82e",
-      "url": "https://developer.download.nvidia.com/compute/cuda/redist/cuda_opencl/windows-x86_64/cuda_opencl-windows-x86_64-13.0.39-archive.zip"
+      "sha256": "ef7b189fba61e0fd13e5f50b940fc0e22f9d211481d1c7061b9d586641929f3b",
+      "url": "https://developer.download.nvidia.com/compute/cuda/redist/cuda_opencl/windows-x86_64/cuda_opencl-windows-x86_64-13.0.85-archive.zip"
     }
   },
   "name": "cuda-opencl-split",
@@ -371,7 +371,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/cuda-opencl.json"
   },
-  "raw_meta_yaml": "{% set name = \"cuda-opencl\" %}\n{% set version = \"13.0.39\" %}\n{% set lib_version = \"1.0.0\" %}\n{% set cuda_version = \"13.0\" %}\n{% set platform = \"linux-x86_64\" %}  # [linux64]\n{% set platform = \"windows-x86_64\" %}  # [win]\n{% set target_name = \"x86_64-linux\" %}  # [linux64]\n{% set target_name = \"x64\" %}  # [win]\n{% set extension = \"tar.xz\" %}  # [not win]\n{% set extension = \"zip\" %}  # [win]\n\npackage:\n  name: {{ name|lower }}-split\n  version: {{ version }}\n\nsource:\n  url: https://developer.download.nvidia.com/compute/cuda/redist/cuda_opencl/{{ platform }}/cuda_opencl-{{ platform }}-{{ version }}-archive.{{ extension }}\n  sha256: b590a6cd9ec45467c91601f9008f7e36cfcd22ec8153fb351d577d500d673d6a  # [linux64]\n  sha256: 7d82a080bffca524e60ab6f65421d6247520f70eaaad62bae5cf7ffc2903c82e  # [win]\n\nbuild:\n  number: 0\n  skip: true  # [osx or aarch64 or ppc64le]\n\nrequirements:\n  build:\n    - cf-nvidia-tools 1.*  # [linux]\n\noutputs:\n  - name: cuda-opencl\n    files:\n      - targets/{{ target_name }}/lib/libOpenCL.so.*  # [linux]\n      - etc/OpenCL/vendors/cuda.icd                   # [linux]\n      - Library\\etc\\OpenCL\\vendors\\cuda.icd           # [win]\n    requirements:\n      build:\n        - {{ compiler(\"c\") }}\n        - {{ compiler(\"cxx\") }}\n        - {{ stdlib(\"c\") }}\n      host:\n        - cuda-version {{ cuda_version }}\n        - ocl-icd                    # [linux]\n        - khronos-opencl-icd-loader  # [win]\n      run:\n        - {{ pin_compatible(\"cuda-version\", max_pin=\"x.x\") }}\n        - ocl-icd                    # [linux]\n        - khronos-opencl-icd-loader  # [win]\n    test:\n      commands:\n        - test -f $PREFIX/targets/{{ target_name }}/lib/libOpenCL.so.{{ lib_version }}                                                # [linux]\n        - test -L $PREFIX/targets/{{ target_name }}/lib/libOpenCL.so.{{ lib_version.split(\".\")[0] }}                                  # [linux]\n        - test -L $PREFIX/targets/{{ target_name }}/lib/libOpenCL.so.{{ lib_version.split(\".\")[0] }}.{{ lib_version.split(\".\")[1] }}  # [linux]\n        - test -f $PREFIX/etc/OpenCL/vendors/cuda.icd                                                                                 # [linux]\n        - if not exist %LIBRARY_PREFIX%\\etc\\OpenCL\\vendors\\cuda.icd exit 1                                                            # [win]\n    about:\n      home: https://developer.nvidia.com/cuda-toolkit\n      license_file: LICENSE\n      license: LicenseRef-NVIDIA-End-User-License-Agreement\n      license_url: https://docs.nvidia.com/cuda/eula/index.html\n      summary: CUDA OpenCL native Libraries\n      description: |\n        CUDA OpenCL native Libraries\n      doc_url: https://docs.nvidia.com/cuda/index.html\n\n  - name: cuda-opencl-dev\n    build:\n      run_exports:\n        - {{ pin_subpackage(\"cuda-opencl\", max_pin=\"x\") }}\n    files:\n      - lib/pkgconfig                               # [linux]\n      - targets/{{ target_name }}/include           # [linux]\n      - targets/{{ target_name }}/lib/libOpenCL.so  # [linux]\n      - Library\\include                             # [win]\n      - Library\\lib\\{{ target_name }}               # [win]\n    requirements:\n      build:\n        - {{ compiler(\"c\") }}\n        - {{ compiler(\"cxx\") }}\n        - {{ stdlib(\"c\") }}\n      host:\n        - cuda-version {{ cuda_version }}\n      run:\n        - {{ pin_compatible(\"cuda-version\", max_pin=\"x.x\") }}\n        - {{ pin_subpackage(\"cuda-opencl\", exact=True) }}\n    test:\n      commands:\n        - test -f $PREFIX/lib/pkgconfig/opencl-*.pc                   # [linux]\n        - test -f $PREFIX/targets/{{ target_name }}/include/CL/cl.h   # [linux]\n        - test -L $PREFIX/targets/{{ target_name }}/lib/libOpenCL.so  # [linux]\n        - if not exist %LIBRARY_INC%\\CL\\cl.h exit 1                     # [win]\n        - if not exist %LIBRARY_LIB%\\{{ target_name }}\\OpenCL.lib exit 1                  # [win]\n    about:\n      home: https://developer.nvidia.com/cuda-toolkit\n      license_file: LICENSE\n      license: LicenseRef-NVIDIA-End-User-License-Agreement\n      license_url: https://docs.nvidia.com/cuda/eula/index.html\n      summary: CUDA OpenCL native Libraries\n      description: |\n        CUDA OpenCL native Libraries\n      doc_url: https://docs.nvidia.com/cuda/index.html\n\nabout:\n  home: https://developer.nvidia.com/cuda-toolkit\n  license: LicenseRef-NVIDIA-End-User-License-Agreement\n  license_file: LICENSE\n  license_url: https://docs.nvidia.com/cuda/eula/index.html\n  summary: CUDA OpenCL native Libraries\n  description: |\n    CUDA OpenCL native Libraries\n  doc_url: https://docs.nvidia.com/cuda/index.html\n\nextra:\n  recipe-maintainers:\n    - conda-forge/cuda\n  feedstock-name: cuda-opencl\n",
+  "raw_meta_yaml": "{% set name = \"cuda-opencl\" %}\n{% set version = \"13.0.85\" %}\n{% set lib_version = \"1.0.0\" %}\n{% set cuda_version = \"13.0\" %}\n{% set platform = \"linux-x86_64\" %}  # [linux64]\n{% set platform = \"windows-x86_64\" %}  # [win]\n{% set target_name = \"x86_64-linux\" %}  # [linux64]\n{% set target_name = \"x64\" %}  # [win]\n{% set extension = \"tar.xz\" %}  # [not win]\n{% set extension = \"zip\" %}  # [win]\n\npackage:\n  name: {{ name|lower }}-split\n  version: {{ version }}\n\nsource:\n  url: https://developer.download.nvidia.com/compute/cuda/redist/cuda_opencl/{{ platform }}/cuda_opencl-{{ platform }}-{{ version }}-archive.{{ extension }}\n  sha256: f48040e3054d561484e4ba136650cec68eeebaf4ff4d70d1d704dcdc5f38cf90  # [linux64]\n  sha256: ef7b189fba61e0fd13e5f50b940fc0e22f9d211481d1c7061b9d586641929f3b  # [win]\n\nbuild:\n  number: 0\n  skip: true  # [osx or aarch64 or ppc64le]\n\nrequirements:\n  build:\n    - cf-nvidia-tools 1.*  # [linux]\n\noutputs:\n  - name: cuda-opencl\n    files:\n      - targets/{{ target_name }}/lib/libOpenCL.so.*  # [linux]\n      - etc/OpenCL/vendors/cuda.icd                   # [linux]\n      - Library\\etc\\OpenCL\\vendors\\cuda.icd           # [win]\n    requirements:\n      build:\n        - {{ compiler(\"c\") }}\n        - {{ compiler(\"cxx\") }}\n        - {{ stdlib(\"c\") }}\n      host:\n        - cuda-version {{ cuda_version }}\n        - ocl-icd                    # [linux]\n        - khronos-opencl-icd-loader  # [win]\n      run:\n        - {{ pin_compatible(\"cuda-version\", max_pin=\"x.x\") }}\n        - ocl-icd                    # [linux]\n        - khronos-opencl-icd-loader  # [win]\n    test:\n      commands:\n        - test -f $PREFIX/targets/{{ target_name }}/lib/libOpenCL.so.{{ lib_version }}                                                # [linux]\n        - test -L $PREFIX/targets/{{ target_name }}/lib/libOpenCL.so.{{ lib_version.split(\".\")[0] }}                                  # [linux]\n        - test -L $PREFIX/targets/{{ target_name }}/lib/libOpenCL.so.{{ lib_version.split(\".\")[0] }}.{{ lib_version.split(\".\")[1] }}  # [linux]\n        - test -f $PREFIX/etc/OpenCL/vendors/cuda.icd                                                                                 # [linux]\n        - if not exist %LIBRARY_PREFIX%\\etc\\OpenCL\\vendors\\cuda.icd exit 1                                                            # [win]\n    about:\n      home: https://developer.nvidia.com/cuda-toolkit\n      license_file: LICENSE\n      license: LicenseRef-NVIDIA-End-User-License-Agreement\n      license_url: https://docs.nvidia.com/cuda/eula/index.html\n      summary: CUDA OpenCL native Libraries\n      description: |\n        CUDA OpenCL native Libraries\n      doc_url: https://docs.nvidia.com/cuda/index.html\n\n  - name: cuda-opencl-dev\n    build:\n      run_exports:\n        - {{ pin_subpackage(\"cuda-opencl\", max_pin=\"x\") }}\n    files:\n      - lib/pkgconfig                               # [linux]\n      - targets/{{ target_name }}/include           # [linux]\n      - targets/{{ target_name }}/lib/libOpenCL.so  # [linux]\n      - Library\\include                             # [win]\n      - Library\\lib\\{{ target_name }}               # [win]\n    requirements:\n      build:\n        - {{ compiler(\"c\") }}\n        - {{ compiler(\"cxx\") }}\n        - {{ stdlib(\"c\") }}\n      host:\n        - cuda-version {{ cuda_version }}\n      run:\n        - {{ pin_compatible(\"cuda-version\", max_pin=\"x.x\") }}\n        - {{ pin_subpackage(\"cuda-opencl\", exact=True) }}\n    test:\n      commands:\n        - test -f $PREFIX/lib/pkgconfig/opencl-*.pc                   # [linux]\n        - test -f $PREFIX/targets/{{ target_name }}/include/CL/cl.h   # [linux]\n        - test -L $PREFIX/targets/{{ target_name }}/lib/libOpenCL.so  # [linux]\n        - if not exist %LIBRARY_INC%\\CL\\cl.h exit 1                     # [win]\n        - if not exist %LIBRARY_LIB%\\{{ target_name }}\\OpenCL.lib exit 1                  # [win]\n    about:\n      home: https://developer.nvidia.com/cuda-toolkit\n      license_file: LICENSE\n      license: LicenseRef-NVIDIA-End-User-License-Agreement\n      license_url: https://docs.nvidia.com/cuda/eula/index.html\n      summary: CUDA OpenCL native Libraries\n      description: |\n        CUDA OpenCL native Libraries\n      doc_url: https://docs.nvidia.com/cuda/index.html\n\nabout:\n  home: https://developer.nvidia.com/cuda-toolkit\n  license: LicenseRef-NVIDIA-End-User-License-Agreement\n  license_file: LICENSE\n  license_url: https://docs.nvidia.com/cuda/eula/index.html\n  summary: CUDA OpenCL native Libraries\n  description: |\n    CUDA OpenCL native Libraries\n  doc_url: https://docs.nvidia.com/cuda/index.html\n\nextra:\n  recipe-maintainers:\n    - conda-forge/cuda\n  feedstock-name: cuda-opencl\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -456,8 +456,8 @@
       "elements": []
     }
   },
-  "url": "https://developer.download.nvidia.com/compute/cuda/redist/cuda_opencl/windows-x86_64/cuda_opencl-windows-x86_64-13.0.39-archive.zip",
-  "version": "13.0.39",
+  "url": "https://developer.download.nvidia.com/compute/cuda/redist/cuda_opencl/windows-x86_64/cuda_opencl-windows-x86_64-13.0.85-archive.zip",
+  "version": "13.0.85",
   "version_pr_info": {
     "__lazy_json__": "version_pr_info/cuda-opencl.json"
   },
@@ -560,15 +560,15 @@
     ],
     "package": {
       "name": "cuda-opencl-split",
-      "version": "13.0.39"
+      "version": "13.0.85"
     },
     "requirements": {
       "build": []
     },
     "schema_version": 0,
     "source": {
-      "sha256": "7d82a080bffca524e60ab6f65421d6247520f70eaaad62bae5cf7ffc2903c82e",
-      "url": "https://developer.download.nvidia.com/compute/cuda/redist/cuda_opencl/windows-x86_64/cuda_opencl-windows-x86_64-13.0.39-archive.zip"
+      "sha256": "ef7b189fba61e0fd13e5f50b940fc0e22f9d211481d1c7061b9d586641929f3b",
+      "url": "https://developer.download.nvidia.com/compute/cuda/redist/cuda_opencl/windows-x86_64/cuda_opencl-windows-x86_64-13.0.85-archive.zip"
     }
   },
   "win_64_requirements": {
