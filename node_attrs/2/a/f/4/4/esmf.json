@@ -33,8 +33,8 @@
       "summary": "The Earth System Modeling Framework (ESMF) is software for building and\ncoupling weather, climate, and related models.\n"
     },
     "build": {
-      "number": "1",
-      "string": "mpi_openmpi_h1234567_1"
+      "number": "2",
+      "string": "mpi_openmpi_h1234567_2"
     },
     "extra": {
       "recipe-maintainers": [
@@ -169,8 +169,8 @@
       "summary": "The Earth System Modeling Framework (ESMF) is software for building and\ncoupling weather, climate, and related models.\n"
     },
     "build": {
-      "number": "1",
-      "string": "mpi_openmpi_h1234567_1"
+      "number": "2",
+      "string": "mpi_openmpi_h1234567_2"
     },
     "extra": {
       "recipe-maintainers": [
@@ -306,8 +306,8 @@
       "summary": "The Earth System Modeling Framework (ESMF) is software for building and\ncoupling weather, climate, and related models.\n"
     },
     "build": {
-      "number": "1",
-      "string": "mpi_openmpi_h1234567_1"
+      "number": "2",
+      "string": "mpi_openmpi_h1234567_2"
     },
     "extra": {
       "recipe-maintainers": [
@@ -442,8 +442,8 @@
       "summary": "The Earth System Modeling Framework (ESMF) is software for building and\ncoupling weather, climate, and related models.\n"
     },
     "build": {
-      "number": "1",
-      "string": "mpi_openmpi_h1234567_1"
+      "number": "2",
+      "string": "mpi_openmpi_h1234567_2"
     },
     "extra": {
       "recipe-maintainers": [
@@ -539,8 +539,8 @@
       "summary": "The Earth System Modeling Framework (ESMF) is software for building and\ncoupling weather, climate, and related models.\n"
     },
     "build": {
-      "number": "1",
-      "string": "mpi_openmpi_h1234567_1"
+      "number": "2",
+      "string": "mpi_openmpi_h1234567_2"
     },
     "extra": {
       "recipe-maintainers": [
@@ -676,8 +676,8 @@
       "summary": "The Earth System Modeling Framework (ESMF) is software for building and\ncoupling weather, climate, and related models.\n"
     },
     "build": {
-      "number": "1",
-      "string": "mpi_openmpi_h1234567_1"
+      "number": "2",
+      "string": "mpi_openmpi_h1234567_2"
     },
     "extra": {
       "recipe-maintainers": [
@@ -820,7 +820,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/esmf.json"
   },
-  "raw_meta_yaml": "{% set version = \"8.9.0\" %}\n{% set build = 1 %}\n\n# ensure mpi is defined (needed for conda-smithy recipe-lint)\n{% set mpi = mpi or 'nompi' %}\n\n{% if mpi == 'mpich' %}\n# prioritize mpich variant, which was previously the only option, via build number\n{% set build = build + 100 %}\n{% endif %}\n\npackage:\n  name: esmf\n  version: {{ version }}\n\nsource:\n  url: https://github.com/esmf-org/esmf/archive/refs/tags/v{{ version }}.tar.gz\n  sha256: 586e0101d76ff9842d9ad43567fae50317ee794d80293430d9f1847dec0eefa5\n  patches:\n    # remove these very long running tests only for aarch64 nompi (which is hanging)\n    - 0001-remove-long-running-tests-aarch64.patch  # [aarch64 and mpi == 'nompi']\n    # Sequence of Windows targeting patches; should be unix compatible\n    - 0002-Add-x86_64-machine-id-for-MinGW.gfortran.patch\n    - 0003-Change-long-int-to-long-long-for-Windows-compatibili.patch\n    - 0004-Deal-with-command-line-length-limitations.patch\n    - 0005-Deactivate-ESMF_NETCDF-way-of-specifying-nc-config.patch\n    - 0006-Replace-flaky-abspath-script-with-make-s-abspath-fun.patch\n    - 0007-Make-pathtype-recognize-Windows-style-absolute-paths.patch\n    - 0008-Hack-in-windows-naming-conventions.patch\n    - 0009-pio-for-osx.patch\n    - 0010-windows-exports.patch\n    # remove a different set of very long running tests only for osx and mpich (also hanging)\n    - 0011-remove-long-running-tests-osx-mpich.patch  # [osx and mpi == 'mpich']\n\nbuild:\n  number: {{ build }}\n\n  # add build string so packages can depend on\n  # mpi or nompi variants explicitly:\n  # `esmf * mpi_mpich_*` for mpich\n  # `esmf * mpi_*` for any mpi\n  # `esmf * nompi_*` for no mpi\n\n  {% if mpi != 'nompi' %}\n  {% set mpi_prefix = \"mpi_\" + mpi %}\n  {% else %}\n  {% set mpi_prefix = \"nompi\" %}\n  {% endif %}\n  string: {{ mpi_prefix }}_h{{ PKG_HASH }}_{{ build }}\n  # There is a compiler error in the current Windows version of gcc, see\n  # https://github.com/conda-forge/esmf-feedstock/pull/109#issuecomment-1795477835\n  skip: true  # [win]\n\nrequirements:\n  build:\n    # General\n    - perl\n    - {{ mpi }}  # [mpi == 'openmpi' and build_platform != target_platform]\n    - cmake\n    - gnuconfig\n    - netcdf-fortran * {{ mpi_prefix }}_*  # [build_platform != target_platform and mpi == 'openmpi']\n    - hdf5 * {{ mpi_prefix }}_*  # [build_platform != target_platform and mpi == 'openmpi']\n    - libnetcdf * {{ mpi_prefix }}_*  # [build_platform != target_platform and mpi == 'openmpi']\n    # Unix\n    - {{ compiler('c') }}  # [unix]\n    - {{ stdlib(\"c\") }}    # [unix]\n    - {{ compiler('cxx') }}  # [unix]\n    - {{ compiler('fortran') }}  # [unix]\n    - make  # [unix]\n    - pkg-config  # [unix]\n    # Win\n    - {{ compiler('m2w64_c') }}  # [win]\n    - {{ stdlib(\"m2w64_c\") }}    # [win]\n    - {{ compiler('m2w64_cxx') }}  # [win]\n    - {{ compiler('m2w64_fortran') }}  # [win]\n    - m2-autoconf  # [win]\n    - m2-grep  # [win]\n    - m2-make  # [win]\n    - m2-sed  # [win]\n    - m2-which  # [win]\n    - m2w64-pkg-config  # [win]\n    - m2w64-dlfcn  # [win]\n  host:\n    # need to list netcdf-fortran, hdf5 and libnetcdf twice to get version\n    # pinning from conda_build_config and build pinning from {{ mpi_prefix }}\n    - netcdf-fortran\n    - netcdf-fortran * {{ mpi_prefix }}_*\n    - libnetcdf\n    - libnetcdf * {{ mpi_prefix }}_*\n    - hdf5\n    - hdf5 * {{ mpi_prefix }}_*\n    - {{ mpi }}  # [mpi != 'nompi']\n    - parallelio 2.6.6  # [mpi != 'nompi']\n  run:\n    - netcdf-fortran * {{ mpi_prefix }}_*\n    - libnetcdf * {{ mpi_prefix }}_*\n    - hdf5 * {{ mpi_prefix }}_*\n    - {{ mpi }}  # [mpi != 'nompi']\n    - openssh  # [mpi == 'openmpi']\n\ntest:\n  commands:\n    - ESMF_PrintInfo\n    - ESMF_RegridWeightGen --help\n    - test -f ${ESMFMKFILE}  # [unix]\n    - if not exist %ESMFMKFILE% exit 1   # [win]\n\nabout:\n  home: http://earthsystemmodeling.org/\n  license: NCSA\n  license_file: LICENSE\n  summary: |\n    The Earth System Modeling Framework (ESMF) is software for building and\n    coupling weather, climate, and related models.\n  dev_url: https://github.com/esmf-org/esmf\n  doc_url: https://earthsystemmodeling.org/doc/\n\nextra:\n  recipe-maintainers:\n    - billsacks\n    - zklaus\n    - ocefpaf\n    - rokuingh\n    - xylar\n",
+  "raw_meta_yaml": "{% set version = \"8.9.0\" %}\n{% set build = 2 %}\n\n# ensure mpi is defined (needed for conda-smithy recipe-lint)\n{% set mpi = mpi or 'nompi' %}\n\n{% if mpi == 'mpich' %}\n# prioritize mpich variant, which was previously the only option, via build number\n{% set build = build + 100 %}\n{% endif %}\n\npackage:\n  name: esmf\n  version: {{ version }}\n\nsource:\n  url: https://github.com/esmf-org/esmf/archive/refs/tags/v{{ version }}.tar.gz\n  sha256: 586e0101d76ff9842d9ad43567fae50317ee794d80293430d9f1847dec0eefa5\n  patches:\n    # remove these very long running tests only for aarch64 nompi (which is hanging)\n    - 0001-remove-long-running-tests-aarch64.patch  # [aarch64 and mpi == 'nompi']\n    # Sequence of Windows targeting patches; should be unix compatible\n    - 0002-Add-x86_64-machine-id-for-MinGW.gfortran.patch\n    - 0003-Change-long-int-to-long-long-for-Windows-compatibili.patch\n    - 0004-Deal-with-command-line-length-limitations.patch\n    - 0005-Deactivate-ESMF_NETCDF-way-of-specifying-nc-config.patch\n    - 0006-Replace-flaky-abspath-script-with-make-s-abspath-fun.patch\n    - 0007-Make-pathtype-recognize-Windows-style-absolute-paths.patch\n    - 0008-Hack-in-windows-naming-conventions.patch\n    - 0009-pio-for-osx.patch\n    - 0010-windows-exports.patch\n    # remove a different set of very long running tests only for osx and mpich (also hanging)\n    - 0011-remove-long-running-tests-osx-mpich.patch  # [osx and mpi == 'mpich']\n\nbuild:\n  number: {{ build }}\n\n  # add build string so packages can depend on\n  # mpi or nompi variants explicitly:\n  # `esmf * mpi_mpich_*` for mpich\n  # `esmf * mpi_*` for any mpi\n  # `esmf * nompi_*` for no mpi\n\n  {% if mpi != 'nompi' %}\n  {% set mpi_prefix = \"mpi_\" + mpi %}\n  {% else %}\n  {% set mpi_prefix = \"nompi\" %}\n  {% endif %}\n  string: {{ mpi_prefix }}_h{{ PKG_HASH }}_{{ build }}\n  # There is a compiler error in the current Windows version of gcc, see\n  # https://github.com/conda-forge/esmf-feedstock/pull/109#issuecomment-1795477835\n  skip: true  # [win]\n\nrequirements:\n  build:\n    # General\n    - perl\n    - {{ mpi }}  # [mpi == 'openmpi' and build_platform != target_platform]\n    - cmake\n    - gnuconfig\n    - netcdf-fortran * {{ mpi_prefix }}_*  # [build_platform != target_platform and mpi == 'openmpi']\n    - hdf5 * {{ mpi_prefix }}_*  # [build_platform != target_platform and mpi == 'openmpi']\n    - libnetcdf * {{ mpi_prefix }}_*  # [build_platform != target_platform and mpi == 'openmpi']\n    # Unix\n    - {{ compiler('c') }}  # [unix]\n    - {{ stdlib(\"c\") }}    # [unix]\n    - {{ compiler('cxx') }}  # [unix]\n    - {{ compiler('fortran') }}  # [unix]\n    - make  # [unix]\n    - pkg-config  # [unix]\n    # Win\n    - {{ compiler('m2w64_c') }}  # [win]\n    - {{ stdlib(\"m2w64_c\") }}    # [win]\n    - {{ compiler('m2w64_cxx') }}  # [win]\n    - {{ compiler('m2w64_fortran') }}  # [win]\n    - m2-autoconf  # [win]\n    - m2-grep  # [win]\n    - m2-make  # [win]\n    - m2-sed  # [win]\n    - m2-which  # [win]\n    - m2w64-pkg-config  # [win]\n    - m2w64-dlfcn  # [win]\n  host:\n    # need to list netcdf-fortran, hdf5 and libnetcdf twice to get version\n    # pinning from conda_build_config and build pinning from {{ mpi_prefix }}\n    - netcdf-fortran\n    - netcdf-fortran * {{ mpi_prefix }}_*\n    - libnetcdf\n    - libnetcdf * {{ mpi_prefix }}_*\n    - hdf5\n    - hdf5 * {{ mpi_prefix }}_*\n    - {{ mpi }}  # [mpi != 'nompi']\n    - parallelio 2.6.6  # [mpi != 'nompi']\n  run:\n    - netcdf-fortran * {{ mpi_prefix }}_*\n    - libnetcdf * {{ mpi_prefix }}_*\n    - hdf5 * {{ mpi_prefix }}_*\n    - {{ mpi }}  # [mpi != 'nompi']\n    - openssh  # [mpi == 'openmpi']\n\ntest:\n  commands:\n    - ESMF_PrintInfo\n    - ESMF_RegridWeightGen --help\n    - test -f ${ESMFMKFILE}  # [unix]\n    - if not exist %ESMFMKFILE% exit 1   # [win]\n\nabout:\n  home: http://earthsystemmodeling.org/\n  license: NCSA\n  license_file: LICENSE\n  summary: |\n    The Earth System Modeling Framework (ESMF) is software for building and\n    coupling weather, climate, and related models.\n  dev_url: https://github.com/esmf-org/esmf\n  doc_url: https://earthsystemmodeling.org/doc/\n\nextra:\n  recipe-maintainers:\n    - billsacks\n    - zklaus\n    - ocefpaf\n    - rokuingh\n    - xylar\n",
   "req": {
     "__set__": true,
     "elements": [
