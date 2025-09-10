@@ -28,7 +28,7 @@
       "summary": "EPICS Base Library"
     },
     "build": {
-      "number": "5",
+      "number": "6",
       "run_exports": [
         "epics-base"
       ]
@@ -169,7 +169,7 @@
       "summary": "EPICS Base Library"
     },
     "build": {
-      "number": "5",
+      "number": "6",
       "run_exports": [
         "epics-base"
       ]
@@ -298,7 +298,10 @@
           "epics/dbd",
           "epics/html",
           "epics/include",
+          "epics/bin/*/*.dll",
           "epics/lib/*/*.lib",
+          "Library/lib/*.lib",
+          "Library/bin/*.dll",
           "epics/lib/perl",
           "epics/lib/pkgconfig",
           "epics/templates"
@@ -317,8 +320,7 @@
         "cxx_compiler_stub",
         "make",
         "perl",
-        "m2-patch",
-        "python >=3.6"
+        "m2-patch"
       ],
       "host": [
         "readline"
@@ -359,7 +361,9 @@
         "if not exist %EPICS_BASE%\\bin\\%EPICS_HOST_ARCH%\\ca.dll exit 1",
         "if not exist %EPICS_BASE%\\include\\epicsVersion.h exit 1",
         "if not exist %EPICS_BASE%\\lib\\%EPICS_HOST_ARCH%\\ca.lib exit 1",
-        "if not exist %EPICS_BASE%\\lib\\%EPICS_HOST_ARCH%\\Com.lib exit 1"
+        "if not exist %EPICS_BASE%\\lib\\%EPICS_HOST_ARCH%\\Com.lib exit 1",
+        "if not exist %PREFIX%\\Library\\bin\\Com.dll exit 1",
+        "if not exist %PREFIX%\\Library\\lib\\Com.lib exit 1"
       ],
       "source_files": [
         "modules/pva2pva/loopback.conf"
@@ -375,7 +379,7 @@
       "summary": "EPICS Base Library"
     },
     "build": {
-      "number": "5",
+      "number": "6",
       "run_exports": [
         "epics-base"
       ]
@@ -516,7 +520,7 @@
       "summary": "EPICS Base Library"
     },
     "build": {
-      "number": "5",
+      "number": "6",
       "run_exports": [
         "epics-base"
       ]
@@ -666,7 +670,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/epics-base.json"
   },
-  "raw_meta_yaml": "# Always use 4 numbers in the version to match run_exports!\n# Add .0 if official version is on 3 numbers\n{% set version = \"7.0.9.0\" %}\n\npackage:\n  name: epics-base\n  version: {{ version }}\n\nsource:\n  # Don't use {{ version }} in the url as it can be on 3 numbers only\n  url: https://epics-controls.org/download/base/base-7.0.9.tar.gz\n  sha256: acd62c9b97b60caea9303cc3aab922dbf2bc3bfb3d20e0027110ffe4c906a6c7\n  patches:\n    - RULES_MODULES_echo_quotes.patch\n    - RULES_BUILD_remove_mkdir.patch\n    - initialise_pthreadInfo_attr.patch\n\nbuild:\n  number: 5\n  run_exports:\n    - {{ pin_subpackage('epics-base', max_pin='x.x.x.x') }}\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ stdlib(\"c\") }}\n    - {{ compiler('cxx') }}\n    - make\n    - perl\n    - m2-patch      # [win]\n    # To run pre-build.py\n    - python >=3.6  # [win]\n  host:\n    - readline      # [unix]\n  run:\n    - perl\n\ntest:\n  source_files:\n    - modules/pva2pva/loopback.conf\n  commands:\n    - caget -h\n    - cainfo -h\n    - caput -h\n    - camonitor -h\n    - pvget -h\n    - pvput -h\n    - pvinfo -h\n    - pvlist -h\n    - softIoc -h\n    - softIocPVA -h\n    # p2p -h exits with 1... Use -C flag to test it instead\n    - p2p -C modules/pva2pva/loopback.conf\n    - test -f ${EPICS_BASE}/bin/${EPICS_HOST_ARCH}/caget                # [not win]\n    - test -f ${EPICS_BASE}/include/epicsVersion.h                      # [not win]\n    - test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libCom${SHLIB_EXT}   # [not win]\n    - test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libca${SHLIB_EXT}    # [not win]\n    - if not exist %EPICS_BASE%\\bin\\%EPICS_HOST_ARCH%\\caget.exe exit 1  # [win]\n    - if not exist %EPICS_BASE%\\bin\\%EPICS_HOST_ARCH%\\Com.dll exit 1    # [win]\n    - if not exist %EPICS_BASE%\\bin\\%EPICS_HOST_ARCH%\\ca.dll exit 1     # [win]\n    - if not exist %EPICS_BASE%\\include\\epicsVersion.h exit 1           # [win]\n    - if not exist %EPICS_BASE%\\lib\\%EPICS_HOST_ARCH%\\ca.lib exit 1     # [win]\n    - if not exist %EPICS_BASE%\\lib\\%EPICS_HOST_ARCH%\\Com.lib exit 1    # [win]\n\noutputs:\n  - name: epics-base\n    files:\n      - etc\n      - epics/bin\n      - epics/cfg\n      - epics/configure\n      - epics/db\n      - epics/dbd\n      - epics/html\n      - epics/include\n      # windows .dll are under bin\n      - epics/lib/*/*.lib    # [win]\n      - epics/lib/*/*.dylib  # [osx]\n      - epics/lib/*/*.so*    # [linux]\n      - epics/lib/perl\n      - epics/lib/pkgconfig\n      - epics/templates\n\n  - name: epics-base-static-libs                                 # [not win]\n    requirements:                                                # [not win]\n      run:                                                       # [not win]\n        - {{ pin_subpackage('epics-base', exact=True) }}         # [not win]\n    files:                                                       # [not win]\n      - epics/lib/*/*.a                                          # [not win]\n    test:                                                        # [not win]\n      commands:                                                  # [not win]\n        - test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libca.a   # [not win]\n        - test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libCom.a  # [not win]\n\nabout:\n  home: http://www.aps.anl.gov/epics\n  license: EPICS\n  license_file: LICENSE\n  summary: EPICS Base Library\n\nextra:\n  recipe-maintainers:\n    - anderslindho\n    - lucmaga\n    - beenje\n    - mrakitin\n    - tacaswell\n    - aharrisson\n    - simon-ess\n",
+  "raw_meta_yaml": "# Always use 4 numbers in the version to match run_exports!\n# Add .0 if official version is on 3 numbers\n{% set version = \"7.0.9.0\" %}\n\npackage:\n  name: epics-base\n  version: {{ version }}\n\nsource:\n  # Don't use {{ version }} in the url as it can be on 3 numbers only\n  url: https://epics-controls.org/download/base/base-7.0.9.tar.gz\n  sha256: acd62c9b97b60caea9303cc3aab922dbf2bc3bfb3d20e0027110ffe4c906a6c7\n  patches:\n    - RULES_MODULES_echo_quotes.patch\n    - RULES_BUILD_remove_mkdir.patch\n    - initialise_pthreadInfo_attr.patch\n\nbuild:\n  number: 6\n  run_exports:\n    - {{ pin_subpackage('epics-base', max_pin='x.x.x.x') }}\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ stdlib(\"c\") }}\n    - {{ compiler('cxx') }}\n    - make\n    - perl\n    - m2-patch      # [win]\n  host:\n    - readline      # [unix]\n  run:\n    - perl\n\ntest:\n  source_files:\n    - modules/pva2pva/loopback.conf\n  commands:\n    - caget -h\n    - cainfo -h\n    - caput -h\n    - camonitor -h\n    - pvget -h\n    - pvput -h\n    - pvinfo -h\n    - pvlist -h\n    - softIoc -h\n    - softIocPVA -h\n    # p2p -h exits with 1... Use -C flag to test it instead\n    - p2p -C modules/pva2pva/loopback.conf\n    - test -f ${EPICS_BASE}/bin/${EPICS_HOST_ARCH}/caget                # [not win]\n    - test -f ${EPICS_BASE}/include/epicsVersion.h                      # [not win]\n    - test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libCom${SHLIB_EXT}   # [not win]\n    - test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libca${SHLIB_EXT}    # [not win]\n    - if not exist %EPICS_BASE%\\bin\\%EPICS_HOST_ARCH%\\caget.exe exit 1  # [win]\n    - if not exist %EPICS_BASE%\\bin\\%EPICS_HOST_ARCH%\\Com.dll exit 1    # [win]\n    - if not exist %EPICS_BASE%\\bin\\%EPICS_HOST_ARCH%\\ca.dll exit 1     # [win]\n    - if not exist %EPICS_BASE%\\include\\epicsVersion.h exit 1           # [win]\n    - if not exist %EPICS_BASE%\\lib\\%EPICS_HOST_ARCH%\\ca.lib exit 1     # [win]\n    - if not exist %EPICS_BASE%\\lib\\%EPICS_HOST_ARCH%\\Com.lib exit 1    # [win]\n    - if not exist %PREFIX%\\Library\\bin\\Com.dll exit 1                  # [win]\n    - if not exist %PREFIX%\\Library\\lib\\Com.lib exit 1                  # [win]\n\noutputs:\n  - name: epics-base\n    files:\n      - etc\n      - epics/bin\n      - epics/cfg\n      - epics/configure\n      - epics/db\n      - epics/dbd\n      - epics/html\n      - epics/include\n      # windows .dll are under bin\n      - epics/bin/*/*.dll    # [win]\n      - epics/lib/*/*.lib    # [win]\n      - Library/lib/*.lib    # [win]\n      - Library/bin/*.dll    # [win]\n      - epics/lib/*/*.dylib  # [osx]\n      - epics/lib/*/*.so*    # [linux]\n      - epics/lib/perl\n      - epics/lib/pkgconfig\n      - epics/templates\n\n  - name: epics-base-static-libs                                 # [not win]\n    requirements:                                                # [not win]\n      run:                                                       # [not win]\n        - {{ pin_subpackage('epics-base', exact=True) }}         # [not win]\n    files:                                                       # [not win]\n      - epics/lib/*/*.a                                          # [not win]\n    test:                                                        # [not win]\n      commands:                                                  # [not win]\n        - test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libca.a   # [not win]\n        - test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libCom.a  # [not win]\n\nabout:\n  home: http://www.aps.anl.gov/epics\n  license: EPICS\n  license_file: LICENSE\n  summary: EPICS Base Library\n\nextra:\n  recipe-maintainers:\n    - anderslindho\n    - lucmaga\n    - beenje\n    - mrakitin\n    - tacaswell\n    - aharrisson\n    - simon-ess\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -677,7 +681,6 @@
       "m2-patch",
       "make",
       "perl",
-      "python",
       "readline"
     ]
   },
@@ -690,8 +693,7 @@
         "cxx_compiler_stub",
         "m2-patch",
         "make",
-        "perl",
-        "python"
+        "perl"
       ]
     },
     "host": {
@@ -728,8 +730,7 @@
         "cxx_compiler_stub",
         "m2-patch",
         "make",
-        "perl",
-        "python >=3.6"
+        "perl"
       ]
     },
     "host": {
@@ -763,7 +764,7 @@
       "summary": "EPICS Base Library"
     },
     "build": {
-      "number": "5",
+      "number": "6",
       "run_exports": [
         "epics-base"
       ]
@@ -790,7 +791,10 @@
           "epics/dbd",
           "epics/html",
           "epics/include",
+          "epics/bin/*/*.dll",
           "epics/lib/*/*.lib",
+          "Library/lib/*.lib",
+          "Library/bin/*.dll",
           "epics/lib/perl",
           "epics/lib/pkgconfig",
           "epics/templates"
@@ -809,8 +813,7 @@
         "cxx_compiler_stub",
         "make",
         "perl",
-        "m2-patch",
-        "python >=3.6"
+        "m2-patch"
       ],
       "host": [],
       "run": [
@@ -845,7 +848,9 @@
         "if not exist %EPICS_BASE%\\bin\\%EPICS_HOST_ARCH%\\ca.dll exit 1",
         "if not exist %EPICS_BASE%\\include\\epicsVersion.h exit 1",
         "if not exist %EPICS_BASE%\\lib\\%EPICS_HOST_ARCH%\\ca.lib exit 1",
-        "if not exist %EPICS_BASE%\\lib\\%EPICS_HOST_ARCH%\\Com.lib exit 1"
+        "if not exist %EPICS_BASE%\\lib\\%EPICS_HOST_ARCH%\\Com.lib exit 1",
+        "if not exist %PREFIX%\\Library\\bin\\Com.dll exit 1",
+        "if not exist %PREFIX%\\Library\\lib\\Com.lib exit 1"
       ],
       "source_files": [
         "modules/pva2pva/loopback.conf"
@@ -861,8 +866,7 @@
         "cxx_compiler_stub",
         "m2-patch",
         "make",
-        "perl",
-        "python"
+        "perl"
       ]
     },
     "host": {
