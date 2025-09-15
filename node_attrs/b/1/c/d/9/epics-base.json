@@ -8,6 +8,7 @@
     "conda_build": {
       "pkg_format": "2"
     },
+    "conda_build_tool": "rattler-build",
     "conda_forge_output_validation": true,
     "github": {
       "branch_name": "main",
@@ -24,14 +25,17 @@
     "about": {
       "home": "http://www.aps.anl.gov/epics",
       "license": "EPICS",
+      "license_family": "EPICS",
       "license_file": "LICENSE",
       "summary": "EPICS Base Library"
     },
     "build": {
-      "number": "6",
-      "run_exports": [
-        "epics-base"
-      ]
+      "number": "7",
+      "run_exports": {
+        "weak": [
+          "epics-base"
+        ]
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -46,38 +50,89 @@
     },
     "outputs": [
       {
-        "files": [
-          "etc",
-          "epics/bin",
-          "epics/cfg",
-          "epics/configure",
-          "epics/db",
-          "epics/dbd",
-          "epics/html",
-          "epics/include",
-          "epics/lib/*/*.so*",
-          "epics/lib/perl",
-          "epics/lib/pkgconfig",
-          "epics/templates"
-        ],
-        "name": "epics-base"
-      },
-      {
-        "files": [
-          "epics/lib/*/*.a"
-        ],
-        "name": "epics-base-static-libs",
-        "requirements": {
-          "run": [
+        "build": {
+          "strong": [],
+          "weak": [
             "epics-base"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libca.a",
-            "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libCom.a"
+        "name": "epics-base",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "perl"
+          ],
+          "host": [
+            "readline"
+          ],
+          "run": [
+            "perl"
           ]
-        }
+        },
+        "tests": [
+          {
+            "files": {
+              "source": [
+                "modules/pva2pva/loopback.conf"
+              ]
+            },
+            "script": [
+              "caget -h",
+              "cainfo -h",
+              "caput -h",
+              "camonitor -h",
+              "pvget -h",
+              "pvput -h",
+              "pvinfo -h",
+              "pvlist -h",
+              "softIoc -h",
+              "softIocPVA -h",
+              "p2p -C modules/pva2pva/loopback.conf",
+              "test -f ${EPICS_BASE}/bin/${EPICS_HOST_ARCH}/caget",
+              "test -f ${EPICS_BASE}/include/epicsVersion.h",
+              "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libCom${SHLIB_EXT}",
+              "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libca${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "7.0.9.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "epics-base"
+          ]
+        },
+        "name": "epics-base-static-libs",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "perl"
+          ],
+          "host": [
+            "readline"
+          ],
+          "run": [
+            "epics-base",
+            "perl"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libca.a",
+              "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libCom.a"
+            ]
+          }
+        ],
+        "version": "7.0.9.0"
       }
     ],
     "package": {
@@ -99,7 +154,7 @@
         "perl"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "patches": [
         "RULES_MODULES_echo_quotes.patch",
@@ -108,28 +163,6 @@
       ],
       "sha256": "acd62c9b97b60caea9303cc3aab922dbf2bc3bfb3d20e0027110ffe4c906a6c7",
       "url": "https://epics-controls.org/download/base/base-7.0.9.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "caget -h",
-        "cainfo -h",
-        "caput -h",
-        "camonitor -h",
-        "pvget -h",
-        "pvput -h",
-        "pvinfo -h",
-        "pvlist -h",
-        "softIoc -h",
-        "softIocPVA -h",
-        "p2p -C modules/pva2pva/loopback.conf",
-        "test -f ${EPICS_BASE}/bin/${EPICS_HOST_ARCH}/caget",
-        "test -f ${EPICS_BASE}/include/epicsVersion.h",
-        "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libCom${SHLIB_EXT}",
-        "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libca${SHLIB_EXT}"
-      ],
-      "source_files": [
-        "modules/pva2pva/loopback.conf"
-      ]
     }
   },
   "linux_64_requirements": {
@@ -165,14 +198,17 @@
     "about": {
       "home": "http://www.aps.anl.gov/epics",
       "license": "EPICS",
+      "license_family": "EPICS",
       "license_file": "LICENSE",
       "summary": "EPICS Base Library"
     },
     "build": {
-      "number": "6",
-      "run_exports": [
-        "epics-base"
-      ]
+      "number": "7",
+      "run_exports": {
+        "weak": [
+          "epics-base"
+        ]
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -187,126 +223,344 @@
     },
     "outputs": [
       {
-        "files": [
-          "etc",
-          "epics/bin",
-          "epics/cfg",
-          "epics/configure",
-          "epics/db",
-          "epics/dbd",
-          "epics/html",
-          "epics/include",
-          "epics/lib/*/*.so*",
-          "epics/lib/perl",
-          "epics/lib/pkgconfig",
-          "epics/templates"
-        ],
-        "name": "epics-base"
-      },
-      {
-        "files": [
-          "epics/lib/*/*.a"
-        ],
-        "name": "epics-base-static-libs",
-        "requirements": {
-          "run": [
+        "build": {
+          "strong": [],
+          "weak": [
             "epics-base"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libca.a",
-            "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libCom.a"
-          ]
-        }
-      },
-      {
-        "files": [
-          "etc",
-          "epics/bin",
-          "epics/cfg",
-          "epics/configure",
-          "epics/db",
-          "epics/dbd",
-          "epics/html",
-          "epics/include",
-          "epics/lib/*/*.dylib",
-          "epics/lib/perl",
-          "epics/lib/pkgconfig",
-          "epics/templates"
-        ],
-        "name": "epics-base"
-      },
-      {
-        "files": [
-          "epics/lib/*/*.a"
-        ],
-        "name": "epics-base-static-libs",
+        "name": "epics-base",
         "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "perl"
+          ],
+          "host": [
+            "readline"
+          ],
           "run": [
+            "perl"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "source": [
+                "modules/pva2pva/loopback.conf"
+              ]
+            },
+            "script": [
+              "caget -h",
+              "cainfo -h",
+              "caput -h",
+              "camonitor -h",
+              "pvget -h",
+              "pvput -h",
+              "pvinfo -h",
+              "pvlist -h",
+              "softIoc -h",
+              "softIocPVA -h",
+              "p2p -C modules/pva2pva/loopback.conf",
+              "test -f ${EPICS_BASE}/bin/${EPICS_HOST_ARCH}/caget",
+              "test -f ${EPICS_BASE}/include/epicsVersion.h",
+              "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libCom${SHLIB_EXT}",
+              "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libca${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "7.0.9.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
             "epics-base"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libca.a",
-            "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libCom.a"
-          ]
-        }
-      },
-      {
-        "files": [
-          "etc",
-          "epics/bin",
-          "epics/cfg",
-          "epics/configure",
-          "epics/db",
-          "epics/dbd",
-          "epics/html",
-          "epics/include",
-          "epics/lib/*/*.dylib",
-          "epics/lib/perl",
-          "epics/lib/pkgconfig",
-          "epics/templates"
-        ],
-        "name": "epics-base"
-      },
-      {
-        "files": [
-          "epics/lib/*/*.a"
-        ],
         "name": "epics-base-static-libs",
         "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "perl"
+          ],
+          "host": [
+            "readline"
+          ],
           "run": [
+            "epics-base",
+            "perl"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libca.a",
+              "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libCom.a"
+            ]
+          }
+        ],
+        "version": "7.0.9.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
             "epics-base"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libca.a",
-            "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libCom.a"
+        "name": "epics-base",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "perl"
+          ],
+          "host": [
+            "readline"
+          ],
+          "run": [
+            "perl"
           ]
-        }
+        },
+        "tests": [
+          {
+            "files": {
+              "source": [
+                "modules/pva2pva/loopback.conf"
+              ]
+            },
+            "script": [
+              "caget -h",
+              "cainfo -h",
+              "caput -h",
+              "camonitor -h",
+              "pvget -h",
+              "pvput -h",
+              "pvinfo -h",
+              "pvlist -h",
+              "softIoc -h",
+              "softIocPVA -h",
+              "p2p -C modules/pva2pva/loopback.conf",
+              "test -f ${EPICS_BASE}/bin/${EPICS_HOST_ARCH}/caget",
+              "test -f ${EPICS_BASE}/include/epicsVersion.h",
+              "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libCom${SHLIB_EXT}",
+              "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libca${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "7.0.9.0"
       },
       {
-        "files": [
-          "etc",
-          "epics/bin",
-          "epics/cfg",
-          "epics/configure",
-          "epics/db",
-          "epics/dbd",
-          "epics/html",
-          "epics/include",
-          "epics/bin/*/*.dll",
-          "epics/lib/*/*.lib",
-          "Library/lib/*.lib",
-          "Library/bin/*.dll",
-          "epics/lib/perl",
-          "epics/lib/pkgconfig",
-          "epics/templates"
+        "build": {
+          "strong": [],
+          "weak": [
+            "epics-base"
+          ]
+        },
+        "name": "epics-base-static-libs",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "perl"
+          ],
+          "host": [
+            "readline"
+          ],
+          "run": [
+            "epics-base",
+            "perl"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libca.a",
+              "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libCom.a"
+            ]
+          }
         ],
-        "name": "epics-base"
+        "version": "7.0.9.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "epics-base"
+          ]
+        },
+        "name": "epics-base",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "perl"
+          ],
+          "host": [
+            "readline"
+          ],
+          "run": [
+            "perl"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "source": [
+                "modules/pva2pva/loopback.conf"
+              ]
+            },
+            "script": [
+              "caget -h",
+              "cainfo -h",
+              "caput -h",
+              "camonitor -h",
+              "pvget -h",
+              "pvput -h",
+              "pvinfo -h",
+              "pvlist -h",
+              "softIoc -h",
+              "softIocPVA -h",
+              "p2p -C modules/pva2pva/loopback.conf",
+              "test -f ${EPICS_BASE}/bin/${EPICS_HOST_ARCH}/caget",
+              "test -f ${EPICS_BASE}/include/epicsVersion.h",
+              "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libCom${SHLIB_EXT}",
+              "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libca${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "7.0.9.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "epics-base"
+          ]
+        },
+        "name": "epics-base-static-libs",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "perl"
+          ],
+          "host": [
+            "readline"
+          ],
+          "run": [
+            "epics-base",
+            "perl"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libca.a",
+              "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libCom.a"
+            ]
+          }
+        ],
+        "version": "7.0.9.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "epics-base"
+          ]
+        },
+        "name": "epics-base",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "perl"
+          ],
+          "host": [
+            "readline"
+          ],
+          "run": [
+            "perl"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "source": [
+                "modules/pva2pva/loopback.conf"
+              ]
+            },
+            "script": [
+              "caget -h",
+              "cainfo -h",
+              "caput -h",
+              "camonitor -h",
+              "pvget -h",
+              "pvput -h",
+              "pvinfo -h",
+              "pvlist -h",
+              "softIoc -h",
+              "softIocPVA -h",
+              "p2p -C modules/pva2pva/loopback.conf",
+              "test -f ${EPICS_BASE}/bin/${EPICS_HOST_ARCH}/caget",
+              "test -f ${EPICS_BASE}/include/epicsVersion.h",
+              "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libCom${SHLIB_EXT}",
+              "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libca${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "7.0.9.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "epics-base"
+          ]
+        },
+        "name": "epics-base-static-libs",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "perl"
+          ],
+          "host": [
+            "readline"
+          ],
+          "run": [
+            "epics-base",
+            "perl"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libca.a",
+              "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libCom.a"
+            ]
+          }
+        ],
+        "version": "7.0.9.0"
       }
     ],
     "package": {
@@ -319,8 +573,7 @@
         "c_stdlib_stub",
         "cxx_compiler_stub",
         "make",
-        "perl",
-        "m2-patch"
+        "perl"
       ],
       "host": [
         "readline"
@@ -329,7 +582,7 @@
         "perl"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "patches": [
         "RULES_MODULES_echo_quotes.patch",
@@ -338,36 +591,6 @@
       ],
       "sha256": "acd62c9b97b60caea9303cc3aab922dbf2bc3bfb3d20e0027110ffe4c906a6c7",
       "url": "https://epics-controls.org/download/base/base-7.0.9.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "caget -h",
-        "cainfo -h",
-        "caput -h",
-        "camonitor -h",
-        "pvget -h",
-        "pvput -h",
-        "pvinfo -h",
-        "pvlist -h",
-        "softIoc -h",
-        "softIocPVA -h",
-        "p2p -C modules/pva2pva/loopback.conf",
-        "test -f ${EPICS_BASE}/bin/${EPICS_HOST_ARCH}/caget",
-        "test -f ${EPICS_BASE}/include/epicsVersion.h",
-        "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libCom${SHLIB_EXT}",
-        "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libca${SHLIB_EXT}",
-        "if not exist %EPICS_BASE%\\bin\\%EPICS_HOST_ARCH%\\caget.exe exit 1",
-        "if not exist %EPICS_BASE%\\bin\\%EPICS_HOST_ARCH%\\Com.dll exit 1",
-        "if not exist %EPICS_BASE%\\bin\\%EPICS_HOST_ARCH%\\ca.dll exit 1",
-        "if not exist %EPICS_BASE%\\include\\epicsVersion.h exit 1",
-        "if not exist %EPICS_BASE%\\lib\\%EPICS_HOST_ARCH%\\ca.lib exit 1",
-        "if not exist %EPICS_BASE%\\lib\\%EPICS_HOST_ARCH%\\Com.lib exit 1",
-        "if not exist %PREFIX%\\Library\\bin\\Com.dll exit 1",
-        "if not exist %PREFIX%\\Library\\lib\\Com.lib exit 1"
-      ],
-      "source_files": [
-        "modules/pva2pva/loopback.conf"
-      ]
     }
   },
   "name": "epics-base",
@@ -375,14 +598,17 @@
     "about": {
       "home": "http://www.aps.anl.gov/epics",
       "license": "EPICS",
+      "license_family": "EPICS",
       "license_file": "LICENSE",
       "summary": "EPICS Base Library"
     },
     "build": {
-      "number": "6",
-      "run_exports": [
-        "epics-base"
-      ]
+      "number": "7",
+      "run_exports": {
+        "weak": [
+          "epics-base"
+        ]
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -397,38 +623,89 @@
     },
     "outputs": [
       {
-        "files": [
-          "etc",
-          "epics/bin",
-          "epics/cfg",
-          "epics/configure",
-          "epics/db",
-          "epics/dbd",
-          "epics/html",
-          "epics/include",
-          "epics/lib/*/*.dylib",
-          "epics/lib/perl",
-          "epics/lib/pkgconfig",
-          "epics/templates"
-        ],
-        "name": "epics-base"
-      },
-      {
-        "files": [
-          "epics/lib/*/*.a"
-        ],
-        "name": "epics-base-static-libs",
-        "requirements": {
-          "run": [
+        "build": {
+          "strong": [],
+          "weak": [
             "epics-base"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libca.a",
-            "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libCom.a"
+        "name": "epics-base",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "perl"
+          ],
+          "host": [
+            "readline"
+          ],
+          "run": [
+            "perl"
           ]
-        }
+        },
+        "tests": [
+          {
+            "files": {
+              "source": [
+                "modules/pva2pva/loopback.conf"
+              ]
+            },
+            "script": [
+              "caget -h",
+              "cainfo -h",
+              "caput -h",
+              "camonitor -h",
+              "pvget -h",
+              "pvput -h",
+              "pvinfo -h",
+              "pvlist -h",
+              "softIoc -h",
+              "softIocPVA -h",
+              "p2p -C modules/pva2pva/loopback.conf",
+              "test -f ${EPICS_BASE}/bin/${EPICS_HOST_ARCH}/caget",
+              "test -f ${EPICS_BASE}/include/epicsVersion.h",
+              "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libCom${SHLIB_EXT}",
+              "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libca${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "7.0.9.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "epics-base"
+          ]
+        },
+        "name": "epics-base-static-libs",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "perl"
+          ],
+          "host": [
+            "readline"
+          ],
+          "run": [
+            "epics-base",
+            "perl"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libca.a",
+              "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libCom.a"
+            ]
+          }
+        ],
+        "version": "7.0.9.0"
       }
     ],
     "package": {
@@ -450,7 +727,7 @@
         "perl"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "patches": [
         "RULES_MODULES_echo_quotes.patch",
@@ -459,28 +736,6 @@
       ],
       "sha256": "acd62c9b97b60caea9303cc3aab922dbf2bc3bfb3d20e0027110ffe4c906a6c7",
       "url": "https://epics-controls.org/download/base/base-7.0.9.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "caget -h",
-        "cainfo -h",
-        "caput -h",
-        "camonitor -h",
-        "pvget -h",
-        "pvput -h",
-        "pvinfo -h",
-        "pvlist -h",
-        "softIoc -h",
-        "softIocPVA -h",
-        "p2p -C modules/pva2pva/loopback.conf",
-        "test -f ${EPICS_BASE}/bin/${EPICS_HOST_ARCH}/caget",
-        "test -f ${EPICS_BASE}/include/epicsVersion.h",
-        "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libCom${SHLIB_EXT}",
-        "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libca${SHLIB_EXT}"
-      ],
-      "source_files": [
-        "modules/pva2pva/loopback.conf"
-      ]
     }
   },
   "osx_64_requirements": {
@@ -516,14 +771,17 @@
     "about": {
       "home": "http://www.aps.anl.gov/epics",
       "license": "EPICS",
+      "license_family": "EPICS",
       "license_file": "LICENSE",
       "summary": "EPICS Base Library"
     },
     "build": {
-      "number": "6",
-      "run_exports": [
-        "epics-base"
-      ]
+      "number": "7",
+      "run_exports": {
+        "weak": [
+          "epics-base"
+        ]
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -538,38 +796,89 @@
     },
     "outputs": [
       {
-        "files": [
-          "etc",
-          "epics/bin",
-          "epics/cfg",
-          "epics/configure",
-          "epics/db",
-          "epics/dbd",
-          "epics/html",
-          "epics/include",
-          "epics/lib/*/*.dylib",
-          "epics/lib/perl",
-          "epics/lib/pkgconfig",
-          "epics/templates"
-        ],
-        "name": "epics-base"
-      },
-      {
-        "files": [
-          "epics/lib/*/*.a"
-        ],
-        "name": "epics-base-static-libs",
-        "requirements": {
-          "run": [
+        "build": {
+          "strong": [],
+          "weak": [
             "epics-base"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libca.a",
-            "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libCom.a"
+        "name": "epics-base",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "perl"
+          ],
+          "host": [
+            "readline"
+          ],
+          "run": [
+            "perl"
           ]
-        }
+        },
+        "tests": [
+          {
+            "files": {
+              "source": [
+                "modules/pva2pva/loopback.conf"
+              ]
+            },
+            "script": [
+              "caget -h",
+              "cainfo -h",
+              "caput -h",
+              "camonitor -h",
+              "pvget -h",
+              "pvput -h",
+              "pvinfo -h",
+              "pvlist -h",
+              "softIoc -h",
+              "softIocPVA -h",
+              "p2p -C modules/pva2pva/loopback.conf",
+              "test -f ${EPICS_BASE}/bin/${EPICS_HOST_ARCH}/caget",
+              "test -f ${EPICS_BASE}/include/epicsVersion.h",
+              "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libCom${SHLIB_EXT}",
+              "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libca${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "7.0.9.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "epics-base"
+          ]
+        },
+        "name": "epics-base-static-libs",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "perl"
+          ],
+          "host": [
+            "readline"
+          ],
+          "run": [
+            "epics-base",
+            "perl"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libca.a",
+              "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libCom.a"
+            ]
+          }
+        ],
+        "version": "7.0.9.0"
       }
     ],
     "package": {
@@ -591,7 +900,7 @@
         "perl"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "patches": [
         "RULES_MODULES_echo_quotes.patch",
@@ -600,28 +909,6 @@
       ],
       "sha256": "acd62c9b97b60caea9303cc3aab922dbf2bc3bfb3d20e0027110ffe4c906a6c7",
       "url": "https://epics-controls.org/download/base/base-7.0.9.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "caget -h",
-        "cainfo -h",
-        "caput -h",
-        "camonitor -h",
-        "pvget -h",
-        "pvput -h",
-        "pvinfo -h",
-        "pvlist -h",
-        "softIoc -h",
-        "softIocPVA -h",
-        "p2p -C modules/pva2pva/loopback.conf",
-        "test -f ${EPICS_BASE}/bin/${EPICS_HOST_ARCH}/caget",
-        "test -f ${EPICS_BASE}/include/epicsVersion.h",
-        "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libCom${SHLIB_EXT}",
-        "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libca${SHLIB_EXT}"
-      ],
-      "source_files": [
-        "modules/pva2pva/loopback.conf"
-      ]
     }
   },
   "osx_arm64_requirements": {
@@ -670,7 +957,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/epics-base.json"
   },
-  "raw_meta_yaml": "# Always use 4 numbers in the version to match run_exports!\n# Add .0 if official version is on 3 numbers\n{% set version = \"7.0.9.0\" %}\n\npackage:\n  name: epics-base\n  version: {{ version }}\n\nsource:\n  # Don't use {{ version }} in the url as it can be on 3 numbers only\n  url: https://epics-controls.org/download/base/base-7.0.9.tar.gz\n  sha256: acd62c9b97b60caea9303cc3aab922dbf2bc3bfb3d20e0027110ffe4c906a6c7\n  patches:\n    - RULES_MODULES_echo_quotes.patch\n    - RULES_BUILD_remove_mkdir.patch\n    - initialise_pthreadInfo_attr.patch\n\nbuild:\n  number: 6\n  run_exports:\n    - {{ pin_subpackage('epics-base', max_pin='x.x.x.x') }}\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ stdlib(\"c\") }}\n    - {{ compiler('cxx') }}\n    - make\n    - perl\n    - m2-patch      # [win]\n  host:\n    - readline      # [unix]\n  run:\n    - perl\n\ntest:\n  source_files:\n    - modules/pva2pva/loopback.conf\n  commands:\n    - caget -h\n    - cainfo -h\n    - caput -h\n    - camonitor -h\n    - pvget -h\n    - pvput -h\n    - pvinfo -h\n    - pvlist -h\n    - softIoc -h\n    - softIocPVA -h\n    # p2p -h exits with 1... Use -C flag to test it instead\n    - p2p -C modules/pva2pva/loopback.conf\n    - test -f ${EPICS_BASE}/bin/${EPICS_HOST_ARCH}/caget                # [not win]\n    - test -f ${EPICS_BASE}/include/epicsVersion.h                      # [not win]\n    - test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libCom${SHLIB_EXT}   # [not win]\n    - test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libca${SHLIB_EXT}    # [not win]\n    - if not exist %EPICS_BASE%\\bin\\%EPICS_HOST_ARCH%\\caget.exe exit 1  # [win]\n    - if not exist %EPICS_BASE%\\bin\\%EPICS_HOST_ARCH%\\Com.dll exit 1    # [win]\n    - if not exist %EPICS_BASE%\\bin\\%EPICS_HOST_ARCH%\\ca.dll exit 1     # [win]\n    - if not exist %EPICS_BASE%\\include\\epicsVersion.h exit 1           # [win]\n    - if not exist %EPICS_BASE%\\lib\\%EPICS_HOST_ARCH%\\ca.lib exit 1     # [win]\n    - if not exist %EPICS_BASE%\\lib\\%EPICS_HOST_ARCH%\\Com.lib exit 1    # [win]\n    - if not exist %PREFIX%\\Library\\bin\\Com.dll exit 1                  # [win]\n    - if not exist %PREFIX%\\Library\\lib\\Com.lib exit 1                  # [win]\n\noutputs:\n  - name: epics-base\n    files:\n      - etc\n      - epics/bin\n      - epics/cfg\n      - epics/configure\n      - epics/db\n      - epics/dbd\n      - epics/html\n      - epics/include\n      # windows .dll are under bin\n      - epics/bin/*/*.dll    # [win]\n      - epics/lib/*/*.lib    # [win]\n      - Library/lib/*.lib    # [win]\n      - Library/bin/*.dll    # [win]\n      - epics/lib/*/*.dylib  # [osx]\n      - epics/lib/*/*.so*    # [linux]\n      - epics/lib/perl\n      - epics/lib/pkgconfig\n      - epics/templates\n\n  - name: epics-base-static-libs                                 # [not win]\n    requirements:                                                # [not win]\n      run:                                                       # [not win]\n        - {{ pin_subpackage('epics-base', exact=True) }}         # [not win]\n    files:                                                       # [not win]\n      - epics/lib/*/*.a                                          # [not win]\n    test:                                                        # [not win]\n      commands:                                                  # [not win]\n        - test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libca.a   # [not win]\n        - test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libCom.a  # [not win]\n\nabout:\n  home: http://www.aps.anl.gov/epics\n  license: EPICS\n  license_file: LICENSE\n  summary: EPICS Base Library\n\nextra:\n  recipe-maintainers:\n    - anderslindho\n    - lucmaga\n    - beenje\n    - mrakitin\n    - tacaswell\n    - aharrisson\n    - simon-ess\n",
+  "raw_meta_yaml": "# Always use 4 numbers in the version to match run_exports!\n# Add .0 if official version is on 3 numbers\nschema_version: 1\n\ncontext:\n  version: 7.0.9.0\n\nrecipe:\n  name: epics-base\n  version: ${{ version }}\n\nsource:\n  # Don't use {{ version }} in the url as it can be on 3 numbers only\n  url: https://epics-controls.org/download/base/base-7.0.9.tar.gz\n  sha256: acd62c9b97b60caea9303cc3aab922dbf2bc3bfb3d20e0027110ffe4c906a6c7\n  patches:\n    - RULES_MODULES_echo_quotes.patch\n    - RULES_BUILD_remove_mkdir.patch\n    - initialise_pthreadInfo_attr.patch\n\nbuild:\n  number: 7\n\noutputs:\n  - package:\n      name: epics-base\n    requirements:\n      build:\n        - ${{ compiler('c') }}\n        - ${{ stdlib(\"c\") }}\n        - ${{ compiler('cxx') }}\n        - make\n        - perl\n        - if: win\n          then: m2-patch\n      host:\n        - if: unix\n          then: readline\n      run:\n        - perl\n      run_exports:\n        - ${{ pin_subpackage('epics-base', upper_bound='x.x.x.x') }}\n    build:\n      files:\n        - etc\n        - epics/bin\n        - epics/cfg\n        - epics/configure\n        - epics/db\n        - epics/dbd\n        - epics/html\n        - epics/include\n        # windows .dll are under bin\n        - if: win\n          then:\n            - epics/bin/*/*.dll\n            - epics/lib/*/*.lib\n            - Library/lib/*.lib\n            - Library/bin/*.dll\n        - if: osx\n          then: epics/lib/*/*.dylib\n        - if: linux\n          then: epics/lib/*/*.so*\n        - epics/lib/perl\n        - epics/lib/pkgconfig\n        - epics/templates\n    tests:\n      - script:\n          - caget -h\n          - cainfo -h\n          - caput -h\n          - camonitor -h\n          - pvget -h\n          - pvput -h\n          - pvinfo -h\n          - pvlist -h\n          - softIoc -h\n          - softIocPVA -h\n          - p2p -C modules/pva2pva/loopback.conf\n          - if: not win\n            then:\n              - test -f ${EPICS_BASE}/bin/${EPICS_HOST_ARCH}/caget\n              - test -f ${EPICS_BASE}/include/epicsVersion.h\n              - test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libCom${SHLIB_EXT}\n              - test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libca${SHLIB_EXT}\n          - if: win\n            then:\n              - if not exist %EPICS_BASE%\\bin\\%EPICS_HOST_ARCH%\\caget.exe exit 1\n              - if not exist %EPICS_BASE%\\bin\\%EPICS_HOST_ARCH%\\Com.dll exit 1\n              - if not exist %EPICS_BASE%\\bin\\%EPICS_HOST_ARCH%\\ca.dll exit 1\n              - if not exist %EPICS_BASE%\\include\\epicsVersion.h exit 1\n              - if not exist %EPICS_BASE%\\lib\\%EPICS_HOST_ARCH%\\ca.lib exit 1\n              - if not exist %EPICS_BASE%\\lib\\%EPICS_HOST_ARCH%\\Com.lib exit 1\n              - if not exist %PREFIX%\\Library\\bin\\Com.dll exit 1\n              - if not exist %PREFIX%\\Library\\lib\\Com.lib exit 1\n        files:\n          source:\n            - modules/pva2pva/loopback.conf\n\n  - package:\n      name: epics-base-static-libs\n    requirements:\n      build:\n        - ${{ compiler('c') }}\n        - ${{ stdlib(\"c\") }}\n        - ${{ compiler('cxx') }}\n        - make\n        - perl\n        - if: win\n          then: m2-patch\n      host:\n        - if: unix\n          then: readline\n      run:\n        - if: not win\n          then: ${{ pin_subpackage('epics-base', exact=True) }}\n        - perl\n      run_exports:\n        - ${{ pin_subpackage('epics-base', upper_bound='x.x.x.x') }}\n    build:\n      files:\n        - if: not win\n          then: epics/lib/*/*.a\n    tests:\n      - script:\n          - if: not win\n            then: test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libca.a\n          - if: not win\n            then: test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libCom.a\n\nabout:\n  license: EPICS\n  license_file: LICENSE\n  summary: EPICS Base Library\n  homepage: http://www.aps.anl.gov/epics\n\nextra:\n  recipe-maintainers:\n    - anderslindho\n    - lucmaga\n    - beenje\n    - mrakitin\n    - tacaswell\n    - aharrisson\n    - simon-ess\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -678,7 +965,6 @@
       "c_stdlib_stub",
       "cxx_compiler_stub",
       "epics-base",
-      "m2-patch",
       "make",
       "perl",
       "readline"
@@ -691,7 +977,6 @@
         "c_compiler_stub",
         "c_stdlib_stub",
         "cxx_compiler_stub",
-        "m2-patch",
         "make",
         "perl"
       ]
@@ -728,7 +1013,6 @@
         "c_compiler_stub",
         "c_stdlib_stub",
         "cxx_compiler_stub",
-        "m2-patch",
         "make",
         "perl"
       ]
@@ -760,14 +1044,17 @@
     "about": {
       "home": "http://www.aps.anl.gov/epics",
       "license": "EPICS",
+      "license_family": "EPICS",
       "license_file": "LICENSE",
       "summary": "EPICS Base Library"
     },
     "build": {
-      "number": "6",
-      "run_exports": [
-        "epics-base"
-      ]
+      "number": "7",
+      "run_exports": {
+        "weak": [
+          "epics-base"
+        ]
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -782,24 +1069,89 @@
     },
     "outputs": [
       {
-        "files": [
-          "etc",
-          "epics/bin",
-          "epics/cfg",
-          "epics/configure",
-          "epics/db",
-          "epics/dbd",
-          "epics/html",
-          "epics/include",
-          "epics/bin/*/*.dll",
-          "epics/lib/*/*.lib",
-          "Library/lib/*.lib",
-          "Library/bin/*.dll",
-          "epics/lib/perl",
-          "epics/lib/pkgconfig",
-          "epics/templates"
+        "build": {
+          "strong": [],
+          "weak": [
+            "epics-base"
+          ]
+        },
+        "name": "epics-base",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "perl"
+          ],
+          "host": [
+            "readline"
+          ],
+          "run": [
+            "perl"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "source": [
+                "modules/pva2pva/loopback.conf"
+              ]
+            },
+            "script": [
+              "caget -h",
+              "cainfo -h",
+              "caput -h",
+              "camonitor -h",
+              "pvget -h",
+              "pvput -h",
+              "pvinfo -h",
+              "pvlist -h",
+              "softIoc -h",
+              "softIocPVA -h",
+              "p2p -C modules/pva2pva/loopback.conf",
+              "test -f ${EPICS_BASE}/bin/${EPICS_HOST_ARCH}/caget",
+              "test -f ${EPICS_BASE}/include/epicsVersion.h",
+              "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libCom${SHLIB_EXT}",
+              "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libca${SHLIB_EXT}"
+            ]
+          }
         ],
-        "name": "epics-base"
+        "version": "7.0.9.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "epics-base"
+          ]
+        },
+        "name": "epics-base-static-libs",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "make",
+            "perl"
+          ],
+          "host": [
+            "readline"
+          ],
+          "run": [
+            "epics-base",
+            "perl"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libca.a",
+              "test -f ${EPICS_BASE}/lib/${EPICS_HOST_ARCH}/libCom.a"
+            ]
+          }
+        ],
+        "version": "7.0.9.0"
       }
     ],
     "package": {
@@ -812,15 +1164,16 @@
         "c_stdlib_stub",
         "cxx_compiler_stub",
         "make",
-        "perl",
-        "m2-patch"
+        "perl"
       ],
-      "host": [],
+      "host": [
+        "readline"
+      ],
       "run": [
         "perl"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "patches": [
         "RULES_MODULES_echo_quotes.patch",
@@ -829,32 +1182,6 @@
       ],
       "sha256": "acd62c9b97b60caea9303cc3aab922dbf2bc3bfb3d20e0027110ffe4c906a6c7",
       "url": "https://epics-controls.org/download/base/base-7.0.9.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "caget -h",
-        "cainfo -h",
-        "caput -h",
-        "camonitor -h",
-        "pvget -h",
-        "pvput -h",
-        "pvinfo -h",
-        "pvlist -h",
-        "softIoc -h",
-        "softIocPVA -h",
-        "p2p -C modules/pva2pva/loopback.conf",
-        "if not exist %EPICS_BASE%\\bin\\%EPICS_HOST_ARCH%\\caget.exe exit 1",
-        "if not exist %EPICS_BASE%\\bin\\%EPICS_HOST_ARCH%\\Com.dll exit 1",
-        "if not exist %EPICS_BASE%\\bin\\%EPICS_HOST_ARCH%\\ca.dll exit 1",
-        "if not exist %EPICS_BASE%\\include\\epicsVersion.h exit 1",
-        "if not exist %EPICS_BASE%\\lib\\%EPICS_HOST_ARCH%\\ca.lib exit 1",
-        "if not exist %EPICS_BASE%\\lib\\%EPICS_HOST_ARCH%\\Com.lib exit 1",
-        "if not exist %PREFIX%\\Library\\bin\\Com.dll exit 1",
-        "if not exist %PREFIX%\\Library\\lib\\Com.lib exit 1"
-      ],
-      "source_files": [
-        "modules/pva2pva/loopback.conf"
-      ]
     }
   },
   "win_64_requirements": {
@@ -864,18 +1191,20 @@
         "c_compiler_stub",
         "c_stdlib_stub",
         "cxx_compiler_stub",
-        "m2-patch",
         "make",
         "perl"
       ]
     },
     "host": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "readline"
+      ]
     },
     "run": {
       "__set__": true,
       "elements": [
+        "epics-base",
         "perl"
       ]
     },
