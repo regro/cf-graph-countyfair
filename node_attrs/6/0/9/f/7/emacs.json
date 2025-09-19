@@ -8,7 +8,9 @@
     "conda_build": {
       "pkg_format": "2"
     },
+    "conda_build_tool": "rattler-build",
     "conda_forge_output_validation": true,
+    "conda_install_tool": "pixi",
     "github": {
       "branch_name": "main",
       "tooling_branch_name": "main"
@@ -28,15 +30,12 @@
     "about": {
       "home": "http://www.gnu.org/software/emacs/",
       "license": "GPL-3.0-only",
+      "license_family": "GPL-3.0-only",
       "license_file": "COPYING",
       "summary": "GNU Emacs is an extensible, customizable text editor."
     },
     "build": {
-      "ignore_prefix_files": [
-        "lib/emacs/jit/bin/*",
-        "lib/emacs/jit/lib/*"
-      ],
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "recipe-maintainers": [
@@ -46,6 +45,76 @@
         "notestaff"
       ]
     },
+    "outputs": [
+      {
+        "build": null,
+        "name": "emacs",
+        "requirements": {
+          "build": [
+            "pkg-config",
+            "gnuconfig",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "autoconf",
+            "automake",
+            "m4",
+            "make",
+            "texinfo"
+          ],
+          "host": [
+            "c_stdlib_stub",
+            "binutils",
+            "cairo",
+            "gtk3",
+            "harfbuzz",
+            "mpc",
+            "mpfr",
+            "xorg-libxaw",
+            "xorg-libxcomposite",
+            "xorg-libxfixes",
+            "xorg-libxi",
+            "xorg-libxinerama",
+            "xorg-libxrandr",
+            "xorg-xorgproto",
+            "expat",
+            "giflib",
+            "glib",
+            "gmp",
+            "gnutls",
+            "libjpeg-turbo",
+            "libpng",
+            "librsvg",
+            "libtiff",
+            "libtree-sitter",
+            "libxml2",
+            "ncurses",
+            "zlib"
+          ],
+          "run": [
+            "binutils"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "$PREFIX/bin/emacs --help",
+              "$PREFIX/bin/emacsclient --help",
+              "$PREFIX/bin/ctags --help",
+              "$PREFIX/bin/ebrowse --help",
+              "$PREFIX/bin/etags --help",
+              "$PREFIX/bin/emacs -nw -Q --kill --batch",
+              "$PREFIX/bin/emacs -Q --kill --batch",
+              "$PREFIX/bin/emacs --batch --eval '(unless (treesit-available-p) (kill-emacs 1))'",
+              "$PREFIX/bin/emacs --batch --eval '(unless (json-available-p) (kill-emacs 1))'",
+              "$PREFIX/bin/emacs --batch --eval \"(unless (string= \\\"${PREFIX}/share/info\\\" configure-info-directory) (kill-emacs 1))\"",
+              "$PREFIX/bin/emacs --batch --eval '(batch-native-compile t)' $PREFIX/share/emacs/${{ version }}/lisp/calculator.elc"
+            ]
+          }
+        ],
+        "version": "30.2"
+      }
+    ],
     "package": {
       "name": "emacs",
       "version": "30.2"
@@ -55,119 +124,56 @@
         "pkg-config",
         "gnuconfig",
         "c_compiler_stub",
-        "cxx_compiler_stub",
         "c_stdlib_stub",
+        "cxx_compiler_stub",
         "autoconf",
         "automake",
         "m4",
         "make",
-        "liblzma-devel",
-        "libtree-sitter",
-        "jansson",
         "texinfo"
       ],
       "host": [
         "c_stdlib_stub",
         "binutils",
-        "libxml2",
-        "ncurses",
-        "libjpeg-turbo",
-        "libpng",
-        "libtiff",
-        "liblzma-devel",
-        "librsvg",
-        "giflib",
-        "gnutls",
-        "gmp",
+        "cairo",
+        "gtk3",
+        "harfbuzz",
         "mpc",
         "mpfr",
-        "glib",
-        "freetype",
-        "cairo",
-        "gtk3",
-        "harfbuzz",
         "xorg-libxaw",
-        "xorg-libxpm",
-        "xorg-libxfixes",
-        "xorg-libxft",
-        "xorg-libxi",
-        "xorg-libxrandr",
-        "xorg-libxcursor",
         "xorg-libxcomposite",
-        "xorg-libxdamage",
+        "xorg-libxfixes",
+        "xorg-libxi",
         "xorg-libxinerama",
+        "xorg-libxrandr",
         "xorg-xorgproto",
-        "xorg-libxtst",
-        "zlib",
-        "libtree-sitter",
-        "jansson",
-        "expat"
-      ],
-      "run": [
-        "binutils",
-        "libxml2",
-        "ncurses",
+        "expat",
+        "giflib",
+        "glib",
+        "gmp",
+        "gnutls",
         "libjpeg-turbo",
         "libpng",
+        "librsvg",
         "libtiff",
-        "giflib",
-        "gnutls",
-        "gmp",
-        "glib",
-        "freetype",
-        "cairo",
-        "gtk3",
-        "harfbuzz",
-        "xorg-libxaw",
-        "xorg-libxpm",
-        "xorg-libxfixes",
-        "xorg-libxft",
-        "xorg-libxi",
-        "xorg-libxrandr",
-        "xorg-libxcursor",
-        "xorg-libxcomposite",
-        "xorg-libxdamage",
-        "xorg-libxinerama",
-        "xorg-xorgproto",
-        "xorg-libxtst",
-        "zlib",
         "libtree-sitter",
-        "jansson"
+        "libxml2",
+        "ncurses",
+        "zlib"
+      ],
+      "run": [
+        "binutils"
       ]
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "fn": "emacs-30.2.tar.xz",
-        "patches": [
-          "0008-do-not-dump-configure-info-directory.patch",
-          "0009-disable-malloc-set-state.patch",
-          "0010-disable-fchmodat.patch"
-        ],
-        "sha256": "b3f36f18a6dd2715713370166257de2fae01f9d38cfe878ced9b1e6ded5befd9",
-        "url": "http://ftp.gnu.org/gnu/emacs/emacs-30.2.tar.xz"
-      },
-      {
-        "fn": "gcc-14.2.0.tar.xz",
-        "folder": "gcc",
-        "sha256": "a7b39bc69cbf9e25826c5a60ab26477001f7c08d85cec04bc0e29cabed6f3cc9",
-        "url": "https://ftp.gnu.org/gnu/gcc/gcc-14.2.0/gcc-14.2.0.tar.xz"
-      }
-    ],
-    "test": {
-      "commands": [
-        "$PREFIX/bin/emacs --help",
-        "$PREFIX/bin/emacsclient --help",
-        "$PREFIX/bin/ctags --help",
-        "$PREFIX/bin/ebrowse --help",
-        "$PREFIX/bin/etags --help",
-        "$PREFIX/bin/emacs -nw -Q --kill --batch",
-        "$PREFIX/bin/emacs -Q --kill --batch",
-        "$PREFIX/bin/emacs --batch --eval '(unless (treesit-available-p) (kill-emacs 1))'",
-        "$PREFIX/bin/emacs --batch --eval '(unless (json-available-p) (kill-emacs 1))'",
-        "$PREFIX/bin/emacs --batch --eval \"(unless (string= \\\"${PREFIX}/share/info\\\" configure-info-directory) (kill-emacs 1))\"",
-        "$PREFIX/bin/emacs --batch --eval '(batch-native-compile t)' $PREFIX/share/emacs/30.2/lisp/calculator.elc"
-      ]
+    "schema_version": 1,
+    "source": {
+      "patches": [
+        "0008-do-not-dump-configure-info-directory.patch",
+        "0009-disable-malloc-set-state.patch",
+        "0010-disable-fchmodat.patch"
+      ],
+      "sha256": "b3f36f18a6dd2715713370166257de2fae01f9d38cfe878ced9b1e6ded5befd9",
+      "url": "https://ftpmirror.gnu.org/gnu/emacs/emacs-30.2.tar.xz"
     }
   },
   "linux_64_requirements": {
@@ -180,9 +186,6 @@
         "c_stdlib_stub",
         "cxx_compiler_stub",
         "gnuconfig",
-        "jansson",
-        "liblzma-devel",
-        "libtree-sitter",
         "m4",
         "make",
         "pkg-config",
@@ -196,16 +199,13 @@
         "c_stdlib_stub",
         "cairo",
         "expat",
-        "freetype",
         "giflib",
         "glib",
         "gmp",
         "gnutls",
         "gtk3",
         "harfbuzz",
-        "jansson",
         "libjpeg-turbo",
-        "liblzma-devel",
         "libpng",
         "librsvg",
         "libtiff",
@@ -216,15 +216,10 @@
         "ncurses",
         "xorg-libxaw",
         "xorg-libxcomposite",
-        "xorg-libxcursor",
-        "xorg-libxdamage",
         "xorg-libxfixes",
-        "xorg-libxft",
         "xorg-libxi",
         "xorg-libxinerama",
-        "xorg-libxpm",
         "xorg-libxrandr",
-        "xorg-libxtst",
         "xorg-xorgproto",
         "zlib"
       ]
@@ -232,35 +227,7 @@
     "run": {
       "__set__": true,
       "elements": [
-        "binutils",
-        "cairo",
-        "freetype",
-        "giflib",
-        "glib",
-        "gmp",
-        "gnutls",
-        "gtk3",
-        "harfbuzz",
-        "jansson",
-        "libjpeg-turbo",
-        "libpng",
-        "libtiff",
-        "libtree-sitter",
-        "libxml2",
-        "ncurses",
-        "xorg-libxaw",
-        "xorg-libxcomposite",
-        "xorg-libxcursor",
-        "xorg-libxdamage",
-        "xorg-libxfixes",
-        "xorg-libxft",
-        "xorg-libxi",
-        "xorg-libxinerama",
-        "xorg-libxpm",
-        "xorg-libxrandr",
-        "xorg-libxtst",
-        "xorg-xorgproto",
-        "zlib"
+        "binutils"
       ]
     },
     "test": {
@@ -272,15 +239,12 @@
     "about": {
       "home": "http://www.gnu.org/software/emacs/",
       "license": "GPL-3.0-only",
+      "license_family": "GPL-3.0-only",
       "license_file": "COPYING",
       "summary": "GNU Emacs is an extensible, customizable text editor."
     },
     "build": {
-      "ignore_prefix_files": [
-        "lib/emacs/jit/bin/*",
-        "lib/emacs/jit/lib/*"
-      ],
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "recipe-maintainers": [
@@ -290,6 +254,212 @@
         "notestaff"
       ]
     },
+    "outputs": [
+      {
+        "build": null,
+        "name": "emacs",
+        "requirements": {
+          "build": [
+            "pkg-config",
+            "gnuconfig",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "autoconf",
+            "automake",
+            "m4",
+            "make",
+            "texinfo"
+          ],
+          "host": [
+            "c_stdlib_stub",
+            "binutils",
+            "cairo",
+            "gtk3",
+            "harfbuzz",
+            "mpc",
+            "mpfr",
+            "xorg-libxaw",
+            "xorg-libxcomposite",
+            "xorg-libxfixes",
+            "xorg-libxi",
+            "xorg-libxinerama",
+            "xorg-libxrandr",
+            "xorg-xorgproto",
+            "expat",
+            "giflib",
+            "glib",
+            "gmp",
+            "gnutls",
+            "libjpeg-turbo",
+            "libpng",
+            "librsvg",
+            "libtiff",
+            "libtree-sitter",
+            "libxml2",
+            "ncurses",
+            "zlib"
+          ],
+          "run": [
+            "binutils"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "$PREFIX/bin/emacs --help",
+              "$PREFIX/bin/emacsclient --help",
+              "$PREFIX/bin/ctags --help",
+              "$PREFIX/bin/ebrowse --help",
+              "$PREFIX/bin/etags --help",
+              "$PREFIX/bin/emacs -nw -Q --kill --batch",
+              "$PREFIX/bin/emacs -Q --kill --batch",
+              "$PREFIX/bin/emacs --batch --eval '(unless (treesit-available-p) (kill-emacs 1))'",
+              "$PREFIX/bin/emacs --batch --eval '(unless (json-available-p) (kill-emacs 1))'",
+              "$PREFIX/bin/emacs --batch --eval \"(unless (string= \\\"${PREFIX}/share/info\\\" configure-info-directory) (kill-emacs 1))\"",
+              "$PREFIX/bin/emacs --batch --eval '(batch-native-compile t)' $PREFIX/share/emacs/${{ version }}/lisp/calculator.elc"
+            ]
+          }
+        ],
+        "version": "30.2"
+      },
+      {
+        "build": null,
+        "name": "emacs",
+        "requirements": {
+          "build": [
+            "pkg-config",
+            "gnuconfig",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "autoconf",
+            "automake",
+            "m4",
+            "make",
+            "texinfo"
+          ],
+          "host": [
+            "c_stdlib_stub",
+            "binutils",
+            "cairo",
+            "gtk3",
+            "harfbuzz",
+            "mpc",
+            "mpfr",
+            "xorg-libxaw",
+            "xorg-libxcomposite",
+            "xorg-libxfixes",
+            "xorg-libxi",
+            "xorg-libxinerama",
+            "xorg-libxrandr",
+            "xorg-xorgproto",
+            "expat",
+            "giflib",
+            "glib",
+            "gmp",
+            "gnutls",
+            "libjpeg-turbo",
+            "libpng",
+            "librsvg",
+            "libtiff",
+            "libtree-sitter",
+            "libxml2",
+            "ncurses",
+            "zlib"
+          ],
+          "run": [
+            "binutils"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "$PREFIX/bin/emacs --help",
+              "$PREFIX/bin/emacsclient --help",
+              "$PREFIX/bin/ctags --help",
+              "$PREFIX/bin/ebrowse --help",
+              "$PREFIX/bin/etags --help",
+              "$PREFIX/bin/emacs -nw -Q --kill --batch",
+              "$PREFIX/bin/emacs -Q --kill --batch",
+              "$PREFIX/bin/emacs --batch --eval '(unless (treesit-available-p) (kill-emacs 1))'",
+              "$PREFIX/bin/emacs --batch --eval '(unless (json-available-p) (kill-emacs 1))'",
+              "$PREFIX/bin/emacs --batch --eval \"(unless (string= \\\"${PREFIX}/share/info\\\" configure-info-directory) (kill-emacs 1))\"",
+              "$PREFIX/bin/emacs --batch --eval '(batch-native-compile t)' $PREFIX/share/emacs/${{ version }}/lisp/calculator.elc"
+            ]
+          }
+        ],
+        "version": "30.2"
+      },
+      {
+        "build": null,
+        "name": "emacs",
+        "requirements": {
+          "build": [
+            "pkg-config",
+            "gnuconfig",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "autoconf",
+            "automake",
+            "m4",
+            "make",
+            "texinfo"
+          ],
+          "host": [
+            "c_stdlib_stub",
+            "binutils",
+            "cairo",
+            "gtk3",
+            "harfbuzz",
+            "mpc",
+            "mpfr",
+            "xorg-libxaw",
+            "xorg-libxcomposite",
+            "xorg-libxfixes",
+            "xorg-libxi",
+            "xorg-libxinerama",
+            "xorg-libxrandr",
+            "xorg-xorgproto",
+            "expat",
+            "giflib",
+            "glib",
+            "gmp",
+            "gnutls",
+            "libjpeg-turbo",
+            "libpng",
+            "librsvg",
+            "libtiff",
+            "libtree-sitter",
+            "libxml2",
+            "ncurses",
+            "zlib"
+          ],
+          "run": [
+            "binutils"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "$PREFIX/bin/emacs --help",
+              "$PREFIX/bin/emacsclient --help",
+              "$PREFIX/bin/ctags --help",
+              "$PREFIX/bin/ebrowse --help",
+              "$PREFIX/bin/etags --help",
+              "$PREFIX/bin/emacs -nw -Q --kill --batch",
+              "$PREFIX/bin/emacs -Q --kill --batch",
+              "$PREFIX/bin/emacs --batch --eval '(unless (treesit-available-p) (kill-emacs 1))'",
+              "$PREFIX/bin/emacs --batch --eval '(unless (json-available-p) (kill-emacs 1))'",
+              "$PREFIX/bin/emacs --batch --eval \"(unless (string= \\\"${PREFIX}/share/info\\\" configure-info-directory) (kill-emacs 1))\"",
+              "$PREFIX/bin/emacs --batch --eval '(batch-native-compile t)' $PREFIX/share/emacs/${{ version }}/lisp/calculator.elc"
+            ]
+          }
+        ],
+        "version": "30.2"
+      }
+    ],
     "package": {
       "name": "emacs",
       "version": "30.2"
@@ -299,137 +469,56 @@
         "pkg-config",
         "gnuconfig",
         "c_compiler_stub",
-        "cxx_compiler_stub",
         "c_stdlib_stub",
+        "cxx_compiler_stub",
         "autoconf",
         "automake",
         "m4",
         "make",
-        "liblzma-devel",
-        "libtree-sitter",
-        "jansson",
         "texinfo"
       ],
       "host": [
         "c_stdlib_stub",
         "binutils",
-        "libxml2",
-        "ncurses",
-        "libjpeg-turbo",
-        "libpng",
-        "libtiff",
-        "liblzma-devel",
-        "librsvg",
-        "giflib",
-        "gnutls",
-        "gmp",
+        "cairo",
+        "gtk3",
+        "harfbuzz",
         "mpc",
         "mpfr",
-        "glib",
-        "freetype",
-        "cairo",
-        "gtk3",
-        "harfbuzz",
         "xorg-libxaw",
-        "xorg-libxpm",
-        "xorg-libxfixes",
-        "xorg-libxft",
-        "xorg-libxi",
-        "xorg-libxrandr",
-        "xorg-libxcursor",
         "xorg-libxcomposite",
-        "xorg-libxdamage",
+        "xorg-libxfixes",
+        "xorg-libxi",
         "xorg-libxinerama",
+        "xorg-libxrandr",
         "xorg-xorgproto",
-        "xorg-libxtst",
-        "zlib",
-        "libtree-sitter",
-        "jansson",
         "expat",
-        "dbus"
-      ],
-      "run": [
-        "binutils",
-        "libxml2",
-        "ncurses",
+        "giflib",
+        "glib",
+        "gmp",
+        "gnutls",
         "libjpeg-turbo",
         "libpng",
+        "librsvg",
         "libtiff",
-        "giflib",
-        "gnutls",
-        "gmp",
-        "glib",
-        "freetype",
-        "cairo",
-        "gtk3",
-        "harfbuzz",
-        "xorg-libxaw",
-        "xorg-libxpm",
-        "xorg-libxfixes",
-        "xorg-libxft",
-        "xorg-libxi",
-        "xorg-libxrandr",
-        "xorg-libxcursor",
-        "xorg-libxcomposite",
-        "xorg-libxdamage",
-        "xorg-libxinerama",
-        "xorg-xorgproto",
-        "xorg-libxtst",
-        "zlib",
         "libtree-sitter",
-        "jansson",
-        "dbus"
+        "libxml2",
+        "ncurses",
+        "zlib"
+      ],
+      "run": [
+        "binutils"
       ]
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "fn": "emacs-30.2.tar.xz",
-        "patches": [
-          "0008-do-not-dump-configure-info-directory.patch",
-          "0009-disable-malloc-set-state.patch",
-          "0010-disable-fchmodat.patch"
-        ],
-        "sha256": "b3f36f18a6dd2715713370166257de2fae01f9d38cfe878ced9b1e6ded5befd9",
-        "url": "http://ftp.gnu.org/gnu/emacs/emacs-30.2.tar.xz"
-      },
-      {
-        "fn": "gcc-14.2.0.tar.xz",
-        "folder": "gcc",
-        "sha256": "a7b39bc69cbf9e25826c5a60ab26477001f7c08d85cec04bc0e29cabed6f3cc9",
-        "url": "https://ftp.gnu.org/gnu/gcc/gcc-14.2.0/gcc-14.2.0.tar.xz"
-      },
-      {
-        "fn": "emacs-30.2.tar.xz",
-        "patches": [
-          "0002-apple-silicon-resign-binary.patch"
-        ],
-        "sha256": "b3f36f18a6dd2715713370166257de2fae01f9d38cfe878ced9b1e6ded5befd9",
-        "url": "http://ftp.gnu.org/gnu/emacs/emacs-30.2.tar.xz"
-      },
-      {
-        "fn": "emacs-30.2.tar.xz",
-        "patches": [
-          "0002-apple-silicon-resign-binary.patch"
-        ],
-        "sha256": "b3f36f18a6dd2715713370166257de2fae01f9d38cfe878ced9b1e6ded5befd9",
-        "url": "http://ftp.gnu.org/gnu/emacs/emacs-30.2.tar.xz"
-      }
-    ],
-    "test": {
-      "commands": [
-        "$PREFIX/bin/emacs --help",
-        "$PREFIX/bin/emacsclient --help",
-        "$PREFIX/bin/ctags --help",
-        "$PREFIX/bin/ebrowse --help",
-        "$PREFIX/bin/etags --help",
-        "$PREFIX/bin/emacs -nw -Q --kill --batch",
-        "$PREFIX/bin/emacs -Q --kill --batch",
-        "$PREFIX/bin/emacs --batch --eval '(unless (treesit-available-p) (kill-emacs 1))'",
-        "$PREFIX/bin/emacs --batch --eval '(unless (json-available-p) (kill-emacs 1))'",
-        "$PREFIX/bin/emacs --batch --eval \"(unless (string= \\\"${PREFIX}/share/info\\\" configure-info-directory) (kill-emacs 1))\"",
-        "$PREFIX/bin/emacs --batch --eval '(batch-native-compile t)' $PREFIX/share/emacs/30.2/lisp/calculator.elc"
-      ]
+    "schema_version": 1,
+    "source": {
+      "patches": [
+        "0008-do-not-dump-configure-info-directory.patch",
+        "0009-disable-malloc-set-state.patch",
+        "0010-disable-fchmodat.patch"
+      ],
+      "sha256": "b3f36f18a6dd2715713370166257de2fae01f9d38cfe878ced9b1e6ded5befd9",
+      "url": "https://ftpmirror.gnu.org/gnu/emacs/emacs-30.2.tar.xz"
     }
   },
   "name": "emacs",
@@ -437,15 +526,12 @@
     "about": {
       "home": "http://www.gnu.org/software/emacs/",
       "license": "GPL-3.0-only",
+      "license_family": "GPL-3.0-only",
       "license_file": "COPYING",
       "summary": "GNU Emacs is an extensible, customizable text editor."
     },
     "build": {
-      "ignore_prefix_files": [
-        "lib/emacs/jit/bin/*",
-        "lib/emacs/jit/lib/*"
-      ],
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "recipe-maintainers": [
@@ -455,6 +541,76 @@
         "notestaff"
       ]
     },
+    "outputs": [
+      {
+        "build": null,
+        "name": "emacs",
+        "requirements": {
+          "build": [
+            "pkg-config",
+            "gnuconfig",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "autoconf",
+            "automake",
+            "m4",
+            "make",
+            "texinfo"
+          ],
+          "host": [
+            "c_stdlib_stub",
+            "binutils",
+            "cairo",
+            "gtk3",
+            "harfbuzz",
+            "mpc",
+            "mpfr",
+            "xorg-libxaw",
+            "xorg-libxcomposite",
+            "xorg-libxfixes",
+            "xorg-libxi",
+            "xorg-libxinerama",
+            "xorg-libxrandr",
+            "xorg-xorgproto",
+            "expat",
+            "giflib",
+            "glib",
+            "gmp",
+            "gnutls",
+            "libjpeg-turbo",
+            "libpng",
+            "librsvg",
+            "libtiff",
+            "libtree-sitter",
+            "libxml2",
+            "ncurses",
+            "zlib"
+          ],
+          "run": [
+            "binutils"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "$PREFIX/bin/emacs --help",
+              "$PREFIX/bin/emacsclient --help",
+              "$PREFIX/bin/ctags --help",
+              "$PREFIX/bin/ebrowse --help",
+              "$PREFIX/bin/etags --help",
+              "$PREFIX/bin/emacs -nw -Q --kill --batch",
+              "$PREFIX/bin/emacs -Q --kill --batch",
+              "$PREFIX/bin/emacs --batch --eval '(unless (treesit-available-p) (kill-emacs 1))'",
+              "$PREFIX/bin/emacs --batch --eval '(unless (json-available-p) (kill-emacs 1))'",
+              "$PREFIX/bin/emacs --batch --eval \"(unless (string= \\\"${PREFIX}/share/info\\\" configure-info-directory) (kill-emacs 1))\"",
+              "$PREFIX/bin/emacs --batch --eval '(batch-native-compile t)' $PREFIX/share/emacs/${{ version }}/lisp/calculator.elc"
+            ]
+          }
+        ],
+        "version": "30.2"
+      }
+    ],
     "package": {
       "name": "emacs",
       "version": "30.2"
@@ -465,72 +621,55 @@
         "gnuconfig",
         "c_compiler_stub",
         "c_stdlib_stub",
+        "cxx_compiler_stub",
         "autoconf",
         "automake",
         "m4",
         "make",
-        "liblzma-devel",
-        "libtree-sitter",
-        "jansson",
         "texinfo"
       ],
       "host": [
-        "libxml2",
-        "ncurses",
-        "dbus",
+        "c_stdlib_stub",
+        "binutils",
+        "cairo",
+        "gtk3",
+        "harfbuzz",
+        "mpc",
+        "mpfr",
+        "xorg-libxaw",
+        "xorg-libxcomposite",
+        "xorg-libxfixes",
+        "xorg-libxi",
+        "xorg-libxinerama",
+        "xorg-libxrandr",
+        "xorg-xorgproto",
+        "expat",
+        "giflib",
+        "glib",
+        "gmp",
+        "gnutls",
         "libjpeg-turbo",
         "libpng",
-        "libtiff",
-        "liblzma-devel",
         "librsvg",
-        "giflib",
-        "gnutls",
-        "gmp",
-        "glib",
-        "zlib",
+        "libtiff",
         "libtree-sitter",
-        "jansson",
-        "expat"
+        "libxml2",
+        "ncurses",
+        "zlib"
       ],
       "run": [
-        "libxml2",
-        "ncurses",
-        "dbus",
-        "libjpeg-turbo",
-        "libpng",
-        "libtiff",
-        "giflib",
-        "gnutls",
-        "gmp",
-        "glib",
-        "zlib",
-        "libtree-sitter",
-        "jansson"
+        "binutils"
       ]
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "fn": "emacs-30.2.tar.xz",
-        "patches": [
-          "0002-apple-silicon-resign-binary.patch"
-        ],
-        "sha256": "b3f36f18a6dd2715713370166257de2fae01f9d38cfe878ced9b1e6ded5befd9",
-        "url": "http://ftp.gnu.org/gnu/emacs/emacs-30.2.tar.xz"
-      }
-    ],
-    "test": {
-      "commands": [
-        "$PREFIX/bin/emacs --help",
-        "$PREFIX/bin/emacsclient --help",
-        "$PREFIX/bin/ctags --help",
-        "$PREFIX/bin/ebrowse --help",
-        "$PREFIX/bin/etags --help",
-        "$PREFIX/bin/emacs -nw -Q --kill --batch",
-        "$PREFIX/bin/emacs -Q --kill --batch",
-        "$PREFIX/bin/emacs --batch --eval '(unless (treesit-available-p) (kill-emacs 1))'",
-        "$PREFIX/bin/emacs --batch --eval '(unless (json-available-p) (kill-emacs 1))'"
-      ]
+    "schema_version": 1,
+    "source": {
+      "patches": [
+        "0008-do-not-dump-configure-info-directory.patch",
+        "0009-disable-malloc-set-state.patch",
+        "0010-disable-fchmodat.patch"
+      ],
+      "sha256": "b3f36f18a6dd2715713370166257de2fae01f9d38cfe878ced9b1e6ded5befd9",
+      "url": "https://ftpmirror.gnu.org/gnu/emacs/emacs-30.2.tar.xz"
     }
   },
   "osx_64_requirements": {
@@ -541,10 +680,8 @@
         "automake",
         "c_compiler_stub",
         "c_stdlib_stub",
+        "cxx_compiler_stub",
         "gnuconfig",
-        "jansson",
-        "liblzma-devel",
-        "libtree-sitter",
         "m4",
         "make",
         "pkg-config",
@@ -554,40 +691,39 @@
     "host": {
       "__set__": true,
       "elements": [
-        "dbus",
+        "binutils",
+        "c_stdlib_stub",
+        "cairo",
         "expat",
         "giflib",
         "glib",
         "gmp",
         "gnutls",
-        "jansson",
+        "gtk3",
+        "harfbuzz",
         "libjpeg-turbo",
-        "liblzma-devel",
         "libpng",
         "librsvg",
         "libtiff",
         "libtree-sitter",
         "libxml2",
+        "mpc",
+        "mpfr",
         "ncurses",
+        "xorg-libxaw",
+        "xorg-libxcomposite",
+        "xorg-libxfixes",
+        "xorg-libxi",
+        "xorg-libxinerama",
+        "xorg-libxrandr",
+        "xorg-xorgproto",
         "zlib"
       ]
     },
     "run": {
       "__set__": true,
       "elements": [
-        "dbus",
-        "giflib",
-        "glib",
-        "gmp",
-        "gnutls",
-        "jansson",
-        "libjpeg-turbo",
-        "libpng",
-        "libtiff",
-        "libtree-sitter",
-        "libxml2",
-        "ncurses",
-        "zlib"
+        "binutils"
       ]
     },
     "test": {
@@ -599,15 +735,12 @@
     "about": {
       "home": "http://www.gnu.org/software/emacs/",
       "license": "GPL-3.0-only",
+      "license_family": "GPL-3.0-only",
       "license_file": "COPYING",
       "summary": "GNU Emacs is an extensible, customizable text editor."
     },
     "build": {
-      "ignore_prefix_files": [
-        "lib/emacs/jit/bin/*",
-        "lib/emacs/jit/lib/*"
-      ],
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "recipe-maintainers": [
@@ -617,6 +750,76 @@
         "notestaff"
       ]
     },
+    "outputs": [
+      {
+        "build": null,
+        "name": "emacs",
+        "requirements": {
+          "build": [
+            "pkg-config",
+            "gnuconfig",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "autoconf",
+            "automake",
+            "m4",
+            "make",
+            "texinfo"
+          ],
+          "host": [
+            "c_stdlib_stub",
+            "binutils",
+            "cairo",
+            "gtk3",
+            "harfbuzz",
+            "mpc",
+            "mpfr",
+            "xorg-libxaw",
+            "xorg-libxcomposite",
+            "xorg-libxfixes",
+            "xorg-libxi",
+            "xorg-libxinerama",
+            "xorg-libxrandr",
+            "xorg-xorgproto",
+            "expat",
+            "giflib",
+            "glib",
+            "gmp",
+            "gnutls",
+            "libjpeg-turbo",
+            "libpng",
+            "librsvg",
+            "libtiff",
+            "libtree-sitter",
+            "libxml2",
+            "ncurses",
+            "zlib"
+          ],
+          "run": [
+            "binutils"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "$PREFIX/bin/emacs --help",
+              "$PREFIX/bin/emacsclient --help",
+              "$PREFIX/bin/ctags --help",
+              "$PREFIX/bin/ebrowse --help",
+              "$PREFIX/bin/etags --help",
+              "$PREFIX/bin/emacs -nw -Q --kill --batch",
+              "$PREFIX/bin/emacs -Q --kill --batch",
+              "$PREFIX/bin/emacs --batch --eval '(unless (treesit-available-p) (kill-emacs 1))'",
+              "$PREFIX/bin/emacs --batch --eval '(unless (json-available-p) (kill-emacs 1))'",
+              "$PREFIX/bin/emacs --batch --eval \"(unless (string= \\\"${PREFIX}/share/info\\\" configure-info-directory) (kill-emacs 1))\"",
+              "$PREFIX/bin/emacs --batch --eval '(batch-native-compile t)' $PREFIX/share/emacs/${{ version }}/lisp/calculator.elc"
+            ]
+          }
+        ],
+        "version": "30.2"
+      }
+    ],
     "package": {
       "name": "emacs",
       "version": "30.2"
@@ -627,72 +830,55 @@
         "gnuconfig",
         "c_compiler_stub",
         "c_stdlib_stub",
+        "cxx_compiler_stub",
         "autoconf",
         "automake",
         "m4",
         "make",
-        "liblzma-devel",
-        "libtree-sitter",
-        "jansson",
         "texinfo"
       ],
       "host": [
-        "libxml2",
-        "ncurses",
-        "dbus",
+        "c_stdlib_stub",
+        "binutils",
+        "cairo",
+        "gtk3",
+        "harfbuzz",
+        "mpc",
+        "mpfr",
+        "xorg-libxaw",
+        "xorg-libxcomposite",
+        "xorg-libxfixes",
+        "xorg-libxi",
+        "xorg-libxinerama",
+        "xorg-libxrandr",
+        "xorg-xorgproto",
+        "expat",
+        "giflib",
+        "glib",
+        "gmp",
+        "gnutls",
         "libjpeg-turbo",
         "libpng",
-        "libtiff",
-        "liblzma-devel",
         "librsvg",
-        "giflib",
-        "gnutls",
-        "gmp",
-        "glib",
-        "zlib",
+        "libtiff",
         "libtree-sitter",
-        "jansson",
-        "expat"
+        "libxml2",
+        "ncurses",
+        "zlib"
       ],
       "run": [
-        "libxml2",
-        "ncurses",
-        "dbus",
-        "libjpeg-turbo",
-        "libpng",
-        "libtiff",
-        "giflib",
-        "gnutls",
-        "gmp",
-        "glib",
-        "zlib",
-        "libtree-sitter",
-        "jansson"
+        "binutils"
       ]
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "fn": "emacs-30.2.tar.xz",
-        "patches": [
-          "0002-apple-silicon-resign-binary.patch"
-        ],
-        "sha256": "b3f36f18a6dd2715713370166257de2fae01f9d38cfe878ced9b1e6ded5befd9",
-        "url": "http://ftp.gnu.org/gnu/emacs/emacs-30.2.tar.xz"
-      }
-    ],
-    "test": {
-      "commands": [
-        "$PREFIX/bin/emacs --help",
-        "$PREFIX/bin/emacsclient --help",
-        "$PREFIX/bin/ctags --help",
-        "$PREFIX/bin/ebrowse --help",
-        "$PREFIX/bin/etags --help",
-        "$PREFIX/bin/emacs -nw -Q --kill --batch",
-        "$PREFIX/bin/emacs -Q --kill --batch",
-        "$PREFIX/bin/emacs --batch --eval '(unless (treesit-available-p) (kill-emacs 1))'",
-        "$PREFIX/bin/emacs --batch --eval '(unless (json-available-p) (kill-emacs 1))'"
-      ]
+    "schema_version": 1,
+    "source": {
+      "patches": [
+        "0008-do-not-dump-configure-info-directory.patch",
+        "0009-disable-malloc-set-state.patch",
+        "0010-disable-fchmodat.patch"
+      ],
+      "sha256": "b3f36f18a6dd2715713370166257de2fae01f9d38cfe878ced9b1e6ded5befd9",
+      "url": "https://ftpmirror.gnu.org/gnu/emacs/emacs-30.2.tar.xz"
     }
   },
   "osx_arm64_requirements": {
@@ -703,10 +889,8 @@
         "automake",
         "c_compiler_stub",
         "c_stdlib_stub",
+        "cxx_compiler_stub",
         "gnuconfig",
-        "jansson",
-        "liblzma-devel",
-        "libtree-sitter",
         "m4",
         "make",
         "pkg-config",
@@ -716,40 +900,39 @@
     "host": {
       "__set__": true,
       "elements": [
-        "dbus",
+        "binutils",
+        "c_stdlib_stub",
+        "cairo",
         "expat",
         "giflib",
         "glib",
         "gmp",
         "gnutls",
-        "jansson",
+        "gtk3",
+        "harfbuzz",
         "libjpeg-turbo",
-        "liblzma-devel",
         "libpng",
         "librsvg",
         "libtiff",
         "libtree-sitter",
         "libxml2",
+        "mpc",
+        "mpfr",
         "ncurses",
+        "xorg-libxaw",
+        "xorg-libxcomposite",
+        "xorg-libxfixes",
+        "xorg-libxi",
+        "xorg-libxinerama",
+        "xorg-libxrandr",
+        "xorg-xorgproto",
         "zlib"
       ]
     },
     "run": {
       "__set__": true,
       "elements": [
-        "dbus",
-        "giflib",
-        "glib",
-        "gmp",
-        "gnutls",
-        "jansson",
-        "libjpeg-turbo",
-        "libpng",
-        "libtiff",
-        "libtree-sitter",
-        "libxml2",
-        "ncurses",
-        "zlib"
+        "binutils"
       ]
     },
     "test": {
@@ -772,7 +955,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/emacs.json"
   },
-  "raw_meta_yaml": "# Note: This recipe currently only works on OS X and Linux.\n\n{% set version = \"30.2\" %}\n\n# Version of GCC sources used to build the embedded JIT compiler\n{% set gcc_version = \"14.2.0\" %}\n\npackage:\n  name: emacs\n  version: {{ version }}\n\nsource:\n  - fn: emacs-{{ version }}.tar.xz\n    url: http://ftp.gnu.org/gnu/emacs/emacs-{{ version }}.tar.xz\n    sha256: b3f36f18a6dd2715713370166257de2fae01f9d38cfe878ced9b1e6ded5befd9\n    patches:\n      - 0001-disable-sanity-check.patch  # [osx and build_platform != target_platform]\n      - 0002-apple-silicon-resign-binary.patch  # [osx]\n      - 0003-macos-cross-compile-configure.patch  # [osx and build_platform != target_platform]\n      - 0004-macos-cross-compile-makefile.patch  # [osx and build_platform != target_platform]\n      - 0006-macos-cross-compile-post-install-pdump-path.patch  # [osx and build_platform != target_platform]\n      - 0007-macos-cross-compile-lisp-makefile.patch  # [osx and build_platform != target_platform]\n      - 0008-do-not-dump-configure-info-directory.patch  # [linux]\n      - 0009-disable-malloc-set-state.patch  # [linux]\n      - 0010-disable-fchmodat.patch  # [linux]\n  - fn: gcc-{{ gcc_version }}.tar.xz  # [linux]\n    url: https://ftp.gnu.org/gnu/gcc/gcc-{{ gcc_version }}/gcc-{{ gcc_version }}.tar.xz  # [linux]\n    sha256: a7b39bc69cbf9e25826c5a60ab26477001f7c08d85cec04bc0e29cabed6f3cc9  # [linux]\n    folder: gcc  # [linux]\n\nbuild:\n  number: 0\n  skip: true  # [win]\n  ignore_prefix_files:\n    - lib/emacs/jit/bin/*\n    - lib/emacs/jit/lib/*\n\nrequirements:\n  build:\n    - pkg-config\n    - gnuconfig  # [unix]\n    - {{ compiler('c') }}\n    - {{ compiler('cxx') }}  # [linux]\n    - {{ stdlib(\"c\") }}\n    - autoconf  # [unix]\n    - automake  # [unix]\n    - m4  # [unix]\n    - make  # [unix]\n    - gtk3  # [build_platform != target_platform]\n    - harfbuzz  # [build_platform != target_platform]\n    - libxml2  # [build_platform != target_platform]\n    - ncurses  # [build_platform != target_platform]\n    - dbus  # [build_platform != target_platform]\n    - libjpeg-turbo   # [build_platform != target_platform]\n    - libpng  # [build_platform != target_platform]\n    - libtiff  # [build_platform != target_platform]\n    - librsvg  # [build_platform != target_platform]\n    - giflib  # [build_platform != target_platform]\n    - gnutls  # [build_platform != target_platform]\n    - gmp  # [build_platform != target_platform]\n    - glib  # [build_platform != target_platform]\n    - zlib  # [build_platform != target_platform]\n    - liblzma-devel\n    - libtree-sitter\n    - jansson\n    - texinfo\n\n  host:\n    - {{ stdlib(\"c\") }}  # [linux]\n    - binutils  # [linux]\n    - libxml2\n    - ncurses\n    - dbus  # [osx]\n    - libjpeg-turbo\n    - libpng\n    - libtiff\n    - liblzma-devel\n    - librsvg\n    - giflib\n    - gnutls\n    - gmp\n    - mpc  # [linux]\n    - mpfr  # [linux]\n    - glib\n    - freetype  # [linux]\n    - cairo  # [linux]\n    - gtk3  # [linux]\n    - harfbuzz  # [linux]\n    - xorg-libxaw  # [linux]\n    - xorg-libxpm  # [linux]\n    - xorg-libxfixes  # [linux]\n    - xorg-libxft  # [linux]\n    - xorg-libxi  # [linux]\n    - xorg-libxrandr  # [linux]\n    - xorg-libxcursor  # [linux]\n    - xorg-libxcomposite  # [linux]\n    - xorg-libxdamage  # [linux]\n    - xorg-libxinerama  # [linux]\n    - xorg-xorgproto  # [linux]\n    - xorg-libxtst  # [linux]\n    - zlib\n    - libtree-sitter\n    - jansson\n    - expat\n\n  run:\n    - binutils  # [linux]\n    - libxml2\n    - ncurses\n    - dbus  # [osx]\n    - libjpeg-turbo\n    - libpng\n    - libtiff\n    - giflib\n    - gnutls\n    - gmp\n    - glib\n    - freetype  # [linux]\n    - cairo  # [linux]\n    - gtk3  # [linux]\n    - harfbuzz  # [linux]\n    - xorg-libxaw  # [linux]\n    - xorg-libxpm  # [linux]\n    - xorg-libxfixes  # [linux]\n    - xorg-libxft  # [linux]\n    - xorg-libxi  # [linux]\n    - xorg-libxrandr  # [linux]\n    - xorg-libxcursor  # [linux]\n    - xorg-libxcomposite  # [linux]\n    - xorg-libxdamage  # [linux]\n    - xorg-libxinerama  # [linux]\n    - xorg-xorgproto  # [linux]\n    - xorg-libxtst  # [linux]\n    - zlib\n    - libtree-sitter\n    - jansson\n\ntest:\n  commands:\n    - $PREFIX/bin/emacs --help\n    - $PREFIX/bin/emacsclient --help\n    - $PREFIX/bin/ctags --help\n    - $PREFIX/bin/ebrowse --help\n    - $PREFIX/bin/etags --help\n    - $PREFIX/bin/emacs -nw -Q --kill --batch\n    - $PREFIX/bin/emacs -Q --kill --batch\n    # Make sure treesit works\n    - $PREFIX/bin/emacs --batch --eval '(unless (treesit-available-p) (kill-emacs 1))'\n    # Make sure json works\n    - $PREFIX/bin/emacs --batch --eval '(unless (json-available-p) (kill-emacs 1))'\n    # Check the configure-info-directory patching\n    - $PREFIX/bin/emacs --batch --eval \"(unless (string= \\\"${PREFIX}/share/info\\\" configure-info-directory) (kill-emacs 1))\"  # [linux]\n    - $PREFIX/bin/emacs --batch --eval '(batch-native-compile t)' $PREFIX/share/emacs/{{ version }}/lisp/calculator.elc  # [linux]\n\nabout:\n  home: http://www.gnu.org/software/emacs/\n  license: GPL-3.0-only\n  summary: GNU Emacs is an extensible, customizable text editor.\n  license_file: COPYING\n\nextra:\n  recipe-maintainers:\n    - asmeurer\n    - jmakovicka\n    - msarahan\n    - notestaff\n",
+  "raw_meta_yaml": "context:\n  version: 30.2\n  gcc_version: 14.3.0\n\npackage:\n  name: emacs\n  version: ${{ version }}\n\nsource:\n  - url: https://ftpmirror.gnu.org/gnu/emacs/emacs-${{ version }}.tar.xz\n    sha256: b3f36f18a6dd2715713370166257de2fae01f9d38cfe878ced9b1e6ded5befd9\n    patches:\n      - if: osx\n        then:\n          - 0002-apple-silicon-resign-binary.patch\n          - if: build_platform != target_platform\n            then:\n              - 0001-disable-sanity-check.patch\n              - 0003-macos-cross-compile-configure.patch\n              - 0004-macos-cross-compile-makefile.patch\n              - 0006-macos-cross-compile-post-install-pdump-path.patch\n              - 0007-macos-cross-compile-lisp-makefile.patch\n\n      - if: linux\n        then:\n          - 0008-do-not-dump-configure-info-directory.patch\n          - 0009-disable-malloc-set-state.patch\n          - 0010-disable-fchmodat.patch\n\n  - if: linux\n    then:\n      - url: https://ftpmirror.gnu.org/gnu/gcc/gcc-${{ gcc_version }}/gcc-${{ gcc_version }}.tar.xz\n        sha256: e0dc77297625631ac8e50fa92fffefe899a4eb702592da5c32ef04e2293aca3a\n        target_directory: gcc\n\nbuild:\n  number: 1\n  skip: win\n  files:\n    exclude:\n      - lib/gdk-pixbuf-*/*/loaders.cache\n      - lib/gtk-*/*/immodules.cache\n      - share/glib-*/schemas/gschemas.compiled\n      - share/icons/hicolor/icon-theme.cache\n  prefix_detection:\n    ignore:\n      - lib/emacs/jit/bin/*\n      - lib/emacs/jit/lib/**/*.o\n      - lib/emacs/jit/lib/**/*.so.*\n\nrequirements:\n  build:\n    - pkg-config\n    - gnuconfig\n\n    - ${{ compiler('c') }}\n    - ${{ stdlib(\"c\") }}\n\n    - if: linux\n      then:\n        - ${{ compiler('cxx') }}\n\n    - if: unix\n      then:\n        - autoconf\n        - automake\n        - m4\n        - make\n\n    - if: build_platform != target_platform\n      then:\n        - dbus\n        - expat\n        - giflib\n        - glib\n        - gmp\n        - gnutls\n        - gtk3\n        - harfbuzz\n        - libjpeg-turbo\n        - libpng\n        - librsvg\n        - libtiff\n        - libtree-sitter\n        - libxml2\n        - ncurses\n        - zlib\n\n    - texinfo\n\n  host:\n    - if: linux\n      then:\n        - ${{ stdlib(\"c\") }}\n        - binutils\n        - cairo\n        - gtk3\n        - harfbuzz\n        - mpc\n        - mpfr\n        - xorg-libxaw\n        - xorg-libxcomposite\n        - xorg-libxfixes\n        - xorg-libxi\n        - xorg-libxinerama\n        - xorg-libxrandr\n        - xorg-xorgproto\n\n    - if: osx\n      then:\n        - dbus\n\n    - expat\n    - giflib\n    - glib\n    - gmp\n    - gnutls\n    - libjpeg-turbo\n    - libpng\n    - librsvg\n    - libtiff\n    - libtree-sitter\n    - libxml2\n    - ncurses\n    - zlib\n\n  run:\n    - if: linux\n      then:\n        - binutils\n\n    - if: osx\n      then:\n        - dbus\n\ntests:\n  - script:\n    - $PREFIX/bin/emacs --help\n    - $PREFIX/bin/emacsclient --help\n    - $PREFIX/bin/ctags --help\n    - $PREFIX/bin/ebrowse --help\n    - $PREFIX/bin/etags --help\n    - $PREFIX/bin/emacs -nw -Q --kill --batch\n    - $PREFIX/bin/emacs -Q --kill --batch\n    # Make sure treesit works\n    - $PREFIX/bin/emacs --batch --eval '(unless (treesit-available-p) (kill-emacs 1))'\n    # Make sure json works\n    - $PREFIX/bin/emacs --batch --eval '(unless (json-available-p) (kill-emacs 1))'\n    - if: linux\n      then:\n        # Check the configure-info-directory patching\n        - $PREFIX/bin/emacs --batch --eval \"(unless (string= \\\"${PREFIX}/share/info\\\" configure-info-directory) (kill-emacs 1))\"\n        # Check the native compilation\n        - $PREFIX/bin/emacs --batch --eval '(batch-native-compile t)' $PREFIX/share/emacs/${{ version }}/lisp/calculator.elc\n\nabout:\n  homepage: http://www.gnu.org/software/emacs/\n  license: GPL-3.0-only\n  summary: GNU Emacs is an extensible, customizable text editor.\n  license_file: COPYING\n\nextra:\n  recipe-maintainers:\n    - asmeurer\n    - jmakovicka\n    - msarahan\n    - notestaff\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -783,9 +966,7 @@
       "c_stdlib_stub",
       "cairo",
       "cxx_compiler_stub",
-      "dbus",
       "expat",
-      "freetype",
       "giflib",
       "glib",
       "gmp",
@@ -793,9 +974,7 @@
       "gnutls",
       "gtk3",
       "harfbuzz",
-      "jansson",
       "libjpeg-turbo",
-      "liblzma-devel",
       "libpng",
       "librsvg",
       "libtiff",
@@ -810,15 +989,10 @@
       "texinfo",
       "xorg-libxaw",
       "xorg-libxcomposite",
-      "xorg-libxcursor",
-      "xorg-libxdamage",
       "xorg-libxfixes",
-      "xorg-libxft",
       "xorg-libxi",
       "xorg-libxinerama",
-      "xorg-libxpm",
       "xorg-libxrandr",
-      "xorg-libxtst",
       "xorg-xorgproto",
       "zlib"
     ]
@@ -833,9 +1007,6 @@
         "c_stdlib_stub",
         "cxx_compiler_stub",
         "gnuconfig",
-        "jansson",
-        "liblzma-devel",
-        "libtree-sitter",
         "m4",
         "make",
         "pkg-config",
@@ -850,18 +1021,14 @@
         "c_stdlib_stub",
         "cairo",
         "cxx_compiler_stub",
-        "dbus",
         "expat",
-        "freetype",
         "giflib",
         "glib",
         "gmp",
         "gnutls",
         "gtk3",
         "harfbuzz",
-        "jansson",
         "libjpeg-turbo",
-        "liblzma-devel",
         "libpng",
         "librsvg",
         "libtiff",
@@ -872,15 +1039,10 @@
         "ncurses",
         "xorg-libxaw",
         "xorg-libxcomposite",
-        "xorg-libxcursor",
-        "xorg-libxdamage",
         "xorg-libxfixes",
-        "xorg-libxft",
         "xorg-libxi",
         "xorg-libxinerama",
-        "xorg-libxpm",
         "xorg-libxrandr",
-        "xorg-libxtst",
         "xorg-xorgproto",
         "zlib"
       ]
@@ -891,36 +1053,7 @@
         "binutils",
         "c_compiler_stub",
         "c_stdlib_stub",
-        "cairo",
-        "cxx_compiler_stub",
-        "dbus",
-        "freetype",
-        "giflib",
-        "glib",
-        "gmp",
-        "gnutls",
-        "gtk3",
-        "harfbuzz",
-        "jansson",
-        "libjpeg-turbo",
-        "libpng",
-        "libtiff",
-        "libtree-sitter",
-        "libxml2",
-        "ncurses",
-        "xorg-libxaw",
-        "xorg-libxcomposite",
-        "xorg-libxcursor",
-        "xorg-libxdamage",
-        "xorg-libxfixes",
-        "xorg-libxft",
-        "xorg-libxi",
-        "xorg-libxinerama",
-        "xorg-libxpm",
-        "xorg-libxrandr",
-        "xorg-libxtst",
-        "xorg-xorgproto",
-        "zlib"
+        "cxx_compiler_stub"
       ]
     },
     "test": {
@@ -939,9 +1072,6 @@
         "c_stdlib_stub",
         "cxx_compiler_stub",
         "gnuconfig",
-        "jansson",
-        "liblzma-devel",
-        "libtree-sitter",
         "m4",
         "make",
         "pkg-config",
@@ -954,18 +1084,14 @@
         "binutils",
         "c_stdlib_stub",
         "cairo",
-        "dbus",
         "expat",
-        "freetype",
         "giflib",
         "glib",
         "gmp",
         "gnutls",
         "gtk3",
         "harfbuzz",
-        "jansson",
         "libjpeg-turbo",
-        "liblzma-devel",
         "libpng",
         "librsvg",
         "libtiff",
@@ -976,15 +1102,10 @@
         "ncurses",
         "xorg-libxaw",
         "xorg-libxcomposite",
-        "xorg-libxcursor",
-        "xorg-libxdamage",
         "xorg-libxfixes",
-        "xorg-libxft",
         "xorg-libxi",
         "xorg-libxinerama",
-        "xorg-libxpm",
         "xorg-libxrandr",
-        "xorg-libxtst",
         "xorg-xorgproto",
         "zlib"
       ]
@@ -992,36 +1113,7 @@
     "run": {
       "__set__": true,
       "elements": [
-        "binutils",
-        "cairo",
-        "dbus",
-        "freetype",
-        "giflib",
-        "glib",
-        "gmp",
-        "gnutls",
-        "gtk3",
-        "harfbuzz",
-        "jansson",
-        "libjpeg-turbo",
-        "libpng",
-        "libtiff",
-        "libtree-sitter",
-        "libxml2",
-        "ncurses",
-        "xorg-libxaw",
-        "xorg-libxcomposite",
-        "xorg-libxcursor",
-        "xorg-libxdamage",
-        "xorg-libxfixes",
-        "xorg-libxft",
-        "xorg-libxi",
-        "xorg-libxinerama",
-        "xorg-libxpm",
-        "xorg-libxrandr",
-        "xorg-libxtst",
-        "xorg-xorgproto",
-        "zlib"
+        "binutils"
       ]
     },
     "test": {
@@ -1029,7 +1121,7 @@
       "elements": []
     }
   },
-  "url": "http://ftp.gnu.org/gnu/emacs/emacs-30.2.tar.xz",
+  "url": "https://ftpmirror.gnu.org/gnu/emacs/emacs-30.2.tar.xz",
   "version": "30.2",
   "version_pr_info": {
     "__lazy_json__": "version_pr_info/emacs.json"
