@@ -36,7 +36,7 @@
       "summary": "cryptography is a package designed to expose cryptographic primitives and recipes to Python developers."
     },
     "build": {
-      "number": "2"
+      "number": "3"
     },
     "extra": {
       "feedstock-name": "cryptography",
@@ -225,7 +225,7 @@
       "summary": "cryptography is a package designed to expose cryptographic primitives and recipes to Python developers."
     },
     "build": {
-      "number": "2"
+      "number": "3"
     },
     "extra": {
       "feedstock-name": "cryptography",
@@ -838,7 +838,7 @@
       "summary": "cryptography is a package designed to expose cryptographic primitives and recipes to Python developers."
     },
     "build": {
-      "number": "2"
+      "number": "3"
     },
     "extra": {
       "feedstock-name": "cryptography",
@@ -1451,7 +1451,7 @@
       "summary": "cryptography is a package designed to expose cryptographic primitives and recipes to Python developers."
     },
     "build": {
-      "number": "2"
+      "number": "3"
     },
     "extra": {
       "feedstock-name": "cryptography",
@@ -4251,7 +4251,7 @@
       "summary": "cryptography is a package designed to expose cryptographic primitives and recipes to Python developers."
     },
     "build": {
-      "number": "2"
+      "number": "3"
     },
     "extra": {
       "feedstock-name": "cryptography",
@@ -4864,7 +4864,7 @@
       "summary": "cryptography is a package designed to expose cryptographic primitives and recipes to Python developers."
     },
     "build": {
-      "number": "2"
+      "number": "3"
     },
     "extra": {
       "feedstock-name": "cryptography",
@@ -5488,7 +5488,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/cryptography.json"
   },
-  "raw_meta_yaml": "{% set version = \"46.0.1\" %}\n\npackage:\n  name: cryptography-split\n  version: {{ version }}\n\nsource:\n  url: https://github.com/pyca/cryptography/archive/refs/tags/{{ version }}.tar.gz\n  sha256: fa18b8f91f1c20c162142ed5cb1b90d829bc0159e8c802e78f2583ae5e7ae284\n  patches:\n    - patches/0001-stay-on-old-cffi-for-non-freethreading-builds.patch  # [not is_freethreading]\n\nbuild:\n  number: 2\n\noutputs:\n  - name: cryptography-vectors\n    build:\n      # this is noarch, but building it in a different feedstock from the same\n      # sources just causes every single upgrade PR to fail pointlessly, so we\n      # build it here (only one build will be uploaded due to coinciding hashes)\n      noarch: python\n      script: python -m pip install ./vectors -vv --no-build-isolation\n      # need to ensure we don't try this on osx-arm\n      skip: true  # [osx and arm64]\n\n    requirements:\n      host:\n        - python {{ python_min }}\n        - uv-build\n        - pip\n      run:\n        - python >={{ python_min }}\n\n    test:\n      imports:\n        - cryptography_vectors\n      requires:\n        - pip\n        - python {{ python_min }}\n      commands:\n        - pip check\n\n    about:\n      home: https://github.com/pyca/cryptography\n      license: BSD-3-Clause OR Apache-2.0\n      license_file:\n        - LICENSE\n        - LICENSE.BSD\n        - LICENSE.APACHE\n      summary: Test vectors for the cryptography package.\n      dev_url: https://github.com/pyca/cryptography/tree/main/vectors\n      doc_url: https://cryptography.io\n\n  - name: cryptography\n    build:\n      script:\n        # see below for what OPENSSL_DIR should be pointing to:\n        # https://github.com/sfackler/rust-openssl/blob/openssl-sys-v0.9.72/openssl/src/lib.rs#L55-L56\n        - export OPENSSL_DIR=$PREFIX        # [unix]\n        - set OPENSSL_DIR=%LIBRARY_PREFIX%  # [win]\n        - python -m pip install . -vv --no-build-isolation\n    requirements:\n      build:\n        - python                                 # [build_platform != target_platform]\n        - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n        - cffi >=1.14                            # [build_platform != target_platform]\n        - maturin >=1,<2                         # [build_platform != target_platform]\n        - {{ stdlib('c') }}\n        - {{ compiler('c') }}\n        - {{ compiler('rust') }}\n      host:\n        - python\n        - pip\n        - maturin >=1,<2\n        - openssl\n        - cffi >=1.14\n        # used by cffi\n        - setuptools\n      run:\n        - python\n        - cffi >=1.14\n    test:\n      imports:\n        - cryptography\n        - cryptography.fernet\n        - cryptography.hazmat\n        - cryptography.hazmat.backends\n        - cryptography.hazmat.backends.openssl\n        - cryptography.hazmat.bindings\n        - cryptography.hazmat.bindings.openssl\n        - cryptography.hazmat.primitives\n        - cryptography.hazmat.primitives.asymmetric\n        - cryptography.hazmat.primitives.ciphers\n        - cryptography.hazmat.primitives.kdf\n        - cryptography.hazmat.primitives.twofactor\n        - cryptography.x509\n      requires:\n        - pip\n        - certifi\n        - cryptography-vectors {{ version }}\n        - hypothesis\n        - iso8601\n        - pretend\n        - pytest\n        - pytest-subtests\n        - pytest-benchmark\n        - pytz\n      source_files:\n        - tests\n        # for marker definitions\n        - pyproject.toml\n      commands:\n        - pip check\n        # run_test.py will check that the correct openssl version is linked\n        - pytest tests\n\nabout:\n  home: https://cryptography.io\n  license: Apache-2.0 AND BSD-3-Clause AND PSF-2.0 AND MIT\n  license_family: BSD\n  license_file: LICENSE\n  summary: cryptography is a package designed to expose cryptographic primitives and recipes to Python developers.\n  description: |\n    cryptography is a package which provides cryptographic recipes and\n    primitives to Python developers. Our goal is for it to be your\n    \"cryptographic standard library\". It supports Python 3.6+ and PyPy3 7.2+.\n    cryptography includes both high level recipes and low level interfaces\n    to common cryptographic algorithms such as symmetric ciphers, message\n    digests, and key derivation functions..\n  doc_url: https://cryptography.io/en/latest\n  doc_source_url: https://github.com/pyca/cryptography/blob/main/docs/index.rst\n  dev_url: https://github.com/pyca/cryptography\n\nextra:\n  recipe-maintainers:\n    - jakirkham\n    - ocefpaf\n    - h-vetinari\n  feedstock-name: cryptography\n",
+  "raw_meta_yaml": "{% set version = \"46.0.1\" %}\n\npackage:\n  name: cryptography-split\n  version: {{ version }}\n\nsource:\n  url: https://github.com/pyca/cryptography/archive/refs/tags/{{ version }}.tar.gz\n  sha256: fa18b8f91f1c20c162142ed5cb1b90d829bc0159e8c802e78f2583ae5e7ae284\n  patches:\n    - patches/0001-stay-on-old-cffi-for-non-freethreading-builds.patch  # [not is_freethreading]\n\nbuild:\n  number: 3\n\noutputs:\n  - name: cryptography-vectors\n    build:\n      # this is noarch, but building it in a different feedstock from the same\n      # sources just causes every single upgrade PR to fail pointlessly, so we\n      # build it here (only one build will be uploaded due to coinciding hashes)\n      noarch: python\n      script: python -m pip install ./vectors -vv --no-build-isolation\n      # need to ensure we don't try this on osx-arm\n      skip: true  # [osx and arm64]\n\n    requirements:\n      host:\n        - python {{ python_min }}\n        - uv-build\n        - pip\n      run:\n        - python >={{ python_min }}\n\n    test:\n      imports:\n        - cryptography_vectors\n      requires:\n        - pip\n        - python {{ python_min }}\n      commands:\n        - pip check\n\n    about:\n      home: https://github.com/pyca/cryptography\n      license: BSD-3-Clause OR Apache-2.0\n      license_file:\n        - LICENSE\n        - LICENSE.BSD\n        - LICENSE.APACHE\n      summary: Test vectors for the cryptography package.\n      dev_url: https://github.com/pyca/cryptography/tree/main/vectors\n      doc_url: https://cryptography.io\n\n  - name: cryptography\n    build:\n      script:\n        # see below for what OPENSSL_DIR should be pointing to:\n        # https://github.com/sfackler/rust-openssl/blob/openssl-sys-v0.9.72/openssl/src/lib.rs#L55-L56\n        - export OPENSSL_DIR=$PREFIX        # [unix]\n        - set OPENSSL_DIR=%LIBRARY_PREFIX%  # [win]\n        - python -m pip install . -vv --no-build-isolation\n    requirements:\n      build:\n        - python                                 # [build_platform != target_platform]\n        - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n        - cffi >=1.14                            # [build_platform != target_platform]\n        - maturin >=1,<2                         # [build_platform != target_platform]\n        - {{ stdlib('c') }}\n        - {{ compiler('c') }}\n        - {{ compiler('rust') }}\n      host:\n        - python\n        - pip\n        - maturin >=1,<2\n        - openssl\n        - cffi >=1.14\n        # used by cffi\n        - setuptools\n      run:\n        - python\n        - cffi >=1.14\n        - typing_extensions >=4.13.2  # [py<311]\n    test:\n      imports:\n        - cryptography\n        - cryptography.fernet\n        - cryptography.hazmat\n        - cryptography.hazmat.backends\n        - cryptography.hazmat.backends.openssl\n        - cryptography.hazmat.bindings\n        - cryptography.hazmat.bindings.openssl\n        - cryptography.hazmat.primitives\n        - cryptography.hazmat.primitives.asymmetric\n        - cryptography.hazmat.primitives.ciphers\n        - cryptography.hazmat.primitives.kdf\n        - cryptography.hazmat.primitives.twofactor\n        - cryptography.x509\n      requires:\n        - pip\n        - certifi\n        - cryptography-vectors {{ version }}\n        - hypothesis\n        - iso8601\n        - pretend\n        - pytest\n        - pytest-subtests\n        - pytest-benchmark\n        - pytz\n      source_files:\n        - tests\n        # for marker definitions\n        - pyproject.toml\n      commands:\n        - pip check\n        # run_test.py will check that the correct openssl version is linked\n        - pytest tests\n\nabout:\n  home: https://cryptography.io\n  license: Apache-2.0 AND BSD-3-Clause AND PSF-2.0 AND MIT\n  license_family: BSD\n  license_file: LICENSE\n  summary: cryptography is a package designed to expose cryptographic primitives and recipes to Python developers.\n  description: |\n    cryptography is a package which provides cryptographic recipes and\n    primitives to Python developers. Our goal is for it to be your\n    \"cryptographic standard library\". It supports Python 3.6+ and PyPy3 7.2+.\n    cryptography includes both high level recipes and low level interfaces\n    to common cryptographic algorithms such as symmetric ciphers, message\n    digests, and key derivation functions..\n  doc_url: https://cryptography.io/en/latest\n  doc_source_url: https://github.com/pyca/cryptography/blob/main/docs/index.rst\n  dev_url: https://github.com/pyca/cryptography\n\nextra:\n  recipe-maintainers:\n    - jakirkham\n    - ocefpaf\n    - h-vetinari\n  feedstock-name: cryptography\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -5619,7 +5619,7 @@
       "summary": "cryptography is a package designed to expose cryptographic primitives and recipes to Python developers."
     },
     "build": {
-      "number": "2"
+      "number": "3"
     },
     "extra": {
       "feedstock-name": "cryptography",
