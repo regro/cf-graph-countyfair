@@ -27,13 +27,10 @@
     },
     "build": {
       "ignore_run_exports_from": [
-        "pytorch * cuda*",
-        "python",
-        "cudatoolkit",
-        "sysroot_linux-64",
         "libcusolver-dev",
         "libcusparse-dev",
-        "pytorch"
+        "pytorch",
+        "python"
       ],
       "number": "0"
     },
@@ -41,7 +38,6 @@
       "recipe-maintainers": [
         "kkvtran",
         "kaoutar55",
-        "todd-deshane",
         "PabloCarmona"
       ]
     },
@@ -64,7 +60,9 @@
         "openblas"
       ],
       "host": [
-        "cuda-version 11.8",
+        "cuda-version 12.6",
+        "libcublas-dev",
+        "libcurand-dev",
         "python",
         "openblas",
         "blas",
@@ -72,9 +70,6 @@
         "scikit-build",
         "setuptools",
         "pytorch * cuda*",
-        "cuda-version 12.6",
-        "libcublas-dev",
-        "libcurand-dev",
         "libcusolver-dev",
         "libcusparse-dev",
         "pytorch"
@@ -89,7 +84,7 @@
         "scipy",
         "scikit-learn",
         "pytorch * cuda*",
-        "pytorch"
+        "pytorch * cpu*"
       ]
     },
     "schema_version": 0,
@@ -168,13 +163,10 @@
     },
     "build": {
       "ignore_run_exports_from": [
-        "pytorch * cuda*",
-        "python",
-        "cudatoolkit",
-        "sysroot_linux-64",
         "libcusolver-dev",
         "libcusparse-dev",
-        "pytorch"
+        "pytorch",
+        "python"
       ],
       "number": "0"
     },
@@ -182,7 +174,6 @@
       "recipe-maintainers": [
         "kkvtran",
         "kaoutar55",
-        "todd-deshane",
         "PabloCarmona"
       ]
     },
@@ -205,7 +196,9 @@
         "openblas"
       ],
       "host": [
-        "cuda-version 11.8",
+        "cuda-version 12.6",
+        "libcublas-dev",
+        "libcurand-dev",
         "python",
         "openblas",
         "blas",
@@ -213,9 +206,6 @@
         "scikit-build",
         "setuptools",
         "pytorch * cuda*",
-        "cuda-version 12.6",
-        "libcublas-dev",
-        "libcurand-dev",
         "libcusolver-dev",
         "libcusparse-dev",
         "pytorch"
@@ -230,7 +220,7 @@
         "scipy",
         "scikit-learn",
         "pytorch * cuda*",
-        "pytorch"
+        "pytorch * cpu*"
       ]
     },
     "schema_version": 0,
@@ -259,7 +249,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/aihwkit-gpu.json"
   },
-  "raw_meta_yaml": "{% set pname = \"aihwkit\" if cuda_compiler_version == \"None\" else \"aihwkit-gpu\" %}\n{% set name = \"aihwkit\" %}\n{% set version = \"1.0.0\" %}\n{% set number = 0 %}\n\npackage:\n  name: {{ pname|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz\n  sha256: 129799705db6031dda5dfae9f0fea92db944fa7f8d92ff518ae287cfb66b306b\n\nbuild:\n  skip: true  # [win or osx]\n  # not yet ready for python 3.12\n  skip: true  # [py>=312]\n  ignore_run_exports_from:\n    - libcusolver-dev  # [(cuda_compiler_version or \"\").startswith(\"12\")]\n    - libcusparse-dev  # [(cuda_compiler_version or \"\").startswith(\"12\")]\n    - pytorch  # [cuda_compiler_version == \"None\"]\n    - pytorch * cuda*  # [cuda_compiler_version != \"None\"]\n    - python\n    - cudatoolkit  # [cuda_compiler_version != \"None\"]\n    - sysroot_linux-64\n  number: {{ number }}\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ stdlib(\"c\") }}\n    - {{ compiler('cxx') }}\n    - {{ compiler('cuda') }}  # [cuda_compiler_version != \"None\"]\n    - cmake\n    - numpy\n    - pybind11\n    - make\n    - mypy\n    - libgomp  # [linux]\n    - openblas\n  host:\n    - cuda-version {{ cuda_compiler_version }}  # [cuda_compiler_version != \"None\"]\n    - libcublas-dev                             # [(cuda_compiler_version or \"\").startswith(\"12\")]\n    - libcurand-dev                             # [(cuda_compiler_version or \"\").startswith(\"12\")]\n    - python\n    - openblas\n    - blas\n    - pip ==23.0.1\n    - scikit-build\n    - setuptools                                # Added setuptools for pip build backend\n    - pytorch * cuda*                           # [cuda_compiler_version != \"None\"]\n    - pytorch                                   # [cuda_compiler_version == \"None\"]\n    ########################################################################################################################################\n    # Needed because PyTorch's ATen `#include`s them                                                                                       #\n    # xref: https://github.com/pytorch/pytorch/blob/50efbb9f1e7111b4b6d5b8e9a6064ee9783930be/aten/src/ATen/cuda/CUDAContextLight.h#L6-L16  #\n    ########################################################################################################################################\n    - libcusolver-dev                           # [(cuda_compiler_version or \"\").startswith(\"12\")]\n    - libcusparse-dev                           # [(cuda_compiler_version or \"\").startswith(\"12\")]\n  run:\n    - python\n    - libopenblas\n    - blas\n    - torchvision\n    - requests\n    - protobuf\n    - scipy\n    - scikit-learn\n    - pytorch * cuda*   # [cuda_compiler_version != \"None\"]  \n    - pytorch           # [cuda_compiler_version == \"None\"]\ntest:\n  imports:\n    - aihwkit\n    - aihwkit.simulator\n\nabout:\n  home: https://github.com/IBM/aihwkit\n  summary: 'A toolkit for exploring and using the capabilities of in-memory computing devices for AI.'\n  license: MIT\n  license_file: LICENSE.txt\n  doc_url: https://aihwkit.readthedocs.io/\n  dev_url: https://github.com/IBM/aihwkit\n  \nextra:\n  recipe-maintainers:\n    - kkvtran\n    - kaoutar55\n    - todd-deshane\n    - PabloCarmona\n",
+  "raw_meta_yaml": "{% set pname = \"aihwkit\" if cuda_compiler_version == \"None\" else \"aihwkit-gpu\" %}\n{% set name = \"aihwkit\" %}\n{% set version = \"1.0.0\" %}\n{% set number = 0 %}\n\npackage:\n  name: {{ pname|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz\n  sha256: 129799705db6031dda5dfae9f0fea92db944fa7f8d92ff518ae287cfb66b306b\n\nbuild:\n  skip: true  # [win or osx]\n  # not yet ready for python 3.12\n  skip: true  # [py>=312]\n  ignore_run_exports_from:\n    - libcusolver-dev  # [cuda_compiler_version != \"None\"]\n    - libcusparse-dev  # [cuda_compiler_version != \"None\"]\n    - pytorch\n    - python\n  number: {{ number }}\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ stdlib(\"c\") }}\n    - {{ compiler('cxx') }}\n    - {{ compiler('cuda') }}  # [cuda_compiler_version != \"None\"]\n    - cmake\n    - numpy\n    - pybind11\n    - make\n    - mypy\n    - libgomp  # [linux]\n    - openblas\n  host:\n    - cuda-version {{ cuda_compiler_version }}  # [cuda_compiler_version != \"None\"]\n    - libcublas-dev                             # [cuda_compiler_version != \"None\"]\n    - libcurand-dev                             # [cuda_compiler_version != \"None\"]\n    - python\n    - openblas\n    - blas\n    - pip ==23.0.1\n    - scikit-build\n    - setuptools                                # Added setuptools for pip build backend\n    - pytorch * cuda*                           # [cuda_compiler_version != \"None\"]\n    - pytorch                                   # [cuda_compiler_version == \"None\"]\n    ########################################################################################################################################\n    # Needed because PyTorch's ATen `#include`s them                                                                                       #\n    # xref: https://github.com/pytorch/pytorch/blob/50efbb9f1e7111b4b6d5b8e9a6064ee9783930be/aten/src/ATen/cuda/CUDAContextLight.h#L6-L16  #\n    ########################################################################################################################################\n    - libcusolver-dev                           # [cuda_compiler_version != \"None\"]\n    - libcusparse-dev                           # [cuda_compiler_version != \"None\"]\n  run:\n    - python\n    - libopenblas\n    - blas\n    - torchvision\n    - requests\n    - protobuf\n    - scipy\n    - scikit-learn\n    - pytorch * cuda*   # [cuda_compiler_version != \"None\"]  \n    - pytorch * cpu*    # [cuda_compiler_version == \"None\"]\ntest:\n  imports:\n    - aihwkit\n    - aihwkit.simulator\n\nabout:\n  home: https://github.com/IBM/aihwkit\n  summary: 'A toolkit for exploring and using the capabilities of in-memory computing devices for AI.'\n  license: MIT\n  license_file: LICENSE.txt\n  doc_url: https://aihwkit.readthedocs.io/\n  dev_url: https://github.com/IBM/aihwkit\n  \nextra:\n  recipe-maintainers:\n    - kkvtran\n    - kaoutar55\n    - PabloCarmona\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -378,7 +368,6 @@
       "__set__": true,
       "elements": [
         "blas",
-        "cuda-version 11.8",
         "cuda-version 12.6",
         "libcublas-dev",
         "libcurand-dev",
@@ -400,7 +389,7 @@
         "libopenblas",
         "protobuf",
         "python",
-        "pytorch",
+        "pytorch * cpu*",
         "pytorch * cuda*",
         "requests",
         "scikit-learn",
