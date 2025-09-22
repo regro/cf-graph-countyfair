@@ -43,11 +43,11 @@
       "missing_dso_whitelist": [
         "*/libcuda.so.1"
       ],
-      "number": "1",
+      "number": "2",
       "run_exports": [
         "adaptivecpp"
       ],
-      "string": "cpu_llvm19_h1234567_1"
+      "string": "cpu_llvm19_h1234567_2"
     },
     "extra": {
       "recipe-maintainers": [
@@ -81,7 +81,7 @@
         "cuda-compat",
         "cuda-cudart-dev",
         "cuda-driver-dev",
-        "cuda-version 12.6",
+        "cuda-version 12.9",
         "llvmdev 17",
         "llvm-openmp 17",
         "llvmdev 18",
@@ -264,11 +264,11 @@
       "missing_dso_whitelist": [
         "*/libcuda.so.1"
       ],
-      "number": "1",
+      "number": "2",
       "run_exports": [
         "adaptivecpp"
       ],
-      "string": "cpu_llvm19_h1234567_1"
+      "string": "cpu_llvm19_h1234567_2"
     },
     "extra": {
       "recipe-maintainers": [
@@ -301,7 +301,7 @@
         "cuda-compat",
         "cuda-cudart-dev",
         "cuda-driver-dev",
-        "cuda-version 12.6",
+        "cuda-version 12.9",
         "llvmdev 17",
         "llvm-openmp 17",
         "llvmdev 18",
@@ -480,11 +480,11 @@
       "missing_dso_whitelist": [
         "*/libcuda.so.1"
       ],
-      "number": "1",
+      "number": "2",
       "run_exports": [
         "adaptivecpp"
       ],
-      "string": "cpu_llvm19_h1234567_1"
+      "string": "cpu_llvm19_h1234567_2"
     },
     "extra": {
       "recipe-maintainers": [
@@ -653,11 +653,11 @@
       "missing_dso_whitelist": [
         "*/nvcuda.dll"
       ],
-      "number": "1",
+      "number": "2",
       "run_exports": [
         "adaptivecpp"
       ],
-      "string": "cpu_llvm19_h1234567_1"
+      "string": "cpu_llvm19_h1234567_2"
     },
     "extra": {
       "recipe-maintainers": [
@@ -691,7 +691,7 @@
         "cuda-compat",
         "cuda-cudart-dev",
         "cuda-driver-dev",
-        "cuda-version 12.6",
+        "cuda-version 12.9",
         "llvmdev 17",
         "llvm-openmp 17",
         "llvmdev 18",
@@ -989,11 +989,11 @@
         "llvm-openmp"
       ],
       "missing_dso_whitelist": null,
-      "number": "1",
+      "number": "2",
       "run_exports": [
         "adaptivecpp"
       ],
-      "string": "cpu_llvm19_h1234567_1"
+      "string": "cpu_llvm19_h1234567_2"
     },
     "extra": {
       "recipe-maintainers": [
@@ -1145,7 +1145,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/adaptivecpp.json"
   },
-  "raw_meta_yaml": "{% set name = \"AdaptiveCpp\" %}\n{% set version = \"25.02.0\" %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  - url: https://github.com/AdaptiveCpp/AdaptiveCpp/archive/v{{ version }}.tar.gz\n    sha256: 8cc8a3be7bb38f88d7fd51597e0ec924b124d4233f64da62a31b9945b55612ca\n    patches:\n      - patches/0001-Install-tool-binaries-to-the-same-folder-of-lib.patch  # [linux]\n      - patches/0002-Fall-back-missing-functions.patch  # [linux]\n\nbuild:\n  number: 1\n  run_exports:\n    - {{ pin_subpackage('adaptivecpp', max_pin='x.x') }}\n  ignore_run_exports:\n    - libboost\n    - llvm\n    - llvm-openmp  # [not win]\n  missing_dso_whitelist:\n    # https://conda-forge.org/docs/maintainer/knowledge_base/#nvcudadll-cannot-be-found-on-windows\n    - \"*/nvcuda.dll\"    # [win]\n    - \"*/libcuda.so.1\"  # [linux]\n  skip: true  # [osx and x86_64]\n  string: cpu_llvm{{ llvm_version }}_h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version == \"None\"]\n  string: cuda{{ cuda_compiler_version | replace('.', '') }}_llvm{{ llvm_version }}_h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version != \"None\"]\n\nrequirements:\n  build:\n    - {{ compiler('cxx') }}\n    - {{ stdlib('c') }}\n    - cmake\n    - doxygen\n    - make       # [linux]\n    - ninja      # [not win]\n    - pkgconfig  # [linux]\n    {% if cuda_compiler_version != \"None\" %}\n    - {{ compiler('cuda') }}\n    - cuda-cudart-dev  # [build_platform != target_platform]\n    {% endif %}\n  host:\n    - clangdev\n    - hipcc        # [linux and x86_64]\n    - libboost-devel\n    - llvmdev {{ llvm_version }}\n    - llvm-openmp {{ llvm_version }}\n    - llvm-spirv   # [linux]\n    - libopencl-devel\n    - spirv-tools  # [linux]\n    {% if cuda_compiler_version != \"None\" %}\n    # cuda-compat is needed for libcuda.so.1\n    - cuda-compat      # [linux]\n    - cuda-cudart-dev\n    - cuda-driver-dev  # [linux]\n    - cuda-version {{ cuda_compiler_version }}\n    {% endif %}\n  run:\n    - clangdev  # [osx]\n    - hip-runtime-amd  # [linux and x86_64]\n    - libllvm{{ llvm_version }}\n    - libnuma  # [linux]\n    - llvm {{ llvm_version }}\n    - llvm-openmp {{ llvm_version }}  # [osx]\n\ntest:\n  commands:\n    - test -f $PREFIX/include/AdaptiveCpp/sycl/sycl.hpp  # [not win]\n    - test -f $PREFIX/lib/cmake/AdaptiveCpp/adaptivecpp-config.cmake  # [not win]\n    - test -f $PREFIX/lib/libacpp-common${SHLIB_EXT}  # [not win]\n    - test -f $PREFIX/lib/hipSYCL/librt-backend-omp${SHLIB_EXT}  # [not win]\n    - test -f $PREFIX/lib/hipSYCL/librt-backend-ocl${SHLIB_EXT}  # [linux]\n    - test -f $PREFIX/lib/hipSYCL/librt-backend-hip${SHLIB_EXT}  # [linux and x86_64]\n    {% if cuda_compiler_version != \"None\" %}\n    - test -f $PREFIX/lib/hipSYCL/librt-backend-cuda${SHLIB_EXT}  # [not win]\n    {% endif %}\n    - acpp-info  # [not win]\n    - if not exist %PREFIX%\\\\Library\\\\include\\\\AdaptiveCpp\\\\SYCL\\\\sycl.hpp exit 1  # [win]\n    - if not exist %PREFIX%\\\\Library\\\\lib\\\\cmake\\\\AdaptiveCpp\\\\adaptivecpp-config.cmake exit 1  # [win]\n    - if not exist %PREFIX%\\\\Library\\\\lib\\\\acpp-common.lib exit 1  # [win]\n    - if not exist %PREFIX%\\\\Library\\\\bin\\\\acpp-common.dll exit 1  # [win]\n    - if not exist %PREFIX%\\\\Library\\\\lib\\\\hipSYCL\\\\rt-backend-omp.lib exit 1  # [win]\n    - if not exist %PREFIX%\\\\Library\\\\bin\\\\hipSYCL\\\\rt-backend-omp.dll exit 1  # [win]\n    {% if cuda_compiler_version != \"None\" %}\n    - if not exist %PREFIX%\\\\Library\\\\lib\\\\hipSYCL\\\\rt-backend-cuda.lib exit 1  # [win]\n    - if not exist %PREFIX%\\\\Library\\\\bin\\\\hipSYCL\\\\rt-backend-cuda.dll exit 1  # [win]\n    {% endif %}\n    - \"acpp-info.exe\"  # [win]\n  requires:\n    - {{ compiler(\"c\") }}\n    - {{ compiler(\"cxx\") }}\n    - clangdev\n    - cmake\n    - ninja  # [unix]\n  files:\n    - tests/\n\nabout:\n  home: https://adaptivecpp.github.io/\n  summary: 'The independent, community-driven platform for heterogeneous programming in C++'\n  description: |\n    AdaptiveCpp is the independent, community-driven modern platform for\n    C++-based heterogeneous programming models targeting CPUs and GPUs from all\n    major vendors. AdaptiveCpp lets applications adapt themselves to all the\n    hardware found in the system. This includes use cases where a single binary\n    needs to be able to target all supported hardware, or utilize hardware from\n    different vendors simultaneously.\n  license: BSD-2-Clause\n  license_file: LICENSE\n  dev_url: https://github.com/AdaptiveCpp/AdaptiveCpp\n\nextra:\n  recipe-maintainers:\n    - jeongseok-meta\n",
+  "raw_meta_yaml": "{% set name = \"AdaptiveCpp\" %}\n{% set version = \"25.02.0\" %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  - url: https://github.com/AdaptiveCpp/AdaptiveCpp/archive/v{{ version }}.tar.gz\n    sha256: 8cc8a3be7bb38f88d7fd51597e0ec924b124d4233f64da62a31b9945b55612ca\n    patches:\n      - patches/0001-Install-tool-binaries-to-the-same-folder-of-lib.patch  # [linux]\n      - patches/0002-Fall-back-missing-functions.patch  # [linux]\n\nbuild:\n  number: 2\n  run_exports:\n    - {{ pin_subpackage('adaptivecpp', max_pin='x.x') }}\n  ignore_run_exports:\n    - libboost\n    - llvm\n    - llvm-openmp  # [not win]\n  missing_dso_whitelist:\n    # https://conda-forge.org/docs/maintainer/knowledge_base/#nvcudadll-cannot-be-found-on-windows\n    - \"*/nvcuda.dll\"    # [win]\n    - \"*/libcuda.so.1\"  # [linux]\n  skip: true  # [osx and x86_64]\n  string: cpu_llvm{{ llvm_version }}_h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version == \"None\"]\n  string: cuda{{ cuda_compiler_version | replace('.', '') }}_llvm{{ llvm_version }}_h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version != \"None\"]\n\nrequirements:\n  build:\n    - {{ compiler('cxx') }}\n    - {{ stdlib('c') }}\n    - cmake\n    - doxygen\n    - make       # [linux]\n    - ninja      # [not win]\n    - pkgconfig  # [linux]\n    {% if cuda_compiler_version != \"None\" %}\n    - {{ compiler('cuda') }}\n    - cuda-cudart-dev  # [build_platform != target_platform]\n    {% endif %}\n  host:\n    - clangdev\n    - hipcc        # [linux and x86_64]\n    - libboost-devel\n    - llvmdev {{ llvm_version }}\n    - llvm-openmp {{ llvm_version }}\n    - llvm-spirv   # [linux]\n    - libopencl-devel\n    - spirv-tools  # [linux]\n    {% if cuda_compiler_version != \"None\" %}\n    # cuda-compat is needed for libcuda.so.1\n    - cuda-compat      # [linux]\n    - cuda-cudart-dev\n    - cuda-driver-dev  # [linux]\n    - cuda-version {{ cuda_compiler_version }}\n    {% endif %}\n  run:\n    - clangdev  # [osx]\n    - hip-runtime-amd  # [linux and x86_64]\n    - libllvm{{ llvm_version }}\n    - libnuma  # [linux]\n    - llvm {{ llvm_version }}\n    - llvm-openmp {{ llvm_version }}  # [osx]\n\ntest:\n  commands:\n    - test -f $PREFIX/include/AdaptiveCpp/sycl/sycl.hpp  # [not win]\n    - test -f $PREFIX/lib/cmake/AdaptiveCpp/adaptivecpp-config.cmake  # [not win]\n    - test -f $PREFIX/lib/libacpp-common${SHLIB_EXT}  # [not win]\n    - test -f $PREFIX/lib/hipSYCL/librt-backend-omp${SHLIB_EXT}  # [not win]\n    - test -f $PREFIX/lib/hipSYCL/librt-backend-ocl${SHLIB_EXT}  # [linux]\n    - test -f $PREFIX/lib/hipSYCL/librt-backend-hip${SHLIB_EXT}  # [linux and x86_64]\n    {% if cuda_compiler_version != \"None\" %}\n    - test -f $PREFIX/lib/hipSYCL/librt-backend-cuda${SHLIB_EXT}  # [not win]\n    {% endif %}\n    - acpp-info  # [not win]\n    - if not exist %PREFIX%\\\\Library\\\\include\\\\AdaptiveCpp\\\\SYCL\\\\sycl.hpp exit 1  # [win]\n    - if not exist %PREFIX%\\\\Library\\\\lib\\\\cmake\\\\AdaptiveCpp\\\\adaptivecpp-config.cmake exit 1  # [win]\n    - if not exist %PREFIX%\\\\Library\\\\lib\\\\acpp-common.lib exit 1  # [win]\n    - if not exist %PREFIX%\\\\Library\\\\bin\\\\acpp-common.dll exit 1  # [win]\n    - if not exist %PREFIX%\\\\Library\\\\lib\\\\hipSYCL\\\\rt-backend-omp.lib exit 1  # [win]\n    - if not exist %PREFIX%\\\\Library\\\\bin\\\\hipSYCL\\\\rt-backend-omp.dll exit 1  # [win]\n    {% if cuda_compiler_version != \"None\" %}\n    - if not exist %PREFIX%\\\\Library\\\\lib\\\\hipSYCL\\\\rt-backend-cuda.lib exit 1  # [win]\n    - if not exist %PREFIX%\\\\Library\\\\bin\\\\hipSYCL\\\\rt-backend-cuda.dll exit 1  # [win]\n    {% endif %}\n    - \"acpp-info.exe\"  # [win]\n  requires:\n    - {{ compiler(\"c\") }}\n    - {{ compiler(\"cxx\") }}\n    - clangdev\n    - cmake\n    - ninja  # [unix]\n  files:\n    - tests/\n\nabout:\n  home: https://adaptivecpp.github.io/\n  summary: 'The independent, community-driven platform for heterogeneous programming in C++'\n  description: |\n    AdaptiveCpp is the independent, community-driven modern platform for\n    C++-based heterogeneous programming models targeting CPUs and GPUs from all\n    major vendors. AdaptiveCpp lets applications adapt themselves to all the\n    hardware found in the system. This includes use cases where a single binary\n    needs to be able to target all supported hardware, or utilize hardware from\n    different vendors simultaneously.\n  license: BSD-2-Clause\n  license_file: LICENSE\n  dev_url: https://github.com/AdaptiveCpp/AdaptiveCpp\n\nextra:\n  recipe-maintainers:\n    - jeongseok-meta\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -1266,7 +1266,7 @@
         "cuda-compat",
         "cuda-cudart-dev",
         "cuda-driver-dev",
-        "cuda-version 12.6",
+        "cuda-version 12.9",
         "hipcc",
         "libboost-devel",
         "libopencl-devel",
@@ -1335,11 +1335,11 @@
       "missing_dso_whitelist": [
         "*/nvcuda.dll"
       ],
-      "number": "1",
+      "number": "2",
       "run_exports": [
         "adaptivecpp"
       ],
-      "string": "cpu_llvm19_h1234567_1"
+      "string": "cpu_llvm19_h1234567_2"
     },
     "extra": {
       "recipe-maintainers": [
@@ -1365,7 +1365,7 @@
         "llvm-openmp 16",
         "libopencl-devel",
         "cuda-cudart-dev",
-        "cuda-version 12.6",
+        "cuda-version 12.9",
         "llvmdev 17",
         "llvm-openmp 17",
         "llvmdev 18",
