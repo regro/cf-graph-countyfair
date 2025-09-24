@@ -2,8 +2,15 @@
   "archived": false,
   "branch": "main",
   "conda-forge.yml": {
+    "azure": {
+      "store_build_artifacts": true
+    },
     "bot": {
       "automerge": true
+    },
+    "build_platform": {
+      "linux_aarch64": "linux_64",
+      "osx_arm64": "osx_64"
     },
     "conda_build": {
       "pkg_format": "2"
@@ -12,7 +19,14 @@
     "github": {
       "branch_name": "main",
       "tooling_branch_name": "main"
-    }
+    },
+    "provider": {
+      "linux_64": "azure",
+      "linux_aarch64": "azure",
+      "osx_64": "azure",
+      "win_64": "azure"
+    },
+    "test": "native_and_emulated"
   },
   "feedstock_name": "spiceypy",
   "hash_type": "sha256",
@@ -26,9 +40,8 @@
       "summary": "The NASA JPL NAIF SPICE toolkit wrapper written in Python"
     },
     "build": {
-      "noarch": "python",
       "number": "0",
-      "script": "PYTHON -m pip install . --no-deps -vv"
+      "script": "PYTHON -m pip install . -vv --no-deps --no-build-isolation"
     },
     "extra": {
       "recipe-maintainers": [
@@ -38,58 +51,76 @@
     },
     "package": {
       "name": "spiceypy",
-      "version": "6.0.3"
+      "version": "7.0.0"
     },
     "requirements": {
+      "build": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "cmake >=3.15",
+        "make"
+      ],
       "host": [
-        "python 3.10",
+        "python",
+        "cython >=3.1",
+        "numpy",
+        "cspice >=67,<68",
         "pip",
-        "setuptools",
-        "numpy >=1.23.5"
+        "scikit-build-core"
       ],
       "run": [
-        "python >=3.10",
-        "cspice ==67",
-        "numpy >=1.23.5"
+        "python",
+        "cspice >=67,<68",
+        "numpy"
       ]
     },
     "schema_version": 0,
     "source": {
-      "fn": "spiceypy-6.0.3.tar.gz",
+      "fn": "spiceypy-7.0.0.tar.gz",
       "patches": [
-        "0001-newer-single-patch-for-conda-installs.patch"
+        "./patches/0001-output-in-src.patch"
       ],
-      "sha256": "5b7338651525c605738f41b1ff3bd363ee2bc09380b574c671e0651b2298ca4b",
-      "url": "https://pypi.org/packages/source/s/spiceypy/spiceypy-6.0.3.tar.gz"
+      "sha256": "023906fbadc5a3fdc73303d8d343162a16754e8d07557ef359378ea21712c396",
+      "url": "https://pypi.org/packages/source/s/spiceypy/spiceypy-7.0.0.tar.gz"
     },
     "test": {
       "commands": [
-        "python -m pytest --pyargs spiceypy -rpP -v --verbose --tb=long"
+        "python -m pytest --pyargs spiceypy -rpP -v --verbose --tb=long --benchmark-disable"
       ],
       "imports": [
         "spiceypy",
-        "spiceypy.utils"
+        "spiceypy.utils",
+        "spiceypy.cyice"
       ],
       "requires": [
         "pytest >=7.0.0",
+        "pytest-benchmark",
         "pandas",
-        "numpy >=1.23.5",
-        "python 3.10"
+        "numpy >=1.23.5,<3",
+        "cspice >=67,<68",
+        "python"
       ]
     }
   },
   "linux_64_requirements": {
     "build": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "cmake",
+        "make"
+      ]
     },
     "host": {
       "__set__": true,
       "elements": [
+        "cspice",
+        "cython",
         "numpy",
         "pip",
         "python",
-        "setuptools"
+        "scikit-build-core"
       ]
     },
     "run": {
@@ -103,9 +134,124 @@
     "test": {
       "__set__": true,
       "elements": [
+        "cspice",
         "numpy",
         "pandas",
         "pytest",
+        "pytest-benchmark",
+        "python"
+      ]
+    }
+  },
+  "linux_aarch64_meta_yaml": {
+    "about": {
+      "description": "SpiceyPy is a python wrapper for the SPICE Toolkit. SPICE is an\nessential tool for scientists and engineers alike in the planetary\nscience field for Solar System Geometry.\n",
+      "doc_url": "http://spiceypy.readthedocs.io/",
+      "home": "https://github.com/AndrewAnnex/SpiceyPy",
+      "license": "MIT",
+      "license_file": "LICENSE",
+      "summary": "The NASA JPL NAIF SPICE toolkit wrapper written in Python"
+    },
+    "build": {
+      "number": "0",
+      "script": "PYTHON -m pip install . -vv --no-deps --no-build-isolation"
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "astrojuanlu",
+        "AndrewAnnex"
+      ]
+    },
+    "package": {
+      "name": "spiceypy",
+      "version": "7.0.0"
+    },
+    "requirements": {
+      "build": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "cmake >=3.15",
+        "make"
+      ],
+      "host": [
+        "python",
+        "cython >=3.1",
+        "numpy",
+        "cspice >=67,<68",
+        "pip",
+        "scikit-build-core"
+      ],
+      "run": [
+        "python",
+        "cspice >=67,<68",
+        "numpy"
+      ]
+    },
+    "schema_version": 0,
+    "source": {
+      "fn": "spiceypy-7.0.0.tar.gz",
+      "patches": [
+        "./patches/0001-output-in-src.patch"
+      ],
+      "sha256": "023906fbadc5a3fdc73303d8d343162a16754e8d07557ef359378ea21712c396",
+      "url": "https://pypi.org/packages/source/s/spiceypy/spiceypy-7.0.0.tar.gz"
+    },
+    "test": {
+      "commands": [
+        "python -m pytest --pyargs spiceypy -rpP -v --verbose --tb=long --benchmark-disable"
+      ],
+      "imports": [
+        "spiceypy",
+        "spiceypy.utils",
+        "spiceypy.cyice"
+      ],
+      "requires": [
+        "pytest >=7.0.0",
+        "pytest-benchmark",
+        "pandas",
+        "numpy >=1.23.5,<3",
+        "cspice >=67,<68",
+        "python"
+      ]
+    }
+  },
+  "linux_aarch64_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "cmake",
+        "make"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "cspice",
+        "cython",
+        "numpy",
+        "pip",
+        "python",
+        "scikit-build-core"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "cspice",
+        "numpy",
+        "python"
+      ]
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "cspice",
+        "numpy",
+        "pandas",
+        "pytest",
+        "pytest-benchmark",
         "python"
       ]
     }
@@ -120,9 +266,8 @@
       "summary": "The NASA JPL NAIF SPICE toolkit wrapper written in Python"
     },
     "build": {
-      "noarch": "python",
       "number": "0",
-      "script": "PYTHON -m pip install . --no-deps -vv"
+      "script": "PYTHON -m pip install . -vv --no-deps --no-build-isolation"
     },
     "extra": {
       "recipe-maintainers": [
@@ -132,83 +277,150 @@
     },
     "package": {
       "name": "spiceypy",
-      "version": "6.0.3"
+      "version": "7.0.0"
     },
     "requirements": {
+      "build": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "cmake >=3.15",
+        "make",
+        "ninja"
+      ],
       "host": [
-        "python 3.10",
+        "python",
+        "cython >=3.1",
+        "numpy",
+        "cspice >=67,<68",
         "pip",
-        "setuptools",
-        "numpy >=1.23.5"
+        "scikit-build-core"
       ],
       "run": [
-        "python >=3.10",
-        "cspice ==67",
-        "numpy >=1.23.5"
+        "python",
+        "cspice >=67,<68",
+        "numpy"
       ]
     },
     "schema_version": 0,
     "source": {
-      "fn": "spiceypy-6.0.3.tar.gz",
+      "fn": "spiceypy-7.0.0.tar.gz",
       "patches": [
-        "0001-newer-single-patch-for-conda-installs.patch"
+        "./patches/0001-output-in-src.patch"
       ],
-      "sha256": "5b7338651525c605738f41b1ff3bd363ee2bc09380b574c671e0651b2298ca4b",
-      "url": "https://pypi.org/packages/source/s/spiceypy/spiceypy-6.0.3.tar.gz"
+      "sha256": "023906fbadc5a3fdc73303d8d343162a16754e8d07557ef359378ea21712c396",
+      "url": "https://pypi.org/packages/source/s/spiceypy/spiceypy-7.0.0.tar.gz"
     },
     "test": {
       "commands": [
-        "python -m pytest --pyargs spiceypy -rpP -v --verbose --tb=long"
+        "python -m pytest --pyargs spiceypy -rpP -v --verbose --tb=long --benchmark-disable"
       ],
       "imports": [
         "spiceypy",
-        "spiceypy.utils"
+        "spiceypy.utils",
+        "spiceypy.cyice"
       ],
       "requires": [
         "pytest >=7.0.0",
+        "pytest-benchmark",
         "pandas",
-        "numpy >=1.23.5",
-        "python 3.10"
+        "numpy >=1.23.5,<3",
+        "cspice >=67,<68",
+        "python"
       ]
     }
   },
   "name": "spiceypy",
-  "outputs_names": {
-    "__set__": true,
-    "elements": [
-      "spiceypy"
-    ]
+  "osx_64_meta_yaml": {
+    "about": {
+      "description": "SpiceyPy is a python wrapper for the SPICE Toolkit. SPICE is an\nessential tool for scientists and engineers alike in the planetary\nscience field for Solar System Geometry.\n",
+      "doc_url": "http://spiceypy.readthedocs.io/",
+      "home": "https://github.com/AndrewAnnex/SpiceyPy",
+      "license": "MIT",
+      "license_file": "LICENSE",
+      "summary": "The NASA JPL NAIF SPICE toolkit wrapper written in Python"
+    },
+    "build": {
+      "number": "0",
+      "script": "PYTHON -m pip install . -vv --no-deps --no-build-isolation"
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "astrojuanlu",
+        "AndrewAnnex"
+      ]
+    },
+    "package": {
+      "name": "spiceypy",
+      "version": "7.0.0"
+    },
+    "requirements": {
+      "build": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "cmake >=3.15",
+        "make"
+      ],
+      "host": [
+        "python",
+        "cython >=3.1",
+        "numpy",
+        "cspice >=67,<68",
+        "pip",
+        "scikit-build-core"
+      ],
+      "run": [
+        "python",
+        "cspice >=67,<68",
+        "numpy"
+      ]
+    },
+    "schema_version": 0,
+    "source": {
+      "fn": "spiceypy-7.0.0.tar.gz",
+      "patches": [
+        "./patches/0001-output-in-src.patch"
+      ],
+      "sha256": "023906fbadc5a3fdc73303d8d343162a16754e8d07557ef359378ea21712c396",
+      "url": "https://pypi.org/packages/source/s/spiceypy/spiceypy-7.0.0.tar.gz"
+    },
+    "test": {
+      "commands": [
+        "python -m pytest --pyargs spiceypy -rpP -v --verbose --tb=long --benchmark-disable"
+      ],
+      "imports": [
+        "spiceypy",
+        "spiceypy.utils",
+        "spiceypy.cyice"
+      ],
+      "requires": [
+        "pytest >=7.0.0",
+        "pytest-benchmark",
+        "pandas",
+        "numpy >=1.23.5,<3",
+        "cspice >=67,<68",
+        "python"
+      ]
+    }
   },
-  "parsing_error": false,
-  "platforms": [
-    "linux_64"
-  ],
-  "pr_info": {
-    "__lazy_json__": "pr_info/spiceypy.json"
-  },
-  "raw_meta_yaml": "{% set name = \"spiceypy\" %}\n{% set version = \"6.0.3\" %}\n{% set sha256 = \"5b7338651525c605738f41b1ff3bd363ee2bc09380b574c671e0651b2298ca4b\" %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  fn: {{ name }}-{{ version }}.tar.gz\n  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz\n  sha256: {{ sha256 }}\n\n  patches:\n    - 0001-newer-single-patch-for-conda-installs.patch\n\nbuild:\n  number: 0\n  noarch: python\n  script: {{ PYTHON }} -m pip install . --no-deps -vv\n\nrequirements:\n  host:\n    - python {{ python_min }}\n    - pip\n    - setuptools\n    - numpy >=1.23.5\n  run:\n    - python >={{ python_min }}\n    - cspice ==67\n    - numpy >=1.23.5\n\ntest:\n  imports:\n    - spiceypy\n    - spiceypy.utils\n  requires:\n    - pytest >=7.0.0\n    - pandas\n    - numpy >=1.23.5\n    - python {{ python_min }}\n  commands:\n    - python -m pytest --pyargs spiceypy -rpP -v --verbose --tb=long\n\nabout:\n  home: https://github.com/AndrewAnnex/SpiceyPy\n  license: MIT\n  license_file: LICENSE\n  summary: The NASA JPL NAIF SPICE toolkit wrapper written in Python\n\n  description: |\n    SpiceyPy is a python wrapper for the SPICE Toolkit. SPICE is an\n    essential tool for scientists and engineers alike in the planetary\n    science field for Solar System Geometry.\n  doc_url: http://spiceypy.readthedocs.io/\n\nextra:\n  recipe-maintainers:\n    - astrojuanlu\n    - AndrewAnnex\n",
-  "req": {
-    "__set__": true,
-    "elements": [
-      "cspice",
-      "numpy",
-      "pip",
-      "python",
-      "setuptools"
-    ]
-  },
-  "requirements": {
+  "osx_64_requirements": {
     "build": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "cmake",
+        "make"
+      ]
     },
     "host": {
       "__set__": true,
       "elements": [
+        "cspice",
+        "cython",
         "numpy",
         "pip",
         "python",
-        "setuptools"
+        "scikit-build-core"
       ]
     },
     "run": {
@@ -222,9 +434,204 @@
     "test": {
       "__set__": true,
       "elements": [
+        "cspice",
         "numpy",
         "pandas",
         "pytest",
+        "pytest-benchmark",
+        "python"
+      ]
+    }
+  },
+  "osx_arm64_meta_yaml": {
+    "about": {
+      "description": "SpiceyPy is a python wrapper for the SPICE Toolkit. SPICE is an\nessential tool for scientists and engineers alike in the planetary\nscience field for Solar System Geometry.\n",
+      "doc_url": "http://spiceypy.readthedocs.io/",
+      "home": "https://github.com/AndrewAnnex/SpiceyPy",
+      "license": "MIT",
+      "license_file": "LICENSE",
+      "summary": "The NASA JPL NAIF SPICE toolkit wrapper written in Python"
+    },
+    "build": {
+      "number": "0",
+      "script": "PYTHON -m pip install . -vv --no-deps --no-build-isolation"
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "astrojuanlu",
+        "AndrewAnnex"
+      ]
+    },
+    "package": {
+      "name": "spiceypy",
+      "version": "7.0.0"
+    },
+    "requirements": {
+      "build": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "cmake >=3.15",
+        "make"
+      ],
+      "host": [
+        "python",
+        "cython >=3.1",
+        "numpy",
+        "cspice >=67,<68",
+        "pip",
+        "scikit-build-core"
+      ],
+      "run": [
+        "python",
+        "cspice >=67,<68",
+        "numpy"
+      ]
+    },
+    "schema_version": 0,
+    "source": {
+      "fn": "spiceypy-7.0.0.tar.gz",
+      "patches": [
+        "./patches/0001-output-in-src.patch"
+      ],
+      "sha256": "023906fbadc5a3fdc73303d8d343162a16754e8d07557ef359378ea21712c396",
+      "url": "https://pypi.org/packages/source/s/spiceypy/spiceypy-7.0.0.tar.gz"
+    },
+    "test": {
+      "commands": [
+        "python -m pytest --pyargs spiceypy -rpP -v --verbose --tb=long --benchmark-disable"
+      ],
+      "imports": [
+        "spiceypy",
+        "spiceypy.utils",
+        "spiceypy.cyice"
+      ],
+      "requires": [
+        "pytest >=7.0.0",
+        "pytest-benchmark",
+        "pandas",
+        "numpy >=1.23.5,<3",
+        "cspice >=67,<68",
+        "python"
+      ]
+    }
+  },
+  "osx_arm64_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "cmake",
+        "make"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "cspice",
+        "cython",
+        "numpy",
+        "pip",
+        "python",
+        "scikit-build-core"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "cspice",
+        "numpy",
+        "python"
+      ]
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "cspice",
+        "numpy",
+        "pandas",
+        "pytest",
+        "pytest-benchmark",
+        "python"
+      ]
+    }
+  },
+  "outputs_names": {
+    "__set__": true,
+    "elements": [
+      "spiceypy"
+    ]
+  },
+  "parsing_error": false,
+  "platforms": [
+    "linux_64",
+    "linux_aarch64",
+    "osx_64",
+    "osx_arm64",
+    "win_64"
+  ],
+  "pr_info": {
+    "__lazy_json__": "pr_info/spiceypy.json"
+  },
+  "raw_meta_yaml": "{% set name = \"spiceypy\" %}\n{% set version = \"7.0.0\" %}\n{% set sha256 = \"023906fbadc5a3fdc73303d8d343162a16754e8d07557ef359378ea21712c396\" %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  fn: {{ name }}-{{ version }}.tar.gz\n  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz\n  sha256: {{ sha256 }}\n  patches:\n    - ./patches/0001-output-in-src.patch\n\n\nbuild:\n  number: 0\n  skip: true  # [python_impl == 'pypy' or py<310 or win32 or s390x]\n  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation\n\nrequirements:\n  build:\n    - python                                 # [build_platform != target_platform]    \n    - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n    - cython                                 # [build_platform != target_platform]              \n    - numpy                                  # [build_platform != target_platform]         \n    - {{ compiler('c') }}\n    - {{ stdlib('c') }}\n    - cmake >=3.15\n    - make  # [not win]\n    - ninja  # [win]                            \n  host:\n    - python\n    - cython >=3.1\n    - numpy\n    - cspice >=67,<68\n    - pip\n    - scikit-build-core  \n  run:\n    - python\n    - cspice >=67,<68\n    - numpy\n\ntest:\n  imports:\n    - spiceypy\n    - spiceypy.utils\n    - spiceypy.cyice\n  requires:\n    - pytest >=7.0.0\n    - pytest-benchmark\n    - pandas\n    - numpy >=1.23.5,<3\n    - cspice >=67,<68\n    - python\n  commands:\n    - python -m pytest --pyargs spiceypy -rpP -v --verbose --tb=long --benchmark-disable\n\nabout:\n  home: https://github.com/AndrewAnnex/SpiceyPy\n  license: MIT\n  license_file: LICENSE\n  summary: The NASA JPL NAIF SPICE toolkit wrapper written in Python\n\n  description: |\n    SpiceyPy is a python wrapper for the SPICE Toolkit. SPICE is an\n    essential tool for scientists and engineers alike in the planetary\n    science field for Solar System Geometry.\n  doc_url: http://spiceypy.readthedocs.io/\n\nextra:\n  recipe-maintainers:\n    - astrojuanlu\n    - AndrewAnnex\n",
+  "req": {
+    "__set__": true,
+    "elements": [
+      "c_compiler_stub",
+      "c_stdlib_stub",
+      "cmake",
+      "cspice",
+      "cython",
+      "make",
+      "ninja",
+      "numpy",
+      "pip",
+      "python",
+      "scikit-build-core"
+    ]
+  },
+  "requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "cmake",
+        "make",
+        "ninja"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "cspice",
+        "cython",
+        "numpy",
+        "pip",
+        "python",
+        "scikit-build-core"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "cspice",
+        "numpy",
+        "python"
+      ]
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "cspice",
+        "numpy",
+        "pandas",
+        "pytest",
+        "pytest-benchmark",
         "python"
       ]
     }
@@ -233,38 +640,161 @@
   "total_requirements": {
     "build": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "cmake >=3.15",
+        "make",
+        "ninja"
+      ]
     },
     "host": {
       "__set__": true,
       "elements": [
-        "numpy >=1.23.5",
+        "cspice >=67,<68",
+        "cython >=3.1",
+        "numpy",
         "pip",
-        "python 3.10",
-        "setuptools"
+        "python",
+        "scikit-build-core"
       ]
     },
     "run": {
       "__set__": true,
       "elements": [
-        "cspice ==67",
-        "numpy >=1.23.5",
-        "python >=3.10"
+        "cspice >=67,<68",
+        "numpy",
+        "python"
       ]
     },
     "test": {
       "__set__": true,
       "elements": [
-        "numpy >=1.23.5",
+        "cspice >=67,<68",
+        "numpy >=1.23.5,<3",
         "pandas",
         "pytest >=7.0.0",
-        "python 3.10"
+        "pytest-benchmark",
+        "python"
       ]
     }
   },
-  "url": "https://pypi.org/packages/source/s/spiceypy/spiceypy-6.0.3.tar.gz",
-  "version": "6.0.3",
+  "url": "https://pypi.org/packages/source/s/spiceypy/spiceypy-7.0.0.tar.gz",
+  "version": "7.0.0",
   "version_pr_info": {
     "__lazy_json__": "version_pr_info/spiceypy.json"
+  },
+  "win_64_meta_yaml": {
+    "about": {
+      "description": "SpiceyPy is a python wrapper for the SPICE Toolkit. SPICE is an\nessential tool for scientists and engineers alike in the planetary\nscience field for Solar System Geometry.\n",
+      "doc_url": "http://spiceypy.readthedocs.io/",
+      "home": "https://github.com/AndrewAnnex/SpiceyPy",
+      "license": "MIT",
+      "license_file": "LICENSE",
+      "summary": "The NASA JPL NAIF SPICE toolkit wrapper written in Python"
+    },
+    "build": {
+      "number": "0",
+      "script": "PYTHON -m pip install . -vv --no-deps --no-build-isolation"
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "astrojuanlu",
+        "AndrewAnnex"
+      ]
+    },
+    "package": {
+      "name": "spiceypy",
+      "version": "7.0.0"
+    },
+    "requirements": {
+      "build": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "cmake >=3.15",
+        "ninja"
+      ],
+      "host": [
+        "python",
+        "cython >=3.1",
+        "numpy",
+        "cspice >=67,<68",
+        "pip",
+        "scikit-build-core"
+      ],
+      "run": [
+        "python",
+        "cspice >=67,<68",
+        "numpy"
+      ]
+    },
+    "schema_version": 0,
+    "source": {
+      "fn": "spiceypy-7.0.0.tar.gz",
+      "patches": [
+        "./patches/0001-output-in-src.patch"
+      ],
+      "sha256": "023906fbadc5a3fdc73303d8d343162a16754e8d07557ef359378ea21712c396",
+      "url": "https://pypi.org/packages/source/s/spiceypy/spiceypy-7.0.0.tar.gz"
+    },
+    "test": {
+      "commands": [
+        "python -m pytest --pyargs spiceypy -rpP -v --verbose --tb=long --benchmark-disable"
+      ],
+      "imports": [
+        "spiceypy",
+        "spiceypy.utils",
+        "spiceypy.cyice"
+      ],
+      "requires": [
+        "pytest >=7.0.0",
+        "pytest-benchmark",
+        "pandas",
+        "numpy >=1.23.5,<3",
+        "cspice >=67,<68",
+        "python"
+      ]
+    }
+  },
+  "win_64_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "cmake",
+        "ninja"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "cspice",
+        "cython",
+        "numpy",
+        "pip",
+        "python",
+        "scikit-build-core"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "cspice",
+        "numpy",
+        "python"
+      ]
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "cspice",
+        "numpy",
+        "pandas",
+        "pytest",
+        "pytest-benchmark",
+        "python"
+      ]
+    }
   }
 }
