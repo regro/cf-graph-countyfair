@@ -31,7 +31,7 @@
       "ignore_run_exports": [
         "numpy"
       ],
-      "number": "1",
+      "number": "2",
       "rpaths": [
         "SP_DIR/csp/lib"
       ],
@@ -96,8 +96,8 @@
       ],
       "run": [
         "python",
-        "numpy",
         "deprecated",
+        "numpy <2",
         "openssl",
         "packaging",
         "pandas",
@@ -212,7 +212,7 @@
       "ignore_run_exports": [
         "numpy"
       ],
-      "number": "1",
+      "number": "2",
       "rpaths": null,
       "run_exports": [
         "csp"
@@ -278,8 +278,8 @@
       ],
       "run": [
         "python",
-        "numpy",
         "deprecated",
+        "numpy <2",
         "openssl",
         "packaging",
         "pandas",
@@ -327,7 +327,7 @@
       "ignore_run_exports": [
         "numpy"
       ],
-      "number": "1",
+      "number": "2",
       "rpaths": [
         "SP_DIR/csp/lib"
       ],
@@ -392,8 +392,8 @@
       ],
       "run": [
         "python",
-        "numpy",
         "deprecated",
+        "numpy <2",
         "openssl",
         "packaging",
         "pandas",
@@ -507,7 +507,7 @@
       "ignore_run_exports": [
         "numpy"
       ],
-      "number": "1",
+      "number": "2",
       "rpaths": [
         "SP_DIR/csp/lib"
       ],
@@ -572,8 +572,8 @@
       ],
       "run": [
         "python",
-        "numpy",
         "deprecated",
+        "numpy <2",
         "openssl",
         "packaging",
         "pandas",
@@ -689,7 +689,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/csp.json"
   },
-  "raw_meta_yaml": "{% set name = \"csp\" %}\n{% set version = \"0.11.3\" %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://pypi.org/packages/source/{{ name [0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz\n  sha256: 02580883054ac438107cb17df817b97b92283f61f5c610ea8959eb6c5542b131\n  patches:\n    - patches/0001-remove-autogen.patch  # [build_platform != target_platform]\n    - patches/0002-local-csp.patch\n\nbuild:\n  number: 1\n  skip: true  # [py>312]\n  # conda-build fails to find .pyd files co-located next to each other whereas the windows\n  # DLL loader does.\n  error_overlinking: false  # [win]\n  script:\n    # We can't cross-compile on csp due to https://github.com/Point72/csp/issues/264\n    # So we \"fake it\" and use pregenerated files\n    - mkdir -p $SRC_DIR/_skbuild/macosx-10.15-arm64-{3.8,3.9,3.10,3.11,3.12}/cmake-build/cpp/csp/engine/csp_autogen/  # [build_platform != target_platform]\n    - mkdir -p $SRC_DIR/_skbuild/macosx-10.15-arm64-{3.8,3.9,3.10,3.11,3.12}/cmake-build/cpp/csp/adapters/websocket/csp_autogen/  # [build_platform != target_platform]\n    - cp $RECIPE_DIR/patches/engine/{autogen_types.cpp,autogen_types.h} $SRC_DIR/_skbuild/macosx-10.15-arm64-3.8/cmake-build/cpp/csp/engine/csp_autogen/  # [build_platform != target_platform]\n    - cp $RECIPE_DIR/patches/engine/{autogen_types.cpp,autogen_types.h} $SRC_DIR/_skbuild/macosx-10.15-arm64-3.9/cmake-build/cpp/csp/engine/csp_autogen/  # [build_platform != target_platform]\n    - cp $RECIPE_DIR/patches/engine/{autogen_types.cpp,autogen_types.h} $SRC_DIR/_skbuild/macosx-10.15-arm64-3.10/cmake-build/cpp/csp/engine/csp_autogen/  # [build_platform != target_platform]\n    - cp $RECIPE_DIR/patches/engine/{autogen_types.cpp,autogen_types.h} $SRC_DIR/_skbuild/macosx-10.15-arm64-3.11/cmake-build/cpp/csp/engine/csp_autogen/  # [build_platform != target_platform]\n    - cp $RECIPE_DIR/patches/engine/{autogen_types.cpp,autogen_types.h} $SRC_DIR/_skbuild/macosx-10.15-arm64-3.12/cmake-build/cpp/csp/engine/csp_autogen/  # [build_platform != target_platform]\n    - cp $RECIPE_DIR/patches/adapters/websocket/{websocket_types.cpp,websocket_types.h} $SRC_DIR/_skbuild/macosx-10.15-arm64-3.8/cmake-build/cpp/csp/adapters/websocket/csp_autogen/  # [build_platform != target_platform]\n    - cp $RECIPE_DIR/patches/adapters/websocket/{websocket_types.cpp,websocket_types.h} $SRC_DIR/_skbuild/macosx-10.15-arm64-3.9/cmake-build/cpp/csp/adapters/websocket/csp_autogen/  # [build_platform != target_platform]\n    - cp $RECIPE_DIR/patches/adapters/websocket/{websocket_types.cpp,websocket_types.h} $SRC_DIR/_skbuild/macosx-10.15-arm64-3.10/cmake-build/cpp/csp/adapters/websocket/csp_autogen/  # [build_platform != target_platform]\n    - cp $RECIPE_DIR/patches/adapters/websocket/{websocket_types.cpp,websocket_types.h} $SRC_DIR/_skbuild/macosx-10.15-arm64-3.11/cmake-build/cpp/csp/adapters/websocket/csp_autogen/  # [build_platform != target_platform]\n    - cp $RECIPE_DIR/patches/adapters/websocket/{websocket_types.cpp,websocket_types.h} $SRC_DIR/_skbuild/macosx-10.15-arm64-3.12/cmake-build/cpp/csp/adapters/websocket/csp_autogen/  # [build_platform != target_platform]\n    - export CSP_USE_VCPKG=0  # [not win]\n    - {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation  # [not win]\n    - set CSP_GENERATOR=Visual Studio 17 2022  # [win]\n    - set CSP_USE_VCPKG=0  # [win]\n    - {{ PYTHON }} setup.py build_ext install --single-version-externally-managed  --record=record.txt  # [win]\n    # Cleanup after, need to tweak pyproject\n    - rm -rf $PREFIX/cpp $PREFIX/CMakeLists.txt $PREFIX/LICENSE $PREFIX/NOTICE $PREFIX/pyproject.toml $PREFIX/README.md $PREFIX/setup.py $PREFIX/vcpkg.json  # [not win]\n  rpaths:\n    - {{ SP_DIR }}/csp/lib  # [not win]\n  run_exports:\n    - {{ pin_subpackage('csp', max_pin='x.x') }}\n  ignore_run_exports:\n    - numpy\n\nrequirements:\n  build:\n    - python                                 # [build_platform != target_platform]\n    - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n    - numpy <2                               # [build_platform != target_platform]\n    - python                                 # [build_platform != target_platform]\n    - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n    - {{ compiler('c') }}\n    - {{ stdlib(\"c\") }}\n    - {{ compiler('cxx') }}\n    - cmake\n    - make  # [not win]\n    - bison  # [not win]\n    - flex  # [not win]\n  host:\n    - python\n    - brotli\n    - cmake\n    - cyrus-sasl\n    - deprecated\n    - exprtk\n    - gtest\n    - libarrow <20\n    - libboost-headers\n    - libparquet <20\n    - librdkafka\n    - lz4-c\n    - numpy <2\n    - openssl\n    - pip\n    - pyarrow <20\n    - pydantic >=2\n    - rapidjson\n    - ruamel.yaml\n    - scikit-build\n    - setuptools >=69,<74\n    - typing-extensions\n    - websocketpp\n    - zlib\n  run:\n    - python\n    - {{ pin_compatible('numpy') }}\n    - backports.zoneinfo  # [py<39]\n    - deprecated\n    - openssl\n    - packaging\n    - pandas\n    - pandas <2.3  # [py<310]\n    - pyarrow\n    - psutil\n    - pydantic >=2\n    - pytz\n    - rapidjson\n    - ruamel.yaml\n    - sqlalchemy\n\ntest:\n  requires:\n    - pip\n  commands:\n    - pip check\n  imports:\n    - csp\n\nabout:\n  home: http://github.com/point72/csp\n  license: Apache-2.0\n  license_family: Apache\n  license_file: LICENSE\n  summary: csp is a high performance reactive stream processing library, written in C++ and Python\n  description: csp is a high performance reactive stream processing library, written in C++ and Python\n  dev_url: https://github.com/point72/csp\n\nextra:\n  recipe-maintainers:\n    - arhamchopra\n    - ptomecek\n    - alexddobkin\n    - robambalu\n    - AdamGlustein\n    - timkpaine\n",
+  "raw_meta_yaml": "{% set name = \"csp\" %}\n{% set version = \"0.11.3\" %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://pypi.org/packages/source/{{ name [0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz\n  sha256: 02580883054ac438107cb17df817b97b92283f61f5c610ea8959eb6c5542b131\n  patches:\n    - patches/0001-remove-autogen.patch  # [build_platform != target_platform]\n    - patches/0002-local-csp.patch\n\nbuild:\n  number: 2\n  skip: true  # [py>312]\n  # conda-build fails to find .pyd files co-located next to each other whereas the windows\n  # DLL loader does.\n  error_overlinking: false  # [win]\n  script:\n    # We can't cross-compile on csp due to https://github.com/Point72/csp/issues/264\n    # So we \"fake it\" and use pregenerated files\n    - mkdir -p $SRC_DIR/_skbuild/macosx-10.15-arm64-{3.8,3.9,3.10,3.11,3.12}/cmake-build/cpp/csp/engine/csp_autogen/  # [build_platform != target_platform]\n    - mkdir -p $SRC_DIR/_skbuild/macosx-10.15-arm64-{3.8,3.9,3.10,3.11,3.12}/cmake-build/cpp/csp/adapters/websocket/csp_autogen/  # [build_platform != target_platform]\n    - cp $RECIPE_DIR/patches/engine/{autogen_types.cpp,autogen_types.h} $SRC_DIR/_skbuild/macosx-10.15-arm64-3.8/cmake-build/cpp/csp/engine/csp_autogen/  # [build_platform != target_platform]\n    - cp $RECIPE_DIR/patches/engine/{autogen_types.cpp,autogen_types.h} $SRC_DIR/_skbuild/macosx-10.15-arm64-3.9/cmake-build/cpp/csp/engine/csp_autogen/  # [build_platform != target_platform]\n    - cp $RECIPE_DIR/patches/engine/{autogen_types.cpp,autogen_types.h} $SRC_DIR/_skbuild/macosx-10.15-arm64-3.10/cmake-build/cpp/csp/engine/csp_autogen/  # [build_platform != target_platform]\n    - cp $RECIPE_DIR/patches/engine/{autogen_types.cpp,autogen_types.h} $SRC_DIR/_skbuild/macosx-10.15-arm64-3.11/cmake-build/cpp/csp/engine/csp_autogen/  # [build_platform != target_platform]\n    - cp $RECIPE_DIR/patches/engine/{autogen_types.cpp,autogen_types.h} $SRC_DIR/_skbuild/macosx-10.15-arm64-3.12/cmake-build/cpp/csp/engine/csp_autogen/  # [build_platform != target_platform]\n    - cp $RECIPE_DIR/patches/adapters/websocket/{websocket_types.cpp,websocket_types.h} $SRC_DIR/_skbuild/macosx-10.15-arm64-3.8/cmake-build/cpp/csp/adapters/websocket/csp_autogen/  # [build_platform != target_platform]\n    - cp $RECIPE_DIR/patches/adapters/websocket/{websocket_types.cpp,websocket_types.h} $SRC_DIR/_skbuild/macosx-10.15-arm64-3.9/cmake-build/cpp/csp/adapters/websocket/csp_autogen/  # [build_platform != target_platform]\n    - cp $RECIPE_DIR/patches/adapters/websocket/{websocket_types.cpp,websocket_types.h} $SRC_DIR/_skbuild/macosx-10.15-arm64-3.10/cmake-build/cpp/csp/adapters/websocket/csp_autogen/  # [build_platform != target_platform]\n    - cp $RECIPE_DIR/patches/adapters/websocket/{websocket_types.cpp,websocket_types.h} $SRC_DIR/_skbuild/macosx-10.15-arm64-3.11/cmake-build/cpp/csp/adapters/websocket/csp_autogen/  # [build_platform != target_platform]\n    - cp $RECIPE_DIR/patches/adapters/websocket/{websocket_types.cpp,websocket_types.h} $SRC_DIR/_skbuild/macosx-10.15-arm64-3.12/cmake-build/cpp/csp/adapters/websocket/csp_autogen/  # [build_platform != target_platform]\n    - export CSP_USE_VCPKG=0  # [not win]\n    - {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation  # [not win]\n    - set CSP_GENERATOR=Visual Studio 17 2022  # [win]\n    - set CSP_USE_VCPKG=0  # [win]\n    - {{ PYTHON }} setup.py build_ext install --single-version-externally-managed  --record=record.txt  # [win]\n    # Cleanup after, need to tweak pyproject\n    - rm -rf $PREFIX/cpp $PREFIX/CMakeLists.txt $PREFIX/LICENSE $PREFIX/NOTICE $PREFIX/pyproject.toml $PREFIX/README.md $PREFIX/setup.py $PREFIX/vcpkg.json  # [not win]\n  rpaths:\n    - {{ SP_DIR }}/csp/lib  # [not win]\n  run_exports:\n    - {{ pin_subpackage('csp', max_pin='x.x') }}\n  ignore_run_exports:\n    - numpy\n\nrequirements:\n  build:\n    - python                                 # [build_platform != target_platform]\n    - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n    - numpy <2                               # [build_platform != target_platform]\n    - python                                 # [build_platform != target_platform]\n    - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n    - {{ compiler('c') }}\n    - {{ stdlib(\"c\") }}\n    - {{ compiler('cxx') }}\n    - cmake\n    - make  # [not win]\n    - bison  # [not win]\n    - flex  # [not win]\n  host:\n    - python\n    - brotli\n    - cmake\n    - cyrus-sasl\n    - deprecated\n    - exprtk\n    - gtest\n    - libarrow <20\n    - libboost-headers\n    - libparquet <20\n    - librdkafka\n    - lz4-c\n    - numpy <2\n    - openssl\n    - pip\n    - pyarrow <20\n    - pydantic >=2\n    - rapidjson\n    - ruamel.yaml\n    - scikit-build\n    - setuptools >=69,<74\n    - typing-extensions\n    - websocketpp\n    - zlib\n  run:\n    - python\n    - backports.zoneinfo  # [py<39]\n    - deprecated\n    - numpy <2\n    - openssl\n    - packaging\n    - pandas\n    - pandas <2.3  # [py<310]\n    - pyarrow\n    - psutil\n    - pydantic >=2\n    - pytz\n    - rapidjson\n    - ruamel.yaml\n    - sqlalchemy\n\ntest:\n  requires:\n    - pip\n  commands:\n    - pip check\n  imports:\n    - csp\n\nabout:\n  home: http://github.com/point72/csp\n  license: Apache-2.0\n  license_family: Apache\n  license_file: LICENSE\n  summary: csp is a high performance reactive stream processing library, written in C++ and Python\n  description: csp is a high performance reactive stream processing library, written in C++ and Python\n  dev_url: https://github.com/point72/csp\n\nextra:\n  recipe-maintainers:\n    - arhamchopra\n    - ptomecek\n    - alexddobkin\n    - robambalu\n    - AdamGlustein\n    - timkpaine\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -850,7 +850,7 @@
       "__set__": true,
       "elements": [
         "deprecated",
-        "numpy",
+        "numpy <2",
         "openssl",
         "packaging",
         "pandas",
@@ -891,7 +891,7 @@
       "ignore_run_exports": [
         "numpy"
       ],
-      "number": "1",
+      "number": "2",
       "rpaths": null,
       "run_exports": [
         "csp"
@@ -951,8 +951,8 @@
       ],
       "run": [
         "python",
-        "numpy",
         "deprecated",
+        "numpy <2",
         "openssl",
         "packaging",
         "pandas",
