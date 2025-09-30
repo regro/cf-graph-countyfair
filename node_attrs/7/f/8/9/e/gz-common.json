@@ -16,7 +16,9 @@
     "conda_build": {
       "pkg_format": "2"
     },
+    "conda_build_tool": "rattler-build",
     "conda_forge_output_validation": true,
+    "conda_install_tool": "pixi",
     "github": {
       "branch_name": "main",
       "tooling_branch_name": "main"
@@ -31,14 +33,20 @@
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
     "about": {
-      "description": "This feedstock builds several conda packages from the gz-common source code, these packages are:\n* `libgz-common6`: Package that contains the gz-common C++ libraries.\n* `gz-common6`: Meta-package that depends on `libgz-common6`.\n\nIf you need to depend at build time on the C++ package, please depend on `libgz-common6` in your recipe.\n",
+      "description": "This feedstock builds several conda packages from the gz-common source code, these packages are:\n* `libgz-common6`: Package that contains the gz-common C++ libraries.\n* `gz-common6`: Meta-package that depends on `libgz-common6`.\n\nIf you need to depend at build time on the C++ package, please depend on `libgz-common6` in your recipe.",
       "home": "https://github.com/gazebosim/gz-common",
       "license": "Apache-2.0",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "An audio-visual library supports processing audio and video files, a graphics library can load a variety 3D mesh file formats into a generic in-memory representation, and the core library of Gazebo Common contains functionality that spans Base64 encoding/decoding to thread pools."
     },
     "build": {
-      "number": "1"
+      "number": "2",
+      "run_exports": {
+        "weak": [
+          "libgz-common6"
+        ]
+      }
     },
     "extra": {
       "feedstock-name": "gz-common",
@@ -50,7 +58,36 @@
     "outputs": [
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
+            "libgz-common6"
+          ]
+        },
+        "name": "gz-common6",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "libgz-common6"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake",
+              "test -f ${PREFIX}/lib/lib${{ name }}.so",
+              "test -f ${PREFIX}/lib/lib${{ name }}-graphics.so",
+              "test -f ${PREFIX}/lib/lib${{ name }}-av.so"
+            ]
+          }
+        ],
+        "version": "6.1.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
             "libgz-common6"
           ]
         },
@@ -75,59 +112,103 @@
             "ffmpeg",
             "libgdal",
             "assimp"
-          ]
+          ],
+          "run": []
         },
-        "script": "build_cxx.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/common6/gz/common.hh",
-            "test -f ${PREFIX}/lib/libgz-common6${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libgz-common6-graphics${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libgz-common6-geospatial${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libgz-common6-av${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libgz-common6-io${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/cmake/gz-common6/gz-common6-config.cmake"
-          ]
-        }
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/lib${{ name }}-graphics${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/lib${{ name }}-av${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/lib${{ name }}-io${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake",
+              "test -f ${PREFIX}/lib/lib${{ name }}-geospatial${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "6.1.0"
       },
       {
         "build": {
-          "run_exports": [
-            "libgz-common6"
+          "strong": [],
+          "weak": [
+            "libgz-common6",
+            "libgz-common"
           ]
         },
-        "name": "gz-common6",
+        "name": "libgz-common",
         "requirements": {
+          "build": [],
+          "host": [],
           "run": [
             "libgz-common6"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/common6/gz/common.hh",
-            "test -f ${PREFIX}/lib/libgz-common6.so",
-            "test -f ${PREFIX}/lib/libgz-common6-graphics.so",
-            "test -f ${PREFIX}/lib/libgz-common6-av.so",
-            "test -f ${PREFIX}/lib/cmake/gz-common6/gz-common6-config.cmake"
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }}${{ major_version }}"
+          }
+        ],
+        "version": "6.1.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "libgz-common6",
+            "libgz-common"
           ]
-        }
+        },
+        "name": "gz-common",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "gz-common6"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }}${{ major_version }}"
+          }
+        ],
+        "version": "6.1.0"
       }
     ],
     "package": {
       "name": "gz-common6",
       "version": "6.1.0"
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "patches": [
-          "librt_linkage.patch",
-          "macro_path_binary_relocation.patch"
-        ],
-        "sha256": "74596a71d3b230beb372d55592df8327b5734119fddf411ba9da7ab495741387",
-        "url": "https://github.com/gazebosim/gz-common/archive/gz-common6_6.1.0.tar.gz"
-      }
-    ]
+    "requirements": {
+      "run": [
+        "libgz-common6"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "patches": [
+        "librt_linkage.patch",
+        "macro_path_binary_relocation.patch"
+      ],
+      "sha256": "74596a71d3b230beb372d55592df8327b5734119fddf411ba9da7ab495741387",
+      "url": "https://github.com/gazebosim/gz-common/archive/gz-common6_6.1.0.tar.gz"
+    }
   },
   "linux_64_requirements": {
     "build": {
@@ -159,24 +240,35 @@
     "run": {
       "__set__": true,
       "elements": [
+        "gz-common6",
         "libgz-common6"
       ]
     },
     "test": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "c_compiler_stub",
+        "cmake-package-check",
+        "cxx_compiler_stub"
+      ]
     }
   },
   "linux_aarch64_meta_yaml": {
     "about": {
-      "description": "This feedstock builds several conda packages from the gz-common source code, these packages are:\n* `libgz-common6`: Package that contains the gz-common C++ libraries.\n* `gz-common6`: Meta-package that depends on `libgz-common6`.\n\nIf you need to depend at build time on the C++ package, please depend on `libgz-common6` in your recipe.\n",
+      "description": "This feedstock builds several conda packages from the gz-common source code, these packages are:\n* `libgz-common6`: Package that contains the gz-common C++ libraries.\n* `gz-common6`: Meta-package that depends on `libgz-common6`.\n\nIf you need to depend at build time on the C++ package, please depend on `libgz-common6` in your recipe.",
       "home": "https://github.com/gazebosim/gz-common",
       "license": "Apache-2.0",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "An audio-visual library supports processing audio and video files, a graphics library can load a variety 3D mesh file formats into a generic in-memory representation, and the core library of Gazebo Common contains functionality that spans Base64 encoding/decoding to thread pools."
     },
     "build": {
-      "number": "1"
+      "number": "2",
+      "run_exports": {
+        "weak": [
+          "libgz-common6"
+        ]
+      }
     },
     "extra": {
       "feedstock-name": "gz-common",
@@ -188,7 +280,36 @@
     "outputs": [
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
+            "libgz-common6"
+          ]
+        },
+        "name": "gz-common6",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "libgz-common6"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake",
+              "test -f ${PREFIX}/lib/lib${{ name }}.so",
+              "test -f ${PREFIX}/lib/lib${{ name }}-graphics.so",
+              "test -f ${PREFIX}/lib/lib${{ name }}-av.so"
+            ]
+          }
+        ],
+        "version": "6.1.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
             "libgz-common6"
           ]
         },
@@ -213,59 +334,103 @@
             "ffmpeg",
             "libgdal",
             "assimp"
-          ]
+          ],
+          "run": []
         },
-        "script": "build_cxx.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/common6/gz/common.hh",
-            "test -f ${PREFIX}/lib/libgz-common6${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libgz-common6-graphics${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libgz-common6-geospatial${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libgz-common6-av${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libgz-common6-io${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/cmake/gz-common6/gz-common6-config.cmake"
-          ]
-        }
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/lib${{ name }}-graphics${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/lib${{ name }}-av${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/lib${{ name }}-io${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake",
+              "test -f ${PREFIX}/lib/lib${{ name }}-geospatial${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "6.1.0"
       },
       {
         "build": {
-          "run_exports": [
-            "libgz-common6"
+          "strong": [],
+          "weak": [
+            "libgz-common6",
+            "libgz-common"
           ]
         },
-        "name": "gz-common6",
+        "name": "libgz-common",
         "requirements": {
+          "build": [],
+          "host": [],
           "run": [
             "libgz-common6"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/common6/gz/common.hh",
-            "test -f ${PREFIX}/lib/libgz-common6.so",
-            "test -f ${PREFIX}/lib/libgz-common6-graphics.so",
-            "test -f ${PREFIX}/lib/libgz-common6-av.so",
-            "test -f ${PREFIX}/lib/cmake/gz-common6/gz-common6-config.cmake"
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }}${{ major_version }}"
+          }
+        ],
+        "version": "6.1.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "libgz-common6",
+            "libgz-common"
           ]
-        }
+        },
+        "name": "gz-common",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "gz-common6"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }}${{ major_version }}"
+          }
+        ],
+        "version": "6.1.0"
       }
     ],
     "package": {
       "name": "gz-common6",
       "version": "6.1.0"
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "patches": [
-          "librt_linkage.patch",
-          "macro_path_binary_relocation.patch"
-        ],
-        "sha256": "74596a71d3b230beb372d55592df8327b5734119fddf411ba9da7ab495741387",
-        "url": "https://github.com/gazebosim/gz-common/archive/gz-common6_6.1.0.tar.gz"
-      }
-    ]
+    "requirements": {
+      "run": [
+        "libgz-common6"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "patches": [
+        "librt_linkage.patch",
+        "macro_path_binary_relocation.patch"
+      ],
+      "sha256": "74596a71d3b230beb372d55592df8327b5734119fddf411ba9da7ab495741387",
+      "url": "https://github.com/gazebosim/gz-common/archive/gz-common6_6.1.0.tar.gz"
+    }
   },
   "linux_aarch64_requirements": {
     "build": {
@@ -297,24 +462,35 @@
     "run": {
       "__set__": true,
       "elements": [
+        "gz-common6",
         "libgz-common6"
       ]
     },
     "test": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "c_compiler_stub",
+        "cmake-package-check",
+        "cxx_compiler_stub"
+      ]
     }
   },
   "linux_ppc64le_meta_yaml": {
     "about": {
-      "description": "This feedstock builds several conda packages from the gz-common source code, these packages are:\n* `libgz-common6`: Package that contains the gz-common C++ libraries.\n* `gz-common6`: Meta-package that depends on `libgz-common6`.\n\nIf you need to depend at build time on the C++ package, please depend on `libgz-common6` in your recipe.\n",
+      "description": "This feedstock builds several conda packages from the gz-common source code, these packages are:\n* `libgz-common6`: Package that contains the gz-common C++ libraries.\n* `gz-common6`: Meta-package that depends on `libgz-common6`.\n\nIf you need to depend at build time on the C++ package, please depend on `libgz-common6` in your recipe.",
       "home": "https://github.com/gazebosim/gz-common",
       "license": "Apache-2.0",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "An audio-visual library supports processing audio and video files, a graphics library can load a variety 3D mesh file formats into a generic in-memory representation, and the core library of Gazebo Common contains functionality that spans Base64 encoding/decoding to thread pools."
     },
     "build": {
-      "number": "1"
+      "number": "2",
+      "run_exports": {
+        "weak": [
+          "libgz-common6"
+        ]
+      }
     },
     "extra": {
       "feedstock-name": "gz-common",
@@ -326,7 +502,36 @@
     "outputs": [
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
+            "libgz-common6"
+          ]
+        },
+        "name": "gz-common6",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "libgz-common6"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake",
+              "test -f ${PREFIX}/lib/lib${{ name }}.so",
+              "test -f ${PREFIX}/lib/lib${{ name }}-graphics.so",
+              "test -f ${PREFIX}/lib/lib${{ name }}-av.so"
+            ]
+          }
+        ],
+        "version": "6.1.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
             "libgz-common6"
           ]
         },
@@ -351,59 +556,103 @@
             "ffmpeg",
             "libgdal",
             "assimp"
-          ]
+          ],
+          "run": []
         },
-        "script": "build_cxx.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/common6/gz/common.hh",
-            "test -f ${PREFIX}/lib/libgz-common6${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libgz-common6-graphics${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libgz-common6-geospatial${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libgz-common6-av${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libgz-common6-io${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/cmake/gz-common6/gz-common6-config.cmake"
-          ]
-        }
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/lib${{ name }}-graphics${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/lib${{ name }}-av${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/lib${{ name }}-io${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake",
+              "test -f ${PREFIX}/lib/lib${{ name }}-geospatial${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "6.1.0"
       },
       {
         "build": {
-          "run_exports": [
-            "libgz-common6"
+          "strong": [],
+          "weak": [
+            "libgz-common6",
+            "libgz-common"
           ]
         },
-        "name": "gz-common6",
+        "name": "libgz-common",
         "requirements": {
+          "build": [],
+          "host": [],
           "run": [
             "libgz-common6"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/common6/gz/common.hh",
-            "test -f ${PREFIX}/lib/libgz-common6.so",
-            "test -f ${PREFIX}/lib/libgz-common6-graphics.so",
-            "test -f ${PREFIX}/lib/libgz-common6-av.so",
-            "test -f ${PREFIX}/lib/cmake/gz-common6/gz-common6-config.cmake"
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }}${{ major_version }}"
+          }
+        ],
+        "version": "6.1.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "libgz-common6",
+            "libgz-common"
           ]
-        }
+        },
+        "name": "gz-common",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "gz-common6"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }}${{ major_version }}"
+          }
+        ],
+        "version": "6.1.0"
       }
     ],
     "package": {
       "name": "gz-common6",
       "version": "6.1.0"
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "patches": [
-          "librt_linkage.patch",
-          "macro_path_binary_relocation.patch"
-        ],
-        "sha256": "74596a71d3b230beb372d55592df8327b5734119fddf411ba9da7ab495741387",
-        "url": "https://github.com/gazebosim/gz-common/archive/gz-common6_6.1.0.tar.gz"
-      }
-    ]
+    "requirements": {
+      "run": [
+        "libgz-common6"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "patches": [
+        "librt_linkage.patch",
+        "macro_path_binary_relocation.patch"
+      ],
+      "sha256": "74596a71d3b230beb372d55592df8327b5734119fddf411ba9da7ab495741387",
+      "url": "https://github.com/gazebosim/gz-common/archive/gz-common6_6.1.0.tar.gz"
+    }
   },
   "linux_ppc64le_requirements": {
     "build": {
@@ -435,24 +684,35 @@
     "run": {
       "__set__": true,
       "elements": [
+        "gz-common6",
         "libgz-common6"
       ]
     },
     "test": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "c_compiler_stub",
+        "cmake-package-check",
+        "cxx_compiler_stub"
+      ]
     }
   },
   "meta_yaml": {
     "about": {
-      "description": "This feedstock builds several conda packages from the gz-common source code, these packages are:\n* `libgz-common6`: Package that contains the gz-common C++ libraries.\n* `gz-common6`: Meta-package that depends on `libgz-common6`.\n\nIf you need to depend at build time on the C++ package, please depend on `libgz-common6` in your recipe.\n",
+      "description": "This feedstock builds several conda packages from the gz-common source code, these packages are:\n* `libgz-common6`: Package that contains the gz-common C++ libraries.\n* `gz-common6`: Meta-package that depends on `libgz-common6`.\n\nIf you need to depend at build time on the C++ package, please depend on `libgz-common6` in your recipe.",
       "home": "https://github.com/gazebosim/gz-common",
       "license": "Apache-2.0",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "An audio-visual library supports processing audio and video files, a graphics library can load a variety 3D mesh file formats into a generic in-memory representation, and the core library of Gazebo Common contains functionality that spans Base64 encoding/decoding to thread pools."
     },
     "build": {
-      "number": "1"
+      "number": "2",
+      "run_exports": {
+        "weak": [
+          "libgz-common6"
+        ]
+      }
     },
     "extra": {
       "feedstock-name": "gz-common",
@@ -464,7 +724,36 @@
     "outputs": [
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
+            "libgz-common6"
+          ]
+        },
+        "name": "gz-common6",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "libgz-common6"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake",
+              "test -f ${PREFIX}/lib/lib${{ name }}.so",
+              "test -f ${PREFIX}/lib/lib${{ name }}-graphics.so",
+              "test -f ${PREFIX}/lib/lib${{ name }}-av.so"
+            ]
+          }
+        ],
+        "version": "6.1.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
             "libgz-common6"
           ]
         },
@@ -489,46 +778,116 @@
             "ffmpeg",
             "libgdal",
             "assimp"
-          ]
+          ],
+          "run": []
         },
-        "script": "build_cxx.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/common6/gz/common.hh",
-            "test -f ${PREFIX}/lib/libgz-common6${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libgz-common6-graphics${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libgz-common6-geospatial${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libgz-common6-av${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libgz-common6-io${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/cmake/gz-common6/gz-common6-config.cmake"
-          ]
-        }
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/lib${{ name }}-graphics${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/lib${{ name }}-av${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/lib${{ name }}-io${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake",
+              "test -f ${PREFIX}/lib/lib${{ name }}-geospatial${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "6.1.0"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
+            "libgz-common6",
+            "libgz-common"
+          ]
+        },
+        "name": "libgz-common",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "libgz-common6"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }}${{ major_version }}"
+          }
+        ],
+        "version": "6.1.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "libgz-common6",
+            "libgz-common"
+          ]
+        },
+        "name": "gz-common",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "gz-common6"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }}${{ major_version }}"
+          }
+        ],
+        "version": "6.1.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
             "libgz-common6"
           ]
         },
         "name": "gz-common6",
         "requirements": {
+          "build": [],
+          "host": [],
           "run": [
             "libgz-common6"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/common6/gz/common.hh",
-            "test -f ${PREFIX}/lib/libgz-common6.so",
-            "test -f ${PREFIX}/lib/libgz-common6-graphics.so",
-            "test -f ${PREFIX}/lib/libgz-common6-av.so",
-            "test -f ${PREFIX}/lib/cmake/gz-common6/gz-common6-config.cmake"
-          ]
-        }
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake",
+              "test -f ${PREFIX}/lib/lib${{ name }}.so",
+              "test -f ${PREFIX}/lib/lib${{ name }}-graphics.so",
+              "test -f ${PREFIX}/lib/lib${{ name }}-av.so"
+            ]
+          }
+        ],
+        "version": "6.1.0"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libgz-common6"
           ]
         },
@@ -553,46 +912,116 @@
             "ffmpeg",
             "libgdal",
             "assimp"
-          ]
+          ],
+          "run": []
         },
-        "script": "build_cxx.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/common6/gz/common.hh",
-            "test -f ${PREFIX}/lib/libgz-common6${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libgz-common6-graphics${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libgz-common6-geospatial${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libgz-common6-av${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libgz-common6-io${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/cmake/gz-common6/gz-common6-config.cmake"
-          ]
-        }
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/lib${{ name }}-graphics${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/lib${{ name }}-av${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/lib${{ name }}-io${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake",
+              "test -f ${PREFIX}/lib/lib${{ name }}-geospatial${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "6.1.0"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
+            "libgz-common6",
+            "libgz-common"
+          ]
+        },
+        "name": "libgz-common",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "libgz-common6"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }}${{ major_version }}"
+          }
+        ],
+        "version": "6.1.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "libgz-common6",
+            "libgz-common"
+          ]
+        },
+        "name": "gz-common",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "gz-common6"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }}${{ major_version }}"
+          }
+        ],
+        "version": "6.1.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
             "libgz-common6"
           ]
         },
         "name": "gz-common6",
         "requirements": {
+          "build": [],
+          "host": [],
           "run": [
             "libgz-common6"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/common6/gz/common.hh",
-            "test -f ${PREFIX}/lib/libgz-common6.so",
-            "test -f ${PREFIX}/lib/libgz-common6-graphics.so",
-            "test -f ${PREFIX}/lib/libgz-common6-av.so",
-            "test -f ${PREFIX}/lib/cmake/gz-common6/gz-common6-config.cmake"
-          ]
-        }
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake",
+              "test -f ${PREFIX}/lib/lib${{ name }}.so",
+              "test -f ${PREFIX}/lib/lib${{ name }}-graphics.so",
+              "test -f ${PREFIX}/lib/lib${{ name }}-av.so"
+            ]
+          }
+        ],
+        "version": "6.1.0"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libgz-common6"
           ]
         },
@@ -617,46 +1046,116 @@
             "ffmpeg",
             "libgdal",
             "assimp"
-          ]
+          ],
+          "run": []
         },
-        "script": "build_cxx.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/common6/gz/common.hh",
-            "test -f ${PREFIX}/lib/libgz-common6${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libgz-common6-graphics${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libgz-common6-geospatial${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libgz-common6-av${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libgz-common6-io${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/cmake/gz-common6/gz-common6-config.cmake"
-          ]
-        }
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/lib${{ name }}-graphics${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/lib${{ name }}-av${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/lib${{ name }}-io${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake",
+              "test -f ${PREFIX}/lib/lib${{ name }}-geospatial${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "6.1.0"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
+            "libgz-common6",
+            "libgz-common"
+          ]
+        },
+        "name": "libgz-common",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "libgz-common6"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }}${{ major_version }}"
+          }
+        ],
+        "version": "6.1.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "libgz-common6",
+            "libgz-common"
+          ]
+        },
+        "name": "gz-common",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "gz-common6"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }}${{ major_version }}"
+          }
+        ],
+        "version": "6.1.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
             "libgz-common6"
           ]
         },
         "name": "gz-common6",
         "requirements": {
+          "build": [],
+          "host": [],
           "run": [
             "libgz-common6"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/common6/gz/common.hh",
-            "test -f ${PREFIX}/lib/libgz-common6.so",
-            "test -f ${PREFIX}/lib/libgz-common6-graphics.so",
-            "test -f ${PREFIX}/lib/libgz-common6-av.so",
-            "test -f ${PREFIX}/lib/cmake/gz-common6/gz-common6-config.cmake"
-          ]
-        }
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake",
+              "test -f ${PREFIX}/lib/lib${{ name }}.so",
+              "test -f ${PREFIX}/lib/lib${{ name }}-graphics.so",
+              "test -f ${PREFIX}/lib/lib${{ name }}-av.so"
+            ]
+          }
+        ],
+        "version": "6.1.0"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libgz-common6"
           ]
         },
@@ -675,51 +1174,122 @@
             "libgz-cmake4",
             "libgz-utils3",
             "spdlog",
+            "libuuid",
             "freeimage",
             "tinyxml2",
             "ffmpeg",
             "libgdal",
             "assimp"
-          ]
+          ],
+          "run": []
         },
-        "script": "build_cxx.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/common6/gz/common.hh",
-            "test -f ${PREFIX}/lib/libgz-common6${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libgz-common6-graphics${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libgz-common6-geospatial${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libgz-common6-av${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libgz-common6-io${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/cmake/gz-common6/gz-common6-config.cmake"
-          ]
-        }
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/lib${{ name }}-graphics${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/lib${{ name }}-av${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/lib${{ name }}-io${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake",
+              "test -f ${PREFIX}/lib/lib${{ name }}-geospatial${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "6.1.0"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
+            "libgz-common6",
+            "libgz-common"
+          ]
+        },
+        "name": "libgz-common",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "libgz-common6"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }}${{ major_version }}"
+          }
+        ],
+        "version": "6.1.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "libgz-common6",
+            "libgz-common"
+          ]
+        },
+        "name": "gz-common",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "gz-common6"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }}${{ major_version }}"
+          }
+        ],
+        "version": "6.1.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
             "libgz-common6"
           ]
         },
         "name": "gz-common6",
         "requirements": {
+          "build": [],
+          "host": [],
           "run": [
             "libgz-common6"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/common6/gz/common.hh",
-            "test -f ${PREFIX}/lib/libgz-common6.dylib",
-            "test -f ${PREFIX}/lib/libgz-common6-graphics.dylib",
-            "test -f ${PREFIX}/lib/libgz-common6-av.dylib",
-            "test -f ${PREFIX}/lib/cmake/gz-common6/gz-common6-config.cmake"
-          ]
-        }
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake",
+              "test -f ${PREFIX}/lib/lib${{ name }}.so",
+              "test -f ${PREFIX}/lib/lib${{ name }}-graphics.so",
+              "test -f ${PREFIX}/lib/lib${{ name }}-av.so"
+            ]
+          }
+        ],
+        "version": "6.1.0"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libgz-common6"
           ]
         },
@@ -738,51 +1308,122 @@
             "libgz-cmake4",
             "libgz-utils3",
             "spdlog",
+            "libuuid",
             "freeimage",
             "tinyxml2",
             "ffmpeg",
             "libgdal",
             "assimp"
-          ]
+          ],
+          "run": []
         },
-        "script": "build_cxx.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/common6/gz/common.hh",
-            "test -f ${PREFIX}/lib/libgz-common6${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libgz-common6-graphics${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libgz-common6-geospatial${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libgz-common6-av${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libgz-common6-io${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/cmake/gz-common6/gz-common6-config.cmake"
-          ]
-        }
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/lib${{ name }}-graphics${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/lib${{ name }}-av${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/lib${{ name }}-io${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake",
+              "test -f ${PREFIX}/lib/lib${{ name }}-geospatial${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "6.1.0"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
+            "libgz-common6",
+            "libgz-common"
+          ]
+        },
+        "name": "libgz-common",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "libgz-common6"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }}${{ major_version }}"
+          }
+        ],
+        "version": "6.1.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "libgz-common6",
+            "libgz-common"
+          ]
+        },
+        "name": "gz-common",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "gz-common6"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }}${{ major_version }}"
+          }
+        ],
+        "version": "6.1.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
             "libgz-common6"
           ]
         },
         "name": "gz-common6",
         "requirements": {
+          "build": [],
+          "host": [],
           "run": [
             "libgz-common6"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/common6/gz/common.hh",
-            "test -f ${PREFIX}/lib/libgz-common6.dylib",
-            "test -f ${PREFIX}/lib/libgz-common6-graphics.dylib",
-            "test -f ${PREFIX}/lib/libgz-common6-av.dylib",
-            "test -f ${PREFIX}/lib/cmake/gz-common6/gz-common6-config.cmake"
-          ]
-        }
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake",
+              "test -f ${PREFIX}/lib/lib${{ name }}.so",
+              "test -f ${PREFIX}/lib/lib${{ name }}-graphics.so",
+              "test -f ${PREFIX}/lib/lib${{ name }}-av.so"
+            ]
+          }
+        ],
+        "version": "6.1.0"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libgz-common6"
           ]
         },
@@ -801,122 +1442,127 @@
             "libgz-cmake4",
             "libgz-utils3",
             "spdlog",
-            "dlfcn-win32",
+            "libuuid",
             "freeimage",
             "tinyxml2",
             "ffmpeg",
             "libgdal",
             "assimp"
-          ]
+          ],
+          "run": []
         },
-        "script": "bld_cxx.bat",
-        "test": {
-          "commands": [
-            "if not exist %PREFIX%\\\\Library\\\\include\\\\gz\\\\common6\\\\gz\\\\common.hh exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\lib\\\\gz-common6.lib exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\bin\\\\gz-common6.dll exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\lib\\\\gz-common6-graphics.lib exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\bin\\\\gz-common6-graphics.dll exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\lib\\\\gz-common6-geospatial.lib exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\bin\\\\gz-common6-geospatial.dll exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\lib\\\\gz-common6-av.lib exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\bin\\\\gz-common6-av.dll exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\lib\\\\gz-common6-io.lib exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\bin\\\\gz-common6-io.dll exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\lib\\\\cmake\\\\gz-common6\\\\gz-common6-config.cmake exit 1"
-          ]
-        }
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/lib${{ name }}-graphics${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/lib${{ name }}-av${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/lib${{ name }}-io${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake",
+              "test -f ${PREFIX}/lib/lib${{ name }}-geospatial${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "6.1.0"
       },
       {
         "build": {
-          "run_exports": [
-            "libgz-common6"
+          "strong": [],
+          "weak": [
+            "libgz-common6",
+            "libgz-common"
           ]
         },
-        "name": "gz-common6",
+        "name": "libgz-common",
         "requirements": {
+          "build": [],
+          "host": [],
           "run": [
             "libgz-common6"
           ]
         },
-        "test": {
-          "commands": [
-            "if not exist %PREFIX%\\\\Library\\\\include\\\\gz\\\\common6\\\\gz\\\\common.hh exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\lib\\\\gz-common6.lib exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\bin\\\\gz-common6.dll exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\lib\\\\gz-common6-graphics.lib exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\bin\\\\gz-common6-graphics.dll exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\lib\\\\gz-common6-av.lib exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\bin\\\\gz-common6-av.dll exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\lib\\\\cmake\\\\gz-common6\\\\gz-common6-config.cmake exit 1"
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }}${{ major_version }}"
+          }
+        ],
+        "version": "6.1.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "libgz-common6",
+            "libgz-common"
           ]
-        }
+        },
+        "name": "gz-common",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "gz-common6"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }}${{ major_version }}"
+          }
+        ],
+        "version": "6.1.0"
       }
     ],
     "package": {
       "name": "gz-common6",
       "version": "6.1.0"
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "patches": [
-          "librt_linkage.patch",
-          "macro_path_binary_relocation.patch"
-        ],
-        "sha256": "74596a71d3b230beb372d55592df8327b5734119fddf411ba9da7ab495741387",
-        "url": "https://github.com/gazebosim/gz-common/archive/gz-common6_6.1.0.tar.gz"
-      },
-      {
-        "patches": [
-          "librt_linkage.patch",
-          "macro_path_binary_relocation.patch"
-        ],
-        "sha256": "74596a71d3b230beb372d55592df8327b5734119fddf411ba9da7ab495741387",
-        "url": "https://github.com/gazebosim/gz-common/archive/gz-common6_6.1.0.tar.gz"
-      },
-      {
-        "patches": [
-          "librt_linkage.patch",
-          "macro_path_binary_relocation.patch"
-        ],
-        "sha256": "74596a71d3b230beb372d55592df8327b5734119fddf411ba9da7ab495741387",
-        "url": "https://github.com/gazebosim/gz-common/archive/gz-common6_6.1.0.tar.gz"
-      },
-      {
-        "patches": [
-          "macro_path_binary_relocation.patch"
-        ],
-        "sha256": "74596a71d3b230beb372d55592df8327b5734119fddf411ba9da7ab495741387",
-        "url": "https://github.com/gazebosim/gz-common/archive/gz-common6_6.1.0.tar.gz"
-      },
-      {
-        "patches": [
-          "macro_path_binary_relocation.patch"
-        ],
-        "sha256": "74596a71d3b230beb372d55592df8327b5734119fddf411ba9da7ab495741387",
-        "url": "https://github.com/gazebosim/gz-common/archive/gz-common6_6.1.0.tar.gz"
-      },
-      {
-        "patches": [
-          "macro_path_binary_relocation.patch"
-        ],
-        "sha256": "74596a71d3b230beb372d55592df8327b5734119fddf411ba9da7ab495741387",
-        "url": "https://github.com/gazebosim/gz-common/archive/gz-common6_6.1.0.tar.gz"
-      }
-    ]
+    "requirements": {
+      "run": [
+        "libgz-common6"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "patches": [
+        "librt_linkage.patch",
+        "macro_path_binary_relocation.patch"
+      ],
+      "sha256": "74596a71d3b230beb372d55592df8327b5734119fddf411ba9da7ab495741387",
+      "url": "https://github.com/gazebosim/gz-common/archive/gz-common6_6.1.0.tar.gz"
+    }
   },
   "name": "gz-common6",
   "osx_64_meta_yaml": {
     "about": {
-      "description": "This feedstock builds several conda packages from the gz-common source code, these packages are:\n* `libgz-common6`: Package that contains the gz-common C++ libraries.\n* `gz-common6`: Meta-package that depends on `libgz-common6`.\n\nIf you need to depend at build time on the C++ package, please depend on `libgz-common6` in your recipe.\n",
+      "description": "This feedstock builds several conda packages from the gz-common source code, these packages are:\n* `libgz-common6`: Package that contains the gz-common C++ libraries.\n* `gz-common6`: Meta-package that depends on `libgz-common6`.\n\nIf you need to depend at build time on the C++ package, please depend on `libgz-common6` in your recipe.",
       "home": "https://github.com/gazebosim/gz-common",
       "license": "Apache-2.0",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "An audio-visual library supports processing audio and video files, a graphics library can load a variety 3D mesh file formats into a generic in-memory representation, and the core library of Gazebo Common contains functionality that spans Base64 encoding/decoding to thread pools."
     },
     "build": {
-      "number": "1"
+      "number": "2",
+      "run_exports": {
+        "weak": [
+          "libgz-common6"
+        ]
+      }
     },
     "extra": {
       "feedstock-name": "gz-common",
@@ -928,7 +1574,36 @@
     "outputs": [
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
+            "libgz-common6"
+          ]
+        },
+        "name": "gz-common6",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "libgz-common6"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake",
+              "test -f ${PREFIX}/lib/lib${{ name }}.so",
+              "test -f ${PREFIX}/lib/lib${{ name }}-graphics.so",
+              "test -f ${PREFIX}/lib/lib${{ name }}-av.so"
+            ]
+          }
+        ],
+        "version": "6.1.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
             "libgz-common6"
           ]
         },
@@ -947,63 +1622,109 @@
             "libgz-cmake4",
             "libgz-utils3",
             "spdlog",
+            "libuuid",
             "freeimage",
             "tinyxml2",
             "ffmpeg",
             "libgdal",
             "assimp"
-          ]
+          ],
+          "run": []
         },
-        "script": "build_cxx.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/common6/gz/common.hh",
-            "test -f ${PREFIX}/lib/libgz-common6${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libgz-common6-graphics${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libgz-common6-geospatial${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libgz-common6-av${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libgz-common6-io${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/cmake/gz-common6/gz-common6-config.cmake"
-          ]
-        }
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/lib${{ name }}-graphics${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/lib${{ name }}-av${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/lib${{ name }}-io${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake",
+              "test -f ${PREFIX}/lib/lib${{ name }}-geospatial${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "6.1.0"
       },
       {
         "build": {
-          "run_exports": [
-            "libgz-common6"
+          "strong": [],
+          "weak": [
+            "libgz-common6",
+            "libgz-common"
           ]
         },
-        "name": "gz-common6",
+        "name": "libgz-common",
         "requirements": {
+          "build": [],
+          "host": [],
           "run": [
             "libgz-common6"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/common6/gz/common.hh",
-            "test -f ${PREFIX}/lib/libgz-common6.dylib",
-            "test -f ${PREFIX}/lib/libgz-common6-graphics.dylib",
-            "test -f ${PREFIX}/lib/libgz-common6-av.dylib",
-            "test -f ${PREFIX}/lib/cmake/gz-common6/gz-common6-config.cmake"
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }}${{ major_version }}"
+          }
+        ],
+        "version": "6.1.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "libgz-common6",
+            "libgz-common"
           ]
-        }
+        },
+        "name": "gz-common",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "gz-common6"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }}${{ major_version }}"
+          }
+        ],
+        "version": "6.1.0"
       }
     ],
     "package": {
       "name": "gz-common6",
       "version": "6.1.0"
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "patches": [
-          "macro_path_binary_relocation.patch"
-        ],
-        "sha256": "74596a71d3b230beb372d55592df8327b5734119fddf411ba9da7ab495741387",
-        "url": "https://github.com/gazebosim/gz-common/archive/gz-common6_6.1.0.tar.gz"
-      }
-    ]
+    "requirements": {
+      "run": [
+        "libgz-common6"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "patches": [
+        "librt_linkage.patch",
+        "macro_path_binary_relocation.patch"
+      ],
+      "sha256": "74596a71d3b230beb372d55592df8327b5734119fddf411ba9da7ab495741387",
+      "url": "https://github.com/gazebosim/gz-common/archive/gz-common6_6.1.0.tar.gz"
+    }
   },
   "osx_64_requirements": {
     "build": {
@@ -1027,6 +1748,7 @@
         "libgz-cmake4",
         "libgz-math8",
         "libgz-utils3",
+        "libuuid",
         "spdlog",
         "tinyxml2"
       ]
@@ -1034,24 +1756,35 @@
     "run": {
       "__set__": true,
       "elements": [
+        "gz-common6",
         "libgz-common6"
       ]
     },
     "test": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "c_compiler_stub",
+        "cmake-package-check",
+        "cxx_compiler_stub"
+      ]
     }
   },
   "osx_arm64_meta_yaml": {
     "about": {
-      "description": "This feedstock builds several conda packages from the gz-common source code, these packages are:\n* `libgz-common6`: Package that contains the gz-common C++ libraries.\n* `gz-common6`: Meta-package that depends on `libgz-common6`.\n\nIf you need to depend at build time on the C++ package, please depend on `libgz-common6` in your recipe.\n",
+      "description": "This feedstock builds several conda packages from the gz-common source code, these packages are:\n* `libgz-common6`: Package that contains the gz-common C++ libraries.\n* `gz-common6`: Meta-package that depends on `libgz-common6`.\n\nIf you need to depend at build time on the C++ package, please depend on `libgz-common6` in your recipe.",
       "home": "https://github.com/gazebosim/gz-common",
       "license": "Apache-2.0",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "An audio-visual library supports processing audio and video files, a graphics library can load a variety 3D mesh file formats into a generic in-memory representation, and the core library of Gazebo Common contains functionality that spans Base64 encoding/decoding to thread pools."
     },
     "build": {
-      "number": "1"
+      "number": "2",
+      "run_exports": {
+        "weak": [
+          "libgz-common6"
+        ]
+      }
     },
     "extra": {
       "feedstock-name": "gz-common",
@@ -1063,7 +1796,36 @@
     "outputs": [
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
+            "libgz-common6"
+          ]
+        },
+        "name": "gz-common6",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "libgz-common6"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake",
+              "test -f ${PREFIX}/lib/lib${{ name }}.so",
+              "test -f ${PREFIX}/lib/lib${{ name }}-graphics.so",
+              "test -f ${PREFIX}/lib/lib${{ name }}-av.so"
+            ]
+          }
+        ],
+        "version": "6.1.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
             "libgz-common6"
           ]
         },
@@ -1082,63 +1844,109 @@
             "libgz-cmake4",
             "libgz-utils3",
             "spdlog",
+            "libuuid",
             "freeimage",
             "tinyxml2",
             "ffmpeg",
             "libgdal",
             "assimp"
-          ]
+          ],
+          "run": []
         },
-        "script": "build_cxx.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/common6/gz/common.hh",
-            "test -f ${PREFIX}/lib/libgz-common6${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libgz-common6-graphics${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libgz-common6-geospatial${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libgz-common6-av${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libgz-common6-io${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/cmake/gz-common6/gz-common6-config.cmake"
-          ]
-        }
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/lib${{ name }}-graphics${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/lib${{ name }}-av${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/lib${{ name }}-io${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake",
+              "test -f ${PREFIX}/lib/lib${{ name }}-geospatial${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "6.1.0"
       },
       {
         "build": {
-          "run_exports": [
-            "libgz-common6"
+          "strong": [],
+          "weak": [
+            "libgz-common6",
+            "libgz-common"
           ]
         },
-        "name": "gz-common6",
+        "name": "libgz-common",
         "requirements": {
+          "build": [],
+          "host": [],
           "run": [
             "libgz-common6"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/common6/gz/common.hh",
-            "test -f ${PREFIX}/lib/libgz-common6.dylib",
-            "test -f ${PREFIX}/lib/libgz-common6-graphics.dylib",
-            "test -f ${PREFIX}/lib/libgz-common6-av.dylib",
-            "test -f ${PREFIX}/lib/cmake/gz-common6/gz-common6-config.cmake"
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }}${{ major_version }}"
+          }
+        ],
+        "version": "6.1.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "libgz-common6",
+            "libgz-common"
           ]
-        }
+        },
+        "name": "gz-common",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "gz-common6"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }}${{ major_version }}"
+          }
+        ],
+        "version": "6.1.0"
       }
     ],
     "package": {
       "name": "gz-common6",
       "version": "6.1.0"
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "patches": [
-          "macro_path_binary_relocation.patch"
-        ],
-        "sha256": "74596a71d3b230beb372d55592df8327b5734119fddf411ba9da7ab495741387",
-        "url": "https://github.com/gazebosim/gz-common/archive/gz-common6_6.1.0.tar.gz"
-      }
-    ]
+    "requirements": {
+      "run": [
+        "libgz-common6"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "patches": [
+        "librt_linkage.patch",
+        "macro_path_binary_relocation.patch"
+      ],
+      "sha256": "74596a71d3b230beb372d55592df8327b5734119fddf411ba9da7ab495741387",
+      "url": "https://github.com/gazebosim/gz-common/archive/gz-common6_6.1.0.tar.gz"
+    }
   },
   "osx_arm64_requirements": {
     "build": {
@@ -1162,6 +1970,7 @@
         "libgz-cmake4",
         "libgz-math8",
         "libgz-utils3",
+        "libuuid",
         "spdlog",
         "tinyxml2"
       ]
@@ -1169,18 +1978,25 @@
     "run": {
       "__set__": true,
       "elements": [
+        "gz-common6",
         "libgz-common6"
       ]
     },
     "test": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "c_compiler_stub",
+        "cmake-package-check",
+        "cxx_compiler_stub"
+      ]
     }
   },
   "outputs_names": {
     "__set__": true,
     "elements": [
+      "gz-common",
       "gz-common6",
+      "libgz-common",
       "libgz-common6"
     ]
   },
@@ -1196,7 +2012,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/gz-common.json"
   },
-  "raw_meta_yaml": "{% set repo_name = \"gz-common\" %}\n{% set component_name = repo_name.split('-')[1] %}\n{% set version = \"6.1.0\" %}\n{% set major_version = version.split('.')[0] %}\n{% set name = repo_name + major_version %}\n{% set component_version = component_name + major_version %}\n{% set cxx_name = \"lib\" + name %}\n\npackage:\n  name: {{ name }}\n  version: {{ version }}\n\nsource:\n  - url: https://github.com/gazebosim/{{ repo_name }}/archive/{{ repo_name }}{{ major_version }}_{{ version }}.tar.gz\n    sha256: 74596a71d3b230beb372d55592df8327b5734119fddf411ba9da7ab495741387\n    patches:\n      - librt_linkage.patch  # [linux]\n      - macro_path_binary_relocation.patch\n\nbuild:\n  number: 1\n\noutputs:\n  - name: {{ cxx_name }}\n    script: build_cxx.sh  # [unix]\n    script: bld_cxx.bat  # [win]\n    build:\n      run_exports:\n        - {{ pin_subpackage(cxx_name, max_pin='x') }}\n    requirements:\n      build:\n        - {{ compiler('cxx') }}\n        - {{ compiler('c') }}\n        - {{ stdlib(\"c\") }}\n        - ninja\n        - cmake\n        - pkg-config\n      host:\n        - libgz-math8\n        - libgz-cmake4\n        - libgz-utils3\n        # Transitive dependency of libgz-utils3\n        - spdlog\n        - dlfcn-win32  # [win]\n        - libuuid      # [linux]\n        - freeimage\n        - tinyxml2\n        - ffmpeg\n        - libgdal\n        - assimp\n    test:\n      commands:\n        - test -f ${PREFIX}/include/gz/{{ component_version }}/gz/{{ component_name }}.hh  # [not win]\n        - test -f ${PREFIX}/lib/lib{{ name }}${SHLIB_EXT}  # [not win]\n        - test -f ${PREFIX}/lib/lib{{ name }}-graphics${SHLIB_EXT}  # [not win]\n        - test -f ${PREFIX}/lib/lib{{ name }}-geospatial${SHLIB_EXT}  # [unix]\n        - test -f ${PREFIX}/lib/lib{{ name }}-av${SHLIB_EXT}  # [not win]\n        - test -f ${PREFIX}/lib/lib{{ name }}-io${SHLIB_EXT}  # [not win]\n        - test -f ${PREFIX}/lib/cmake/{{ name }}/{{ name }}-config.cmake  # [not win]\n        - if not exist %PREFIX%\\\\Library\\\\include\\\\gz\\\\{{ component_version }}\\\\gz\\\\{{ component_name }}.hh exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\lib\\\\{{ name }}.lib exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\bin\\\\{{ name }}.dll exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\lib\\\\{{ name }}-graphics.lib exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\bin\\\\{{ name }}-graphics.dll exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\lib\\\\{{ name }}-geospatial.lib exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\bin\\\\{{ name }}-geospatial.dll exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\lib\\\\{{ name }}-av.lib exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\bin\\\\{{ name }}-av.dll exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\lib\\\\{{ name }}-io.lib exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\bin\\\\{{ name }}-io.dll exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\lib\\\\cmake\\\\{{ name }}\\\\{{ name }}-config.cmake exit 1  # [win]\n\n  - name: {{ name }}\n    build:\n      run_exports:\n        - {{ pin_subpackage(cxx_name, max_pin='x') }}\n    requirements:\n      run:\n        - {{ pin_subpackage(cxx_name, exact=True) }}\n    test:\n      commands:\n        - test -f ${PREFIX}/include/gz/{{ component_version }}/gz/{{ component_name }}.hh  # [not win]\n        - test -f ${PREFIX}/lib/lib{{ name }}.so  # [linux]\n        - test -f ${PREFIX}/lib/lib{{ name }}.dylib  # [osx]\n        - test -f ${PREFIX}/lib/lib{{ name }}-graphics.so  # [linux]\n        - test -f ${PREFIX}/lib/lib{{ name }}-graphics.dylib  # [osx]\n        - test -f ${PREFIX}/lib/lib{{ name }}-av.so  # [linux]\n        - test -f ${PREFIX}/lib/lib{{ name }}-av.dylib  # [osx]\n        - test -f ${PREFIX}/lib/cmake/{{ name }}/{{ name }}-config.cmake  # [not win]\n        - if not exist %PREFIX%\\\\Library\\\\include\\\\gz\\\\{{ component_version }}\\\\gz\\\\{{ component_name }}.hh exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\lib\\\\{{ name }}.lib exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\bin\\\\{{ name }}.dll exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\lib\\\\{{ name }}-graphics.lib exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\bin\\\\{{ name }}-graphics.dll exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\lib\\\\{{ name }}-av.lib exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\bin\\\\{{ name }}-av.dll exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\lib\\\\cmake\\\\{{ name }}\\\\{{ name }}-config.cmake exit 1  # [win]\n\nabout:\n  home: https://github.com/gazebosim/{{ repo_name }}\n  license: Apache-2.0\n  license_file: LICENSE\n  summary: An audio-visual library supports processing audio and video files, a graphics library can load a variety 3D mesh file formats into a generic in-memory representation, and the core library of Gazebo Common contains functionality that spans Base64 encoding/decoding to thread pools.\n  description: |\n    This feedstock builds several conda packages from the gz-common source code, these packages are:\n    * `{{ cxx_name }}`: Package that contains the gz-common C++ libraries.\n    * `{{ name }}`: Meta-package that depends on `{{ cxx_name }}`.\n\n    If you need to depend at build time on the C++ package, please depend on `{{ cxx_name }}` in your recipe.\n\nextra:\n  feedstock-name: {{ repo_name }}\n  recipe-maintainers:\n    - Tobias-Fischer\n    - traversaro\n",
+  "raw_meta_yaml": "schema_version: 1\n\ncontext:\n  repo_name: gz-common\n  component_name: common\n  version: 6.1.0\n  major_version: \"6\"\n  name: ${{ repo_name + major_version }}\n  component_version: ${{ component_name + major_version }}\n  cxx_name: ${{ \"lib\" + name }}\n\nrecipe:\n  name: ${{ name }}\n  version: ${{ version }}\n\nsource:\n  - url: https://github.com/gazebosim/${{ repo_name }}/archive/${{ repo_name }}${{ major_version }}_${{ version }}.tar.gz\n    sha256: 74596a71d3b230beb372d55592df8327b5734119fddf411ba9da7ab495741387\n    patches:\n      - if: linux\n        then:\n          - librt_linkage.patch\n      - macro_path_binary_relocation.patch\n\nbuild:\n  number: 2\n\noutputs:\n  - package:\n      name: ${{ cxx_name }}\n    build:\n      script:\n        - if: unix\n          then: build_cxx.sh\n        - if: win\n          then: bld_cxx.bat\n    requirements:\n      build:\n        - ${{ compiler('cxx') }}\n        - ${{ compiler('c') }}\n        - ${{ stdlib(\"c\") }}\n        - ninja\n        - cmake\n        - pkg-config\n      host:\n        - libgz-math8\n        - libgz-cmake4\n        - libgz-utils3\n        - spdlog\n        - if: win\n          then:\n            - dlfcn-win32\n        - if: linux\n          then:\n            - libuuid\n        - freeimage\n        - tinyxml2\n        - ffmpeg\n        - libgdal\n        - assimp\n      run_exports:\n        - ${{ pin_subpackage(cxx_name, upper_bound='x') }}\n    tests:\n      - script:\n          - if: not win\n            then:\n              - test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh\n              - test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}\n              - test -f ${PREFIX}/lib/lib${{ name }}-graphics${SHLIB_EXT}\n              - test -f ${PREFIX}/lib/lib${{ name }}-av${SHLIB_EXT}\n              - test -f ${PREFIX}/lib/lib${{ name }}-io${SHLIB_EXT}\n              - test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake\n          - if: unix\n            then:\n              - test -f ${PREFIX}/lib/lib${{ name }}-geospatial${SHLIB_EXT}\n          - if: win\n            then:\n              - if not exist %PREFIX%\\\\Library\\\\include\\\\gz\\\\${{ component_version }}\\\\gz\\\\${{ component_name }}.hh exit 1\n              - if not exist %PREFIX%\\\\Library\\\\lib\\\\${{ name }}.lib exit 1\n              - if not exist %PREFIX%\\\\Library\\\\bin\\\\${{ name }}.dll exit 1\n              - if not exist %PREFIX%\\\\Library\\\\lib\\\\${{ name }}-graphics.lib exit 1\n              - if not exist %PREFIX%\\\\Library\\\\bin\\\\${{ name }}-graphics.dll exit 1\n              - if not exist %PREFIX%\\\\Library\\\\lib\\\\${{ name }}-geospatial.lib exit 1\n              - if not exist %PREFIX%\\\\Library\\\\bin\\\\${{ name }}-geospatial.dll exit 1\n              - if not exist %PREFIX%\\\\Library\\\\lib\\\\${{ name }}-av.lib exit 1\n              - if not exist %PREFIX%\\\\Library\\\\bin\\\\${{ name }}-av.dll exit 1\n              - if not exist %PREFIX%\\\\Library\\\\lib\\\\${{ name }}-io.lib exit 1\n              - if not exist %PREFIX%\\\\Library\\\\bin\\\\${{ name }}-io.dll exit 1\n              - if not exist %PREFIX%\\\\Library\\\\lib\\\\cmake\\\\${{ name }}\\\\${{ name }}-config.cmake exit 1\n\n  - package:\n      name: ${{ name }}\n    requirements:\n      run:\n        - ${{ pin_subpackage(cxx_name, exact=True) }}\n      run_exports:\n        - ${{ pin_subpackage(cxx_name, upper_bound='x') }}\n    tests:\n      - script:\n          - if: not win\n            then:\n              - test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh\n              - test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake\n          - if: linux\n            then:\n              - test -f ${PREFIX}/lib/lib${{ name }}.so\n              - test -f ${PREFIX}/lib/lib${{ name }}-graphics.so\n              - test -f ${PREFIX}/lib/lib${{ name }}-av.so\n          - if: osx\n            then:\n              - test -f ${PREFIX}/lib/lib${{ name }}.dylib\n              - test -f ${PREFIX}/lib/lib${{ name }}-graphics.dylib\n              - test -f ${PREFIX}/lib/lib${{ name }}-av.dylib\n          - if: win\n            then:\n              - if not exist %PREFIX%\\\\Library\\\\include\\\\gz\\\\${{ component_version }}\\\\gz\\\\${{ component_name }}.hh exit 1\n              - if not exist %PREFIX%\\\\Library\\\\lib\\\\${{ name }}.lib exit 1\n              - if not exist %PREFIX%\\\\Library\\\\bin\\\\${{ name }}.dll exit 1\n              - if not exist %PREFIX%\\\\Library\\\\lib\\\\${{ name }}-graphics.lib exit 1\n              - if not exist %PREFIX%\\\\Library\\\\bin\\\\${{ name }}-graphics.dll exit 1\n              - if not exist %PREFIX%\\\\Library\\\\lib\\\\${{ name }}-av.lib exit 1\n              - if not exist %PREFIX%\\\\Library\\\\bin\\\\${{ name }}-av.dll exit 1\n              - if not exist %PREFIX%\\\\Library\\\\lib\\\\cmake\\\\${{ name }}\\\\${{ name }}-config.cmake exit 1\n\n  # Versionless dummy packages, see https://github.com/conda-forge/gz-sim-feedstock/issues/102\n  - package:\n      name: libgz-${{ component_name }}\n    requirements:\n      run:\n        - ${{ pin_subpackage(cxx_name, exact=true) }}\n      run_exports:\n        - ${{ pin_subpackage(cxx_name, upper_bound='x') }}\n        - ${{ pin_subpackage('libgz-common', upper_bound='x') }}\n    tests:\n      - script:\n          - cmake-package-check gz-${{ component_name }}${{ major_version }}\n        requirements:\n          run:\n            - cmake-package-check\n            - ${{ compiler('c') }}\n            - ${{ compiler('cxx') }}\n\n  - package:\n      name: gz-${{ component_name }}\n    requirements:\n      run:\n        - ${{ pin_subpackage(name, exact=true) }}\n      run_exports:\n        - ${{ pin_subpackage(cxx_name, upper_bound='x') }}\n        - ${{ pin_subpackage('libgz-common', upper_bound='x') }}\n    tests:\n      - script:\n          - cmake-package-check gz-${{ component_name }}${{ major_version }}\n        requirements:\n          run:\n            - cmake-package-check\n            - ${{ compiler('c') }}\n            - ${{ compiler('cxx') }}\n\n\nabout:\n  homepage: https://github.com/gazebosim/${{ repo_name }}\n  license: Apache-2.0\n  license_file: LICENSE\n  summary: An audio-visual library supports processing audio and video files, a graphics library can load a variety 3D mesh file formats into a generic in-memory representation, and the core library of Gazebo Common contains functionality that spans Base64 encoding/decoding to thread pools.\n  description: |\n    This feedstock builds several conda packages from the gz-common source code, these packages are:\n    * `${{ cxx_name }}`: Package that contains the gz-common C++ libraries.\n    * `${{ name }}`: Meta-package that depends on `${{ cxx_name }}`.\n\n    If you need to depend at build time on the C++ package, please depend on `${{ cxx_name }}` in your recipe.\n\nextra:\n  feedstock-name: ${{ repo_name }}\n  recipe-maintainers:\n    - Tobias-Fischer\n    - traversaro\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -1205,9 +2021,9 @@
       "c_stdlib_stub",
       "cmake",
       "cxx_compiler_stub",
-      "dlfcn-win32",
       "ffmpeg",
       "freeimage",
+      "gz-common6",
       "libgdal",
       "libgz-cmake4",
       "libgz-common6",
@@ -1239,7 +2055,6 @@
         "c_compiler_stub",
         "c_stdlib_stub",
         "cxx_compiler_stub",
-        "dlfcn-win32",
         "ffmpeg",
         "freeimage",
         "libgdal",
@@ -1257,12 +2072,17 @@
         "c_compiler_stub",
         "c_stdlib_stub",
         "cxx_compiler_stub",
+        "gz-common6",
         "libgz-common6"
       ]
     },
     "test": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "c_compiler_stub",
+        "cmake-package-check",
+        "cxx_compiler_stub"
+      ]
     }
   },
   "strong_exports": false,
@@ -1282,7 +2102,6 @@
       "__set__": true,
       "elements": [
         "assimp",
-        "dlfcn-win32",
         "ffmpeg",
         "freeimage",
         "libgdal",
@@ -1297,12 +2116,17 @@
     "run": {
       "__set__": true,
       "elements": [
+        "gz-common6",
         "libgz-common6"
       ]
     },
     "test": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "c_compiler_stub",
+        "cmake-package-check",
+        "cxx_compiler_stub"
+      ]
     }
   },
   "url": "https://github.com/gazebosim/gz-common/archive/gz-common6_6.1.0.tar.gz",
@@ -1312,14 +2136,20 @@
   },
   "win_64_meta_yaml": {
     "about": {
-      "description": "This feedstock builds several conda packages from the gz-common source code, these packages are:\n* `libgz-common6`: Package that contains the gz-common C++ libraries.\n* `gz-common6`: Meta-package that depends on `libgz-common6`.\n\nIf you need to depend at build time on the C++ package, please depend on `libgz-common6` in your recipe.\n",
+      "description": "This feedstock builds several conda packages from the gz-common source code, these packages are:\n* `libgz-common6`: Package that contains the gz-common C++ libraries.\n* `gz-common6`: Meta-package that depends on `libgz-common6`.\n\nIf you need to depend at build time on the C++ package, please depend on `libgz-common6` in your recipe.",
       "home": "https://github.com/gazebosim/gz-common",
       "license": "Apache-2.0",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "An audio-visual library supports processing audio and video files, a graphics library can load a variety 3D mesh file formats into a generic in-memory representation, and the core library of Gazebo Common contains functionality that spans Base64 encoding/decoding to thread pools."
     },
     "build": {
-      "number": "1"
+      "number": "2",
+      "run_exports": {
+        "weak": [
+          "libgz-common6"
+        ]
+      }
     },
     "extra": {
       "feedstock-name": "gz-common",
@@ -1331,7 +2161,36 @@
     "outputs": [
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
+            "libgz-common6"
+          ]
+        },
+        "name": "gz-common6",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "libgz-common6"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake",
+              "test -f ${PREFIX}/lib/lib${{ name }}.so",
+              "test -f ${PREFIX}/lib/lib${{ name }}-graphics.so",
+              "test -f ${PREFIX}/lib/lib${{ name }}-av.so"
+            ]
+          }
+        ],
+        "version": "6.1.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
             "libgz-common6"
           ]
         },
@@ -1350,72 +2209,109 @@
             "libgz-cmake4",
             "libgz-utils3",
             "spdlog",
-            "dlfcn-win32",
+            "libuuid",
             "freeimage",
             "tinyxml2",
             "ffmpeg",
             "libgdal",
             "assimp"
-          ]
+          ],
+          "run": []
         },
-        "script": "bld_cxx.bat",
-        "test": {
-          "commands": [
-            "if not exist %PREFIX%\\\\Library\\\\include\\\\gz\\\\common6\\\\gz\\\\common.hh exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\lib\\\\gz-common6.lib exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\bin\\\\gz-common6.dll exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\lib\\\\gz-common6-graphics.lib exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\bin\\\\gz-common6-graphics.dll exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\lib\\\\gz-common6-geospatial.lib exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\bin\\\\gz-common6-geospatial.dll exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\lib\\\\gz-common6-av.lib exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\bin\\\\gz-common6-av.dll exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\lib\\\\gz-common6-io.lib exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\bin\\\\gz-common6-io.dll exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\lib\\\\cmake\\\\gz-common6\\\\gz-common6-config.cmake exit 1"
-          ]
-        }
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/include/gz/${{ component_version }}/gz/${{ component_name }}.hh",
+              "test -f ${PREFIX}/lib/lib${{ name }}${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/lib${{ name }}-graphics${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/lib${{ name }}-av${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/lib${{ name }}-io${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/cmake/${{ name }}/${{ name }}-config.cmake",
+              "test -f ${PREFIX}/lib/lib${{ name }}-geospatial${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "6.1.0"
       },
       {
         "build": {
-          "run_exports": [
-            "libgz-common6"
+          "strong": [],
+          "weak": [
+            "libgz-common6",
+            "libgz-common"
           ]
         },
-        "name": "gz-common6",
+        "name": "libgz-common",
         "requirements": {
+          "build": [],
+          "host": [],
           "run": [
             "libgz-common6"
           ]
         },
-        "test": {
-          "commands": [
-            "if not exist %PREFIX%\\\\Library\\\\include\\\\gz\\\\common6\\\\gz\\\\common.hh exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\lib\\\\gz-common6.lib exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\bin\\\\gz-common6.dll exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\lib\\\\gz-common6-graphics.lib exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\bin\\\\gz-common6-graphics.dll exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\lib\\\\gz-common6-av.lib exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\bin\\\\gz-common6-av.dll exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\lib\\\\cmake\\\\gz-common6\\\\gz-common6-config.cmake exit 1"
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }}${{ major_version }}"
+          }
+        ],
+        "version": "6.1.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "libgz-common6",
+            "libgz-common"
           ]
-        }
+        },
+        "name": "gz-common",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "gz-common6"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }}${{ major_version }}"
+          }
+        ],
+        "version": "6.1.0"
       }
     ],
     "package": {
       "name": "gz-common6",
       "version": "6.1.0"
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "patches": [
-          "macro_path_binary_relocation.patch"
-        ],
-        "sha256": "74596a71d3b230beb372d55592df8327b5734119fddf411ba9da7ab495741387",
-        "url": "https://github.com/gazebosim/gz-common/archive/gz-common6_6.1.0.tar.gz"
-      }
-    ]
+    "requirements": {
+      "run": [
+        "libgz-common6"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "patches": [
+        "librt_linkage.patch",
+        "macro_path_binary_relocation.patch"
+      ],
+      "sha256": "74596a71d3b230beb372d55592df8327b5734119fddf411ba9da7ab495741387",
+      "url": "https://github.com/gazebosim/gz-common/archive/gz-common6_6.1.0.tar.gz"
+    }
   },
   "win_64_requirements": {
     "build": {
@@ -1433,13 +2329,13 @@
       "__set__": true,
       "elements": [
         "assimp",
-        "dlfcn-win32",
         "ffmpeg",
         "freeimage",
         "libgdal",
         "libgz-cmake4",
         "libgz-math8",
         "libgz-utils3",
+        "libuuid",
         "spdlog",
         "tinyxml2"
       ]
@@ -1447,12 +2343,17 @@
     "run": {
       "__set__": true,
       "elements": [
+        "gz-common6",
         "libgz-common6"
       ]
     },
     "test": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "c_compiler_stub",
+        "cmake-package-check",
+        "cxx_compiler_stub"
+      ]
     }
   }
 }
