@@ -36,9 +36,20 @@ all_pr_json = set(
     for pr_json in all_pr_json
 )
 
+print("removing extra 'keys' entry from pr_info blobs", flush=True)
+all_pr_info = glob.glob("./pr_info/**/*.json", recursive=True)
+all_pr_info_lzj = set(
+    "pr_info/" + pr_info.split("/")[-1]
+    for pr_info in all_pr_info
+)
+for pr_info in all_pr_info_lzj:
+    with LazyJson(pr_info) as lzj:
+        for _pr in lzj.get("PRed", []) or []:
+            if "keys" in _pr:
+                del _pr["keys"]
+
 print("getting only referenced pr json blobs", flush=True)
 found_pr_json = set()
-all_pr_info = glob.glob("./pr_info/**/*.json", recursive=True)
 for pr_info in all_pr_info:
     with open(pr_info, "r") as fp:
         pri = json.load(fp)
@@ -51,7 +62,7 @@ for pr_info in all_pr_info:
             found_pr_json.add(lzj)
 
 orphaned_pr_json = all_pr_json - found_pr_json
-print(f"Found {len(orphaned_pr_json)} orphaned PR json blobs")
+print(f"Found {len(orphaned_pr_json)} orphaned PR json blobs", flush=True)
 
 for pr_json in orphaned_pr_json:
     with LazyJson(pr_json) as lzj:
