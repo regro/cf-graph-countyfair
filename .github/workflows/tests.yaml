@@ -69,35 +69,31 @@ jobs:
         with:
           path: cf-graph
 
-      - uses: conda-incubator/setup-miniconda@835234971496cad1653abb28a638a281cf32541f # v3.2.0
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
-          python-version: 3.11
-          channels: conda-forge
-          channel-priority: strict
-          show-channel-urls: true
-          miniforge-version: latest
-          activate-environment: cf-scripts
+          repository: regro/cf-scripts
+          path: cf-scripts
+
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          repository: conda-forge/conda-forge-pinning-feedstock
+          path: conda-forge-pinning-feedstock
+
+      - uses: mamba-org/setup-micromamba@add3a49764cedee8ee24e82dfde87f5bc2914462 # v2.0.7
+        with:
+          environment-file: cf-scripts/conda-lock.yml
+          environment-name: cf-scripts
+          condarc-file: cf-scripts/autotick-bot/condarc      
 
       - name: install bot code
         run: |
-          conda install -y -q pygithub requests git pytest
-
           git config --global user.name regro-cf-autotick-bot
           git config --global user.email 36490558+regro-cf-autotick-bot@users.noreply.github.com
           git config --global pull.rebase false
 
-          conda config --env --set add_pip_as_python_dependency False
-          conda info
-          conda config --show-sources
-          conda list --show-channel-urls
-
-          git clone --depth=1 https://github.com/regro/cf-scripts.git
           pushd cf-scripts
-          conda env update --file environment.yml
           python -m pip install --no-deps --no-build-isolation -e .
           popd
-
-          git clone --depth=1 https://github.com/conda-forge/conda-forge-pinning-feedstock.git
 
       - name: check graph model
         run: |
