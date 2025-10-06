@@ -4,7 +4,8 @@
   "conda-forge.yml": {
     "bot": {
       "abi_migration_branches": [
-        "v8"
+        "v8",
+        "v9"
       ],
       "automerge": true
     },
@@ -16,14 +17,12 @@
     "conda_build": {
       "pkg_format": "2"
     },
+    "conda_build_tool": "rattler-build",
     "conda_forge_output_validation": true,
+    "conda_install_tool": "pixi",
     "github": {
       "branch_name": "main",
       "tooling_branch_name": "main"
-    },
-    "provider": {
-      "linux_aarch64": "azure",
-      "linux_ppc64le": "azure"
     },
     "test": "native_and_emulated"
   },
@@ -33,11 +32,17 @@
     "about": {
       "home": "https://github.com/gazebosim/gz-sensors",
       "license": "Apache-2.0",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "Gazebo Sensors provides numerous sensor models designed to generate realistic data from simulation environments."
     },
     "build": {
-      "number": "0"
+      "number": "0",
+      "run_exports": {
+        "weak": [
+          "libgz-sensors"
+        ]
+      }
     },
     "extra": {
       "feedstock-name": "gz-sensors",
@@ -51,18 +56,41 @@
     "outputs": [
       {
         "build": {
-          "ignore_run_exports": [
-            "python",
-            "python_abi"
-          ],
-          "ignore_run_exports_from": [
-            "python"
-          ],
-          "run_exports": [
-            "libgz-sensors9"
+          "strong": [],
+          "weak": [
+            "libgz-sensors"
           ]
         },
-        "name": "libgz-sensors9",
+        "name": "gz-sensors",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "libgz-sensors"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }} --targets gz-${{ component_name }}::gz-${{ component_name }}"
+          }
+        ],
+        "version": "10.0.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "libgz-sensors"
+          ]
+        },
+        "name": "libgz-sensors",
         "requirements": {
           "build": [
             "cxx_compiler_stub",
@@ -73,61 +101,61 @@
             "pkg-config"
           ],
           "host": [
-            "libgz-cmake4",
+            "libgz-cmake",
             "libabseil",
             "libprotobuf",
-            "libgz-math8",
-            "libgz-common6",
-            "libgz-transport14",
-            "libgz-rendering9",
-            "libgz-msgs11",
-            "libgz-plugin3",
-            "libsdformat15",
-            "ogre 1.10.*",
-            "python"
-          ]
-        },
-        "script": "build_cxx.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/sensors9/gz/sensors.hh",
-            "test -f ${PREFIX}/lib/libgz-sensors9${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/cmake/gz-sensors9/gz-sensors9-config.cmake"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
-            "libgz-sensors9"
-          ]
-        },
-        "name": "gz-sensors9",
-        "requirements": {
+            "libgz-math",
+            "libgz-common",
+            "libgz-transport",
+            "libgz-rendering",
+            "libgz-msgs",
+            "libgz-plugin",
+            "libsdformat",
+            "ogre 1.10.*"
+          ],
           "run": [
-            "libgz-sensors9"
+            "libgl-devel"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/sensors9/gz/sensors.hh",
-            "test -f ${PREFIX}/lib/libgz-sensors9${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/cmake/gz-sensors9/gz-sensors9-config.cmake"
-          ]
-        }
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "gz/sensors10/gz/sensors.hh"
+              ],
+              "lib": [
+                "gz-sensors"
+              ]
+            }
+          },
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }} --targets gz-${{ component_name }}::gz-${{ component_name }}"
+          }
+        ],
+        "version": "10.0.0"
       }
     ],
     "package": {
-      "name": "gz-sensors9",
-      "version": "9.2.0"
+      "name": "gz-sensors",
+      "version": "10.0.0"
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "sha256": "455d20d320ba741de0e38da320408afcdfe2f109e00de911b4cce200913cefaa",
-        "url": "https://github.com/gazebosim/gz-sensors/archive/gz-sensors9_9.2.0.tar.gz"
-      }
-    ]
+    "requirements": {
+      "run": [
+        "libgz-sensors"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "sha256": "9841854013d61114f7a8d20b918df651404bf5a28d52dd0b4fc4caba5dc8aa08",
+      "url": "https://github.com/gazebosim/gz-sensors/archive/gz-sensors10_10.0.0.tar.gz"
+    }
   },
   "linux_64_requirements": {
     "build": {
@@ -145,39 +173,49 @@
       "__set__": true,
       "elements": [
         "libabseil",
-        "libgz-cmake4",
-        "libgz-common6",
-        "libgz-math8",
-        "libgz-msgs11",
-        "libgz-plugin3",
-        "libgz-rendering9",
-        "libgz-transport14",
+        "libgz-cmake",
+        "libgz-common",
+        "libgz-math",
+        "libgz-msgs",
+        "libgz-plugin",
+        "libgz-rendering",
+        "libgz-transport",
         "libprotobuf",
-        "libsdformat15",
-        "ogre",
-        "python"
+        "libsdformat",
+        "ogre"
       ]
     },
     "run": {
       "__set__": true,
       "elements": [
-        "libgz-sensors9"
+        "libgl-devel",
+        "libgz-sensors"
       ]
     },
     "test": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "c_compiler_stub",
+        "cmake-package-check",
+        "cxx_compiler_stub"
+      ]
     }
   },
   "linux_aarch64_meta_yaml": {
     "about": {
       "home": "https://github.com/gazebosim/gz-sensors",
       "license": "Apache-2.0",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "Gazebo Sensors provides numerous sensor models designed to generate realistic data from simulation environments."
     },
     "build": {
-      "number": "0"
+      "number": "0",
+      "run_exports": {
+        "weak": [
+          "libgz-sensors"
+        ]
+      }
     },
     "extra": {
       "feedstock-name": "gz-sensors",
@@ -191,18 +229,41 @@
     "outputs": [
       {
         "build": {
-          "ignore_run_exports": [
-            "python",
-            "python_abi"
-          ],
-          "ignore_run_exports_from": [
-            "python"
-          ],
-          "run_exports": [
-            "libgz-sensors9"
+          "strong": [],
+          "weak": [
+            "libgz-sensors"
           ]
         },
-        "name": "libgz-sensors9",
+        "name": "gz-sensors",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "libgz-sensors"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }} --targets gz-${{ component_name }}::gz-${{ component_name }}"
+          }
+        ],
+        "version": "10.0.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "libgz-sensors"
+          ]
+        },
+        "name": "libgz-sensors",
         "requirements": {
           "build": [
             "cxx_compiler_stub",
@@ -213,61 +274,61 @@
             "pkg-config"
           ],
           "host": [
-            "libgz-cmake4",
+            "libgz-cmake",
             "libabseil",
             "libprotobuf",
-            "libgz-math8",
-            "libgz-common6",
-            "libgz-transport14",
-            "libgz-rendering9",
-            "libgz-msgs11",
-            "libgz-plugin3",
-            "libsdformat15",
-            "ogre 1.10.*",
-            "python"
-          ]
-        },
-        "script": "build_cxx.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/sensors9/gz/sensors.hh",
-            "test -f ${PREFIX}/lib/libgz-sensors9${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/cmake/gz-sensors9/gz-sensors9-config.cmake"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
-            "libgz-sensors9"
-          ]
-        },
-        "name": "gz-sensors9",
-        "requirements": {
+            "libgz-math",
+            "libgz-common",
+            "libgz-transport",
+            "libgz-rendering",
+            "libgz-msgs",
+            "libgz-plugin",
+            "libsdformat",
+            "ogre 1.10.*"
+          ],
           "run": [
-            "libgz-sensors9"
+            "libgl-devel"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/sensors9/gz/sensors.hh",
-            "test -f ${PREFIX}/lib/libgz-sensors9${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/cmake/gz-sensors9/gz-sensors9-config.cmake"
-          ]
-        }
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "gz/sensors10/gz/sensors.hh"
+              ],
+              "lib": [
+                "gz-sensors"
+              ]
+            }
+          },
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }} --targets gz-${{ component_name }}::gz-${{ component_name }}"
+          }
+        ],
+        "version": "10.0.0"
       }
     ],
     "package": {
-      "name": "gz-sensors9",
-      "version": "9.2.0"
+      "name": "gz-sensors",
+      "version": "10.0.0"
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "sha256": "455d20d320ba741de0e38da320408afcdfe2f109e00de911b4cce200913cefaa",
-        "url": "https://github.com/gazebosim/gz-sensors/archive/gz-sensors9_9.2.0.tar.gz"
-      }
-    ]
+    "requirements": {
+      "run": [
+        "libgz-sensors"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "sha256": "9841854013d61114f7a8d20b918df651404bf5a28d52dd0b4fc4caba5dc8aa08",
+      "url": "https://github.com/gazebosim/gz-sensors/archive/gz-sensors10_10.0.0.tar.gz"
+    }
   },
   "linux_aarch64_requirements": {
     "build": {
@@ -285,39 +346,49 @@
       "__set__": true,
       "elements": [
         "libabseil",
-        "libgz-cmake4",
-        "libgz-common6",
-        "libgz-math8",
-        "libgz-msgs11",
-        "libgz-plugin3",
-        "libgz-rendering9",
-        "libgz-transport14",
+        "libgz-cmake",
+        "libgz-common",
+        "libgz-math",
+        "libgz-msgs",
+        "libgz-plugin",
+        "libgz-rendering",
+        "libgz-transport",
         "libprotobuf",
-        "libsdformat15",
-        "ogre",
-        "python"
+        "libsdformat",
+        "ogre"
       ]
     },
     "run": {
       "__set__": true,
       "elements": [
-        "libgz-sensors9"
+        "libgl-devel",
+        "libgz-sensors"
       ]
     },
     "test": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "c_compiler_stub",
+        "cmake-package-check",
+        "cxx_compiler_stub"
+      ]
     }
   },
   "linux_ppc64le_meta_yaml": {
     "about": {
       "home": "https://github.com/gazebosim/gz-sensors",
       "license": "Apache-2.0",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "Gazebo Sensors provides numerous sensor models designed to generate realistic data from simulation environments."
     },
     "build": {
-      "number": "0"
+      "number": "0",
+      "run_exports": {
+        "weak": [
+          "libgz-sensors"
+        ]
+      }
     },
     "extra": {
       "feedstock-name": "gz-sensors",
@@ -331,18 +402,41 @@
     "outputs": [
       {
         "build": {
-          "ignore_run_exports": [
-            "python",
-            "python_abi"
-          ],
-          "ignore_run_exports_from": [
-            "python"
-          ],
-          "run_exports": [
-            "libgz-sensors9"
+          "strong": [],
+          "weak": [
+            "libgz-sensors"
           ]
         },
-        "name": "libgz-sensors9",
+        "name": "gz-sensors",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "libgz-sensors"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }} --targets gz-${{ component_name }}::gz-${{ component_name }}"
+          }
+        ],
+        "version": "10.0.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "libgz-sensors"
+          ]
+        },
+        "name": "libgz-sensors",
         "requirements": {
           "build": [
             "cxx_compiler_stub",
@@ -353,61 +447,61 @@
             "pkg-config"
           ],
           "host": [
-            "libgz-cmake4",
+            "libgz-cmake",
             "libabseil",
             "libprotobuf",
-            "libgz-math8",
-            "libgz-common6",
-            "libgz-transport14",
-            "libgz-rendering9",
-            "libgz-msgs11",
-            "libgz-plugin3",
-            "libsdformat15",
-            "ogre 1.10.*",
-            "python"
-          ]
-        },
-        "script": "build_cxx.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/sensors9/gz/sensors.hh",
-            "test -f ${PREFIX}/lib/libgz-sensors9${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/cmake/gz-sensors9/gz-sensors9-config.cmake"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
-            "libgz-sensors9"
-          ]
-        },
-        "name": "gz-sensors9",
-        "requirements": {
+            "libgz-math",
+            "libgz-common",
+            "libgz-transport",
+            "libgz-rendering",
+            "libgz-msgs",
+            "libgz-plugin",
+            "libsdformat",
+            "ogre 1.10.*"
+          ],
           "run": [
-            "libgz-sensors9"
+            "libgl-devel"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/sensors9/gz/sensors.hh",
-            "test -f ${PREFIX}/lib/libgz-sensors9${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/cmake/gz-sensors9/gz-sensors9-config.cmake"
-          ]
-        }
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "gz/sensors10/gz/sensors.hh"
+              ],
+              "lib": [
+                "gz-sensors"
+              ]
+            }
+          },
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }} --targets gz-${{ component_name }}::gz-${{ component_name }}"
+          }
+        ],
+        "version": "10.0.0"
       }
     ],
     "package": {
-      "name": "gz-sensors9",
-      "version": "9.2.0"
+      "name": "gz-sensors",
+      "version": "10.0.0"
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "sha256": "455d20d320ba741de0e38da320408afcdfe2f109e00de911b4cce200913cefaa",
-        "url": "https://github.com/gazebosim/gz-sensors/archive/gz-sensors9_9.2.0.tar.gz"
-      }
-    ]
+    "requirements": {
+      "run": [
+        "libgz-sensors"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "sha256": "9841854013d61114f7a8d20b918df651404bf5a28d52dd0b4fc4caba5dc8aa08",
+      "url": "https://github.com/gazebosim/gz-sensors/archive/gz-sensors10_10.0.0.tar.gz"
+    }
   },
   "linux_ppc64le_requirements": {
     "build": {
@@ -425,39 +519,49 @@
       "__set__": true,
       "elements": [
         "libabseil",
-        "libgz-cmake4",
-        "libgz-common6",
-        "libgz-math8",
-        "libgz-msgs11",
-        "libgz-plugin3",
-        "libgz-rendering9",
-        "libgz-transport14",
+        "libgz-cmake",
+        "libgz-common",
+        "libgz-math",
+        "libgz-msgs",
+        "libgz-plugin",
+        "libgz-rendering",
+        "libgz-transport",
         "libprotobuf",
-        "libsdformat15",
-        "ogre",
-        "python"
+        "libsdformat",
+        "ogre"
       ]
     },
     "run": {
       "__set__": true,
       "elements": [
-        "libgz-sensors9"
+        "libgl-devel",
+        "libgz-sensors"
       ]
     },
     "test": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "c_compiler_stub",
+        "cmake-package-check",
+        "cxx_compiler_stub"
+      ]
     }
   },
   "meta_yaml": {
     "about": {
       "home": "https://github.com/gazebosim/gz-sensors",
       "license": "Apache-2.0",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "Gazebo Sensors provides numerous sensor models designed to generate realistic data from simulation environments."
     },
     "build": {
-      "number": "0"
+      "number": "0",
+      "run_exports": {
+        "weak": [
+          "libgz-sensors"
+        ]
+      }
     },
     "extra": {
       "feedstock-name": "gz-sensors",
@@ -471,18 +575,41 @@
     "outputs": [
       {
         "build": {
-          "ignore_run_exports": [
-            "python",
-            "python_abi"
-          ],
-          "ignore_run_exports_from": [
-            "python"
-          ],
-          "run_exports": [
-            "libgz-sensors9"
+          "strong": [],
+          "weak": [
+            "libgz-sensors"
           ]
         },
-        "name": "libgz-sensors9",
+        "name": "gz-sensors",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "libgz-sensors"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }} --targets gz-${{ component_name }}::gz-${{ component_name }}"
+          }
+        ],
+        "version": "10.0.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "libgz-sensors"
+          ]
+        },
+        "name": "libgz-sensors",
         "requirements": {
           "build": [
             "cxx_compiler_stub",
@@ -493,63 +620,83 @@
             "pkg-config"
           ],
           "host": [
-            "libgz-cmake4",
+            "libgz-cmake",
             "libabseil",
             "libprotobuf",
-            "libgz-math8",
-            "libgz-common6",
-            "libgz-transport14",
-            "libgz-rendering9",
-            "libgz-msgs11",
-            "libgz-plugin3",
-            "libsdformat15",
-            "ogre 1.10.*",
-            "python"
-          ]
-        },
-        "script": "build_cxx.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/sensors9/gz/sensors.hh",
-            "test -f ${PREFIX}/lib/libgz-sensors9${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/cmake/gz-sensors9/gz-sensors9-config.cmake"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
-            "libgz-sensors9"
-          ]
-        },
-        "name": "gz-sensors9",
-        "requirements": {
+            "libgz-math",
+            "libgz-common",
+            "libgz-transport",
+            "libgz-rendering",
+            "libgz-msgs",
+            "libgz-plugin",
+            "libsdformat",
+            "ogre 1.10.*"
+          ],
           "run": [
-            "libgz-sensors9"
+            "libgl-devel"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/sensors9/gz/sensors.hh",
-            "test -f ${PREFIX}/lib/libgz-sensors9${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/cmake/gz-sensors9/gz-sensors9-config.cmake"
-          ]
-        }
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "gz/sensors10/gz/sensors.hh"
+              ],
+              "lib": [
+                "gz-sensors"
+              ]
+            }
+          },
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }} --targets gz-${{ component_name }}::gz-${{ component_name }}"
+          }
+        ],
+        "version": "10.0.0"
       },
       {
         "build": {
-          "ignore_run_exports": [
-            "python",
-            "python_abi"
-          ],
-          "ignore_run_exports_from": [
-            "python"
-          ],
-          "run_exports": [
-            "libgz-sensors9"
+          "strong": [],
+          "weak": [
+            "libgz-sensors"
           ]
         },
-        "name": "libgz-sensors9",
+        "name": "gz-sensors",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "libgz-sensors"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }} --targets gz-${{ component_name }}::gz-${{ component_name }}"
+          }
+        ],
+        "version": "10.0.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "libgz-sensors"
+          ]
+        },
+        "name": "libgz-sensors",
         "requirements": {
           "build": [
             "cxx_compiler_stub",
@@ -560,63 +707,83 @@
             "pkg-config"
           ],
           "host": [
-            "libgz-cmake4",
+            "libgz-cmake",
             "libabseil",
             "libprotobuf",
-            "libgz-math8",
-            "libgz-common6",
-            "libgz-transport14",
-            "libgz-rendering9",
-            "libgz-msgs11",
-            "libgz-plugin3",
-            "libsdformat15",
-            "ogre 1.10.*",
-            "python"
-          ]
-        },
-        "script": "build_cxx.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/sensors9/gz/sensors.hh",
-            "test -f ${PREFIX}/lib/libgz-sensors9${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/cmake/gz-sensors9/gz-sensors9-config.cmake"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
-            "libgz-sensors9"
-          ]
-        },
-        "name": "gz-sensors9",
-        "requirements": {
+            "libgz-math",
+            "libgz-common",
+            "libgz-transport",
+            "libgz-rendering",
+            "libgz-msgs",
+            "libgz-plugin",
+            "libsdformat",
+            "ogre 1.10.*"
+          ],
           "run": [
-            "libgz-sensors9"
+            "libgl-devel"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/sensors9/gz/sensors.hh",
-            "test -f ${PREFIX}/lib/libgz-sensors9${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/cmake/gz-sensors9/gz-sensors9-config.cmake"
-          ]
-        }
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "gz/sensors10/gz/sensors.hh"
+              ],
+              "lib": [
+                "gz-sensors"
+              ]
+            }
+          },
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }} --targets gz-${{ component_name }}::gz-${{ component_name }}"
+          }
+        ],
+        "version": "10.0.0"
       },
       {
         "build": {
-          "ignore_run_exports": [
-            "python",
-            "python_abi"
-          ],
-          "ignore_run_exports_from": [
-            "python"
-          ],
-          "run_exports": [
-            "libgz-sensors9"
+          "strong": [],
+          "weak": [
+            "libgz-sensors"
           ]
         },
-        "name": "libgz-sensors9",
+        "name": "gz-sensors",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "libgz-sensors"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }} --targets gz-${{ component_name }}::gz-${{ component_name }}"
+          }
+        ],
+        "version": "10.0.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "libgz-sensors"
+          ]
+        },
+        "name": "libgz-sensors",
         "requirements": {
           "build": [
             "cxx_compiler_stub",
@@ -627,63 +794,83 @@
             "pkg-config"
           ],
           "host": [
-            "libgz-cmake4",
+            "libgz-cmake",
             "libabseil",
             "libprotobuf",
-            "libgz-math8",
-            "libgz-common6",
-            "libgz-transport14",
-            "libgz-rendering9",
-            "libgz-msgs11",
-            "libgz-plugin3",
-            "libsdformat15",
-            "ogre 1.10.*",
-            "python"
-          ]
-        },
-        "script": "build_cxx.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/sensors9/gz/sensors.hh",
-            "test -f ${PREFIX}/lib/libgz-sensors9${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/cmake/gz-sensors9/gz-sensors9-config.cmake"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
-            "libgz-sensors9"
-          ]
-        },
-        "name": "gz-sensors9",
-        "requirements": {
+            "libgz-math",
+            "libgz-common",
+            "libgz-transport",
+            "libgz-rendering",
+            "libgz-msgs",
+            "libgz-plugin",
+            "libsdformat",
+            "ogre 1.10.*"
+          ],
           "run": [
-            "libgz-sensors9"
+            "libgl-devel"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/sensors9/gz/sensors.hh",
-            "test -f ${PREFIX}/lib/libgz-sensors9${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/cmake/gz-sensors9/gz-sensors9-config.cmake"
-          ]
-        }
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "gz/sensors10/gz/sensors.hh"
+              ],
+              "lib": [
+                "gz-sensors"
+              ]
+            }
+          },
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }} --targets gz-${{ component_name }}::gz-${{ component_name }}"
+          }
+        ],
+        "version": "10.0.0"
       },
       {
         "build": {
-          "ignore_run_exports": [
-            "python",
-            "python_abi"
-          ],
-          "ignore_run_exports_from": [
-            "python"
-          ],
-          "run_exports": [
-            "libgz-sensors9"
+          "strong": [],
+          "weak": [
+            "libgz-sensors"
           ]
         },
-        "name": "libgz-sensors9",
+        "name": "gz-sensors",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "libgz-sensors"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }} --targets gz-${{ component_name }}::gz-${{ component_name }}"
+          }
+        ],
+        "version": "10.0.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "libgz-sensors"
+          ]
+        },
+        "name": "libgz-sensors",
         "requirements": {
           "build": [
             "cxx_compiler_stub",
@@ -694,64 +881,83 @@
             "pkg-config"
           ],
           "host": [
-            "libgz-cmake4",
+            "libgz-cmake",
             "libabseil",
             "libprotobuf",
-            "libgz-math8",
-            "libgz-common6",
-            "libgz-transport14",
-            "libgz-rendering9",
-            "libgz-msgs11",
-            "libgz-plugin3",
-            "libsdformat15",
-            "libarchive",
-            "ogre 1.10.*",
-            "python"
-          ]
-        },
-        "script": "build_cxx.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/sensors9/gz/sensors.hh",
-            "test -f ${PREFIX}/lib/libgz-sensors9${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/cmake/gz-sensors9/gz-sensors9-config.cmake"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
-            "libgz-sensors9"
-          ]
-        },
-        "name": "gz-sensors9",
-        "requirements": {
+            "libgz-math",
+            "libgz-common",
+            "libgz-transport",
+            "libgz-rendering",
+            "libgz-msgs",
+            "libgz-plugin",
+            "libsdformat",
+            "ogre 1.10.*"
+          ],
           "run": [
-            "libgz-sensors9"
+            "libgl-devel"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/sensors9/gz/sensors.hh",
-            "test -f ${PREFIX}/lib/libgz-sensors9${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/cmake/gz-sensors9/gz-sensors9-config.cmake"
-          ]
-        }
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "gz/sensors10/gz/sensors.hh"
+              ],
+              "lib": [
+                "gz-sensors"
+              ]
+            }
+          },
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }} --targets gz-${{ component_name }}::gz-${{ component_name }}"
+          }
+        ],
+        "version": "10.0.0"
       },
       {
         "build": {
-          "ignore_run_exports": [
-            "python",
-            "python_abi"
-          ],
-          "ignore_run_exports_from": [
-            "python"
-          ],
-          "run_exports": [
-            "libgz-sensors9"
+          "strong": [],
+          "weak": [
+            "libgz-sensors"
           ]
         },
-        "name": "libgz-sensors9",
+        "name": "gz-sensors",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "libgz-sensors"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }} --targets gz-${{ component_name }}::gz-${{ component_name }}"
+          }
+        ],
+        "version": "10.0.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "libgz-sensors"
+          ]
+        },
+        "name": "libgz-sensors",
         "requirements": {
           "build": [
             "cxx_compiler_stub",
@@ -762,64 +968,83 @@
             "pkg-config"
           ],
           "host": [
-            "libgz-cmake4",
+            "libgz-cmake",
             "libabseil",
             "libprotobuf",
-            "libgz-math8",
-            "libgz-common6",
-            "libgz-transport14",
-            "libgz-rendering9",
-            "libgz-msgs11",
-            "libgz-plugin3",
-            "libsdformat15",
-            "libarchive",
-            "ogre 1.10.*",
-            "python"
-          ]
-        },
-        "script": "build_cxx.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/sensors9/gz/sensors.hh",
-            "test -f ${PREFIX}/lib/libgz-sensors9${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/cmake/gz-sensors9/gz-sensors9-config.cmake"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
-            "libgz-sensors9"
-          ]
-        },
-        "name": "gz-sensors9",
-        "requirements": {
+            "libgz-math",
+            "libgz-common",
+            "libgz-transport",
+            "libgz-rendering",
+            "libgz-msgs",
+            "libgz-plugin",
+            "libsdformat",
+            "ogre 1.10.*"
+          ],
           "run": [
-            "libgz-sensors9"
+            "libgl-devel"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/sensors9/gz/sensors.hh",
-            "test -f ${PREFIX}/lib/libgz-sensors9${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/cmake/gz-sensors9/gz-sensors9-config.cmake"
-          ]
-        }
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "gz/sensors10/gz/sensors.hh"
+              ],
+              "lib": [
+                "gz-sensors"
+              ]
+            }
+          },
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }} --targets gz-${{ component_name }}::gz-${{ component_name }}"
+          }
+        ],
+        "version": "10.0.0"
       },
       {
         "build": {
-          "ignore_run_exports": [
-            "python",
-            "python_abi"
-          ],
-          "ignore_run_exports_from": [
-            "python"
-          ],
-          "run_exports": [
-            "libgz-sensors9"
+          "strong": [],
+          "weak": [
+            "libgz-sensors"
           ]
         },
-        "name": "libgz-sensors9",
+        "name": "gz-sensors",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "libgz-sensors"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }} --targets gz-${{ component_name }}::gz-${{ component_name }}"
+          }
+        ],
+        "version": "10.0.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "libgz-sensors"
+          ]
+        },
+        "name": "libgz-sensors",
         "requirements": {
           "build": [
             "cxx_compiler_stub",
@@ -830,94 +1055,78 @@
             "pkg-config"
           ],
           "host": [
-            "libgz-cmake4",
+            "libgz-cmake",
             "libabseil",
             "libprotobuf",
-            "libgz-math8",
-            "libgz-common6",
-            "libgz-transport14",
-            "libgz-rendering9",
-            "libgz-msgs11",
-            "libgz-plugin3",
-            "libsdformat15",
-            "ogre 1.10.*",
-            "python"
-          ]
-        },
-        "script": "bld_cxx.bat",
-        "test": {
-          "commands": [
-            "if not exist %PREFIX%\\\\Library\\\\include\\\\gz\\\\sensors9\\\\gz\\\\sensors.hh exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\lib\\\\gz-sensors9.lib exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\bin\\\\gz-sensors9.dll exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\lib\\\\cmake\\\\gz-sensors9\\\\gz-sensors9-config.cmake exit 1"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
-            "libgz-sensors9"
-          ]
-        },
-        "name": "gz-sensors9",
-        "requirements": {
+            "libgz-math",
+            "libgz-common",
+            "libgz-transport",
+            "libgz-rendering",
+            "libgz-msgs",
+            "libgz-plugin",
+            "libsdformat",
+            "ogre 1.10.*"
+          ],
           "run": [
-            "libgz-sensors9"
+            "libgl-devel"
           ]
         },
-        "test": {
-          "commands": [
-            "if not exist %PREFIX%\\\\Library\\\\include\\\\gz\\\\sensors9\\\\gz\\\\sensors.hh exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\lib\\\\gz-sensors9.lib exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\bin\\\\gz-sensors9.dll exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\lib\\\\cmake\\\\gz-sensors9\\\\gz-sensors9-config.cmake exit 1"
-          ]
-        }
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "gz/sensors10/gz/sensors.hh"
+              ],
+              "lib": [
+                "gz-sensors"
+              ]
+            }
+          },
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }} --targets gz-${{ component_name }}::gz-${{ component_name }}"
+          }
+        ],
+        "version": "10.0.0"
       }
     ],
     "package": {
-      "name": "gz-sensors9",
-      "version": "9.2.0"
+      "name": "gz-sensors",
+      "version": "10.0.0"
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "sha256": "455d20d320ba741de0e38da320408afcdfe2f109e00de911b4cce200913cefaa",
-        "url": "https://github.com/gazebosim/gz-sensors/archive/gz-sensors9_9.2.0.tar.gz"
-      },
-      {
-        "sha256": "455d20d320ba741de0e38da320408afcdfe2f109e00de911b4cce200913cefaa",
-        "url": "https://github.com/gazebosim/gz-sensors/archive/gz-sensors9_9.2.0.tar.gz"
-      },
-      {
-        "sha256": "455d20d320ba741de0e38da320408afcdfe2f109e00de911b4cce200913cefaa",
-        "url": "https://github.com/gazebosim/gz-sensors/archive/gz-sensors9_9.2.0.tar.gz"
-      },
-      {
-        "sha256": "455d20d320ba741de0e38da320408afcdfe2f109e00de911b4cce200913cefaa",
-        "url": "https://github.com/gazebosim/gz-sensors/archive/gz-sensors9_9.2.0.tar.gz"
-      },
-      {
-        "sha256": "455d20d320ba741de0e38da320408afcdfe2f109e00de911b4cce200913cefaa",
-        "url": "https://github.com/gazebosim/gz-sensors/archive/gz-sensors9_9.2.0.tar.gz"
-      },
-      {
-        "sha256": "455d20d320ba741de0e38da320408afcdfe2f109e00de911b4cce200913cefaa",
-        "url": "https://github.com/gazebosim/gz-sensors/archive/gz-sensors9_9.2.0.tar.gz"
-      }
-    ]
+    "requirements": {
+      "run": [
+        "libgz-sensors"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "sha256": "9841854013d61114f7a8d20b918df651404bf5a28d52dd0b4fc4caba5dc8aa08",
+      "url": "https://github.com/gazebosim/gz-sensors/archive/gz-sensors10_10.0.0.tar.gz"
+    }
   },
-  "name": "gz-sensors9",
+  "name": "gz-sensors",
   "osx_64_meta_yaml": {
     "about": {
       "home": "https://github.com/gazebosim/gz-sensors",
       "license": "Apache-2.0",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "Gazebo Sensors provides numerous sensor models designed to generate realistic data from simulation environments."
     },
     "build": {
-      "number": "0"
+      "number": "0",
+      "run_exports": {
+        "weak": [
+          "libgz-sensors"
+        ]
+      }
     },
     "extra": {
       "feedstock-name": "gz-sensors",
@@ -931,18 +1140,41 @@
     "outputs": [
       {
         "build": {
-          "ignore_run_exports": [
-            "python",
-            "python_abi"
-          ],
-          "ignore_run_exports_from": [
-            "python"
-          ],
-          "run_exports": [
-            "libgz-sensors9"
+          "strong": [],
+          "weak": [
+            "libgz-sensors"
           ]
         },
-        "name": "libgz-sensors9",
+        "name": "gz-sensors",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "libgz-sensors"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }} --targets gz-${{ component_name }}::gz-${{ component_name }}"
+          }
+        ],
+        "version": "10.0.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "libgz-sensors"
+          ]
+        },
+        "name": "libgz-sensors",
         "requirements": {
           "build": [
             "cxx_compiler_stub",
@@ -953,62 +1185,61 @@
             "pkg-config"
           ],
           "host": [
-            "libgz-cmake4",
+            "libgz-cmake",
             "libabseil",
             "libprotobuf",
-            "libgz-math8",
-            "libgz-common6",
-            "libgz-transport14",
-            "libgz-rendering9",
-            "libgz-msgs11",
-            "libgz-plugin3",
-            "libsdformat15",
-            "libarchive",
-            "ogre 1.10.*",
-            "python"
-          ]
-        },
-        "script": "build_cxx.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/sensors9/gz/sensors.hh",
-            "test -f ${PREFIX}/lib/libgz-sensors9${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/cmake/gz-sensors9/gz-sensors9-config.cmake"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
-            "libgz-sensors9"
-          ]
-        },
-        "name": "gz-sensors9",
-        "requirements": {
+            "libgz-math",
+            "libgz-common",
+            "libgz-transport",
+            "libgz-rendering",
+            "libgz-msgs",
+            "libgz-plugin",
+            "libsdformat",
+            "ogre 1.10.*"
+          ],
           "run": [
-            "libgz-sensors9"
+            "libgl-devel"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/sensors9/gz/sensors.hh",
-            "test -f ${PREFIX}/lib/libgz-sensors9${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/cmake/gz-sensors9/gz-sensors9-config.cmake"
-          ]
-        }
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "gz/sensors10/gz/sensors.hh"
+              ],
+              "lib": [
+                "gz-sensors"
+              ]
+            }
+          },
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }} --targets gz-${{ component_name }}::gz-${{ component_name }}"
+          }
+        ],
+        "version": "10.0.0"
       }
     ],
     "package": {
-      "name": "gz-sensors9",
-      "version": "9.2.0"
+      "name": "gz-sensors",
+      "version": "10.0.0"
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "sha256": "455d20d320ba741de0e38da320408afcdfe2f109e00de911b4cce200913cefaa",
-        "url": "https://github.com/gazebosim/gz-sensors/archive/gz-sensors9_9.2.0.tar.gz"
-      }
-    ]
+    "requirements": {
+      "run": [
+        "libgz-sensors"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "sha256": "9841854013d61114f7a8d20b918df651404bf5a28d52dd0b4fc4caba5dc8aa08",
+      "url": "https://github.com/gazebosim/gz-sensors/archive/gz-sensors10_10.0.0.tar.gz"
+    }
   },
   "osx_64_requirements": {
     "build": {
@@ -1026,40 +1257,49 @@
       "__set__": true,
       "elements": [
         "libabseil",
-        "libarchive",
-        "libgz-cmake4",
-        "libgz-common6",
-        "libgz-math8",
-        "libgz-msgs11",
-        "libgz-plugin3",
-        "libgz-rendering9",
-        "libgz-transport14",
+        "libgz-cmake",
+        "libgz-common",
+        "libgz-math",
+        "libgz-msgs",
+        "libgz-plugin",
+        "libgz-rendering",
+        "libgz-transport",
         "libprotobuf",
-        "libsdformat15",
-        "ogre",
-        "python"
+        "libsdformat",
+        "ogre"
       ]
     },
     "run": {
       "__set__": true,
       "elements": [
-        "libgz-sensors9"
+        "libgl-devel",
+        "libgz-sensors"
       ]
     },
     "test": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "c_compiler_stub",
+        "cmake-package-check",
+        "cxx_compiler_stub"
+      ]
     }
   },
   "osx_arm64_meta_yaml": {
     "about": {
       "home": "https://github.com/gazebosim/gz-sensors",
       "license": "Apache-2.0",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "Gazebo Sensors provides numerous sensor models designed to generate realistic data from simulation environments."
     },
     "build": {
-      "number": "0"
+      "number": "0",
+      "run_exports": {
+        "weak": [
+          "libgz-sensors"
+        ]
+      }
     },
     "extra": {
       "feedstock-name": "gz-sensors",
@@ -1073,18 +1313,41 @@
     "outputs": [
       {
         "build": {
-          "ignore_run_exports": [
-            "python",
-            "python_abi"
-          ],
-          "ignore_run_exports_from": [
-            "python"
-          ],
-          "run_exports": [
-            "libgz-sensors9"
+          "strong": [],
+          "weak": [
+            "libgz-sensors"
           ]
         },
-        "name": "libgz-sensors9",
+        "name": "gz-sensors",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "libgz-sensors"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }} --targets gz-${{ component_name }}::gz-${{ component_name }}"
+          }
+        ],
+        "version": "10.0.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "libgz-sensors"
+          ]
+        },
+        "name": "libgz-sensors",
         "requirements": {
           "build": [
             "cxx_compiler_stub",
@@ -1095,62 +1358,61 @@
             "pkg-config"
           ],
           "host": [
-            "libgz-cmake4",
+            "libgz-cmake",
             "libabseil",
             "libprotobuf",
-            "libgz-math8",
-            "libgz-common6",
-            "libgz-transport14",
-            "libgz-rendering9",
-            "libgz-msgs11",
-            "libgz-plugin3",
-            "libsdformat15",
-            "libarchive",
-            "ogre 1.10.*",
-            "python"
-          ]
-        },
-        "script": "build_cxx.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/sensors9/gz/sensors.hh",
-            "test -f ${PREFIX}/lib/libgz-sensors9${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/cmake/gz-sensors9/gz-sensors9-config.cmake"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
-            "libgz-sensors9"
-          ]
-        },
-        "name": "gz-sensors9",
-        "requirements": {
+            "libgz-math",
+            "libgz-common",
+            "libgz-transport",
+            "libgz-rendering",
+            "libgz-msgs",
+            "libgz-plugin",
+            "libsdformat",
+            "ogre 1.10.*"
+          ],
           "run": [
-            "libgz-sensors9"
+            "libgl-devel"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/gz/sensors9/gz/sensors.hh",
-            "test -f ${PREFIX}/lib/libgz-sensors9${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/cmake/gz-sensors9/gz-sensors9-config.cmake"
-          ]
-        }
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "gz/sensors10/gz/sensors.hh"
+              ],
+              "lib": [
+                "gz-sensors"
+              ]
+            }
+          },
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }} --targets gz-${{ component_name }}::gz-${{ component_name }}"
+          }
+        ],
+        "version": "10.0.0"
       }
     ],
     "package": {
-      "name": "gz-sensors9",
-      "version": "9.2.0"
+      "name": "gz-sensors",
+      "version": "10.0.0"
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "sha256": "455d20d320ba741de0e38da320408afcdfe2f109e00de911b4cce200913cefaa",
-        "url": "https://github.com/gazebosim/gz-sensors/archive/gz-sensors9_9.2.0.tar.gz"
-      }
-    ]
+    "requirements": {
+      "run": [
+        "libgz-sensors"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "sha256": "9841854013d61114f7a8d20b918df651404bf5a28d52dd0b4fc4caba5dc8aa08",
+      "url": "https://github.com/gazebosim/gz-sensors/archive/gz-sensors10_10.0.0.tar.gz"
+    }
   },
   "osx_arm64_requirements": {
     "build": {
@@ -1168,36 +1430,39 @@
       "__set__": true,
       "elements": [
         "libabseil",
-        "libarchive",
-        "libgz-cmake4",
-        "libgz-common6",
-        "libgz-math8",
-        "libgz-msgs11",
-        "libgz-plugin3",
-        "libgz-rendering9",
-        "libgz-transport14",
+        "libgz-cmake",
+        "libgz-common",
+        "libgz-math",
+        "libgz-msgs",
+        "libgz-plugin",
+        "libgz-rendering",
+        "libgz-transport",
         "libprotobuf",
-        "libsdformat15",
-        "ogre",
-        "python"
+        "libsdformat",
+        "ogre"
       ]
     },
     "run": {
       "__set__": true,
       "elements": [
-        "libgz-sensors9"
+        "libgl-devel",
+        "libgz-sensors"
       ]
     },
     "test": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "c_compiler_stub",
+        "cmake-package-check",
+        "cxx_compiler_stub"
+      ]
     }
   },
   "outputs_names": {
     "__set__": true,
     "elements": [
-      "gz-sensors9",
-      "libgz-sensors9"
+      "gz-sensors",
+      "libgz-sensors"
     ]
   },
   "parsing_error": false,
@@ -1212,7 +1477,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/gz-sensors.json"
   },
-  "raw_meta_yaml": "{% set component_name = \"sensors\" %}\n{% set repo_name = \"gz-\" + component_name %}\n{% set version = \"9.2.0\" %}\n{% set major_version = version.split('.')[0] %}\n{% set name = repo_name + major_version %}\n{% set component_version = component_name + major_version %}\n{% set cxx_name = \"lib\" + name %}\n\npackage:\n  name: {{ name }}\n  version: {{ version }}\n\nsource:\n  - url: https://github.com/gazebosim/{{ repo_name }}/archive/{{ repo_name }}{{ major_version }}_{{ version }}.tar.gz\n    sha256: 455d20d320ba741de0e38da320408afcdfe2f109e00de911b4cce200913cefaa\n\nbuild:\n  number: 0\n\n\noutputs:\n  - name: {{ cxx_name }}\n    script: build_cxx.sh  # [unix]\n    script: bld_cxx.bat  # [win]\n    build:\n      run_exports:\n        - {{ pin_subpackage(cxx_name, max_pin='x') }}\n      ignore_run_exports:\n        - python\n        - python_abi\n      ignore_run_exports_from:\n        - python\n        - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n    requirements:\n      build:\n        - {{ compiler('cxx') }}\n        - {{ compiler('c') }}\n        - {{ stdlib(\"c\") }}\n        - ninja\n        - cmake\n        - pkg-config\n        - python                                 # [build_platform != target_platform]\n        - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n      host:\n        - libgz-cmake4\n        - libabseil\n        - libprotobuf\n        - libgz-math8\n        - libgz-common6\n        - libgz-transport14\n        - libgz-rendering9\n        - libgz-msgs11\n        - libgz-plugin3\n        - libsdformat15\n        - libarchive  # [osx]\n        - ogre 1.10.*\n        - python\n    test:\n      commands:\n        - test -f ${PREFIX}/include/gz/{{ component_version }}/gz/{{ component_name }}.hh  # [not win]\n        - test -f ${PREFIX}/lib/lib{{ name }}${SHLIB_EXT}  # [not win]\n        - test -f ${PREFIX}/lib/cmake/{{ name }}/{{ name }}-config.cmake  # [not win]\n        - if not exist %PREFIX%\\\\Library\\\\include\\\\gz\\\\{{ component_version }}\\\\gz\\\\{{ component_name }}.hh exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\lib\\\\{{ name }}.lib exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\bin\\\\{{ name }}.dll exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\lib\\\\cmake\\\\{{ name }}\\\\{{ name }}-config.cmake exit 1  # [win]\n\n  - name: {{ name }}\n    build:\n      run_exports:\n        - {{ pin_subpackage(cxx_name, max_pin='x') }}\n    requirements:\n      run:\n        - {{ pin_subpackage(cxx_name, exact=True) }}\n    test:\n      commands:\n        - test -f ${PREFIX}/include/gz/{{ component_version }}/gz/{{ component_name }}.hh  # [not win]\n        - test -f ${PREFIX}/lib/lib{{ name }}${SHLIB_EXT}  # [not win]\n        - test -f ${PREFIX}/lib/cmake/{{ name }}/{{ name }}-config.cmake  # [not win]\n        - if not exist %PREFIX%\\\\Library\\\\include\\\\gz\\\\{{ component_version }}\\\\gz\\\\{{ component_name }}.hh exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\lib\\\\{{ name }}.lib exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\bin\\\\{{ name }}.dll exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\lib\\\\cmake\\\\{{ name }}\\\\{{ name }}-config.cmake exit 1  # [win]\n\nabout:\n  home: https://github.com/gazebosim/{{ repo_name }}\n  license: Apache-2.0\n  license_file: LICENSE\n  summary: Gazebo Sensors provides numerous sensor models designed to generate realistic data from simulation environments.\n\nextra:\n  feedstock-name: {{ repo_name }}\n  recipe-maintainers:\n    - wolfv\n    - traversaro\n    - Tobias-Fischer\n    - j-rivero\n",
+  "raw_meta_yaml": "schema_version: 1\n\ncontext:\n  component_name: sensors\n  repo_name: ${{ \"gz-\" + component_name }}\n  version: 10.0.0\n  major_version: \"10\"\n  name: ${{ repo_name }}\n  component_version: ${{ component_name + major_version }}\n  cxx_name: ${{ \"lib\" + name }}\n\nrecipe:\n  name: ${{ name }}\n  version: ${{ version }}\n\nsource:\n  - url: https://github.com/gazebosim/${{ repo_name }}/archive/${{ repo_name }}${{ major_version }}_${{ version }}.tar.gz\n    sha256: 9841854013d61114f7a8d20b918df651404bf5a28d52dd0b4fc4caba5dc8aa08\n\nbuild:\n  number: 0\n\noutputs:\n  - package:\n      name: ${{ cxx_name }}\n    build:\n      script:\n        - if: unix\n          then: build_cxx.sh\n        - if: win\n          then: bld_cxx.bat\n    requirements:\n      build:\n        - ${{ compiler('cxx') }}\n        - ${{ compiler('c') }}\n        - ${{ stdlib('c') }}\n        - ninja\n        - cmake\n        - pkg-config\n      host:\n        - libgz-cmake\n        - libabseil\n        - libprotobuf\n        - libgz-math\n        - libgz-common\n        - libgz-transport\n        - libgz-rendering\n        - libgz-msgs\n        - libgz-plugin\n        - libsdformat\n        - if: osx\n          then:\n            - libarchive\n        - ogre 1.10.*\n      run:\n        # This is actually only necessary to make sure that find_package(gz-sensors) works out of the box,\n        # as gz-rendering transitively calls find_package(OpenGL). As gz-sensors is mostly a C++ library we add it\n        # as run dependency, even if the proper solution may be to have dedicated *-devel packages, that itself should depend on libgl-devel (only on Linux)\n        - if: linux\n          then:\n            - libgl-devel\n      run_exports:\n        - ${{ pin_subpackage(cxx_name, upper_bound='x') }}\n\n    tests:\n      - package_contents:\n          include:\n            - gz/${{ component_version }}/gz/${{ component_name }}.hh\n          lib:\n            - gz-${{ component_name }}\n      - script:\n          - cmake-package-check gz-${{ component_name }} --targets gz-${{ component_name }}::gz-${{ component_name }}\n        requirements:\n          run:\n            - cmake-package-check\n            - ${{ compiler('c') }}\n            - ${{ compiler('cxx') }}\n\n  - package:\n      name: ${{ name }}\n    requirements:\n      run:\n        - ${{ pin_subpackage(cxx_name, exact=True) }}\n      run_exports:\n        - ${{ pin_subpackage(cxx_name, upper_bound='x') }}\n    tests:\n      - script:\n          - cmake-package-check gz-${{ component_name }} --targets gz-${{ component_name }}::gz-${{ component_name }}\n        requirements:\n          run:\n            - cmake-package-check\n            - ${{ compiler('c') }}\n            - ${{ compiler('cxx') }}\n\nabout:\n  homepage: https://github.com/gazebosim/${{ repo_name }}\n  license: Apache-2.0\n  license_file: LICENSE\n  summary: Gazebo Sensors provides numerous sensor models designed to generate realistic data from simulation environments.\n\nextra:\n  feedstock-name: ${{ repo_name }}\n  recipe-maintainers:\n    - wolfv\n    - traversaro\n    - Tobias-Fischer\n    - j-rivero\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -1221,21 +1486,20 @@
       "cmake",
       "cxx_compiler_stub",
       "libabseil",
-      "libarchive",
-      "libgz-cmake4",
-      "libgz-common6",
-      "libgz-math8",
-      "libgz-msgs11",
-      "libgz-plugin3",
-      "libgz-rendering9",
-      "libgz-sensors9",
-      "libgz-transport14",
+      "libgl-devel",
+      "libgz-cmake",
+      "libgz-common",
+      "libgz-math",
+      "libgz-msgs",
+      "libgz-plugin",
+      "libgz-rendering",
+      "libgz-sensors",
+      "libgz-transport",
       "libprotobuf",
-      "libsdformat15",
+      "libsdformat",
       "ninja",
       "ogre",
-      "pkg-config",
-      "python"
+      "pkg-config"
     ]
   },
   "requirements": {
@@ -1257,18 +1521,16 @@
         "c_stdlib_stub",
         "cxx_compiler_stub",
         "libabseil",
-        "libarchive",
-        "libgz-cmake4",
-        "libgz-common6",
-        "libgz-math8",
-        "libgz-msgs11",
-        "libgz-plugin3",
-        "libgz-rendering9",
-        "libgz-transport14",
+        "libgz-cmake",
+        "libgz-common",
+        "libgz-math",
+        "libgz-msgs",
+        "libgz-plugin",
+        "libgz-rendering",
+        "libgz-transport",
         "libprotobuf",
-        "libsdformat15",
-        "ogre",
-        "python"
+        "libsdformat",
+        "ogre"
       ]
     },
     "run": {
@@ -1277,12 +1539,17 @@
         "c_compiler_stub",
         "c_stdlib_stub",
         "cxx_compiler_stub",
-        "libgz-sensors9"
+        "libgl-devel",
+        "libgz-sensors"
       ]
     },
     "test": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "c_compiler_stub",
+        "cmake-package-check",
+        "cxx_compiler_stub"
+      ]
     }
   },
   "strong_exports": false,
@@ -1302,33 +1569,36 @@
       "__set__": true,
       "elements": [
         "libabseil",
-        "libarchive",
-        "libgz-cmake4",
-        "libgz-common6",
-        "libgz-math8",
-        "libgz-msgs11",
-        "libgz-plugin3",
-        "libgz-rendering9",
-        "libgz-transport14",
+        "libgz-cmake",
+        "libgz-common",
+        "libgz-math",
+        "libgz-msgs",
+        "libgz-plugin",
+        "libgz-rendering",
+        "libgz-transport",
         "libprotobuf",
-        "libsdformat15",
-        "ogre 1.10.*",
-        "python"
+        "libsdformat",
+        "ogre 1.10.*"
       ]
     },
     "run": {
       "__set__": true,
       "elements": [
-        "libgz-sensors9"
+        "libgl-devel",
+        "libgz-sensors"
       ]
     },
     "test": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "c_compiler_stub",
+        "cmake-package-check",
+        "cxx_compiler_stub"
+      ]
     }
   },
-  "url": "https://github.com/gazebosim/gz-sensors/archive/gz-sensors9_9.2.0.tar.gz",
-  "version": "9.2.0",
+  "url": "https://github.com/gazebosim/gz-sensors/archive/gz-sensors10_10.0.0.tar.gz",
+  "version": "10.0.0",
   "version_pr_info": {
     "__lazy_json__": "version_pr_info/gz-sensors.json"
   },
@@ -1336,11 +1606,17 @@
     "about": {
       "home": "https://github.com/gazebosim/gz-sensors",
       "license": "Apache-2.0",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "Gazebo Sensors provides numerous sensor models designed to generate realistic data from simulation environments."
     },
     "build": {
-      "number": "0"
+      "number": "0",
+      "run_exports": {
+        "weak": [
+          "libgz-sensors"
+        ]
+      }
     },
     "extra": {
       "feedstock-name": "gz-sensors",
@@ -1354,18 +1630,41 @@
     "outputs": [
       {
         "build": {
-          "ignore_run_exports": [
-            "python",
-            "python_abi"
-          ],
-          "ignore_run_exports_from": [
-            "python"
-          ],
-          "run_exports": [
-            "libgz-sensors9"
+          "strong": [],
+          "weak": [
+            "libgz-sensors"
           ]
         },
-        "name": "libgz-sensors9",
+        "name": "gz-sensors",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "libgz-sensors"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }} --targets gz-${{ component_name }}::gz-${{ component_name }}"
+          }
+        ],
+        "version": "10.0.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "libgz-sensors"
+          ]
+        },
+        "name": "libgz-sensors",
         "requirements": {
           "build": [
             "cxx_compiler_stub",
@@ -1376,63 +1675,61 @@
             "pkg-config"
           ],
           "host": [
-            "libgz-cmake4",
+            "libgz-cmake",
             "libabseil",
             "libprotobuf",
-            "libgz-math8",
-            "libgz-common6",
-            "libgz-transport14",
-            "libgz-rendering9",
-            "libgz-msgs11",
-            "libgz-plugin3",
-            "libsdformat15",
-            "ogre 1.10.*",
-            "python"
-          ]
-        },
-        "script": "bld_cxx.bat",
-        "test": {
-          "commands": [
-            "if not exist %PREFIX%\\\\Library\\\\include\\\\gz\\\\sensors9\\\\gz\\\\sensors.hh exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\lib\\\\gz-sensors9.lib exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\bin\\\\gz-sensors9.dll exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\lib\\\\cmake\\\\gz-sensors9\\\\gz-sensors9-config.cmake exit 1"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
-            "libgz-sensors9"
-          ]
-        },
-        "name": "gz-sensors9",
-        "requirements": {
+            "libgz-math",
+            "libgz-common",
+            "libgz-transport",
+            "libgz-rendering",
+            "libgz-msgs",
+            "libgz-plugin",
+            "libsdformat",
+            "ogre 1.10.*"
+          ],
           "run": [
-            "libgz-sensors9"
+            "libgl-devel"
           ]
         },
-        "test": {
-          "commands": [
-            "if not exist %PREFIX%\\\\Library\\\\include\\\\gz\\\\sensors9\\\\gz\\\\sensors.hh exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\lib\\\\gz-sensors9.lib exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\bin\\\\gz-sensors9.dll exit 1",
-            "if not exist %PREFIX%\\\\Library\\\\lib\\\\cmake\\\\gz-sensors9\\\\gz-sensors9-config.cmake exit 1"
-          ]
-        }
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "gz/sensors10/gz/sensors.hh"
+              ],
+              "lib": [
+                "gz-sensors"
+              ]
+            }
+          },
+          {
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": "cmake-package-check gz-${{ component_name }} --targets gz-${{ component_name }}::gz-${{ component_name }}"
+          }
+        ],
+        "version": "10.0.0"
       }
     ],
     "package": {
-      "name": "gz-sensors9",
-      "version": "9.2.0"
+      "name": "gz-sensors",
+      "version": "10.0.0"
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "sha256": "455d20d320ba741de0e38da320408afcdfe2f109e00de911b4cce200913cefaa",
-        "url": "https://github.com/gazebosim/gz-sensors/archive/gz-sensors9_9.2.0.tar.gz"
-      }
-    ]
+    "requirements": {
+      "run": [
+        "libgz-sensors"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "sha256": "9841854013d61114f7a8d20b918df651404bf5a28d52dd0b4fc4caba5dc8aa08",
+      "url": "https://github.com/gazebosim/gz-sensors/archive/gz-sensors10_10.0.0.tar.gz"
+    }
   },
   "win_64_requirements": {
     "build": {
@@ -1450,28 +1747,32 @@
       "__set__": true,
       "elements": [
         "libabseil",
-        "libgz-cmake4",
-        "libgz-common6",
-        "libgz-math8",
-        "libgz-msgs11",
-        "libgz-plugin3",
-        "libgz-rendering9",
-        "libgz-transport14",
+        "libgz-cmake",
+        "libgz-common",
+        "libgz-math",
+        "libgz-msgs",
+        "libgz-plugin",
+        "libgz-rendering",
+        "libgz-transport",
         "libprotobuf",
-        "libsdformat15",
-        "ogre",
-        "python"
+        "libsdformat",
+        "ogre"
       ]
     },
     "run": {
       "__set__": true,
       "elements": [
-        "libgz-sensors9"
+        "libgl-devel",
+        "libgz-sensors"
       ]
     },
     "test": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "c_compiler_stub",
+        "cmake-package-check",
+        "cxx_compiler_stub"
+      ]
     }
   }
 }
