@@ -2,6 +2,15 @@
   "archived": false,
   "branch": "main",
   "conda-forge.yml": {
+    "azure": {
+      "settings_win": {
+        "variables": {
+          "CONDA_BLD_PATH": "C:\\\\bld\\\\",
+          "MINIFORGE_HOME": "C:\\\\Miniforge",
+          "SET_PAGEFILE": "True"
+        }
+      }
+    },
     "bot": {
       "inspection": "update-grayskull"
     },
@@ -35,8 +44,8 @@
       "summary": "A Python framework for high-performance simulation and graphics programming."
     },
     "build": {
-      "number": "0",
-      "string": "cpu313_h1234567_0"
+      "number": "1",
+      "string": "cpu313_h1234567_1"
     },
     "extra": {
       "recipe-maintainers": [
@@ -56,22 +65,21 @@
         "cuda_compiler_stub",
         "c_stdlib_stub",
         "cmake",
-        "ninja",
         "cuda-nvrtc-dev",
         "cuda-nvrtc-static",
         "libnvjitlink-dev",
         "libnvjitlink-static",
         "libmathdx-dev ==0.1.2",
-        "libmathdx-static ==0.1.2"
+        "libmathdx-static ==0.1.2",
+        "ninja"
       ],
       "host": [
-        "cuda-version 11.8",
+        "cuda-version 12.9",
         "python",
         "pip",
         "setuptools",
         "gitpython",
-        "numpy",
-        "cuda-version 12.6"
+        "numpy"
       ],
       "run": [
         "__cuda",
@@ -177,8 +185,8 @@
       "summary": "A Python framework for high-performance simulation and graphics programming."
     },
     "build": {
-      "number": "0",
-      "string": "cpu313_h1234567_0"
+      "number": "1",
+      "string": "cpu313_h1234567_1"
     },
     "extra": {
       "recipe-maintainers": [
@@ -198,24 +206,21 @@
         "cuda_compiler_stub",
         "c_stdlib_stub",
         "cmake",
-        "ninja",
         "cuda-nvrtc-dev",
         "cuda-nvrtc-static",
         "libnvjitlink-dev",
         "libnvjitlink-static",
         "libmathdx-dev ==0.1.2",
-        "libmathdx-static ==0.1.2"
+        "libmathdx-static ==0.1.2",
+        "ninja"
       ],
       "host": [
-        "cuda-version 11.8",
+        "cuda-version 12.9",
         "python",
         "pip",
         "setuptools",
         "gitpython",
-        "numpy",
-        "cuda-version 12.6",
-        "cuda-cudart-dev",
-        "cuda-nvcc"
+        "numpy"
       ],
       "run": [
         "__cuda",
@@ -273,8 +278,8 @@
       "summary": "A Python framework for high-performance simulation and graphics programming."
     },
     "build": {
-      "number": "0",
-      "string": "cpu313_h1234567_0"
+      "number": "1",
+      "string": "cpu313_h1234567_1"
     },
     "extra": {
       "recipe-maintainers": [
@@ -391,7 +396,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/warp-lang.json"
   },
-  "raw_meta_yaml": "{% set name = \"warp-lang\" %}\n{% set version = \"1.7.1\" %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://github.com/NVIDIA/warp/archive/refs/tags/v{{ version }}.zip\n  sha256: 97a8140a8bc81ea583525eef6d74efc5ca60e9d6e1d5eca092b4f648c73c8179\n  patches:\n    - 01-find_g++_env.patch\n    - 02-add_macro_def_build.patch\n    - 03-install_deps_llvm_conda.patch\n    - 04-find_nvcc_env.patch\n\nbuild:\n  string: cpu{{ CONDA_PY }}_h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version == \"None\"]\n  string: cuda{{ cuda_compiler_version | replace('.', '') }}_h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version != \"None\"]\n  number: 0\n  skip: true  # [cuda_compiler_version == \"11.2\" or (cuda_compiler_version == \"11.8\" and win)]\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ compiler('cxx') }}\n    - {{ compiler('cuda') }}  # [cuda_compiler_version != \"None\"]\n    - {{ stdlib(\"c\") }}\n    - cmake\n    - cuda-nvrtc-dev             # [(cuda_compiler_version or \"\").startswith(\"12\")]\n    - cuda-nvrtc-static          # [(cuda_compiler_version or \"\").startswith(\"12\")]\n    - libnvjitlink-dev           # [(cuda_compiler_version or \"\").startswith(\"12\")]\n    - libnvjitlink-static        # [(cuda_compiler_version or \"\").startswith(\"12\")]\n    - libmathdx-dev ==0.1.2      # [(cuda_compiler_version or \"\").startswith(\"12\") and linux]\n    - libmathdx-static ==0.1.2   # [(cuda_compiler_version or \"\").startswith(\"12\") and linux]\n    - ninja\n  host:\n    - cuda-cudart-dev    # [(cuda_compiler_version or \"\").startswith(\"12\") and win]\n    - cuda-nvcc          # [(cuda_compiler_version or \"\").startswith(\"12\") and win]\n    - cuda-version {{ cuda_compiler_version }}  # [cuda_compiler_version != \"None\"]\n    - python\n    - pip\n    - setuptools\n    - gitpython\n    - numpy\n  run:\n    - __cuda   # [cuda_compiler_version != \"None\"]\n    - jax      # [not win]\n    - python\n    - scipy\n    - treelib\n    - typeguard\n\ntest:\n  imports:\n    - warp\n  commands:\n    - pip check\n    # Testing main functionalities to avoid OOM errors\n    - python -m warp.tests -s autodetect -p 'test_c*.py' -p 'test_m*.py' -p 'test_s*.py'\n    - python -c \"import warp; warp.init(); exit(not warp.context.runtime.core.is_mathdx_enabled())\"  # [(cuda_compiler_version or \"\").startswith(\"12\") and linux]\n  requires:\n    - python\n    - pip\n    - pytest\n\nabout:\n  home: https://github.com/NVIDIA/warp\n  summary: 'A Python framework for high-performance simulation and graphics programming.'\n  license: Apache-2.0 AND MIT AND CC0-1.0 AND LicenseRef-NvidiaProprietary\n  license_file:\n    - LICENSE.md\n    - licenses/appdirs-LICENSE.txt\n    - licenses/fp16-LICENSE.txt\n    - licenses/Gaia-LICENSE.txt\n    - licenses/llvm-LICENSE.txt\n    - licenses/moller-LICENSE.txt\n    - licenses/nanovdb-LICENSE.txt\n    - licenses/svd-LICENSE.txt\n    - licenses/unittest_parallel-LICENSE.txt\n    - licenses/usd-LICENSE.txt\n\nextra:\n  recipe-maintainers:\n    - shi-eric\n    - flferretti\n    - traversaro\n",
+  "raw_meta_yaml": "{% set name = \"warp-lang\" %}\n{% set version = \"1.7.1\" %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://github.com/NVIDIA/warp/archive/refs/tags/v{{ version }}.zip\n  sha256: 97a8140a8bc81ea583525eef6d74efc5ca60e9d6e1d5eca092b4f648c73c8179\n  patches:\n    - 01-find_g++_env.patch\n    - 02-add_macro_def_build.patch\n    - 03-install_deps_llvm_conda.patch\n    - 04-find_nvcc_env.patch\n\nbuild:\n  string: cpu{{ CONDA_PY }}_h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version == \"None\"]\n  string: cuda{{ cuda_compiler_version | replace('.', '') }}_h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version != \"None\"]\n  number: 1\n  skip: true  # [cuda_compiler_version == \"11.2\" or (cuda_compiler_version != \"None\" and win)]\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ compiler('cxx') }}\n    - {{ compiler('cuda') }}  # [cuda_compiler_version != \"None\"]\n    - {{ stdlib(\"c\") }}\n    - cmake\n    - cuda-nvrtc-dev             # [(cuda_compiler_version or \"\").startswith(\"12\")]\n    - cuda-nvrtc-static          # [(cuda_compiler_version or \"\").startswith(\"12\")]\n    - libnvjitlink-dev           # [(cuda_compiler_version or \"\").startswith(\"12\")]\n    - libnvjitlink-static        # [(cuda_compiler_version or \"\").startswith(\"12\")]\n    - libmathdx-dev ==0.1.2      # [(cuda_compiler_version or \"\").startswith(\"12\") and linux]\n    - libmathdx-static ==0.1.2   # [(cuda_compiler_version or \"\").startswith(\"12\") and linux]\n    - ninja\n  host:\n    - cuda-cudart-dev    # [(cuda_compiler_version or \"\").startswith(\"12\") and win]\n    - cuda-nvcc          # [(cuda_compiler_version or \"\").startswith(\"12\") and win]\n    - cuda-version {{ cuda_compiler_version }}  # [cuda_compiler_version != \"None\"]\n    - python\n    - pip\n    - setuptools\n    - gitpython\n    - numpy\n  run:\n    - __cuda   # [cuda_compiler_version != \"None\"]\n    - jax      # [not win]\n    - python\n    - scipy\n    - treelib\n    - typeguard\n\ntest:\n  imports:\n    - warp\n  commands:\n    - pip check\n    # Testing main functionalities to avoid OOM errors\n    - python -m warp.tests -s autodetect -p 'test_c*.py' -p 'test_m*.py' -p 'test_s*.py'\n    - python -c \"import warp; warp.init(); exit(not warp.context.runtime.core.is_mathdx_enabled())\"  # [(cuda_compiler_version or \"\").startswith(\"12\") and linux]\n  requires:\n    - python\n    - pip\n    - pytest\n\nabout:\n  home: https://github.com/NVIDIA/warp\n  summary: 'A Python framework for high-performance simulation and graphics programming.'\n  license: Apache-2.0 AND MIT AND CC0-1.0 AND LicenseRef-NvidiaProprietary\n  license_file:\n    - LICENSE.md\n    - licenses/appdirs-LICENSE.txt\n    - licenses/fp16-LICENSE.txt\n    - licenses/Gaia-LICENSE.txt\n    - licenses/llvm-LICENSE.txt\n    - licenses/moller-LICENSE.txt\n    - licenses/nanovdb-LICENSE.txt\n    - licenses/svd-LICENSE.txt\n    - licenses/unittest_parallel-LICENSE.txt\n    - licenses/usd-LICENSE.txt\n\nextra:\n  recipe-maintainers:\n    - shi-eric\n    - flferretti\n    - traversaro\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -399,8 +404,6 @@
       "c_compiler_stub",
       "c_stdlib_stub",
       "cmake",
-      "cuda-cudart-dev",
-      "cuda-nvcc",
       "cuda-nvrtc-dev",
       "cuda-nvrtc-static",
       "cuda-version",
@@ -445,8 +448,6 @@
       "elements": [
         "c_compiler_stub",
         "c_stdlib_stub",
-        "cuda-cudart-dev",
-        "cuda-nvcc",
         "cuda-version",
         "cuda_compiler_stub",
         "cxx_compiler_stub",
@@ -503,10 +504,7 @@
     "host": {
       "__set__": true,
       "elements": [
-        "cuda-cudart-dev",
-        "cuda-nvcc",
-        "cuda-version 11.8",
-        "cuda-version 12.6",
+        "cuda-version 12.9",
         "gitpython",
         "numpy",
         "pip",
@@ -558,8 +556,8 @@
       "summary": "A Python framework for high-performance simulation and graphics programming."
     },
     "build": {
-      "number": "0",
-      "string": "cpu313_h1234567_0"
+      "number": "1",
+      "string": "cpu313_h1234567_1"
     },
     "extra": {
       "recipe-maintainers": [
@@ -576,19 +574,11 @@
       "build": [
         "c_compiler_stub",
         "cxx_compiler_stub",
-        "cuda_compiler_stub",
         "c_stdlib_stub",
         "cmake",
-        "cuda-nvrtc-dev",
-        "cuda-nvrtc-static",
-        "libnvjitlink-dev",
-        "libnvjitlink-static",
         "ninja"
       ],
       "host": [
-        "cuda-cudart-dev",
-        "cuda-nvcc",
-        "cuda-version 12.6",
         "python",
         "pip",
         "setuptools",
@@ -596,7 +586,6 @@
         "numpy"
       ],
       "run": [
-        "__cuda",
         "python",
         "scipy",
         "treelib",
@@ -636,21 +625,13 @@
         "c_compiler_stub",
         "c_stdlib_stub",
         "cmake",
-        "cuda-nvrtc-dev",
-        "cuda-nvrtc-static",
-        "cuda_compiler_stub",
         "cxx_compiler_stub",
-        "libnvjitlink-dev",
-        "libnvjitlink-static",
         "ninja"
       ]
     },
     "host": {
       "__set__": true,
       "elements": [
-        "cuda-cudart-dev",
-        "cuda-nvcc",
-        "cuda-version",
         "gitpython",
         "numpy",
         "pip",
@@ -661,7 +642,6 @@
     "run": {
       "__set__": true,
       "elements": [
-        "__cuda",
         "python",
         "scipy",
         "treelib",
