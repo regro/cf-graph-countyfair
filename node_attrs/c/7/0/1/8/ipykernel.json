@@ -3,15 +3,14 @@
   "branch": "main",
   "conda-forge.yml": {
     "bot": {
-      "abi_migration_branches": [
-        "5.x"
-      ],
       "inspection": "hint-all"
     },
     "conda_build": {
       "pkg_format": "2"
     },
+    "conda_build_tool": "rattler-build",
     "conda_forge_output_validation": true,
+    "conda_install_tool": "pixi",
     "github": {
       "branch_name": "main",
       "tooling_branch_name": "main"
@@ -27,26 +26,28 @@
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
     "about": {
-      "description": "A powerful interactive Python shell and a Jupyter kernel to work with\nPython code in Jupyter notebooks and other interactive frontends.\n",
+      "description": "A powerful interactive Python shell and a Jupyter kernel to work with\nPython code in Jupyter notebooks and other interactive frontends.",
       "dev_url": "https://github.com/ipython/ipykernel",
-      "doc_source_url": "https://github.com/ipython/ipykernel/blob/master/docs/index.rst",
-      "doc_url": "https://ipykernel.readthedocs.io",
-      "home": "https://ipython.org",
+      "doc_url": "https://ipykernel.readthedocs.io/",
+      "home": "https://ipython.org/",
       "license": "BSD-3-Clause",
-      "license_family": "BSD",
+      "license_family": "BSD-3-Clause",
       "license_file": "LICENSE",
       "summary": "IPython Kernel for Jupyter"
     },
     "build": {
       "noarch": "python",
       "number": "0",
-      "script": [
-        "PYTHON -m pip install . -vv --no-deps --no-build-isolation",
-        "PYTHON -m ipykernel install --sys-prefix"
-      ],
-      "script_env": [
-        "MIGRATING=False"
-      ]
+      "script": {
+        "content": [
+          "${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation",
+          "${{ PYTHON }} -m ipykernel install --sys-prefix",
+          "${{ PYTHON }} ${{ RECIPE_DIR }}/fix_kernelspec.py"
+        ],
+        "env": {
+          "MIGRATING": "false"
+        }
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -57,18 +58,98 @@
         "minrk",
         "ocefpaf",
         "pelson",
-        "davidbrochart"
+        "davidbrochart",
+        "ianthomas23"
       ]
     },
+    "outputs": [
+      {
+        "build": null,
+        "name": "ipykernel",
+        "requirements": {
+          "build": [],
+          "host": [
+            "hatchling >=1.4",
+            "pip",
+            "python 3.10.*",
+            "comm >=0.1.1",
+            "debugpy >=1.6.5",
+            "ipython >=7.23.1",
+            "jupyter_client >=8.0.0",
+            "packaging >=22",
+            "psutil >=5.7"
+          ],
+          "run": [
+            "python",
+            "__linux",
+            "comm >=0.1.1",
+            "debugpy >=1.6.5",
+            "ipython >=7.23.1",
+            "jupyter_client >=8.0.0",
+            "jupyter_core >=4.12,!=5.0.*",
+            "matplotlib-inline >=0.1",
+            "nest-asyncio >=1.4",
+            "packaging >=22",
+            "psutil >=5.7",
+            "python >=3.10",
+            "pyzmq >=25",
+            "tornado >=6.2",
+            "traitlets >=5.4.0"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "ipykernel"
+              ],
+              "python_version": [
+                "3.10.*",
+                "3.14.*"
+              ]
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "run_test.py"
+              ],
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "flaky",
+                "ipyparallel",
+                "matplotlib-base",
+                "numpy",
+                "pytest >=7.0,<9",
+                "pytest-asyncio >=0.23.5",
+                "pytest-cov",
+                "pytest-timeout",
+                "python 3.10.*",
+                "curio"
+              ]
+            },
+            "script": [
+              "jupyter kernelspec list",
+              "python run_test.py"
+            ]
+          }
+        ],
+        "version": "7.0.0"
+      }
+    ],
     "package": {
       "name": "ipykernel",
-      "version": "6.30.1"
+      "version": "7.0.0"
     },
     "requirements": {
       "host": [
         "hatchling >=1.4",
         "pip",
-        "python 3.9.*",
+        "python 3.10.*",
         "comm >=0.1.1",
         "debugpy >=1.6.5",
         "ipython >=7.23.1",
@@ -77,51 +158,27 @@
         "psutil >=5.7"
       ],
       "run": [
+        "python",
         "__linux",
-        "jupyter_core >=4.12,!=5.0.*",
-        "matplotlib-inline >=0.1",
-        "nest-asyncio >=1.4",
-        "python >=3.9",
-        "pyzmq >=25",
-        "tornado >=6.2",
-        "traitlets >=5.4.0",
-        "packaging >=22",
-        "psutil >=5.7",
         "comm >=0.1.1",
         "debugpy >=1.6.5",
         "ipython >=7.23.1",
-        "jupyter_client >=8.0.0"
+        "jupyter_client >=8.0.0",
+        "jupyter_core >=4.12,!=5.0.*",
+        "matplotlib-inline >=0.1",
+        "nest-asyncio >=1.4",
+        "packaging >=22",
+        "psutil >=5.7",
+        "python >=3.10",
+        "pyzmq >=25",
+        "tornado >=6.2",
+        "traitlets >=5.4.0"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
-      "sha256": "6abb270161896402e76b91394fcdce5d1be5d45f456671e5080572f8505be39b",
-      "url": "https://pypi.org/packages/source/i/ipykernel/ipykernel-6.30.1.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "pip check",
-        "jupyter kernelspec list"
-      ],
-      "imports": [
-        "ipykernel"
-      ],
-      "requires": [
-        "curio",
-        "flaky",
-        "numpy",
-        "pip",
-        "pytest >=7.0,<9",
-        "pytest-asyncio >=0.23.5",
-        "pytest-cov",
-        "pytest-timeout",
-        "python !=3.9.*",
-        "ipyparallel",
-        "matplotlib-base"
-      ],
-      "source_files": [
-        "tests"
-      ]
+      "sha256": "06aef83f27adbce00b23345aa70f749f907dc4ac6f4a41fe7bf5f780dc506225",
+      "url": "https://pypi.org/packages/source/i/ipykernel/ipykernel-7.0.0.tar.gz"
     }
   },
   "linux_64_requirements": {
@@ -181,26 +238,28 @@
   },
   "meta_yaml": {
     "about": {
-      "description": "A powerful interactive Python shell and a Jupyter kernel to work with\nPython code in Jupyter notebooks and other interactive frontends.\n",
+      "description": "A powerful interactive Python shell and a Jupyter kernel to work with\nPython code in Jupyter notebooks and other interactive frontends.",
       "dev_url": "https://github.com/ipython/ipykernel",
-      "doc_source_url": "https://github.com/ipython/ipykernel/blob/master/docs/index.rst",
-      "doc_url": "https://ipykernel.readthedocs.io",
-      "home": "https://ipython.org",
+      "doc_url": "https://ipykernel.readthedocs.io/",
+      "home": "https://ipython.org/",
       "license": "BSD-3-Clause",
-      "license_family": "BSD",
+      "license_family": "BSD-3-Clause",
       "license_file": "LICENSE",
       "summary": "IPython Kernel for Jupyter"
     },
     "build": {
       "noarch": "python",
       "number": "0",
-      "script": [
-        "PYTHON -m pip install . -vv --no-deps --no-build-isolation",
-        "PYTHON -m ipykernel install --sys-prefix"
-      ],
-      "script_env": [
-        "MIGRATING=False"
-      ]
+      "script": {
+        "content": [
+          "${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation",
+          "${{ PYTHON }} -m ipykernel install --sys-prefix",
+          "${{ PYTHON }} ${{ RECIPE_DIR }}/fix_kernelspec.py"
+        ],
+        "env": {
+          "MIGRATING": "false"
+        }
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -211,18 +270,252 @@
         "minrk",
         "ocefpaf",
         "pelson",
-        "davidbrochart"
+        "davidbrochart",
+        "ianthomas23"
       ]
     },
+    "outputs": [
+      {
+        "build": null,
+        "name": "ipykernel",
+        "requirements": {
+          "build": [],
+          "host": [
+            "hatchling >=1.4",
+            "pip",
+            "python 3.10.*",
+            "comm >=0.1.1",
+            "debugpy >=1.6.5",
+            "ipython >=7.23.1",
+            "jupyter_client >=8.0.0",
+            "packaging >=22",
+            "psutil >=5.7"
+          ],
+          "run": [
+            "python",
+            "__linux",
+            "comm >=0.1.1",
+            "debugpy >=1.6.5",
+            "ipython >=7.23.1",
+            "jupyter_client >=8.0.0",
+            "jupyter_core >=4.12,!=5.0.*",
+            "matplotlib-inline >=0.1",
+            "nest-asyncio >=1.4",
+            "packaging >=22",
+            "psutil >=5.7",
+            "python >=3.10",
+            "pyzmq >=25",
+            "tornado >=6.2",
+            "traitlets >=5.4.0"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "ipykernel"
+              ],
+              "python_version": [
+                "3.10.*",
+                "3.14.*"
+              ]
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "run_test.py"
+              ],
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "flaky",
+                "ipyparallel",
+                "matplotlib-base",
+                "numpy",
+                "pytest >=7.0,<9",
+                "pytest-asyncio >=0.23.5",
+                "pytest-cov",
+                "pytest-timeout",
+                "python 3.10.*",
+                "curio"
+              ]
+            },
+            "script": [
+              "jupyter kernelspec list",
+              "python run_test.py"
+            ]
+          }
+        ],
+        "version": "7.0.0"
+      },
+      {
+        "build": null,
+        "name": "ipykernel",
+        "requirements": {
+          "build": [],
+          "host": [
+            "hatchling >=1.4",
+            "pip",
+            "python 3.10.*",
+            "comm >=0.1.1",
+            "debugpy >=1.6.5",
+            "ipython >=7.23.1",
+            "jupyter_client >=8.0.0",
+            "packaging >=22",
+            "psutil >=5.7"
+          ],
+          "run": [
+            "appnope",
+            "__osx",
+            "comm >=0.1.1",
+            "debugpy >=1.6.5",
+            "ipython >=7.23.1",
+            "jupyter_client >=8.0.0",
+            "jupyter_core >=4.12,!=5.0.*",
+            "matplotlib-inline >=0.1",
+            "nest-asyncio >=1.4",
+            "packaging >=22",
+            "psutil >=5.7",
+            "python >=3.10",
+            "pyzmq >=25",
+            "tornado >=6.2",
+            "traitlets >=5.4.0"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "ipykernel"
+              ],
+              "python_version": [
+                "3.10.*",
+                "3.14.*"
+              ]
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "run_test.py"
+              ],
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "flaky",
+                "ipyparallel",
+                "matplotlib-base",
+                "numpy",
+                "pytest >=7.0,<9",
+                "pytest-asyncio >=0.23.5",
+                "pytest-cov",
+                "pytest-timeout",
+                "python 3.10.*",
+                "curio"
+              ]
+            },
+            "script": [
+              "jupyter kernelspec list",
+              "python run_test.py"
+            ]
+          }
+        ],
+        "version": "7.0.0"
+      },
+      {
+        "build": null,
+        "name": "ipykernel",
+        "requirements": {
+          "build": [],
+          "host": [
+            "hatchling >=1.4",
+            "pip",
+            "python 3.10.*",
+            "comm >=0.1.1",
+            "debugpy >=1.6.5",
+            "ipython >=7.23.1",
+            "jupyter_client >=8.0.0",
+            "packaging >=22",
+            "psutil >=5.7"
+          ],
+          "run": [
+            "python",
+            "__win",
+            "comm >=0.1.1",
+            "debugpy >=1.6.5",
+            "ipython >=7.23.1",
+            "jupyter_client >=8.0.0",
+            "jupyter_core >=4.12,!=5.0.*",
+            "matplotlib-inline >=0.1",
+            "nest-asyncio >=1.4",
+            "packaging >=22",
+            "psutil >=5.7",
+            "python >=3.10",
+            "pyzmq >=25",
+            "tornado >=6.2",
+            "traitlets >=5.4.0"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "ipykernel"
+              ],
+              "python_version": [
+                "3.10.*",
+                "3.14.*"
+              ]
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "run_test.py"
+              ],
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "flaky",
+                "ipyparallel",
+                "matplotlib-base",
+                "numpy",
+                "pytest >=7.0,<9",
+                "pytest-asyncio >=0.23.5",
+                "pytest-cov",
+                "pytest-timeout",
+                "python 3.10.*",
+                "curio"
+              ]
+            },
+            "script": [
+              "jupyter kernelspec list",
+              "python run_test.py"
+            ]
+          }
+        ],
+        "version": "7.0.0"
+      }
+    ],
     "package": {
       "name": "ipykernel",
-      "version": "6.30.1"
+      "version": "7.0.0"
     },
     "requirements": {
       "host": [
         "hatchling >=1.4",
         "pip",
-        "python 3.9.*",
+        "python 3.10.*",
         "comm >=0.1.1",
         "debugpy >=1.6.5",
         "ipython >=7.23.1",
@@ -231,79 +524,57 @@
         "psutil >=5.7"
       ],
       "run": [
+        "python",
         "__linux",
-        "jupyter_core >=4.12,!=5.0.*",
-        "matplotlib-inline >=0.1",
-        "nest-asyncio >=1.4",
-        "python >=3.9",
-        "pyzmq >=25",
-        "tornado >=6.2",
-        "traitlets >=5.4.0",
-        "packaging >=22",
-        "psutil >=5.7",
         "comm >=0.1.1",
         "debugpy >=1.6.5",
         "ipython >=7.23.1",
         "jupyter_client >=8.0.0",
-        "__osx",
+        "jupyter_core >=4.12,!=5.0.*",
+        "matplotlib-inline >=0.1",
+        "nest-asyncio >=1.4",
+        "packaging >=22",
+        "psutil >=5.7",
+        "python >=3.10",
+        "pyzmq >=25",
+        "tornado >=6.2",
+        "traitlets >=5.4.0",
         "appnope",
+        "__osx",
         "__win"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
-      "sha256": "6abb270161896402e76b91394fcdce5d1be5d45f456671e5080572f8505be39b",
-      "url": "https://pypi.org/packages/source/i/ipykernel/ipykernel-6.30.1.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "pip check",
-        "jupyter kernelspec list"
-      ],
-      "imports": [
-        "ipykernel"
-      ],
-      "requires": [
-        "curio",
-        "flaky",
-        "numpy",
-        "pip",
-        "pytest >=7.0,<9",
-        "pytest-asyncio >=0.23.5",
-        "pytest-cov",
-        "pytest-timeout",
-        "python !=3.9.*",
-        "ipyparallel",
-        "matplotlib-base"
-      ],
-      "source_files": [
-        "tests"
-      ]
+      "sha256": "06aef83f27adbce00b23345aa70f749f907dc4ac6f4a41fe7bf5f780dc506225",
+      "url": "https://pypi.org/packages/source/i/ipykernel/ipykernel-7.0.0.tar.gz"
     }
   },
   "name": "ipykernel",
   "osx_64_meta_yaml": {
     "about": {
-      "description": "A powerful interactive Python shell and a Jupyter kernel to work with\nPython code in Jupyter notebooks and other interactive frontends.\n",
+      "description": "A powerful interactive Python shell and a Jupyter kernel to work with\nPython code in Jupyter notebooks and other interactive frontends.",
       "dev_url": "https://github.com/ipython/ipykernel",
-      "doc_source_url": "https://github.com/ipython/ipykernel/blob/master/docs/index.rst",
-      "doc_url": "https://ipykernel.readthedocs.io",
-      "home": "https://ipython.org",
+      "doc_url": "https://ipykernel.readthedocs.io/",
+      "home": "https://ipython.org/",
       "license": "BSD-3-Clause",
-      "license_family": "BSD",
+      "license_family": "BSD-3-Clause",
       "license_file": "LICENSE",
       "summary": "IPython Kernel for Jupyter"
     },
     "build": {
       "noarch": "python",
       "number": "0",
-      "script": [
-        "PYTHON -m pip install . -vv --no-deps --no-build-isolation",
-        "PYTHON -m ipykernel install --sys-prefix"
-      ],
-      "script_env": [
-        "MIGRATING=False"
-      ]
+      "script": {
+        "content": [
+          "${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation",
+          "${{ PYTHON }} -m ipykernel install --sys-prefix",
+          "${{ PYTHON }} ${{ RECIPE_DIR }}/fix_kernelspec.py"
+        ],
+        "env": {
+          "MIGRATING": "false"
+        }
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -314,18 +585,98 @@
         "minrk",
         "ocefpaf",
         "pelson",
-        "davidbrochart"
+        "davidbrochart",
+        "ianthomas23"
       ]
     },
+    "outputs": [
+      {
+        "build": null,
+        "name": "ipykernel",
+        "requirements": {
+          "build": [],
+          "host": [
+            "hatchling >=1.4",
+            "pip",
+            "python 3.10.*",
+            "comm >=0.1.1",
+            "debugpy >=1.6.5",
+            "ipython >=7.23.1",
+            "jupyter_client >=8.0.0",
+            "packaging >=22",
+            "psutil >=5.7"
+          ],
+          "run": [
+            "appnope",
+            "__osx",
+            "comm >=0.1.1",
+            "debugpy >=1.6.5",
+            "ipython >=7.23.1",
+            "jupyter_client >=8.0.0",
+            "jupyter_core >=4.12,!=5.0.*",
+            "matplotlib-inline >=0.1",
+            "nest-asyncio >=1.4",
+            "packaging >=22",
+            "psutil >=5.7",
+            "python >=3.10",
+            "pyzmq >=25",
+            "tornado >=6.2",
+            "traitlets >=5.4.0"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "ipykernel"
+              ],
+              "python_version": [
+                "3.10.*",
+                "3.14.*"
+              ]
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "run_test.py"
+              ],
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "flaky",
+                "ipyparallel",
+                "matplotlib-base",
+                "numpy",
+                "pytest >=7.0,<9",
+                "pytest-asyncio >=0.23.5",
+                "pytest-cov",
+                "pytest-timeout",
+                "python 3.10.*",
+                "curio"
+              ]
+            },
+            "script": [
+              "jupyter kernelspec list",
+              "python run_test.py"
+            ]
+          }
+        ],
+        "version": "7.0.0"
+      }
+    ],
     "package": {
       "name": "ipykernel",
-      "version": "6.30.1"
+      "version": "7.0.0"
     },
     "requirements": {
       "host": [
         "hatchling >=1.4",
         "pip",
-        "python 3.9.*",
+        "python 3.10.*",
         "comm >=0.1.1",
         "debugpy >=1.6.5",
         "ipython >=7.23.1",
@@ -334,52 +685,27 @@
         "psutil >=5.7"
       ],
       "run": [
-        "__osx",
         "appnope",
-        "jupyter_core >=4.12,!=5.0.*",
-        "matplotlib-inline >=0.1",
-        "nest-asyncio >=1.4",
-        "python >=3.9",
-        "pyzmq >=25",
-        "tornado >=6.2",
-        "traitlets >=5.4.0",
-        "packaging >=22",
-        "psutil >=5.7",
+        "__osx",
         "comm >=0.1.1",
         "debugpy >=1.6.5",
         "ipython >=7.23.1",
-        "jupyter_client >=8.0.0"
+        "jupyter_client >=8.0.0",
+        "jupyter_core >=4.12,!=5.0.*",
+        "matplotlib-inline >=0.1",
+        "nest-asyncio >=1.4",
+        "packaging >=22",
+        "psutil >=5.7",
+        "python >=3.10",
+        "pyzmq >=25",
+        "tornado >=6.2",
+        "traitlets >=5.4.0"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
-      "sha256": "6abb270161896402e76b91394fcdce5d1be5d45f456671e5080572f8505be39b",
-      "url": "https://pypi.org/packages/source/i/ipykernel/ipykernel-6.30.1.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "pip check",
-        "jupyter kernelspec list"
-      ],
-      "imports": [
-        "ipykernel"
-      ],
-      "requires": [
-        "curio",
-        "flaky",
-        "numpy",
-        "pip",
-        "pytest >=7.0,<9",
-        "pytest-asyncio >=0.23.5",
-        "pytest-cov",
-        "pytest-timeout",
-        "python !=3.9.*",
-        "ipyparallel",
-        "matplotlib-base"
-      ],
-      "source_files": [
-        "tests"
-      ]
+      "sha256": "06aef83f27adbce00b23345aa70f749f907dc4ac6f4a41fe7bf5f780dc506225",
+      "url": "https://pypi.org/packages/source/i/ipykernel/ipykernel-7.0.0.tar.gz"
     }
   },
   "osx_64_requirements": {
@@ -453,7 +779,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/ipykernel.json"
   },
-  "raw_meta_yaml": "{% set version = \"6.30.1\" %}\n\n{% set migrating = false %}\n\npackage:\n  name: ipykernel\n  version: {{ version }}\n\nsource:\n  url: https://pypi.org/packages/source/i/ipykernel/ipykernel-{{ version }}.tar.gz\n  sha256: 6abb270161896402e76b91394fcdce5d1be5d45f456671e5080572f8505be39b\n\nbuild:\n  number: 0\n  noarch: python\n  script:\n    - {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation\n    - {{ PYTHON }} -m ipykernel install --sys-prefix\n    # TODO: this may be needed/desirable at some point\n    # - cd {{ RECIPE_DIR }} && {{ PYTHON }} fix_kernelspec.py\n  script_env:\n    - MIGRATING={{ migrating }}\n\nrequirements:\n  host:\n    - hatchling >=1.4\n    - pip\n    - python {{ python_min }}.*\n    # minimum needed to intall kernelspec\n    - comm >=0.1.1\n    - debugpy >=1.6.5\n    - ipython >=7.23.1\n    - jupyter_client >=8.0.0\n    - packaging >=22\n    - psutil >=5.7\n  run:\n    - __{{ noarch_platform }}\n    {% if noarch_platform == \"osx\" %}\n    - appnope\n    {% endif %}\n    - jupyter_core >=4.12,!=5.0.*\n    - matplotlib-inline >=0.1\n    - nest-asyncio >=1.4\n    - python >={{ python_min }}\n    - pyzmq >=25\n    - tornado >=6.2\n    - traitlets >=5.4.0\n    - packaging >=22\n    - psutil >=5.7\n    - comm >=0.1.1\n    - debugpy >=1.6.5\n    - ipython >=7.23.1\n    - jupyter_client >=8.0.0\n\ntest:\n  source_files:\n    - tests\n  requires:\n    - curio  # [not win]\n    - flaky\n    - numpy\n    - pip\n    - pytest >=7.0,<9\n    - pytest-asyncio >=0.23.5\n    - pytest-cov\n    - pytest-timeout\n    - python !={{ python_min }}.*\n    {% if not migrating %}\n    - ipyparallel\n    - matplotlib-base\n    {% endif %}\n\n  imports:\n    - ipykernel\n  commands:\n    - pip check\n    - jupyter kernelspec list\n\nabout:\n  home: https://ipython.org\n  license: BSD-3-Clause\n  license_family: BSD\n  license_file: LICENSE\n  summary: IPython Kernel for Jupyter\n  description: |\n    A powerful interactive Python shell and a Jupyter kernel to work with\n    Python code in Jupyter notebooks and other interactive frontends.\n  dev_url: https://github.com/ipython/ipykernel\n  doc_url: https://ipykernel.readthedocs.io\n  doc_source_url: https://github.com/ipython/ipykernel/blob/master/docs/index.rst\n\nextra:\n  recipe-maintainers:\n    - blink1073\n    - bollwyvl\n    - Carreau\n    - jakirkham\n    - minrk\n    - ocefpaf\n    - pelson\n    - davidbrochart\n",
+  "raw_meta_yaml": "# yaml-language-server: $schema=https://raw.githubusercontent.com/prefix-dev/recipe-format/main/schema.json\nschema_version: 1\n\ncontext:\n  version: 7.0.0\n  appnope_on_osx: ${{ \"appnope\" if noarch_platform == \"osx\" else \"python\" }}\n  migrating: false\n  python_check_max: \"3.14\"\n\npackage:\n  name: ipykernel\n  version: ${{ version }}\n\nsource:\n  url: https://pypi.org/packages/source/i/ipykernel/ipykernel-${{ version }}.tar.gz\n  sha256: 06aef83f27adbce00b23345aa70f749f907dc4ac6f4a41fe7bf5f780dc506225\n\nbuild:\n  number: 0\n  noarch: python\n  script:\n    env:\n      MIGRATING: ${{ migrating }}\n    content:\n      - ${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation\n      - ${{ PYTHON }} -m ipykernel install --sys-prefix\n      - ${{ PYTHON }} ${{ RECIPE_DIR }}/fix_kernelspec.py\n\nrequirements:\n  host:\n    - hatchling >=1.4\n    - pip\n    - python ${{ python_min }}.*\n    # minimum needed to intall kernelspec\n    - comm >=0.1.1\n    - debugpy >=1.6.5\n    - ipython >=7.23.1\n    - jupyter_client >=8.0.0\n    - packaging >=22\n    - psutil >=5.7\n  run:\n    - ${{ appnope_on_osx }}\n    - __${{ noarch_platform }}\n    - comm >=0.1.1\n    - debugpy >=1.6.5\n    - ipython >=7.23.1\n    - jupyter_client >=8.0.0\n    - jupyter_core >=4.12,!=5.0.*\n    - matplotlib-inline >=0.1\n    - nest-asyncio >=1.4\n    - packaging >=22\n    - psutil >=5.7\n    - python >=${{ python_min }}\n    - pyzmq >=25\n    - tornado >=6.2\n    - traitlets >=5.4.0\n  run_constraints:\n    - appnope >=0.1.2\n\ntests:\n  - python:\n      imports: ipykernel\n      pip_check: true\n      python_version:\n        - ${{ python_min }}.*\n        - ${{ python_check_max }}.*\n  - files:\n      source:\n        - tests/\n      recipe:\n        - run_test.py\n    requirements:\n      run:\n        - flaky\n        - ipyparallel\n        - matplotlib-base\n        - numpy\n        - pytest >=7.0,<9\n        - pytest-asyncio >=0.23.5\n        - pytest-cov\n        - pytest-timeout\n        - python ${{ python_min }}.*\n        - if: not win\n          then:\n            - curio\n    script:\n      - jupyter kernelspec list\n      - python run_test.py\n\nabout:\n  license: BSD-3-Clause\n  license_file: LICENSE\n  summary: IPython Kernel for Jupyter\n  description: |\n    A powerful interactive Python shell and a Jupyter kernel to work with\n    Python code in Jupyter notebooks and other interactive frontends.\n  homepage: https://ipython.org\n  repository: https://github.com/ipython/ipykernel\n  documentation: https://ipykernel.readthedocs.io\n\nextra:\n  recipe-maintainers:\n    - blink1073\n    - bollwyvl\n    - Carreau\n    - jakirkham\n    - minrk\n    - ocefpaf\n    - pelson\n    - davidbrochart\n    - ianthomas23\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -553,7 +879,7 @@
         "packaging >=22",
         "pip",
         "psutil >=5.7",
-        "python 3.9.*"
+        "python 3.10.*"
       ]
     },
     "run": {
@@ -572,7 +898,8 @@
         "nest-asyncio >=1.4",
         "packaging >=22",
         "psutil >=5.7",
-        "python >=3.9",
+        "python",
+        "python >=3.10",
         "pyzmq >=25",
         "tornado >=6.2",
         "traitlets >=5.4.0"
@@ -591,37 +918,39 @@
         "pytest-asyncio >=0.23.5",
         "pytest-cov",
         "pytest-timeout",
-        "python !=3.9.*"
+        "python 3.10.*"
       ]
     }
   },
-  "url": "https://pypi.org/packages/source/i/ipykernel/ipykernel-6.30.1.tar.gz",
-  "version": "6.30.1",
+  "url": "https://pypi.org/packages/source/i/ipykernel/ipykernel-7.0.0.tar.gz",
+  "version": "7.0.0",
   "version_pr_info": {
     "__lazy_json__": "version_pr_info/ipykernel.json"
   },
   "win_64_meta_yaml": {
     "about": {
-      "description": "A powerful interactive Python shell and a Jupyter kernel to work with\nPython code in Jupyter notebooks and other interactive frontends.\n",
+      "description": "A powerful interactive Python shell and a Jupyter kernel to work with\nPython code in Jupyter notebooks and other interactive frontends.",
       "dev_url": "https://github.com/ipython/ipykernel",
-      "doc_source_url": "https://github.com/ipython/ipykernel/blob/master/docs/index.rst",
-      "doc_url": "https://ipykernel.readthedocs.io",
-      "home": "https://ipython.org",
+      "doc_url": "https://ipykernel.readthedocs.io/",
+      "home": "https://ipython.org/",
       "license": "BSD-3-Clause",
-      "license_family": "BSD",
+      "license_family": "BSD-3-Clause",
       "license_file": "LICENSE",
       "summary": "IPython Kernel for Jupyter"
     },
     "build": {
       "noarch": "python",
       "number": "0",
-      "script": [
-        "PYTHON -m pip install . -vv --no-deps --no-build-isolation",
-        "PYTHON -m ipykernel install --sys-prefix"
-      ],
-      "script_env": [
-        "MIGRATING=False"
-      ]
+      "script": {
+        "content": [
+          "${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation",
+          "${{ PYTHON }} -m ipykernel install --sys-prefix",
+          "${{ PYTHON }} ${{ RECIPE_DIR }}/fix_kernelspec.py"
+        ],
+        "env": {
+          "MIGRATING": "false"
+        }
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -632,18 +961,98 @@
         "minrk",
         "ocefpaf",
         "pelson",
-        "davidbrochart"
+        "davidbrochart",
+        "ianthomas23"
       ]
     },
+    "outputs": [
+      {
+        "build": null,
+        "name": "ipykernel",
+        "requirements": {
+          "build": [],
+          "host": [
+            "hatchling >=1.4",
+            "pip",
+            "python 3.10.*",
+            "comm >=0.1.1",
+            "debugpy >=1.6.5",
+            "ipython >=7.23.1",
+            "jupyter_client >=8.0.0",
+            "packaging >=22",
+            "psutil >=5.7"
+          ],
+          "run": [
+            "python",
+            "__win",
+            "comm >=0.1.1",
+            "debugpy >=1.6.5",
+            "ipython >=7.23.1",
+            "jupyter_client >=8.0.0",
+            "jupyter_core >=4.12,!=5.0.*",
+            "matplotlib-inline >=0.1",
+            "nest-asyncio >=1.4",
+            "packaging >=22",
+            "psutil >=5.7",
+            "python >=3.10",
+            "pyzmq >=25",
+            "tornado >=6.2",
+            "traitlets >=5.4.0"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "ipykernel"
+              ],
+              "python_version": [
+                "3.10.*",
+                "3.14.*"
+              ]
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "run_test.py"
+              ],
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "flaky",
+                "ipyparallel",
+                "matplotlib-base",
+                "numpy",
+                "pytest >=7.0,<9",
+                "pytest-asyncio >=0.23.5",
+                "pytest-cov",
+                "pytest-timeout",
+                "python 3.10.*",
+                "curio"
+              ]
+            },
+            "script": [
+              "jupyter kernelspec list",
+              "python run_test.py"
+            ]
+          }
+        ],
+        "version": "7.0.0"
+      }
+    ],
     "package": {
       "name": "ipykernel",
-      "version": "6.30.1"
+      "version": "7.0.0"
     },
     "requirements": {
       "host": [
         "hatchling >=1.4",
         "pip",
-        "python 3.9.*",
+        "python 3.10.*",
         "comm >=0.1.1",
         "debugpy >=1.6.5",
         "ipython >=7.23.1",
@@ -652,50 +1061,27 @@
         "psutil >=5.7"
       ],
       "run": [
+        "python",
         "__win",
-        "jupyter_core >=4.12,!=5.0.*",
-        "matplotlib-inline >=0.1",
-        "nest-asyncio >=1.4",
-        "python >=3.9",
-        "pyzmq >=25",
-        "tornado >=6.2",
-        "traitlets >=5.4.0",
-        "packaging >=22",
-        "psutil >=5.7",
         "comm >=0.1.1",
         "debugpy >=1.6.5",
         "ipython >=7.23.1",
-        "jupyter_client >=8.0.0"
+        "jupyter_client >=8.0.0",
+        "jupyter_core >=4.12,!=5.0.*",
+        "matplotlib-inline >=0.1",
+        "nest-asyncio >=1.4",
+        "packaging >=22",
+        "psutil >=5.7",
+        "python >=3.10",
+        "pyzmq >=25",
+        "tornado >=6.2",
+        "traitlets >=5.4.0"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
-      "sha256": "6abb270161896402e76b91394fcdce5d1be5d45f456671e5080572f8505be39b",
-      "url": "https://pypi.org/packages/source/i/ipykernel/ipykernel-6.30.1.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "pip check",
-        "jupyter kernelspec list"
-      ],
-      "imports": [
-        "ipykernel"
-      ],
-      "requires": [
-        "flaky",
-        "numpy",
-        "pip",
-        "pytest >=7.0,<9",
-        "pytest-asyncio >=0.23.5",
-        "pytest-cov",
-        "pytest-timeout",
-        "python !=3.9.*",
-        "ipyparallel",
-        "matplotlib-base"
-      ],
-      "source_files": [
-        "tests"
-      ]
+      "sha256": "06aef83f27adbce00b23345aa70f749f907dc4ac6f4a41fe7bf5f780dc506225",
+      "url": "https://pypi.org/packages/source/i/ipykernel/ipykernel-7.0.0.tar.gz"
     }
   },
   "win_64_requirements": {
@@ -739,6 +1125,7 @@
     "test": {
       "__set__": true,
       "elements": [
+        "curio",
         "flaky",
         "ipyparallel",
         "matplotlib-base",
