@@ -2,10 +2,15 @@
   "archived": false,
   "branch": "main",
   "conda-forge.yml": {
+    "bot": {
+      "inspection": "hint-all"
+    },
     "conda_build": {
       "pkg_format": "2"
     },
+    "conda_build_tool": "rattler-build",
     "conda_forge_output_validation": true,
+    "conda_install_tool": "pixi",
     "github": {
       "branch_name": "main",
       "tooling_branch_name": "main"
@@ -18,12 +23,14 @@
       "dev_url": "https://github.com/jupyter-server/pytest-jupyter",
       "home": "https://pypi.org/project/pytest-jupyter",
       "license": "BSD-3-Clause",
+      "license_family": "BSD-3-Clause",
       "license_file": "LICENSE",
       "summary": "A pytest plugin for testing Jupyter libraries and extensions."
     },
     "build": {
       "noarch": "python",
-      "number": "1"
+      "number": "0",
+      "script": "${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation --disable-pip-version-check"
     },
     "extra": {
       "feedstock-name": "pytest-jupyter",
@@ -35,130 +42,127 @@
     },
     "outputs": [
       {
-        "build": {
-          "noarch": "python",
-          "script": "PYTHON -m pip install . -vv --no-deps --no-build-isolation"
-        },
+        "build": null,
         "name": "pytest-jupyter",
         "requirements": {
+          "build": [],
           "host": [
-            "python 3.9",
+            "hatchling >=1.10.0",
             "pip",
-            "hatchling"
+            "python 3.10.*"
           ],
           "run": [
-            "python >=3.9",
             "jupyter_core >=5.7",
-            "pytest >=7"
-          ],
-          "run_constrained": [
-            "jupyter_server >=1.21",
-            "jupyter_client >=7.4.0",
-            "ipykernel >=6.14",
-            "nbformat >=5.3"
+            "pytest >=7.0",
+            "python >=3.10"
           ]
         },
-        "test": {
-          "commands": [
-            "pip check"
-          ],
-          "imports": [
-            "pytest_jupyter",
-            "pytest_jupyter.jupyter_core"
-          ],
-          "requires": [
-            "pip"
-          ],
-          "source_files": [
-            "tests"
-          ]
-        }
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "pytest_jupyter.jupyter_core"
+              ],
+              "python_version": [
+                "3.10.*",
+                "3.14.*"
+              ]
+            }
+          }
+        ],
+        "version": "0.11.0"
       },
       {
-        "about": {
-          "dev_url": "https://github.com/jupyter-server/pytest-jupyter",
-          "home": "https://pypi.org/project/pytest-jupyter",
-          "license": "BSD-3-Clause",
-          "license_file": "LICENSE",
-          "summary": "A pytest plugin for testing Jupyter libraries and extensions. (with client dependencies)"
-        },
-        "build": {
-          "noarch": "generic"
-        },
+        "build": null,
         "name": "pytest-jupyter-client",
         "requirements": {
+          "build": [],
+          "host": [],
           "run": [
             "pytest-jupyter",
             "ipykernel",
             "jupyter_client"
           ]
         },
-        "test": {
-          "commands": [
-            "pip check"
-          ],
-          "imports": [
-            "pytest_jupyter",
-            "pytest_jupyter.jupyter_client"
-          ],
-          "requires": [
-            "pip"
-          ]
-        }
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "pytest_jupyter.jupyter_client"
+              ],
+              "python_version": [
+                "3.10.*",
+                "3.14.*"
+              ]
+            }
+          }
+        ],
+        "version": "0.11.0"
       },
       {
-        "about": {
-          "dev_url": "https://github.com/jupyter-server/pytest-jupyter",
-          "home": "https://pypi.org/project/pytest-jupyter",
-          "license": "BSD-3-Clause",
-          "license_file": "LICENSE",
-          "summary": "A pytest plugin for testing Jupyter libraries and extensions. (with server dependencies)"
-        },
-        "build": {
-          "noarch": "generic"
-        },
+        "build": null,
         "name": "pytest-jupyter-server",
         "requirements": {
+          "build": [],
+          "host": [],
           "run": [
             "pytest-jupyter-client",
             "jupyter_server"
           ]
         },
-        "test": {
-          "commands": [
-            "pip check",
-            "cd tests && pytest -vv --cov=pytest_jupyter --cov-report=term-missing:skip-covered --no-cov-on-fail --cov-fail-under=90"
-          ],
-          "imports": [
-            "pytest_jupyter",
-            "pytest_jupyter.jupyter_server"
-          ],
-          "requires": [
-            "pip",
-            "pytest-cov"
-          ],
-          "source_files": [
-            "tests"
-          ]
-        }
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "pytest_jupyter.jupyter_server"
+              ],
+              "python_version": [
+                "3.10.*",
+                "3.14.*"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest-cov",
+                "python 3.10.*"
+              ]
+            },
+            "script": [
+              "coverage run --source=pytest_jupyter --branch -m pytest -vv --tb=long --color=yes",
+              "coverage report --show-missing --skip-covered --fail-under=${{ cov_fail_under }}"
+            ]
+          }
+        ],
+        "version": "0.11.0"
       }
     ],
     "package": {
-      "name": "pytest-jupyter-split",
-      "version": "0.10.1"
+      "name": "pytest-jupyter",
+      "version": "0.11.0"
     },
     "requirements": {
       "host": [
-        "python 3.9"
+        "hatchling >=1.10.0",
+        "pip",
+        "python 3.10.*"
       ],
       "run": [
-        "python >=3.9"
+        "jupyter_core >=5.7",
+        "pytest >=7.0",
+        "python >=3.10"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
-      "sha256": "00df54eef9e201dd542d5471b8980def15d34b917b30587d14d7c824fc4d9e84",
-      "url": "https://pypi.org/packages/source/p/pytest-jupyter/pytest_jupyter-0.10.1.tar.gz"
+      "sha256": "a4e08ced44cfea1bce080090c626b8dc4f9d617fa5aafcd84b71405f503e9899",
+      "url": "https://pypi.org/packages/source/p/pytest-jupyter/pytest_jupyter-0.11.0.tar.gz"
     }
   },
   "linux_64_requirements": {
@@ -191,7 +195,8 @@
       "__set__": true,
       "elements": [
         "pip",
-        "pytest-cov"
+        "pytest-cov",
+        "python"
       ]
     }
   },
@@ -200,12 +205,14 @@
       "dev_url": "https://github.com/jupyter-server/pytest-jupyter",
       "home": "https://pypi.org/project/pytest-jupyter",
       "license": "BSD-3-Clause",
+      "license_family": "BSD-3-Clause",
       "license_file": "LICENSE",
       "summary": "A pytest plugin for testing Jupyter libraries and extensions."
     },
     "build": {
       "noarch": "python",
-      "number": "1"
+      "number": "0",
+      "script": "${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation --disable-pip-version-check"
     },
     "extra": {
       "feedstock-name": "pytest-jupyter",
@@ -217,140 +224,136 @@
     },
     "outputs": [
       {
-        "build": {
-          "noarch": "python",
-          "script": "PYTHON -m pip install . -vv --no-deps --no-build-isolation"
-        },
+        "build": null,
         "name": "pytest-jupyter",
         "requirements": {
+          "build": [],
           "host": [
-            "python 3.9",
+            "hatchling >=1.10.0",
             "pip",
-            "hatchling"
+            "python 3.10.*"
           ],
           "run": [
-            "python >=3.9",
             "jupyter_core >=5.7",
-            "pytest >=7"
-          ],
-          "run_constrained": [
-            "jupyter_server >=1.21",
-            "jupyter_client >=7.4.0",
-            "ipykernel >=6.14",
-            "nbformat >=5.3"
+            "pytest >=7.0",
+            "python >=3.10"
           ]
         },
-        "test": {
-          "commands": [
-            "pip check"
-          ],
-          "imports": [
-            "pytest_jupyter",
-            "pytest_jupyter.jupyter_core"
-          ],
-          "requires": [
-            "pip"
-          ],
-          "source_files": [
-            "tests"
-          ]
-        }
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "pytest_jupyter.jupyter_core"
+              ],
+              "python_version": [
+                "3.10.*",
+                "3.14.*"
+              ]
+            }
+          }
+        ],
+        "version": "0.11.0"
       },
       {
-        "about": {
-          "dev_url": "https://github.com/jupyter-server/pytest-jupyter",
-          "home": "https://pypi.org/project/pytest-jupyter",
-          "license": "BSD-3-Clause",
-          "license_file": "LICENSE",
-          "summary": "A pytest plugin for testing Jupyter libraries and extensions. (with client dependencies)"
-        },
-        "build": {
-          "noarch": "generic"
-        },
+        "build": null,
         "name": "pytest-jupyter-client",
         "requirements": {
+          "build": [],
+          "host": [],
           "run": [
             "pytest-jupyter",
             "ipykernel",
             "jupyter_client"
           ]
         },
-        "test": {
-          "commands": [
-            "pip check"
-          ],
-          "imports": [
-            "pytest_jupyter",
-            "pytest_jupyter.jupyter_client"
-          ],
-          "requires": [
-            "pip"
-          ]
-        }
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "pytest_jupyter.jupyter_client"
+              ],
+              "python_version": [
+                "3.10.*",
+                "3.14.*"
+              ]
+            }
+          }
+        ],
+        "version": "0.11.0"
       },
       {
-        "about": {
-          "dev_url": "https://github.com/jupyter-server/pytest-jupyter",
-          "home": "https://pypi.org/project/pytest-jupyter",
-          "license": "BSD-3-Clause",
-          "license_file": "LICENSE",
-          "summary": "A pytest plugin for testing Jupyter libraries and extensions. (with server dependencies)"
-        },
-        "build": {
-          "noarch": "generic"
-        },
+        "build": null,
         "name": "pytest-jupyter-server",
         "requirements": {
+          "build": [],
+          "host": [],
           "run": [
             "pytest-jupyter-client",
             "jupyter_server"
           ]
         },
-        "test": {
-          "commands": [
-            "pip check",
-            "cd tests && pytest -vv --cov=pytest_jupyter --cov-report=term-missing:skip-covered --no-cov-on-fail --cov-fail-under=90"
-          ],
-          "imports": [
-            "pytest_jupyter",
-            "pytest_jupyter.jupyter_server"
-          ],
-          "requires": [
-            "pip",
-            "pytest-cov"
-          ],
-          "source_files": [
-            "tests"
-          ]
-        }
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "pytest_jupyter.jupyter_server"
+              ],
+              "python_version": [
+                "3.10.*",
+                "3.14.*"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest-cov",
+                "python 3.10.*"
+              ]
+            },
+            "script": [
+              "coverage run --source=pytest_jupyter --branch -m pytest -vv --tb=long --color=yes",
+              "coverage report --show-missing --skip-covered --fail-under=${{ cov_fail_under }}"
+            ]
+          }
+        ],
+        "version": "0.11.0"
       }
     ],
     "package": {
-      "name": "pytest-jupyter-split",
-      "version": "0.10.1"
+      "name": "pytest-jupyter",
+      "version": "0.11.0"
     },
     "requirements": {
       "host": [
-        "python 3.9"
+        "hatchling >=1.10.0",
+        "pip",
+        "python 3.10.*"
       ],
       "run": [
-        "python >=3.9"
+        "jupyter_core >=5.7",
+        "pytest >=7.0",
+        "python >=3.10"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
-      "sha256": "00df54eef9e201dd542d5471b8980def15d34b917b30587d14d7c824fc4d9e84",
-      "url": "https://pypi.org/packages/source/p/pytest-jupyter/pytest_jupyter-0.10.1.tar.gz"
+      "sha256": "a4e08ced44cfea1bce080090c626b8dc4f9d617fa5aafcd84b71405f503e9899",
+      "url": "https://pypi.org/packages/source/p/pytest-jupyter/pytest_jupyter-0.11.0.tar.gz"
     }
   },
-  "name": "pytest-jupyter-split",
+  "name": "pytest-jupyter",
   "outputs_names": {
     "__set__": true,
     "elements": [
       "pytest-jupyter",
       "pytest-jupyter-client",
-      "pytest-jupyter-server",
-      "pytest-jupyter-split"
+      "pytest-jupyter-server"
     ]
   },
   "parsing_error": false,
@@ -360,7 +363,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/pytest-jupyter.json"
   },
-  "raw_meta_yaml": "{% set version = \"0.10.1\" %}\n\n# handle undefined PYTHON in `noarch: generic` outputs\n{% if PYTHON is not defined %}{% set PYTHON = \"$PYTHON\" %}{% endif %}\n\npackage:\n  name: pytest-jupyter-split\n  version: {{ version }}\n\nsource:\n  url: https://pypi.org/packages/source/p/pytest-jupyter/pytest_jupyter-{{ version }}.tar.gz\n  sha256: 00df54eef9e201dd542d5471b8980def15d34b917b30587d14d7c824fc4d9e84\n\nbuild:\n  noarch: python\n  number: 1\n\nrequirements:\n  host:\n    - python {{ python_min }}\n  run:\n    - python >={{ python_min }}\n\noutputs:\n  - name: pytest-jupyter\n    build:\n      script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation\n      noarch: python\n    requirements:\n      host:\n        - python {{ python_min }}\n        - pip\n        - hatchling\n      run:\n        - python >={{ python_min }}\n        - jupyter_core >=5.7\n        - pytest >=7\n      run_constrained:\n        # the hard `run` dependencies are in sub-packages\n        - jupyter_server >=1.21\n        - jupyter_client >=7.4.0\n        - ipykernel >=6.14\n        - nbformat >=5.3\n    test:\n      source_files:\n        - tests\n      imports:\n        - pytest_jupyter\n        - pytest_jupyter.jupyter_core\n      commands:\n        - pip check\n      requires:\n        - pip\n\n  - name: pytest-jupyter-client\n    build:\n      noarch: generic\n    requirements:\n      run:\n        - {{ pin_subpackage(\"pytest-jupyter\", exact=True) }}\n        - ipykernel\n        - jupyter_client\n    test:\n      imports:\n        - pytest_jupyter\n        - pytest_jupyter.jupyter_client\n      commands:\n        - pip check\n      requires:\n        - pip\n    about:\n      home: https://pypi.org/project/pytest-jupyter\n      summary: A pytest plugin for testing Jupyter libraries and extensions. (with client dependencies)\n      dev_url: https://github.com/jupyter-server/pytest-jupyter\n      license: BSD-3-Clause\n      license_file: LICENSE\n\n  - name: pytest-jupyter-server\n    build:\n      noarch: generic\n    requirements:\n      run:\n        - {{ pin_subpackage(\"pytest-jupyter-client\", exact=True) }}\n        - jupyter_server\n    test:\n      source_files:\n        - tests\n      imports:\n        - pytest_jupyter\n        - pytest_jupyter.jupyter_server\n      commands:\n        - pip check\n        - cd tests && pytest -vv --cov=pytest_jupyter --cov-report=term-missing:skip-covered --no-cov-on-fail --cov-fail-under=90\n      requires:\n        - pip\n        - pytest-cov\n    about:\n      home: https://pypi.org/project/pytest-jupyter\n      summary: A pytest plugin for testing Jupyter libraries and extensions. (with server dependencies)\n      dev_url: https://github.com/jupyter-server/pytest-jupyter\n      license: BSD-3-Clause\n      license_file: LICENSE\n\nabout:\n  home: https://pypi.org/project/pytest-jupyter\n  summary: A pytest plugin for testing Jupyter libraries and extensions.\n  dev_url: https://github.com/jupyter-server/pytest-jupyter\n  license: BSD-3-Clause\n  license_file: LICENSE\n\nextra:\n  feedstock-name: pytest-jupyter\n  recipe-maintainers:\n    - blink1073\n    - fcollonval\n    - conda-forge/jupyter_server\n",
+  "raw_meta_yaml": "# yaml-language-server: $schema=https://raw.githubusercontent.com/prefix-dev/recipe-format/main/schema.json\nschema_version: 1\n\ncontext:\n  version: \"0.11.0\"\n  python_check_max: \"3.14\"\n  cov_fail_under: \"87\"\n\nrecipe:\n  name: pytest-jupyter-split\n  version: ${{ version }}\n\nsource:\n  url: https://pypi.org/packages/source/p/pytest-jupyter/pytest_jupyter-${{ version }}.tar.gz\n  sha256: a4e08ced44cfea1bce080090c626b8dc4f9d617fa5aafcd84b71405f503e9899\n\nbuild:\n  number: 0\n  noarch: python\n\noutputs:\n  - package:\n      name: pytest-jupyter\n    build:\n      noarch: python\n      script:\n        - ${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation --disable-pip-version-check\n    requirements:\n      host:\n        - hatchling >=1.10.0\n        - pip\n        - python ${{ python_min }}.*\n      run:\n        - jupyter_core >=5.7\n        - pytest >=7.0\n        - python >=${{ python_min }}\n      run_constraints:\n        - ipykernel >=6.14\n        - jupyter_client >=7.4.0\n        - jupyter_server >=1.21\n        - nbformat >=5.3\n    tests:\n      - python:\n          imports: pytest_jupyter.jupyter_core\n          pip_check: true\n          python_version:\n            - ${{ python_min }}.*\n            - ${{ python_check_max }}.*\n\n  - package:\n      name: pytest-jupyter-client\n    build:\n      noarch: generic\n    requirements:\n      run:\n        - ${{ pin_subpackage(\"pytest-jupyter\", exact=True) }}\n        - ipykernel\n        - jupyter_client\n    tests:\n      - python:\n          imports: pytest_jupyter.jupyter_client\n          pip_check: true\n          python_version:\n            - ${{ python_min }}.*\n            - ${{ python_check_max }}.*\n    about:\n      summary: A pytest plugin for testing Jupyter libraries and extensions. (with client dependencies)\n      license: BSD-3-Clause\n      license_file: LICENSE\n      homepage: https://pypi.org/project/pytest-jupyter\n      repository: https://github.com/jupyter-server/pytest-jupyter\n\n  - package:\n      name: pytest-jupyter-server\n    build:\n      noarch: generic\n    requirements:\n      run:\n        - ${{ pin_subpackage(\"pytest-jupyter-client\", exact=True) }}\n        - jupyter_server\n    tests:\n      - python:\n          imports: pytest_jupyter.jupyter_server\n          pip_check: true\n          python_version:\n            - ${{ python_min }}.*\n            - ${{ python_check_max }}.*\n      - files:\n          source:\n            - tests/\n        requirements:\n          run:\n            - pytest-cov\n            - python ${{ python_min }}.*\n        script:\n          - coverage run --source=pytest_jupyter --branch -m pytest -vv --tb=long --color=yes\n          - coverage report --show-missing --skip-covered --fail-under=${{ cov_fail_under }}\n    about:\n      summary: A pytest plugin for testing Jupyter libraries and extensions. (with server dependencies)\n      license: BSD-3-Clause\n      license_file: LICENSE\n      homepage: https://pypi.org/project/pytest-jupyter\n      repository: https://github.com/jupyter-server/pytest-jupyter\n\nabout:\n  summary: A pytest plugin for testing Jupyter libraries and extensions.\n  license: BSD-3-Clause\n  license_file: LICENSE\n  homepage: https://pypi.org/project/pytest-jupyter\n  repository: https://github.com/jupyter-server/pytest-jupyter\n\nextra:\n  feedstock-name: pytest-jupyter\n  recipe-maintainers:\n    - blink1073\n    - fcollonval\n    - conda-forge/jupyter_server\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -406,7 +409,8 @@
       "__set__": true,
       "elements": [
         "pip",
-        "pytest-cov"
+        "pytest-cov",
+        "python"
       ]
     }
   },
@@ -419,9 +423,9 @@
     "host": {
       "__set__": true,
       "elements": [
-        "hatchling",
+        "hatchling >=1.10.0",
         "pip",
-        "python 3.9"
+        "python 3.10.*"
       ]
     },
     "run": {
@@ -431,22 +435,23 @@
         "jupyter_client",
         "jupyter_core >=5.7",
         "jupyter_server",
-        "pytest >=7",
+        "pytest >=7.0",
         "pytest-jupyter",
         "pytest-jupyter-client",
-        "python >=3.9"
+        "python >=3.10"
       ]
     },
     "test": {
       "__set__": true,
       "elements": [
         "pip",
-        "pytest-cov"
+        "pytest-cov",
+        "python 3.10.*"
       ]
     }
   },
-  "url": "https://pypi.org/packages/source/p/pytest-jupyter/pytest_jupyter-0.10.1.tar.gz",
-  "version": "0.10.1",
+  "url": "https://pypi.org/packages/source/p/pytest-jupyter/pytest_jupyter-0.11.0.tar.gz",
+  "version": "0.11.0",
   "version_pr_info": {
     "__lazy_json__": "version_pr_info/pytest-jupyter.json"
   }
