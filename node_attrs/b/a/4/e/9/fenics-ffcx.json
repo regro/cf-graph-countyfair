@@ -8,7 +8,9 @@
     "conda_build": {
       "pkg_format": "2"
     },
+    "conda_build_tool": "rattler-build",
     "conda_forge_output_validation": true,
+    "conda_install_tool": "pixi",
     "github": {
       "branch_name": "main",
       "tooling_branch_name": "main"
@@ -22,17 +24,21 @@
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
     "about": {
-      "description": "FFCx is a new version of the FEniCS Form Compiler.\nIt is being actively developed and is compatible with DOLFINx.\n\nFFCx is a compiler for finite element variational forms.\nFrom a high-level description of the form in the Unified Form Language (UFL),\nit generates efficient low-level C code that can be used to assemble the corresponding discrete operator (tensor).\nIn particular, a bilinear form may be assembled into a matrix and a linear form may be assembled into a vector.\nFFCx may be used either from the command line (by invoking the ffcx command) or as a Python module (import ffcx).\n",
+      "description": "FFCx is a new version of the FEniCS Form Compiler.\nIt is being actively developed and is compatible with DOLFINx.\n\nFFCx is a compiler for finite element variational forms.\nFrom a high-level description of the form in the Unified Form Language (UFL),\nit generates efficient low-level C code that can be used to assemble the corresponding discrete operator (tensor).\nIn particular, a bilinear form may be assembled into a matrix and a linear form may be assembled into a vector.\nFFCx may be used either from the command line (by invoking the ffcx command) or as a Python module (import ffcx).",
       "dev_url": "https://github.com/fenics/ffcx",
-      "doc_url": "https://docs.fenicsproject.org/ffcx/v0.9.0/",
-      "home": "https://fenicsproject.org",
+      "doc_url": "https://docs.fenicsproject.org/ffcx/v0.10.0/",
+      "home": "https://fenicsproject.org/",
       "license": "LGPL-3.0-or-later",
-      "license_family": "LGPL",
+      "license_family": "LGPL-3.0-or-later",
       "license_file": "COPYING.LESSER",
       "summary": "The FEniCSx Form Compiler"
     },
     "build": {
-      "number": "0"
+      "noarch": "python",
+      "number": "0",
+      "script": {
+        "file": "build-ffcx-py"
+      }
     },
     "extra": {
       "feedstock-name": "fenics-ffcx",
@@ -42,13 +48,61 @@
     },
     "outputs": [
       {
-        "build": {
-          "ignore_run_exports_from": [
-            "c_compiler_stub",
-            "c_stdlib_stub"
+        "build": null,
+        "name": "fenics-ffcx",
+        "requirements": {
+          "build": [],
+          "host": [
+            "python 3.10.*",
+            "pip",
+            "setuptools >=62",
+            "wheel"
           ],
-          "noarch": "generic"
+          "run": [
+            "python >=3.10",
+            "setuptools >=77.0.3",
+            "numpy >=1.21",
+            "cffi",
+            "fenics-basix 0.10.*",
+            "fenics-ufl 2025.2.*"
+          ]
         },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "ffcx"
+              ],
+              "python_version": [
+                "3.10.*",
+                "3.13.*"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "test"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "python 3.10.*",
+                "pip",
+                "numba",
+                "pytest",
+                "sympy",
+                "pygraphviz",
+                "c_compiler_stub"
+              ]
+            },
+            "script": "pytest -v -k \"not bilinear\" test"
+          }
+        ],
+        "version": "0.10.0"
+      },
+      {
+        "build": null,
         "name": "fenics-ufcx",
         "requirements": {
           "build": [
@@ -57,82 +111,65 @@
             "c_compiler_stub",
             "c_stdlib_stub"
           ],
+          "host": [],
           "run": [
             "__unix"
           ]
         },
-        "script": "build-ufcx.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/ufcx.h",
-            "pkg-config --cflags ufcx"
-          ],
-          "files": [
-            "test-ufcx"
-          ],
-          "requires": [
-            "pkg-config",
-            "cmake",
-            "make",
-            "cxx_compiler_stub"
-          ],
-          "script": "test-ufcx.sh"
-        }
-      },
-      {
-        "build": {
-          "entry_points": [
-            "ffcx = ffcx:__main__.main"
-          ],
-          "noarch": "python"
-        },
-        "name": "fenics-ffcx",
-        "requirements": {
-          "host": [
-            "python >=3.9",
-            "pip",
-            "setuptools >=62",
-            "wheel"
-          ],
-          "run": [
-            "python >=3.9",
-            "setuptools",
-            "numpy >=1.21",
-            "cffi",
-            "fenics-basix 0.9.*",
-            "fenics-ufl 2024.2.*"
-          ]
-        },
-        "script": "build-ffcx-py.sh",
-        "test": {
-          "commands": [
-            "pytest -v test"
-          ],
-          "imports": [
-            "ffcx"
-          ],
-          "requires": [
-            "pip",
-            "numba",
-            "pytest >=6",
-            "sympy",
-            "pygraphviz",
-            "c_compiler_stub"
-          ],
-          "source_files": [
-            "test"
-          ]
-        }
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "ufcx.h"
+              ]
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "test-ufcx/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pkg-config",
+                "cmake",
+                "make",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": {
+              "file": "test-ufcx"
+            }
+          }
+        ],
+        "version": "0.10.0"
       }
     ],
     "package": {
-      "name": "fenics-ffcx-ufcx",
-      "version": "0.9.0"
+      "name": "fenics-ffcx",
+      "version": "0.10.0"
     },
-    "schema_version": 0,
+    "requirements": {
+      "host": [
+        "python 3.10.*",
+        "pip",
+        "setuptools >=62",
+        "wheel"
+      ],
+      "run": [
+        "python >=3.10",
+        "setuptools >=77.0.3",
+        "numpy >=1.21",
+        "cffi",
+        "fenics-basix 0.10.*",
+        "fenics-ufl 2025.2.*"
+      ]
+    },
+    "schema_version": 1,
     "source": {
-      "sha256": "afa517272a3d2249f513cb711c50b77cf8368dd0b8f5ea4b759142229204a448",
-      "url": "https://github.com/fenics/ffcx/archive/refs/tags/v0.9.0.tar.gz"
+      "sha256": "8006c97e642978c3d0373b092d8df712015f692ccbb6b4df13e62383ab2fb649",
+      "url": "https://github.com/fenics/ffcx/archive/refs/tags/v0.10.0.tar.gz"
     }
   },
   "linux_64_requirements": {
@@ -178,23 +215,28 @@
         "pkg-config",
         "pygraphviz",
         "pytest",
+        "python",
         "sympy"
       ]
     }
   },
   "meta_yaml": {
     "about": {
-      "description": "FFCx is a new version of the FEniCS Form Compiler.\nIt is being actively developed and is compatible with DOLFINx.\n\nFFCx is a compiler for finite element variational forms.\nFrom a high-level description of the form in the Unified Form Language (UFL),\nit generates efficient low-level C code that can be used to assemble the corresponding discrete operator (tensor).\nIn particular, a bilinear form may be assembled into a matrix and a linear form may be assembled into a vector.\nFFCx may be used either from the command line (by invoking the ffcx command) or as a Python module (import ffcx).\n",
+      "description": "FFCx is a new version of the FEniCS Form Compiler.\nIt is being actively developed and is compatible with DOLFINx.\n\nFFCx is a compiler for finite element variational forms.\nFrom a high-level description of the form in the Unified Form Language (UFL),\nit generates efficient low-level C code that can be used to assemble the corresponding discrete operator (tensor).\nIn particular, a bilinear form may be assembled into a matrix and a linear form may be assembled into a vector.\nFFCx may be used either from the command line (by invoking the ffcx command) or as a Python module (import ffcx).",
       "dev_url": "https://github.com/fenics/ffcx",
-      "doc_url": "https://docs.fenicsproject.org/ffcx/v0.9.0/",
-      "home": "https://fenicsproject.org",
+      "doc_url": "https://docs.fenicsproject.org/ffcx/v0.10.0/",
+      "home": "https://fenicsproject.org/",
       "license": "LGPL-3.0-or-later",
-      "license_family": "LGPL",
+      "license_family": "LGPL-3.0-or-later",
       "license_file": "COPYING.LESSER",
       "summary": "The FEniCSx Form Compiler"
     },
     "build": {
-      "number": "0"
+      "noarch": "python",
+      "number": "0",
+      "script": {
+        "file": "build-ffcx-py"
+      }
     },
     "extra": {
       "feedstock-name": "fenics-ffcx",
@@ -204,13 +246,61 @@
     },
     "outputs": [
       {
-        "build": {
-          "ignore_run_exports_from": [
-            "c_compiler_stub",
-            "c_stdlib_stub"
+        "build": null,
+        "name": "fenics-ffcx",
+        "requirements": {
+          "build": [],
+          "host": [
+            "python 3.10.*",
+            "pip",
+            "setuptools >=62",
+            "wheel"
           ],
-          "noarch": "generic"
+          "run": [
+            "python >=3.10",
+            "setuptools >=77.0.3",
+            "numpy >=1.21",
+            "cffi",
+            "fenics-basix 0.10.*",
+            "fenics-ufl 2025.2.*"
+          ]
         },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "ffcx"
+              ],
+              "python_version": [
+                "3.10.*",
+                "3.13.*"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "test"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "python 3.10.*",
+                "pip",
+                "numba",
+                "pytest",
+                "sympy",
+                "pygraphviz",
+                "c_compiler_stub"
+              ]
+            },
+            "script": "pytest -v -k \"not bilinear\" test"
+          }
+        ],
+        "version": "0.10.0"
+      },
+      {
+        "build": null,
         "name": "fenics-ufcx",
         "requirements": {
           "build": [
@@ -219,166 +309,166 @@
             "c_compiler_stub",
             "c_stdlib_stub"
           ],
+          "host": [],
           "run": [
             "__unix"
           ]
         },
-        "script": "build-ufcx.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/ufcx.h",
-            "pkg-config --cflags ufcx"
-          ],
-          "files": [
-            "test-ufcx"
-          ],
-          "requires": [
-            "pkg-config",
-            "cmake",
-            "make",
-            "cxx_compiler_stub"
-          ],
-          "script": "test-ufcx.sh"
-        }
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "ufcx.h"
+              ]
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "test-ufcx/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pkg-config",
+                "cmake",
+                "make",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": {
+              "file": "test-ufcx"
+            }
+          }
+        ],
+        "version": "0.10.0"
       },
       {
-        "build": {
-          "entry_points": [
-            "ffcx = ffcx:__main__.main"
-          ],
-          "noarch": "python"
-        },
+        "build": null,
         "name": "fenics-ffcx",
         "requirements": {
+          "build": [],
           "host": [
-            "python >=3.9",
+            "python 3.10.*",
             "pip",
             "setuptools >=62",
             "wheel"
           ],
           "run": [
-            "python >=3.9",
-            "setuptools",
+            "python >=3.10",
+            "setuptools >=77.0.3",
             "numpy >=1.21",
             "cffi",
-            "fenics-basix 0.9.*",
-            "fenics-ufl 2024.2.*"
+            "fenics-basix 0.10.*",
+            "fenics-ufl 2025.2.*"
           ]
         },
-        "script": "build-ffcx-py.sh",
-        "test": {
-          "commands": [
-            "pytest -v test"
-          ],
-          "imports": [
-            "ffcx"
-          ],
-          "requires": [
-            "pip",
-            "numba",
-            "pytest >=6",
-            "sympy",
-            "pygraphviz",
-            "c_compiler_stub"
-          ],
-          "source_files": [
-            "test"
-          ]
-        }
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "ffcx"
+              ],
+              "python_version": [
+                "3.10.*",
+                "3.13.*"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "test"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "python 3.10.*",
+                "pip",
+                "numba",
+                "pytest",
+                "sympy",
+                "pygraphviz",
+                "c_compiler_stub"
+              ]
+            },
+            "script": "pytest -v -k \"not bilinear\" test"
+          }
+        ],
+        "version": "0.10.0"
       },
       {
-        "build": {
-          "ignore_run_exports_from": [
-            "c_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "noarch": "generic"
-        },
+        "build": null,
         "name": "fenics-ufcx",
         "requirements": {
           "build": [
             "cmake",
+            "make",
             "c_compiler_stub",
             "c_stdlib_stub"
           ],
+          "host": [],
           "run": [
-            "__win"
+            "__unix"
           ]
         },
-        "script": "build-ufcx.bat",
-        "test": {
-          "commands": [
-            "if not exist %LIBRARY_PREFIX%\\include\\ufcx.h  (exit 1)"
-          ],
-          "files": [
-            "test-ufcx"
-          ],
-          "requires": [
-            "pkg-config",
-            "cmake",
-            "make",
-            "cxx_compiler_stub"
-          ],
-          "script": "test-ufcx.bat"
-        }
-      },
-      {
-        "build": {
-          "entry_points": [
-            "ffcx = ffcx:__main__.main"
-          ],
-          "noarch": "python"
-        },
-        "name": "fenics-ffcx",
-        "requirements": {
-          "host": [
-            "python >=3.9",
-            "pip",
-            "setuptools >=62",
-            "wheel"
-          ],
-          "run": [
-            "python >=3.9",
-            "setuptools",
-            "numpy >=1.21",
-            "cffi",
-            "fenics-basix 0.9.*",
-            "fenics-ufl 2024.2.*"
-          ]
-        },
-        "script": "build-ffcx-py.bat",
-        "test": {
-          "commands": [
-            "pytest -v test"
-          ],
-          "imports": [
-            "ffcx"
-          ],
-          "requires": [
-            "pip",
-            "numba",
-            "pytest >=6",
-            "sympy",
-            "pygraphviz",
-            "c_compiler_stub"
-          ],
-          "source_files": [
-            "test"
-          ]
-        }
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "ufcx.h"
+              ]
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "test-ufcx/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pkg-config",
+                "cmake",
+                "make",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": {
+              "file": "test-ufcx"
+            }
+          }
+        ],
+        "version": "0.10.0"
       }
     ],
     "package": {
-      "name": "fenics-ffcx-ufcx",
-      "version": "0.9.0"
+      "name": "fenics-ffcx",
+      "version": "0.10.0"
     },
-    "schema_version": 0,
+    "requirements": {
+      "host": [
+        "python 3.10.*",
+        "pip",
+        "setuptools >=62",
+        "wheel"
+      ],
+      "run": [
+        "python >=3.10",
+        "setuptools >=77.0.3",
+        "numpy >=1.21",
+        "cffi",
+        "fenics-basix 0.10.*",
+        "fenics-ufl 2025.2.*"
+      ]
+    },
+    "schema_version": 1,
     "source": {
-      "sha256": "afa517272a3d2249f513cb711c50b77cf8368dd0b8f5ea4b759142229204a448",
-      "url": "https://github.com/fenics/ffcx/archive/refs/tags/v0.9.0.tar.gz"
+      "sha256": "8006c97e642978c3d0373b092d8df712015f692ccbb6b4df13e62383ab2fb649",
+      "url": "https://github.com/fenics/ffcx/archive/refs/tags/v0.10.0.tar.gz"
     }
   },
-  "name": "fenics-ffcx-ufcx",
+  "name": "fenics-ffcx",
   "outputs_names": {
     "__set__": true,
     "elements": [
@@ -394,12 +484,11 @@
   "pr_info": {
     "__lazy_json__": "pr_info/fenics-ffcx.json"
   },
-  "raw_meta_yaml": "{% set name = \"fenics-ffcx-ufcx\" %}\n{% set version = \"0.9.0\" %}\n\n# pins are usually updated on minor bumps:\n# basix is currently co-versioned with ffcx\n{% set major_minor = version.rsplit(\".\", 1)[0] %}\n{% set ufl_version = \"2024.2\" %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://github.com/fenics/ffcx/archive/refs/tags/v{{ version }}.tar.gz\n  sha256: afa517272a3d2249f513cb711c50b77cf8368dd0b8f5ea4b759142229204a448\nbuild:\n  number: 0\n\noutputs:\n  - name: fenics-ufcx\n    script: build-ufcx.sh  # [not win]\n    script: build-ufcx.bat  # [win]\n    build:\n      noarch: generic\n      ignore_run_exports_from:\n        # we don't use the compiler, but cmake still needs it\n        - {{ compiler(\"c\") }}\n        - {{ stdlib(\"c\") }}\n    requirements:\n      build:\n        - cmake\n        - make  # [not win]\n        - {{ compiler(\"c\") }}\n        - {{ stdlib(\"c\") }}\n      run:\n        - __unix  # [not win]\n        - __win  # [win]\n    test:\n      script: test-ufcx.sh  # [not win]\n      script: test-ufcx.bat  # [win]\n      files:\n        - test-ufcx\n      requires:\n        - pkg-config\n        - cmake\n        - make\n        - {{ compiler(\"cxx\") }}\n      commands:\n        - test -f ${PREFIX}/include/ufcx.h  # [not win]\n        - if not exist %LIBRARY_PREFIX%\\include\\ufcx.h  (exit 1)  # [win]\n        - pkg-config --cflags ufcx  # [not win]\n  - name: fenics-ffcx\n    script: build-ffcx-py.sh  # [not win]\n    script: build-ffcx-py.bat  # [win]\n    build:\n      noarch: python\n      entry_points:\n        - ffcx = ffcx:__main__.main\n    requirements:\n      host:\n        - python >=3.9\n        - pip\n        - setuptools >=62\n        - wheel\n      run:\n        - python >=3.9\n        - setuptools\n        - numpy >=1.21\n        - cffi\n        - fenics-basix {{ major_minor }}.*\n        - fenics-ufl {{ ufl_version }}.*\n    test:\n      source_files:\n        - test\n      requires:\n        - pip\n        - numba\n        - pytest >=6\n        - sympy\n        - pygraphviz\n        - {{ compiler(\"c\") }}\n      imports:\n        - ffcx\n      commands:\n        - pytest -v test\n\nabout:\n  home: https://fenicsproject.org\n  summary: The FEniCSx Form Compiler\n  description: |\n    FFCx is a new version of the FEniCS Form Compiler.\n    It is being actively developed and is compatible with DOLFINx.\n\n    FFCx is a compiler for finite element variational forms.\n    From a high-level description of the form in the Unified Form Language (UFL),\n    it generates efficient low-level C code that can be used to assemble the corresponding discrete operator (tensor).\n    In particular, a bilinear form may be assembled into a matrix and a linear form may be assembled into a vector.\n    FFCx may be used either from the command line (by invoking the ffcx command) or as a Python module (import ffcx).\n  license: LGPL-3.0-or-later\n  license_family: LGPL\n  license_file: COPYING.LESSER\n  doc_url: https://docs.fenicsproject.org/ffcx/v{{ version }}/\n  dev_url: https://github.com/fenics/ffcx\n\nextra:\n  feedstock-name: fenics-ffcx\n  recipe-maintainers:\n    - minrk\n",
+  "raw_meta_yaml": "# pins are usually updated on minor bumps:\n# basix is currently co-versioned with ffcx\nschema_version: 1\n\ncontext:\n  name: fenics-ffcx-ufcx\n  version: 0.10.0\n  major_minor: \"${{ (version | split('.'))[:2] | join('.') }}\"\n  ufl_version: \"2025.2\"\n\nrecipe:\n  name: ${{ name|lower }}\n  version: ${{ version }}\n\nsource:\n  url: https://github.com/fenics/ffcx/archive/refs/tags/v${{ version }}.tar.gz\n  sha256: 8006c97e642978c3d0373b092d8df712015f692ccbb6b4df13e62383ab2fb649\n\nbuild:\n  number: 0\n\noutputs:\n  - package:\n      name: fenics-ufcx\n    build:\n      noarch: generic\n      script: build-ufcx\n    requirements:\n      build:\n        - cmake\n        - if: not win\n          then: make\n        - ${{ compiler(\"c\") }}\n        - ${{ stdlib(\"c\") }}\n      host: []\n      run:\n        - if: not win\n          then: __unix\n        - if: win\n          then: __win\n      ignore_run_exports:\n        from_package:\n          - ${{ compiler(\"c\") }}\n          - ${{ stdlib(\"c\") }}\n    tests:\n      - package_contents:\n          include:\n            - ufcx.h\n      - script:\n          # rattler-build bug: executes .sh on Windows with .bat\n          # for noarch: generic package\n          file: test-ufcx${{ '.bat' if win else '' }}\n        files:\n          recipe:\n            - test-ufcx/\n        requirements:\n          run:\n            - pkg-config\n            - cmake\n            - make\n            - ${{ compiler(\"cxx\") }}\n  - package:\n      name: fenics-ffcx\n    build:\n      noarch: python\n      python:\n        entry_points:\n          - ffcx = ffcx:__main__.main\n      script:\n        file: build-ffcx-py\n    requirements:\n      host:\n        - python ${{ python_min }}.*\n        - pip\n        - setuptools >=62\n        - wheel\n      run:\n        - python >=${{ python_min }}\n        - setuptools >=77.0.3\n        - numpy >=1.21\n        - cffi\n        - fenics-basix ${{ major_minor }}.*\n        - fenics-ufl ${{ ufl_version }}.*\n    tests:\n      - python:\n          imports:\n            - ffcx\n          python_version:\n            - ${{ python_min }}.*\n            - \"3.13.*\"\n      - files:\n          source:\n            - test\n        requirements:\n          run:\n            - python ${{ python_min }}.*\n            - pip\n            - numba\n            - pytest\n            - sympy\n            - pygraphviz\n            - ${{ compiler(\"c\") }}\n        script:\n          - pytest -v -k \"not bilinear\" test\n\nabout:\n  summary: The FEniCSx Form Compiler\n  description: |\n    FFCx is a new version of the FEniCS Form Compiler.\n    It is being actively developed and is compatible with DOLFINx.\n\n    FFCx is a compiler for finite element variational forms.\n    From a high-level description of the form in the Unified Form Language (UFL),\n    it generates efficient low-level C code that can be used to assemble the corresponding discrete operator (tensor).\n    In particular, a bilinear form may be assembled into a matrix and a linear form may be assembled into a vector.\n    FFCx may be used either from the command line (by invoking the ffcx command) or as a Python module (import ffcx).\n  license: LGPL-3.0-or-later\n  license_file: COPYING.LESSER\n  homepage: https://fenicsproject.org\n  repository: https://github.com/fenics/ffcx\n  documentation: https://docs.fenicsproject.org/ffcx/v${{ version }}/\n\nextra:\n  feedstock-name: fenics-ffcx\n  recipe-maintainers:\n    - minrk\n",
   "req": {
     "__set__": true,
     "elements": [
       "__unix",
-      "__win",
       "c_compiler_stub",
       "c_stdlib_stub",
       "cffi",
@@ -440,7 +529,6 @@
       "__set__": true,
       "elements": [
         "__unix",
-        "__win",
         "c_compiler_stub",
         "c_stdlib_stub",
         "cffi",
@@ -464,6 +552,7 @@
         "pkg-config",
         "pygraphviz",
         "pytest",
+        "python",
         "sympy"
       ]
     }
@@ -483,7 +572,7 @@
       "__set__": true,
       "elements": [
         "pip",
-        "python >=3.9",
+        "python 3.10.*",
         "setuptools >=62",
         "wheel"
       ]
@@ -492,13 +581,12 @@
       "__set__": true,
       "elements": [
         "__unix",
-        "__win",
         "cffi",
-        "fenics-basix 0.9.*",
-        "fenics-ufl 2024.2.*",
+        "fenics-basix 0.10.*",
+        "fenics-ufl 2025.2.*",
         "numpy >=1.21",
-        "python >=3.9",
-        "setuptools"
+        "python >=3.10",
+        "setuptools >=77.0.3"
       ]
     },
     "test": {
@@ -512,29 +600,34 @@
         "pip",
         "pkg-config",
         "pygraphviz",
-        "pytest >=6",
+        "pytest",
+        "python 3.10.*",
         "sympy"
       ]
     }
   },
-  "url": "https://github.com/fenics/ffcx/archive/refs/tags/v0.9.0.tar.gz",
-  "version": "0.9.0",
+  "url": "https://github.com/fenics/ffcx/archive/refs/tags/v0.10.0.tar.gz",
+  "version": "0.10.0",
   "version_pr_info": {
     "__lazy_json__": "version_pr_info/fenics-ffcx.json"
   },
   "win_64_meta_yaml": {
     "about": {
-      "description": "FFCx is a new version of the FEniCS Form Compiler.\nIt is being actively developed and is compatible with DOLFINx.\n\nFFCx is a compiler for finite element variational forms.\nFrom a high-level description of the form in the Unified Form Language (UFL),\nit generates efficient low-level C code that can be used to assemble the corresponding discrete operator (tensor).\nIn particular, a bilinear form may be assembled into a matrix and a linear form may be assembled into a vector.\nFFCx may be used either from the command line (by invoking the ffcx command) or as a Python module (import ffcx).\n",
+      "description": "FFCx is a new version of the FEniCS Form Compiler.\nIt is being actively developed and is compatible with DOLFINx.\n\nFFCx is a compiler for finite element variational forms.\nFrom a high-level description of the form in the Unified Form Language (UFL),\nit generates efficient low-level C code that can be used to assemble the corresponding discrete operator (tensor).\nIn particular, a bilinear form may be assembled into a matrix and a linear form may be assembled into a vector.\nFFCx may be used either from the command line (by invoking the ffcx command) or as a Python module (import ffcx).",
       "dev_url": "https://github.com/fenics/ffcx",
-      "doc_url": "https://docs.fenicsproject.org/ffcx/v0.9.0/",
-      "home": "https://fenicsproject.org",
+      "doc_url": "https://docs.fenicsproject.org/ffcx/v0.10.0/",
+      "home": "https://fenicsproject.org/",
       "license": "LGPL-3.0-or-later",
-      "license_family": "LGPL",
+      "license_family": "LGPL-3.0-or-later",
       "license_file": "COPYING.LESSER",
       "summary": "The FEniCSx Form Compiler"
     },
     "build": {
-      "number": "0"
+      "noarch": "python",
+      "number": "0",
+      "script": {
+        "file": "build-ffcx-py"
+      }
     },
     "extra": {
       "feedstock-name": "fenics-ffcx",
@@ -544,95 +637,128 @@
     },
     "outputs": [
       {
-        "build": {
-          "ignore_run_exports_from": [
-            "c_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "noarch": "generic"
-        },
-        "name": "fenics-ufcx",
-        "requirements": {
-          "build": [
-            "cmake",
-            "c_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "run": [
-            "__win"
-          ]
-        },
-        "script": "build-ufcx.bat",
-        "test": {
-          "commands": [
-            "if not exist %LIBRARY_PREFIX%\\include\\ufcx.h  (exit 1)"
-          ],
-          "files": [
-            "test-ufcx"
-          ],
-          "requires": [
-            "pkg-config",
-            "cmake",
-            "make",
-            "cxx_compiler_stub"
-          ],
-          "script": "test-ufcx.bat"
-        }
-      },
-      {
-        "build": {
-          "entry_points": [
-            "ffcx = ffcx:__main__.main"
-          ],
-          "noarch": "python"
-        },
+        "build": null,
         "name": "fenics-ffcx",
         "requirements": {
+          "build": [],
           "host": [
-            "python >=3.9",
+            "python 3.10.*",
             "pip",
             "setuptools >=62",
             "wheel"
           ],
           "run": [
-            "python >=3.9",
-            "setuptools",
+            "python >=3.10",
+            "setuptools >=77.0.3",
             "numpy >=1.21",
             "cffi",
-            "fenics-basix 0.9.*",
-            "fenics-ufl 2024.2.*"
+            "fenics-basix 0.10.*",
+            "fenics-ufl 2025.2.*"
           ]
         },
-        "script": "build-ffcx-py.bat",
-        "test": {
-          "commands": [
-            "pytest -v test"
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "ffcx"
+              ],
+              "python_version": [
+                "3.10.*",
+                "3.13.*"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "test"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "python 3.10.*",
+                "pip",
+                "numba",
+                "pytest",
+                "sympy",
+                "pygraphviz",
+                "c_compiler_stub"
+              ]
+            },
+            "script": "pytest -v -k \"not bilinear\" test"
+          }
+        ],
+        "version": "0.10.0"
+      },
+      {
+        "build": null,
+        "name": "fenics-ufcx",
+        "requirements": {
+          "build": [
+            "cmake",
+            "make",
+            "c_compiler_stub",
+            "c_stdlib_stub"
           ],
-          "imports": [
-            "ffcx"
-          ],
-          "requires": [
-            "pip",
-            "numba",
-            "pytest >=6",
-            "sympy",
-            "pygraphviz",
-            "c_compiler_stub"
-          ],
-          "source_files": [
-            "test"
+          "host": [],
+          "run": [
+            "__unix"
           ]
-        }
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "ufcx.h"
+              ]
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "test-ufcx/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pkg-config",
+                "cmake",
+                "make",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": {
+              "file": "test-ufcx"
+            }
+          }
+        ],
+        "version": "0.10.0"
       }
     ],
     "package": {
-      "name": "fenics-ffcx-ufcx",
-      "version": "0.9.0"
+      "name": "fenics-ffcx",
+      "version": "0.10.0"
     },
-    "schema_version": 0,
+    "requirements": {
+      "host": [
+        "python 3.10.*",
+        "pip",
+        "setuptools >=62",
+        "wheel"
+      ],
+      "run": [
+        "python >=3.10",
+        "setuptools >=77.0.3",
+        "numpy >=1.21",
+        "cffi",
+        "fenics-basix 0.10.*",
+        "fenics-ufl 2025.2.*"
+      ]
+    },
+    "schema_version": 1,
     "source": {
-      "sha256": "afa517272a3d2249f513cb711c50b77cf8368dd0b8f5ea4b759142229204a448",
-      "url": "https://github.com/fenics/ffcx/archive/refs/tags/v0.9.0.tar.gz"
+      "sha256": "8006c97e642978c3d0373b092d8df712015f692ccbb6b4df13e62383ab2fb649",
+      "url": "https://github.com/fenics/ffcx/archive/refs/tags/v0.10.0.tar.gz"
     }
   },
   "win_64_requirements": {
@@ -641,7 +767,8 @@
       "elements": [
         "c_compiler_stub",
         "c_stdlib_stub",
-        "cmake"
+        "cmake",
+        "make"
       ]
     },
     "host": {
@@ -656,7 +783,7 @@
     "run": {
       "__set__": true,
       "elements": [
-        "__win",
+        "__unix",
         "cffi",
         "fenics-basix",
         "fenics-ufl",
@@ -677,6 +804,7 @@
         "pkg-config",
         "pygraphviz",
         "pytest",
+        "python",
         "sympy"
       ]
     }
