@@ -37,9 +37,9 @@
         "libboost",
         "python"
       ],
-      "number": "100",
+      "number": "101",
       "script": "PYTHON -m pip install . -vv --no-build-isolation -Cmkl=no",
-      "string": "py313h1234567_100"
+      "string": "py314h1234567_101"
     },
     "extra": {
       "recipe-maintainers": [
@@ -152,9 +152,9 @@
         "libboost",
         "python"
       ],
-      "number": "100",
+      "number": "101",
       "script": "PYTHON -m pip install . -vv --no-build-isolation -Cmkl=no -Cgenerator=\"Visual Studio 17 2022\"",
-      "string": "py313h1234567_100"
+      "string": "py314h1234567_101"
     },
     "extra": {
       "recipe-maintainers": [
@@ -227,9 +227,9 @@
         "libboost",
         "python"
       ],
-      "number": "0",
+      "number": "1",
       "script": "PYTHON -m pip install . -vv --no-build-isolation -Cmkl=no",
-      "string": "mkl_py313h1234567_0"
+      "string": "mkl_py314h1234567_1"
     },
     "extra": {
       "recipe-maintainers": [
@@ -338,9 +338,9 @@
         "libboost",
         "python"
       ],
-      "number": "0",
+      "number": "1",
       "script": "PYTHON -m pip install . -vv --no-build-isolation -Cmkl=no",
-      "string": "mkl_py313h1234567_0"
+      "string": "mkl_py314h1234567_1"
     },
     "extra": {
       "recipe-maintainers": [
@@ -448,7 +448,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/pyinterp.json"
   },
-  "raw_meta_yaml": "{% set name = \"pyinterp\" %}\n{% set version = \"2025.8.1\" %}\n{% set sha256 = \"7e352d4182a0054d2df0cddce1e4cdb908f766716c96ce790b8b97933c387b3a\" %}\n{% set build = 0 %}\n\n# Set blas to \"openblas\" if not already set\n{% set blas = blas or \"openblas\" %}\n{% if blas == \"openblas\" %}\n# Prioritize openblas via build number\n{% set build = build + 100 %}\n{% endif %}\n# Set mkl_option to \"yes\" if blas is \"mkl\"\n{% if blas != \"mkl\" %}\n{% set mkl_option = \"no\" %}\n{% else %}\n{% set mkl_option = \"yes\" %}\n{% endif %}\n# Define the generator for the build\n{% if target_platform == \"win-64\" %}\n{% set generator = \"-Cgenerator=\\\"Visual Studio 17 2022\\\"\" %}\n{% else %}\n{% set generator = \"\" %}\n{% endif %}\n# Define the prefix for the package name\n{% if blas == \"openblas\" or osx %}\n{% if win or linux %}\n{% set blas_prefix = \"openblas_\" %}\n{% else %}\n# For OSX, dot not use a prefix, because we use the system blas (accelerate)\n{% set blas_prefix = \"\" %}\n{% endif %}\n{% else %}\n{% set blas_prefix = \"mkl_\" %}\n{% endif %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://github.com/CNES/pangeo-{{ name }}/releases/download/{{ version }}/{{ name }}-{{ version }}.tar.gz\n  sha256: {{ sha256 }}\n\nbuild:\n  number: {{ build }}\n  script: {{ PYTHON }} -m pip install . -vv --no-build-isolation -Cmkl={{ mkl_option }} {{ generator }}\n  skip: true  # [linux32 or win32 or py<310]\n  string: {{ blas_prefix }}py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ build }}\n\n  ignore_run_exports:\n    - xarray\n    - numpy\n    - libboost\n    - python\n\nrequirements:\n  build:\n    - python                              # [build_platform != target_platform]\n    - cross-python_{{ target_platform }}  # [build_platform != target_platform]\n    - setuptools                          # [build_platform != target_platform]\n    - {{ compiler('cxx') }}\n    - {{ stdlib(\"c\") }}\n    - cmake\n    - make                                # [linux or osx]\n  host:\n    - dask\n    - eigen\n    - libboost-devel >=1.79.0\n    - mkl-devel                           # [blas == \"mkl\"]\n    - openblas                            # [(blas == \"openblas\") and (win or linux)]\n    - blas * accelerate                   # [osx]\n    - numpy\n    - pip\n    - pytest\n    - python\n    - setuptools\n    - xarray\n  run:\n    - dask *\n    - mkl *                               # [blas == \"mkl\"]\n    - openblas *                          # [(blas == \"openblas\") and (win or linux)]\n    - blas * accelerate                   # [osx]\n    - python\n    - xarray >=0.13\n\ntest:\n  requires:\n    - pytest\n  commands:\n    - pytest --pyargs pyinterp\n\nabout:\n  home: https://github.com/CNES/pangeo-pyinterp\n  license: BSD-3-Clause\n  license_file: LICENSE\n  summary: Python library for optimized geo-referenced interpolation\n\n  description: |\n    Tools for interpolating geo-referenced data used in the field of\n    geosciences. There are other libraries that cover this problem, but written\n    entirely in Python, the performance of these projects was not quite\n    sufficient for our needs. That is why this project was created.\n  doc_url: https://cnes.github.io/pangeo-pyinterp/\n  dev_url: https://github.com/CNES/pangeo-pyinterp\n\nextra:\n  recipe-maintainers:\n    - fbriol\n",
+  "raw_meta_yaml": "{% set name = \"pyinterp\" %}\n{% set version = \"2025.8.1\" %}\n{% set sha256 = \"7e352d4182a0054d2df0cddce1e4cdb908f766716c96ce790b8b97933c387b3a\" %}\n{% set build = 1 %}\n\n# Set blas to \"openblas\" if not already set\n{% set blas = blas or \"openblas\" %}\n{% if blas == \"openblas\" %}\n# Prioritize openblas via build number\n{% set build = build + 100 %}\n{% endif %}\n# Set mkl_option to \"yes\" if blas is \"mkl\"\n{% if blas != \"mkl\" %}\n{% set mkl_option = \"no\" %}\n{% else %}\n{% set mkl_option = \"yes\" %}\n{% endif %}\n# Define the generator for the build\n{% if target_platform == \"win-64\" %}\n{% set generator = \"-Cgenerator=\\\"Visual Studio 17 2022\\\"\" %}\n{% else %}\n{% set generator = \"\" %}\n{% endif %}\n# Define the prefix for the package name\n{% if blas == \"openblas\" or osx %}\n{% if win or linux %}\n{% set blas_prefix = \"openblas_\" %}\n{% else %}\n# For OSX, dot not use a prefix, because we use the system blas (accelerate)\n{% set blas_prefix = \"\" %}\n{% endif %}\n{% else %}\n{% set blas_prefix = \"mkl_\" %}\n{% endif %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://github.com/CNES/pangeo-{{ name }}/releases/download/{{ version }}/{{ name }}-{{ version }}.tar.gz\n  sha256: {{ sha256 }}\n\nbuild:\n  number: {{ build }}\n  script: {{ PYTHON }} -m pip install . -vv --no-build-isolation -Cmkl={{ mkl_option }} {{ generator }}\n  skip: true  # [linux32 or win32 or py<310]\n  string: {{ blas_prefix }}py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ build }}\n\n  ignore_run_exports:\n    - xarray\n    - numpy\n    - libboost\n    - python\n\nrequirements:\n  build:\n    - python                              # [build_platform != target_platform]\n    - cross-python_{{ target_platform }}  # [build_platform != target_platform]\n    - setuptools                          # [build_platform != target_platform]\n    - {{ compiler('cxx') }}\n    - {{ stdlib(\"c\") }}\n    - cmake\n    - make                                # [linux or osx]\n  host:\n    - dask\n    - eigen\n    - libboost-devel >=1.79.0\n    - mkl-devel                           # [blas == \"mkl\"]\n    - openblas                            # [(blas == \"openblas\") and (win or linux)]\n    - blas * accelerate                   # [osx]\n    - numpy\n    - pip\n    - pytest\n    - python\n    - setuptools\n    - xarray\n  run:\n    - dask *\n    - mkl *                               # [blas == \"mkl\"]\n    - openblas *                          # [(blas == \"openblas\") and (win or linux)]\n    - blas * accelerate                   # [osx]\n    - python\n    - xarray >=0.13\n\ntest:\n  requires:\n    - pytest\n  commands:\n    - pytest --pyargs pyinterp\n\nabout:\n  home: https://github.com/CNES/pangeo-pyinterp\n  license: BSD-3-Clause\n  license_file: LICENSE\n  summary: Python library for optimized geo-referenced interpolation\n\n  description: |\n    Tools for interpolating geo-referenced data used in the field of\n    geosciences. There are other libraries that cover this problem, but written\n    entirely in Python, the performance of these projects was not quite\n    sufficient for our needs. That is why this project was created.\n  doc_url: https://cnes.github.io/pangeo-pyinterp/\n  dev_url: https://github.com/CNES/pangeo-pyinterp\n\nextra:\n  recipe-maintainers:\n    - fbriol\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -588,9 +588,9 @@
         "libboost",
         "python"
       ],
-      "number": "100",
+      "number": "101",
       "script": "PYTHON -m pip install . -vv --no-build-isolation -Cmkl=no -Cgenerator=\"Visual Studio 17 2022\"",
-      "string": "py313h1234567_100"
+      "string": "py314h1234567_101"
     },
     "extra": {
       "recipe-maintainers": [
