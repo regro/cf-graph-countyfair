@@ -48,6 +48,7 @@
     "extra": {
       "feedstock-name": "lightgbm",
       "recipe-maintainers": [
+        "timkpaine",
         "synapticarbors",
         "aldanor",
         "xhochy",
@@ -340,6 +341,7 @@
     "extra": {
       "feedstock-name": "lightgbm",
       "recipe-maintainers": [
+        "timkpaine",
         "synapticarbors",
         "aldanor",
         "xhochy",
@@ -632,6 +634,7 @@
     "extra": {
       "feedstock-name": "lightgbm",
       "recipe-maintainers": [
+        "timkpaine",
         "synapticarbors",
         "aldanor",
         "xhochy",
@@ -799,6 +802,7 @@
     "extra": {
       "feedstock-name": "lightgbm",
       "recipe-maintainers": [
+        "timkpaine",
         "synapticarbors",
         "aldanor",
         "xhochy",
@@ -1459,6 +1463,7 @@
     "extra": {
       "feedstock-name": "lightgbm",
       "recipe-maintainers": [
+        "timkpaine",
         "synapticarbors",
         "aldanor",
         "xhochy",
@@ -1626,6 +1631,7 @@
     "extra": {
       "feedstock-name": "lightgbm",
       "recipe-maintainers": [
+        "timkpaine",
         "synapticarbors",
         "aldanor",
         "xhochy",
@@ -1791,7 +1797,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/lightgbm.json"
   },
-  "raw_meta_yaml": "{% set version = \"4.6.0\" %}\n\npackage:\n  name: liblightgbm\n  version: {{ version }}\n\nsource:\n  url: https://pypi.org/packages/source/l/lightgbm/lightgbm-{{ version }}.tar.gz\n  sha256: cb1c59720eb569389c0ba74d14f52351b573af489f230032a1c9f314f8bab7fe\n  patches:\n    - patches/0001-boost-shared.patch\n    # Taken from https://github.com/microsoft/LightGBM/blob/v4.5.0/build-python.sh#L308-L316\n    # except that we don't copy lib_lightgbm.so to SP_DIR\n    - patches/0002-use-precompiled.patch\n    # Compatibility fix for Boost 1.86\n    - patches/0003-boost-sha1.patch\n    # use C++17\n    - patches/0004-use-cxx-17.patch\n    # avoid trying to compile for unsupported GPU architectures when targeting CUDA 13\n    - patches/0005-drop-arches-for-cuda13.patch\n\nbuild:\n  number: 6\n  string: cuda{{ cuda_compiler_version | replace('.', '') }}_h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version != \"None\"]\n  string: cpu_h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version == \"None\"]\n  # CUDA is not supported in windows\n  skip: true  # [cuda_compiler_version != \"None\" and win]\n  run_exports:\n    # Pin conservatively as we don't know ABI guarantees\n    - {{ pin_subpackage(\"liblightgbm\", max_pin=\"x.x.x\") }}\n\nrequirements:\n  build:\n    - cmake >=3.28\n    - make    # [not win]\n    - ninja   # [win]\n    - {{ compiler('c') }}\n    - {{ stdlib(\"c\") }}\n    - {{ compiler('cxx') }}\n    - {{ compiler('cuda') }}                 # [cuda_compiler_version != \"None\"]\n  host:\n    - llvm-openmp  # [osx]\n    - libgomp  # [linux]\n    - libboost-devel              # [cuda_compiler_version == \"None\"]\n    - ocl-icd                     # [cuda_compiler_version == \"None\" and linux]\n    - khronos-opencl-icd-loader   # [cuda_compiler_version == \"None\" and not linux]\n  run:\n    - __cuda                      # [cuda_compiler_version != \"None\"]\n  run_constrained:\n    - lightgbm {{ version }} cuda{{ cuda_compiler_version | replace('.', '') }}_*_{{ PKG_BUILDNUM }}   # [cuda_compiler_version != \"None\"]\n    - lightgbm {{ version }} cpu_*_{{ PKG_BUILDNUM }}    # [cuda_compiler_version == \"None\"]\n\ntest:\n  commands:\n    - test -f $PREFIX/lib/lib_lightgbm${SHLIB_EXT}  # [unix]\n\noutputs:\n  - name: liblightgbm\n\n  - name: lightgbm\n    script: install-python.sh\n    build:\n      noarch: python\n      string: cuda{{ cuda_compiler_version | replace('.', '') }}_py_{{ PKG_BUILDNUM }}  # [cuda_compiler_version != \"None\"]\n      string: cpu_py_{{ PKG_BUILDNUM }}   # [cuda_compiler_version == \"None\"]\n      # TODO: remove this when conda-build bug is fixed where `noarch` subpackages\n      # when tested does not find dependencies from target_platform.\n      skip: True  # [build_platform != target_platform]\n    requirements:\n      build:\n        - python                                 # [build_platform != target_platform]\n        - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n      host:\n        - python {{ python_min }}\n        - pip\n        - setuptools\n      run:\n        - python >={{ python_min }}\n        - {{ pin_subpackage(\"liblightgbm\", max_pin=\"x.x.x\") }}\n        - __cuda                                 # [cuda_compiler_version != \"None\"]\n        - numpy >=1.17.0\n        - scipy\n      # optional dependencies from [project.optional-dependencies]\n      # at https://github.com/microsoft/LightGBM/blob/master/python-package/pyproject.toml\n      run_constrained:\n        - cffi >=1.15.1\n        - dask >=2.0.0\n        - pandas >=0.24.0\n        - pyarrow >=6.0.1\n        - scikit-learn >=0.24.2\n    test:\n      files:\n        - python_run_test.py\n      imports:\n        - lightgbm\n        - lightgbm.basic\n        - lightgbm.callback\n        - lightgbm.compat\n        - lightgbm.dask\n        - lightgbm.engine\n        - lightgbm.libpath\n        - lightgbm.plotting\n        - lightgbm.sklearn\n      requires:\n        - pip\n        - scikit-learn\n        - python {{ python_min }}\n      commands:\n        - pip check\n        - python python_run_test.py\n        - python -c \"from lightgbm import __version__\"\n\nabout:\n  home: https://github.com/microsoft/LightGBM\n  license: MIT\n  license_family: MIT\n  license_file: LICENSE\n  summary: LightGBM is a gradient boosting framework that uses tree based learning algorithms.\n\n  description: |\n    A fast, distributed, high performance gradient boosting (GBDT, GBRT, GBM or MART) framework based on decision tree algorithms, used for ranking, classification and many other machine learning tasks.\n  doc_url: https://lightgbm.readthedocs.io/en/v{{ version }}/\n  dev_url: https://github.com/microsoft/LightGBM\n\nextra:\n  feedstock-name: lightgbm\n  recipe-maintainers:\n    - synapticarbors\n    - aldanor\n    - xhochy\n    - jameslamb\n",
+  "raw_meta_yaml": "{% set version = \"4.6.0\" %}\n\npackage:\n  name: liblightgbm\n  version: {{ version }}\n\nsource:\n  url: https://pypi.org/packages/source/l/lightgbm/lightgbm-{{ version }}.tar.gz\n  sha256: cb1c59720eb569389c0ba74d14f52351b573af489f230032a1c9f314f8bab7fe\n  patches:\n    - patches/0001-boost-shared.patch\n    # Taken from https://github.com/microsoft/LightGBM/blob/v4.5.0/build-python.sh#L308-L316\n    # except that we don't copy lib_lightgbm.so to SP_DIR\n    - patches/0002-use-precompiled.patch\n    # Compatibility fix for Boost 1.86\n    - patches/0003-boost-sha1.patch\n    # use C++17\n    - patches/0004-use-cxx-17.patch\n    # avoid trying to compile for unsupported GPU architectures when targeting CUDA 13\n    - patches/0005-drop-arches-for-cuda13.patch\n\nbuild:\n  number: 6\n  string: cuda{{ cuda_compiler_version | replace('.', '') }}_h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version != \"None\"]\n  string: cpu_h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version == \"None\"]\n  # CUDA is not supported in windows\n  skip: true  # [cuda_compiler_version != \"None\" and win]\n  run_exports:\n    # Pin conservatively as we don't know ABI guarantees\n    - {{ pin_subpackage(\"liblightgbm\", max_pin=\"x.x.x\") }}\n\nrequirements:\n  build:\n    - cmake >=3.28\n    - make    # [not win]\n    - ninja   # [win]\n    - {{ compiler('c') }}\n    - {{ stdlib(\"c\") }}\n    - {{ compiler('cxx') }}\n    - {{ compiler('cuda') }}                 # [cuda_compiler_version != \"None\"]\n  host:\n    - llvm-openmp  # [osx]\n    - libgomp  # [linux]\n    - libboost-devel              # [cuda_compiler_version == \"None\"]\n    - ocl-icd                     # [cuda_compiler_version == \"None\" and linux]\n    - khronos-opencl-icd-loader   # [cuda_compiler_version == \"None\" and not linux]\n  run:\n    - __cuda                      # [cuda_compiler_version != \"None\"]\n  run_constrained:\n    - lightgbm {{ version }} cuda{{ cuda_compiler_version | replace('.', '') }}_*_{{ PKG_BUILDNUM }}   # [cuda_compiler_version != \"None\"]\n    - lightgbm {{ version }} cpu_*_{{ PKG_BUILDNUM }}    # [cuda_compiler_version == \"None\"]\n\ntest:\n  commands:\n    - test -f $PREFIX/lib/lib_lightgbm${SHLIB_EXT}  # [unix]\n\noutputs:\n  - name: liblightgbm\n\n  - name: lightgbm\n    script: install-python.sh\n    build:\n      noarch: python\n      string: cuda{{ cuda_compiler_version | replace('.', '') }}_py_{{ PKG_BUILDNUM }}  # [cuda_compiler_version != \"None\"]\n      string: cpu_py_{{ PKG_BUILDNUM }}   # [cuda_compiler_version == \"None\"]\n      # TODO: remove this when conda-build bug is fixed where `noarch` subpackages\n      # when tested does not find dependencies from target_platform.\n      skip: True  # [build_platform != target_platform]\n    requirements:\n      build:\n        - python                                 # [build_platform != target_platform]\n        - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n      host:\n        - python {{ python_min }}\n        - pip\n        - setuptools\n      run:\n        - python >={{ python_min }}\n        - {{ pin_subpackage(\"liblightgbm\", max_pin=\"x.x.x\") }}\n        - __cuda                                 # [cuda_compiler_version != \"None\"]\n        - numpy >=1.17.0\n        - scipy\n      # optional dependencies from [project.optional-dependencies]\n      # at https://github.com/microsoft/LightGBM/blob/master/python-package/pyproject.toml\n      run_constrained:\n        - cffi >=1.15.1\n        - dask >=2.0.0\n        - pandas >=0.24.0\n        - pyarrow >=6.0.1\n        - scikit-learn >=0.24.2\n    test:\n      files:\n        - python_run_test.py\n      imports:\n        - lightgbm\n        - lightgbm.basic\n        - lightgbm.callback\n        - lightgbm.compat\n        - lightgbm.dask\n        - lightgbm.engine\n        - lightgbm.libpath\n        - lightgbm.plotting\n        - lightgbm.sklearn\n      requires:\n        - pip\n        - scikit-learn\n        - python {{ python_min }}\n      commands:\n        - pip check\n        - python python_run_test.py\n        - python -c \"from lightgbm import __version__\"\n\nabout:\n  home: https://github.com/microsoft/LightGBM\n  license: MIT\n  license_family: MIT\n  license_file: LICENSE\n  summary: LightGBM is a gradient boosting framework that uses tree based learning algorithms.\n\n  description: |\n    A fast, distributed, high performance gradient boosting (GBDT, GBRT, GBM or MART) framework based on decision tree algorithms, used for ranking, classification and many other machine learning tasks.\n  doc_url: https://lightgbm.readthedocs.io/en/v{{ version }}/\n  dev_url: https://github.com/microsoft/LightGBM\n\nextra:\n  feedstock-name: lightgbm\n  recipe-maintainers:\n    - timkpaine\n    - synapticarbors\n    - aldanor\n    - xhochy\n    - jameslamb\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -1945,6 +1951,7 @@
     "extra": {
       "feedstock-name": "lightgbm",
       "recipe-maintainers": [
+        "timkpaine",
         "synapticarbors",
         "aldanor",
         "xhochy",
