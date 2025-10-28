@@ -15,8 +15,8 @@
     },
     "test": "native_and_emulated"
   },
-  "feedstock_hash": "de34ab20b657f8c6542f1e40cf83de216edc7d2c",
-  "feedstock_hash_ts": 1745994220,
+  "feedstock_hash": "ca5953de7d909eac6a6c6cb84a0f602d227763dc",
+  "feedstock_hash_ts": 1761649390,
   "feedstock_name": "physics-tenpy",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -31,7 +31,7 @@
       "summary": "Simulation of quantum many-body systems with tensor networks in Python"
     },
     "build": {
-      "number": "0",
+      "number": "1",
       "script": "PYTHON -m pip install . -vv"
     },
     "extra": {
@@ -136,8 +136,9 @@
       "summary": "Simulation of quantum many-body systems with tensor networks in Python"
     },
     "build": {
-      "number": "0",
-      "script": "PYTHON -m pip install . -vv"
+      "number": "1",
+      "script": "PYTHON -m pip install . -vv",
+      "skip": true
     },
     "extra": {
       "recipe-maintainers": [
@@ -160,7 +161,8 @@
         "python",
         "cython",
         "numpy",
-        "scipy"
+        "scipy",
+        "scipy >=1.15.3"
       ],
       "run": [
         "python",
@@ -168,7 +170,7 @@
         "bottleneck",
         "pyyaml",
         "h5py",
-        "scipy <1.15"
+        "scipy >=1.15.3"
       ]
     },
     "schema_version": 0,
@@ -206,7 +208,7 @@
       "summary": "Simulation of quantum many-body systems with tensor networks in Python"
     },
     "build": {
-      "number": "0",
+      "number": "1",
       "script": "PYTHON -m pip install . -vv"
     },
     "extra": {
@@ -311,7 +313,7 @@
       "summary": "Simulation of quantum many-body systems with tensor networks in Python"
     },
     "build": {
-      "number": "0",
+      "number": "1",
       "script": "PYTHON -m pip install . -vv"
     },
     "extra": {
@@ -420,7 +422,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/physics-tenpy.json"
   },
-  "raw_meta_yaml": "{% set name = \"physics-tenpy\" %}\n{% set version = \"1.0.6\" %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name.replace('-', '_') }}-{{ version }}.tar.gz\n  sha256: 5a382a10e4f91ba6a5afd1fb06f065b01a84e590d9ea96057cd0aa1b2b2be119\n\nbuild:\n  number: 0\n  script: {{ PYTHON }} -m pip install . -vv\n  skip: true  # [python_impl == 'pypy']\n\nrequirements:\n  build:\n    - python                                 # [build_platform != target_platform]\n    - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n    - cython                                 # [build_platform != target_platform]\n    - numpy                                  # [build_platform != target_platform]\n    - scipy                                  # [build_platform != target_platform]\n    - pip                                    # [build_platform != target_platform]\n    - setuptools                             # [build_platform != target_platform]\n    - {{ compiler('cxx') }}\n    - {{ stdlib(\"c\") }}\n  host:\n    - pip\n    - setuptools\n    - python\n    - cython\n    - numpy\n    - scipy\n  run:\n    - python\n    # 2025-03: scipy.linalg.expm implemented in C from version 1.15 fails tests on windows\n    # see https://github.com/scipy/scipy/issues/22558\n    # hence I pin them here to scipy < 1.15 for win\n    - scipy <1.15      # [win]\n    - scipy            # [not win]\n    - bottleneck\n    - pyyaml\n    - h5py\n\ntest:\n  source_files:\n    - tests\n    - pyproject.toml\n  requires:\n    - pytest\n    - psutil\n  imports:\n    - tenpy\n  commands:\n    - pytest -m \"not slow\" --ignore=tests/test_examples.py tests\n\nabout:\n  home: https://github.com/tenpy/tenpy\n  license: Apache-2.0\n  license_file: LICENSE\n  license_url: https://www.apache.org/licenses/LICENSE-2.0\n  summary: Simulation of quantum many-body systems with tensor networks in Python\n  description: |\n    \"TeNPy is a package of Python code for the simulation of quantum many-body systems with tensor networks.\n    Amongst others, it includes codes for the density matrix renormalization group (DMRG) algorithm\n    and the time evolving block decimation (TEBD) algorithm based on matrix product states (MPS).\n    The minimal dependency is Python, Numpy and Scipy, but it ships with an optional Cython extension to\n    reduce the Python overhead in tensor contractions.\"\n  doc_url: https://tenpy.readthedocs.io/\n  dev_url: https://github.com/tenpy/tenpy\n\nextra:\n  recipe-maintainers:\n    - jhauschild\n    - Jakob-Unfried\n",
+  "raw_meta_yaml": "{% set name = \"physics-tenpy\" %}\n{% set version = \"1.0.6\" %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name.replace('-', '_') }}-{{ version }}.tar.gz\n  sha256: 5a382a10e4f91ba6a5afd1fb06f065b01a84e590d9ea96057cd0aa1b2b2be119\n\n\n# [1] notes on windows builds (28 oct 2025):\n#     - There is a known bug affecting `1.15 <= scipy < 1.15.3` on windows.\n#       See https://github.com/scipy/scipy/issues/22558\n#       We make sure to exclude these scipy versions explicitly\n#     - There are unknown bugs somewhere in scipy/numpy, probably the underlying MKL that cause\n#       our tests to fail (lanczos does not converge, np.linalg.eigh raises not converged), only\n#       on numpy and only for python 3.10 and 3.11 (<3.10 not tested, end of life).\n#       This could probably be resolved by carefully excluding package versions, but I dont have\n#       capacity to diagnose which versions cause the problems, and I want to publish for 3.14 ASAP\n\nbuild:\n  number: 1\n  script: {{ PYTHON }} -m pip install . -vv\n  skip: true  # [python_impl == 'pypy']\n  # restrict python version for windows: see note [1] above\n  skip: true  # [win and py<312]\n\nrequirements:\n  build:\n    - python                                 # [build_platform != target_platform]\n    - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n    - cython                                 # [build_platform != target_platform]\n    - numpy                                  # [build_platform != target_platform]\n    # restrict scipy version for windows: see note [1] above\n    - scipy >=1.15.3                         # [build_platform != target_platform and win]\n    - scipy                                  # [build_platform != target_platform and not win]\n    - pip                                    # [build_platform != target_platform]\n    - setuptools                             # [build_platform != target_platform]\n    - {{ compiler('cxx') }}\n    - {{ stdlib(\"c\") }}\n  host:\n    - pip\n    - setuptools\n    - python\n    - cython\n    - numpy\n    # restrict scipy version for windows: see note [1] above\n    - scipy >=1.15.3            # [win]\n    - scipy                     # [not win]\n  run:\n    - python\n    # restrict scipy version for windows: see note [1] above\n    - scipy >=1.15.3            # [win]\n    - scipy                     # [not win]\n    - bottleneck\n    - pyyaml\n    - h5py\n\ntest:\n  source_files:\n    - tests\n    - pyproject.toml\n  requires:\n    - pytest\n    - psutil\n  imports:\n    - tenpy\n  commands:\n    - pytest -m \"not slow\" --ignore=tests/test_examples.py tests\n\nabout:\n  home: https://github.com/tenpy/tenpy\n  license: Apache-2.0\n  license_file: LICENSE\n  license_url: https://www.apache.org/licenses/LICENSE-2.0\n  summary: Simulation of quantum many-body systems with tensor networks in Python\n  description: |\n    \"TeNPy is a package of Python code for the simulation of quantum many-body systems with tensor networks.\n    Amongst others, it includes codes for the density matrix renormalization group (DMRG) algorithm\n    and the time evolving block decimation (TEBD) algorithm based on matrix product states (MPS).\n    The minimal dependency is Python, Numpy and Scipy, but it ships with an optional Cython extension to\n    reduce the Python overhead in tensor contractions.\"\n  doc_url: https://tenpy.readthedocs.io/\n  dev_url: https://github.com/tenpy/tenpy\n\nextra:\n  recipe-maintainers:\n    - jhauschild\n    - Jakob-Unfried\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -495,6 +497,7 @@
         "pip",
         "python",
         "scipy",
+        "scipy >=1.15.3",
         "setuptools"
       ]
     },
@@ -506,7 +509,7 @@
         "python",
         "pyyaml",
         "scipy",
-        "scipy <1.15"
+        "scipy >=1.15.3"
       ]
     },
     "test": {
@@ -534,8 +537,9 @@
       "summary": "Simulation of quantum many-body systems with tensor networks in Python"
     },
     "build": {
-      "number": "0",
-      "script": "PYTHON -m pip install . -vv"
+      "number": "1",
+      "script": "PYTHON -m pip install . -vv",
+      "skip": true
     },
     "extra": {
       "recipe-maintainers": [
@@ -558,11 +562,11 @@
         "python",
         "cython",
         "numpy",
-        "scipy"
+        "scipy >=1.15.3"
       ],
       "run": [
         "python",
-        "scipy <1.15",
+        "scipy >=1.15.3",
         "bottleneck",
         "pyyaml",
         "h5py"
