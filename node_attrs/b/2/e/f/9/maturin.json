@@ -9,6 +9,8 @@
       "automerge": true
     },
     "build_platform": {
+      "linux_aarch64": "linux_64",
+      "linux_ppc64le": "linux_64",
       "osx_arm64": "osx_64"
     },
     "conda_build": {
@@ -20,15 +22,10 @@
       "branch_name": "main",
       "tooling_branch_name": "main"
     },
-    "provider": {
-      "linux_aarch64": "azure",
-      "linux_ppc64le": "azure",
-      "win": "azure"
-    },
     "test": "native_and_emulated"
   },
-  "feedstock_hash": "c0f36bd4aa918f136d3223cac21136a10fffd340",
-  "feedstock_hash_ts": 1759889620,
+  "feedstock_hash": "5dd27a677254286ef18e510b5a9c7699f92f064a",
+  "feedstock_hash_ts": 1762770587,
   "feedstock_name": "maturin",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -41,10 +38,11 @@
       "summary": "Build and publish crates with pyo3, rust-cpython and cffi bindings as well as rust binaries as python packages"
     },
     "build": {
-      "number": "0",
+      "number": "1",
       "script": {
         "content": [
           "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml",
+          "${{ \"export OPENSSL_DIR=$PREFIX\" if unix }}",
           "${{ PYTHON }} -m pip install -v --use-pep517 --no-build-isolation ."
         ],
         "env": {
@@ -182,10 +180,11 @@
       "summary": "Build and publish crates with pyo3, rust-cpython and cffi bindings as well as rust binaries as python packages"
     },
     "build": {
-      "number": "0",
+      "number": "1",
       "script": {
         "content": [
           "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml",
+          "${{ \"export OPENSSL_DIR=$PREFIX\" if unix }}",
           "${{ PYTHON }} -m pip install -v --use-pep517 --no-build-isolation ."
         ],
         "env": {
@@ -323,10 +322,11 @@
       "summary": "Build and publish crates with pyo3, rust-cpython and cffi bindings as well as rust binaries as python packages"
     },
     "build": {
-      "number": "0",
+      "number": "1",
       "script": {
         "content": [
           "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml",
+          "${{ \"export OPENSSL_DIR=$PREFIX\" if unix }}",
           "${{ PYTHON }} -m pip install -v --use-pep517 --no-build-isolation ."
         ],
         "env": {
@@ -464,10 +464,11 @@
       "summary": "Build and publish crates with pyo3, rust-cpython and cffi bindings as well as rust binaries as python packages"
     },
     "build": {
-      "number": "0",
+      "number": "1",
       "script": {
         "content": [
           "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml",
+          "${{ \"export OPENSSL_DIR=$PREFIX\" if unix }}",
           "${{ PYTHON }} -m pip install -v --use-pep517 --no-build-isolation ."
         ],
         "env": {
@@ -769,10 +770,11 @@
       "summary": "Build and publish crates with pyo3, rust-cpython and cffi bindings as well as rust binaries as python packages"
     },
     "build": {
-      "number": "0",
+      "number": "1",
       "script": {
         "content": [
           "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml",
+          "${{ \"export OPENSSL_DIR=$PREFIX\" if unix }}",
           "${{ PYTHON }} -m pip install -v --use-pep517 --no-build-isolation ."
         ],
         "env": {
@@ -910,10 +912,11 @@
       "summary": "Build and publish crates with pyo3, rust-cpython and cffi bindings as well as rust binaries as python packages"
     },
     "build": {
-      "number": "0",
+      "number": "1",
       "script": {
         "content": [
           "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml",
+          "${{ \"export OPENSSL_DIR=$PREFIX\" if unix }}",
           "${{ PYTHON }} -m pip install -v --use-pep517 --no-build-isolation ."
         ],
         "env": {
@@ -1059,7 +1062,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/maturin.json"
   },
-  "raw_meta_yaml": "# yaml-language-server: $schema=https://raw.githubusercontent.com/prefix-dev/recipe-format/main/schema.json\n\nschema_version: 1\n\ncontext:\n  name: maturin\n  version: \"1.9.6\"\n\npackage:\n  name: \"${{ name }}\"\n  version: \"${{ version }}\"\n\nsource:\n  url: https://pypi.org/packages/source/m/maturin/maturin-${{ version }}.tar.gz\n  sha256: \"2c2ae37144811d365509889ed7220b0598487f1278c2441829c3abf56cc6324a\"\n\nbuild:\n  number: 0\n  # we only build 1 package for each target platform\n  # so only trigger the build on the lowest python version\n  skip: \"not match(python, python_min + '.*')\"\n  # the `is_python_min` currently has a rendering bug, so do not use is_python_min\n  # until conda-smithy/issues/2320 is fixed\n  python:\n    version_independent: true\n\n  script:\n    env:\n      MATURIN_SETUP_ARGS: \"--no-default-features --features=full,native-tls,password-storage\"\n      CARGO_NET_GIT_FETCH_WITH_CLI: \"true\"\n      OPENSSL_NO_VENDOR: \"1\"\n    content:\n      - cargo-bundle-licenses --format yaml --output THIRDPARTY.yml\n      - \"${{ PYTHON }} -m pip install -v --use-pep517 --no-build-isolation .\"\n\n  dynamic_linking:\n    missing_dso_allowlist:\n      - if: osx\n        then:\n          - /usr/lib/libresolv.9.dylib\n\nrequirements:\n  build:\n    - cargo-bundle-licenses\n    - \"${{ compiler('c') }}\"\n    - \"${{ stdlib('c') }}\"\n    - \"${{ compiler('rust') }}\"\n    - if: build_platform != target_platform\n      then:\n        - python\n        - cross-python_${{ target_platform }}\n  host:\n    - python\n    - pip\n    - setuptools\n    - setuptools-rust >=1.4.0\n    - wheel\n    - tomli >=1.1.0\n    - if: unix\n      then:\n        - openssl\n        - pkg-config\n  run:\n    # do we really need python here?\n    - python\n    - tomli >=1.1.0\n\n  ignore_run_exports:\n    from_package:\n      # avoid run_requirements on cpython abi\n      - cross-python_${{ target_platform }}\n\ntests:\n  - python:\n      python_version: \"${{ python_min }}.*\"\n      imports:\n        - maturin\n  - script:\n      - maturin --help\n\nabout:\n  homepage: https://github.com/PyO3/maturin\n  repository: https://github.com/PyO3/maturin\n  license: MIT\n  license_family: MIT\n  license_file:\n    - license-mit\n    - THIRDPARTY.yml\n  summary: >-\n    Build and publish crates with pyo3, rust-cpython and cffi bindings as well as rust binaries as python packages\n\nextra:\n  recipe-maintainers:\n    - messense\n    - apcamargo\n    - synapticarbors\n",
+  "raw_meta_yaml": "# yaml-language-server: $schema=https://raw.githubusercontent.com/prefix-dev/recipe-format/main/schema.json\n\nschema_version: 1\n\ncontext:\n  name: maturin\n  version: \"1.9.6\"\n\npackage:\n  name: \"${{ name }}\"\n  version: \"${{ version }}\"\n\nsource:\n  url: https://pypi.org/packages/source/m/maturin/maturin-${{ version }}.tar.gz\n  sha256: \"2c2ae37144811d365509889ed7220b0598487f1278c2441829c3abf56cc6324a\"\n\nbuild:\n  number: 1\n  skip: not is_python_min\n  python:\n    version_independent: true\n\n  script:\n    env:\n      MATURIN_SETUP_ARGS: \"--no-default-features --features=full,native-tls,password-storage\"\n      CARGO_NET_GIT_FETCH_WITH_CLI: \"true\"\n      OPENSSL_NO_VENDOR: \"1\"\n    content:\n      - cargo-bundle-licenses --format yaml --output THIRDPARTY.yml\n      - ${{ \"export OPENSSL_DIR=$PREFIX\" if unix }}\n      - \"${{ PYTHON }} -m pip install -v --use-pep517 --no-build-isolation .\"\n\n  dynamic_linking:\n    missing_dso_allowlist:\n      - if: osx\n        then:\n          - /usr/lib/libresolv.9.dylib\n\nrequirements:\n  build:\n    - cargo-bundle-licenses\n    - \"${{ compiler('c') }}\"\n    - \"${{ stdlib('c') }}\"\n    - \"${{ compiler('rust') }}\"\n    - if: build_platform != target_platform\n      then:\n        - python\n        - cross-python_${{ target_platform }}\n  host:\n    - python\n    - pip\n    - setuptools\n    - setuptools-rust >=1.4.0\n    - wheel\n    - tomli >=1.1.0\n    - if: unix\n      then:\n        - openssl\n        - pkg-config\n  run:\n    # do we really need python here?\n    - python\n    - tomli >=1.1.0\n\n  ignore_run_exports:\n    from_package:\n      # avoid run_requirements on cpython abi\n      - cross-python_${{ target_platform }}\n\ntests:\n  - python:\n      python_version: \"${{ python_min }}.*\"\n      imports:\n        - maturin\n  - script:\n      - maturin --help\n\nabout:\n  homepage: https://github.com/PyO3/maturin\n  repository: https://github.com/PyO3/maturin\n  license: MIT\n  license_family: MIT\n  license_file:\n    - license-mit\n    - THIRDPARTY.yml\n  summary: >-\n    Build and publish crates with pyo3, rust-cpython and cffi bindings as well as rust binaries as python packages\n\nextra:\n  recipe-maintainers:\n    - messense\n    - apcamargo\n    - synapticarbors\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -1171,10 +1174,11 @@
       "summary": "Build and publish crates with pyo3, rust-cpython and cffi bindings as well as rust binaries as python packages"
     },
     "build": {
-      "number": "0",
+      "number": "1",
       "script": {
         "content": [
           "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml",
+          "${{ \"export OPENSSL_DIR=$PREFIX\" if unix }}",
           "${{ PYTHON }} -m pip install -v --use-pep517 --no-build-isolation ."
         ],
         "env": {
