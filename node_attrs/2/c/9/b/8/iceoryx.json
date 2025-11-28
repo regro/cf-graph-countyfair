@@ -12,8 +12,8 @@
       "tooling_branch_name": "main"
     }
   },
-  "feedstock_hash": "eadcd231890d47317b5c781f217ba8f0e1a2e4da",
-  "feedstock_hash_ts": 1762506417,
+  "feedstock_hash": "0551f9eac3336d678ef9e08bffd2a95c3f566671",
+  "feedstock_hash_ts": 1764351415,
   "feedstock_name": "iceoryx",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -25,8 +25,7 @@
       "license": "Apache-2.0 AND MIT AND EPL-2.0",
       "license_file": [
         "LICENSE",
-        "iceoryx_posh/doc/3rd_party_licenses/cpptoml/LICENSE",
-        "doc/3rd_party_licenses/cyclonedds/LICENSE"
+        "iceoryx_posh/doc/3rd_party_licenses/cpptoml/LICENSE"
       ],
       "summary": "Eclipse iceoryx - true zero-copy inter-process-communication"
     },
@@ -43,8 +42,32 @@
       {
         "files": {
           "include": [
-            "lib/libiceoryx_hoofs*",
             "lib/libiceoryx_platform*"
+          ]
+        },
+        "name": "libiceoryx-platform",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "libacl",
+            "ncurses"
+          ]
+        },
+        "test": {
+          "commands": [
+            "test -f ${PREFIX}/lib/libiceoryx_platform${SHLIB_EXT}"
+          ]
+        }
+      },
+      {
+        "files": {
+          "include": [
+            "lib/libiceoryx_hoofs*"
           ]
         },
         "name": "libiceoryx-hoofs",
@@ -57,7 +80,11 @@
           ],
           "host": [
             "libacl",
-            "ncurses"
+            "ncurses",
+            "libiceoryx-platform"
+          ],
+          "run": [
+            "libiceoryx-platform"
           ]
         },
         "test": {
@@ -83,10 +110,12 @@
           "host": [
             "libacl",
             "ncurses",
-            "libiceoryx-hoofs"
+            "libiceoryx-hoofs",
+            "libiceoryx-platform"
           ],
           "run": [
-            "libiceoryx-hoofs"
+            "libiceoryx-hoofs",
+            "libiceoryx-platform"
           ]
         },
         "test": {
@@ -129,26 +158,52 @@
       {
         "build": {
           "run_exports": [
+            "libiceoryx-platform"
+          ]
+        },
+        "files": {
+          "include": [
+            "include/iceoryx/v2.95.8/iceoryx_versions.hpp",
+            "include/iceoryx/v2.95.8/iox",
+            "include/iceoryx/v2.95.8/iceoryx_platform",
+            "lib/cmake/iceoryx_platform"
+          ]
+        },
+        "name": "libiceoryx-platform-devel",
+        "requirements": {
+          "run": [
+            "libiceoryx-platform"
+          ]
+        },
+        "test": {
+          "commands": [
+            "test -f ${PREFIX}/include/iceoryx/v2.95.8/iceoryx_versions.hpp",
+            "test -f ${PREFIX}/include/iceoryx/v2.95.8/iceoryx_platform/inet.hpp"
+          ]
+        }
+      },
+      {
+        "build": {
+          "run_exports": [
             "libiceoryx-hoofs"
           ]
         },
         "files": {
           "include": [
-            "include/iceoryx/v2.0.6/iceoryx_versions.hpp",
-            "include/iceoryx/v2.0.6/iceoryx_hoofs",
+            "include/iceoryx/v2.95.8/iceoryx_hoofs",
             "lib/cmake/iceoryx_hoofs"
           ]
         },
         "name": "libiceoryx-hoofs-devel",
         "requirements": {
           "run": [
-            "libiceoryx-hoofs"
+            "libiceoryx-hoofs",
+            "libiceoryx-platform-devel"
           ]
         },
         "test": {
           "commands": [
-            "test -f ${PREFIX}/include/iceoryx/v2.0.6/iceoryx_versions.hpp",
-            "test -f ${PREFIX}/include/iceoryx/v2.0.6/iceoryx_hoofs/platform/inet.hpp"
+            "test -f ${PREFIX}/include/iceoryx/v2.95.8/iceoryx_hoofs/iceoryx_hoofs_types.hpp"
           ]
         }
       },
@@ -161,7 +216,7 @@
         },
         "files": {
           "include": [
-            "include/iceoryx/v2.0.6/iceoryx_posh",
+            "include/iceoryx/v2.95.8/iceoryx_posh",
             "lib/cmake/iceoryx_posh"
           ]
         },
@@ -174,7 +229,7 @@
         },
         "test": {
           "commands": [
-            "test -f ${PREFIX}/include/iceoryx/v2.0.6/iceoryx_posh/version/version_info.hpp"
+            "test -f ${PREFIX}/include/iceoryx/v2.95.8/iceoryx_posh/version/version_info.hpp"
           ]
         }
       },
@@ -186,7 +241,7 @@
         },
         "files": {
           "include": [
-            "include/iceoryx/v2.0.6/iceoryx_binding_c",
+            "include/iceoryx/v2.95.8/iceoryx_binding_c",
             "lib/cmake/iceoryx_binding"
           ]
         },
@@ -200,7 +255,7 @@
         },
         "test": {
           "commands": [
-            "test -f ${PREFIX}/include/iceoryx/v2.0.6/iceoryx_posh/version/version_info.hpp"
+            "test -f ${PREFIX}/include/iceoryx/v2.95.8/iceoryx_posh/version/version_info.hpp"
           ]
         }
       },
@@ -248,7 +303,7 @@
     ],
     "package": {
       "name": "iceoryx-split",
-      "version": "2.0.6"
+      "version": "2.95.8"
     },
     "requirements": {
       "build": [
@@ -265,12 +320,10 @@
     "schema_version": 0,
     "source": {
       "patches": [
-        "patches/fix_channel.diff",
-        "patches/missing_cstdint.diff",
         "patches/sha1_cannot_be_empty.diff"
       ],
-      "sha256": "a2add8ffee0c3357ef985cc46c7de79ccb754ea2bed02c61f2ff805ab2c869f1",
-      "url": "https://github.com/eclipse-iceoryx/iceoryx/archive/refs/tags/v2.0.6.tar.gz"
+      "sha256": "00b1bf874e17b3e986f11cd134e2be339f3d12643b58b4544692cc4e820439ff",
+      "url": "https://github.com/eclipse-iceoryx/iceoryx/archive/refs/tags/v2.95.8.tar.gz"
     }
   },
   "linux_64_requirements": {
@@ -291,6 +344,7 @@
         "libiceoryx-binding-c-devel",
         "libiceoryx-hoofs",
         "libiceoryx-hoofs-devel",
+        "libiceoryx-platform",
         "libiceoryx-posh",
         "libiceoryx-posh-devel",
         "ncurses"
@@ -303,6 +357,8 @@
         "libiceoryx-binding-c-devel",
         "libiceoryx-hoofs",
         "libiceoryx-hoofs-devel",
+        "libiceoryx-platform",
+        "libiceoryx-platform-devel",
         "libiceoryx-posh",
         "libiceoryx-posh-devel"
       ]
@@ -321,8 +377,7 @@
       "license": "Apache-2.0 AND MIT AND EPL-2.0",
       "license_file": [
         "LICENSE",
-        "iceoryx_posh/doc/3rd_party_licenses/cpptoml/LICENSE",
-        "doc/3rd_party_licenses/cyclonedds/LICENSE"
+        "iceoryx_posh/doc/3rd_party_licenses/cpptoml/LICENSE"
       ],
       "summary": "Eclipse iceoryx - true zero-copy inter-process-communication"
     },
@@ -339,8 +394,32 @@
       {
         "files": {
           "include": [
-            "lib/libiceoryx_hoofs*",
             "lib/libiceoryx_platform*"
+          ]
+        },
+        "name": "libiceoryx-platform",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "libacl",
+            "ncurses"
+          ]
+        },
+        "test": {
+          "commands": [
+            "test -f ${PREFIX}/lib/libiceoryx_platform${SHLIB_EXT}"
+          ]
+        }
+      },
+      {
+        "files": {
+          "include": [
+            "lib/libiceoryx_hoofs*"
           ]
         },
         "name": "libiceoryx-hoofs",
@@ -353,7 +432,11 @@
           ],
           "host": [
             "libacl",
-            "ncurses"
+            "ncurses",
+            "libiceoryx-platform"
+          ],
+          "run": [
+            "libiceoryx-platform"
           ]
         },
         "test": {
@@ -379,10 +462,12 @@
           "host": [
             "libacl",
             "ncurses",
-            "libiceoryx-hoofs"
+            "libiceoryx-hoofs",
+            "libiceoryx-platform"
           ],
           "run": [
-            "libiceoryx-hoofs"
+            "libiceoryx-hoofs",
+            "libiceoryx-platform"
           ]
         },
         "test": {
@@ -425,26 +510,52 @@
       {
         "build": {
           "run_exports": [
+            "libiceoryx-platform"
+          ]
+        },
+        "files": {
+          "include": [
+            "include/iceoryx/v2.95.8/iceoryx_versions.hpp",
+            "include/iceoryx/v2.95.8/iox",
+            "include/iceoryx/v2.95.8/iceoryx_platform",
+            "lib/cmake/iceoryx_platform"
+          ]
+        },
+        "name": "libiceoryx-platform-devel",
+        "requirements": {
+          "run": [
+            "libiceoryx-platform"
+          ]
+        },
+        "test": {
+          "commands": [
+            "test -f ${PREFIX}/include/iceoryx/v2.95.8/iceoryx_versions.hpp",
+            "test -f ${PREFIX}/include/iceoryx/v2.95.8/iceoryx_platform/inet.hpp"
+          ]
+        }
+      },
+      {
+        "build": {
+          "run_exports": [
             "libiceoryx-hoofs"
           ]
         },
         "files": {
           "include": [
-            "include/iceoryx/v2.0.6/iceoryx_versions.hpp",
-            "include/iceoryx/v2.0.6/iceoryx_hoofs",
+            "include/iceoryx/v2.95.8/iceoryx_hoofs",
             "lib/cmake/iceoryx_hoofs"
           ]
         },
         "name": "libiceoryx-hoofs-devel",
         "requirements": {
           "run": [
-            "libiceoryx-hoofs"
+            "libiceoryx-hoofs",
+            "libiceoryx-platform-devel"
           ]
         },
         "test": {
           "commands": [
-            "test -f ${PREFIX}/include/iceoryx/v2.0.6/iceoryx_versions.hpp",
-            "test -f ${PREFIX}/include/iceoryx/v2.0.6/iceoryx_hoofs/platform/inet.hpp"
+            "test -f ${PREFIX}/include/iceoryx/v2.95.8/iceoryx_hoofs/iceoryx_hoofs_types.hpp"
           ]
         }
       },
@@ -457,7 +568,7 @@
         },
         "files": {
           "include": [
-            "include/iceoryx/v2.0.6/iceoryx_posh",
+            "include/iceoryx/v2.95.8/iceoryx_posh",
             "lib/cmake/iceoryx_posh"
           ]
         },
@@ -470,7 +581,7 @@
         },
         "test": {
           "commands": [
-            "test -f ${PREFIX}/include/iceoryx/v2.0.6/iceoryx_posh/version/version_info.hpp"
+            "test -f ${PREFIX}/include/iceoryx/v2.95.8/iceoryx_posh/version/version_info.hpp"
           ]
         }
       },
@@ -482,7 +593,7 @@
         },
         "files": {
           "include": [
-            "include/iceoryx/v2.0.6/iceoryx_binding_c",
+            "include/iceoryx/v2.95.8/iceoryx_binding_c",
             "lib/cmake/iceoryx_binding"
           ]
         },
@@ -496,7 +607,7 @@
         },
         "test": {
           "commands": [
-            "test -f ${PREFIX}/include/iceoryx/v2.0.6/iceoryx_posh/version/version_info.hpp"
+            "test -f ${PREFIX}/include/iceoryx/v2.95.8/iceoryx_posh/version/version_info.hpp"
           ]
         }
       },
@@ -544,8 +655,31 @@
       {
         "files": {
           "include": [
-            "lib/libiceoryx_hoofs*",
             "lib/libiceoryx_platform*"
+          ]
+        },
+        "name": "libiceoryx-platform",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "ncurses"
+          ]
+        },
+        "test": {
+          "commands": [
+            "test -f ${PREFIX}/lib/libiceoryx_platform${SHLIB_EXT}"
+          ]
+        }
+      },
+      {
+        "files": {
+          "include": [
+            "lib/libiceoryx_hoofs*"
           ]
         },
         "name": "libiceoryx-hoofs",
@@ -557,7 +691,11 @@
             "make"
           ],
           "host": [
-            "ncurses"
+            "ncurses",
+            "libiceoryx-platform"
+          ],
+          "run": [
+            "libiceoryx-platform"
           ]
         },
         "test": {
@@ -582,10 +720,12 @@
           ],
           "host": [
             "ncurses",
-            "libiceoryx-hoofs"
+            "libiceoryx-hoofs",
+            "libiceoryx-platform"
           ],
           "run": [
-            "libiceoryx-hoofs"
+            "libiceoryx-hoofs",
+            "libiceoryx-platform"
           ]
         },
         "test": {
@@ -627,26 +767,52 @@
       {
         "build": {
           "run_exports": [
+            "libiceoryx-platform"
+          ]
+        },
+        "files": {
+          "include": [
+            "include/iceoryx/v2.95.8/iceoryx_versions.hpp",
+            "include/iceoryx/v2.95.8/iox",
+            "include/iceoryx/v2.95.8/iceoryx_platform",
+            "lib/cmake/iceoryx_platform"
+          ]
+        },
+        "name": "libiceoryx-platform-devel",
+        "requirements": {
+          "run": [
+            "libiceoryx-platform"
+          ]
+        },
+        "test": {
+          "commands": [
+            "test -f ${PREFIX}/include/iceoryx/v2.95.8/iceoryx_versions.hpp",
+            "test -f ${PREFIX}/include/iceoryx/v2.95.8/iceoryx_platform/inet.hpp"
+          ]
+        }
+      },
+      {
+        "build": {
+          "run_exports": [
             "libiceoryx-hoofs"
           ]
         },
         "files": {
           "include": [
-            "include/iceoryx/v2.0.6/iceoryx_versions.hpp",
-            "include/iceoryx/v2.0.6/iceoryx_hoofs",
+            "include/iceoryx/v2.95.8/iceoryx_hoofs",
             "lib/cmake/iceoryx_hoofs"
           ]
         },
         "name": "libiceoryx-hoofs-devel",
         "requirements": {
           "run": [
-            "libiceoryx-hoofs"
+            "libiceoryx-hoofs",
+            "libiceoryx-platform-devel"
           ]
         },
         "test": {
           "commands": [
-            "test -f ${PREFIX}/include/iceoryx/v2.0.6/iceoryx_versions.hpp",
-            "test -f ${PREFIX}/include/iceoryx/v2.0.6/iceoryx_hoofs/platform/inet.hpp"
+            "test -f ${PREFIX}/include/iceoryx/v2.95.8/iceoryx_hoofs/iceoryx_hoofs_types.hpp"
           ]
         }
       },
@@ -659,7 +825,7 @@
         },
         "files": {
           "include": [
-            "include/iceoryx/v2.0.6/iceoryx_posh",
+            "include/iceoryx/v2.95.8/iceoryx_posh",
             "lib/cmake/iceoryx_posh"
           ]
         },
@@ -672,7 +838,7 @@
         },
         "test": {
           "commands": [
-            "test -f ${PREFIX}/include/iceoryx/v2.0.6/iceoryx_posh/version/version_info.hpp"
+            "test -f ${PREFIX}/include/iceoryx/v2.95.8/iceoryx_posh/version/version_info.hpp"
           ]
         }
       },
@@ -684,7 +850,7 @@
         },
         "files": {
           "include": [
-            "include/iceoryx/v2.0.6/iceoryx_binding_c",
+            "include/iceoryx/v2.95.8/iceoryx_binding_c",
             "lib/cmake/iceoryx_binding"
           ]
         },
@@ -698,7 +864,7 @@
         },
         "test": {
           "commands": [
-            "test -f ${PREFIX}/include/iceoryx/v2.0.6/iceoryx_posh/version/version_info.hpp"
+            "test -f ${PREFIX}/include/iceoryx/v2.95.8/iceoryx_posh/version/version_info.hpp"
           ]
         }
       },
@@ -745,7 +911,7 @@
     ],
     "package": {
       "name": "iceoryx-split",
-      "version": "2.0.6"
+      "version": "2.95.8"
     },
     "requirements": {
       "build": [
@@ -762,12 +928,10 @@
     "schema_version": 0,
     "source": {
       "patches": [
-        "patches/fix_channel.diff",
-        "patches/missing_cstdint.diff",
         "patches/sha1_cannot_be_empty.diff"
       ],
-      "sha256": "a2add8ffee0c3357ef985cc46c7de79ccb754ea2bed02c61f2ff805ab2c869f1",
-      "url": "https://github.com/eclipse-iceoryx/iceoryx/archive/refs/tags/v2.0.6.tar.gz"
+      "sha256": "00b1bf874e17b3e986f11cd134e2be339f3d12643b58b4544692cc4e820439ff",
+      "url": "https://github.com/eclipse-iceoryx/iceoryx/archive/refs/tags/v2.95.8.tar.gz"
     }
   },
   "name": "iceoryx-split",
@@ -780,8 +944,7 @@
       "license": "Apache-2.0 AND MIT AND EPL-2.0",
       "license_file": [
         "LICENSE",
-        "iceoryx_posh/doc/3rd_party_licenses/cpptoml/LICENSE",
-        "doc/3rd_party_licenses/cyclonedds/LICENSE"
+        "iceoryx_posh/doc/3rd_party_licenses/cpptoml/LICENSE"
       ],
       "summary": "Eclipse iceoryx - true zero-copy inter-process-communication"
     },
@@ -798,8 +961,31 @@
       {
         "files": {
           "include": [
-            "lib/libiceoryx_hoofs*",
             "lib/libiceoryx_platform*"
+          ]
+        },
+        "name": "libiceoryx-platform",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "ncurses"
+          ]
+        },
+        "test": {
+          "commands": [
+            "test -f ${PREFIX}/lib/libiceoryx_platform${SHLIB_EXT}"
+          ]
+        }
+      },
+      {
+        "files": {
+          "include": [
+            "lib/libiceoryx_hoofs*"
           ]
         },
         "name": "libiceoryx-hoofs",
@@ -811,7 +997,11 @@
             "make"
           ],
           "host": [
-            "ncurses"
+            "ncurses",
+            "libiceoryx-platform"
+          ],
+          "run": [
+            "libiceoryx-platform"
           ]
         },
         "test": {
@@ -836,10 +1026,12 @@
           ],
           "host": [
             "ncurses",
-            "libiceoryx-hoofs"
+            "libiceoryx-hoofs",
+            "libiceoryx-platform"
           ],
           "run": [
-            "libiceoryx-hoofs"
+            "libiceoryx-hoofs",
+            "libiceoryx-platform"
           ]
         },
         "test": {
@@ -881,26 +1073,52 @@
       {
         "build": {
           "run_exports": [
+            "libiceoryx-platform"
+          ]
+        },
+        "files": {
+          "include": [
+            "include/iceoryx/v2.95.8/iceoryx_versions.hpp",
+            "include/iceoryx/v2.95.8/iox",
+            "include/iceoryx/v2.95.8/iceoryx_platform",
+            "lib/cmake/iceoryx_platform"
+          ]
+        },
+        "name": "libiceoryx-platform-devel",
+        "requirements": {
+          "run": [
+            "libiceoryx-platform"
+          ]
+        },
+        "test": {
+          "commands": [
+            "test -f ${PREFIX}/include/iceoryx/v2.95.8/iceoryx_versions.hpp",
+            "test -f ${PREFIX}/include/iceoryx/v2.95.8/iceoryx_platform/inet.hpp"
+          ]
+        }
+      },
+      {
+        "build": {
+          "run_exports": [
             "libiceoryx-hoofs"
           ]
         },
         "files": {
           "include": [
-            "include/iceoryx/v2.0.6/iceoryx_versions.hpp",
-            "include/iceoryx/v2.0.6/iceoryx_hoofs",
+            "include/iceoryx/v2.95.8/iceoryx_hoofs",
             "lib/cmake/iceoryx_hoofs"
           ]
         },
         "name": "libiceoryx-hoofs-devel",
         "requirements": {
           "run": [
-            "libiceoryx-hoofs"
+            "libiceoryx-hoofs",
+            "libiceoryx-platform-devel"
           ]
         },
         "test": {
           "commands": [
-            "test -f ${PREFIX}/include/iceoryx/v2.0.6/iceoryx_versions.hpp",
-            "test -f ${PREFIX}/include/iceoryx/v2.0.6/iceoryx_hoofs/platform/inet.hpp"
+            "test -f ${PREFIX}/include/iceoryx/v2.95.8/iceoryx_hoofs/iceoryx_hoofs_types.hpp"
           ]
         }
       },
@@ -913,7 +1131,7 @@
         },
         "files": {
           "include": [
-            "include/iceoryx/v2.0.6/iceoryx_posh",
+            "include/iceoryx/v2.95.8/iceoryx_posh",
             "lib/cmake/iceoryx_posh"
           ]
         },
@@ -926,7 +1144,7 @@
         },
         "test": {
           "commands": [
-            "test -f ${PREFIX}/include/iceoryx/v2.0.6/iceoryx_posh/version/version_info.hpp"
+            "test -f ${PREFIX}/include/iceoryx/v2.95.8/iceoryx_posh/version/version_info.hpp"
           ]
         }
       },
@@ -938,7 +1156,7 @@
         },
         "files": {
           "include": [
-            "include/iceoryx/v2.0.6/iceoryx_binding_c",
+            "include/iceoryx/v2.95.8/iceoryx_binding_c",
             "lib/cmake/iceoryx_binding"
           ]
         },
@@ -952,7 +1170,7 @@
         },
         "test": {
           "commands": [
-            "test -f ${PREFIX}/include/iceoryx/v2.0.6/iceoryx_posh/version/version_info.hpp"
+            "test -f ${PREFIX}/include/iceoryx/v2.95.8/iceoryx_posh/version/version_info.hpp"
           ]
         }
       },
@@ -999,7 +1217,7 @@
     ],
     "package": {
       "name": "iceoryx-split",
-      "version": "2.0.6"
+      "version": "2.95.8"
     },
     "requirements": {
       "build": [
@@ -1015,12 +1233,10 @@
     "schema_version": 0,
     "source": {
       "patches": [
-        "patches/fix_channel.diff",
-        "patches/missing_cstdint.diff",
         "patches/sha1_cannot_be_empty.diff"
       ],
-      "sha256": "a2add8ffee0c3357ef985cc46c7de79ccb754ea2bed02c61f2ff805ab2c869f1",
-      "url": "https://github.com/eclipse-iceoryx/iceoryx/archive/refs/tags/v2.0.6.tar.gz"
+      "sha256": "00b1bf874e17b3e986f11cd134e2be339f3d12643b58b4544692cc4e820439ff",
+      "url": "https://github.com/eclipse-iceoryx/iceoryx/archive/refs/tags/v2.95.8.tar.gz"
     }
   },
   "osx_64_requirements": {
@@ -1040,6 +1256,7 @@
         "libiceoryx-binding-c-devel",
         "libiceoryx-hoofs",
         "libiceoryx-hoofs-devel",
+        "libiceoryx-platform",
         "libiceoryx-posh",
         "libiceoryx-posh-devel",
         "ncurses"
@@ -1052,6 +1269,8 @@
         "libiceoryx-binding-c-devel",
         "libiceoryx-hoofs",
         "libiceoryx-hoofs-devel",
+        "libiceoryx-platform",
+        "libiceoryx-platform-devel",
         "libiceoryx-posh",
         "libiceoryx-posh-devel"
       ]
@@ -1069,6 +1288,8 @@
       "libiceoryx-binding-c-devel",
       "libiceoryx-hoofs",
       "libiceoryx-hoofs-devel",
+      "libiceoryx-platform",
+      "libiceoryx-platform-devel",
       "libiceoryx-posh",
       "libiceoryx-posh-devel"
     ]
@@ -1081,7 +1302,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/iceoryx.json"
   },
-  "raw_meta_yaml": "{% set version = \"2.0.6\" %}\n\npackage:\n  name: iceoryx-split\n  version: {{ version }}\n\nsource:\n  url: https://github.com/eclipse-iceoryx/iceoryx/archive/refs/tags/v{{ version }}.tar.gz\n  sha256: a2add8ffee0c3357ef985cc46c7de79ccb754ea2bed02c61f2ff805ab2c869f1\n  patches:\n    - patches/fix_channel.diff\n    - patches/missing_cstdint.diff\n    - patches/sha1_cannot_be_empty.diff\n\nbuild:\n  number: 0\n  skip: true  # [win]\n\nrequirements:\n  build:\n    - {{ compiler('cxx') }}\n    - {{ stdlib('c') }}\n    - cmake\n    - make\n  host:\n    - libacl    # [linux]\n    - ncurses\n\noutputs:\n  - name: libiceoryx-hoofs\n    files:\n      include:\n        - lib/libiceoryx_hoofs*\n        - lib/libiceoryx_platform*\n    requirements:\n      build:\n        - {{ compiler('cxx') }}\n        - {{ stdlib('c') }}\n        - cmake\n        - make\n      host:\n        - libacl    # [linux]\n        - ncurses\n    test:\n      commands:\n        - test -f ${PREFIX}/lib/libiceoryx_hoofs${SHLIB_EXT}\n\n  - name: libiceoryx-posh\n    files:\n      include:\n        - lib/libiceoryx_posh*\n    requirements:\n      build:\n        - {{ compiler('cxx') }}\n        - {{ stdlib('c') }}\n        - cmake\n        - make\n      host:\n        - libacl    # [linux]\n        - ncurses\n        - {{ pin_subpackage(\"libiceoryx-hoofs\", exact=True) }}\n      run:\n        - {{ pin_subpackage(\"libiceoryx-hoofs\", exact=True) }}\n    test:\n      commands:\n        - test -f ${PREFIX}/lib/libiceoryx_posh${SHLIB_EXT}\n\n  - name: libiceoryx-binding-c\n    files:\n      include:\n        - lib/libiceoryx_binding_c*\n    requirements:\n      build:\n        - {{ compiler('cxx') }}\n        - {{ stdlib('c') }}\n        - cmake\n        - make\n      host:\n        - libacl    # [linux]\n        - ncurses\n        - {{ pin_subpackage(\"libiceoryx-hoofs\", exact=True) }}\n        - {{ pin_subpackage(\"libiceoryx-posh\", exact=True) }}\n      run:\n        - {{ pin_subpackage(\"libiceoryx-hoofs\", exact=True) }}\n        - {{ pin_subpackage(\"libiceoryx-posh\", exact=True) }}\n    test:\n      commands:\n        - test -f ${PREFIX}/lib/libiceoryx_binding_c${SHLIB_EXT}\n\n  - name: libiceoryx-hoofs-devel\n    build:\n      run_exports:\n        - {{ pin_subpackage(\"libiceoryx-hoofs\", max_pin=\"x.x.x\") }}\n    files:\n      include:\n        - include/iceoryx/v{{ version }}/iceoryx_versions.hpp\n        - include/iceoryx/v{{ version }}/iceoryx_hoofs\n        - lib/cmake/iceoryx_hoofs\n    requirements:\n      run:\n        - {{ pin_subpackage(\"libiceoryx-hoofs\", exact=True) }}\n    test:\n      commands:\n        - test -f ${PREFIX}/include/iceoryx/v{{ version }}/iceoryx_versions.hpp\n        - test -f ${PREFIX}/include/iceoryx/v{{ version }}/iceoryx_hoofs/platform/inet.hpp\n\n  - name: libiceoryx-posh-devel\n    build:\n      run_exports:\n        - {{ pin_subpackage(\"libiceoryx-posh\", max_pin=\"x.x.x\") }}\n        - {{ pin_subpackage(\"libiceoryx-hoofs\", max_pin=\"x.x.x\") }}\n    files:\n      include:\n        - include/iceoryx/v{{ version }}/iceoryx_posh\n        - lib/cmake/iceoryx_posh\n    requirements:\n      run:\n        - {{ pin_subpackage(\"libiceoryx-hoofs-devel\", exact=True) }}\n        - {{ pin_subpackage(\"libiceoryx-posh\", exact=True) }}\n    test:\n      commands:\n        - test -f ${PREFIX}/include/iceoryx/v{{ version }}/iceoryx_posh/version/version_info.hpp\n\n  - name: libiceoryx-binding-c-devel\n    build:\n      run_exports:\n        - {{ pin_subpackage(\"libiceoryx-binding-c\", max_pin=\"x.x.x\") }}\n    files:\n      include:\n        - include/iceoryx/v{{ version }}/iceoryx_binding_c\n        - lib/cmake/iceoryx_binding\n    requirements:\n      run:\n        - {{ pin_subpackage(\"libiceoryx-hoofs-devel\", exact=True) }}\n        - {{ pin_subpackage(\"libiceoryx-posh-devel\", exact=True) }}\n        - {{ pin_subpackage(\"libiceoryx-binding-c\", exact=True) }}\n    test:\n      commands:\n        - test -f ${PREFIX}/include/iceoryx/v{{ version }}/iceoryx_posh/version/version_info.hpp\n\n  - name: iceoryx\n    files:\n      include:\n        - share/doc\n        - bin/iox-roudi\n        - etc/roudi_config_example.toml\n    requirements:\n      build:\n        - {{ compiler('cxx') }}\n        - {{ stdlib('c') }}\n        - cmake\n        - make\n      host:\n        - libacl     # [linux]\n        - ncurses\n        - {{ pin_subpackage(\"libiceoryx-hoofs\", exact=True) }}\n        - {{ pin_subpackage(\"libiceoryx-posh\", exact=True) }}\n        - {{ pin_subpackage(\"libiceoryx-binding-c\", exact=True) }}\n        - {{ pin_subpackage(\"libiceoryx-hoofs-devel\", exact=True) }}\n        - {{ pin_subpackage(\"libiceoryx-posh-devel\", exact=True) }}\n        - {{ pin_subpackage(\"libiceoryx-binding-c-devel\", exact=True) }}\n      run:\n        - {{ pin_subpackage(\"libiceoryx-hoofs\", exact=True) }}\n        - {{ pin_subpackage(\"libiceoryx-posh\", exact=True) }}\n        - {{ pin_subpackage(\"libiceoryx-binding-c\", exact=True) }}\n        - {{ pin_subpackage(\"libiceoryx-hoofs-devel\", exact=True) }}\n        - {{ pin_subpackage(\"libiceoryx-posh-devel\", exact=True) }}\n        - {{ pin_subpackage(\"libiceoryx-binding-c-devel\", exact=True) }}\n    test:\n      commands:\n        - iox-roudi -h\n\nabout:\n  home: https://iceoryx.io/\n  summary: 'Eclipse iceoryx - true zero-copy inter-process-communication'\n  description: |\n    Eclipse iceoryx is an inter-process-communication middleware that enables\n    virtually limitless data transmissions at constant time.\n  license: Apache-2.0 AND MIT AND EPL-2.0\n  license_file:\n    - LICENSE\n    - iceoryx_posh/doc/3rd_party_licenses/cpptoml/LICENSE\n    - doc/3rd_party_licenses/cyclonedds/LICENSE\n  doc_url: https://iceoryx.io/latest/\n  dev_url: https://github.com/eclipse-iceoryx/iceoryx\n\nextra:\n  feedstock-name: iceoryx\n  recipe-maintainers:\n    - timkpaine\n",
+  "raw_meta_yaml": "{% set version = \"2.95.8\" %}\n\npackage:\n  name: iceoryx-split\n  version: {{ version }}\n\nsource:\n  url: https://github.com/eclipse-iceoryx/iceoryx/archive/refs/tags/v{{ version }}.tar.gz\n  sha256: 00b1bf874e17b3e986f11cd134e2be339f3d12643b58b4544692cc4e820439ff\n  patches:\n    - patches/sha1_cannot_be_empty.diff\n\nbuild:\n  number: 0\n  skip: true  # [win]\n\nrequirements:\n  build:\n    - {{ compiler('cxx') }}\n    - {{ stdlib('c') }}\n    - cmake\n    - make\n  host:\n    - libacl    # [linux]\n    - ncurses\n\noutputs:\n  - name: libiceoryx-platform\n    files:\n      include:\n        - lib/libiceoryx_platform*\n    requirements:\n      build:\n        - {{ compiler('cxx') }}\n        - {{ stdlib('c') }}\n        - cmake\n        - make\n      host:\n        - libacl    # [linux]\n        - ncurses\n    test:\n      commands:\n        - test -f ${PREFIX}/lib/libiceoryx_platform${SHLIB_EXT}\n\n  - name: libiceoryx-hoofs\n    files:\n      include:\n        - lib/libiceoryx_hoofs*\n    requirements:\n      build:\n        - {{ compiler('cxx') }}\n        - {{ stdlib('c') }}\n        - cmake\n        - make\n      host:\n        - libacl    # [linux]\n        - ncurses\n        - {{ pin_subpackage(\"libiceoryx-platform\", exact=True) }}\n      run:\n        - {{ pin_subpackage(\"libiceoryx-platform\", exact=True) }}\n    test:\n      commands:\n        - test -f ${PREFIX}/lib/libiceoryx_hoofs${SHLIB_EXT}\n\n  - name: libiceoryx-posh\n    files:\n      include:\n        - lib/libiceoryx_posh*\n    requirements:\n      build:\n        - {{ compiler('cxx') }}\n        - {{ stdlib('c') }}\n        - cmake\n        - make\n      host:\n        - libacl    # [linux]\n        - ncurses\n        - {{ pin_subpackage(\"libiceoryx-hoofs\", exact=True) }}\n        - {{ pin_subpackage(\"libiceoryx-platform\", exact=True) }}\n      run:\n        - {{ pin_subpackage(\"libiceoryx-hoofs\", exact=True) }}\n        - {{ pin_subpackage(\"libiceoryx-platform\", exact=True) }}\n    test:\n      commands:\n        - test -f ${PREFIX}/lib/libiceoryx_posh${SHLIB_EXT}\n\n  - name: libiceoryx-binding-c\n    files:\n      include:\n        - lib/libiceoryx_binding_c*\n    requirements:\n      build:\n        - {{ compiler('cxx') }}\n        - {{ stdlib('c') }}\n        - cmake\n        - make\n      host:\n        - libacl    # [linux]\n        - ncurses\n        - {{ pin_subpackage(\"libiceoryx-hoofs\", exact=True) }}\n        - {{ pin_subpackage(\"libiceoryx-posh\", exact=True) }}\n      run:\n        - {{ pin_subpackage(\"libiceoryx-hoofs\", exact=True) }}\n        - {{ pin_subpackage(\"libiceoryx-posh\", exact=True) }}\n    test:\n      commands:\n        - test -f ${PREFIX}/lib/libiceoryx_binding_c${SHLIB_EXT}\n\n  - name: libiceoryx-platform-devel\n    build:\n      run_exports:\n        - {{ pin_subpackage(\"libiceoryx-platform\", max_pin=\"x.x.x\") }}\n    files:\n      include:\n        - include/iceoryx/v{{ version }}/iceoryx_versions.hpp\n        - include/iceoryx/v{{ version }}/iox\n        - include/iceoryx/v{{ version }}/iceoryx_platform\n        - lib/cmake/iceoryx_platform\n    requirements:\n      run:\n        - {{ pin_subpackage(\"libiceoryx-platform\", exact=True) }}\n    test:\n      commands:\n        - test -f ${PREFIX}/include/iceoryx/v{{ version }}/iceoryx_versions.hpp\n        - test -f ${PREFIX}/include/iceoryx/v{{ version }}/iceoryx_platform/inet.hpp\n\n  - name: libiceoryx-hoofs-devel\n    build:\n      run_exports:\n        - {{ pin_subpackage(\"libiceoryx-hoofs\", max_pin=\"x.x.x\") }}\n    files:\n      include:\n        - include/iceoryx/v{{ version }}/iceoryx_hoofs\n        - lib/cmake/iceoryx_hoofs\n    requirements:\n      run:\n        - {{ pin_subpackage(\"libiceoryx-hoofs\", exact=True) }}\n        - {{ pin_subpackage(\"libiceoryx-platform-devel\", exact=True) }}\n    test:\n      commands:\n        - test -f ${PREFIX}/include/iceoryx/v{{ version }}/iceoryx_hoofs/iceoryx_hoofs_types.hpp\n\n  - name: libiceoryx-posh-devel\n    build:\n      run_exports:\n        - {{ pin_subpackage(\"libiceoryx-posh\", max_pin=\"x.x.x\") }}\n        - {{ pin_subpackage(\"libiceoryx-hoofs\", max_pin=\"x.x.x\") }}\n    files:\n      include:\n        - include/iceoryx/v{{ version }}/iceoryx_posh\n        - lib/cmake/iceoryx_posh\n    requirements:\n      run:\n        - {{ pin_subpackage(\"libiceoryx-hoofs-devel\", exact=True) }}\n        - {{ pin_subpackage(\"libiceoryx-posh\", exact=True) }}\n    test:\n      commands:\n        - test -f ${PREFIX}/include/iceoryx/v{{ version }}/iceoryx_posh/version/version_info.hpp\n\n  - name: libiceoryx-binding-c-devel\n    build:\n      run_exports:\n        - {{ pin_subpackage(\"libiceoryx-binding-c\", max_pin=\"x.x.x\") }}\n    files:\n      include:\n        - include/iceoryx/v{{ version }}/iceoryx_binding_c\n        - lib/cmake/iceoryx_binding\n    requirements:\n      run:\n        - {{ pin_subpackage(\"libiceoryx-hoofs-devel\", exact=True) }}\n        - {{ pin_subpackage(\"libiceoryx-posh-devel\", exact=True) }}\n        - {{ pin_subpackage(\"libiceoryx-binding-c\", exact=True) }}\n    test:\n      commands:\n        - test -f ${PREFIX}/include/iceoryx/v{{ version }}/iceoryx_posh/version/version_info.hpp\n\n  - name: iceoryx\n    files:\n      include:\n        - share/doc\n        - bin/iox-roudi\n        - etc/roudi_config_example.toml\n    requirements:\n      build:\n        - {{ compiler('cxx') }}\n        - {{ stdlib('c') }}\n        - cmake\n        - make\n      host:\n        - libacl     # [linux]\n        - ncurses\n        - {{ pin_subpackage(\"libiceoryx-hoofs\", exact=True) }}\n        - {{ pin_subpackage(\"libiceoryx-posh\", exact=True) }}\n        - {{ pin_subpackage(\"libiceoryx-binding-c\", exact=True) }}\n        - {{ pin_subpackage(\"libiceoryx-hoofs-devel\", exact=True) }}\n        - {{ pin_subpackage(\"libiceoryx-posh-devel\", exact=True) }}\n        - {{ pin_subpackage(\"libiceoryx-binding-c-devel\", exact=True) }}\n      run:\n        - {{ pin_subpackage(\"libiceoryx-hoofs\", exact=True) }}\n        - {{ pin_subpackage(\"libiceoryx-posh\", exact=True) }}\n        - {{ pin_subpackage(\"libiceoryx-binding-c\", exact=True) }}\n        - {{ pin_subpackage(\"libiceoryx-hoofs-devel\", exact=True) }}\n        - {{ pin_subpackage(\"libiceoryx-posh-devel\", exact=True) }}\n        - {{ pin_subpackage(\"libiceoryx-binding-c-devel\", exact=True) }}\n    test:\n      commands:\n        - iox-roudi -h\n\nabout:\n  home: https://iceoryx.io/\n  summary: 'Eclipse iceoryx - true zero-copy inter-process-communication'\n  description: |\n    Eclipse iceoryx is an inter-process-communication middleware that enables\n    virtually limitless data transmissions at constant time.\n  license: Apache-2.0 AND MIT AND EPL-2.0\n  license_file:\n    - LICENSE\n    - iceoryx_posh/doc/3rd_party_licenses/cpptoml/LICENSE\n  doc_url: https://iceoryx.io/latest/\n  dev_url: https://github.com/eclipse-iceoryx/iceoryx\n\nextra:\n  feedstock-name: iceoryx\n  recipe-maintainers:\n    - timkpaine\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -1093,6 +1314,8 @@
       "libiceoryx-binding-c-devel",
       "libiceoryx-hoofs",
       "libiceoryx-hoofs-devel",
+      "libiceoryx-platform",
+      "libiceoryx-platform-devel",
       "libiceoryx-posh",
       "libiceoryx-posh-devel",
       "make",
@@ -1119,6 +1342,7 @@
         "libiceoryx-binding-c-devel",
         "libiceoryx-hoofs",
         "libiceoryx-hoofs-devel",
+        "libiceoryx-platform",
         "libiceoryx-posh",
         "libiceoryx-posh-devel",
         "ncurses"
@@ -1133,6 +1357,8 @@
         "libiceoryx-binding-c-devel",
         "libiceoryx-hoofs",
         "libiceoryx-hoofs-devel",
+        "libiceoryx-platform",
+        "libiceoryx-platform-devel",
         "libiceoryx-posh",
         "libiceoryx-posh-devel"
       ]
@@ -1161,6 +1387,7 @@
         "libiceoryx-binding-c-devel",
         "libiceoryx-hoofs",
         "libiceoryx-hoofs-devel",
+        "libiceoryx-platform",
         "libiceoryx-posh",
         "libiceoryx-posh-devel",
         "ncurses"
@@ -1173,6 +1400,8 @@
         "libiceoryx-binding-c-devel",
         "libiceoryx-hoofs",
         "libiceoryx-hoofs-devel",
+        "libiceoryx-platform",
+        "libiceoryx-platform-devel",
         "libiceoryx-posh",
         "libiceoryx-posh-devel"
       ]
@@ -1182,8 +1411,8 @@
       "elements": []
     }
   },
-  "url": "https://github.com/eclipse-iceoryx/iceoryx/archive/refs/tags/v2.0.6.tar.gz",
-  "version": "2.0.6",
+  "url": "https://github.com/eclipse-iceoryx/iceoryx/archive/refs/tags/v2.95.8.tar.gz",
+  "version": "2.95.8",
   "version_pr_info": {
     "__lazy_json__": "version_pr_info/iceoryx.json"
   }
