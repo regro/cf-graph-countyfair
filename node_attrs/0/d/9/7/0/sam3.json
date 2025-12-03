@@ -14,8 +14,8 @@
       "tooling_branch_name": "main"
     }
   },
-  "feedstock_hash": "ab60c018bed9f75e3a1db44bee26f0f078f906c5",
-  "feedstock_hash_ts": 1764688749,
+  "feedstock_hash": "be1fe5f8e7d3df3f54a07cff9f48d696e9142276",
+  "feedstock_hash_ts": 1764765666,
   "feedstock_name": "sam3",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -41,7 +41,6 @@
     "extra": {
       "recipe-maintainers": [
         "giswqs",
-        "hmaarrfk",
         "claydugo"
       ]
     },
@@ -196,7 +195,6 @@
     "extra": {
       "recipe-maintainers": [
         "giswqs",
-        "hmaarrfk",
         "claydugo"
       ]
     },
@@ -302,7 +300,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/sam3.json"
   },
-  "raw_meta_yaml": "schema_version: 1\n\ncontext:\n  name: \"sam3\"\n  git_hash: \"84cc43bca4347b772f17d1078a1ddb4c054655c2\"\n  version: \"0.1.0\"\n  python_min: \"3.10\"\n\n\npackage:\n  name: ${{ name|lower }}\n  version: ${{ version }}\n\nsource:\n  url: https://github.com/facebookresearch/sam3/archive/${{ git_hash }}.tar.gz\n  sha256: b50d5f85bc57f13ef8c1b7fe485688bc0f76f58d18078ce9b505acb3bcfa408b\n  patches:\n    # https://github.com/facebookresearch/sam3/pull/167\n    - 167-update_setuptools_to_find_all_subpackages.patch\n    # https://github.com/facebookresearch/sam3/pull/282\n    - 282-fix_missing_bpe_vocabulary_asset.patch\n    # https://github.com/facebookresearch/sam3/pull/196\n    # - 196-lazy_import_decord.patch\n    # Decord is simply unmaintained and the codepath doesn't really use\n    # that much reuse of a single video instance\n    # I (hmaarrfk) rewrote it in pyav\n    - use_pyav_instead_of_decord.patch\n    # triton seems to be only used in\n    # sample_one_point_from_error_center\n    # which doesn't seem to be used in any sam3 codepath\n    # So i'm going to lazy import this to avoid the whole triton (and compiler)\n    # requirement\n    - 0001-Avoid-importing-triton-since-it-doesn-t-seem-used.patch\n    # numpy and ftfy are pinned too hard in sam3\n    - loosen_dependencies.patch\n\nbuild:\n  number: 1\n  noarch: python\n  # Copy BPE vocab asset into sam3 package before pip install\n  # since assets/ is at repo root but code expects it inside the package\n  script:\n    - mkdir -p sam3/assets\n    - cp assets/bpe_simple_vocab_16e6.txt.gz sam3/assets/\n    - python -m pip install . -vv\n\nrequirements:\n  host:\n    - python ${{ python_min }}.*\n    - setuptools\n    - wheel\n    - pip\n  run:\n    - python >=${{ python_min }}\n    - timm >=1.0.17\n    - numpy >=1.26\n    - tqdm\n    - ftfy >=6.1.1\n    - regex\n    - iopath >=0.1.10\n    - typing_extensions\n    - huggingface_hub\n    - einops\n    - pytorch\n    - einops >=0.8.0\n    # They use pycocotools's mask utils alot\n    - pycocotools\n    - psutil\n    - av\n\ntests:\n  - python:\n      imports:\n        - sam3\n      pip_check: true\n      python_version: ${{ python_min }}.*\n  - script:\n      # Verify the BPE vocabulary asset is included in the package\n      - test -f $PREFIX/lib/python*/site-packages/sam3/assets/bpe_simple_vocab_16e6.txt.gz\n\nabout:\n  summary: \"SAM 3: Segment Anything with Concepts\"\n  description: |\n    SAM 3 is a unified foundation model for promptable segmentation in images and videos.\n    It can detect, segment, and track objects using text or visual prompts such as points,\n    boxes, and masks.\n  license: LicenseRef-SAM\n  license_file: LICENSE\n  homepage: https://github.com/facebookresearch/sam3\n  repository: https://github.com/facebookresearch/sam3\n  documentation: https://ai.meta.com/sam3/\n\n\nextra:\n  recipe-maintainers:\n    - giswqs\n    - hmaarrfk\n    - claydugo\n",
+  "raw_meta_yaml": "schema_version: 1\n\ncontext:\n  name: \"sam3\"\n  git_hash: \"84cc43bca4347b772f17d1078a1ddb4c054655c2\"\n  version: \"0.1.0\"\n  python_min: \"3.10\"\n\n\npackage:\n  name: ${{ name|lower }}\n  version: ${{ version }}\n\nsource:\n  url: https://github.com/facebookresearch/sam3/archive/${{ git_hash }}.tar.gz\n  sha256: b50d5f85bc57f13ef8c1b7fe485688bc0f76f58d18078ce9b505acb3bcfa408b\n  patches:\n    # https://github.com/facebookresearch/sam3/pull/167\n    - 167-update_setuptools_to_find_all_subpackages.patch\n    # https://github.com/facebookresearch/sam3/pull/282\n    - 282-fix_missing_bpe_vocabulary_asset.patch\n    # https://github.com/facebookresearch/sam3/pull/196\n    # - 196-lazy_import_decord.patch\n    # Decord is simply unmaintained and the codepath doesn't really use\n    # that much reuse of a single video instance\n    # I (hmaarrfk) rewrote it in pyav\n    - use_pyav_instead_of_decord.patch\n    # triton seems to be only used in\n    # sample_one_point_from_error_center\n    # which doesn't seem to be used in any sam3 codepath\n    # So i'm going to lazy import this to avoid the whole triton (and compiler)\n    # requirement\n    - 0001-Avoid-importing-triton-since-it-doesn-t-seem-used.patch\n    # numpy and ftfy are pinned too hard in sam3\n    - loosen_dependencies.patch\n\nbuild:\n  number: 1\n  noarch: python\n  # Copy BPE vocab asset into sam3 package before pip install\n  # since assets/ is at repo root but code expects it inside the package\n  script:\n    - mkdir -p sam3/assets\n    - cp assets/bpe_simple_vocab_16e6.txt.gz sam3/assets/\n    - python -m pip install . -vv\n\nrequirements:\n  host:\n    - python ${{ python_min }}.*\n    - setuptools\n    - wheel\n    - pip\n  run:\n    - python >=${{ python_min }}\n    - timm >=1.0.17\n    - numpy >=1.26\n    - tqdm\n    - ftfy >=6.1.1\n    - regex\n    - iopath >=0.1.10\n    - typing_extensions\n    - huggingface_hub\n    - einops\n    - pytorch\n    - einops >=0.8.0\n    # They use pycocotools's mask utils alot\n    - pycocotools\n    - psutil\n    - av\n\ntests:\n  - python:\n      imports:\n        - sam3\n      pip_check: true\n      python_version: ${{ python_min }}.*\n  - script:\n      # Verify the BPE vocabulary asset is included in the package\n      - test -f $PREFIX/lib/python*/site-packages/sam3/assets/bpe_simple_vocab_16e6.txt.gz\n\nabout:\n  summary: \"SAM 3: Segment Anything with Concepts\"\n  description: |\n    SAM 3 is a unified foundation model for promptable segmentation in images and videos.\n    It can detect, segment, and track objects using text or visual prompts such as points,\n    boxes, and masks.\n  license: LicenseRef-SAM\n  license_file: LICENSE\n  homepage: https://github.com/facebookresearch/sam3\n  repository: https://github.com/facebookresearch/sam3\n  documentation: https://ai.meta.com/sam3/\n\n\nextra:\n  recipe-maintainers:\n    - giswqs\n    - claydugo\n",
   "req": {
     "__set__": true,
     "elements": [
