@@ -6,26 +6,31 @@
     "conda_build": {
       "pkg_format": "2"
     },
+    "conda_build_tool": "rattler-build",
     "conda_forge_output_validation": true,
+    "conda_install_tool": "pixi",
     "github": {
       "branch_name": "main",
       "tooling_branch_name": "main"
     }
   },
-  "feedstock_hash": "f2a24006ea5dca420637ef551bdd6b83135c44ef",
-  "feedstock_hash_ts": 1764342599,
+  "feedstock_hash": "44ef59348d5a784e794a06222404cc38567585e3",
+  "feedstock_hash_ts": 1764783170,
   "feedstock_name": "esmvaltool-suite",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
     "about": {
       "description": "A community diagnostic and performance metrics tool for routine evaluation of Earth system models in CMIP.",
-      "home": "https://www.esmvaltool.org",
+      "home": "https://www.esmvaltool.org/",
       "license": "Apache-2.0",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "A community diagnostic and performance metrics tool for routine evaluation of Earth system models in CMIP."
     },
     "build": {
-      "number": "1"
+      "noarch": "python",
+      "number": "2",
+      "script": "${{ PYTHON }} -m pip install . --no-deps -vv --no-build-isolation"
     },
     "extra": {
       "recipe-maintainers": [
@@ -43,24 +48,18 @@
     },
     "outputs": [
       {
-        "build": {
-          "entry_points": [
-            "mip_convert_setup = esmvaltool.cmorizers.mip_convert.esmvt_mipconv_setup:main",
-            "nclcodestyle = esmvaltool.utils.nclcodestyle.nclcodestyle:_main"
-          ],
-          "noarch": "python"
-        },
+        "build": null,
         "name": "esmvaltool-python",
         "requirements": {
           "build": [
-            "python 3.11",
-            "pip !=21.3"
+            "pip !=21.3",
+            "python 3.11.*"
           ],
           "host": [
-            "python 3.11",
+            "pip !=21.3",
+            "python 3.11.*",
             "setuptools",
-            "setuptools_scm",
-            "pip !=21.3"
+            "setuptools_scm"
           ],
           "run": [
             "aiohttp",
@@ -94,7 +93,7 @@
             "matplotlib-base",
             "natsort",
             "nc-time-axis",
-            "netCDF4",
+            "netcdf4",
             "numba",
             "numpy !=1.24.3",
             "openpyxl",
@@ -104,7 +103,7 @@
             "prov",
             "pyproj >=2.1",
             "pys2index >=0.1.5",
-            "python >=3.11,<=3.14",
+            "python >=3.11",
             "python-cdo",
             "python-dateutil",
             "pyyaml",
@@ -124,76 +123,51 @@
             "zarr"
           ]
         },
-        "script": "build_python.sh",
-        "test": {
-          "commands": [
-            "pip check",
-            "pytest -n 2 --ignore=\"run_test.py\" --ignore=\"tests/unit/documentation/\" -k \"not ([diagnostic.R] or [diagnostic.jl] or [diagnostic.ncl] or test_r_lint)\"",
-            "esmvaltool --help",
-            "esmvaltool data --help",
-            "nclcodestyle --help",
-            "esmvaltool colortables --help"
-          ],
-          "imports": [
-            "esmvaltool"
-          ],
-          "requires": [
-            "pre-commit",
-            "pytest >=3.9,!=6.0.0rc1,!=6.0.0",
-            "pytest-cov",
-            "pytest-env",
-            "pytest-html !=2.1.0",
-            "pytest-metadata >=1.5.1",
-            "pytest-mock",
-            "pytest-xdist",
-            "python 3.11"
-          ],
-          "source_files": [
-            "tests",
-            "setup.cfg"
-          ]
-        }
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "esmvaltool"
+              ],
+              "python_version": "3.11.*"
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "tests",
+                "pyproject.toml"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest >=3.9,!=6.0.0rc1,!=6.0.0",
+                "pytest-cov",
+                "pytest-env",
+                "pytest-html !=2.1.0",
+                "pytest-metadata >=1.5.1",
+                "pytest-mock",
+                "pytest-xdist",
+                "python 3.11.*"
+              ]
+            },
+            "script": [
+              "pytest -n 2 --ignore=\"run_test.py\" --ignore=\"tests/unit/documentation/\" -k \"not ([diagnostic.R] or [diagnostic.ncl] or test_r_lint)\"",
+              "esmvaltool --help",
+              "esmvaltool data --help",
+              "nclcodestyle --help",
+              "esmvaltool colortables --help"
+            ]
+          }
+        ],
+        "version": "2.13.0"
       },
       {
-        "build": {
-          "noarch": "generic"
-        },
-        "name": "esmvaltool-ncl",
-        "requirements": {
-          "run": [
-            "esmvaltool-python",
-            "ncl >=6.6.2",
-            "cdo",
-            "imagemagick",
-            "nco"
-          ]
-        },
-        "test": {
-          "commands": [
-            "pytest -n 2 -k \"[diagnostic.ncl]\""
-          ],
-          "requires": [
-            "pre-commit",
-            "pytest >=3.9,!=6.0.0rc1,!=6.0.0",
-            "pytest-cov",
-            "pytest-env",
-            "pytest-html !=2.1.0",
-            "pytest-metadata >=1.5.1",
-            "pytest-mock",
-            "pytest-xdist"
-          ],
-          "source_files": [
-            "tests",
-            "setup.cfg"
-          ]
-        }
-      },
-      {
-        "build": {
-          "noarch": "generic"
-        },
+        "build": null,
         "name": "esmvaltool-r",
         "requirements": {
+          "build": [],
+          "host": [],
           "run": [
             "esmvaltool-python",
             "nco",
@@ -228,65 +202,189 @@
             "r-yaml"
           ]
         },
-        "test": {
-          "commands": [
-            "pytest -n 2 -k \"[diagnostic.R] or test_r_lint\""
-          ],
-          "requires": [
-            "pre-commit",
-            "pytest >=3.9,!=6.0.0rc1,!=6.0.0",
-            "pytest-cov",
-            "pytest-env",
-            "pytest-html !=2.1.0",
-            "pytest-metadata >=1.5.1",
-            "pytest-mock",
-            "pytest-xdist"
-          ],
-          "source_files": [
-            "tests",
-            "setup.cfg"
-          ]
-        }
+        "tests": [
+          {
+            "files": {
+              "source": [
+                "tests",
+                "setup.cfg"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest >=3.9,!=6.0.0rc1,!=6.0.0",
+                "pytest-cov",
+                "pytest-env",
+                "pytest-html !=2.1.0",
+                "pytest-metadata >=1.5.1",
+                "pytest-mock",
+                "pytest-xdist"
+              ]
+            },
+            "script": "pytest -n 2 -k \"[diagnostic.R] or test_r_lint\""
+          }
+        ],
+        "version": "2.13.0"
       },
       {
-        "build": {
-          "noarch": "python"
+        "build": null,
+        "name": "esmvaltool-ncl",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "esmvaltool-python",
+            "ncl >=6.6.2",
+            "cdo",
+            "imagemagick",
+            "nco"
+          ]
         },
+        "tests": [
+          {
+            "files": {
+              "source": [
+                "tests",
+                "setup.cfg"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest >=3.9,!=6.0.0rc1,!=6.0.0",
+                "pytest-cov",
+                "pytest-env",
+                "pytest-html !=2.1.0",
+                "pytest-metadata >=1.5.1",
+                "pytest-mock",
+                "pytest-xdist"
+              ]
+            },
+            "script": "pytest -n 2 -k \"[diagnostic.ncl]\""
+          }
+        ],
+        "version": "2.13.0"
+      },
+      {
+        "build": null,
         "name": "esmvaltool",
         "requirements": {
+          "build": [],
           "host": [
-            "python 3.11"
+            "python 3.11.*"
           ],
           "run": [
-            "python >=3.11,<=3.14",
             "esmvaltool-ncl",
             "esmvaltool-python",
-            "esmvaltool-r"
+            "esmvaltool-r",
+            "python >=3.11"
           ]
         },
-        "test": {
-          "commands": [
-            "esmvaltool --help",
-            "esmvaltool recipes list",
-            "esmvaltool version",
-            "esmvaltool data --help",
-            "nclcodestyle --help",
-            "esmvaltool colortables --help"
-          ],
-          "imports": [
-            "esmvaltool"
-          ],
-          "requires": [
-            "python 3.11"
-          ]
-        }
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "esmvaltool"
+              ],
+              "python_version": "3.11.*"
+            }
+          },
+          {
+            "requirements": {
+              "run": [
+                "python 3.11.*"
+              ]
+            },
+            "script": [
+              "esmvaltool --help",
+              "esmvaltool recipes list",
+              "esmvaltool version",
+              "esmvaltool data --help",
+              "nclcodestyle --help",
+              "esmvaltool colortables --help"
+            ]
+          }
+        ],
+        "version": "2.13.0"
       }
     ],
     "package": {
-      "name": "esmvaltool-suite",
+      "name": "esmvaltool-python",
       "version": "2.13.0"
     },
-    "schema_version": 0,
+    "requirements": {
+      "build": [
+        "pip !=21.3",
+        "python 3.11.*"
+      ],
+      "host": [
+        "pip !=21.3",
+        "python 3.11.*",
+        "setuptools",
+        "setuptools_scm"
+      ],
+      "run": [
+        "aiohttp",
+        "arviz",
+        "cartopy",
+        "cdo >=2.3.0",
+        "cdsapi",
+        "cf-units",
+        "cfgrib",
+        "cftime",
+        "cmocean",
+        "cython",
+        "dask !=2024.8.0",
+        "distributed",
+        "ecmwf-api-client",
+        "eofs",
+        "esmpy",
+        "esmvalcore 2.13.*",
+        "fiona",
+        "fire",
+        "fsspec",
+        "gdal >=3.9.0",
+        "imagehash",
+        "ipython",
+        "iris >=3.11",
+        "iris-esmf-regrid >=0.10.0",
+        "jinja2",
+        "joblib",
+        "lime",
+        "mapgenerator >=1.0.5",
+        "matplotlib-base",
+        "natsort",
+        "nc-time-axis",
+        "netcdf4",
+        "numba",
+        "numpy !=1.24.3",
+        "openpyxl",
+        "packaging",
+        "pandas",
+        "progressbar2",
+        "prov",
+        "pyproj >=2.1",
+        "pys2index >=0.1.5",
+        "python >=3.11",
+        "python-cdo",
+        "python-dateutil",
+        "pyyaml",
+        "rasterio >=1.3.10",
+        "requests",
+        "ruamel.yaml",
+        "scikit-image",
+        "scikit-learn >=1.4.0",
+        "scipy",
+        "seaborn",
+        "seawater",
+        "shapely >=2.0.2",
+        "xarray >=0.12.0",
+        "xesmf >=0.7.1",
+        "xgboost >1.6.1",
+        "xlsxwriter",
+        "zarr"
+      ]
+    },
+    "schema_version": 1,
     "source": {
       "patches": [
         "0001-Unpin-ipython.patch"
@@ -413,7 +511,7 @@
     "test": {
       "__set__": true,
       "elements": [
-        "pre-commit",
+        "pip",
         "pytest",
         "pytest-cov",
         "pytest-env",
@@ -428,13 +526,16 @@
   "meta_yaml": {
     "about": {
       "description": "A community diagnostic and performance metrics tool for routine evaluation of Earth system models in CMIP.",
-      "home": "https://www.esmvaltool.org",
+      "home": "https://www.esmvaltool.org/",
       "license": "Apache-2.0",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "A community diagnostic and performance metrics tool for routine evaluation of Earth system models in CMIP."
     },
     "build": {
-      "number": "1"
+      "noarch": "python",
+      "number": "2",
+      "script": "${{ PYTHON }} -m pip install . --no-deps -vv --no-build-isolation"
     },
     "extra": {
       "recipe-maintainers": [
@@ -452,24 +553,18 @@
     },
     "outputs": [
       {
-        "build": {
-          "entry_points": [
-            "mip_convert_setup = esmvaltool.cmorizers.mip_convert.esmvt_mipconv_setup:main",
-            "nclcodestyle = esmvaltool.utils.nclcodestyle.nclcodestyle:_main"
-          ],
-          "noarch": "python"
-        },
+        "build": null,
         "name": "esmvaltool-python",
         "requirements": {
           "build": [
-            "python 3.11",
-            "pip !=21.3"
+            "pip !=21.3",
+            "python 3.11.*"
           ],
           "host": [
-            "python 3.11",
+            "pip !=21.3",
+            "python 3.11.*",
             "setuptools",
-            "setuptools_scm",
-            "pip !=21.3"
+            "setuptools_scm"
           ],
           "run": [
             "aiohttp",
@@ -503,7 +598,7 @@
             "matplotlib-base",
             "natsort",
             "nc-time-axis",
-            "netCDF4",
+            "netcdf4",
             "numba",
             "numpy !=1.24.3",
             "openpyxl",
@@ -513,7 +608,7 @@
             "prov",
             "pyproj >=2.1",
             "pys2index >=0.1.5",
-            "python >=3.11,<=3.14",
+            "python >=3.11",
             "python-cdo",
             "python-dateutil",
             "pyyaml",
@@ -533,76 +628,51 @@
             "zarr"
           ]
         },
-        "script": "build_python.sh",
-        "test": {
-          "commands": [
-            "pip check",
-            "pytest -n 2 --ignore=\"run_test.py\" --ignore=\"tests/unit/documentation/\" -k \"not ([diagnostic.R] or [diagnostic.jl] or [diagnostic.ncl] or test_r_lint)\"",
-            "esmvaltool --help",
-            "esmvaltool data --help",
-            "nclcodestyle --help",
-            "esmvaltool colortables --help"
-          ],
-          "imports": [
-            "esmvaltool"
-          ],
-          "requires": [
-            "pre-commit",
-            "pytest >=3.9,!=6.0.0rc1,!=6.0.0",
-            "pytest-cov",
-            "pytest-env",
-            "pytest-html !=2.1.0",
-            "pytest-metadata >=1.5.1",
-            "pytest-mock",
-            "pytest-xdist",
-            "python 3.11"
-          ],
-          "source_files": [
-            "tests",
-            "setup.cfg"
-          ]
-        }
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "esmvaltool"
+              ],
+              "python_version": "3.11.*"
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "tests",
+                "pyproject.toml"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest >=3.9,!=6.0.0rc1,!=6.0.0",
+                "pytest-cov",
+                "pytest-env",
+                "pytest-html !=2.1.0",
+                "pytest-metadata >=1.5.1",
+                "pytest-mock",
+                "pytest-xdist",
+                "python 3.11.*"
+              ]
+            },
+            "script": [
+              "pytest -n 2 --ignore=\"run_test.py\" --ignore=\"tests/unit/documentation/\" -k \"not ([diagnostic.R] or [diagnostic.ncl] or test_r_lint)\"",
+              "esmvaltool --help",
+              "esmvaltool data --help",
+              "nclcodestyle --help",
+              "esmvaltool colortables --help"
+            ]
+          }
+        ],
+        "version": "2.13.0"
       },
       {
-        "build": {
-          "noarch": "generic"
-        },
-        "name": "esmvaltool-ncl",
-        "requirements": {
-          "run": [
-            "esmvaltool-python",
-            "ncl >=6.6.2",
-            "cdo",
-            "imagemagick",
-            "nco"
-          ]
-        },
-        "test": {
-          "commands": [
-            "pytest -n 2 -k \"[diagnostic.ncl]\""
-          ],
-          "requires": [
-            "pre-commit",
-            "pytest >=3.9,!=6.0.0rc1,!=6.0.0",
-            "pytest-cov",
-            "pytest-env",
-            "pytest-html !=2.1.0",
-            "pytest-metadata >=1.5.1",
-            "pytest-mock",
-            "pytest-xdist"
-          ],
-          "source_files": [
-            "tests",
-            "setup.cfg"
-          ]
-        }
-      },
-      {
-        "build": {
-          "noarch": "generic"
-        },
+        "build": null,
         "name": "esmvaltool-r",
         "requirements": {
+          "build": [],
+          "host": [],
           "run": [
             "esmvaltool-python",
             "nco",
@@ -637,65 +707,189 @@
             "r-yaml"
           ]
         },
-        "test": {
-          "commands": [
-            "pytest -n 2 -k \"[diagnostic.R] or test_r_lint\""
-          ],
-          "requires": [
-            "pre-commit",
-            "pytest >=3.9,!=6.0.0rc1,!=6.0.0",
-            "pytest-cov",
-            "pytest-env",
-            "pytest-html !=2.1.0",
-            "pytest-metadata >=1.5.1",
-            "pytest-mock",
-            "pytest-xdist"
-          ],
-          "source_files": [
-            "tests",
-            "setup.cfg"
-          ]
-        }
+        "tests": [
+          {
+            "files": {
+              "source": [
+                "tests",
+                "setup.cfg"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest >=3.9,!=6.0.0rc1,!=6.0.0",
+                "pytest-cov",
+                "pytest-env",
+                "pytest-html !=2.1.0",
+                "pytest-metadata >=1.5.1",
+                "pytest-mock",
+                "pytest-xdist"
+              ]
+            },
+            "script": "pytest -n 2 -k \"[diagnostic.R] or test_r_lint\""
+          }
+        ],
+        "version": "2.13.0"
       },
       {
-        "build": {
-          "noarch": "python"
+        "build": null,
+        "name": "esmvaltool-ncl",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "esmvaltool-python",
+            "ncl >=6.6.2",
+            "cdo",
+            "imagemagick",
+            "nco"
+          ]
         },
+        "tests": [
+          {
+            "files": {
+              "source": [
+                "tests",
+                "setup.cfg"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest >=3.9,!=6.0.0rc1,!=6.0.0",
+                "pytest-cov",
+                "pytest-env",
+                "pytest-html !=2.1.0",
+                "pytest-metadata >=1.5.1",
+                "pytest-mock",
+                "pytest-xdist"
+              ]
+            },
+            "script": "pytest -n 2 -k \"[diagnostic.ncl]\""
+          }
+        ],
+        "version": "2.13.0"
+      },
+      {
+        "build": null,
         "name": "esmvaltool",
         "requirements": {
+          "build": [],
           "host": [
-            "python 3.11"
+            "python 3.11.*"
           ],
           "run": [
-            "python >=3.11,<=3.14",
             "esmvaltool-ncl",
             "esmvaltool-python",
-            "esmvaltool-r"
+            "esmvaltool-r",
+            "python >=3.11"
           ]
         },
-        "test": {
-          "commands": [
-            "esmvaltool --help",
-            "esmvaltool recipes list",
-            "esmvaltool version",
-            "esmvaltool data --help",
-            "nclcodestyle --help",
-            "esmvaltool colortables --help"
-          ],
-          "imports": [
-            "esmvaltool"
-          ],
-          "requires": [
-            "python 3.11"
-          ]
-        }
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "esmvaltool"
+              ],
+              "python_version": "3.11.*"
+            }
+          },
+          {
+            "requirements": {
+              "run": [
+                "python 3.11.*"
+              ]
+            },
+            "script": [
+              "esmvaltool --help",
+              "esmvaltool recipes list",
+              "esmvaltool version",
+              "esmvaltool data --help",
+              "nclcodestyle --help",
+              "esmvaltool colortables --help"
+            ]
+          }
+        ],
+        "version": "2.13.0"
       }
     ],
     "package": {
-      "name": "esmvaltool-suite",
+      "name": "esmvaltool-python",
       "version": "2.13.0"
     },
-    "schema_version": 0,
+    "requirements": {
+      "build": [
+        "pip !=21.3",
+        "python 3.11.*"
+      ],
+      "host": [
+        "pip !=21.3",
+        "python 3.11.*",
+        "setuptools",
+        "setuptools_scm"
+      ],
+      "run": [
+        "aiohttp",
+        "arviz",
+        "cartopy",
+        "cdo >=2.3.0",
+        "cdsapi",
+        "cf-units",
+        "cfgrib",
+        "cftime",
+        "cmocean",
+        "cython",
+        "dask !=2024.8.0",
+        "distributed",
+        "ecmwf-api-client",
+        "eofs",
+        "esmpy",
+        "esmvalcore 2.13.*",
+        "fiona",
+        "fire",
+        "fsspec",
+        "gdal >=3.9.0",
+        "imagehash",
+        "ipython",
+        "iris >=3.11",
+        "iris-esmf-regrid >=0.10.0",
+        "jinja2",
+        "joblib",
+        "lime",
+        "mapgenerator >=1.0.5",
+        "matplotlib-base",
+        "natsort",
+        "nc-time-axis",
+        "netcdf4",
+        "numba",
+        "numpy !=1.24.3",
+        "openpyxl",
+        "packaging",
+        "pandas",
+        "progressbar2",
+        "prov",
+        "pyproj >=2.1",
+        "pys2index >=0.1.5",
+        "python >=3.11",
+        "python-cdo",
+        "python-dateutil",
+        "pyyaml",
+        "rasterio >=1.3.10",
+        "requests",
+        "ruamel.yaml",
+        "scikit-image",
+        "scikit-learn >=1.4.0",
+        "scipy",
+        "seaborn",
+        "seawater",
+        "shapely >=2.0.2",
+        "xarray >=0.12.0",
+        "xesmf >=0.7.1",
+        "xgboost >1.6.1",
+        "xlsxwriter",
+        "zarr"
+      ]
+    },
+    "schema_version": 1,
     "source": {
       "patches": [
         "0001-Unpin-ipython.patch"
@@ -704,7 +898,7 @@
       "url": "https://pypi.org/packages/source/E/ESMValTool/esmvaltool-2.13.0.tar.gz"
     }
   },
-  "name": "esmvaltool-suite",
+  "name": "esmvaltool-python",
   "outputs_names": {
     "__set__": true,
     "elements": [
@@ -721,7 +915,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/esmvaltool-suite.json"
   },
-  "raw_meta_yaml": "{% set name = \"ESMValTool\" %}\n{% set version = \"2.13.0\" %}\n\n{% set python_min = \"3.11\" %}\n{% set python_max = \"3.14\" %}\n\npackage:\n  name: {{ name|lower }}-suite\n  version: {{ version }}\n\nsource:\n  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name|lower }}-{{ version }}.tar.gz\n  sha256: 92d4eac21f594131539b0749c6362f2328d72b70b18e02a4b2b8fe0ef7dea9e5\n  patches:\n    - 0001-Unpin-ipython.patch\n\nbuild:\n  number: 1\n\noutputs:\n  - name: esmvaltool-python\n    build:\n      noarch: python\n      entry_points:\n        - mip_convert_setup = esmvaltool.cmorizers.mip_convert.esmvt_mipconv_setup:main\n        - nclcodestyle = esmvaltool.utils.nclcodestyle.nclcodestyle:_main\n    script: build_python.bat  # [win]\n    script: build_python.sh  # [not win]\n    requirements:\n      build:\n        - python {{ python_min }}\n        - pip !=21.3\n      host:\n        - python {{ python_min }}\n        - setuptools\n        - setuptools_scm\n        - pip !=21.3\n      run:\n        - aiohttp\n        - arviz\n        - cartopy\n        - cdo >=2.3.0\n        - cdsapi\n        - cf-units\n        - cfgrib\n        - cftime\n        - cmocean\n        - cython\n        - dask !=2024.8.0\n        - distributed\n        - ecmwf-api-client\n        - eofs\n        - esmpy\n        - esmvalcore 2.13.*\n        - fiona\n        - fire\n        - fsspec\n        - gdal >=3.9.0\n        - imagehash\n        - ipython\n        - iris >=3.11\n        - iris-esmf-regrid >=0.10.0\n        - jinja2\n        - joblib\n        - lime\n        - mapgenerator >=1.0.5\n        - matplotlib-base\n        - natsort\n        - nc-time-axis\n        - netCDF4\n        - numba\n        - numpy !=1.24.3  # severe masking bug, avoid pulling 2.0.0\n        - openpyxl\n        - packaging\n        - pandas\n        - progressbar2\n        - prov\n        - pyproj >=2.1\n        - pys2index >=0.1.5  # only from conda-forge; 0.1.4 broken\n        - python >={{ python_min }},<={{ python_max }}\n        - python-cdo\n        - python-dateutil\n        - pyyaml\n        - rasterio >=1.3.10\n        - requests\n        - ruamel.yaml\n        - scikit-image\n        - scikit-learn >=1.4.0 # github.com/ESMValGroup/ESMValTool/issues/3504\n        - scipy\n        - seaborn\n        - seawater\n        - shapely >=2.0.2\n        - xarray >=0.12.0\n        - xesmf >=0.7.1\n        - xgboost >1.6.1  # github.com/ESMValGroup/ESMValTool/issues/2779\n        - xlsxwriter\n        - zarr\n    test:\n      source_files:\n        - tests\n        - setup.cfg\n      requires:\n        - pre-commit\n        - pytest >=3.9,!=6.0.0rc1,!=6.0.0\n        - pytest-cov\n        - pytest-env\n        - pytest-html !=2.1.0\n        - pytest-metadata >=1.5.1\n        - pytest-mock\n        - pytest-xdist\n        - python {{ python_min }}\n      imports:\n        - esmvaltool\n      commands:\n        - pip check\n        - pytest -n 2 --ignore=\"run_test.py\" --ignore=\"tests/unit/documentation/\" -k \"not ([diagnostic.R] or [diagnostic.jl] or [diagnostic.ncl] or test_r_lint)\"\n        - esmvaltool --help\n        - esmvaltool data --help\n        - nclcodestyle --help\n        - esmvaltool colortables --help\n\n  - name: esmvaltool-ncl\n    build:\n      noarch: generic\n    requirements:\n      run:\n        - {{ pin_subpackage('esmvaltool-python', exact=True) }}\n        - ncl >=6.6.2\n        - cdo\n        - imagemagick\n        - nco\n    test:\n      source_files:\n        - tests\n        - setup.cfg\n      requires:\n        - pre-commit\n        - pytest >=3.9,!=6.0.0rc1,!=6.0.0\n        - pytest-cov\n        - pytest-env\n        - pytest-html !=2.1.0\n        - pytest-metadata >=1.5.1\n        - pytest-mock\n        - pytest-xdist\n      commands:\n        - pytest -n 2 -k \"[diagnostic.ncl]\"\n\n  - name: esmvaltool-r\n    build:\n      noarch: generic\n    requirements:\n      run:\n        - {{ pin_subpackage('esmvaltool-python', exact=True) }}\n        - nco\n        - cdo\n        - r-base >=3.5\n        - r-abind\n        - r-akima\n        - r-climdex.pcic\n        - r-climprojdiags\n        - r-docopt\n        - r-dotcall64\n        - r-functional\n        - r-ggplot2\n        - r-git2r  # dependency of r-lintr\n        - r-gridextra\n        - r-lintr ==3.1.2\n        - r-logging\n        - r-mapproj\n        - r-maps\n        - r-multiapply\n        - r-ncdf4\n        - r-ncdf4.helpers\n        - r-pcict\n        - r-plyr\n        - r-rcolorbrewer\n        - r-rcpp\n        - r-s2dverification\n        - r-snow\n        - r-spei\n        - r-styler ==1.10.3\n        - r-udunits2\n        - r-yaml\n    test:\n      source_files:\n        - tests\n        - setup.cfg\n      requires:\n        - pre-commit\n        - pytest >=3.9,!=6.0.0rc1,!=6.0.0\n        - pytest-cov\n        - pytest-env\n        - pytest-html !=2.1.0\n        - pytest-metadata >=1.5.1\n        - pytest-mock\n        - pytest-xdist\n      commands:\n        - pytest -n 2 -k \"[diagnostic.R] or test_r_lint\"\n\n  - name: esmvaltool\n    build:\n      noarch: python\n    requirements:\n      host:\n        - python {{ python_min }}\n      run:\n        - python >={{ python_min }},<={{ python_max }}\n        - {{ pin_subpackage('esmvaltool-ncl', exact=True) }}\n        - {{ pin_subpackage('esmvaltool-python', exact=True) }}\n        - {{ pin_subpackage('esmvaltool-r', exact=True) }}\n    test:\n      requires:\n        - python {{ python_min }}\n      imports:\n        - esmvaltool\n      commands:\n        - esmvaltool --help\n        - esmvaltool recipes list\n        - esmvaltool version\n        - esmvaltool data --help\n        - nclcodestyle --help\n        - esmvaltool colortables --help\n\nabout:\n  home: https://www.esmvaltool.org\n  license: Apache-2.0\n  license_file: LICENSE\n  summary: A community diagnostic and performance metrics tool for routine evaluation of Earth system models in CMIP.\n  description: A community diagnostic and performance metrics tool for routine evaluation of Earth system models in CMIP.\n\nextra:\n  recipe-maintainers:\n    - jlenh\n    - bettina-gier\n    - ehogan\n    - remi-kazeroni\n    - sloosvel\n    - schlunma\n    - zklaus\n    - valeriupredoi\n    - nielsdrost\n    - bouweandela\n    - jlenh\n",
+  "raw_meta_yaml": "schema_version: 1\n\ncontext:\n  name: ESMValTool\n  version: 2.13.0\n  python_min: 3.11\n\nrecipe:\n  name: ${{ name|lower }}-suite\n  version: ${{ version }}\n\nsource:\n  url: https://pypi.org/packages/source/${{ name[0] }}/${{ name }}/${{ name|lower }}-${{ version }}.tar.gz\n  sha256: 92d4eac21f594131539b0749c6362f2328d72b70b18e02a4b2b8fe0ef7dea9e5\n  patches:\n    - 0001-Unpin-ipython.patch\n\nbuild:\n  number: 2\n\noutputs:\n  - package:\n      name: esmvaltool-python\n    build:\n      noarch: python\n      script: ${{ PYTHON }} -m pip install . --no-deps -vv --no-build-isolation\n      python:\n        entry_points:\n          - nclcodestyle = esmvaltool.utils.nclcodestyle.nclcodestyle:_main\n    requirements:\n      build:\n        - pip !=21.3\n        - python ${{ python_min }}.*\n      host:\n        - pip !=21.3\n        - python ${{ python_min }}.*\n        - setuptools\n        - setuptools_scm\n      run:\n        - aiohttp\n        - arviz\n        - cartopy\n        - cdo >=2.3.0\n        - cdsapi\n        - cf-units\n        - cfgrib\n        - cftime\n        - cmocean\n        - cython\n        - dask !=2024.8.0\n        - distributed\n        - ecmwf-api-client\n        - eofs\n        - esmpy\n        - esmvalcore 2.13.*\n        - fiona\n        - fire\n        - fsspec\n        - gdal >=3.9.0\n        - imagehash\n        - ipython\n        - iris >=3.11\n        - iris-esmf-regrid >=0.10.0\n        - jinja2\n        - joblib\n        - lime\n        - mapgenerator >=1.0.5\n        - matplotlib-base\n        - natsort\n        - nc-time-axis\n        - netCDF4\n        - numba\n        - numpy !=1.24.3 # severe masking bug, avoid pulling 2.0.0\n        - openpyxl\n        - packaging\n        - pandas\n        - progressbar2\n        - prov\n        - pyproj >=2.1\n        - pys2index >=0.1.5 # only from conda-forge; 0.1.4 broken\n        - python >=${{ python_min }}\n        - python-cdo\n        - python-dateutil\n        - pyyaml\n        - rasterio >=1.3.10\n        - requests\n        - ruamel.yaml\n        - scikit-image\n        - scikit-learn >=1.4.0 # github.com/ESMValGroup/ESMValTool/issues/3504\n        - scipy\n        - seaborn\n        - seawater\n        - shapely >=2.0.2\n        - xarray >=0.12.0\n        - xesmf >=0.7.1\n        - xgboost >1.6.1 # github.com/ESMValGroup/ESMValTool/issues/2779\n        - xlsxwriter\n        - zarr\n    tests:\n      - python:\n          imports:\n            - esmvaltool\n          pip_check: true\n          python_version: ${{ python_min }}.*\n      - files:\n          source:\n            - tests\n            - pyproject.toml\n        requirements:\n          run:\n            - pytest >=3.9,!=6.0.0rc1,!=6.0.0\n            - pytest-cov\n            - pytest-env\n            - pytest-html !=2.1.0\n            - pytest-metadata >=1.5.1\n            - pytest-mock\n            - pytest-xdist\n            - python ${{ python_min }}.*\n        script:\n          - pytest -n 2 --ignore=\"run_test.py\" --ignore=\"tests/unit/documentation/\" -k \"not ([diagnostic.R] or [diagnostic.ncl] or test_r_lint)\"\n          - esmvaltool --help\n          - esmvaltool data --help\n          - nclcodestyle --help\n          - esmvaltool colortables --help\n  - package:\n      name: esmvaltool-ncl\n    build:\n      noarch: generic\n    requirements:\n      run:\n        - ${{ pin_subpackage('esmvaltool-python', exact=True) }}\n        - ncl >=6.6.2\n        - cdo\n        - imagemagick\n        - nco\n    tests:\n      - files:\n          source:\n            - tests\n            - setup.cfg\n        requirements:\n          run:\n            - pytest >=3.9,!=6.0.0rc1,!=6.0.0\n            - pytest-cov\n            - pytest-env\n            - pytest-html !=2.1.0\n            - pytest-metadata >=1.5.1\n            - pytest-mock\n            - pytest-xdist\n        script:\n          - pytest -n 2 -k \"[diagnostic.ncl]\"\n  - package:\n      name: esmvaltool-r\n    build:\n      noarch: generic\n    requirements:\n      run:\n        - ${{ pin_subpackage('esmvaltool-python', exact=True) }}\n        - nco\n        - cdo\n        - r-base >=3.5\n        - r-abind\n        - r-akima\n        - r-climdex.pcic\n        - r-climprojdiags\n        - r-docopt\n        - r-dotcall64\n        - r-functional\n        - r-ggplot2\n        - r-git2r # dependency of r-lintr\n        - r-gridextra\n        - r-lintr ==3.1.2\n        - r-logging\n        - r-mapproj\n        - r-maps\n        - r-multiapply\n        - r-ncdf4\n        - r-ncdf4.helpers\n        - r-pcict\n        - r-plyr\n        - r-rcolorbrewer\n        - r-rcpp\n        - r-s2dverification\n        - r-snow\n        - r-spei\n        - r-styler ==1.10.3\n        - r-udunits2\n        - r-yaml\n    tests:\n      - files:\n          source:\n            - tests\n            - setup.cfg\n        requirements:\n          run:\n            - pytest >=3.9,!=6.0.0rc1,!=6.0.0\n            - pytest-cov\n            - pytest-env\n            - pytest-html !=2.1.0\n            - pytest-metadata >=1.5.1\n            - pytest-mock\n            - pytest-xdist\n        script:\n          - pytest -n 2 -k \"[diagnostic.R] or test_r_lint\"\n  - package:\n      name: esmvaltool\n    build:\n      noarch: python\n    requirements:\n      host:\n        - python ${{ python_min }}.*\n      run:\n        - ${{ pin_subpackage('esmvaltool-ncl', exact=True) }}\n        - ${{ pin_subpackage('esmvaltool-python', exact=True) }}\n        - ${{ pin_subpackage('esmvaltool-r', exact=True) }}\n        - python >=${{ python_min }}\n    tests:\n      - python:\n          imports:\n            - esmvaltool\n          pip_check: true\n          python_version: ${{ python_min }}.*\n      - requirements:\n          run:\n            - python ${{ python_min }}.*\n        script:\n          - esmvaltool --help\n          - esmvaltool recipes list\n          - esmvaltool version\n          - esmvaltool data --help\n          - nclcodestyle --help\n          - esmvaltool colortables --help\n\nabout:\n  license: Apache-2.0\n  license_file: LICENSE\n  summary: A community diagnostic and performance metrics tool for routine evaluation of Earth system models in CMIP.\n  description: A community diagnostic and performance metrics tool for routine evaluation of Earth system models in CMIP.\n  homepage: https://www.esmvaltool.org\n\nextra:\n  recipe-maintainers:\n    - jlenh\n    - bettina-gier\n    - ehogan\n    - remi-kazeroni\n    - sloosvel\n    - schlunma\n    - zklaus\n    - valeriupredoi\n    - nielsdrost\n    - bouweandela\n    - jlenh\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -941,7 +1135,7 @@
     "test": {
       "__set__": true,
       "elements": [
-        "pre-commit",
+        "pip",
         "pytest",
         "pytest-cov",
         "pytest-env",
@@ -959,14 +1153,14 @@
       "__set__": true,
       "elements": [
         "pip !=21.3",
-        "python 3.11"
+        "python 3.11.*"
       ]
     },
     "host": {
       "__set__": true,
       "elements": [
         "pip !=21.3",
-        "python 3.11",
+        "python 3.11.*",
         "setuptools",
         "setuptools_scm"
       ]
@@ -1012,7 +1206,7 @@
         "nc-time-axis",
         "ncl >=6.6.2",
         "nco",
-        "netCDF4",
+        "netcdf4",
         "numba",
         "numpy !=1.24.3",
         "openpyxl",
@@ -1022,7 +1216,7 @@
         "prov",
         "pyproj >=2.1",
         "pys2index >=0.1.5",
-        "python >=3.11,<=3.14",
+        "python >=3.11",
         "python-cdo",
         "python-dateutil",
         "pyyaml",
@@ -1073,7 +1267,7 @@
     "test": {
       "__set__": true,
       "elements": [
-        "pre-commit",
+        "pip",
         "pytest >=3.9,!=6.0.0rc1,!=6.0.0",
         "pytest-cov",
         "pytest-env",
@@ -1081,7 +1275,7 @@
         "pytest-metadata >=1.5.1",
         "pytest-mock",
         "pytest-xdist",
-        "python 3.11"
+        "python 3.11.*"
       ]
     }
   },
