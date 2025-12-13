@@ -1,0 +1,320 @@
+{
+  "archived": false,
+  "branch": "main",
+  "ci_support_win_64_.yaml": "c_compiler:\n- vs2019\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ntarget_platform:\n- win-64\nzstd:\n- '1.5'\n",
+  "conda-forge.yml": {
+    "conda_build": {
+      "pkg_format": "2"
+    },
+    "conda_forge_output_validation": true,
+    "github": {
+      "branch_name": "main",
+      "tooling_branch_name": "main"
+    }
+  },
+  "feedstock_hash": "bcb0418c35fc492c6907395dc3aeae1e5e92d622",
+  "feedstock_hash_ts": 1730853452,
+  "feedstock_name": "symlink-exe-substitute",
+  "meta_yaml": {
+    "about": {
+      "description": "Compile small .exe launchers to be placed under, e.g., %PREFIX%/Scripts.\nThese launch target executables relative to their path inside the prefix\nand as such work as alternative to symbolic links (symlinks) to binaries.\nUse this package as a build dependency to workaround the fact that by\ndefault creating symlinks is not available to non-admin users on Windows.\nUsage is similar to `ln TARGET... DIRECTORY` on Unixes, e.g., run\n`call build-symlink-exe \"%PREFIX%\\some\\dir\\your.exe\" \"%PREFIX%\\Scripts\"`\n",
+      "dev_url": "http://github.com/conda-forge/symlink-exe-substitute-feedstock",
+      "home": "http://github.com/conda-forge/symlink-exe-substitute-feedstock",
+      "license": "BSD-3-Clause AND (MIT OR PSF-2.0 OR ZPL-2.1)",
+      "license_file": [
+        "LICENSE.txt",
+        "LICENSE-conda-forge.txt",
+        "LICENSE-conda-recipes.txt",
+        "LICENSE-setuptools-new.txt",
+        "LICENSE-setuptools-old.txt"
+      ],
+      "summary": "Build .exe launchers under %PREFIX%/Scripts as symlink substitutes."
+    },
+    "build": {
+      "number": "0"
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "mbargull"
+      ]
+    },
+    "outputs": [
+      {
+        "about": {
+          "description": "This is an empty, only-dependency-providing package (meta-package).\nThe executable launchers built by symlink-exe-build are dynamically\nlinked to the C runtime provided by the \"strong\" \"run_exports\" from the\n\"compiler('c')\" packages. As of now, conda-build does not offer\ntransitive \"run_exports\" and as such this package helps to provide them.\n",
+          "home": "http://github.com/conda-forge/symlink-exe-substitute-feedstock",
+          "license": "BSD-3-Clause",
+          "summary": "Runtimes needed for .exe files built by symlink-exe-build."
+        },
+        "name": "symlink-exe-runtime",
+        "requirements": {
+          "build": [
+            "c_compiler_stub"
+          ],
+          "host": [],
+          "run": []
+        },
+        "test": {
+          "commands": [
+            "if not exist %PREFIX%\\vcruntime*.dll exit 1",
+            "if not exist %PREFIX%\\api-ms-win-crt-*.dll exit 1"
+          ]
+        }
+      },
+      {
+        "build": {
+          "run_exports": {
+            "strong": [
+              "symlink-exe-runtime"
+            ]
+          }
+        },
+        "name": "symlink-exe-build",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "m2-bash",
+            "m2-coreutils",
+            "m2-sed",
+            "c_compiler_stub"
+          ]
+        },
+        "script": "bld-build.bat",
+        "test": {
+          "commands": [
+            "if exist \"%PREFIX%\\Scripts\\xz.exe\" exit 1",
+            "if exist \"%PREFIX%\\Scripts\\zstd.exe\" exit 1",
+            "if exist \"%PREFIX%\\Scripts\\xzcat.exe\" exit 1",
+            "if not exist \"%PREFIX%\\Scripts\\\" md \"%PREFIX%\\Scripts\"",
+            "call build-symlink-exe \"%PREFIX%\\Library\\mingw-w64\\bin\\xz.exe\" \"%PREFIX%\\Library\\bin\\zstd.exe\" \"%PREFIX%\\Library\\mingw-w64\\bin\\xzcat.exe\" \"%PREFIX%\\Scripts\"\n",
+            "dir \"%PREFIX%\\Scripts\\xz.exe\"",
+            "dir \"%PREFIX%\\Scripts\\zstd.exe\"",
+            "dir \"%PREFIX%\\Scripts\\xzcat.exe\"",
+            "\"%PREFIX%\\Scripts\\xz.exe\" --version | findstr \"/C:XZ Utils\"",
+            "\"%PREFIX%\\Scripts\\zstd.exe\" --version | findstr \"/C:zstd\"",
+            "\"%PREFIX%\\Scripts\\xzcat.exe\" --version | findstr \"/C:XZ Utils\""
+          ],
+          "requires": [
+            "zstd",
+            "m2w64-xz"
+          ]
+        }
+      }
+    ],
+    "package": {
+      "name": "symlink-exe-substitute",
+      "version": "1.0"
+    },
+    "schema_version": 0
+  },
+  "name": "symlink-exe-substitute",
+  "outputs_names": {
+    "__set__": true,
+    "elements": [
+      "symlink-exe-build",
+      "symlink-exe-runtime"
+    ]
+  },
+  "parsing_error": false,
+  "platforms": [
+    "win_64"
+  ],
+  "pr_info": {
+    "__lazy_json__": "pr_info/symlink-exe-substitute.json"
+  },
+  "raw_meta_yaml": "package:\n  name: symlink-exe-substitute\n  version: 1.0\n\nbuild:\n  number: 0\n  skip: true  # [not win]\n\noutputs:\n\n  - name: symlink-exe-runtime\n    requirements:\n      build:\n        - {{ compiler(\"c\") }}\n      host:\n      run:\n    test:\n      commands:\n        - if not exist %PREFIX%\\vcruntime*.dll exit 1\n        - if not exist %PREFIX%\\api-ms-win-crt-*.dll exit 1\n    about:\n      home: http://github.com/conda-forge/symlink-exe-substitute-feedstock\n      summary: Runtimes needed for .exe files built by symlink-exe-build.\n      description: |\n        This is an empty, only-dependency-providing package (meta-package).\n        The executable launchers built by symlink-exe-build are dynamically\n        linked to the C runtime provided by the \"strong\" \"run_exports\" from the\n        \"compiler('c')\" packages. As of now, conda-build does not offer\n        transitive \"run_exports\" and as such this package helps to provide them.\n      license: BSD-3-Clause\n\n  - name: symlink-exe-build\n    script: bld-build.bat\n    build:\n      run_exports:\n        strong:\n          - {{ pin_subpackage(\"symlink-exe-runtime\") }}\n    requirements:\n      build:\n      host:\n      run:\n        # To make things less painful (i.e., not having to deal with CMD and\n        # other Windows idiosyncracies) for me (@mbargull), I opted to use a\n        # POSIX shell script to create an easy-to-use wrapper around calling\n        # the compiler. m2-bash is used to run the script, m2-coreutils is used\n        # for realpath, etc. and m2-sed for sed itself.\n        - m2-bash\n        - m2-coreutils\n        - m2-sed\n        - {{ compiler(\"c\") }}\n    test:\n      requires:\n        # Some random packages that have exe files not under %PREFIX%\\Scripts.\n        - zstd\n        - m2w64-xz\n      commands:\n        - if exist \"%PREFIX%\\Scripts\\xz.exe\" exit 1\n        - if exist \"%PREFIX%\\Scripts\\zstd.exe\" exit 1\n        - if exist \"%PREFIX%\\Scripts\\xzcat.exe\" exit 1\n        - if not exist \"%PREFIX%\\Scripts\\\" md \"%PREFIX%\\Scripts\"\n        - >\n          call build-symlink-exe\n          \"%PREFIX%\\Library\\mingw-w64\\bin\\xz.exe\"\n          \"%PREFIX%\\Library\\bin\\zstd.exe\"\n          \"%PREFIX%\\Library\\mingw-w64\\bin\\xzcat.exe\"\n          \"%PREFIX%\\Scripts\"\n        - dir \"%PREFIX%\\Scripts\\xz.exe\"\n        - dir \"%PREFIX%\\Scripts\\zstd.exe\"\n        - dir \"%PREFIX%\\Scripts\\xzcat.exe\"\n        - '\"%PREFIX%\\Scripts\\xz.exe\" --version | findstr \"/C:XZ Utils\"'\n        - '\"%PREFIX%\\Scripts\\zstd.exe\" --version | findstr \"/C:zstd\"'\n        - '\"%PREFIX%\\Scripts\\xzcat.exe\" --version | findstr \"/C:XZ Utils\"'\n\nabout:\n  home: http://github.com/conda-forge/symlink-exe-substitute-feedstock\n  dev_url: http://github.com/conda-forge/symlink-exe-substitute-feedstock\n  summary: Build .exe launchers under %PREFIX%/Scripts as symlink substitutes.\n  description: |\n    Compile small .exe launchers to be placed under, e.g., %PREFIX%/Scripts.\n    These launch target executables relative to their path inside the prefix\n    and as such work as alternative to symbolic links (symlinks) to binaries.\n    Use this package as a build dependency to workaround the fact that by\n    default creating symlinks is not available to non-admin users on Windows.\n    Usage is similar to `ln TARGET... DIRECTORY` on Unixes, e.g., run\n    `call build-symlink-exe \"%PREFIX%\\some\\dir\\your.exe\" \"%PREFIX%\\Scripts\"`\n  license: BSD-3-Clause AND (MIT OR PSF-2.0 OR ZPL-2.1)\n  license_file:\n    - LICENSE.txt\n    - LICENSE-conda-forge.txt\n    - LICENSE-conda-recipes.txt\n    - LICENSE-setuptools-new.txt\n    - LICENSE-setuptools-old.txt\n\nextra:\n  recipe-maintainers:\n    - mbargull\n",
+  "req": {
+    "__set__": true,
+    "elements": [
+      "c_compiler_stub",
+      "m2-bash",
+      "m2-coreutils",
+      "m2-sed"
+    ]
+  },
+  "requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_compiler_stub"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "c_compiler_stub"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "c_compiler_stub",
+        "m2-bash",
+        "m2-coreutils",
+        "m2-sed"
+      ]
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "m2w64-xz",
+        "zstd"
+      ]
+    }
+  },
+  "strong_exports": true,
+  "total_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_compiler_stub"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": []
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "c_compiler_stub",
+        "m2-bash",
+        "m2-coreutils",
+        "m2-sed"
+      ]
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "m2w64-xz",
+        "zstd"
+      ]
+    }
+  },
+  "version": "1.0",
+  "version_pr_info": {
+    "__lazy_json__": "version_pr_info/symlink-exe-substitute.json"
+  },
+  "win_64_meta_yaml": {
+    "about": {
+      "description": "Compile small .exe launchers to be placed under, e.g., %PREFIX%/Scripts.\nThese launch target executables relative to their path inside the prefix\nand as such work as alternative to symbolic links (symlinks) to binaries.\nUse this package as a build dependency to workaround the fact that by\ndefault creating symlinks is not available to non-admin users on Windows.\nUsage is similar to `ln TARGET... DIRECTORY` on Unixes, e.g., run\n`call build-symlink-exe \"%PREFIX%\\some\\dir\\your.exe\" \"%PREFIX%\\Scripts\"`\n",
+      "dev_url": "http://github.com/conda-forge/symlink-exe-substitute-feedstock",
+      "home": "http://github.com/conda-forge/symlink-exe-substitute-feedstock",
+      "license": "BSD-3-Clause AND (MIT OR PSF-2.0 OR ZPL-2.1)",
+      "license_file": [
+        "LICENSE.txt",
+        "LICENSE-conda-forge.txt",
+        "LICENSE-conda-recipes.txt",
+        "LICENSE-setuptools-new.txt",
+        "LICENSE-setuptools-old.txt"
+      ],
+      "summary": "Build .exe launchers under %PREFIX%/Scripts as symlink substitutes."
+    },
+    "build": {
+      "number": "0"
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "mbargull"
+      ]
+    },
+    "outputs": [
+      {
+        "about": {
+          "description": "This is an empty, only-dependency-providing package (meta-package).\nThe executable launchers built by symlink-exe-build are dynamically\nlinked to the C runtime provided by the \"strong\" \"run_exports\" from the\n\"compiler('c')\" packages. As of now, conda-build does not offer\ntransitive \"run_exports\" and as such this package helps to provide them.\n",
+          "home": "http://github.com/conda-forge/symlink-exe-substitute-feedstock",
+          "license": "BSD-3-Clause",
+          "summary": "Runtimes needed for .exe files built by symlink-exe-build."
+        },
+        "name": "symlink-exe-runtime",
+        "requirements": {
+          "build": [
+            "c_compiler_stub"
+          ],
+          "host": [],
+          "run": []
+        },
+        "test": {
+          "commands": [
+            "if not exist %PREFIX%\\vcruntime*.dll exit 1",
+            "if not exist %PREFIX%\\api-ms-win-crt-*.dll exit 1"
+          ]
+        }
+      },
+      {
+        "build": {
+          "run_exports": {
+            "strong": [
+              "symlink-exe-runtime"
+            ]
+          }
+        },
+        "name": "symlink-exe-build",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "m2-bash",
+            "m2-coreutils",
+            "m2-sed",
+            "c_compiler_stub"
+          ]
+        },
+        "script": "bld-build.bat",
+        "test": {
+          "commands": [
+            "if exist \"%PREFIX%\\Scripts\\xz.exe\" exit 1",
+            "if exist \"%PREFIX%\\Scripts\\zstd.exe\" exit 1",
+            "if exist \"%PREFIX%\\Scripts\\xzcat.exe\" exit 1",
+            "if not exist \"%PREFIX%\\Scripts\\\" md \"%PREFIX%\\Scripts\"",
+            "call build-symlink-exe \"%PREFIX%\\Library\\mingw-w64\\bin\\xz.exe\" \"%PREFIX%\\Library\\bin\\zstd.exe\" \"%PREFIX%\\Library\\mingw-w64\\bin\\xzcat.exe\" \"%PREFIX%\\Scripts\"\n",
+            "dir \"%PREFIX%\\Scripts\\xz.exe\"",
+            "dir \"%PREFIX%\\Scripts\\zstd.exe\"",
+            "dir \"%PREFIX%\\Scripts\\xzcat.exe\"",
+            "\"%PREFIX%\\Scripts\\xz.exe\" --version | findstr \"/C:XZ Utils\"",
+            "\"%PREFIX%\\Scripts\\zstd.exe\" --version | findstr \"/C:zstd\"",
+            "\"%PREFIX%\\Scripts\\xzcat.exe\" --version | findstr \"/C:XZ Utils\""
+          ],
+          "requires": [
+            "zstd",
+            "m2w64-xz"
+          ]
+        }
+      }
+    ],
+    "package": {
+      "name": "symlink-exe-substitute",
+      "version": "1.0"
+    },
+    "schema_version": 0
+  },
+  "win_64_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_compiler_stub"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": []
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "c_compiler_stub",
+        "m2-bash",
+        "m2-coreutils",
+        "m2-sed"
+      ]
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "m2w64-xz",
+        "zstd"
+      ]
+    }
+  }
+}

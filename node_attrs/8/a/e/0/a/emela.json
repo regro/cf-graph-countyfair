@@ -1,0 +1,1577 @@
+{
+  "archived": false,
+  "branch": "main",
+  "ci_support_linux_64_.yaml": "c_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ncxx_compiler:\n- gxx\ncxx_compiler_version:\n- '14'\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\nfortran_compiler:\n- gfortran\nfortran_compiler_version:\n- '14'\nlibboost_devel:\n- '1.88'\ntarget_platform:\n- linux-64\nzip_keys:\n- - cxx_compiler_version\n  - fortran_compiler_version\n",
+  "conda-forge.yml": {
+    "build_platform": {
+      "linux_aarch64": "linux_64",
+      "linux_ppc64le": "linux_64",
+      "osx_arm64": "osx_64"
+    },
+    "conda_build": {
+      "error_overlinking": true
+    },
+    "conda_build_tool": "rattler-build",
+    "conda_forge_output_validation": true,
+    "conda_install_tool": "pixi",
+    "github": {
+      "branch_name": "main",
+      "tooling_branch_name": "main"
+    },
+    "provider": {
+      "linux_aarch64": "default",
+      "linux_ppc64le": "default"
+    },
+    "test": "native_and_emulated"
+  },
+  "feedstock_hash": "127c3b6c1459a418f8f7687fd620228d60faf7cb",
+  "feedstock_hash_ts": 1759681167,
+  "feedstock_name": "emela",
+  "hash_type": "sha256",
+  "linux_64_meta_yaml": {
+    "about": {
+      "description": "``eMELA`` is a library that implements the evolution in pure QED of the\nunpolarised electron parton distribution functions (PDFs) up to\nnext-to-leading logarithmic (NLL) approximation, according to the papers\nlisted on the GitHub repository. ``eMELA`` includes the evolution with\nmultiple fermion families and their mass thresholds, and it gives one the\npossibility of choosing among three different UV-renormalisation schemes\n(`MSBAR`: $\\overline{\\rm MS}$, `ALPMZ`: $\\alpha(m_Z)$, `ALGMU`: $G_\\mu$)\nand two different factorisation schemes\n(`MSBAR`: $\\overline{\\rm MS}$, `DELTA`: $\\Delta$).\n\nMore in detail, ``eMELA`` is an improved QED-version of\n[MELA](https://github.com/vbertone/MELA). It consists of a Fortran code\nresponsible for the numerical evolution of the PDFs, and a C++ wrapper that\nprovides one with the analytical solutions in the asymptotic $z \\to 1$\nregion. Moreover, the possibility is given to the user to output the PDFs\nas grids compliant with the\n[LHAPDF](https://lhapdf.hepforge.org/index.html) format, that can be\nemployed at a later stage. Regardless of whether the numerical solution is\ncomputed at runtime or read from the grids, eMELA offers the possibility\nto switch to the analytical solution in the asymptotic region. This must be\nconsidered as the default option when using the PDFs for physics\nsimulations.\n\n**Note**: eMELA supersedes [ePDF](https://github.com/gstagnit/ePDF), that\nwas limited to the evolution with a single lepton in the $\\overline{\\rm MS}$\nrenormalisation and factorisation schemes.",
+      "dev_url": "https://github.com/gstagnit/eMELA",
+      "home": "https://github.com/gstagnit/eMELA",
+      "license": "MIT",
+      "license_family": "MIT",
+      "license_file": "source/LICENSE",
+      "summary": "emela: an improved QED-version of MELA"
+    },
+    "build": {
+      "number": "0",
+      "run_exports": {
+        "weak": [
+          "emela"
+        ]
+      },
+      "script": [
+        "cmake ${CMAKE_ARGS} -DCMAKE_INSTALL_PREFIX=$PREFIX -DWITH_LHAPDF=ON -S source -B build",
+        "cmake -LH build",
+        "cmake --build build --clean-first --parallel=\"${CPU_COUNT}\"",
+        "cmake --install build"
+      ]
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "gstagnit",
+        "matthewfeickert"
+      ]
+    },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "emela"
+          ]
+        },
+        "name": "emela",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "fortran_compiler_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "libboost-devel",
+            "lhapdf"
+          ],
+          "run": [
+            "lhapdf"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "bin": [
+                "eMELA-config"
+              ],
+              "files": [
+                "etc/conda/test-files/emela/0/source/example/*"
+              ],
+              "include": [
+                "eMELA/version.h",
+                "eMELA/bspdf.hh",
+                "eMELA/analytics.hh",
+                "eMELA/specialfunctions.hh",
+                "eMELA/version.h.in",
+                "eMELA/constants.hh",
+                "eMELA/eMELA.hh",
+                "eMELA/grid.hh",
+                "eMELA/ilc500.hh",
+                "eMELA/numerics.hh"
+              ],
+              "lib": [
+                "eMELA"
+              ],
+              "strict": true
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "source/example"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "cxx_compiler_stub",
+                "cmake",
+                "make",
+                "curl",
+                "tar"
+              ]
+            },
+            "script": [
+              "eMELA-config --help",
+              "eMELA-config --version",
+              "eMELA-config --prefix",
+              "eMELA-config --incdir",
+              "eMELA-config --libdir",
+              "eMELA-config --data",
+              "eMELA-config --cppflags",
+              "eMELA-config --cxxflags",
+              "eMELA-config --ldflags",
+              "cd source/example",
+              "$CXX CreateGrid.cc -o CreateGrid $CXXFLAGS $LDFLAGS $(eMELA-config --ldflags)",
+              "test -f ./CreateGrid",
+              "$CXX GetPdf.cc -o GetPdf $CXXFLAGS $LDFLAGS $(eMELA-config --ldflags)",
+              "./GetPdf",
+              "curl -sLO https://github.com/gstagnit/eMELA/releases/download/v${{ version }}/grids.tar.gz",
+              "tar -xzf grids.tar.gz",
+              "export LHAPDF_DATA_PATH=$(readlink -f ./grids):$(lhapdf-config --datadir):$LHAPDF_DATA_PATH",
+              "$CXX GetPdfGrid.cc -o GetPdfGrid $CXXFLAGS $LDFLAGS $(eMELA-config --ldflags) $(lhapdf-config --ldflags)",
+              "./GetPdfGrid"
+            ]
+          }
+        ],
+        "version": "1.0.1"
+      }
+    ],
+    "package": {
+      "name": "emela",
+      "version": "1.0.1"
+    },
+    "requirements": {
+      "build": [
+        "c_stdlib_stub",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "cmake",
+        "make"
+      ],
+      "host": [
+        "libboost-devel",
+        "lhapdf"
+      ],
+      "run": [
+        "lhapdf"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "sha256": "4495aaf754fb9da22d222f2a58761262beb012a907d6d2ec1d9b637c4f4743d2",
+      "url": "https://github.com/gstagnit/emela/archive/v1.0.1.tar.gz"
+    }
+  },
+  "linux_64_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "cmake",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "make"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "lhapdf",
+        "libboost-devel"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "lhapdf"
+      ]
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "cmake",
+        "curl",
+        "cxx_compiler_stub",
+        "make",
+        "tar"
+      ]
+    }
+  },
+  "linux_aarch64_meta_yaml": {
+    "about": {
+      "description": "``eMELA`` is a library that implements the evolution in pure QED of the\nunpolarised electron parton distribution functions (PDFs) up to\nnext-to-leading logarithmic (NLL) approximation, according to the papers\nlisted on the GitHub repository. ``eMELA`` includes the evolution with\nmultiple fermion families and their mass thresholds, and it gives one the\npossibility of choosing among three different UV-renormalisation schemes\n(`MSBAR`: $\\overline{\\rm MS}$, `ALPMZ`: $\\alpha(m_Z)$, `ALGMU`: $G_\\mu$)\nand two different factorisation schemes\n(`MSBAR`: $\\overline{\\rm MS}$, `DELTA`: $\\Delta$).\n\nMore in detail, ``eMELA`` is an improved QED-version of\n[MELA](https://github.com/vbertone/MELA). It consists of a Fortran code\nresponsible for the numerical evolution of the PDFs, and a C++ wrapper that\nprovides one with the analytical solutions in the asymptotic $z \\to 1$\nregion. Moreover, the possibility is given to the user to output the PDFs\nas grids compliant with the\n[LHAPDF](https://lhapdf.hepforge.org/index.html) format, that can be\nemployed at a later stage. Regardless of whether the numerical solution is\ncomputed at runtime or read from the grids, eMELA offers the possibility\nto switch to the analytical solution in the asymptotic region. This must be\nconsidered as the default option when using the PDFs for physics\nsimulations.\n\n**Note**: eMELA supersedes [ePDF](https://github.com/gstagnit/ePDF), that\nwas limited to the evolution with a single lepton in the $\\overline{\\rm MS}$\nrenormalisation and factorisation schemes.",
+      "dev_url": "https://github.com/gstagnit/eMELA",
+      "home": "https://github.com/gstagnit/eMELA",
+      "license": "MIT",
+      "license_family": "MIT",
+      "license_file": "source/LICENSE",
+      "summary": "emela: an improved QED-version of MELA"
+    },
+    "build": {
+      "number": "0",
+      "run_exports": {
+        "weak": [
+          "emela"
+        ]
+      },
+      "script": [
+        "cmake ${CMAKE_ARGS} -DCMAKE_INSTALL_PREFIX=$PREFIX -DWITH_LHAPDF=ON -S source -B build",
+        "cmake -LH build",
+        "cmake --build build --clean-first --parallel=\"${CPU_COUNT}\"",
+        "cmake --install build"
+      ]
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "gstagnit",
+        "matthewfeickert"
+      ]
+    },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "emela"
+          ]
+        },
+        "name": "emela",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "fortran_compiler_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "libboost-devel",
+            "lhapdf"
+          ],
+          "run": [
+            "lhapdf"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "bin": [
+                "eMELA-config"
+              ],
+              "files": [
+                "etc/conda/test-files/emela/0/source/example/*"
+              ],
+              "include": [
+                "eMELA/version.h",
+                "eMELA/bspdf.hh",
+                "eMELA/analytics.hh",
+                "eMELA/specialfunctions.hh",
+                "eMELA/version.h.in",
+                "eMELA/constants.hh",
+                "eMELA/eMELA.hh",
+                "eMELA/grid.hh",
+                "eMELA/ilc500.hh",
+                "eMELA/numerics.hh"
+              ],
+              "lib": [
+                "eMELA"
+              ],
+              "strict": true
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "source/example"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "cxx_compiler_stub",
+                "cmake",
+                "make",
+                "curl",
+                "tar"
+              ]
+            },
+            "script": [
+              "eMELA-config --help",
+              "eMELA-config --version",
+              "eMELA-config --prefix",
+              "eMELA-config --incdir",
+              "eMELA-config --libdir",
+              "eMELA-config --data",
+              "eMELA-config --cppflags",
+              "eMELA-config --cxxflags",
+              "eMELA-config --ldflags",
+              "cd source/example",
+              "$CXX CreateGrid.cc -o CreateGrid $CXXFLAGS $LDFLAGS $(eMELA-config --ldflags)",
+              "test -f ./CreateGrid",
+              "$CXX GetPdf.cc -o GetPdf $CXXFLAGS $LDFLAGS $(eMELA-config --ldflags)",
+              "./GetPdf",
+              "curl -sLO https://github.com/gstagnit/eMELA/releases/download/v${{ version }}/grids.tar.gz",
+              "tar -xzf grids.tar.gz",
+              "export LHAPDF_DATA_PATH=$(readlink -f ./grids):$(lhapdf-config --datadir):$LHAPDF_DATA_PATH",
+              "$CXX GetPdfGrid.cc -o GetPdfGrid $CXXFLAGS $LDFLAGS $(eMELA-config --ldflags) $(lhapdf-config --ldflags)",
+              "./GetPdfGrid"
+            ]
+          }
+        ],
+        "version": "1.0.1"
+      }
+    ],
+    "package": {
+      "name": "emela",
+      "version": "1.0.1"
+    },
+    "requirements": {
+      "build": [
+        "c_stdlib_stub",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "cmake",
+        "make"
+      ],
+      "host": [
+        "libboost-devel",
+        "lhapdf"
+      ],
+      "run": [
+        "lhapdf"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "sha256": "4495aaf754fb9da22d222f2a58761262beb012a907d6d2ec1d9b637c4f4743d2",
+      "url": "https://github.com/gstagnit/emela/archive/v1.0.1.tar.gz"
+    }
+  },
+  "linux_aarch64_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "cmake",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "make"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "lhapdf",
+        "libboost-devel"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "lhapdf"
+      ]
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "cmake",
+        "curl",
+        "cxx_compiler_stub",
+        "make",
+        "tar"
+      ]
+    }
+  },
+  "linux_ppc64le_meta_yaml": {
+    "about": {
+      "description": "``eMELA`` is a library that implements the evolution in pure QED of the\nunpolarised electron parton distribution functions (PDFs) up to\nnext-to-leading logarithmic (NLL) approximation, according to the papers\nlisted on the GitHub repository. ``eMELA`` includes the evolution with\nmultiple fermion families and their mass thresholds, and it gives one the\npossibility of choosing among three different UV-renormalisation schemes\n(`MSBAR`: $\\overline{\\rm MS}$, `ALPMZ`: $\\alpha(m_Z)$, `ALGMU`: $G_\\mu$)\nand two different factorisation schemes\n(`MSBAR`: $\\overline{\\rm MS}$, `DELTA`: $\\Delta$).\n\nMore in detail, ``eMELA`` is an improved QED-version of\n[MELA](https://github.com/vbertone/MELA). It consists of a Fortran code\nresponsible for the numerical evolution of the PDFs, and a C++ wrapper that\nprovides one with the analytical solutions in the asymptotic $z \\to 1$\nregion. Moreover, the possibility is given to the user to output the PDFs\nas grids compliant with the\n[LHAPDF](https://lhapdf.hepforge.org/index.html) format, that can be\nemployed at a later stage. Regardless of whether the numerical solution is\ncomputed at runtime or read from the grids, eMELA offers the possibility\nto switch to the analytical solution in the asymptotic region. This must be\nconsidered as the default option when using the PDFs for physics\nsimulations.\n\n**Note**: eMELA supersedes [ePDF](https://github.com/gstagnit/ePDF), that\nwas limited to the evolution with a single lepton in the $\\overline{\\rm MS}$\nrenormalisation and factorisation schemes.",
+      "dev_url": "https://github.com/gstagnit/eMELA",
+      "home": "https://github.com/gstagnit/eMELA",
+      "license": "MIT",
+      "license_family": "MIT",
+      "license_file": "source/LICENSE",
+      "summary": "emela: an improved QED-version of MELA"
+    },
+    "build": {
+      "number": "0",
+      "run_exports": {
+        "weak": [
+          "emela"
+        ]
+      },
+      "script": [
+        "cmake ${CMAKE_ARGS} -DCMAKE_INSTALL_PREFIX=$PREFIX -DWITH_LHAPDF=ON -S source -B build",
+        "cmake -LH build",
+        "cmake --build build --clean-first --parallel=\"${CPU_COUNT}\"",
+        "cmake --install build"
+      ]
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "gstagnit",
+        "matthewfeickert"
+      ]
+    },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "emela"
+          ]
+        },
+        "name": "emela",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "fortran_compiler_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "libboost-devel",
+            "lhapdf"
+          ],
+          "run": [
+            "lhapdf"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "bin": [
+                "eMELA-config"
+              ],
+              "files": [
+                "etc/conda/test-files/emela/0/source/example/*"
+              ],
+              "include": [
+                "eMELA/version.h",
+                "eMELA/bspdf.hh",
+                "eMELA/analytics.hh",
+                "eMELA/specialfunctions.hh",
+                "eMELA/version.h.in",
+                "eMELA/constants.hh",
+                "eMELA/eMELA.hh",
+                "eMELA/grid.hh",
+                "eMELA/ilc500.hh",
+                "eMELA/numerics.hh"
+              ],
+              "lib": [
+                "eMELA"
+              ],
+              "strict": true
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "source/example"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "cxx_compiler_stub",
+                "cmake",
+                "make",
+                "curl",
+                "tar"
+              ]
+            },
+            "script": [
+              "eMELA-config --help",
+              "eMELA-config --version",
+              "eMELA-config --prefix",
+              "eMELA-config --incdir",
+              "eMELA-config --libdir",
+              "eMELA-config --data",
+              "eMELA-config --cppflags",
+              "eMELA-config --cxxflags",
+              "eMELA-config --ldflags",
+              "cd source/example",
+              "$CXX CreateGrid.cc -o CreateGrid $CXXFLAGS $LDFLAGS $(eMELA-config --ldflags)",
+              "test -f ./CreateGrid",
+              "$CXX GetPdf.cc -o GetPdf $CXXFLAGS $LDFLAGS $(eMELA-config --ldflags)",
+              "./GetPdf",
+              "curl -sLO https://github.com/gstagnit/eMELA/releases/download/v${{ version }}/grids.tar.gz",
+              "tar -xzf grids.tar.gz",
+              "export LHAPDF_DATA_PATH=$(readlink -f ./grids):$(lhapdf-config --datadir):$LHAPDF_DATA_PATH",
+              "$CXX GetPdfGrid.cc -o GetPdfGrid $CXXFLAGS $LDFLAGS $(eMELA-config --ldflags) $(lhapdf-config --ldflags)",
+              "./GetPdfGrid"
+            ]
+          }
+        ],
+        "version": "1.0.1"
+      }
+    ],
+    "package": {
+      "name": "emela",
+      "version": "1.0.1"
+    },
+    "requirements": {
+      "build": [
+        "c_stdlib_stub",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "cmake",
+        "make"
+      ],
+      "host": [
+        "libboost-devel",
+        "lhapdf"
+      ],
+      "run": [
+        "lhapdf"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "sha256": "4495aaf754fb9da22d222f2a58761262beb012a907d6d2ec1d9b637c4f4743d2",
+      "url": "https://github.com/gstagnit/emela/archive/v1.0.1.tar.gz"
+    }
+  },
+  "linux_ppc64le_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "cmake",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "make"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "lhapdf",
+        "libboost-devel"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "lhapdf"
+      ]
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "cmake",
+        "curl",
+        "cxx_compiler_stub",
+        "make",
+        "tar"
+      ]
+    }
+  },
+  "meta_yaml": {
+    "about": {
+      "description": "``eMELA`` is a library that implements the evolution in pure QED of the\nunpolarised electron parton distribution functions (PDFs) up to\nnext-to-leading logarithmic (NLL) approximation, according to the papers\nlisted on the GitHub repository. ``eMELA`` includes the evolution with\nmultiple fermion families and their mass thresholds, and it gives one the\npossibility of choosing among three different UV-renormalisation schemes\n(`MSBAR`: $\\overline{\\rm MS}$, `ALPMZ`: $\\alpha(m_Z)$, `ALGMU`: $G_\\mu$)\nand two different factorisation schemes\n(`MSBAR`: $\\overline{\\rm MS}$, `DELTA`: $\\Delta$).\n\nMore in detail, ``eMELA`` is an improved QED-version of\n[MELA](https://github.com/vbertone/MELA). It consists of a Fortran code\nresponsible for the numerical evolution of the PDFs, and a C++ wrapper that\nprovides one with the analytical solutions in the asymptotic $z \\to 1$\nregion. Moreover, the possibility is given to the user to output the PDFs\nas grids compliant with the\n[LHAPDF](https://lhapdf.hepforge.org/index.html) format, that can be\nemployed at a later stage. Regardless of whether the numerical solution is\ncomputed at runtime or read from the grids, eMELA offers the possibility\nto switch to the analytical solution in the asymptotic region. This must be\nconsidered as the default option when using the PDFs for physics\nsimulations.\n\n**Note**: eMELA supersedes [ePDF](https://github.com/gstagnit/ePDF), that\nwas limited to the evolution with a single lepton in the $\\overline{\\rm MS}$\nrenormalisation and factorisation schemes.",
+      "dev_url": "https://github.com/gstagnit/eMELA",
+      "home": "https://github.com/gstagnit/eMELA",
+      "license": "MIT",
+      "license_family": "MIT",
+      "license_file": "source/LICENSE",
+      "summary": "emela: an improved QED-version of MELA"
+    },
+    "build": {
+      "number": "0",
+      "run_exports": {
+        "weak": [
+          "emela"
+        ]
+      },
+      "script": [
+        "cmake ${CMAKE_ARGS} -DCMAKE_INSTALL_PREFIX=$PREFIX -DWITH_LHAPDF=ON -S source -B build",
+        "cmake -LH build",
+        "cmake --build build --clean-first --parallel=\"${CPU_COUNT}\"",
+        "cmake --install build"
+      ]
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "gstagnit",
+        "matthewfeickert"
+      ]
+    },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "emela"
+          ]
+        },
+        "name": "emela",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "fortran_compiler_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "libboost-devel",
+            "lhapdf"
+          ],
+          "run": [
+            "lhapdf"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "bin": [
+                "eMELA-config"
+              ],
+              "files": [
+                "etc/conda/test-files/emela/0/source/example/*"
+              ],
+              "include": [
+                "eMELA/version.h",
+                "eMELA/bspdf.hh",
+                "eMELA/analytics.hh",
+                "eMELA/specialfunctions.hh",
+                "eMELA/version.h.in",
+                "eMELA/constants.hh",
+                "eMELA/eMELA.hh",
+                "eMELA/grid.hh",
+                "eMELA/ilc500.hh",
+                "eMELA/numerics.hh"
+              ],
+              "lib": [
+                "eMELA"
+              ],
+              "strict": true
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "source/example"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "cxx_compiler_stub",
+                "cmake",
+                "make",
+                "curl",
+                "tar"
+              ]
+            },
+            "script": [
+              "eMELA-config --help",
+              "eMELA-config --version",
+              "eMELA-config --prefix",
+              "eMELA-config --incdir",
+              "eMELA-config --libdir",
+              "eMELA-config --data",
+              "eMELA-config --cppflags",
+              "eMELA-config --cxxflags",
+              "eMELA-config --ldflags",
+              "cd source/example",
+              "$CXX CreateGrid.cc -o CreateGrid $CXXFLAGS $LDFLAGS $(eMELA-config --ldflags)",
+              "test -f ./CreateGrid",
+              "$CXX GetPdf.cc -o GetPdf $CXXFLAGS $LDFLAGS $(eMELA-config --ldflags)",
+              "./GetPdf",
+              "curl -sLO https://github.com/gstagnit/eMELA/releases/download/v${{ version }}/grids.tar.gz",
+              "tar -xzf grids.tar.gz",
+              "export LHAPDF_DATA_PATH=$(readlink -f ./grids):$(lhapdf-config --datadir):$LHAPDF_DATA_PATH",
+              "$CXX GetPdfGrid.cc -o GetPdfGrid $CXXFLAGS $LDFLAGS $(eMELA-config --ldflags) $(lhapdf-config --ldflags)",
+              "./GetPdfGrid"
+            ]
+          }
+        ],
+        "version": "1.0.1"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "emela"
+          ]
+        },
+        "name": "emela",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "fortran_compiler_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "libboost-devel",
+            "lhapdf"
+          ],
+          "run": [
+            "lhapdf"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "bin": [
+                "eMELA-config"
+              ],
+              "files": [
+                "etc/conda/test-files/emela/0/source/example/*"
+              ],
+              "include": [
+                "eMELA/version.h",
+                "eMELA/bspdf.hh",
+                "eMELA/analytics.hh",
+                "eMELA/specialfunctions.hh",
+                "eMELA/version.h.in",
+                "eMELA/constants.hh",
+                "eMELA/eMELA.hh",
+                "eMELA/grid.hh",
+                "eMELA/ilc500.hh",
+                "eMELA/numerics.hh"
+              ],
+              "lib": [
+                "eMELA"
+              ],
+              "strict": true
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "source/example"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "cxx_compiler_stub",
+                "cmake",
+                "make",
+                "curl",
+                "tar"
+              ]
+            },
+            "script": [
+              "eMELA-config --help",
+              "eMELA-config --version",
+              "eMELA-config --prefix",
+              "eMELA-config --incdir",
+              "eMELA-config --libdir",
+              "eMELA-config --data",
+              "eMELA-config --cppflags",
+              "eMELA-config --cxxflags",
+              "eMELA-config --ldflags",
+              "cd source/example",
+              "$CXX CreateGrid.cc -o CreateGrid $CXXFLAGS $LDFLAGS $(eMELA-config --ldflags)",
+              "test -f ./CreateGrid",
+              "$CXX GetPdf.cc -o GetPdf $CXXFLAGS $LDFLAGS $(eMELA-config --ldflags)",
+              "./GetPdf",
+              "curl -sLO https://github.com/gstagnit/eMELA/releases/download/v${{ version }}/grids.tar.gz",
+              "tar -xzf grids.tar.gz",
+              "export LHAPDF_DATA_PATH=$(readlink -f ./grids):$(lhapdf-config --datadir):$LHAPDF_DATA_PATH",
+              "$CXX GetPdfGrid.cc -o GetPdfGrid $CXXFLAGS $LDFLAGS $(eMELA-config --ldflags) $(lhapdf-config --ldflags)",
+              "./GetPdfGrid"
+            ]
+          }
+        ],
+        "version": "1.0.1"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "emela"
+          ]
+        },
+        "name": "emela",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "fortran_compiler_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "libboost-devel",
+            "lhapdf"
+          ],
+          "run": [
+            "lhapdf"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "bin": [
+                "eMELA-config"
+              ],
+              "files": [
+                "etc/conda/test-files/emela/0/source/example/*"
+              ],
+              "include": [
+                "eMELA/version.h",
+                "eMELA/bspdf.hh",
+                "eMELA/analytics.hh",
+                "eMELA/specialfunctions.hh",
+                "eMELA/version.h.in",
+                "eMELA/constants.hh",
+                "eMELA/eMELA.hh",
+                "eMELA/grid.hh",
+                "eMELA/ilc500.hh",
+                "eMELA/numerics.hh"
+              ],
+              "lib": [
+                "eMELA"
+              ],
+              "strict": true
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "source/example"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "cxx_compiler_stub",
+                "cmake",
+                "make",
+                "curl",
+                "tar"
+              ]
+            },
+            "script": [
+              "eMELA-config --help",
+              "eMELA-config --version",
+              "eMELA-config --prefix",
+              "eMELA-config --incdir",
+              "eMELA-config --libdir",
+              "eMELA-config --data",
+              "eMELA-config --cppflags",
+              "eMELA-config --cxxflags",
+              "eMELA-config --ldflags",
+              "cd source/example",
+              "$CXX CreateGrid.cc -o CreateGrid $CXXFLAGS $LDFLAGS $(eMELA-config --ldflags)",
+              "test -f ./CreateGrid",
+              "$CXX GetPdf.cc -o GetPdf $CXXFLAGS $LDFLAGS $(eMELA-config --ldflags)",
+              "./GetPdf",
+              "curl -sLO https://github.com/gstagnit/eMELA/releases/download/v${{ version }}/grids.tar.gz",
+              "tar -xzf grids.tar.gz",
+              "export LHAPDF_DATA_PATH=$(readlink -f ./grids):$(lhapdf-config --datadir):$LHAPDF_DATA_PATH",
+              "$CXX GetPdfGrid.cc -o GetPdfGrid $CXXFLAGS $LDFLAGS $(eMELA-config --ldflags) $(lhapdf-config --ldflags)",
+              "./GetPdfGrid"
+            ]
+          }
+        ],
+        "version": "1.0.1"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "emela"
+          ]
+        },
+        "name": "emela",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "fortran_compiler_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "libboost-devel",
+            "lhapdf"
+          ],
+          "run": [
+            "lhapdf"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "bin": [
+                "eMELA-config"
+              ],
+              "files": [
+                "etc/conda/test-files/emela/0/source/example/*"
+              ],
+              "include": [
+                "eMELA/version.h",
+                "eMELA/bspdf.hh",
+                "eMELA/analytics.hh",
+                "eMELA/specialfunctions.hh",
+                "eMELA/version.h.in",
+                "eMELA/constants.hh",
+                "eMELA/eMELA.hh",
+                "eMELA/grid.hh",
+                "eMELA/ilc500.hh",
+                "eMELA/numerics.hh"
+              ],
+              "lib": [
+                "eMELA"
+              ],
+              "strict": true
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "source/example"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "cxx_compiler_stub",
+                "cmake",
+                "make",
+                "curl",
+                "tar"
+              ]
+            },
+            "script": [
+              "eMELA-config --help",
+              "eMELA-config --version",
+              "eMELA-config --prefix",
+              "eMELA-config --incdir",
+              "eMELA-config --libdir",
+              "eMELA-config --data",
+              "eMELA-config --cppflags",
+              "eMELA-config --cxxflags",
+              "eMELA-config --ldflags",
+              "cd source/example",
+              "$CXX CreateGrid.cc -o CreateGrid $CXXFLAGS $LDFLAGS $(eMELA-config --ldflags)",
+              "test -f ./CreateGrid",
+              "$CXX GetPdf.cc -o GetPdf $CXXFLAGS $LDFLAGS $(eMELA-config --ldflags)",
+              "./GetPdf",
+              "curl -sLO https://github.com/gstagnit/eMELA/releases/download/v${{ version }}/grids.tar.gz",
+              "tar -xzf grids.tar.gz",
+              "export LHAPDF_DATA_PATH=$(readlink -f ./grids):$(lhapdf-config --datadir):$LHAPDF_DATA_PATH",
+              "$CXX GetPdfGrid.cc -o GetPdfGrid $CXXFLAGS $LDFLAGS $(eMELA-config --ldflags) $(lhapdf-config --ldflags)",
+              "./GetPdfGrid"
+            ]
+          }
+        ],
+        "version": "1.0.1"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "emela"
+          ]
+        },
+        "name": "emela",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "fortran_compiler_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "libboost-devel",
+            "lhapdf"
+          ],
+          "run": [
+            "lhapdf"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "bin": [
+                "eMELA-config"
+              ],
+              "files": [
+                "etc/conda/test-files/emela/0/source/example/*"
+              ],
+              "include": [
+                "eMELA/version.h",
+                "eMELA/bspdf.hh",
+                "eMELA/analytics.hh",
+                "eMELA/specialfunctions.hh",
+                "eMELA/version.h.in",
+                "eMELA/constants.hh",
+                "eMELA/eMELA.hh",
+                "eMELA/grid.hh",
+                "eMELA/ilc500.hh",
+                "eMELA/numerics.hh"
+              ],
+              "lib": [
+                "eMELA"
+              ],
+              "strict": true
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "source/example"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "cxx_compiler_stub",
+                "cmake",
+                "make",
+                "curl",
+                "tar"
+              ]
+            },
+            "script": [
+              "eMELA-config --help",
+              "eMELA-config --version",
+              "eMELA-config --prefix",
+              "eMELA-config --incdir",
+              "eMELA-config --libdir",
+              "eMELA-config --data",
+              "eMELA-config --cppflags",
+              "eMELA-config --cxxflags",
+              "eMELA-config --ldflags",
+              "cd source/example",
+              "$CXX CreateGrid.cc -o CreateGrid $CXXFLAGS $LDFLAGS $(eMELA-config --ldflags)",
+              "test -f ./CreateGrid",
+              "$CXX GetPdf.cc -o GetPdf $CXXFLAGS $LDFLAGS $(eMELA-config --ldflags)",
+              "./GetPdf",
+              "curl -sLO https://github.com/gstagnit/eMELA/releases/download/v${{ version }}/grids.tar.gz",
+              "tar -xzf grids.tar.gz",
+              "export LHAPDF_DATA_PATH=$(readlink -f ./grids):$(lhapdf-config --datadir):$LHAPDF_DATA_PATH",
+              "$CXX GetPdfGrid.cc -o GetPdfGrid $CXXFLAGS $LDFLAGS $(eMELA-config --ldflags) $(lhapdf-config --ldflags)",
+              "./GetPdfGrid"
+            ]
+          }
+        ],
+        "version": "1.0.1"
+      }
+    ],
+    "package": {
+      "name": "emela",
+      "version": "1.0.1"
+    },
+    "requirements": {
+      "build": [
+        "c_stdlib_stub",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "cmake",
+        "make"
+      ],
+      "host": [
+        "libboost-devel",
+        "lhapdf"
+      ],
+      "run": [
+        "lhapdf"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "sha256": "4495aaf754fb9da22d222f2a58761262beb012a907d6d2ec1d9b637c4f4743d2",
+      "url": "https://github.com/gstagnit/emela/archive/v1.0.1.tar.gz"
+    }
+  },
+  "name": "emela",
+  "osx_64_meta_yaml": {
+    "about": {
+      "description": "``eMELA`` is a library that implements the evolution in pure QED of the\nunpolarised electron parton distribution functions (PDFs) up to\nnext-to-leading logarithmic (NLL) approximation, according to the papers\nlisted on the GitHub repository. ``eMELA`` includes the evolution with\nmultiple fermion families and their mass thresholds, and it gives one the\npossibility of choosing among three different UV-renormalisation schemes\n(`MSBAR`: $\\overline{\\rm MS}$, `ALPMZ`: $\\alpha(m_Z)$, `ALGMU`: $G_\\mu$)\nand two different factorisation schemes\n(`MSBAR`: $\\overline{\\rm MS}$, `DELTA`: $\\Delta$).\n\nMore in detail, ``eMELA`` is an improved QED-version of\n[MELA](https://github.com/vbertone/MELA). It consists of a Fortran code\nresponsible for the numerical evolution of the PDFs, and a C++ wrapper that\nprovides one with the analytical solutions in the asymptotic $z \\to 1$\nregion. Moreover, the possibility is given to the user to output the PDFs\nas grids compliant with the\n[LHAPDF](https://lhapdf.hepforge.org/index.html) format, that can be\nemployed at a later stage. Regardless of whether the numerical solution is\ncomputed at runtime or read from the grids, eMELA offers the possibility\nto switch to the analytical solution in the asymptotic region. This must be\nconsidered as the default option when using the PDFs for physics\nsimulations.\n\n**Note**: eMELA supersedes [ePDF](https://github.com/gstagnit/ePDF), that\nwas limited to the evolution with a single lepton in the $\\overline{\\rm MS}$\nrenormalisation and factorisation schemes.",
+      "dev_url": "https://github.com/gstagnit/eMELA",
+      "home": "https://github.com/gstagnit/eMELA",
+      "license": "MIT",
+      "license_family": "MIT",
+      "license_file": "source/LICENSE",
+      "summary": "emela: an improved QED-version of MELA"
+    },
+    "build": {
+      "number": "0",
+      "run_exports": {
+        "weak": [
+          "emela"
+        ]
+      },
+      "script": [
+        "cmake ${CMAKE_ARGS} -DCMAKE_INSTALL_PREFIX=$PREFIX -DWITH_LHAPDF=ON -S source -B build",
+        "cmake -LH build",
+        "cmake --build build --clean-first --parallel=\"${CPU_COUNT}\"",
+        "cmake --install build"
+      ]
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "gstagnit",
+        "matthewfeickert"
+      ]
+    },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "emela"
+          ]
+        },
+        "name": "emela",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "fortran_compiler_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "libboost-devel",
+            "lhapdf"
+          ],
+          "run": [
+            "lhapdf"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "bin": [
+                "eMELA-config"
+              ],
+              "files": [
+                "etc/conda/test-files/emela/0/source/example/*"
+              ],
+              "include": [
+                "eMELA/version.h",
+                "eMELA/bspdf.hh",
+                "eMELA/analytics.hh",
+                "eMELA/specialfunctions.hh",
+                "eMELA/version.h.in",
+                "eMELA/constants.hh",
+                "eMELA/eMELA.hh",
+                "eMELA/grid.hh",
+                "eMELA/ilc500.hh",
+                "eMELA/numerics.hh"
+              ],
+              "lib": [
+                "eMELA"
+              ],
+              "strict": true
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "source/example"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "cxx_compiler_stub",
+                "cmake",
+                "make",
+                "curl",
+                "tar"
+              ]
+            },
+            "script": [
+              "eMELA-config --help",
+              "eMELA-config --version",
+              "eMELA-config --prefix",
+              "eMELA-config --incdir",
+              "eMELA-config --libdir",
+              "eMELA-config --data",
+              "eMELA-config --cppflags",
+              "eMELA-config --cxxflags",
+              "eMELA-config --ldflags",
+              "cd source/example",
+              "$CXX CreateGrid.cc -o CreateGrid $CXXFLAGS $LDFLAGS $(eMELA-config --ldflags)",
+              "test -f ./CreateGrid",
+              "$CXX GetPdf.cc -o GetPdf $CXXFLAGS $LDFLAGS $(eMELA-config --ldflags)",
+              "./GetPdf",
+              "curl -sLO https://github.com/gstagnit/eMELA/releases/download/v${{ version }}/grids.tar.gz",
+              "tar -xzf grids.tar.gz",
+              "export LHAPDF_DATA_PATH=$(readlink -f ./grids):$(lhapdf-config --datadir):$LHAPDF_DATA_PATH",
+              "$CXX GetPdfGrid.cc -o GetPdfGrid $CXXFLAGS $LDFLAGS $(eMELA-config --ldflags) $(lhapdf-config --ldflags)",
+              "./GetPdfGrid"
+            ]
+          }
+        ],
+        "version": "1.0.1"
+      }
+    ],
+    "package": {
+      "name": "emela",
+      "version": "1.0.1"
+    },
+    "requirements": {
+      "build": [
+        "c_stdlib_stub",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "cmake",
+        "make"
+      ],
+      "host": [
+        "libboost-devel",
+        "lhapdf"
+      ],
+      "run": [
+        "lhapdf"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "sha256": "4495aaf754fb9da22d222f2a58761262beb012a907d6d2ec1d9b637c4f4743d2",
+      "url": "https://github.com/gstagnit/emela/archive/v1.0.1.tar.gz"
+    }
+  },
+  "osx_64_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "cmake",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "make"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "lhapdf",
+        "libboost-devel"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "lhapdf"
+      ]
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "cmake",
+        "curl",
+        "cxx_compiler_stub",
+        "make",
+        "tar"
+      ]
+    }
+  },
+  "osx_arm64_meta_yaml": {
+    "about": {
+      "description": "``eMELA`` is a library that implements the evolution in pure QED of the\nunpolarised electron parton distribution functions (PDFs) up to\nnext-to-leading logarithmic (NLL) approximation, according to the papers\nlisted on the GitHub repository. ``eMELA`` includes the evolution with\nmultiple fermion families and their mass thresholds, and it gives one the\npossibility of choosing among three different UV-renormalisation schemes\n(`MSBAR`: $\\overline{\\rm MS}$, `ALPMZ`: $\\alpha(m_Z)$, `ALGMU`: $G_\\mu$)\nand two different factorisation schemes\n(`MSBAR`: $\\overline{\\rm MS}$, `DELTA`: $\\Delta$).\n\nMore in detail, ``eMELA`` is an improved QED-version of\n[MELA](https://github.com/vbertone/MELA). It consists of a Fortran code\nresponsible for the numerical evolution of the PDFs, and a C++ wrapper that\nprovides one with the analytical solutions in the asymptotic $z \\to 1$\nregion. Moreover, the possibility is given to the user to output the PDFs\nas grids compliant with the\n[LHAPDF](https://lhapdf.hepforge.org/index.html) format, that can be\nemployed at a later stage. Regardless of whether the numerical solution is\ncomputed at runtime or read from the grids, eMELA offers the possibility\nto switch to the analytical solution in the asymptotic region. This must be\nconsidered as the default option when using the PDFs for physics\nsimulations.\n\n**Note**: eMELA supersedes [ePDF](https://github.com/gstagnit/ePDF), that\nwas limited to the evolution with a single lepton in the $\\overline{\\rm MS}$\nrenormalisation and factorisation schemes.",
+      "dev_url": "https://github.com/gstagnit/eMELA",
+      "home": "https://github.com/gstagnit/eMELA",
+      "license": "MIT",
+      "license_family": "MIT",
+      "license_file": "source/LICENSE",
+      "summary": "emela: an improved QED-version of MELA"
+    },
+    "build": {
+      "number": "0",
+      "run_exports": {
+        "weak": [
+          "emela"
+        ]
+      },
+      "script": [
+        "cmake ${CMAKE_ARGS} -DCMAKE_INSTALL_PREFIX=$PREFIX -DWITH_LHAPDF=ON -S source -B build",
+        "cmake -LH build",
+        "cmake --build build --clean-first --parallel=\"${CPU_COUNT}\"",
+        "cmake --install build"
+      ]
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "gstagnit",
+        "matthewfeickert"
+      ]
+    },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "emela"
+          ]
+        },
+        "name": "emela",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "fortran_compiler_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "libboost-devel",
+            "lhapdf"
+          ],
+          "run": [
+            "lhapdf"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "bin": [
+                "eMELA-config"
+              ],
+              "files": [
+                "etc/conda/test-files/emela/0/source/example/*"
+              ],
+              "include": [
+                "eMELA/version.h",
+                "eMELA/bspdf.hh",
+                "eMELA/analytics.hh",
+                "eMELA/specialfunctions.hh",
+                "eMELA/version.h.in",
+                "eMELA/constants.hh",
+                "eMELA/eMELA.hh",
+                "eMELA/grid.hh",
+                "eMELA/ilc500.hh",
+                "eMELA/numerics.hh"
+              ],
+              "lib": [
+                "eMELA"
+              ],
+              "strict": true
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "source/example"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "cxx_compiler_stub",
+                "cmake",
+                "make",
+                "curl",
+                "tar"
+              ]
+            },
+            "script": [
+              "eMELA-config --help",
+              "eMELA-config --version",
+              "eMELA-config --prefix",
+              "eMELA-config --incdir",
+              "eMELA-config --libdir",
+              "eMELA-config --data",
+              "eMELA-config --cppflags",
+              "eMELA-config --cxxflags",
+              "eMELA-config --ldflags",
+              "cd source/example",
+              "$CXX CreateGrid.cc -o CreateGrid $CXXFLAGS $LDFLAGS $(eMELA-config --ldflags)",
+              "test -f ./CreateGrid",
+              "$CXX GetPdf.cc -o GetPdf $CXXFLAGS $LDFLAGS $(eMELA-config --ldflags)",
+              "./GetPdf",
+              "curl -sLO https://github.com/gstagnit/eMELA/releases/download/v${{ version }}/grids.tar.gz",
+              "tar -xzf grids.tar.gz",
+              "export LHAPDF_DATA_PATH=$(readlink -f ./grids):$(lhapdf-config --datadir):$LHAPDF_DATA_PATH",
+              "$CXX GetPdfGrid.cc -o GetPdfGrid $CXXFLAGS $LDFLAGS $(eMELA-config --ldflags) $(lhapdf-config --ldflags)",
+              "./GetPdfGrid"
+            ]
+          }
+        ],
+        "version": "1.0.1"
+      }
+    ],
+    "package": {
+      "name": "emela",
+      "version": "1.0.1"
+    },
+    "requirements": {
+      "build": [
+        "c_stdlib_stub",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "cmake",
+        "make"
+      ],
+      "host": [
+        "libboost-devel",
+        "lhapdf"
+      ],
+      "run": [
+        "lhapdf"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "sha256": "4495aaf754fb9da22d222f2a58761262beb012a907d6d2ec1d9b637c4f4743d2",
+      "url": "https://github.com/gstagnit/emela/archive/v1.0.1.tar.gz"
+    }
+  },
+  "osx_arm64_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "cmake",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "make"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "lhapdf",
+        "libboost-devel"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "lhapdf"
+      ]
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "cmake",
+        "curl",
+        "cxx_compiler_stub",
+        "make",
+        "tar"
+      ]
+    }
+  },
+  "outputs_names": {
+    "__set__": true,
+    "elements": [
+      "emela"
+    ]
+  },
+  "parsing_error": false,
+  "platforms": [
+    "linux_64",
+    "linux_aarch64",
+    "linux_ppc64le",
+    "osx_64",
+    "osx_arm64"
+  ],
+  "pr_info": {
+    "__lazy_json__": "pr_info/emela.json"
+  },
+  "raw_meta_yaml": "schema_version: 1\n\ncontext:\n  name: emela\n  version: \"1.0.1\"\n\npackage:\n  name: ${{ name }}\n  version: ${{ version }}\n\nsource:\n  url: https://github.com/gstagnit/${{ name }}/archive/v${{ version }}.tar.gz\n  sha256: 4495aaf754fb9da22d222f2a58761262beb012a907d6d2ec1d9b637c4f4743d2\n  target_directory: source\n\nbuild:\n  number: 0\n  skip: win\n  script:\n    - cmake ${CMAKE_ARGS} -DCMAKE_INSTALL_PREFIX=$PREFIX -DWITH_LHAPDF=ON -S source -B build\n    - cmake -LH build\n    - cmake --build build --clean-first --parallel=\"${CPU_COUNT}\"\n    - cmake --install build\n\nrequirements:\n  build:\n    - ${{ stdlib('c') }}\n    - ${{ compiler('cxx') }}\n    - ${{ compiler('fortran') }}\n    - cmake\n    - make\n  host:\n    - libboost-devel\n    - lhapdf\n  run:\n    - lhapdf\n  run_exports:\n    - ${{ pin_subpackage('emela', upper_bound='x.x') }}\n\ntests:\n  - package_contents:\n      strict: true\n      files:\n        - etc/conda/test-files/emela/0/source/example/*\n      include:\n        - eMELA/version.h\n        - eMELA/bspdf.hh\n        - eMELA/analytics.hh\n        - eMELA/specialfunctions.hh\n        - eMELA/version.h.in\n        - eMELA/constants.hh\n        - eMELA/eMELA.hh\n        - eMELA/grid.hh\n        - eMELA/ilc500.hh\n        - eMELA/numerics.hh\n      lib:\n        - eMELA\n      bin:\n        - eMELA-config\n\n  - files:\n      source:\n        - source/example\n    requirements:\n      run:\n        - ${{ compiler('cxx') }}\n        - cmake\n        - make\n        - curl\n        - tar\n    script:\n      - eMELA-config --help\n      - eMELA-config --version\n      - eMELA-config --prefix\n      - eMELA-config --incdir\n      - eMELA-config --libdir\n      - eMELA-config --data\n      - eMELA-config --cppflags\n      - eMELA-config --cxxflags\n      - eMELA-config --ldflags\n\n      - cd source/example\n      - $CXX CreateGrid.cc -o CreateGrid $CXXFLAGS $LDFLAGS $(eMELA-config --ldflags)\n      # Skip as extremely slow with 50000 grid points\n      # - ./CreateGrid NLL DELTA MSBAR\n      - test -f ./CreateGrid\n      - $CXX GetPdf.cc -o GetPdf $CXXFLAGS $LDFLAGS $(eMELA-config --ldflags)\n      - ./GetPdf\n\n      # Download the grids from the GitHub releases page\n      # https://github.com/gstagnit/eMELA/releases/tag/v1.0.1\n      - curl -sLO https://github.com/gstagnit/eMELA/releases/download/v${{ version }}/grids.tar.gz\n      - tar -xzf grids.tar.gz\n      - export LHAPDF_DATA_PATH=$(readlink -f ./grids):$(lhapdf-config --datadir):$LHAPDF_DATA_PATH\n\n      - $CXX GetPdfGrid.cc -o GetPdfGrid $CXXFLAGS $LDFLAGS $(eMELA-config --ldflags) $(lhapdf-config --ldflags)\n      - ./GetPdfGrid\n\nabout:\n  summary: \"emela: an improved QED-version of MELA\"\n  description: |\n    ``eMELA`` is a library that implements the evolution in pure QED of the\n    unpolarised electron parton distribution functions (PDFs) up to\n    next-to-leading logarithmic (NLL) approximation, according to the papers\n    listed on the GitHub repository. ``eMELA`` includes the evolution with\n    multiple fermion families and their mass thresholds, and it gives one the\n    possibility of choosing among three different UV-renormalisation schemes\n    (`MSBAR`: $\\overline{\\rm MS}$, `ALPMZ`: $\\alpha(m_Z)$, `ALGMU`: $G_\\mu$)\n    and two different factorisation schemes\n    (`MSBAR`: $\\overline{\\rm MS}$, `DELTA`: $\\Delta$).\n\n    More in detail, ``eMELA`` is an improved QED-version of\n    [MELA](https://github.com/vbertone/MELA). It consists of a Fortran code\n    responsible for the numerical evolution of the PDFs, and a C++ wrapper that\n    provides one with the analytical solutions in the asymptotic $z \\to 1$\n    region. Moreover, the possibility is given to the user to output the PDFs\n    as grids compliant with the\n    [LHAPDF](https://lhapdf.hepforge.org/index.html) format, that can be\n    employed at a later stage. Regardless of whether the numerical solution is\n    computed at runtime or read from the grids, eMELA offers the possibility\n    to switch to the analytical solution in the asymptotic region. This must be\n    considered as the default option when using the PDFs for physics\n    simulations.\n\n    **Note**: eMELA supersedes [ePDF](https://github.com/gstagnit/ePDF), that\n    was limited to the evolution with a single lepton in the $\\overline{\\rm MS}$\n    renormalisation and factorisation schemes.\n  license: MIT\n  license_file: source/LICENSE\n  homepage: https://github.com/gstagnit/eMELA\n  repository: https://github.com/gstagnit/eMELA\n\nextra:\n  recipe-maintainers:\n    - gstagnit\n    - matthewfeickert\n",
+  "req": {
+    "__set__": true,
+    "elements": [
+      "c_stdlib_stub",
+      "cmake",
+      "cxx_compiler_stub",
+      "fortran_compiler_stub",
+      "lhapdf",
+      "libboost-devel",
+      "make"
+    ]
+  },
+  "requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "cmake",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "make"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "lhapdf",
+        "libboost-devel"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "lhapdf"
+      ]
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "cmake",
+        "curl",
+        "cxx_compiler_stub",
+        "make",
+        "tar"
+      ]
+    }
+  },
+  "strong_exports": false,
+  "total_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "cmake",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "make"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "lhapdf",
+        "libboost-devel"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "lhapdf"
+      ]
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "cmake",
+        "curl",
+        "cxx_compiler_stub",
+        "make",
+        "tar"
+      ]
+    }
+  },
+  "url": "https://github.com/gstagnit/emela/archive/v1.0.1.tar.gz",
+  "version": "1.0.1",
+  "version_pr_info": {
+    "__lazy_json__": "version_pr_info/emela.json"
+  }
+}

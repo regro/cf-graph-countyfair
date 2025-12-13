@@ -1,0 +1,1438 @@
+{
+  "archived": false,
+  "branch": "main",
+  "ci_support_linux_64_python3.10.____cpython.yaml": "c_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ncxx_compiler:\n- gxx\ncxx_compiler_version:\n- '14'\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\nfortran_compiler:\n- gfortran\nfortran_compiler_version:\n- '14'\nhdf5:\n- 1.14.6\nlibnetcdf:\n- 4.9.3\nnetcdf_fortran:\n- '4.6'\npin_run_as_build:\n  python:\n    min_pin: x.x\n    max_pin: x.x\npython:\n- 3.10.* *_cpython\ntarget_platform:\n- linux-64\nzip_keys:\n- - cxx_compiler_version\n  - fortran_compiler_version\n",
+  "conda-forge.yml": {
+    "build_platform": {
+      "linux_aarch64": "linux_64",
+      "linux_ppc64le": "linux_64",
+      "osx_arm64": "osx_64"
+    },
+    "conda_build": {
+      "pkg_format": "2"
+    },
+    "conda_forge_output_validation": true,
+    "github": {
+      "branch_name": "main",
+      "tooling_branch_name": "main"
+    },
+    "provider": {
+      "linux_aarch64": "default",
+      "linux_ppc64le": "default"
+    },
+    "test": "native_and_emulated"
+  },
+  "feedstock_hash": "bfcbae2f933bd04b2de949cd17a4c5f5d04a0dda",
+  "feedstock_hash_ts": 1762719415,
+  "feedstock_name": "mpas_tools",
+  "hash_type": "sha256",
+  "linux_64_meta_yaml": {
+    "about": {
+      "description": "A set of tools for creating and manipulating meshes for the climate\ncomponents based on the Model for Prediction Across Scales (MPAS) framework\n",
+      "dev_url": "https://github.com/MPAS-Dev/MPAS-Tools/",
+      "doc_url": "https://github.com/MPAS-Dev/MPAS-Tools/README.md",
+      "home": "https://github.com/MPAS-Dev/MPAS-Tools/",
+      "license": "BSD-3-Clause",
+      "license_family": "BSD",
+      "license_file": "LICENSE",
+      "summary": "Mesh tools for Model for Prediction Across Scales (MPAS)"
+    },
+    "build": {
+      "number": "0"
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "andrewdnolan",
+        "xylar",
+        "jhkennedy"
+      ]
+    },
+    "package": {
+      "name": "mpas_tools",
+      "version": "1.4.0"
+    },
+    "requirements": {
+      "build": [
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "c_stdlib_stub",
+        "cmake",
+        "make",
+        "pkgconfig"
+      ],
+      "host": [
+        "python",
+        "hdf5",
+        "hdf5 * nompi_*",
+        "libnetcdf",
+        "libnetcdf * nompi_*",
+        "netcdf-fortran",
+        "netcdf-fortran * nompi_*",
+        "setuptools",
+        "pip",
+        "netcdf4"
+      ],
+      "run": [
+        "python",
+        "cartopy",
+        "cmocean",
+        "dask",
+        "geometric_features >=1.0.1,<2.0.0",
+        "h5py",
+        "inpoly",
+        "matplotlib-base >=3.9.0",
+        "nco",
+        "netcdf4",
+        "networkx",
+        "numpy >=2.0,<3.0",
+        "progressbar2",
+        "pyamg",
+        "pyevtk",
+        "pyproj",
+        "python-igraph >=0.10.0",
+        "scikit-image !=0.20.0",
+        "scipy",
+        "shapely >=2.0,<3.0",
+        "tqdm",
+        "xarray"
+      ]
+    },
+    "schema_version": 0,
+    "source": {
+      "sha256": "90732c5c46d69d148295af0f42005751dcd672c7cb126b7502a9be6aceaa409a",
+      "url": "https://github.com/MPAS-Dev/MPAS-Tools/archive/1.4.0.tar.gz"
+    },
+    "test": {
+      "commands": [
+        "pip check",
+        "test -f \"${PREFIX}/bin/ocean_smooth_topo_skip_land_ice\"",
+        "test -f \"${PREFIX}/bin/ocean_smooth_topo_before_init\"",
+        "test -f \"${PREFIX}/bin/ocean_smooth_topo_before_init_skip_land_ice\"",
+        "planar_hex --nx=10 --ny=20 --dc=1000. --outFileName='periodic_mesh_10x20_1km.nc'",
+        "translate_planar_grid -f 'periodic_mesh_10x20_1km.nc' -x 1000. -y 2000.",
+        "translate_planar_grid -f 'periodic_mesh_10x20_1km.nc' -c",
+        "planar_hex --nx=20 --ny=40 --dc=1000. --outFileName='periodic_mesh_20x40_1km.nc'",
+        "translate_planar_grid -f 'periodic_mesh_10x20_1km.nc' -d 'periodic_mesh_20x40_1km.nc'",
+        "MpasMeshConverter.x mesh_tools/mesh_conversion_tools/test/mesh.QU.1920km.151026.nc mesh.nc",
+        "sort_mesh --mesh-file mesh.nc --sort-file sorted_mesh.nc",
+        "MpasCellCuller.x mesh.nc culled_mesh.nc -m mesh_tools/mesh_conversion_tools/test/land_mask_final.nc",
+        "MpasMaskCreator.x mesh.nc arctic_mask.nc -f mesh_tools/mesh_conversion_tools/test/Arctic_Ocean.geojson",
+        "planar_hex --nx=30 --ny=20 --dc=1000. --npx --npy --outFileName='nonperiodic_mesh_30x20_1km.nc'",
+        "MpasCellCuller.x nonperiodic_mesh_30x20_1km.nc culled_nonperiodic_mesh_30x20_1km.nc",
+        "python -m pytest conda_package/tests",
+        "mark_horns_for_culling --help",
+        "set_lat_lon_fields_in_planar_grid --help",
+        "create_scrip_file_from_mpas_mesh --help",
+        "create_scrip_file_from_planar_rectangular_grid --help",
+        "prepare_seaice_partitions --help",
+        "create_seaice_partitions --help",
+        "fix_regrid_output.exe",
+        "create_landice_grid_from_generic_mpas_grid --help",
+        "define_landice_cull_mask --help",
+        "interpolate_to_mpasli_grid --help",
+        "mark_domain_boundaries_dirichlet --help",
+        "add_critical_land_blockages_to_mask --help",
+        "add_land_locked_cells_to_mask --help",
+        "widen_transect_edge_masks --help",
+        "moc_southern_boundary_extractor --help",
+        "ocean_add_depth --help",
+        "ocean_add_zmid --help",
+        "ocean_write_time_varying_zmid --help",
+        "paraview_vtk_field_extractor -f mesh_tools/mesh_conversion_tools/test/mesh.QU.1920km.151026.nc -v latCell,lonCell --ignore_time -o vtk_test",
+        "mpas_to_xdmf -m mesh_tools/mesh_conversion_tools/test/mesh.QU.1920km.151026.nc -v latCell lonCell -o xdmf_test",
+        "split_grids --help",
+        "merge_grids --help",
+        "inject_bathymetry mesh_tools/mesh_conversion_tools/test/mesh.QU.1920km.151026.nc",
+        "inject_preserve_floodplain --help",
+        "mpas_to_triangle --help",
+        "triangle_to_netcdf --help",
+        "jigsaw_to_netcdf --help",
+        "build_jigsaw --clone",
+        "scrip_from_mpas --help",
+        "compute_mpas_region_masks --help",
+        "compute_mpas_transect_masks --help",
+        "compute_mpas_flood_fill_mask --help",
+        "compute_lon_lat_region_masks --help",
+        "compute_projection_region_masks --help"
+      ],
+      "imports": [
+        "mpas_tools",
+        "mpas_tools.mesh.conversion",
+        "mpas_tools.mesh.creation",
+        "mpas_tools.viz",
+        "mpas_tools.conversion"
+      ],
+      "requires": [
+        "git",
+        "pytest",
+        "requests",
+        "pip"
+      ],
+      "source_files": [
+        "mesh_tools/mesh_conversion_tools/test/Arctic_Ocean.geojson",
+        "mesh_tools/mesh_conversion_tools/test/mesh.QU.1920km.151026.nc",
+        "mesh_tools/mesh_conversion_tools/test/land_mask_final.nc",
+        "conda_package/tests/*"
+      ]
+    }
+  },
+  "linux_64_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "cmake",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "make",
+        "pkgconfig"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "hdf5",
+        "libnetcdf",
+        "netcdf-fortran",
+        "netcdf4",
+        "pip",
+        "python",
+        "setuptools"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "cartopy",
+        "cmocean",
+        "dask",
+        "geometric_features",
+        "h5py",
+        "inpoly",
+        "matplotlib-base",
+        "nco",
+        "netcdf4",
+        "networkx",
+        "numpy",
+        "progressbar2",
+        "pyamg",
+        "pyevtk",
+        "pyproj",
+        "python",
+        "python-igraph",
+        "scikit-image",
+        "scipy",
+        "shapely",
+        "tqdm",
+        "xarray"
+      ]
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "git",
+        "pip",
+        "pytest",
+        "requests"
+      ]
+    }
+  },
+  "linux_aarch64_meta_yaml": {
+    "about": {
+      "description": "A set of tools for creating and manipulating meshes for the climate\ncomponents based on the Model for Prediction Across Scales (MPAS) framework\n",
+      "dev_url": "https://github.com/MPAS-Dev/MPAS-Tools/",
+      "doc_url": "https://github.com/MPAS-Dev/MPAS-Tools/README.md",
+      "home": "https://github.com/MPAS-Dev/MPAS-Tools/",
+      "license": "BSD-3-Clause",
+      "license_family": "BSD",
+      "license_file": "LICENSE",
+      "summary": "Mesh tools for Model for Prediction Across Scales (MPAS)"
+    },
+    "build": {
+      "number": "0"
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "andrewdnolan",
+        "xylar",
+        "jhkennedy"
+      ]
+    },
+    "package": {
+      "name": "mpas_tools",
+      "version": "1.4.0"
+    },
+    "requirements": {
+      "build": [
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "c_stdlib_stub",
+        "cmake",
+        "make",
+        "pkgconfig"
+      ],
+      "host": [
+        "python",
+        "hdf5",
+        "hdf5 * nompi_*",
+        "libnetcdf",
+        "libnetcdf * nompi_*",
+        "netcdf-fortran",
+        "netcdf-fortran * nompi_*",
+        "setuptools",
+        "pip",
+        "netcdf4"
+      ],
+      "run": [
+        "python",
+        "cartopy",
+        "cmocean",
+        "dask",
+        "geometric_features >=1.0.1,<2.0.0",
+        "h5py",
+        "inpoly",
+        "matplotlib-base >=3.9.0",
+        "nco",
+        "netcdf4",
+        "networkx",
+        "numpy >=2.0,<3.0",
+        "progressbar2",
+        "pyamg",
+        "pyevtk",
+        "pyproj",
+        "python-igraph >=0.10.0",
+        "scikit-image !=0.20.0",
+        "scipy",
+        "shapely >=2.0,<3.0",
+        "tqdm",
+        "xarray"
+      ]
+    },
+    "schema_version": 0,
+    "source": {
+      "sha256": "90732c5c46d69d148295af0f42005751dcd672c7cb126b7502a9be6aceaa409a",
+      "url": "https://github.com/MPAS-Dev/MPAS-Tools/archive/1.4.0.tar.gz"
+    },
+    "test": {
+      "commands": [
+        "pip check",
+        "test -f \"${PREFIX}/bin/ocean_smooth_topo_skip_land_ice\"",
+        "test -f \"${PREFIX}/bin/ocean_smooth_topo_before_init\"",
+        "test -f \"${PREFIX}/bin/ocean_smooth_topo_before_init_skip_land_ice\"",
+        "planar_hex --nx=10 --ny=20 --dc=1000. --outFileName='periodic_mesh_10x20_1km.nc'",
+        "translate_planar_grid -f 'periodic_mesh_10x20_1km.nc' -x 1000. -y 2000.",
+        "translate_planar_grid -f 'periodic_mesh_10x20_1km.nc' -c",
+        "planar_hex --nx=20 --ny=40 --dc=1000. --outFileName='periodic_mesh_20x40_1km.nc'",
+        "translate_planar_grid -f 'periodic_mesh_10x20_1km.nc' -d 'periodic_mesh_20x40_1km.nc'",
+        "MpasMeshConverter.x mesh_tools/mesh_conversion_tools/test/mesh.QU.1920km.151026.nc mesh.nc",
+        "sort_mesh --mesh-file mesh.nc --sort-file sorted_mesh.nc",
+        "MpasCellCuller.x mesh.nc culled_mesh.nc -m mesh_tools/mesh_conversion_tools/test/land_mask_final.nc",
+        "MpasMaskCreator.x mesh.nc arctic_mask.nc -f mesh_tools/mesh_conversion_tools/test/Arctic_Ocean.geojson",
+        "planar_hex --nx=30 --ny=20 --dc=1000. --npx --npy --outFileName='nonperiodic_mesh_30x20_1km.nc'",
+        "MpasCellCuller.x nonperiodic_mesh_30x20_1km.nc culled_nonperiodic_mesh_30x20_1km.nc",
+        "python -m pytest conda_package/tests",
+        "mark_horns_for_culling --help",
+        "set_lat_lon_fields_in_planar_grid --help",
+        "create_scrip_file_from_mpas_mesh --help",
+        "create_scrip_file_from_planar_rectangular_grid --help",
+        "prepare_seaice_partitions --help",
+        "create_seaice_partitions --help",
+        "fix_regrid_output.exe",
+        "create_landice_grid_from_generic_mpas_grid --help",
+        "define_landice_cull_mask --help",
+        "interpolate_to_mpasli_grid --help",
+        "mark_domain_boundaries_dirichlet --help",
+        "add_critical_land_blockages_to_mask --help",
+        "add_land_locked_cells_to_mask --help",
+        "widen_transect_edge_masks --help",
+        "moc_southern_boundary_extractor --help",
+        "ocean_add_depth --help",
+        "ocean_add_zmid --help",
+        "ocean_write_time_varying_zmid --help",
+        "paraview_vtk_field_extractor -f mesh_tools/mesh_conversion_tools/test/mesh.QU.1920km.151026.nc -v latCell,lonCell --ignore_time -o vtk_test",
+        "mpas_to_xdmf -m mesh_tools/mesh_conversion_tools/test/mesh.QU.1920km.151026.nc -v latCell lonCell -o xdmf_test",
+        "split_grids --help",
+        "merge_grids --help",
+        "inject_bathymetry mesh_tools/mesh_conversion_tools/test/mesh.QU.1920km.151026.nc",
+        "inject_preserve_floodplain --help",
+        "mpas_to_triangle --help",
+        "triangle_to_netcdf --help",
+        "jigsaw_to_netcdf --help",
+        "build_jigsaw --clone",
+        "scrip_from_mpas --help",
+        "compute_mpas_region_masks --help",
+        "compute_mpas_transect_masks --help",
+        "compute_mpas_flood_fill_mask --help",
+        "compute_lon_lat_region_masks --help",
+        "compute_projection_region_masks --help"
+      ],
+      "imports": [
+        "mpas_tools",
+        "mpas_tools.mesh.conversion",
+        "mpas_tools.mesh.creation",
+        "mpas_tools.viz",
+        "mpas_tools.conversion"
+      ],
+      "requires": [
+        "git",
+        "pytest",
+        "requests",
+        "pip"
+      ],
+      "source_files": [
+        "mesh_tools/mesh_conversion_tools/test/Arctic_Ocean.geojson",
+        "mesh_tools/mesh_conversion_tools/test/mesh.QU.1920km.151026.nc",
+        "mesh_tools/mesh_conversion_tools/test/land_mask_final.nc",
+        "conda_package/tests/*"
+      ]
+    }
+  },
+  "linux_aarch64_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "cmake",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "make",
+        "pkgconfig"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "hdf5",
+        "libnetcdf",
+        "netcdf-fortran",
+        "netcdf4",
+        "pip",
+        "python",
+        "setuptools"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "cartopy",
+        "cmocean",
+        "dask",
+        "geometric_features",
+        "h5py",
+        "inpoly",
+        "matplotlib-base",
+        "nco",
+        "netcdf4",
+        "networkx",
+        "numpy",
+        "progressbar2",
+        "pyamg",
+        "pyevtk",
+        "pyproj",
+        "python",
+        "python-igraph",
+        "scikit-image",
+        "scipy",
+        "shapely",
+        "tqdm",
+        "xarray"
+      ]
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "git",
+        "pip",
+        "pytest",
+        "requests"
+      ]
+    }
+  },
+  "linux_ppc64le_meta_yaml": {
+    "about": {
+      "description": "A set of tools for creating and manipulating meshes for the climate\ncomponents based on the Model for Prediction Across Scales (MPAS) framework\n",
+      "dev_url": "https://github.com/MPAS-Dev/MPAS-Tools/",
+      "doc_url": "https://github.com/MPAS-Dev/MPAS-Tools/README.md",
+      "home": "https://github.com/MPAS-Dev/MPAS-Tools/",
+      "license": "BSD-3-Clause",
+      "license_family": "BSD",
+      "license_file": "LICENSE",
+      "summary": "Mesh tools for Model for Prediction Across Scales (MPAS)"
+    },
+    "build": {
+      "number": "0"
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "andrewdnolan",
+        "xylar",
+        "jhkennedy"
+      ]
+    },
+    "package": {
+      "name": "mpas_tools",
+      "version": "1.4.0"
+    },
+    "requirements": {
+      "build": [
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "c_stdlib_stub",
+        "cmake",
+        "make",
+        "pkgconfig"
+      ],
+      "host": [
+        "python",
+        "hdf5",
+        "hdf5 * nompi_*",
+        "libnetcdf",
+        "libnetcdf * nompi_*",
+        "netcdf-fortran",
+        "netcdf-fortran * nompi_*",
+        "setuptools",
+        "pip",
+        "netcdf4"
+      ],
+      "run": [
+        "python",
+        "cartopy",
+        "cmocean",
+        "dask",
+        "geometric_features >=1.0.1,<2.0.0",
+        "h5py",
+        "inpoly",
+        "matplotlib-base >=3.9.0",
+        "nco",
+        "netcdf4",
+        "networkx",
+        "numpy >=2.0,<3.0",
+        "progressbar2",
+        "pyamg",
+        "pyevtk",
+        "pyproj",
+        "python-igraph >=0.10.0",
+        "scikit-image !=0.20.0",
+        "scipy",
+        "shapely >=2.0,<3.0",
+        "tqdm",
+        "xarray"
+      ]
+    },
+    "schema_version": 0,
+    "source": {
+      "sha256": "90732c5c46d69d148295af0f42005751dcd672c7cb126b7502a9be6aceaa409a",
+      "url": "https://github.com/MPAS-Dev/MPAS-Tools/archive/1.4.0.tar.gz"
+    },
+    "test": {
+      "commands": [
+        "pip check",
+        "test -f \"${PREFIX}/bin/ocean_smooth_topo_skip_land_ice\"",
+        "test -f \"${PREFIX}/bin/ocean_smooth_topo_before_init\"",
+        "test -f \"${PREFIX}/bin/ocean_smooth_topo_before_init_skip_land_ice\"",
+        "planar_hex --nx=10 --ny=20 --dc=1000. --outFileName='periodic_mesh_10x20_1km.nc'",
+        "translate_planar_grid -f 'periodic_mesh_10x20_1km.nc' -x 1000. -y 2000.",
+        "translate_planar_grid -f 'periodic_mesh_10x20_1km.nc' -c",
+        "planar_hex --nx=20 --ny=40 --dc=1000. --outFileName='periodic_mesh_20x40_1km.nc'",
+        "translate_planar_grid -f 'periodic_mesh_10x20_1km.nc' -d 'periodic_mesh_20x40_1km.nc'",
+        "MpasMeshConverter.x mesh_tools/mesh_conversion_tools/test/mesh.QU.1920km.151026.nc mesh.nc",
+        "sort_mesh --mesh-file mesh.nc --sort-file sorted_mesh.nc",
+        "MpasCellCuller.x mesh.nc culled_mesh.nc -m mesh_tools/mesh_conversion_tools/test/land_mask_final.nc",
+        "MpasMaskCreator.x mesh.nc arctic_mask.nc -f mesh_tools/mesh_conversion_tools/test/Arctic_Ocean.geojson",
+        "planar_hex --nx=30 --ny=20 --dc=1000. --npx --npy --outFileName='nonperiodic_mesh_30x20_1km.nc'",
+        "MpasCellCuller.x nonperiodic_mesh_30x20_1km.nc culled_nonperiodic_mesh_30x20_1km.nc",
+        "python -m pytest conda_package/tests",
+        "mark_horns_for_culling --help",
+        "set_lat_lon_fields_in_planar_grid --help",
+        "create_scrip_file_from_mpas_mesh --help",
+        "create_scrip_file_from_planar_rectangular_grid --help",
+        "prepare_seaice_partitions --help",
+        "create_seaice_partitions --help",
+        "fix_regrid_output.exe",
+        "create_landice_grid_from_generic_mpas_grid --help",
+        "define_landice_cull_mask --help",
+        "interpolate_to_mpasli_grid --help",
+        "mark_domain_boundaries_dirichlet --help",
+        "add_critical_land_blockages_to_mask --help",
+        "add_land_locked_cells_to_mask --help",
+        "widen_transect_edge_masks --help",
+        "moc_southern_boundary_extractor --help",
+        "ocean_add_depth --help",
+        "ocean_add_zmid --help",
+        "ocean_write_time_varying_zmid --help",
+        "paraview_vtk_field_extractor -f mesh_tools/mesh_conversion_tools/test/mesh.QU.1920km.151026.nc -v latCell,lonCell --ignore_time -o vtk_test",
+        "mpas_to_xdmf -m mesh_tools/mesh_conversion_tools/test/mesh.QU.1920km.151026.nc -v latCell lonCell -o xdmf_test",
+        "split_grids --help",
+        "merge_grids --help",
+        "inject_bathymetry mesh_tools/mesh_conversion_tools/test/mesh.QU.1920km.151026.nc",
+        "inject_preserve_floodplain --help",
+        "mpas_to_triangle --help",
+        "triangle_to_netcdf --help",
+        "jigsaw_to_netcdf --help",
+        "build_jigsaw --clone",
+        "scrip_from_mpas --help",
+        "compute_mpas_region_masks --help",
+        "compute_mpas_transect_masks --help",
+        "compute_mpas_flood_fill_mask --help",
+        "compute_lon_lat_region_masks --help",
+        "compute_projection_region_masks --help"
+      ],
+      "imports": [
+        "mpas_tools",
+        "mpas_tools.mesh.conversion",
+        "mpas_tools.mesh.creation",
+        "mpas_tools.viz",
+        "mpas_tools.conversion"
+      ],
+      "requires": [
+        "git",
+        "pytest",
+        "requests",
+        "pip"
+      ],
+      "source_files": [
+        "mesh_tools/mesh_conversion_tools/test/Arctic_Ocean.geojson",
+        "mesh_tools/mesh_conversion_tools/test/mesh.QU.1920km.151026.nc",
+        "mesh_tools/mesh_conversion_tools/test/land_mask_final.nc",
+        "conda_package/tests/*"
+      ]
+    }
+  },
+  "linux_ppc64le_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "cmake",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "make",
+        "pkgconfig"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "hdf5",
+        "libnetcdf",
+        "netcdf-fortran",
+        "netcdf4",
+        "pip",
+        "python",
+        "setuptools"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "cartopy",
+        "cmocean",
+        "dask",
+        "geometric_features",
+        "h5py",
+        "inpoly",
+        "matplotlib-base",
+        "nco",
+        "netcdf4",
+        "networkx",
+        "numpy",
+        "progressbar2",
+        "pyamg",
+        "pyevtk",
+        "pyproj",
+        "python",
+        "python-igraph",
+        "scikit-image",
+        "scipy",
+        "shapely",
+        "tqdm",
+        "xarray"
+      ]
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "git",
+        "pip",
+        "pytest",
+        "requests"
+      ]
+    }
+  },
+  "meta_yaml": {
+    "about": {
+      "description": "A set of tools for creating and manipulating meshes for the climate\ncomponents based on the Model for Prediction Across Scales (MPAS) framework\n",
+      "dev_url": "https://github.com/MPAS-Dev/MPAS-Tools/",
+      "doc_url": "https://github.com/MPAS-Dev/MPAS-Tools/README.md",
+      "home": "https://github.com/MPAS-Dev/MPAS-Tools/",
+      "license": "BSD-3-Clause",
+      "license_family": "BSD",
+      "license_file": "LICENSE",
+      "summary": "Mesh tools for Model for Prediction Across Scales (MPAS)"
+    },
+    "build": {
+      "number": "0"
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "andrewdnolan",
+        "xylar",
+        "jhkennedy"
+      ]
+    },
+    "package": {
+      "name": "mpas_tools",
+      "version": "1.4.0"
+    },
+    "requirements": {
+      "build": [
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "c_stdlib_stub",
+        "cmake",
+        "make",
+        "pkgconfig"
+      ],
+      "host": [
+        "python",
+        "hdf5",
+        "hdf5 * nompi_*",
+        "libnetcdf",
+        "libnetcdf * nompi_*",
+        "netcdf-fortran",
+        "netcdf-fortran * nompi_*",
+        "setuptools",
+        "pip",
+        "netcdf4",
+        "llvm-openmp"
+      ],
+      "run": [
+        "python",
+        "cartopy",
+        "cmocean",
+        "dask",
+        "geometric_features >=1.0.1,<2.0.0",
+        "h5py",
+        "inpoly",
+        "matplotlib-base >=3.9.0",
+        "nco",
+        "netcdf4",
+        "networkx",
+        "numpy >=2.0,<3.0",
+        "progressbar2",
+        "pyamg",
+        "pyevtk",
+        "pyproj",
+        "python-igraph >=0.10.0",
+        "scikit-image !=0.20.0",
+        "scipy",
+        "shapely >=2.0,<3.0",
+        "tqdm",
+        "xarray"
+      ]
+    },
+    "schema_version": 0,
+    "source": {
+      "sha256": "90732c5c46d69d148295af0f42005751dcd672c7cb126b7502a9be6aceaa409a",
+      "url": "https://github.com/MPAS-Dev/MPAS-Tools/archive/1.4.0.tar.gz"
+    },
+    "test": {
+      "commands": [
+        "pip check",
+        "test -f \"${PREFIX}/bin/ocean_smooth_topo_skip_land_ice\"",
+        "test -f \"${PREFIX}/bin/ocean_smooth_topo_before_init\"",
+        "test -f \"${PREFIX}/bin/ocean_smooth_topo_before_init_skip_land_ice\"",
+        "planar_hex --nx=10 --ny=20 --dc=1000. --outFileName='periodic_mesh_10x20_1km.nc'",
+        "translate_planar_grid -f 'periodic_mesh_10x20_1km.nc' -x 1000. -y 2000.",
+        "translate_planar_grid -f 'periodic_mesh_10x20_1km.nc' -c",
+        "planar_hex --nx=20 --ny=40 --dc=1000. --outFileName='periodic_mesh_20x40_1km.nc'",
+        "translate_planar_grid -f 'periodic_mesh_10x20_1km.nc' -d 'periodic_mesh_20x40_1km.nc'",
+        "MpasMeshConverter.x mesh_tools/mesh_conversion_tools/test/mesh.QU.1920km.151026.nc mesh.nc",
+        "sort_mesh --mesh-file mesh.nc --sort-file sorted_mesh.nc",
+        "MpasCellCuller.x mesh.nc culled_mesh.nc -m mesh_tools/mesh_conversion_tools/test/land_mask_final.nc",
+        "MpasMaskCreator.x mesh.nc arctic_mask.nc -f mesh_tools/mesh_conversion_tools/test/Arctic_Ocean.geojson",
+        "planar_hex --nx=30 --ny=20 --dc=1000. --npx --npy --outFileName='nonperiodic_mesh_30x20_1km.nc'",
+        "MpasCellCuller.x nonperiodic_mesh_30x20_1km.nc culled_nonperiodic_mesh_30x20_1km.nc",
+        "python -m pytest conda_package/tests",
+        "mark_horns_for_culling --help",
+        "set_lat_lon_fields_in_planar_grid --help",
+        "create_scrip_file_from_mpas_mesh --help",
+        "create_scrip_file_from_planar_rectangular_grid --help",
+        "prepare_seaice_partitions --help",
+        "create_seaice_partitions --help",
+        "fix_regrid_output.exe",
+        "create_landice_grid_from_generic_mpas_grid --help",
+        "define_landice_cull_mask --help",
+        "interpolate_to_mpasli_grid --help",
+        "mark_domain_boundaries_dirichlet --help",
+        "add_critical_land_blockages_to_mask --help",
+        "add_land_locked_cells_to_mask --help",
+        "widen_transect_edge_masks --help",
+        "moc_southern_boundary_extractor --help",
+        "ocean_add_depth --help",
+        "ocean_add_zmid --help",
+        "ocean_write_time_varying_zmid --help",
+        "paraview_vtk_field_extractor -f mesh_tools/mesh_conversion_tools/test/mesh.QU.1920km.151026.nc -v latCell,lonCell --ignore_time -o vtk_test",
+        "mpas_to_xdmf -m mesh_tools/mesh_conversion_tools/test/mesh.QU.1920km.151026.nc -v latCell lonCell -o xdmf_test",
+        "split_grids --help",
+        "merge_grids --help",
+        "inject_bathymetry mesh_tools/mesh_conversion_tools/test/mesh.QU.1920km.151026.nc",
+        "inject_preserve_floodplain --help",
+        "mpas_to_triangle --help",
+        "triangle_to_netcdf --help",
+        "jigsaw_to_netcdf --help",
+        "build_jigsaw --clone",
+        "scrip_from_mpas --help",
+        "compute_mpas_region_masks --help",
+        "compute_mpas_transect_masks --help",
+        "compute_mpas_flood_fill_mask --help",
+        "compute_lon_lat_region_masks --help",
+        "compute_projection_region_masks --help"
+      ],
+      "imports": [
+        "mpas_tools",
+        "mpas_tools.mesh.conversion",
+        "mpas_tools.mesh.creation",
+        "mpas_tools.viz",
+        "mpas_tools.conversion"
+      ],
+      "requires": [
+        "git",
+        "pytest",
+        "requests",
+        "pip"
+      ],
+      "source_files": [
+        "mesh_tools/mesh_conversion_tools/test/Arctic_Ocean.geojson",
+        "mesh_tools/mesh_conversion_tools/test/mesh.QU.1920km.151026.nc",
+        "mesh_tools/mesh_conversion_tools/test/land_mask_final.nc",
+        "conda_package/tests/*"
+      ]
+    }
+  },
+  "name": "mpas_tools",
+  "osx_64_meta_yaml": {
+    "about": {
+      "description": "A set of tools for creating and manipulating meshes for the climate\ncomponents based on the Model for Prediction Across Scales (MPAS) framework\n",
+      "dev_url": "https://github.com/MPAS-Dev/MPAS-Tools/",
+      "doc_url": "https://github.com/MPAS-Dev/MPAS-Tools/README.md",
+      "home": "https://github.com/MPAS-Dev/MPAS-Tools/",
+      "license": "BSD-3-Clause",
+      "license_family": "BSD",
+      "license_file": "LICENSE",
+      "summary": "Mesh tools for Model for Prediction Across Scales (MPAS)"
+    },
+    "build": {
+      "number": "0"
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "andrewdnolan",
+        "xylar",
+        "jhkennedy"
+      ]
+    },
+    "package": {
+      "name": "mpas_tools",
+      "version": "1.4.0"
+    },
+    "requirements": {
+      "build": [
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "c_stdlib_stub",
+        "cmake",
+        "make",
+        "pkgconfig"
+      ],
+      "host": [
+        "python",
+        "hdf5",
+        "hdf5 * nompi_*",
+        "libnetcdf",
+        "libnetcdf * nompi_*",
+        "netcdf-fortran",
+        "netcdf-fortran * nompi_*",
+        "setuptools",
+        "pip",
+        "netcdf4",
+        "llvm-openmp"
+      ],
+      "run": [
+        "python",
+        "cartopy",
+        "cmocean",
+        "dask",
+        "geometric_features >=1.0.1,<2.0.0",
+        "h5py",
+        "inpoly",
+        "matplotlib-base >=3.9.0",
+        "nco",
+        "netcdf4",
+        "networkx",
+        "numpy >=2.0,<3.0",
+        "progressbar2",
+        "pyamg",
+        "pyevtk",
+        "pyproj",
+        "python-igraph >=0.10.0",
+        "scikit-image !=0.20.0",
+        "scipy",
+        "shapely >=2.0,<3.0",
+        "tqdm",
+        "xarray"
+      ]
+    },
+    "schema_version": 0,
+    "source": {
+      "sha256": "90732c5c46d69d148295af0f42005751dcd672c7cb126b7502a9be6aceaa409a",
+      "url": "https://github.com/MPAS-Dev/MPAS-Tools/archive/1.4.0.tar.gz"
+    },
+    "test": {
+      "commands": [
+        "pip check",
+        "test -f \"${PREFIX}/bin/ocean_smooth_topo_skip_land_ice\"",
+        "test -f \"${PREFIX}/bin/ocean_smooth_topo_before_init\"",
+        "test -f \"${PREFIX}/bin/ocean_smooth_topo_before_init_skip_land_ice\"",
+        "planar_hex --nx=10 --ny=20 --dc=1000. --outFileName='periodic_mesh_10x20_1km.nc'",
+        "translate_planar_grid -f 'periodic_mesh_10x20_1km.nc' -x 1000. -y 2000.",
+        "translate_planar_grid -f 'periodic_mesh_10x20_1km.nc' -c",
+        "planar_hex --nx=20 --ny=40 --dc=1000. --outFileName='periodic_mesh_20x40_1km.nc'",
+        "translate_planar_grid -f 'periodic_mesh_10x20_1km.nc' -d 'periodic_mesh_20x40_1km.nc'",
+        "MpasMeshConverter.x mesh_tools/mesh_conversion_tools/test/mesh.QU.1920km.151026.nc mesh.nc",
+        "sort_mesh --mesh-file mesh.nc --sort-file sorted_mesh.nc",
+        "MpasCellCuller.x mesh.nc culled_mesh.nc -m mesh_tools/mesh_conversion_tools/test/land_mask_final.nc",
+        "MpasMaskCreator.x mesh.nc arctic_mask.nc -f mesh_tools/mesh_conversion_tools/test/Arctic_Ocean.geojson",
+        "planar_hex --nx=30 --ny=20 --dc=1000. --npx --npy --outFileName='nonperiodic_mesh_30x20_1km.nc'",
+        "MpasCellCuller.x nonperiodic_mesh_30x20_1km.nc culled_nonperiodic_mesh_30x20_1km.nc",
+        "python -m pytest conda_package/tests",
+        "mark_horns_for_culling --help",
+        "set_lat_lon_fields_in_planar_grid --help",
+        "create_scrip_file_from_mpas_mesh --help",
+        "create_scrip_file_from_planar_rectangular_grid --help",
+        "prepare_seaice_partitions --help",
+        "create_seaice_partitions --help",
+        "fix_regrid_output.exe",
+        "create_landice_grid_from_generic_mpas_grid --help",
+        "define_landice_cull_mask --help",
+        "interpolate_to_mpasli_grid --help",
+        "mark_domain_boundaries_dirichlet --help",
+        "add_critical_land_blockages_to_mask --help",
+        "add_land_locked_cells_to_mask --help",
+        "widen_transect_edge_masks --help",
+        "moc_southern_boundary_extractor --help",
+        "ocean_add_depth --help",
+        "ocean_add_zmid --help",
+        "ocean_write_time_varying_zmid --help",
+        "paraview_vtk_field_extractor -f mesh_tools/mesh_conversion_tools/test/mesh.QU.1920km.151026.nc -v latCell,lonCell --ignore_time -o vtk_test",
+        "mpas_to_xdmf -m mesh_tools/mesh_conversion_tools/test/mesh.QU.1920km.151026.nc -v latCell lonCell -o xdmf_test",
+        "split_grids --help",
+        "merge_grids --help",
+        "inject_bathymetry mesh_tools/mesh_conversion_tools/test/mesh.QU.1920km.151026.nc",
+        "inject_preserve_floodplain --help",
+        "mpas_to_triangle --help",
+        "triangle_to_netcdf --help",
+        "jigsaw_to_netcdf --help",
+        "build_jigsaw --clone",
+        "scrip_from_mpas --help",
+        "compute_mpas_region_masks --help",
+        "compute_mpas_transect_masks --help",
+        "compute_mpas_flood_fill_mask --help",
+        "compute_lon_lat_region_masks --help",
+        "compute_projection_region_masks --help"
+      ],
+      "imports": [
+        "mpas_tools",
+        "mpas_tools.mesh.conversion",
+        "mpas_tools.mesh.creation",
+        "mpas_tools.viz",
+        "mpas_tools.conversion"
+      ],
+      "requires": [
+        "git",
+        "pytest",
+        "requests",
+        "pip"
+      ],
+      "source_files": [
+        "mesh_tools/mesh_conversion_tools/test/Arctic_Ocean.geojson",
+        "mesh_tools/mesh_conversion_tools/test/mesh.QU.1920km.151026.nc",
+        "mesh_tools/mesh_conversion_tools/test/land_mask_final.nc",
+        "conda_package/tests/*"
+      ]
+    }
+  },
+  "osx_64_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "cmake",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "make",
+        "pkgconfig"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "hdf5",
+        "libnetcdf",
+        "llvm-openmp",
+        "netcdf-fortran",
+        "netcdf4",
+        "pip",
+        "python",
+        "setuptools"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "cartopy",
+        "cmocean",
+        "dask",
+        "geometric_features",
+        "h5py",
+        "inpoly",
+        "matplotlib-base",
+        "nco",
+        "netcdf4",
+        "networkx",
+        "numpy",
+        "progressbar2",
+        "pyamg",
+        "pyevtk",
+        "pyproj",
+        "python",
+        "python-igraph",
+        "scikit-image",
+        "scipy",
+        "shapely",
+        "tqdm",
+        "xarray"
+      ]
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "git",
+        "pip",
+        "pytest",
+        "requests"
+      ]
+    }
+  },
+  "osx_arm64_meta_yaml": {
+    "about": {
+      "description": "A set of tools for creating and manipulating meshes for the climate\ncomponents based on the Model for Prediction Across Scales (MPAS) framework\n",
+      "dev_url": "https://github.com/MPAS-Dev/MPAS-Tools/",
+      "doc_url": "https://github.com/MPAS-Dev/MPAS-Tools/README.md",
+      "home": "https://github.com/MPAS-Dev/MPAS-Tools/",
+      "license": "BSD-3-Clause",
+      "license_family": "BSD",
+      "license_file": "LICENSE",
+      "summary": "Mesh tools for Model for Prediction Across Scales (MPAS)"
+    },
+    "build": {
+      "number": "0"
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "andrewdnolan",
+        "xylar",
+        "jhkennedy"
+      ]
+    },
+    "package": {
+      "name": "mpas_tools",
+      "version": "1.4.0"
+    },
+    "requirements": {
+      "build": [
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "c_stdlib_stub",
+        "cmake",
+        "make",
+        "pkgconfig"
+      ],
+      "host": [
+        "python",
+        "hdf5",
+        "hdf5 * nompi_*",
+        "libnetcdf",
+        "libnetcdf * nompi_*",
+        "netcdf-fortran",
+        "netcdf-fortran * nompi_*",
+        "setuptools",
+        "pip",
+        "netcdf4",
+        "llvm-openmp"
+      ],
+      "run": [
+        "python",
+        "cartopy",
+        "cmocean",
+        "dask",
+        "geometric_features >=1.0.1,<2.0.0",
+        "h5py",
+        "inpoly",
+        "matplotlib-base >=3.9.0",
+        "nco",
+        "netcdf4",
+        "networkx",
+        "numpy >=2.0,<3.0",
+        "progressbar2",
+        "pyamg",
+        "pyevtk",
+        "pyproj",
+        "python-igraph >=0.10.0",
+        "scikit-image !=0.20.0",
+        "scipy",
+        "shapely >=2.0,<3.0",
+        "tqdm",
+        "xarray"
+      ]
+    },
+    "schema_version": 0,
+    "source": {
+      "sha256": "90732c5c46d69d148295af0f42005751dcd672c7cb126b7502a9be6aceaa409a",
+      "url": "https://github.com/MPAS-Dev/MPAS-Tools/archive/1.4.0.tar.gz"
+    },
+    "test": {
+      "commands": [
+        "pip check",
+        "test -f \"${PREFIX}/bin/ocean_smooth_topo_skip_land_ice\"",
+        "test -f \"${PREFIX}/bin/ocean_smooth_topo_before_init\"",
+        "test -f \"${PREFIX}/bin/ocean_smooth_topo_before_init_skip_land_ice\"",
+        "planar_hex --nx=10 --ny=20 --dc=1000. --outFileName='periodic_mesh_10x20_1km.nc'",
+        "translate_planar_grid -f 'periodic_mesh_10x20_1km.nc' -x 1000. -y 2000.",
+        "translate_planar_grid -f 'periodic_mesh_10x20_1km.nc' -c",
+        "planar_hex --nx=20 --ny=40 --dc=1000. --outFileName='periodic_mesh_20x40_1km.nc'",
+        "translate_planar_grid -f 'periodic_mesh_10x20_1km.nc' -d 'periodic_mesh_20x40_1km.nc'",
+        "MpasMeshConverter.x mesh_tools/mesh_conversion_tools/test/mesh.QU.1920km.151026.nc mesh.nc",
+        "sort_mesh --mesh-file mesh.nc --sort-file sorted_mesh.nc",
+        "MpasCellCuller.x mesh.nc culled_mesh.nc -m mesh_tools/mesh_conversion_tools/test/land_mask_final.nc",
+        "MpasMaskCreator.x mesh.nc arctic_mask.nc -f mesh_tools/mesh_conversion_tools/test/Arctic_Ocean.geojson",
+        "planar_hex --nx=30 --ny=20 --dc=1000. --npx --npy --outFileName='nonperiodic_mesh_30x20_1km.nc'",
+        "MpasCellCuller.x nonperiodic_mesh_30x20_1km.nc culled_nonperiodic_mesh_30x20_1km.nc",
+        "python -m pytest conda_package/tests",
+        "mark_horns_for_culling --help",
+        "set_lat_lon_fields_in_planar_grid --help",
+        "create_scrip_file_from_mpas_mesh --help",
+        "create_scrip_file_from_planar_rectangular_grid --help",
+        "prepare_seaice_partitions --help",
+        "create_seaice_partitions --help",
+        "fix_regrid_output.exe",
+        "create_landice_grid_from_generic_mpas_grid --help",
+        "define_landice_cull_mask --help",
+        "interpolate_to_mpasli_grid --help",
+        "mark_domain_boundaries_dirichlet --help",
+        "add_critical_land_blockages_to_mask --help",
+        "add_land_locked_cells_to_mask --help",
+        "widen_transect_edge_masks --help",
+        "moc_southern_boundary_extractor --help",
+        "ocean_add_depth --help",
+        "ocean_add_zmid --help",
+        "ocean_write_time_varying_zmid --help",
+        "paraview_vtk_field_extractor -f mesh_tools/mesh_conversion_tools/test/mesh.QU.1920km.151026.nc -v latCell,lonCell --ignore_time -o vtk_test",
+        "mpas_to_xdmf -m mesh_tools/mesh_conversion_tools/test/mesh.QU.1920km.151026.nc -v latCell lonCell -o xdmf_test",
+        "split_grids --help",
+        "merge_grids --help",
+        "inject_bathymetry mesh_tools/mesh_conversion_tools/test/mesh.QU.1920km.151026.nc",
+        "inject_preserve_floodplain --help",
+        "mpas_to_triangle --help",
+        "triangle_to_netcdf --help",
+        "jigsaw_to_netcdf --help",
+        "build_jigsaw --clone",
+        "scrip_from_mpas --help",
+        "compute_mpas_region_masks --help",
+        "compute_mpas_transect_masks --help",
+        "compute_mpas_flood_fill_mask --help",
+        "compute_lon_lat_region_masks --help",
+        "compute_projection_region_masks --help"
+      ],
+      "imports": [
+        "mpas_tools",
+        "mpas_tools.mesh.conversion",
+        "mpas_tools.mesh.creation",
+        "mpas_tools.viz",
+        "mpas_tools.conversion"
+      ],
+      "requires": [
+        "git",
+        "pytest",
+        "requests",
+        "pip"
+      ],
+      "source_files": [
+        "mesh_tools/mesh_conversion_tools/test/Arctic_Ocean.geojson",
+        "mesh_tools/mesh_conversion_tools/test/mesh.QU.1920km.151026.nc",
+        "mesh_tools/mesh_conversion_tools/test/land_mask_final.nc",
+        "conda_package/tests/*"
+      ]
+    }
+  },
+  "osx_arm64_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "cmake",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "make",
+        "pkgconfig"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "hdf5",
+        "libnetcdf",
+        "llvm-openmp",
+        "netcdf-fortran",
+        "netcdf4",
+        "pip",
+        "python",
+        "setuptools"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "cartopy",
+        "cmocean",
+        "dask",
+        "geometric_features",
+        "h5py",
+        "inpoly",
+        "matplotlib-base",
+        "nco",
+        "netcdf4",
+        "networkx",
+        "numpy",
+        "progressbar2",
+        "pyamg",
+        "pyevtk",
+        "pyproj",
+        "python",
+        "python-igraph",
+        "scikit-image",
+        "scipy",
+        "shapely",
+        "tqdm",
+        "xarray"
+      ]
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "git",
+        "pip",
+        "pytest",
+        "requests"
+      ]
+    }
+  },
+  "outputs_names": {
+    "__set__": true,
+    "elements": [
+      "mpas_tools"
+    ]
+  },
+  "parsing_error": false,
+  "platforms": [
+    "linux_64",
+    "linux_aarch64",
+    "linux_ppc64le",
+    "osx_64",
+    "osx_arm64"
+  ],
+  "pr_info": {
+    "__lazy_json__": "pr_info/mpas_tools.json"
+  },
+  "raw_meta_yaml": "{% set name = \"mpas_tools\" %}\n{% set version = \"1.4.0\" %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://github.com/MPAS-Dev/MPAS-Tools/archive/{{ version }}.tar.gz\n  sha256: 90732c5c46d69d148295af0f42005751dcd672c7cb126b7502a9be6aceaa409a\n\nbuild:\n  number: 0\n  skip: true  # [win]\n\nrequirements:\n  build:\n    - python                                 # [build_platform != target_platform]\n    - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n    - {{ compiler('cxx') }}\n    - {{ compiler('fortran') }}\n    - {{ stdlib('c') }}\n    - cmake\n    - make\n    - pkgconfig\n  host:\n    - python\n    - hdf5\n    - hdf5 * nompi_*\n    - libnetcdf\n    - libnetcdf * nompi_*\n    - netcdf-fortran\n    - netcdf-fortran * nompi_*\n    - setuptools\n    - pip\n    - netcdf4\n    - llvm-openmp  # [osx]\n  run:\n    - python\n    - cartopy\n    - cmocean\n    - dask\n    - geometric_features >=1.0.1,<2.0.0\n    - h5py\n    - inpoly\n    - matplotlib-base >=3.9.0\n    - nco\n    - netcdf4\n    - networkx\n    - numpy >=2.0,<3.0\n    - progressbar2\n    - pyamg\n    - pyevtk\n    - pyproj\n    # older python-igraph is giving me build troubles\n    - python-igraph >=0.10.0\n    - scikit-image !=0.20.0\n    - scipy\n    - shapely >=2.0,<3.0\n    - tqdm\n    - xarray\n\ntest:\n  requires:\n    - git\n    - pytest\n    - requests\n    - pip\n  source_files:\n    - mesh_tools/mesh_conversion_tools/test/Arctic_Ocean.geojson\n    - mesh_tools/mesh_conversion_tools/test/mesh.QU.1920km.151026.nc\n    - mesh_tools/mesh_conversion_tools/test/land_mask_final.nc\n    - conda_package/tests/*\n  imports:\n    - mpas_tools\n    - mpas_tools.mesh.conversion\n    - mpas_tools.mesh.creation\n    - mpas_tools.viz\n    - mpas_tools.conversion\n  commands:\n    - pip check\n    - test -f \"${PREFIX}/bin/ocean_smooth_topo_skip_land_ice\"\n    - test -f \"${PREFIX}/bin/ocean_smooth_topo_before_init\"\n    - test -f \"${PREFIX}/bin/ocean_smooth_topo_before_init_skip_land_ice\"\n    {% if build_platform == target_platform %}\n    - planar_hex --nx=10 --ny=20 --dc=1000. --outFileName='periodic_mesh_10x20_1km.nc'\n    - translate_planar_grid -f 'periodic_mesh_10x20_1km.nc' -x 1000. -y 2000.\n    - translate_planar_grid -f 'periodic_mesh_10x20_1km.nc' -c\n    - planar_hex --nx=20 --ny=40 --dc=1000. --outFileName='periodic_mesh_20x40_1km.nc'\n    - translate_planar_grid -f 'periodic_mesh_10x20_1km.nc' -d 'periodic_mesh_20x40_1km.nc'\n    - MpasMeshConverter.x mesh_tools/mesh_conversion_tools/test/mesh.QU.1920km.151026.nc mesh.nc\n    - sort_mesh --mesh-file mesh.nc --sort-file sorted_mesh.nc\n    - MpasCellCuller.x mesh.nc culled_mesh.nc -m mesh_tools/mesh_conversion_tools/test/land_mask_final.nc\n    - MpasMaskCreator.x mesh.nc arctic_mask.nc -f mesh_tools/mesh_conversion_tools/test/Arctic_Ocean.geojson\n    - planar_hex --nx=30 --ny=20 --dc=1000. --npx --npy --outFileName='nonperiodic_mesh_30x20_1km.nc'\n    - MpasCellCuller.x nonperiodic_mesh_30x20_1km.nc culled_nonperiodic_mesh_30x20_1km.nc\n    - python -m pytest conda_package/tests\n    - mark_horns_for_culling --help\n    - set_lat_lon_fields_in_planar_grid --help\n    - create_scrip_file_from_mpas_mesh --help\n    - create_scrip_file_from_planar_rectangular_grid --help\n    - prepare_seaice_partitions --help\n    - create_seaice_partitions --help\n    - fix_regrid_output.exe\n    - create_landice_grid_from_generic_mpas_grid --help\n    - define_landice_cull_mask --help\n    - interpolate_to_mpasli_grid --help\n    - mark_domain_boundaries_dirichlet --help\n    - add_critical_land_blockages_to_mask --help\n    - add_land_locked_cells_to_mask --help\n    - widen_transect_edge_masks --help\n    - moc_southern_boundary_extractor --help\n    - ocean_add_depth --help\n    - ocean_add_zmid --help\n    - ocean_write_time_varying_zmid --help\n    - paraview_vtk_field_extractor -f mesh_tools/mesh_conversion_tools/test/mesh.QU.1920km.151026.nc -v latCell,lonCell --ignore_time -o vtk_test\n    - mpas_to_xdmf -m mesh_tools/mesh_conversion_tools/test/mesh.QU.1920km.151026.nc -v latCell lonCell -o xdmf_test\n    - split_grids --help\n    - merge_grids --help\n    - inject_bathymetry mesh_tools/mesh_conversion_tools/test/mesh.QU.1920km.151026.nc\n    - inject_preserve_floodplain --help\n    - mpas_to_triangle --help\n    - triangle_to_netcdf --help\n    - jigsaw_to_netcdf --help\n    - build_jigsaw --clone\n    - scrip_from_mpas --help\n    - compute_mpas_region_masks --help\n    - compute_mpas_transect_masks --help\n    - compute_mpas_flood_fill_mask --help\n    - compute_lon_lat_region_masks --help\n    - compute_projection_region_masks --help\n    {% endif %}\n\nabout:\n  home: https://github.com/MPAS-Dev/MPAS-Tools/\n  license: BSD-3-Clause\n  license_family: BSD\n  license_file: LICENSE\n  summary: Mesh tools for Model for Prediction Across Scales (MPAS)\n  description: |\n    A set of tools for creating and manipulating meshes for the climate\n    components based on the Model for Prediction Across Scales (MPAS) framework\n  doc_url: https://github.com/MPAS-Dev/MPAS-Tools/README.md\n  dev_url: https://github.com/MPAS-Dev/MPAS-Tools/\n\nextra:\n  recipe-maintainers:\n    - andrewdnolan\n    - xylar\n    - jhkennedy\n",
+  "req": {
+    "__set__": true,
+    "elements": [
+      "c_stdlib_stub",
+      "cartopy",
+      "cmake",
+      "cmocean",
+      "cxx_compiler_stub",
+      "dask",
+      "fortran_compiler_stub",
+      "geometric_features",
+      "h5py",
+      "hdf5",
+      "inpoly",
+      "libnetcdf",
+      "llvm-openmp",
+      "make",
+      "matplotlib-base",
+      "nco",
+      "netcdf-fortran",
+      "netcdf4",
+      "networkx",
+      "numpy",
+      "pip",
+      "pkgconfig",
+      "progressbar2",
+      "pyamg",
+      "pyevtk",
+      "pyproj",
+      "python",
+      "python-igraph",
+      "scikit-image",
+      "scipy",
+      "setuptools",
+      "shapely",
+      "tqdm",
+      "xarray"
+    ]
+  },
+  "requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "cmake",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "make",
+        "pkgconfig"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "hdf5",
+        "libnetcdf",
+        "llvm-openmp",
+        "netcdf-fortran",
+        "netcdf4",
+        "openmp",
+        "pip",
+        "python",
+        "setuptools"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "cartopy",
+        "cmocean",
+        "cxx_compiler_stub",
+        "dask",
+        "fortran_compiler_stub",
+        "geometric_features",
+        "h5py",
+        "inpoly",
+        "matplotlib-base",
+        "nco",
+        "netcdf4",
+        "networkx",
+        "numpy",
+        "openmp",
+        "progressbar2",
+        "pyamg",
+        "pyevtk",
+        "pyproj",
+        "python",
+        "python-igraph",
+        "scikit-image",
+        "scipy",
+        "shapely",
+        "tqdm",
+        "xarray"
+      ]
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "git",
+        "pip",
+        "pytest",
+        "requests"
+      ]
+    }
+  },
+  "strong_exports": false,
+  "total_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "cmake",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "make",
+        "pkgconfig"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "hdf5",
+        "hdf5 * nompi_*",
+        "libnetcdf",
+        "libnetcdf * nompi_*",
+        "llvm-openmp",
+        "netcdf-fortran",
+        "netcdf-fortran * nompi_*",
+        "netcdf4",
+        "pip",
+        "python",
+        "setuptools"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "cartopy",
+        "cmocean",
+        "dask",
+        "geometric_features >=1.0.1,<2.0.0",
+        "h5py",
+        "inpoly",
+        "matplotlib-base >=3.9.0",
+        "nco",
+        "netcdf4",
+        "networkx",
+        "numpy >=2.0,<3.0",
+        "progressbar2",
+        "pyamg",
+        "pyevtk",
+        "pyproj",
+        "python",
+        "python-igraph >=0.10.0",
+        "scikit-image !=0.20.0",
+        "scipy",
+        "shapely >=2.0,<3.0",
+        "tqdm",
+        "xarray"
+      ]
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "git",
+        "pip",
+        "pytest",
+        "requests"
+      ]
+    }
+  },
+  "url": "https://github.com/MPAS-Dev/MPAS-Tools/archive/1.4.0.tar.gz",
+  "version": "1.4.0",
+  "version_pr_info": {
+    "__lazy_json__": "version_pr_info/mpas_tools.json"
+  }
+}

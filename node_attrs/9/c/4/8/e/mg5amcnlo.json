@@ -1,0 +1,3884 @@
+{
+  "archived": false,
+  "branch": "main",
+  "ci_support_linux_64_python3.10.____cpython.yaml": "c_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ncxx_compiler:\n- gxx\ncxx_compiler_version:\n- '14'\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\nfortran_compiler:\n- gfortran\nfortran_compiler_version:\n- '14'\npin_run_as_build:\n  python:\n    min_pin: x.x\n    max_pin: x.x\npython:\n- 3.10.* *_cpython\ntarget_platform:\n- linux-64\nzip_keys:\n- - cxx_compiler_version\n  - fortran_compiler_version\n",
+  "conda-forge.yml": {
+    "build_platform": {
+      "linux_aarch64": "linux_64",
+      "linux_ppc64le": "linux_64",
+      "osx_arm64": "osx_64"
+    },
+    "conda_build": {
+      "error_overlinking": true
+    },
+    "conda_build_tool": "rattler-build",
+    "conda_forge_output_validation": true,
+    "conda_install_tool": "pixi",
+    "github": {
+      "branch_name": "main",
+      "tooling_branch_name": "main"
+    },
+    "provider": {
+      "linux_aarch64": "default",
+      "linux_ppc64le": "default"
+    },
+    "shellcheck": {
+      "enabled": true
+    },
+    "test": "native_and_emulated"
+  },
+  "feedstock_hash": "fafaead4c1754a5b05f51f515ccab6c15c6ed65a",
+  "feedstock_hash_ts": 1759217746,
+  "feedstock_name": "mg5amcnlo",
+  "hash_type": "sha256",
+  "linux_64_meta_yaml": {
+    "about": {
+      "description": "MadGraph5_aMC@NLO is a framework that aims at providing all the elements\nnecessary for SM and BSM phenomenology, such as the computations of cross\nsections, the generation of hard events and their matching with event\ngenerators, and the use of a variety of tools relevant to event manipulation\nand analysis.\nProcesses can be simulated to LO accuracy for any user-defined Lagrangian,\nand the NLO accuracy in the case of models that support this kind of calculations\n&mdash; prominent among these are QCD and EW corrections to SM processes.\nMatrix elements at the tree- and one-loop-level can also be obtained.\n\nMadGraph5_aMC@NLO is the new version of both MadGraph5 and aMC@NLO that unifies\nthe LO and NLO lines of development of automated tools within the MadGraph family.\nAs such, the code allows one to simulate processes in virtually all configurations\nof interest, in particular for hadronic and e+e- colliders; starting from version\n3.2.0, the latter include Initial State Radiation and beamstrahlung effects.",
+      "dev_url": "https://github.com/mg5amcnlo/mg5amcnlo",
+      "home": "https://github.com/mg5amcnlo/mg5amcnlo",
+      "license": "LicenseRef-NCSA",
+      "license_family": "LicenseRef-NCSA",
+      "license_file": "source/LICENSE",
+      "summary": "MadGraph5_aMC@NLO"
+    },
+    "build": {
+      "number": "6",
+      "script": [
+        "rm -r source/.github",
+        "rm -r source/tests",
+        "rm source/.bzrignore",
+        "rm source/.gitignore",
+        "rm source/code-notes",
+        "rm source/README",
+        "rm source/UpdateNotes.txt",
+        "rm source/vendor/DiscreteSampler/check",
+        "find source -type f -exec grep -Il '#!/usr/bin/perl -w' {} + | xargs sed -i 's|#!/usr/bin/perl -w|#!/usr/bin/env perl\\nuse warnings;|g'",
+        "cp -a source $PREFIX/MG5_aMC",
+        "cd $PREFIX/MG5_aMC/vendor/CutTools",
+        "echo -e \"\\n# Compiling CutTools\"",
+        "make FC=$FC FFLAGS=\"-fPIC -fno-automatic -O2 -funroll-all-loops $FFLAGS\"",
+        "find . -name \"*.o\" -exec rm {} +",
+        "cd -",
+        "rm -rf $PREFIX/MG5_aMC/vendor/IREGI",
+        "mkdir -p $PREFIX/MG5_aMC/vendor/IREGI/src",
+        "ln -s $PREFIX/lib/libiregi.a $PREFIX/MG5_aMC/vendor/IREGI/src/",
+        "for file in $PREFIX/include/iregi/*; do ln -s \"$file\" $PREFIX/MG5_aMC/vendor/IREGI/src/; done",
+        "mkdir -p $PREFIX/MG5_aMC/vendor/IREGI/src/qcdloop/ff",
+        "ln -s $PREFIX/lib/libff.a $PREFIX/MG5_aMC/vendor/IREGI/src/qcdloop/ff/",
+        "mkdir -p $PREFIX/MG5_aMC/vendor/IREGI/src/qcdloop/ql",
+        "ln -s $PREFIX/lib/libqcdloop.a $PREFIX/MG5_aMC/vendor/IREGI/src/qcdloop/ql/",
+        "cd $PREFIX/MG5_aMC/vendor/StdHEP",
+        "sed -i \"s|FFLAGS += -std=legacy|FFLAGS += -std=legacy -ffixed-line-length-none $FFLAGS|g\" makefile",
+        "sed -i \"s|CFLAGS += -Wno-implicit-function-declaration|CFLAGS += -Wno-implicit-function-declaration $CFLAGS|g\" makefile",
+        "echo -e \"\\n# Compiling StdHEP\"",
+        "make all FC=$FC F77=$FC CC=$CC --jobs=$CPU_COUNT",
+        "make clean",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/lib",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/include",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/oneloop",
+        "echo -e \"\\n# Symlinking OneLOop\"",
+        "ln -s $PREFIX/lib/libavh_olo.a $PREFIX/MG5_aMC/HEPTools/oneloop/",
+        "ln -s $PREFIX/lib/libavh_olo.a $PREFIX/MG5_aMC/HEPTools/lib/",
+        "for file in $PREFIX/include/oneloop/*; do ln -s \"$file\" $PREFIX/MG5_aMC/HEPTools/oneloop/; ln -s \"$file\" $PREFIX/MG5_aMC/HEPTools/include/; done",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/bin",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/ninja/lib",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/ninja/include",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/ninja/bin",
+        "echo -e \"\\n# Symlinking Ninja\"",
+        "ln -s $PREFIX/lib/libninja.a $PREFIX/MG5_aMC/HEPTools/ninja/lib/",
+        "ln -s $PREFIX/lib/libninja.a $PREFIX/MG5_aMC/HEPTools/lib/",
+        "ln -s $PREFIX/include/mninja.mod $PREFIX/MG5_aMC/HEPTools/ninja/include/",
+        "ln -s $PREFIX/include/ninjago_module.mod $PREFIX/MG5_aMC/HEPTools/ninja/include/",
+        "ln -s $PREFIX/include/ninjavholo.mod $PREFIX/MG5_aMC/HEPTools/ninja/include/",
+        "ln -s $PREFIX/include/ninja $PREFIX/MG5_aMC/HEPTools/ninja/include/ninja",
+        "ln -s $PREFIX/include/quadninja $PREFIX/MG5_aMC/HEPTools/ninja/include/quadninja",
+        "for file in $PREFIX/MG5_aMC/HEPTools/ninja/include/*.mod; do ln -s \"$file\" $PREFIX/MG5_aMC/HEPTools/include/; done",
+        "ln -s $PREFIX/MG5_aMC/HEPTools/ninja/include/ninja $PREFIX/MG5_aMC/HEPTools/include/ninja",
+        "ln -s $PREFIX/MG5_aMC/HEPTools/ninja/include/quadninja $PREFIX/MG5_aMC/HEPTools/include/quadninja",
+        "ln -s $PREFIX/bin/ninja-config $PREFIX/MG5_aMC/HEPTools/ninja/bin/",
+        "ln -s $PREFIX/bin/ninja-config $PREFIX/MG5_aMC/HEPTools/bin/",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/collier/include",
+        "echo -e \"\\n# Symlinking Collier\"",
+        "ln -s $PREFIX/lib/libcollier.a $PREFIX/MG5_aMC/HEPTools/collier/",
+        "ln -s $PREFIX/lib/libcollier.a $PREFIX/MG5_aMC/HEPTools/lib/",
+        "ln -s $PREFIX/include/collier.mod $PREFIX/MG5_aMC/HEPTools/collier/include/",
+        "ln -s $PREFIX/include/collier.mod $PREFIX/MG5_aMC/HEPTools/include/",
+        "echo -e \"\\n# Configuring $PREFIX/MG5_aMC/input/mg5_configuration.txt\"",
+        "cp $RECIPE_DIR/mg5_configuration.txt .",
+        "sed -i \"s|REPLACE_WITH_PREFIX|$PREFIX|g\" mg5_configuration.txt",
+        "sed -i \"s|REPLACE_WITH_BASENAME_FC|$(basename ${FC_FOR_BUILD//$BUILD/$HOST})|g\" mg5_configuration.txt",
+        "sed -i \"s|REPLACE_WITH_BASENAME_CXX|$(basename ${CXX_FOR_BUILD//$BUILD/$HOST})|g\" mg5_configuration.txt",
+        "sed -i \"s|# automatic_html_opening = True|automatic_html_opening = False|g\" mg5_configuration.txt",
+        "sed -i '/ninja =/s/^# //g' mg5_configuration.txt",
+        "mv mg5_configuration.txt $PREFIX/MG5_aMC/input/mg5_configuration.txt",
+        "mkdir -p $PREFIX/bin",
+        "ln -s $PREFIX/MG5_aMC/bin/mg5_aMC $PREFIX/bin/mg5_aMC",
+        "mkdir -p $PREFIX/share/mg5_aMC",
+        "ln -s $PREFIX/MG5_aMC/proc_card.dat $PREFIX/share/mg5_aMC/proc_card.dat",
+        "mkdir -p $PREFIX/etc/conda/activate.d",
+        "cp \"${RECIPE_DIR}/activate.sh\" \"${PREFIX}/etc/conda/activate.d/zzz-${PKG_NAME}-activate.sh\"",
+        "cp \"${RECIPE_DIR}/activate.csh\" \"${PREFIX}/etc/conda/activate.d/zzz-${PKG_NAME}-activate.csh\"",
+        "cp \"${RECIPE_DIR}/activate.fish\" \"${PREFIX}/etc/conda/activate.d/zzz-${PKG_NAME}-activate.fish\"",
+        "mkdir -p $PREFIX/etc/conda/deactivate.d",
+        "cp \"${RECIPE_DIR}/deactivate.sh\" \"${PREFIX}/etc/conda/deactivate.d/zzz-${PKG_NAME}-deactivate.sh\"",
+        "cp \"${RECIPE_DIR}/deactivate.csh\" \"${PREFIX}/etc/conda/deactivate.d/zzz-${PKG_NAME}-deactivate.csh\"",
+        "cp \"${RECIPE_DIR}/deactivate.fish\" \"${PREFIX}/etc/conda/deactivate.d/zzz-${PKG_NAME}-deactivate.fish\"",
+        "ls -lhtra $PREFIX/etc/conda/activate.d/",
+        "ls -lhtra $PREFIX/etc/conda/deactivate.d/",
+        "echo \"exit\" | mg5_aMC"
+      ]
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "matthewfeickert"
+      ]
+    },
+    "outputs": [
+      {
+        "build": null,
+        "name": "mg5amcnlo",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "fortran_compiler_stub",
+            "make",
+            "sed",
+            "grep"
+          ],
+          "host": [
+            "python",
+            "six",
+            "ply",
+            "fastjet-cxx",
+            "emela",
+            "lhapdf",
+            "oneloop-static",
+            "iregi-static 1.1.0.*",
+            "qcdloop-fortran-static",
+            "ninja-hep-ph-static 1.1.*",
+            "collier-static",
+            "hepmc2",
+            "hepmc3"
+          ],
+          "run": [
+            "cxx-compiler",
+            "fortran-compiler",
+            "make",
+            "tar",
+            "wget",
+            "curl",
+            "perl",
+            "python",
+            "six",
+            "numpy",
+            "fastjet-contrib",
+            "emela",
+            "lhapdf",
+            "ply",
+            "bc",
+            "procps-ng",
+            "oneloop-static",
+            "iregi-static 1.1.0.*",
+            "qcdloop-fortran-static",
+            "libtirpc",
+            "ninja-hep-ph-static 1.1.*",
+            "collier-static",
+            "mg5amcnlo-pythia8-interface",
+            "hepmc2",
+            "hepmc3",
+            "ghostscript",
+            "gnuplot"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "bin": [
+                "mg5_aMC"
+              ],
+              "files": [
+                "MG5_aMC/aloha/*",
+                "MG5_aMC/bin/*",
+                "MG5_aMC/HELAS/*",
+                "MG5_aMC/input/*",
+                "MG5_aMC/madgraph/*",
+                "MG5_aMC/MadSpin/*",
+                "MG5_aMC/mg5decay/*",
+                "MG5_aMC/models/*",
+                "MG5_aMC/PLUGIN/*",
+                "MG5_aMC/Template/*",
+                "MG5_aMC/vendor/*",
+                "MG5_aMC/proc_card.dat",
+                "MG5_aMC/VERSION",
+                "MG5_aMC/input/mg5_configuration.txt",
+                "MG5_aMC/madgraph/LICENSE",
+                "MG5_aMC/vendor/CutTools/includects/libcts.a",
+                "MG5_aMC/vendor/IREGI/src/libiregi.a",
+                "MG5_aMC/vendor/IREGI/src/qcdloop/ff/libff.a",
+                "MG5_aMC/vendor/IREGI/src/qcdloop/ql/libqcdloop.a",
+                "MG5_aMC/vendor/StdHEP/lib/libstdhep.a",
+                "MG5_aMC/vendor/StdHEP/lib/libstdhepC.a",
+                "MG5_aMC/vendor/StdHEP/lib/libFmcfio.a"
+              ]
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "tutorial.mg5",
+                "tutorial_amc-at-nlo.mg5"
+              ]
+            },
+            "script": [
+              "echo -e \"\\n# Checking mg5_configuration.txt\"",
+              "cat $PREFIX/MG5_aMC/input/mg5_configuration.txt",
+              "mg5_aMC --help",
+              "echo \"exit\" | mg5_aMC",
+              "lhapdf install NNPDF23_lo_as_0130_qed &> download_log.txt",
+              "echo -e \"\\n# Running tutorial.mg5\"",
+              "mg5_aMC ./tutorial.mg5",
+              "ls -lhtra",
+              "test ! -f ME5_debug",
+              "lhapdf install NNPDF23_nlo_as_0119_qed &> download_log.txt",
+              "echo -e \"\\n# Running tutorial_amc-at-nlo.mg5\"",
+              "mg5_aMC ./tutorial_amc-at-nlo.mg5"
+            ]
+          }
+        ],
+        "version": "3.5.7"
+      },
+      {
+        "build": null,
+        "name": "mg5amcnlo",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "fortran_compiler_stub",
+            "make",
+            "sed",
+            "grep"
+          ],
+          "host": [
+            "python",
+            "six",
+            "ply",
+            "fastjet-cxx",
+            "emela",
+            "lhapdf",
+            "oneloop-static",
+            "iregi-static 1.1.0.*",
+            "qcdloop-fortran-static",
+            "ninja-hep-ph-static 1.1.*",
+            "collier-static",
+            "hepmc2",
+            "hepmc3"
+          ],
+          "run": [
+            "cxx-compiler",
+            "fortran-compiler",
+            "make",
+            "tar",
+            "wget",
+            "curl",
+            "perl",
+            "python",
+            "six",
+            "numpy",
+            "fastjet-contrib",
+            "emela",
+            "lhapdf",
+            "ply",
+            "bc",
+            "procps-ng",
+            "oneloop-static",
+            "iregi-static 1.1.0.*",
+            "qcdloop-fortran-static",
+            "libtirpc",
+            "ninja-hep-ph-static 1.1.*",
+            "collier-static",
+            "mg5amcnlo-pythia8-interface",
+            "hepmc2",
+            "hepmc3",
+            "ghostscript",
+            "gnuplot"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "bin": [
+                "mg5_aMC"
+              ],
+              "files": [
+                "MG5_aMC/aloha/*",
+                "MG5_aMC/bin/*",
+                "MG5_aMC/HELAS/*",
+                "MG5_aMC/input/*",
+                "MG5_aMC/madgraph/*",
+                "MG5_aMC/MadSpin/*",
+                "MG5_aMC/mg5decay/*",
+                "MG5_aMC/models/*",
+                "MG5_aMC/PLUGIN/*",
+                "MG5_aMC/Template/*",
+                "MG5_aMC/vendor/*",
+                "MG5_aMC/proc_card.dat",
+                "MG5_aMC/VERSION",
+                "MG5_aMC/input/mg5_configuration.txt",
+                "MG5_aMC/madgraph/LICENSE",
+                "MG5_aMC/vendor/CutTools/includects/libcts.a",
+                "MG5_aMC/vendor/IREGI/src/libiregi.a",
+                "MG5_aMC/vendor/IREGI/src/qcdloop/ff/libff.a",
+                "MG5_aMC/vendor/IREGI/src/qcdloop/ql/libqcdloop.a",
+                "MG5_aMC/vendor/StdHEP/lib/libstdhep.a",
+                "MG5_aMC/vendor/StdHEP/lib/libstdhepC.a",
+                "MG5_aMC/vendor/StdHEP/lib/libFmcfio.a"
+              ]
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "tutorial.mg5",
+                "tutorial_amc-at-nlo.mg5"
+              ]
+            },
+            "script": [
+              "echo -e \"\\n# Checking mg5_configuration.txt\"",
+              "cat $PREFIX/MG5_aMC/input/mg5_configuration.txt",
+              "mg5_aMC --help",
+              "echo \"exit\" | mg5_aMC",
+              "lhapdf install NNPDF23_lo_as_0130_qed &> download_log.txt",
+              "echo -e \"\\n# Running tutorial.mg5\"",
+              "mg5_aMC ./tutorial.mg5",
+              "ls -lhtra",
+              "test ! -f ME5_debug",
+              "lhapdf install NNPDF23_nlo_as_0119_qed &> download_log.txt",
+              "echo -e \"\\n# Running tutorial_amc-at-nlo.mg5\"",
+              "mg5_aMC ./tutorial_amc-at-nlo.mg5"
+            ]
+          }
+        ],
+        "version": "3.5.7"
+      }
+    ],
+    "package": {
+      "name": "mg5amcnlo",
+      "version": "3.5.7"
+    },
+    "requirements": {
+      "build": [
+        "c_stdlib_stub",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "make",
+        "sed",
+        "grep"
+      ],
+      "host": [
+        "python",
+        "six",
+        "ply",
+        "fastjet-cxx",
+        "emela",
+        "lhapdf",
+        "oneloop-static",
+        "iregi-static 1.1.0.*",
+        "qcdloop-fortran-static",
+        "ninja-hep-ph-static 1.1.*",
+        "collier-static",
+        "hepmc2",
+        "hepmc3"
+      ],
+      "run": [
+        "cxx-compiler",
+        "fortran-compiler",
+        "make",
+        "tar",
+        "wget",
+        "curl",
+        "perl",
+        "python",
+        "six",
+        "numpy",
+        "fastjet-contrib",
+        "emela",
+        "lhapdf",
+        "ply",
+        "bc",
+        "procps-ng",
+        "oneloop-static",
+        "iregi-static 1.1.0.*",
+        "qcdloop-fortran-static",
+        "libtirpc",
+        "ninja-hep-ph-static 1.1.*",
+        "collier-static",
+        "mg5amcnlo-pythia8-interface",
+        "hepmc2",
+        "hepmc3",
+        "ghostscript",
+        "gnuplot"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "patches": [
+        "remove-cuttools-compiler-requirement.patch",
+        "add-libtirpc-to-nlo-extralibs-for-xdr.patch"
+      ],
+      "sha256": "ca3e027f078438318bd4143a102aebc2d51358f537b5d52bbc574fe49a6a901e",
+      "url": "https://github.com/hep-packaging-coordination/mg5amcnlo-release-mirror/releases/download/3.5.7/MG5_aMC_v3.5.7.tar.gz"
+    }
+  },
+  "linux_64_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "grep",
+        "make",
+        "sed"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "collier-static",
+        "emela",
+        "fastjet-cxx",
+        "hepmc2",
+        "hepmc3",
+        "iregi-static",
+        "lhapdf",
+        "ninja-hep-ph-static",
+        "oneloop-static",
+        "ply",
+        "python",
+        "qcdloop-fortran-static",
+        "six"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "bc",
+        "collier-static",
+        "curl",
+        "cxx-compiler",
+        "emela",
+        "fastjet-contrib",
+        "fortran-compiler",
+        "ghostscript",
+        "gnuplot",
+        "hepmc2",
+        "hepmc3",
+        "iregi-static",
+        "lhapdf",
+        "libtirpc",
+        "make",
+        "mg5amcnlo-pythia8-interface",
+        "ninja-hep-ph-static",
+        "numpy",
+        "oneloop-static",
+        "perl",
+        "ply",
+        "procps-ng",
+        "python",
+        "qcdloop-fortran-static",
+        "six",
+        "tar",
+        "wget"
+      ]
+    },
+    "test": {
+      "__set__": true,
+      "elements": []
+    }
+  },
+  "linux_aarch64_meta_yaml": {
+    "about": {
+      "description": "MadGraph5_aMC@NLO is a framework that aims at providing all the elements\nnecessary for SM and BSM phenomenology, such as the computations of cross\nsections, the generation of hard events and their matching with event\ngenerators, and the use of a variety of tools relevant to event manipulation\nand analysis.\nProcesses can be simulated to LO accuracy for any user-defined Lagrangian,\nand the NLO accuracy in the case of models that support this kind of calculations\n&mdash; prominent among these are QCD and EW corrections to SM processes.\nMatrix elements at the tree- and one-loop-level can also be obtained.\n\nMadGraph5_aMC@NLO is the new version of both MadGraph5 and aMC@NLO that unifies\nthe LO and NLO lines of development of automated tools within the MadGraph family.\nAs such, the code allows one to simulate processes in virtually all configurations\nof interest, in particular for hadronic and e+e- colliders; starting from version\n3.2.0, the latter include Initial State Radiation and beamstrahlung effects.",
+      "dev_url": "https://github.com/mg5amcnlo/mg5amcnlo",
+      "home": "https://github.com/mg5amcnlo/mg5amcnlo",
+      "license": "LicenseRef-NCSA",
+      "license_family": "LicenseRef-NCSA",
+      "license_file": "source/LICENSE",
+      "summary": "MadGraph5_aMC@NLO"
+    },
+    "build": {
+      "number": "6",
+      "script": [
+        "rm -r source/.github",
+        "rm -r source/tests",
+        "rm source/.bzrignore",
+        "rm source/.gitignore",
+        "rm source/code-notes",
+        "rm source/README",
+        "rm source/UpdateNotes.txt",
+        "rm source/vendor/DiscreteSampler/check",
+        "find source -type f -exec grep -Il '#!/usr/bin/perl -w' {} + | xargs sed -i 's|#!/usr/bin/perl -w|#!/usr/bin/env perl\\nuse warnings;|g'",
+        "cp -a source $PREFIX/MG5_aMC",
+        "cd $PREFIX/MG5_aMC/vendor/CutTools",
+        "echo -e \"\\n# Compiling CutTools\"",
+        "make FC=$FC FFLAGS=\"-fPIC -fno-automatic -O2 -funroll-all-loops $FFLAGS\"",
+        "find . -name \"*.o\" -exec rm {} +",
+        "cd -",
+        "rm -rf $PREFIX/MG5_aMC/vendor/IREGI",
+        "mkdir -p $PREFIX/MG5_aMC/vendor/IREGI/src",
+        "ln -s $PREFIX/lib/libiregi.a $PREFIX/MG5_aMC/vendor/IREGI/src/",
+        "for file in $PREFIX/include/iregi/*; do ln -s \"$file\" $PREFIX/MG5_aMC/vendor/IREGI/src/; done",
+        "mkdir -p $PREFIX/MG5_aMC/vendor/IREGI/src/qcdloop/ff",
+        "ln -s $PREFIX/lib/libff.a $PREFIX/MG5_aMC/vendor/IREGI/src/qcdloop/ff/",
+        "mkdir -p $PREFIX/MG5_aMC/vendor/IREGI/src/qcdloop/ql",
+        "ln -s $PREFIX/lib/libqcdloop.a $PREFIX/MG5_aMC/vendor/IREGI/src/qcdloop/ql/",
+        "cd $PREFIX/MG5_aMC/vendor/StdHEP",
+        "sed -i \"s|FFLAGS += -std=legacy|FFLAGS += -std=legacy -ffixed-line-length-none $FFLAGS|g\" makefile",
+        "sed -i \"s|CFLAGS += -Wno-implicit-function-declaration|CFLAGS += -Wno-implicit-function-declaration $CFLAGS|g\" makefile",
+        "echo -e \"\\n# Compiling StdHEP\"",
+        "make all FC=$FC F77=$FC CC=$CC --jobs=$CPU_COUNT",
+        "make clean",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/lib",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/include",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/oneloop",
+        "echo -e \"\\n# Symlinking OneLOop\"",
+        "ln -s $PREFIX/lib/libavh_olo.a $PREFIX/MG5_aMC/HEPTools/oneloop/",
+        "ln -s $PREFIX/lib/libavh_olo.a $PREFIX/MG5_aMC/HEPTools/lib/",
+        "for file in $PREFIX/include/oneloop/*; do ln -s \"$file\" $PREFIX/MG5_aMC/HEPTools/oneloop/; ln -s \"$file\" $PREFIX/MG5_aMC/HEPTools/include/; done",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/bin",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/ninja/lib",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/ninja/include",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/ninja/bin",
+        "echo -e \"\\n# Symlinking Ninja\"",
+        "ln -s $PREFIX/lib/libninja.a $PREFIX/MG5_aMC/HEPTools/ninja/lib/",
+        "ln -s $PREFIX/lib/libninja.a $PREFIX/MG5_aMC/HEPTools/lib/",
+        "ln -s $PREFIX/include/mninja.mod $PREFIX/MG5_aMC/HEPTools/ninja/include/",
+        "ln -s $PREFIX/include/ninjago_module.mod $PREFIX/MG5_aMC/HEPTools/ninja/include/",
+        "ln -s $PREFIX/include/ninjavholo.mod $PREFIX/MG5_aMC/HEPTools/ninja/include/",
+        "ln -s $PREFIX/include/ninja $PREFIX/MG5_aMC/HEPTools/ninja/include/ninja",
+        "ln -s $PREFIX/include/quadninja $PREFIX/MG5_aMC/HEPTools/ninja/include/quadninja",
+        "for file in $PREFIX/MG5_aMC/HEPTools/ninja/include/*.mod; do ln -s \"$file\" $PREFIX/MG5_aMC/HEPTools/include/; done",
+        "ln -s $PREFIX/MG5_aMC/HEPTools/ninja/include/ninja $PREFIX/MG5_aMC/HEPTools/include/ninja",
+        "ln -s $PREFIX/MG5_aMC/HEPTools/ninja/include/quadninja $PREFIX/MG5_aMC/HEPTools/include/quadninja",
+        "ln -s $PREFIX/bin/ninja-config $PREFIX/MG5_aMC/HEPTools/ninja/bin/",
+        "ln -s $PREFIX/bin/ninja-config $PREFIX/MG5_aMC/HEPTools/bin/",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/collier/include",
+        "echo -e \"\\n# Symlinking Collier\"",
+        "ln -s $PREFIX/lib/libcollier.a $PREFIX/MG5_aMC/HEPTools/collier/",
+        "ln -s $PREFIX/lib/libcollier.a $PREFIX/MG5_aMC/HEPTools/lib/",
+        "ln -s $PREFIX/include/collier.mod $PREFIX/MG5_aMC/HEPTools/collier/include/",
+        "ln -s $PREFIX/include/collier.mod $PREFIX/MG5_aMC/HEPTools/include/",
+        "echo -e \"\\n# Configuring $PREFIX/MG5_aMC/input/mg5_configuration.txt\"",
+        "cp $RECIPE_DIR/mg5_configuration.txt .",
+        "sed -i \"s|REPLACE_WITH_PREFIX|$PREFIX|g\" mg5_configuration.txt",
+        "sed -i \"s|REPLACE_WITH_BASENAME_FC|$(basename ${FC_FOR_BUILD//$BUILD/$HOST})|g\" mg5_configuration.txt",
+        "sed -i \"s|REPLACE_WITH_BASENAME_CXX|$(basename ${CXX_FOR_BUILD//$BUILD/$HOST})|g\" mg5_configuration.txt",
+        "sed -i \"s|# automatic_html_opening = True|automatic_html_opening = False|g\" mg5_configuration.txt",
+        "sed -i '/ninja =/s/^# //g' mg5_configuration.txt",
+        "mv mg5_configuration.txt $PREFIX/MG5_aMC/input/mg5_configuration.txt",
+        "mkdir -p $PREFIX/bin",
+        "ln -s $PREFIX/MG5_aMC/bin/mg5_aMC $PREFIX/bin/mg5_aMC",
+        "mkdir -p $PREFIX/share/mg5_aMC",
+        "ln -s $PREFIX/MG5_aMC/proc_card.dat $PREFIX/share/mg5_aMC/proc_card.dat",
+        "mkdir -p $PREFIX/etc/conda/activate.d",
+        "cp \"${RECIPE_DIR}/activate.sh\" \"${PREFIX}/etc/conda/activate.d/zzz-${PKG_NAME}-activate.sh\"",
+        "cp \"${RECIPE_DIR}/activate.csh\" \"${PREFIX}/etc/conda/activate.d/zzz-${PKG_NAME}-activate.csh\"",
+        "cp \"${RECIPE_DIR}/activate.fish\" \"${PREFIX}/etc/conda/activate.d/zzz-${PKG_NAME}-activate.fish\"",
+        "mkdir -p $PREFIX/etc/conda/deactivate.d",
+        "cp \"${RECIPE_DIR}/deactivate.sh\" \"${PREFIX}/etc/conda/deactivate.d/zzz-${PKG_NAME}-deactivate.sh\"",
+        "cp \"${RECIPE_DIR}/deactivate.csh\" \"${PREFIX}/etc/conda/deactivate.d/zzz-${PKG_NAME}-deactivate.csh\"",
+        "cp \"${RECIPE_DIR}/deactivate.fish\" \"${PREFIX}/etc/conda/deactivate.d/zzz-${PKG_NAME}-deactivate.fish\"",
+        "ls -lhtra $PREFIX/etc/conda/activate.d/",
+        "ls -lhtra $PREFIX/etc/conda/deactivate.d/",
+        "echo \"exit\" | mg5_aMC"
+      ]
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "matthewfeickert"
+      ]
+    },
+    "outputs": [
+      {
+        "build": null,
+        "name": "mg5amcnlo",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "fortran_compiler_stub",
+            "make",
+            "sed",
+            "grep"
+          ],
+          "host": [
+            "python",
+            "six",
+            "ply",
+            "fastjet-cxx",
+            "emela",
+            "lhapdf",
+            "oneloop-static",
+            "iregi-static 1.1.0.*",
+            "qcdloop-fortran-static",
+            "ninja-hep-ph-static 1.1.*",
+            "collier-static",
+            "hepmc2",
+            "hepmc3"
+          ],
+          "run": [
+            "cxx-compiler",
+            "fortran-compiler",
+            "make",
+            "tar",
+            "wget",
+            "curl",
+            "perl",
+            "python",
+            "six",
+            "numpy",
+            "fastjet-contrib",
+            "emela",
+            "lhapdf",
+            "ply",
+            "bc",
+            "procps-ng",
+            "oneloop-static",
+            "iregi-static 1.1.0.*",
+            "qcdloop-fortran-static",
+            "libtirpc",
+            "ninja-hep-ph-static 1.1.*",
+            "collier-static",
+            "mg5amcnlo-pythia8-interface",
+            "hepmc2",
+            "hepmc3",
+            "ghostscript",
+            "gnuplot"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "bin": [
+                "mg5_aMC"
+              ],
+              "files": [
+                "MG5_aMC/aloha/*",
+                "MG5_aMC/bin/*",
+                "MG5_aMC/HELAS/*",
+                "MG5_aMC/input/*",
+                "MG5_aMC/madgraph/*",
+                "MG5_aMC/MadSpin/*",
+                "MG5_aMC/mg5decay/*",
+                "MG5_aMC/models/*",
+                "MG5_aMC/PLUGIN/*",
+                "MG5_aMC/Template/*",
+                "MG5_aMC/vendor/*",
+                "MG5_aMC/proc_card.dat",
+                "MG5_aMC/VERSION",
+                "MG5_aMC/input/mg5_configuration.txt",
+                "MG5_aMC/madgraph/LICENSE",
+                "MG5_aMC/vendor/CutTools/includects/libcts.a",
+                "MG5_aMC/vendor/IREGI/src/libiregi.a",
+                "MG5_aMC/vendor/IREGI/src/qcdloop/ff/libff.a",
+                "MG5_aMC/vendor/IREGI/src/qcdloop/ql/libqcdloop.a",
+                "MG5_aMC/vendor/StdHEP/lib/libstdhep.a",
+                "MG5_aMC/vendor/StdHEP/lib/libstdhepC.a",
+                "MG5_aMC/vendor/StdHEP/lib/libFmcfio.a"
+              ]
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "tutorial.mg5",
+                "tutorial_amc-at-nlo.mg5"
+              ]
+            },
+            "script": [
+              "echo -e \"\\n# Checking mg5_configuration.txt\"",
+              "cat $PREFIX/MG5_aMC/input/mg5_configuration.txt",
+              "mg5_aMC --help",
+              "echo \"exit\" | mg5_aMC",
+              "lhapdf install NNPDF23_lo_as_0130_qed &> download_log.txt",
+              "echo -e \"\\n# Running tutorial.mg5\"",
+              "mg5_aMC ./tutorial.mg5",
+              "ls -lhtra",
+              "test ! -f ME5_debug",
+              "lhapdf install NNPDF23_nlo_as_0119_qed &> download_log.txt",
+              "echo -e \"\\n# Running tutorial_amc-at-nlo.mg5\"",
+              "mg5_aMC ./tutorial_amc-at-nlo.mg5"
+            ]
+          }
+        ],
+        "version": "3.5.7"
+      },
+      {
+        "build": null,
+        "name": "mg5amcnlo",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "fortran_compiler_stub",
+            "make",
+            "sed",
+            "grep"
+          ],
+          "host": [
+            "python",
+            "six",
+            "ply",
+            "fastjet-cxx",
+            "emela",
+            "lhapdf",
+            "oneloop-static",
+            "iregi-static 1.1.0.*",
+            "qcdloop-fortran-static",
+            "ninja-hep-ph-static 1.1.*",
+            "collier-static",
+            "hepmc2",
+            "hepmc3"
+          ],
+          "run": [
+            "cxx-compiler",
+            "fortran-compiler",
+            "make",
+            "tar",
+            "wget",
+            "curl",
+            "perl",
+            "python",
+            "six",
+            "numpy",
+            "fastjet-contrib",
+            "emela",
+            "lhapdf",
+            "ply",
+            "bc",
+            "procps-ng",
+            "oneloop-static",
+            "iregi-static 1.1.0.*",
+            "qcdloop-fortran-static",
+            "libtirpc",
+            "ninja-hep-ph-static 1.1.*",
+            "collier-static",
+            "mg5amcnlo-pythia8-interface",
+            "hepmc2",
+            "hepmc3",
+            "ghostscript",
+            "gnuplot"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "bin": [
+                "mg5_aMC"
+              ],
+              "files": [
+                "MG5_aMC/aloha/*",
+                "MG5_aMC/bin/*",
+                "MG5_aMC/HELAS/*",
+                "MG5_aMC/input/*",
+                "MG5_aMC/madgraph/*",
+                "MG5_aMC/MadSpin/*",
+                "MG5_aMC/mg5decay/*",
+                "MG5_aMC/models/*",
+                "MG5_aMC/PLUGIN/*",
+                "MG5_aMC/Template/*",
+                "MG5_aMC/vendor/*",
+                "MG5_aMC/proc_card.dat",
+                "MG5_aMC/VERSION",
+                "MG5_aMC/input/mg5_configuration.txt",
+                "MG5_aMC/madgraph/LICENSE",
+                "MG5_aMC/vendor/CutTools/includects/libcts.a",
+                "MG5_aMC/vendor/IREGI/src/libiregi.a",
+                "MG5_aMC/vendor/IREGI/src/qcdloop/ff/libff.a",
+                "MG5_aMC/vendor/IREGI/src/qcdloop/ql/libqcdloop.a",
+                "MG5_aMC/vendor/StdHEP/lib/libstdhep.a",
+                "MG5_aMC/vendor/StdHEP/lib/libstdhepC.a",
+                "MG5_aMC/vendor/StdHEP/lib/libFmcfio.a"
+              ]
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "tutorial.mg5",
+                "tutorial_amc-at-nlo.mg5"
+              ]
+            },
+            "script": [
+              "echo -e \"\\n# Checking mg5_configuration.txt\"",
+              "cat $PREFIX/MG5_aMC/input/mg5_configuration.txt",
+              "mg5_aMC --help",
+              "echo \"exit\" | mg5_aMC",
+              "lhapdf install NNPDF23_lo_as_0130_qed &> download_log.txt",
+              "echo -e \"\\n# Running tutorial.mg5\"",
+              "mg5_aMC ./tutorial.mg5",
+              "ls -lhtra",
+              "test ! -f ME5_debug",
+              "lhapdf install NNPDF23_nlo_as_0119_qed &> download_log.txt",
+              "echo -e \"\\n# Running tutorial_amc-at-nlo.mg5\"",
+              "mg5_aMC ./tutorial_amc-at-nlo.mg5"
+            ]
+          }
+        ],
+        "version": "3.5.7"
+      }
+    ],
+    "package": {
+      "name": "mg5amcnlo",
+      "version": "3.5.7"
+    },
+    "requirements": {
+      "build": [
+        "c_stdlib_stub",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "make",
+        "sed",
+        "grep"
+      ],
+      "host": [
+        "python",
+        "six",
+        "ply",
+        "fastjet-cxx",
+        "emela",
+        "lhapdf",
+        "oneloop-static",
+        "iregi-static 1.1.0.*",
+        "qcdloop-fortran-static",
+        "ninja-hep-ph-static 1.1.*",
+        "collier-static",
+        "hepmc2",
+        "hepmc3"
+      ],
+      "run": [
+        "cxx-compiler",
+        "fortran-compiler",
+        "make",
+        "tar",
+        "wget",
+        "curl",
+        "perl",
+        "python",
+        "six",
+        "numpy",
+        "fastjet-contrib",
+        "emela",
+        "lhapdf",
+        "ply",
+        "bc",
+        "procps-ng",
+        "oneloop-static",
+        "iregi-static 1.1.0.*",
+        "qcdloop-fortran-static",
+        "libtirpc",
+        "ninja-hep-ph-static 1.1.*",
+        "collier-static",
+        "mg5amcnlo-pythia8-interface",
+        "hepmc2",
+        "hepmc3",
+        "ghostscript",
+        "gnuplot"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "patches": [
+        "remove-cuttools-compiler-requirement.patch",
+        "add-libtirpc-to-nlo-extralibs-for-xdr.patch"
+      ],
+      "sha256": "ca3e027f078438318bd4143a102aebc2d51358f537b5d52bbc574fe49a6a901e",
+      "url": "https://github.com/hep-packaging-coordination/mg5amcnlo-release-mirror/releases/download/3.5.7/MG5_aMC_v3.5.7.tar.gz"
+    }
+  },
+  "linux_aarch64_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "grep",
+        "make",
+        "sed"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "collier-static",
+        "emela",
+        "fastjet-cxx",
+        "hepmc2",
+        "hepmc3",
+        "iregi-static",
+        "lhapdf",
+        "ninja-hep-ph-static",
+        "oneloop-static",
+        "ply",
+        "python",
+        "qcdloop-fortran-static",
+        "six"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "bc",
+        "collier-static",
+        "curl",
+        "cxx-compiler",
+        "emela",
+        "fastjet-contrib",
+        "fortran-compiler",
+        "ghostscript",
+        "gnuplot",
+        "hepmc2",
+        "hepmc3",
+        "iregi-static",
+        "lhapdf",
+        "libtirpc",
+        "make",
+        "mg5amcnlo-pythia8-interface",
+        "ninja-hep-ph-static",
+        "numpy",
+        "oneloop-static",
+        "perl",
+        "ply",
+        "procps-ng",
+        "python",
+        "qcdloop-fortran-static",
+        "six",
+        "tar",
+        "wget"
+      ]
+    },
+    "test": {
+      "__set__": true,
+      "elements": []
+    }
+  },
+  "linux_ppc64le_meta_yaml": {
+    "about": {
+      "description": "MadGraph5_aMC@NLO is a framework that aims at providing all the elements\nnecessary for SM and BSM phenomenology, such as the computations of cross\nsections, the generation of hard events and their matching with event\ngenerators, and the use of a variety of tools relevant to event manipulation\nand analysis.\nProcesses can be simulated to LO accuracy for any user-defined Lagrangian,\nand the NLO accuracy in the case of models that support this kind of calculations\n&mdash; prominent among these are QCD and EW corrections to SM processes.\nMatrix elements at the tree- and one-loop-level can also be obtained.\n\nMadGraph5_aMC@NLO is the new version of both MadGraph5 and aMC@NLO that unifies\nthe LO and NLO lines of development of automated tools within the MadGraph family.\nAs such, the code allows one to simulate processes in virtually all configurations\nof interest, in particular for hadronic and e+e- colliders; starting from version\n3.2.0, the latter include Initial State Radiation and beamstrahlung effects.",
+      "dev_url": "https://github.com/mg5amcnlo/mg5amcnlo",
+      "home": "https://github.com/mg5amcnlo/mg5amcnlo",
+      "license": "LicenseRef-NCSA",
+      "license_family": "LicenseRef-NCSA",
+      "license_file": "source/LICENSE",
+      "summary": "MadGraph5_aMC@NLO"
+    },
+    "build": {
+      "number": "6",
+      "script": [
+        "rm -r source/.github",
+        "rm -r source/tests",
+        "rm source/.bzrignore",
+        "rm source/.gitignore",
+        "rm source/code-notes",
+        "rm source/README",
+        "rm source/UpdateNotes.txt",
+        "rm source/vendor/DiscreteSampler/check",
+        "find source -type f -exec grep -Il '#!/usr/bin/perl -w' {} + | xargs sed -i 's|#!/usr/bin/perl -w|#!/usr/bin/env perl\\nuse warnings;|g'",
+        "cp -a source $PREFIX/MG5_aMC",
+        "cd $PREFIX/MG5_aMC/vendor/CutTools",
+        "echo -e \"\\n# Compiling CutTools\"",
+        "make FC=$FC FFLAGS=\"-fPIC -fno-automatic -O2 -funroll-all-loops $FFLAGS\"",
+        "find . -name \"*.o\" -exec rm {} +",
+        "cd -",
+        "rm -rf $PREFIX/MG5_aMC/vendor/IREGI",
+        "mkdir -p $PREFIX/MG5_aMC/vendor/IREGI/src",
+        "ln -s $PREFIX/lib/libiregi.a $PREFIX/MG5_aMC/vendor/IREGI/src/",
+        "for file in $PREFIX/include/iregi/*; do ln -s \"$file\" $PREFIX/MG5_aMC/vendor/IREGI/src/; done",
+        "mkdir -p $PREFIX/MG5_aMC/vendor/IREGI/src/qcdloop/ff",
+        "ln -s $PREFIX/lib/libff.a $PREFIX/MG5_aMC/vendor/IREGI/src/qcdloop/ff/",
+        "mkdir -p $PREFIX/MG5_aMC/vendor/IREGI/src/qcdloop/ql",
+        "ln -s $PREFIX/lib/libqcdloop.a $PREFIX/MG5_aMC/vendor/IREGI/src/qcdloop/ql/",
+        "cd $PREFIX/MG5_aMC/vendor/StdHEP",
+        "sed -i \"s|FFLAGS += -std=legacy|FFLAGS += -std=legacy -ffixed-line-length-none $FFLAGS|g\" makefile",
+        "sed -i \"s|CFLAGS += -Wno-implicit-function-declaration|CFLAGS += -Wno-implicit-function-declaration $CFLAGS|g\" makefile",
+        "echo -e \"\\n# Compiling StdHEP\"",
+        "make all FC=$FC F77=$FC CC=$CC --jobs=$CPU_COUNT",
+        "make clean",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/lib",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/include",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/oneloop",
+        "echo -e \"\\n# Symlinking OneLOop\"",
+        "ln -s $PREFIX/lib/libavh_olo.a $PREFIX/MG5_aMC/HEPTools/oneloop/",
+        "ln -s $PREFIX/lib/libavh_olo.a $PREFIX/MG5_aMC/HEPTools/lib/",
+        "for file in $PREFIX/include/oneloop/*; do ln -s \"$file\" $PREFIX/MG5_aMC/HEPTools/oneloop/; ln -s \"$file\" $PREFIX/MG5_aMC/HEPTools/include/; done",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/bin",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/ninja/lib",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/ninja/include",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/ninja/bin",
+        "echo -e \"\\n# Symlinking Ninja\"",
+        "ln -s $PREFIX/lib/libninja.a $PREFIX/MG5_aMC/HEPTools/ninja/lib/",
+        "ln -s $PREFIX/lib/libninja.a $PREFIX/MG5_aMC/HEPTools/lib/",
+        "ln -s $PREFIX/include/mninja.mod $PREFIX/MG5_aMC/HEPTools/ninja/include/",
+        "ln -s $PREFIX/include/ninjago_module.mod $PREFIX/MG5_aMC/HEPTools/ninja/include/",
+        "ln -s $PREFIX/include/ninjavholo.mod $PREFIX/MG5_aMC/HEPTools/ninja/include/",
+        "ln -s $PREFIX/include/ninja $PREFIX/MG5_aMC/HEPTools/ninja/include/ninja",
+        "ln -s $PREFIX/include/quadninja $PREFIX/MG5_aMC/HEPTools/ninja/include/quadninja",
+        "for file in $PREFIX/MG5_aMC/HEPTools/ninja/include/*.mod; do ln -s \"$file\" $PREFIX/MG5_aMC/HEPTools/include/; done",
+        "ln -s $PREFIX/MG5_aMC/HEPTools/ninja/include/ninja $PREFIX/MG5_aMC/HEPTools/include/ninja",
+        "ln -s $PREFIX/MG5_aMC/HEPTools/ninja/include/quadninja $PREFIX/MG5_aMC/HEPTools/include/quadninja",
+        "ln -s $PREFIX/bin/ninja-config $PREFIX/MG5_aMC/HEPTools/ninja/bin/",
+        "ln -s $PREFIX/bin/ninja-config $PREFIX/MG5_aMC/HEPTools/bin/",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/collier/include",
+        "echo -e \"\\n# Symlinking Collier\"",
+        "ln -s $PREFIX/lib/libcollier.a $PREFIX/MG5_aMC/HEPTools/collier/",
+        "ln -s $PREFIX/lib/libcollier.a $PREFIX/MG5_aMC/HEPTools/lib/",
+        "ln -s $PREFIX/include/collier.mod $PREFIX/MG5_aMC/HEPTools/collier/include/",
+        "ln -s $PREFIX/include/collier.mod $PREFIX/MG5_aMC/HEPTools/include/",
+        "echo -e \"\\n# Configuring $PREFIX/MG5_aMC/input/mg5_configuration.txt\"",
+        "cp $RECIPE_DIR/mg5_configuration.txt .",
+        "sed -i \"s|REPLACE_WITH_PREFIX|$PREFIX|g\" mg5_configuration.txt",
+        "sed -i \"s|REPLACE_WITH_BASENAME_FC|$(basename ${FC_FOR_BUILD//$BUILD/$HOST})|g\" mg5_configuration.txt",
+        "sed -i \"s|REPLACE_WITH_BASENAME_CXX|$(basename ${CXX_FOR_BUILD//$BUILD/$HOST})|g\" mg5_configuration.txt",
+        "sed -i \"s|# automatic_html_opening = True|automatic_html_opening = False|g\" mg5_configuration.txt",
+        "sed -i '/ninja =/s/^# //g' mg5_configuration.txt",
+        "mv mg5_configuration.txt $PREFIX/MG5_aMC/input/mg5_configuration.txt",
+        "mkdir -p $PREFIX/bin",
+        "ln -s $PREFIX/MG5_aMC/bin/mg5_aMC $PREFIX/bin/mg5_aMC",
+        "mkdir -p $PREFIX/share/mg5_aMC",
+        "ln -s $PREFIX/MG5_aMC/proc_card.dat $PREFIX/share/mg5_aMC/proc_card.dat",
+        "mkdir -p $PREFIX/etc/conda/activate.d",
+        "cp \"${RECIPE_DIR}/activate.sh\" \"${PREFIX}/etc/conda/activate.d/zzz-${PKG_NAME}-activate.sh\"",
+        "cp \"${RECIPE_DIR}/activate.csh\" \"${PREFIX}/etc/conda/activate.d/zzz-${PKG_NAME}-activate.csh\"",
+        "cp \"${RECIPE_DIR}/activate.fish\" \"${PREFIX}/etc/conda/activate.d/zzz-${PKG_NAME}-activate.fish\"",
+        "mkdir -p $PREFIX/etc/conda/deactivate.d",
+        "cp \"${RECIPE_DIR}/deactivate.sh\" \"${PREFIX}/etc/conda/deactivate.d/zzz-${PKG_NAME}-deactivate.sh\"",
+        "cp \"${RECIPE_DIR}/deactivate.csh\" \"${PREFIX}/etc/conda/deactivate.d/zzz-${PKG_NAME}-deactivate.csh\"",
+        "cp \"${RECIPE_DIR}/deactivate.fish\" \"${PREFIX}/etc/conda/deactivate.d/zzz-${PKG_NAME}-deactivate.fish\"",
+        "ls -lhtra $PREFIX/etc/conda/activate.d/",
+        "ls -lhtra $PREFIX/etc/conda/deactivate.d/",
+        "echo \"exit\" | mg5_aMC"
+      ]
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "matthewfeickert"
+      ]
+    },
+    "outputs": [
+      {
+        "build": null,
+        "name": "mg5amcnlo",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "fortran_compiler_stub",
+            "make",
+            "sed",
+            "grep"
+          ],
+          "host": [
+            "python",
+            "six",
+            "ply",
+            "fastjet-cxx",
+            "emela",
+            "lhapdf",
+            "oneloop-static",
+            "iregi-static 1.1.0.*",
+            "qcdloop-fortran-static",
+            "ninja-hep-ph-static 1.1.*",
+            "collier-static",
+            "hepmc2",
+            "hepmc3"
+          ],
+          "run": [
+            "cxx-compiler",
+            "fortran-compiler",
+            "make",
+            "tar",
+            "wget",
+            "curl",
+            "perl",
+            "python",
+            "six",
+            "numpy",
+            "fastjet-contrib",
+            "emela",
+            "lhapdf",
+            "ply",
+            "bc",
+            "procps-ng",
+            "oneloop-static",
+            "iregi-static 1.1.0.*",
+            "qcdloop-fortran-static",
+            "libtirpc",
+            "ninja-hep-ph-static 1.1.*",
+            "collier-static",
+            "mg5amcnlo-pythia8-interface",
+            "hepmc2",
+            "hepmc3",
+            "ghostscript",
+            "gnuplot"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "bin": [
+                "mg5_aMC"
+              ],
+              "files": [
+                "MG5_aMC/aloha/*",
+                "MG5_aMC/bin/*",
+                "MG5_aMC/HELAS/*",
+                "MG5_aMC/input/*",
+                "MG5_aMC/madgraph/*",
+                "MG5_aMC/MadSpin/*",
+                "MG5_aMC/mg5decay/*",
+                "MG5_aMC/models/*",
+                "MG5_aMC/PLUGIN/*",
+                "MG5_aMC/Template/*",
+                "MG5_aMC/vendor/*",
+                "MG5_aMC/proc_card.dat",
+                "MG5_aMC/VERSION",
+                "MG5_aMC/input/mg5_configuration.txt",
+                "MG5_aMC/madgraph/LICENSE",
+                "MG5_aMC/vendor/CutTools/includects/libcts.a",
+                "MG5_aMC/vendor/IREGI/src/libiregi.a",
+                "MG5_aMC/vendor/IREGI/src/qcdloop/ff/libff.a",
+                "MG5_aMC/vendor/IREGI/src/qcdloop/ql/libqcdloop.a",
+                "MG5_aMC/vendor/StdHEP/lib/libstdhep.a",
+                "MG5_aMC/vendor/StdHEP/lib/libstdhepC.a",
+                "MG5_aMC/vendor/StdHEP/lib/libFmcfio.a"
+              ]
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "tutorial.mg5",
+                "tutorial_amc-at-nlo.mg5"
+              ]
+            },
+            "script": [
+              "echo -e \"\\n# Checking mg5_configuration.txt\"",
+              "cat $PREFIX/MG5_aMC/input/mg5_configuration.txt",
+              "mg5_aMC --help",
+              "echo \"exit\" | mg5_aMC",
+              "lhapdf install NNPDF23_lo_as_0130_qed &> download_log.txt",
+              "echo -e \"\\n# Running tutorial.mg5\"",
+              "mg5_aMC ./tutorial.mg5",
+              "ls -lhtra",
+              "test ! -f ME5_debug",
+              "lhapdf install NNPDF23_nlo_as_0119_qed &> download_log.txt",
+              "echo -e \"\\n# Running tutorial_amc-at-nlo.mg5\"",
+              "mg5_aMC ./tutorial_amc-at-nlo.mg5"
+            ]
+          }
+        ],
+        "version": "3.5.7"
+      },
+      {
+        "build": null,
+        "name": "mg5amcnlo",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "fortran_compiler_stub",
+            "make",
+            "sed",
+            "grep"
+          ],
+          "host": [
+            "python",
+            "six",
+            "ply",
+            "fastjet-cxx",
+            "emela",
+            "lhapdf",
+            "oneloop-static",
+            "iregi-static 1.1.0.*",
+            "qcdloop-fortran-static",
+            "ninja-hep-ph-static 1.1.*",
+            "collier-static",
+            "hepmc2",
+            "hepmc3"
+          ],
+          "run": [
+            "cxx-compiler",
+            "fortran-compiler",
+            "make",
+            "tar",
+            "wget",
+            "curl",
+            "perl",
+            "python",
+            "six",
+            "numpy",
+            "fastjet-contrib",
+            "emela",
+            "lhapdf",
+            "ply",
+            "bc",
+            "procps-ng",
+            "oneloop-static",
+            "iregi-static 1.1.0.*",
+            "qcdloop-fortran-static",
+            "libtirpc",
+            "ninja-hep-ph-static 1.1.*",
+            "collier-static",
+            "mg5amcnlo-pythia8-interface",
+            "hepmc2",
+            "hepmc3",
+            "ghostscript",
+            "gnuplot"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "bin": [
+                "mg5_aMC"
+              ],
+              "files": [
+                "MG5_aMC/aloha/*",
+                "MG5_aMC/bin/*",
+                "MG5_aMC/HELAS/*",
+                "MG5_aMC/input/*",
+                "MG5_aMC/madgraph/*",
+                "MG5_aMC/MadSpin/*",
+                "MG5_aMC/mg5decay/*",
+                "MG5_aMC/models/*",
+                "MG5_aMC/PLUGIN/*",
+                "MG5_aMC/Template/*",
+                "MG5_aMC/vendor/*",
+                "MG5_aMC/proc_card.dat",
+                "MG5_aMC/VERSION",
+                "MG5_aMC/input/mg5_configuration.txt",
+                "MG5_aMC/madgraph/LICENSE",
+                "MG5_aMC/vendor/CutTools/includects/libcts.a",
+                "MG5_aMC/vendor/IREGI/src/libiregi.a",
+                "MG5_aMC/vendor/IREGI/src/qcdloop/ff/libff.a",
+                "MG5_aMC/vendor/IREGI/src/qcdloop/ql/libqcdloop.a",
+                "MG5_aMC/vendor/StdHEP/lib/libstdhep.a",
+                "MG5_aMC/vendor/StdHEP/lib/libstdhepC.a",
+                "MG5_aMC/vendor/StdHEP/lib/libFmcfio.a"
+              ]
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "tutorial.mg5",
+                "tutorial_amc-at-nlo.mg5"
+              ]
+            },
+            "script": [
+              "echo -e \"\\n# Checking mg5_configuration.txt\"",
+              "cat $PREFIX/MG5_aMC/input/mg5_configuration.txt",
+              "mg5_aMC --help",
+              "echo \"exit\" | mg5_aMC",
+              "lhapdf install NNPDF23_lo_as_0130_qed &> download_log.txt",
+              "echo -e \"\\n# Running tutorial.mg5\"",
+              "mg5_aMC ./tutorial.mg5",
+              "ls -lhtra",
+              "test ! -f ME5_debug",
+              "lhapdf install NNPDF23_nlo_as_0119_qed &> download_log.txt",
+              "echo -e \"\\n# Running tutorial_amc-at-nlo.mg5\"",
+              "mg5_aMC ./tutorial_amc-at-nlo.mg5"
+            ]
+          }
+        ],
+        "version": "3.5.7"
+      }
+    ],
+    "package": {
+      "name": "mg5amcnlo",
+      "version": "3.5.7"
+    },
+    "requirements": {
+      "build": [
+        "c_stdlib_stub",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "make",
+        "sed",
+        "grep"
+      ],
+      "host": [
+        "python",
+        "six",
+        "ply",
+        "fastjet-cxx",
+        "emela",
+        "lhapdf",
+        "oneloop-static",
+        "iregi-static 1.1.0.*",
+        "qcdloop-fortran-static",
+        "ninja-hep-ph-static 1.1.*",
+        "collier-static",
+        "hepmc2",
+        "hepmc3"
+      ],
+      "run": [
+        "cxx-compiler",
+        "fortran-compiler",
+        "make",
+        "tar",
+        "wget",
+        "curl",
+        "perl",
+        "python",
+        "six",
+        "numpy",
+        "fastjet-contrib",
+        "emela",
+        "lhapdf",
+        "ply",
+        "bc",
+        "procps-ng",
+        "oneloop-static",
+        "iregi-static 1.1.0.*",
+        "qcdloop-fortran-static",
+        "libtirpc",
+        "ninja-hep-ph-static 1.1.*",
+        "collier-static",
+        "mg5amcnlo-pythia8-interface",
+        "hepmc2",
+        "hepmc3",
+        "ghostscript",
+        "gnuplot"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "patches": [
+        "remove-cuttools-compiler-requirement.patch",
+        "add-libtirpc-to-nlo-extralibs-for-xdr.patch"
+      ],
+      "sha256": "ca3e027f078438318bd4143a102aebc2d51358f537b5d52bbc574fe49a6a901e",
+      "url": "https://github.com/hep-packaging-coordination/mg5amcnlo-release-mirror/releases/download/3.5.7/MG5_aMC_v3.5.7.tar.gz"
+    }
+  },
+  "linux_ppc64le_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "grep",
+        "make",
+        "sed"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "collier-static",
+        "emela",
+        "fastjet-cxx",
+        "hepmc2",
+        "hepmc3",
+        "iregi-static",
+        "lhapdf",
+        "ninja-hep-ph-static",
+        "oneloop-static",
+        "ply",
+        "python",
+        "qcdloop-fortran-static",
+        "six"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "bc",
+        "collier-static",
+        "curl",
+        "cxx-compiler",
+        "emela",
+        "fastjet-contrib",
+        "fortran-compiler",
+        "ghostscript",
+        "gnuplot",
+        "hepmc2",
+        "hepmc3",
+        "iregi-static",
+        "lhapdf",
+        "libtirpc",
+        "make",
+        "mg5amcnlo-pythia8-interface",
+        "ninja-hep-ph-static",
+        "numpy",
+        "oneloop-static",
+        "perl",
+        "ply",
+        "procps-ng",
+        "python",
+        "qcdloop-fortran-static",
+        "six",
+        "tar",
+        "wget"
+      ]
+    },
+    "test": {
+      "__set__": true,
+      "elements": []
+    }
+  },
+  "meta_yaml": {
+    "about": {
+      "description": "MadGraph5_aMC@NLO is a framework that aims at providing all the elements\nnecessary for SM and BSM phenomenology, such as the computations of cross\nsections, the generation of hard events and their matching with event\ngenerators, and the use of a variety of tools relevant to event manipulation\nand analysis.\nProcesses can be simulated to LO accuracy for any user-defined Lagrangian,\nand the NLO accuracy in the case of models that support this kind of calculations\n&mdash; prominent among these are QCD and EW corrections to SM processes.\nMatrix elements at the tree- and one-loop-level can also be obtained.\n\nMadGraph5_aMC@NLO is the new version of both MadGraph5 and aMC@NLO that unifies\nthe LO and NLO lines of development of automated tools within the MadGraph family.\nAs such, the code allows one to simulate processes in virtually all configurations\nof interest, in particular for hadronic and e+e- colliders; starting from version\n3.2.0, the latter include Initial State Radiation and beamstrahlung effects.",
+      "dev_url": "https://github.com/mg5amcnlo/mg5amcnlo",
+      "home": "https://github.com/mg5amcnlo/mg5amcnlo",
+      "license": "LicenseRef-NCSA",
+      "license_family": "LicenseRef-NCSA",
+      "license_file": "source/LICENSE",
+      "summary": "MadGraph5_aMC@NLO"
+    },
+    "build": {
+      "number": "6",
+      "script": [
+        "rm -r source/.github",
+        "rm -r source/tests",
+        "rm source/.bzrignore",
+        "rm source/.gitignore",
+        "rm source/code-notes",
+        "rm source/README",
+        "rm source/UpdateNotes.txt",
+        "rm source/vendor/DiscreteSampler/check",
+        "find source -type f -exec grep -Il '#!/usr/bin/perl -w' {} + | xargs sed -i 's|#!/usr/bin/perl -w|#!/usr/bin/env perl\\nuse warnings;|g'",
+        "cp -a source $PREFIX/MG5_aMC",
+        "cd $PREFIX/MG5_aMC/vendor/CutTools",
+        "echo -e \"\\n# Compiling CutTools\"",
+        "make FC=$FC FFLAGS=\"-fPIC -fno-automatic -O2 -funroll-all-loops $FFLAGS\"",
+        "find . -name \"*.o\" -exec rm {} +",
+        "cd -",
+        "rm -rf $PREFIX/MG5_aMC/vendor/IREGI",
+        "mkdir -p $PREFIX/MG5_aMC/vendor/IREGI/src",
+        "ln -s $PREFIX/lib/libiregi.a $PREFIX/MG5_aMC/vendor/IREGI/src/",
+        "for file in $PREFIX/include/iregi/*; do ln -s \"$file\" $PREFIX/MG5_aMC/vendor/IREGI/src/; done",
+        "mkdir -p $PREFIX/MG5_aMC/vendor/IREGI/src/qcdloop/ff",
+        "ln -s $PREFIX/lib/libff.a $PREFIX/MG5_aMC/vendor/IREGI/src/qcdloop/ff/",
+        "mkdir -p $PREFIX/MG5_aMC/vendor/IREGI/src/qcdloop/ql",
+        "ln -s $PREFIX/lib/libqcdloop.a $PREFIX/MG5_aMC/vendor/IREGI/src/qcdloop/ql/",
+        "cd $PREFIX/MG5_aMC/vendor/StdHEP",
+        "sed -i \"s|FFLAGS += -std=legacy|FFLAGS += -std=legacy -ffixed-line-length-none $FFLAGS|g\" makefile",
+        "sed -i \"s|CFLAGS += -Wno-implicit-function-declaration|CFLAGS += -Wno-implicit-function-declaration $CFLAGS|g\" makefile",
+        "echo -e \"\\n# Compiling StdHEP\"",
+        "make all FC=$FC F77=$FC CC=$CC --jobs=$CPU_COUNT",
+        "make clean",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/lib",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/include",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/oneloop",
+        "echo -e \"\\n# Symlinking OneLOop\"",
+        "ln -s $PREFIX/lib/libavh_olo.a $PREFIX/MG5_aMC/HEPTools/oneloop/",
+        "ln -s $PREFIX/lib/libavh_olo.a $PREFIX/MG5_aMC/HEPTools/lib/",
+        "for file in $PREFIX/include/oneloop/*; do ln -s \"$file\" $PREFIX/MG5_aMC/HEPTools/oneloop/; ln -s \"$file\" $PREFIX/MG5_aMC/HEPTools/include/; done",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/bin",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/ninja/lib",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/ninja/include",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/ninja/bin",
+        "echo -e \"\\n# Symlinking Ninja\"",
+        "ln -s $PREFIX/lib/libninja.a $PREFIX/MG5_aMC/HEPTools/ninja/lib/",
+        "ln -s $PREFIX/lib/libninja.a $PREFIX/MG5_aMC/HEPTools/lib/",
+        "ln -s $PREFIX/include/mninja.mod $PREFIX/MG5_aMC/HEPTools/ninja/include/",
+        "ln -s $PREFIX/include/ninjago_module.mod $PREFIX/MG5_aMC/HEPTools/ninja/include/",
+        "ln -s $PREFIX/include/ninjavholo.mod $PREFIX/MG5_aMC/HEPTools/ninja/include/",
+        "ln -s $PREFIX/include/ninja $PREFIX/MG5_aMC/HEPTools/ninja/include/ninja",
+        "ln -s $PREFIX/include/quadninja $PREFIX/MG5_aMC/HEPTools/ninja/include/quadninja",
+        "for file in $PREFIX/MG5_aMC/HEPTools/ninja/include/*.mod; do ln -s \"$file\" $PREFIX/MG5_aMC/HEPTools/include/; done",
+        "ln -s $PREFIX/MG5_aMC/HEPTools/ninja/include/ninja $PREFIX/MG5_aMC/HEPTools/include/ninja",
+        "ln -s $PREFIX/MG5_aMC/HEPTools/ninja/include/quadninja $PREFIX/MG5_aMC/HEPTools/include/quadninja",
+        "ln -s $PREFIX/bin/ninja-config $PREFIX/MG5_aMC/HEPTools/ninja/bin/",
+        "ln -s $PREFIX/bin/ninja-config $PREFIX/MG5_aMC/HEPTools/bin/",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/collier/include",
+        "echo -e \"\\n# Symlinking Collier\"",
+        "ln -s $PREFIX/lib/libcollier.a $PREFIX/MG5_aMC/HEPTools/collier/",
+        "ln -s $PREFIX/lib/libcollier.a $PREFIX/MG5_aMC/HEPTools/lib/",
+        "ln -s $PREFIX/include/collier.mod $PREFIX/MG5_aMC/HEPTools/collier/include/",
+        "ln -s $PREFIX/include/collier.mod $PREFIX/MG5_aMC/HEPTools/include/",
+        "echo -e \"\\n# Configuring $PREFIX/MG5_aMC/input/mg5_configuration.txt\"",
+        "cp $RECIPE_DIR/mg5_configuration.txt .",
+        "sed -i \"s|REPLACE_WITH_PREFIX|$PREFIX|g\" mg5_configuration.txt",
+        "sed -i \"s|REPLACE_WITH_BASENAME_FC|$(basename ${FC_FOR_BUILD//$BUILD/$HOST})|g\" mg5_configuration.txt",
+        "sed -i \"s|REPLACE_WITH_BASENAME_CXX|$(basename ${CXX_FOR_BUILD//$BUILD/$HOST})|g\" mg5_configuration.txt",
+        "sed -i \"s|# automatic_html_opening = True|automatic_html_opening = False|g\" mg5_configuration.txt",
+        "sed -i '/ninja =/s/^# //g' mg5_configuration.txt",
+        "mv mg5_configuration.txt $PREFIX/MG5_aMC/input/mg5_configuration.txt",
+        "mkdir -p $PREFIX/bin",
+        "ln -s $PREFIX/MG5_aMC/bin/mg5_aMC $PREFIX/bin/mg5_aMC",
+        "mkdir -p $PREFIX/share/mg5_aMC",
+        "ln -s $PREFIX/MG5_aMC/proc_card.dat $PREFIX/share/mg5_aMC/proc_card.dat",
+        "mkdir -p $PREFIX/etc/conda/activate.d",
+        "cp \"${RECIPE_DIR}/activate.sh\" \"${PREFIX}/etc/conda/activate.d/zzz-${PKG_NAME}-activate.sh\"",
+        "cp \"${RECIPE_DIR}/activate.csh\" \"${PREFIX}/etc/conda/activate.d/zzz-${PKG_NAME}-activate.csh\"",
+        "cp \"${RECIPE_DIR}/activate.fish\" \"${PREFIX}/etc/conda/activate.d/zzz-${PKG_NAME}-activate.fish\"",
+        "mkdir -p $PREFIX/etc/conda/deactivate.d",
+        "cp \"${RECIPE_DIR}/deactivate.sh\" \"${PREFIX}/etc/conda/deactivate.d/zzz-${PKG_NAME}-deactivate.sh\"",
+        "cp \"${RECIPE_DIR}/deactivate.csh\" \"${PREFIX}/etc/conda/deactivate.d/zzz-${PKG_NAME}-deactivate.csh\"",
+        "cp \"${RECIPE_DIR}/deactivate.fish\" \"${PREFIX}/etc/conda/deactivate.d/zzz-${PKG_NAME}-deactivate.fish\"",
+        "ls -lhtra $PREFIX/etc/conda/activate.d/",
+        "ls -lhtra $PREFIX/etc/conda/deactivate.d/",
+        "echo \"exit\" | mg5_aMC"
+      ]
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "matthewfeickert"
+      ]
+    },
+    "outputs": [
+      {
+        "build": null,
+        "name": "mg5amcnlo",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "fortran_compiler_stub",
+            "make",
+            "sed",
+            "grep"
+          ],
+          "host": [
+            "python",
+            "six",
+            "ply",
+            "fastjet-cxx",
+            "emela",
+            "lhapdf",
+            "oneloop-static",
+            "iregi-static 1.1.0.*",
+            "qcdloop-fortran-static",
+            "ninja-hep-ph-static 1.1.*",
+            "collier-static",
+            "hepmc2",
+            "hepmc3"
+          ],
+          "run": [
+            "cxx-compiler",
+            "fortran-compiler",
+            "make",
+            "tar",
+            "wget",
+            "curl",
+            "perl",
+            "python",
+            "six",
+            "numpy",
+            "fastjet-contrib",
+            "emela",
+            "lhapdf",
+            "ply",
+            "bc",
+            "procps-ng",
+            "oneloop-static",
+            "iregi-static 1.1.0.*",
+            "qcdloop-fortran-static",
+            "libtirpc",
+            "ninja-hep-ph-static 1.1.*",
+            "collier-static",
+            "mg5amcnlo-pythia8-interface",
+            "hepmc2",
+            "hepmc3",
+            "ghostscript",
+            "gnuplot"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "bin": [
+                "mg5_aMC"
+              ],
+              "files": [
+                "MG5_aMC/aloha/*",
+                "MG5_aMC/bin/*",
+                "MG5_aMC/HELAS/*",
+                "MG5_aMC/input/*",
+                "MG5_aMC/madgraph/*",
+                "MG5_aMC/MadSpin/*",
+                "MG5_aMC/mg5decay/*",
+                "MG5_aMC/models/*",
+                "MG5_aMC/PLUGIN/*",
+                "MG5_aMC/Template/*",
+                "MG5_aMC/vendor/*",
+                "MG5_aMC/proc_card.dat",
+                "MG5_aMC/VERSION",
+                "MG5_aMC/input/mg5_configuration.txt",
+                "MG5_aMC/madgraph/LICENSE",
+                "MG5_aMC/vendor/CutTools/includects/libcts.a",
+                "MG5_aMC/vendor/IREGI/src/libiregi.a",
+                "MG5_aMC/vendor/IREGI/src/qcdloop/ff/libff.a",
+                "MG5_aMC/vendor/IREGI/src/qcdloop/ql/libqcdloop.a",
+                "MG5_aMC/vendor/StdHEP/lib/libstdhep.a",
+                "MG5_aMC/vendor/StdHEP/lib/libstdhepC.a",
+                "MG5_aMC/vendor/StdHEP/lib/libFmcfio.a"
+              ]
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "tutorial.mg5",
+                "tutorial_amc-at-nlo.mg5"
+              ]
+            },
+            "script": [
+              "echo -e \"\\n# Checking mg5_configuration.txt\"",
+              "cat $PREFIX/MG5_aMC/input/mg5_configuration.txt",
+              "mg5_aMC --help",
+              "echo \"exit\" | mg5_aMC",
+              "lhapdf install NNPDF23_lo_as_0130_qed &> download_log.txt",
+              "echo -e \"\\n# Running tutorial.mg5\"",
+              "mg5_aMC ./tutorial.mg5",
+              "ls -lhtra",
+              "test ! -f ME5_debug",
+              "lhapdf install NNPDF23_nlo_as_0119_qed &> download_log.txt",
+              "echo -e \"\\n# Running tutorial_amc-at-nlo.mg5\"",
+              "mg5_aMC ./tutorial_amc-at-nlo.mg5"
+            ]
+          }
+        ],
+        "version": "3.5.7"
+      },
+      {
+        "build": null,
+        "name": "mg5amcnlo",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "fortran_compiler_stub",
+            "make",
+            "sed",
+            "grep"
+          ],
+          "host": [
+            "python",
+            "six",
+            "ply",
+            "fastjet-cxx",
+            "emela",
+            "lhapdf",
+            "oneloop-static",
+            "iregi-static 1.1.0.*",
+            "qcdloop-fortran-static",
+            "ninja-hep-ph-static 1.1.*",
+            "collier-static",
+            "hepmc2",
+            "hepmc3"
+          ],
+          "run": [
+            "cxx-compiler",
+            "fortran-compiler",
+            "make",
+            "tar",
+            "wget",
+            "curl",
+            "perl",
+            "python",
+            "six",
+            "numpy",
+            "fastjet-contrib",
+            "emela",
+            "lhapdf",
+            "ply",
+            "bc",
+            "procps-ng",
+            "oneloop-static",
+            "iregi-static 1.1.0.*",
+            "qcdloop-fortran-static",
+            "libtirpc",
+            "ninja-hep-ph-static 1.1.*",
+            "collier-static",
+            "mg5amcnlo-pythia8-interface",
+            "hepmc2",
+            "hepmc3",
+            "ghostscript",
+            "gnuplot"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "bin": [
+                "mg5_aMC"
+              ],
+              "files": [
+                "MG5_aMC/aloha/*",
+                "MG5_aMC/bin/*",
+                "MG5_aMC/HELAS/*",
+                "MG5_aMC/input/*",
+                "MG5_aMC/madgraph/*",
+                "MG5_aMC/MadSpin/*",
+                "MG5_aMC/mg5decay/*",
+                "MG5_aMC/models/*",
+                "MG5_aMC/PLUGIN/*",
+                "MG5_aMC/Template/*",
+                "MG5_aMC/vendor/*",
+                "MG5_aMC/proc_card.dat",
+                "MG5_aMC/VERSION",
+                "MG5_aMC/input/mg5_configuration.txt",
+                "MG5_aMC/madgraph/LICENSE",
+                "MG5_aMC/vendor/CutTools/includects/libcts.a",
+                "MG5_aMC/vendor/IREGI/src/libiregi.a",
+                "MG5_aMC/vendor/IREGI/src/qcdloop/ff/libff.a",
+                "MG5_aMC/vendor/IREGI/src/qcdloop/ql/libqcdloop.a",
+                "MG5_aMC/vendor/StdHEP/lib/libstdhep.a",
+                "MG5_aMC/vendor/StdHEP/lib/libstdhepC.a",
+                "MG5_aMC/vendor/StdHEP/lib/libFmcfio.a"
+              ]
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "tutorial.mg5",
+                "tutorial_amc-at-nlo.mg5"
+              ]
+            },
+            "script": [
+              "echo -e \"\\n# Checking mg5_configuration.txt\"",
+              "cat $PREFIX/MG5_aMC/input/mg5_configuration.txt",
+              "mg5_aMC --help",
+              "echo \"exit\" | mg5_aMC",
+              "lhapdf install NNPDF23_lo_as_0130_qed &> download_log.txt",
+              "echo -e \"\\n# Running tutorial.mg5\"",
+              "mg5_aMC ./tutorial.mg5",
+              "ls -lhtra",
+              "test ! -f ME5_debug",
+              "lhapdf install NNPDF23_nlo_as_0119_qed &> download_log.txt",
+              "echo -e \"\\n# Running tutorial_amc-at-nlo.mg5\"",
+              "mg5_aMC ./tutorial_amc-at-nlo.mg5"
+            ]
+          }
+        ],
+        "version": "3.5.7"
+      },
+      {
+        "build": null,
+        "name": "mg5amcnlo",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "fortran_compiler_stub",
+            "make",
+            "sed",
+            "grep"
+          ],
+          "host": [
+            "python",
+            "six",
+            "ply",
+            "fastjet-cxx",
+            "emela",
+            "lhapdf",
+            "oneloop-static",
+            "iregi-static 1.1.0.*",
+            "qcdloop-fortran-static",
+            "ninja-hep-ph-static 1.1.*",
+            "collier-static",
+            "hepmc2",
+            "hepmc3"
+          ],
+          "run": [
+            "cxx-compiler",
+            "fortran-compiler",
+            "make",
+            "tar",
+            "wget",
+            "curl",
+            "perl",
+            "python",
+            "six",
+            "numpy",
+            "fastjet-contrib",
+            "emela",
+            "lhapdf",
+            "ply",
+            "bc",
+            "procps-ng",
+            "oneloop-static",
+            "iregi-static 1.1.0.*",
+            "qcdloop-fortran-static",
+            "libtirpc",
+            "ninja-hep-ph-static 1.1.*",
+            "collier-static",
+            "mg5amcnlo-pythia8-interface",
+            "hepmc2",
+            "hepmc3",
+            "ghostscript",
+            "gnuplot"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "bin": [
+                "mg5_aMC"
+              ],
+              "files": [
+                "MG5_aMC/aloha/*",
+                "MG5_aMC/bin/*",
+                "MG5_aMC/HELAS/*",
+                "MG5_aMC/input/*",
+                "MG5_aMC/madgraph/*",
+                "MG5_aMC/MadSpin/*",
+                "MG5_aMC/mg5decay/*",
+                "MG5_aMC/models/*",
+                "MG5_aMC/PLUGIN/*",
+                "MG5_aMC/Template/*",
+                "MG5_aMC/vendor/*",
+                "MG5_aMC/proc_card.dat",
+                "MG5_aMC/VERSION",
+                "MG5_aMC/input/mg5_configuration.txt",
+                "MG5_aMC/madgraph/LICENSE",
+                "MG5_aMC/vendor/CutTools/includects/libcts.a",
+                "MG5_aMC/vendor/IREGI/src/libiregi.a",
+                "MG5_aMC/vendor/IREGI/src/qcdloop/ff/libff.a",
+                "MG5_aMC/vendor/IREGI/src/qcdloop/ql/libqcdloop.a",
+                "MG5_aMC/vendor/StdHEP/lib/libstdhep.a",
+                "MG5_aMC/vendor/StdHEP/lib/libstdhepC.a",
+                "MG5_aMC/vendor/StdHEP/lib/libFmcfio.a"
+              ]
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "tutorial.mg5",
+                "tutorial_amc-at-nlo.mg5"
+              ]
+            },
+            "script": [
+              "echo -e \"\\n# Checking mg5_configuration.txt\"",
+              "cat $PREFIX/MG5_aMC/input/mg5_configuration.txt",
+              "mg5_aMC --help",
+              "echo \"exit\" | mg5_aMC",
+              "lhapdf install NNPDF23_lo_as_0130_qed &> download_log.txt",
+              "echo -e \"\\n# Running tutorial.mg5\"",
+              "mg5_aMC ./tutorial.mg5",
+              "ls -lhtra",
+              "test ! -f ME5_debug",
+              "lhapdf install NNPDF23_nlo_as_0119_qed &> download_log.txt",
+              "echo -e \"\\n# Running tutorial_amc-at-nlo.mg5\"",
+              "mg5_aMC ./tutorial_amc-at-nlo.mg5"
+            ]
+          }
+        ],
+        "version": "3.5.7"
+      },
+      {
+        "build": null,
+        "name": "mg5amcnlo",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "fortran_compiler_stub",
+            "make",
+            "sed",
+            "grep"
+          ],
+          "host": [
+            "python",
+            "six",
+            "ply",
+            "fastjet-cxx",
+            "emela",
+            "lhapdf",
+            "oneloop-static",
+            "iregi-static 1.1.0.*",
+            "qcdloop-fortran-static",
+            "ninja-hep-ph-static 1.1.*",
+            "collier-static",
+            "hepmc2",
+            "hepmc3"
+          ],
+          "run": [
+            "cxx-compiler",
+            "fortran-compiler",
+            "make",
+            "tar",
+            "wget",
+            "curl",
+            "perl",
+            "python",
+            "six",
+            "numpy",
+            "fastjet-contrib",
+            "emela",
+            "lhapdf",
+            "ply",
+            "bc",
+            "procps-ng",
+            "oneloop-static",
+            "iregi-static 1.1.0.*",
+            "qcdloop-fortran-static",
+            "libtirpc",
+            "ninja-hep-ph-static 1.1.*",
+            "collier-static",
+            "mg5amcnlo-pythia8-interface",
+            "hepmc2",
+            "hepmc3",
+            "ghostscript",
+            "gnuplot"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "bin": [
+                "mg5_aMC"
+              ],
+              "files": [
+                "MG5_aMC/aloha/*",
+                "MG5_aMC/bin/*",
+                "MG5_aMC/HELAS/*",
+                "MG5_aMC/input/*",
+                "MG5_aMC/madgraph/*",
+                "MG5_aMC/MadSpin/*",
+                "MG5_aMC/mg5decay/*",
+                "MG5_aMC/models/*",
+                "MG5_aMC/PLUGIN/*",
+                "MG5_aMC/Template/*",
+                "MG5_aMC/vendor/*",
+                "MG5_aMC/proc_card.dat",
+                "MG5_aMC/VERSION",
+                "MG5_aMC/input/mg5_configuration.txt",
+                "MG5_aMC/madgraph/LICENSE",
+                "MG5_aMC/vendor/CutTools/includects/libcts.a",
+                "MG5_aMC/vendor/IREGI/src/libiregi.a",
+                "MG5_aMC/vendor/IREGI/src/qcdloop/ff/libff.a",
+                "MG5_aMC/vendor/IREGI/src/qcdloop/ql/libqcdloop.a",
+                "MG5_aMC/vendor/StdHEP/lib/libstdhep.a",
+                "MG5_aMC/vendor/StdHEP/lib/libstdhepC.a",
+                "MG5_aMC/vendor/StdHEP/lib/libFmcfio.a"
+              ]
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "tutorial.mg5",
+                "tutorial_amc-at-nlo.mg5"
+              ]
+            },
+            "script": [
+              "echo -e \"\\n# Checking mg5_configuration.txt\"",
+              "cat $PREFIX/MG5_aMC/input/mg5_configuration.txt",
+              "mg5_aMC --help",
+              "echo \"exit\" | mg5_aMC",
+              "lhapdf install NNPDF23_lo_as_0130_qed &> download_log.txt",
+              "echo -e \"\\n# Running tutorial.mg5\"",
+              "mg5_aMC ./tutorial.mg5",
+              "ls -lhtra",
+              "test ! -f ME5_debug",
+              "lhapdf install NNPDF23_nlo_as_0119_qed &> download_log.txt",
+              "echo -e \"\\n# Running tutorial_amc-at-nlo.mg5\"",
+              "mg5_aMC ./tutorial_amc-at-nlo.mg5"
+            ]
+          }
+        ],
+        "version": "3.5.7"
+      },
+      {
+        "build": null,
+        "name": "mg5amcnlo",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "fortran_compiler_stub",
+            "make",
+            "sed",
+            "grep"
+          ],
+          "host": [
+            "python",
+            "six",
+            "ply",
+            "fastjet-cxx",
+            "emela",
+            "lhapdf",
+            "oneloop-static",
+            "iregi-static 1.1.0.*",
+            "qcdloop-fortran-static",
+            "ninja-hep-ph-static 1.1.*",
+            "collier-static",
+            "hepmc2",
+            "hepmc3"
+          ],
+          "run": [
+            "cxx-compiler",
+            "fortran-compiler",
+            "make",
+            "tar",
+            "wget",
+            "curl",
+            "perl",
+            "python",
+            "six",
+            "numpy",
+            "fastjet-contrib",
+            "emela",
+            "lhapdf",
+            "ply",
+            "bc",
+            "procps-ng",
+            "oneloop-static",
+            "iregi-static 1.1.0.*",
+            "qcdloop-fortran-static",
+            "libtirpc",
+            "ninja-hep-ph-static 1.1.*",
+            "collier-static",
+            "mg5amcnlo-pythia8-interface",
+            "hepmc2",
+            "hepmc3",
+            "ghostscript",
+            "gnuplot"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "bin": [
+                "mg5_aMC"
+              ],
+              "files": [
+                "MG5_aMC/aloha/*",
+                "MG5_aMC/bin/*",
+                "MG5_aMC/HELAS/*",
+                "MG5_aMC/input/*",
+                "MG5_aMC/madgraph/*",
+                "MG5_aMC/MadSpin/*",
+                "MG5_aMC/mg5decay/*",
+                "MG5_aMC/models/*",
+                "MG5_aMC/PLUGIN/*",
+                "MG5_aMC/Template/*",
+                "MG5_aMC/vendor/*",
+                "MG5_aMC/proc_card.dat",
+                "MG5_aMC/VERSION",
+                "MG5_aMC/input/mg5_configuration.txt",
+                "MG5_aMC/madgraph/LICENSE",
+                "MG5_aMC/vendor/CutTools/includects/libcts.a",
+                "MG5_aMC/vendor/IREGI/src/libiregi.a",
+                "MG5_aMC/vendor/IREGI/src/qcdloop/ff/libff.a",
+                "MG5_aMC/vendor/IREGI/src/qcdloop/ql/libqcdloop.a",
+                "MG5_aMC/vendor/StdHEP/lib/libstdhep.a",
+                "MG5_aMC/vendor/StdHEP/lib/libstdhepC.a",
+                "MG5_aMC/vendor/StdHEP/lib/libFmcfio.a"
+              ]
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "tutorial.mg5",
+                "tutorial_amc-at-nlo.mg5"
+              ]
+            },
+            "script": [
+              "echo -e \"\\n# Checking mg5_configuration.txt\"",
+              "cat $PREFIX/MG5_aMC/input/mg5_configuration.txt",
+              "mg5_aMC --help",
+              "echo \"exit\" | mg5_aMC",
+              "lhapdf install NNPDF23_lo_as_0130_qed &> download_log.txt",
+              "echo -e \"\\n# Running tutorial.mg5\"",
+              "mg5_aMC ./tutorial.mg5",
+              "ls -lhtra",
+              "test ! -f ME5_debug",
+              "lhapdf install NNPDF23_nlo_as_0119_qed &> download_log.txt",
+              "echo -e \"\\n# Running tutorial_amc-at-nlo.mg5\"",
+              "mg5_aMC ./tutorial_amc-at-nlo.mg5"
+            ]
+          }
+        ],
+        "version": "3.5.7"
+      },
+      {
+        "build": null,
+        "name": "mg5amcnlo",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "fortran_compiler_stub",
+            "make",
+            "sed",
+            "grep"
+          ],
+          "host": [
+            "python",
+            "six",
+            "ply",
+            "fastjet-cxx",
+            "emela",
+            "lhapdf",
+            "oneloop-static",
+            "iregi-static 1.1.0.*",
+            "qcdloop-fortran-static",
+            "ninja-hep-ph-static 1.1.*",
+            "collier-static",
+            "hepmc2",
+            "hepmc3"
+          ],
+          "run": [
+            "cxx-compiler",
+            "fortran-compiler",
+            "make",
+            "tar",
+            "wget",
+            "curl",
+            "perl",
+            "python",
+            "six",
+            "numpy",
+            "fastjet-contrib",
+            "emela",
+            "lhapdf",
+            "ply",
+            "bc",
+            "procps-ng",
+            "oneloop-static",
+            "iregi-static 1.1.0.*",
+            "qcdloop-fortran-static",
+            "libtirpc",
+            "ninja-hep-ph-static 1.1.*",
+            "collier-static",
+            "mg5amcnlo-pythia8-interface",
+            "hepmc2",
+            "hepmc3",
+            "ghostscript",
+            "gnuplot"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "bin": [
+                "mg5_aMC"
+              ],
+              "files": [
+                "MG5_aMC/aloha/*",
+                "MG5_aMC/bin/*",
+                "MG5_aMC/HELAS/*",
+                "MG5_aMC/input/*",
+                "MG5_aMC/madgraph/*",
+                "MG5_aMC/MadSpin/*",
+                "MG5_aMC/mg5decay/*",
+                "MG5_aMC/models/*",
+                "MG5_aMC/PLUGIN/*",
+                "MG5_aMC/Template/*",
+                "MG5_aMC/vendor/*",
+                "MG5_aMC/proc_card.dat",
+                "MG5_aMC/VERSION",
+                "MG5_aMC/input/mg5_configuration.txt",
+                "MG5_aMC/madgraph/LICENSE",
+                "MG5_aMC/vendor/CutTools/includects/libcts.a",
+                "MG5_aMC/vendor/IREGI/src/libiregi.a",
+                "MG5_aMC/vendor/IREGI/src/qcdloop/ff/libff.a",
+                "MG5_aMC/vendor/IREGI/src/qcdloop/ql/libqcdloop.a",
+                "MG5_aMC/vendor/StdHEP/lib/libstdhep.a",
+                "MG5_aMC/vendor/StdHEP/lib/libstdhepC.a",
+                "MG5_aMC/vendor/StdHEP/lib/libFmcfio.a"
+              ]
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "tutorial.mg5",
+                "tutorial_amc-at-nlo.mg5"
+              ]
+            },
+            "script": [
+              "echo -e \"\\n# Checking mg5_configuration.txt\"",
+              "cat $PREFIX/MG5_aMC/input/mg5_configuration.txt",
+              "mg5_aMC --help",
+              "echo \"exit\" | mg5_aMC",
+              "lhapdf install NNPDF23_lo_as_0130_qed &> download_log.txt",
+              "echo -e \"\\n# Running tutorial.mg5\"",
+              "mg5_aMC ./tutorial.mg5",
+              "ls -lhtra",
+              "test ! -f ME5_debug",
+              "lhapdf install NNPDF23_nlo_as_0119_qed &> download_log.txt",
+              "echo -e \"\\n# Running tutorial_amc-at-nlo.mg5\"",
+              "mg5_aMC ./tutorial_amc-at-nlo.mg5"
+            ]
+          }
+        ],
+        "version": "3.5.7"
+      },
+      {
+        "build": null,
+        "name": "mg5amcnlo",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "fortran_compiler_stub",
+            "make",
+            "sed",
+            "grep"
+          ],
+          "host": [
+            "python",
+            "six",
+            "ply",
+            "fastjet-cxx",
+            "emela",
+            "lhapdf",
+            "oneloop-static",
+            "iregi-static 1.1.0.*",
+            "qcdloop-fortran-static",
+            "ninja-hep-ph-static 1.1.*",
+            "collier-static",
+            "hepmc2",
+            "hepmc3"
+          ],
+          "run": [
+            "cxx-compiler",
+            "fortran-compiler",
+            "make",
+            "tar",
+            "wget",
+            "curl",
+            "perl",
+            "python",
+            "six",
+            "numpy",
+            "fastjet-contrib",
+            "emela",
+            "lhapdf",
+            "ply",
+            "bc",
+            "procps-ng",
+            "oneloop-static",
+            "iregi-static 1.1.0.*",
+            "qcdloop-fortran-static",
+            "libtirpc",
+            "ninja-hep-ph-static 1.1.*",
+            "collier-static",
+            "mg5amcnlo-pythia8-interface",
+            "hepmc2",
+            "hepmc3",
+            "ghostscript",
+            "gnuplot"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "bin": [
+                "mg5_aMC"
+              ],
+              "files": [
+                "MG5_aMC/aloha/*",
+                "MG5_aMC/bin/*",
+                "MG5_aMC/HELAS/*",
+                "MG5_aMC/input/*",
+                "MG5_aMC/madgraph/*",
+                "MG5_aMC/MadSpin/*",
+                "MG5_aMC/mg5decay/*",
+                "MG5_aMC/models/*",
+                "MG5_aMC/PLUGIN/*",
+                "MG5_aMC/Template/*",
+                "MG5_aMC/vendor/*",
+                "MG5_aMC/proc_card.dat",
+                "MG5_aMC/VERSION",
+                "MG5_aMC/input/mg5_configuration.txt",
+                "MG5_aMC/madgraph/LICENSE",
+                "MG5_aMC/vendor/CutTools/includects/libcts.a",
+                "MG5_aMC/vendor/IREGI/src/libiregi.a",
+                "MG5_aMC/vendor/IREGI/src/qcdloop/ff/libff.a",
+                "MG5_aMC/vendor/IREGI/src/qcdloop/ql/libqcdloop.a",
+                "MG5_aMC/vendor/StdHEP/lib/libstdhep.a",
+                "MG5_aMC/vendor/StdHEP/lib/libstdhepC.a",
+                "MG5_aMC/vendor/StdHEP/lib/libFmcfio.a"
+              ]
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "tutorial.mg5",
+                "tutorial_amc-at-nlo.mg5"
+              ]
+            },
+            "script": [
+              "echo -e \"\\n# Checking mg5_configuration.txt\"",
+              "cat $PREFIX/MG5_aMC/input/mg5_configuration.txt",
+              "mg5_aMC --help",
+              "echo \"exit\" | mg5_aMC",
+              "lhapdf install NNPDF23_lo_as_0130_qed &> download_log.txt",
+              "echo -e \"\\n# Running tutorial.mg5\"",
+              "mg5_aMC ./tutorial.mg5",
+              "ls -lhtra",
+              "test ! -f ME5_debug",
+              "lhapdf install NNPDF23_nlo_as_0119_qed &> download_log.txt",
+              "echo -e \"\\n# Running tutorial_amc-at-nlo.mg5\"",
+              "mg5_aMC ./tutorial_amc-at-nlo.mg5"
+            ]
+          }
+        ],
+        "version": "3.5.7"
+      },
+      {
+        "build": null,
+        "name": "mg5amcnlo",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "fortran_compiler_stub",
+            "make",
+            "sed",
+            "grep"
+          ],
+          "host": [
+            "python",
+            "six",
+            "ply",
+            "fastjet-cxx",
+            "emela",
+            "lhapdf",
+            "oneloop-static",
+            "iregi-static 1.1.0.*",
+            "qcdloop-fortran-static",
+            "ninja-hep-ph-static 1.1.*",
+            "collier-static",
+            "hepmc2",
+            "hepmc3"
+          ],
+          "run": [
+            "cxx-compiler",
+            "fortran-compiler",
+            "make",
+            "tar",
+            "wget",
+            "curl",
+            "perl",
+            "python",
+            "six",
+            "numpy",
+            "fastjet-contrib",
+            "emela",
+            "lhapdf",
+            "ply",
+            "bc",
+            "procps-ng",
+            "oneloop-static",
+            "iregi-static 1.1.0.*",
+            "qcdloop-fortran-static",
+            "libtirpc",
+            "ninja-hep-ph-static 1.1.*",
+            "collier-static",
+            "mg5amcnlo-pythia8-interface",
+            "hepmc2",
+            "hepmc3",
+            "ghostscript",
+            "gnuplot"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "bin": [
+                "mg5_aMC"
+              ],
+              "files": [
+                "MG5_aMC/aloha/*",
+                "MG5_aMC/bin/*",
+                "MG5_aMC/HELAS/*",
+                "MG5_aMC/input/*",
+                "MG5_aMC/madgraph/*",
+                "MG5_aMC/MadSpin/*",
+                "MG5_aMC/mg5decay/*",
+                "MG5_aMC/models/*",
+                "MG5_aMC/PLUGIN/*",
+                "MG5_aMC/Template/*",
+                "MG5_aMC/vendor/*",
+                "MG5_aMC/proc_card.dat",
+                "MG5_aMC/VERSION",
+                "MG5_aMC/input/mg5_configuration.txt",
+                "MG5_aMC/madgraph/LICENSE",
+                "MG5_aMC/vendor/CutTools/includects/libcts.a",
+                "MG5_aMC/vendor/IREGI/src/libiregi.a",
+                "MG5_aMC/vendor/IREGI/src/qcdloop/ff/libff.a",
+                "MG5_aMC/vendor/IREGI/src/qcdloop/ql/libqcdloop.a",
+                "MG5_aMC/vendor/StdHEP/lib/libstdhep.a",
+                "MG5_aMC/vendor/StdHEP/lib/libstdhepC.a",
+                "MG5_aMC/vendor/StdHEP/lib/libFmcfio.a"
+              ]
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "tutorial.mg5",
+                "tutorial_amc-at-nlo.mg5"
+              ]
+            },
+            "script": [
+              "echo -e \"\\n# Checking mg5_configuration.txt\"",
+              "cat $PREFIX/MG5_aMC/input/mg5_configuration.txt",
+              "mg5_aMC --help",
+              "echo \"exit\" | mg5_aMC",
+              "lhapdf install NNPDF23_lo_as_0130_qed &> download_log.txt",
+              "echo -e \"\\n# Running tutorial.mg5\"",
+              "mg5_aMC ./tutorial.mg5",
+              "ls -lhtra",
+              "test ! -f ME5_debug",
+              "lhapdf install NNPDF23_nlo_as_0119_qed &> download_log.txt",
+              "echo -e \"\\n# Running tutorial_amc-at-nlo.mg5\"",
+              "mg5_aMC ./tutorial_amc-at-nlo.mg5"
+            ]
+          }
+        ],
+        "version": "3.5.7"
+      },
+      {
+        "build": null,
+        "name": "mg5amcnlo",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "fortran_compiler_stub",
+            "make",
+            "sed",
+            "grep"
+          ],
+          "host": [
+            "python",
+            "six",
+            "ply",
+            "fastjet-cxx",
+            "emela",
+            "lhapdf",
+            "oneloop-static",
+            "iregi-static 1.1.0.*",
+            "qcdloop-fortran-static",
+            "ninja-hep-ph-static 1.1.*",
+            "collier-static",
+            "hepmc2",
+            "hepmc3"
+          ],
+          "run": [
+            "cxx-compiler",
+            "fortran-compiler",
+            "make",
+            "tar",
+            "wget",
+            "curl",
+            "perl",
+            "python",
+            "six",
+            "numpy",
+            "fastjet-contrib",
+            "emela",
+            "lhapdf",
+            "ply",
+            "bc",
+            "procps-ng",
+            "oneloop-static",
+            "iregi-static 1.1.0.*",
+            "qcdloop-fortran-static",
+            "libtirpc",
+            "ninja-hep-ph-static 1.1.*",
+            "collier-static",
+            "mg5amcnlo-pythia8-interface",
+            "hepmc2",
+            "hepmc3",
+            "ghostscript",
+            "gnuplot"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "bin": [
+                "mg5_aMC"
+              ],
+              "files": [
+                "MG5_aMC/aloha/*",
+                "MG5_aMC/bin/*",
+                "MG5_aMC/HELAS/*",
+                "MG5_aMC/input/*",
+                "MG5_aMC/madgraph/*",
+                "MG5_aMC/MadSpin/*",
+                "MG5_aMC/mg5decay/*",
+                "MG5_aMC/models/*",
+                "MG5_aMC/PLUGIN/*",
+                "MG5_aMC/Template/*",
+                "MG5_aMC/vendor/*",
+                "MG5_aMC/proc_card.dat",
+                "MG5_aMC/VERSION",
+                "MG5_aMC/input/mg5_configuration.txt",
+                "MG5_aMC/madgraph/LICENSE",
+                "MG5_aMC/vendor/CutTools/includects/libcts.a",
+                "MG5_aMC/vendor/IREGI/src/libiregi.a",
+                "MG5_aMC/vendor/IREGI/src/qcdloop/ff/libff.a",
+                "MG5_aMC/vendor/IREGI/src/qcdloop/ql/libqcdloop.a",
+                "MG5_aMC/vendor/StdHEP/lib/libstdhep.a",
+                "MG5_aMC/vendor/StdHEP/lib/libstdhepC.a",
+                "MG5_aMC/vendor/StdHEP/lib/libFmcfio.a"
+              ]
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "tutorial.mg5",
+                "tutorial_amc-at-nlo.mg5"
+              ]
+            },
+            "script": [
+              "echo -e \"\\n# Checking mg5_configuration.txt\"",
+              "cat $PREFIX/MG5_aMC/input/mg5_configuration.txt",
+              "mg5_aMC --help",
+              "echo \"exit\" | mg5_aMC",
+              "lhapdf install NNPDF23_lo_as_0130_qed &> download_log.txt",
+              "echo -e \"\\n# Running tutorial.mg5\"",
+              "mg5_aMC ./tutorial.mg5",
+              "ls -lhtra",
+              "test ! -f ME5_debug",
+              "lhapdf install NNPDF23_nlo_as_0119_qed &> download_log.txt",
+              "echo -e \"\\n# Running tutorial_amc-at-nlo.mg5\"",
+              "mg5_aMC ./tutorial_amc-at-nlo.mg5"
+            ]
+          }
+        ],
+        "version": "3.5.7"
+      },
+      {
+        "build": null,
+        "name": "mg5amcnlo",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "fortran_compiler_stub",
+            "make",
+            "sed",
+            "grep"
+          ],
+          "host": [
+            "python",
+            "six",
+            "ply",
+            "fastjet-cxx",
+            "emela",
+            "lhapdf",
+            "oneloop-static",
+            "iregi-static 1.1.0.*",
+            "qcdloop-fortran-static",
+            "ninja-hep-ph-static 1.1.*",
+            "collier-static",
+            "hepmc2",
+            "hepmc3"
+          ],
+          "run": [
+            "cxx-compiler",
+            "fortran-compiler",
+            "make",
+            "tar",
+            "wget",
+            "curl",
+            "perl",
+            "python",
+            "six",
+            "numpy",
+            "fastjet-contrib",
+            "emela",
+            "lhapdf",
+            "ply",
+            "bc",
+            "procps-ng",
+            "oneloop-static",
+            "iregi-static 1.1.0.*",
+            "qcdloop-fortran-static",
+            "libtirpc",
+            "ninja-hep-ph-static 1.1.*",
+            "collier-static",
+            "mg5amcnlo-pythia8-interface",
+            "hepmc2",
+            "hepmc3",
+            "ghostscript",
+            "gnuplot"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "bin": [
+                "mg5_aMC"
+              ],
+              "files": [
+                "MG5_aMC/aloha/*",
+                "MG5_aMC/bin/*",
+                "MG5_aMC/HELAS/*",
+                "MG5_aMC/input/*",
+                "MG5_aMC/madgraph/*",
+                "MG5_aMC/MadSpin/*",
+                "MG5_aMC/mg5decay/*",
+                "MG5_aMC/models/*",
+                "MG5_aMC/PLUGIN/*",
+                "MG5_aMC/Template/*",
+                "MG5_aMC/vendor/*",
+                "MG5_aMC/proc_card.dat",
+                "MG5_aMC/VERSION",
+                "MG5_aMC/input/mg5_configuration.txt",
+                "MG5_aMC/madgraph/LICENSE",
+                "MG5_aMC/vendor/CutTools/includects/libcts.a",
+                "MG5_aMC/vendor/IREGI/src/libiregi.a",
+                "MG5_aMC/vendor/IREGI/src/qcdloop/ff/libff.a",
+                "MG5_aMC/vendor/IREGI/src/qcdloop/ql/libqcdloop.a",
+                "MG5_aMC/vendor/StdHEP/lib/libstdhep.a",
+                "MG5_aMC/vendor/StdHEP/lib/libstdhepC.a",
+                "MG5_aMC/vendor/StdHEP/lib/libFmcfio.a"
+              ]
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "tutorial.mg5",
+                "tutorial_amc-at-nlo.mg5"
+              ]
+            },
+            "script": [
+              "echo -e \"\\n# Checking mg5_configuration.txt\"",
+              "cat $PREFIX/MG5_aMC/input/mg5_configuration.txt",
+              "mg5_aMC --help",
+              "echo \"exit\" | mg5_aMC",
+              "lhapdf install NNPDF23_lo_as_0130_qed &> download_log.txt",
+              "echo -e \"\\n# Running tutorial.mg5\"",
+              "mg5_aMC ./tutorial.mg5",
+              "ls -lhtra",
+              "test ! -f ME5_debug",
+              "lhapdf install NNPDF23_nlo_as_0119_qed &> download_log.txt",
+              "echo -e \"\\n# Running tutorial_amc-at-nlo.mg5\"",
+              "mg5_aMC ./tutorial_amc-at-nlo.mg5"
+            ]
+          }
+        ],
+        "version": "3.5.7"
+      }
+    ],
+    "package": {
+      "name": "mg5amcnlo",
+      "version": "3.5.7"
+    },
+    "requirements": {
+      "build": [
+        "c_stdlib_stub",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "make",
+        "sed",
+        "grep"
+      ],
+      "host": [
+        "python",
+        "six",
+        "ply",
+        "fastjet-cxx",
+        "emela",
+        "lhapdf",
+        "oneloop-static",
+        "iregi-static 1.1.0.*",
+        "qcdloop-fortran-static",
+        "ninja-hep-ph-static 1.1.*",
+        "collier-static",
+        "hepmc2",
+        "hepmc3"
+      ],
+      "run": [
+        "cxx-compiler",
+        "fortran-compiler",
+        "make",
+        "tar",
+        "wget",
+        "curl",
+        "perl",
+        "python",
+        "six",
+        "numpy",
+        "fastjet-contrib",
+        "emela",
+        "lhapdf",
+        "ply",
+        "bc",
+        "procps-ng",
+        "oneloop-static",
+        "iregi-static 1.1.0.*",
+        "qcdloop-fortran-static",
+        "libtirpc",
+        "ninja-hep-ph-static 1.1.*",
+        "collier-static",
+        "mg5amcnlo-pythia8-interface",
+        "hepmc2",
+        "hepmc3",
+        "ghostscript",
+        "gnuplot"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "patches": [
+        "remove-cuttools-compiler-requirement.patch",
+        "add-libtirpc-to-nlo-extralibs-for-xdr.patch"
+      ],
+      "sha256": "ca3e027f078438318bd4143a102aebc2d51358f537b5d52bbc574fe49a6a901e",
+      "url": "https://github.com/hep-packaging-coordination/mg5amcnlo-release-mirror/releases/download/3.5.7/MG5_aMC_v3.5.7.tar.gz"
+    }
+  },
+  "name": "mg5amcnlo",
+  "osx_64_meta_yaml": {
+    "about": {
+      "description": "MadGraph5_aMC@NLO is a framework that aims at providing all the elements\nnecessary for SM and BSM phenomenology, such as the computations of cross\nsections, the generation of hard events and their matching with event\ngenerators, and the use of a variety of tools relevant to event manipulation\nand analysis.\nProcesses can be simulated to LO accuracy for any user-defined Lagrangian,\nand the NLO accuracy in the case of models that support this kind of calculations\n&mdash; prominent among these are QCD and EW corrections to SM processes.\nMatrix elements at the tree- and one-loop-level can also be obtained.\n\nMadGraph5_aMC@NLO is the new version of both MadGraph5 and aMC@NLO that unifies\nthe LO and NLO lines of development of automated tools within the MadGraph family.\nAs such, the code allows one to simulate processes in virtually all configurations\nof interest, in particular for hadronic and e+e- colliders; starting from version\n3.2.0, the latter include Initial State Radiation and beamstrahlung effects.",
+      "dev_url": "https://github.com/mg5amcnlo/mg5amcnlo",
+      "home": "https://github.com/mg5amcnlo/mg5amcnlo",
+      "license": "LicenseRef-NCSA",
+      "license_family": "LicenseRef-NCSA",
+      "license_file": "source/LICENSE",
+      "summary": "MadGraph5_aMC@NLO"
+    },
+    "build": {
+      "number": "6",
+      "script": [
+        "rm -r source/.github",
+        "rm -r source/tests",
+        "rm source/.bzrignore",
+        "rm source/.gitignore",
+        "rm source/code-notes",
+        "rm source/README",
+        "rm source/UpdateNotes.txt",
+        "rm source/vendor/DiscreteSampler/check",
+        "find source -type f -exec grep -Il '#!/usr/bin/perl -w' {} + | xargs sed -i 's|#!/usr/bin/perl -w|#!/usr/bin/env perl\\nuse warnings;|g'",
+        "cp -a source $PREFIX/MG5_aMC",
+        "cd $PREFIX/MG5_aMC/vendor/CutTools",
+        "echo -e \"\\n# Compiling CutTools\"",
+        "make FC=$FC FFLAGS=\"-fPIC -fno-automatic -O2 -funroll-all-loops $FFLAGS\"",
+        "find . -name \"*.o\" -exec rm {} +",
+        "cd -",
+        "rm -rf $PREFIX/MG5_aMC/vendor/IREGI",
+        "mkdir -p $PREFIX/MG5_aMC/vendor/IREGI/src",
+        "ln -s $PREFIX/lib/libiregi.a $PREFIX/MG5_aMC/vendor/IREGI/src/",
+        "for file in $PREFIX/include/iregi/*; do ln -s \"$file\" $PREFIX/MG5_aMC/vendor/IREGI/src/; done",
+        "mkdir -p $PREFIX/MG5_aMC/vendor/IREGI/src/qcdloop/ff",
+        "ln -s $PREFIX/lib/libff.a $PREFIX/MG5_aMC/vendor/IREGI/src/qcdloop/ff/",
+        "mkdir -p $PREFIX/MG5_aMC/vendor/IREGI/src/qcdloop/ql",
+        "ln -s $PREFIX/lib/libqcdloop.a $PREFIX/MG5_aMC/vendor/IREGI/src/qcdloop/ql/",
+        "cd $PREFIX/MG5_aMC/vendor/StdHEP",
+        "sed -i \"s|FFLAGS += -std=legacy|FFLAGS += -std=legacy -ffixed-line-length-none $FFLAGS|g\" makefile",
+        "sed -i \"s|CFLAGS += -Wno-implicit-function-declaration|CFLAGS += -Wno-implicit-function-declaration $CFLAGS|g\" makefile",
+        "echo -e \"\\n# Compiling StdHEP\"",
+        "make all FC=$FC F77=$FC CC=$CC --jobs=$CPU_COUNT",
+        "make clean",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/lib",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/include",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/oneloop",
+        "echo -e \"\\n# Symlinking OneLOop\"",
+        "ln -s $PREFIX/lib/libavh_olo.a $PREFIX/MG5_aMC/HEPTools/oneloop/",
+        "ln -s $PREFIX/lib/libavh_olo.a $PREFIX/MG5_aMC/HEPTools/lib/",
+        "for file in $PREFIX/include/oneloop/*; do ln -s \"$file\" $PREFIX/MG5_aMC/HEPTools/oneloop/; ln -s \"$file\" $PREFIX/MG5_aMC/HEPTools/include/; done",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/bin",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/ninja/lib",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/ninja/include",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/ninja/bin",
+        "echo -e \"\\n# Symlinking Ninja\"",
+        "ln -s $PREFIX/lib/libninja.a $PREFIX/MG5_aMC/HEPTools/ninja/lib/",
+        "ln -s $PREFIX/lib/libninja.a $PREFIX/MG5_aMC/HEPTools/lib/",
+        "ln -s $PREFIX/include/mninja.mod $PREFIX/MG5_aMC/HEPTools/ninja/include/",
+        "ln -s $PREFIX/include/ninjago_module.mod $PREFIX/MG5_aMC/HEPTools/ninja/include/",
+        "ln -s $PREFIX/include/ninjavholo.mod $PREFIX/MG5_aMC/HEPTools/ninja/include/",
+        "ln -s $PREFIX/include/ninja $PREFIX/MG5_aMC/HEPTools/ninja/include/ninja",
+        "ln -s $PREFIX/include/quadninja $PREFIX/MG5_aMC/HEPTools/ninja/include/quadninja",
+        "for file in $PREFIX/MG5_aMC/HEPTools/ninja/include/*.mod; do ln -s \"$file\" $PREFIX/MG5_aMC/HEPTools/include/; done",
+        "ln -s $PREFIX/MG5_aMC/HEPTools/ninja/include/ninja $PREFIX/MG5_aMC/HEPTools/include/ninja",
+        "ln -s $PREFIX/MG5_aMC/HEPTools/ninja/include/quadninja $PREFIX/MG5_aMC/HEPTools/include/quadninja",
+        "ln -s $PREFIX/bin/ninja-config $PREFIX/MG5_aMC/HEPTools/ninja/bin/",
+        "ln -s $PREFIX/bin/ninja-config $PREFIX/MG5_aMC/HEPTools/bin/",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/collier/include",
+        "echo -e \"\\n# Symlinking Collier\"",
+        "ln -s $PREFIX/lib/libcollier.a $PREFIX/MG5_aMC/HEPTools/collier/",
+        "ln -s $PREFIX/lib/libcollier.a $PREFIX/MG5_aMC/HEPTools/lib/",
+        "ln -s $PREFIX/include/collier.mod $PREFIX/MG5_aMC/HEPTools/collier/include/",
+        "ln -s $PREFIX/include/collier.mod $PREFIX/MG5_aMC/HEPTools/include/",
+        "echo -e \"\\n# Configuring $PREFIX/MG5_aMC/input/mg5_configuration.txt\"",
+        "cp $RECIPE_DIR/mg5_configuration.txt .",
+        "sed -i \"s|REPLACE_WITH_PREFIX|$PREFIX|g\" mg5_configuration.txt",
+        "sed -i \"s|REPLACE_WITH_BASENAME_FC|$(basename ${FC_FOR_BUILD//$BUILD/$HOST})|g\" mg5_configuration.txt",
+        "sed -i \"s|REPLACE_WITH_BASENAME_CXX|$(basename ${CXX_FOR_BUILD//$BUILD/$HOST})|g\" mg5_configuration.txt",
+        "sed -i \"s|# automatic_html_opening = True|automatic_html_opening = False|g\" mg5_configuration.txt",
+        "sed -i '/ninja =/s/^# //g' mg5_configuration.txt",
+        "mv mg5_configuration.txt $PREFIX/MG5_aMC/input/mg5_configuration.txt",
+        "mkdir -p $PREFIX/bin",
+        "ln -s $PREFIX/MG5_aMC/bin/mg5_aMC $PREFIX/bin/mg5_aMC",
+        "mkdir -p $PREFIX/share/mg5_aMC",
+        "ln -s $PREFIX/MG5_aMC/proc_card.dat $PREFIX/share/mg5_aMC/proc_card.dat",
+        "mkdir -p $PREFIX/etc/conda/activate.d",
+        "cp \"${RECIPE_DIR}/activate.sh\" \"${PREFIX}/etc/conda/activate.d/zzz-${PKG_NAME}-activate.sh\"",
+        "cp \"${RECIPE_DIR}/activate.csh\" \"${PREFIX}/etc/conda/activate.d/zzz-${PKG_NAME}-activate.csh\"",
+        "cp \"${RECIPE_DIR}/activate.fish\" \"${PREFIX}/etc/conda/activate.d/zzz-${PKG_NAME}-activate.fish\"",
+        "mkdir -p $PREFIX/etc/conda/deactivate.d",
+        "cp \"${RECIPE_DIR}/deactivate.sh\" \"${PREFIX}/etc/conda/deactivate.d/zzz-${PKG_NAME}-deactivate.sh\"",
+        "cp \"${RECIPE_DIR}/deactivate.csh\" \"${PREFIX}/etc/conda/deactivate.d/zzz-${PKG_NAME}-deactivate.csh\"",
+        "cp \"${RECIPE_DIR}/deactivate.fish\" \"${PREFIX}/etc/conda/deactivate.d/zzz-${PKG_NAME}-deactivate.fish\"",
+        "ls -lhtra $PREFIX/etc/conda/activate.d/",
+        "ls -lhtra $PREFIX/etc/conda/deactivate.d/",
+        "echo \"exit\" | mg5_aMC"
+      ]
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "matthewfeickert"
+      ]
+    },
+    "outputs": [
+      {
+        "build": null,
+        "name": "mg5amcnlo",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "fortran_compiler_stub",
+            "make",
+            "sed",
+            "grep"
+          ],
+          "host": [
+            "python",
+            "six",
+            "ply",
+            "fastjet-cxx",
+            "emela",
+            "lhapdf",
+            "oneloop-static",
+            "iregi-static 1.1.0.*",
+            "qcdloop-fortran-static",
+            "ninja-hep-ph-static 1.1.*",
+            "collier-static",
+            "hepmc2",
+            "hepmc3"
+          ],
+          "run": [
+            "cxx-compiler",
+            "fortran-compiler",
+            "make",
+            "tar",
+            "wget",
+            "curl",
+            "perl",
+            "python",
+            "six",
+            "numpy",
+            "fastjet-contrib",
+            "emela",
+            "lhapdf",
+            "ply",
+            "bc",
+            "procps-ng",
+            "oneloop-static",
+            "iregi-static 1.1.0.*",
+            "qcdloop-fortran-static",
+            "libtirpc",
+            "ninja-hep-ph-static 1.1.*",
+            "collier-static",
+            "mg5amcnlo-pythia8-interface",
+            "hepmc2",
+            "hepmc3",
+            "ghostscript",
+            "gnuplot"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "bin": [
+                "mg5_aMC"
+              ],
+              "files": [
+                "MG5_aMC/aloha/*",
+                "MG5_aMC/bin/*",
+                "MG5_aMC/HELAS/*",
+                "MG5_aMC/input/*",
+                "MG5_aMC/madgraph/*",
+                "MG5_aMC/MadSpin/*",
+                "MG5_aMC/mg5decay/*",
+                "MG5_aMC/models/*",
+                "MG5_aMC/PLUGIN/*",
+                "MG5_aMC/Template/*",
+                "MG5_aMC/vendor/*",
+                "MG5_aMC/proc_card.dat",
+                "MG5_aMC/VERSION",
+                "MG5_aMC/input/mg5_configuration.txt",
+                "MG5_aMC/madgraph/LICENSE",
+                "MG5_aMC/vendor/CutTools/includects/libcts.a",
+                "MG5_aMC/vendor/IREGI/src/libiregi.a",
+                "MG5_aMC/vendor/IREGI/src/qcdloop/ff/libff.a",
+                "MG5_aMC/vendor/IREGI/src/qcdloop/ql/libqcdloop.a",
+                "MG5_aMC/vendor/StdHEP/lib/libstdhep.a",
+                "MG5_aMC/vendor/StdHEP/lib/libstdhepC.a",
+                "MG5_aMC/vendor/StdHEP/lib/libFmcfio.a"
+              ]
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "tutorial.mg5",
+                "tutorial_amc-at-nlo.mg5"
+              ]
+            },
+            "script": [
+              "echo -e \"\\n# Checking mg5_configuration.txt\"",
+              "cat $PREFIX/MG5_aMC/input/mg5_configuration.txt",
+              "mg5_aMC --help",
+              "echo \"exit\" | mg5_aMC",
+              "lhapdf install NNPDF23_lo_as_0130_qed &> download_log.txt",
+              "echo -e \"\\n# Running tutorial.mg5\"",
+              "mg5_aMC ./tutorial.mg5",
+              "ls -lhtra",
+              "test ! -f ME5_debug",
+              "lhapdf install NNPDF23_nlo_as_0119_qed &> download_log.txt",
+              "echo -e \"\\n# Running tutorial_amc-at-nlo.mg5\"",
+              "mg5_aMC ./tutorial_amc-at-nlo.mg5"
+            ]
+          }
+        ],
+        "version": "3.5.7"
+      },
+      {
+        "build": null,
+        "name": "mg5amcnlo",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "fortran_compiler_stub",
+            "make",
+            "sed",
+            "grep"
+          ],
+          "host": [
+            "python",
+            "six",
+            "ply",
+            "fastjet-cxx",
+            "emela",
+            "lhapdf",
+            "oneloop-static",
+            "iregi-static 1.1.0.*",
+            "qcdloop-fortran-static",
+            "ninja-hep-ph-static 1.1.*",
+            "collier-static",
+            "hepmc2",
+            "hepmc3"
+          ],
+          "run": [
+            "cxx-compiler",
+            "fortran-compiler",
+            "make",
+            "tar",
+            "wget",
+            "curl",
+            "perl",
+            "python",
+            "six",
+            "numpy",
+            "fastjet-contrib",
+            "emela",
+            "lhapdf",
+            "ply",
+            "bc",
+            "procps-ng",
+            "oneloop-static",
+            "iregi-static 1.1.0.*",
+            "qcdloop-fortran-static",
+            "libtirpc",
+            "ninja-hep-ph-static 1.1.*",
+            "collier-static",
+            "mg5amcnlo-pythia8-interface",
+            "hepmc2",
+            "hepmc3",
+            "ghostscript",
+            "gnuplot"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "bin": [
+                "mg5_aMC"
+              ],
+              "files": [
+                "MG5_aMC/aloha/*",
+                "MG5_aMC/bin/*",
+                "MG5_aMC/HELAS/*",
+                "MG5_aMC/input/*",
+                "MG5_aMC/madgraph/*",
+                "MG5_aMC/MadSpin/*",
+                "MG5_aMC/mg5decay/*",
+                "MG5_aMC/models/*",
+                "MG5_aMC/PLUGIN/*",
+                "MG5_aMC/Template/*",
+                "MG5_aMC/vendor/*",
+                "MG5_aMC/proc_card.dat",
+                "MG5_aMC/VERSION",
+                "MG5_aMC/input/mg5_configuration.txt",
+                "MG5_aMC/madgraph/LICENSE",
+                "MG5_aMC/vendor/CutTools/includects/libcts.a",
+                "MG5_aMC/vendor/IREGI/src/libiregi.a",
+                "MG5_aMC/vendor/IREGI/src/qcdloop/ff/libff.a",
+                "MG5_aMC/vendor/IREGI/src/qcdloop/ql/libqcdloop.a",
+                "MG5_aMC/vendor/StdHEP/lib/libstdhep.a",
+                "MG5_aMC/vendor/StdHEP/lib/libstdhepC.a",
+                "MG5_aMC/vendor/StdHEP/lib/libFmcfio.a"
+              ]
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "tutorial.mg5",
+                "tutorial_amc-at-nlo.mg5"
+              ]
+            },
+            "script": [
+              "echo -e \"\\n# Checking mg5_configuration.txt\"",
+              "cat $PREFIX/MG5_aMC/input/mg5_configuration.txt",
+              "mg5_aMC --help",
+              "echo \"exit\" | mg5_aMC",
+              "lhapdf install NNPDF23_lo_as_0130_qed &> download_log.txt",
+              "echo -e \"\\n# Running tutorial.mg5\"",
+              "mg5_aMC ./tutorial.mg5",
+              "ls -lhtra",
+              "test ! -f ME5_debug",
+              "lhapdf install NNPDF23_nlo_as_0119_qed &> download_log.txt",
+              "echo -e \"\\n# Running tutorial_amc-at-nlo.mg5\"",
+              "mg5_aMC ./tutorial_amc-at-nlo.mg5"
+            ]
+          }
+        ],
+        "version": "3.5.7"
+      }
+    ],
+    "package": {
+      "name": "mg5amcnlo",
+      "version": "3.5.7"
+    },
+    "requirements": {
+      "build": [
+        "c_stdlib_stub",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "make",
+        "sed",
+        "grep"
+      ],
+      "host": [
+        "python",
+        "six",
+        "ply",
+        "fastjet-cxx",
+        "emela",
+        "lhapdf",
+        "oneloop-static",
+        "iregi-static 1.1.0.*",
+        "qcdloop-fortran-static",
+        "ninja-hep-ph-static 1.1.*",
+        "collier-static",
+        "hepmc2",
+        "hepmc3"
+      ],
+      "run": [
+        "cxx-compiler",
+        "fortran-compiler",
+        "make",
+        "tar",
+        "wget",
+        "curl",
+        "perl",
+        "python",
+        "six",
+        "numpy",
+        "fastjet-contrib",
+        "emela",
+        "lhapdf",
+        "ply",
+        "bc",
+        "procps-ng",
+        "oneloop-static",
+        "iregi-static 1.1.0.*",
+        "qcdloop-fortran-static",
+        "libtirpc",
+        "ninja-hep-ph-static 1.1.*",
+        "collier-static",
+        "mg5amcnlo-pythia8-interface",
+        "hepmc2",
+        "hepmc3",
+        "ghostscript",
+        "gnuplot"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "patches": [
+        "remove-cuttools-compiler-requirement.patch",
+        "add-libtirpc-to-nlo-extralibs-for-xdr.patch"
+      ],
+      "sha256": "ca3e027f078438318bd4143a102aebc2d51358f537b5d52bbc574fe49a6a901e",
+      "url": "https://github.com/hep-packaging-coordination/mg5amcnlo-release-mirror/releases/download/3.5.7/MG5_aMC_v3.5.7.tar.gz"
+    }
+  },
+  "osx_64_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "grep",
+        "make",
+        "sed"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "collier-static",
+        "emela",
+        "fastjet-cxx",
+        "hepmc2",
+        "hepmc3",
+        "iregi-static",
+        "lhapdf",
+        "ninja-hep-ph-static",
+        "oneloop-static",
+        "ply",
+        "python",
+        "qcdloop-fortran-static",
+        "six"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "bc",
+        "collier-static",
+        "curl",
+        "cxx-compiler",
+        "emela",
+        "fastjet-contrib",
+        "fortran-compiler",
+        "ghostscript",
+        "gnuplot",
+        "hepmc2",
+        "hepmc3",
+        "iregi-static",
+        "lhapdf",
+        "libtirpc",
+        "make",
+        "mg5amcnlo-pythia8-interface",
+        "ninja-hep-ph-static",
+        "numpy",
+        "oneloop-static",
+        "perl",
+        "ply",
+        "procps-ng",
+        "python",
+        "qcdloop-fortran-static",
+        "six",
+        "tar",
+        "wget"
+      ]
+    },
+    "test": {
+      "__set__": true,
+      "elements": []
+    }
+  },
+  "osx_arm64_meta_yaml": {
+    "about": {
+      "description": "MadGraph5_aMC@NLO is a framework that aims at providing all the elements\nnecessary for SM and BSM phenomenology, such as the computations of cross\nsections, the generation of hard events and their matching with event\ngenerators, and the use of a variety of tools relevant to event manipulation\nand analysis.\nProcesses can be simulated to LO accuracy for any user-defined Lagrangian,\nand the NLO accuracy in the case of models that support this kind of calculations\n&mdash; prominent among these are QCD and EW corrections to SM processes.\nMatrix elements at the tree- and one-loop-level can also be obtained.\n\nMadGraph5_aMC@NLO is the new version of both MadGraph5 and aMC@NLO that unifies\nthe LO and NLO lines of development of automated tools within the MadGraph family.\nAs such, the code allows one to simulate processes in virtually all configurations\nof interest, in particular for hadronic and e+e- colliders; starting from version\n3.2.0, the latter include Initial State Radiation and beamstrahlung effects.",
+      "dev_url": "https://github.com/mg5amcnlo/mg5amcnlo",
+      "home": "https://github.com/mg5amcnlo/mg5amcnlo",
+      "license": "LicenseRef-NCSA",
+      "license_family": "LicenseRef-NCSA",
+      "license_file": "source/LICENSE",
+      "summary": "MadGraph5_aMC@NLO"
+    },
+    "build": {
+      "number": "6",
+      "script": [
+        "rm -r source/.github",
+        "rm -r source/tests",
+        "rm source/.bzrignore",
+        "rm source/.gitignore",
+        "rm source/code-notes",
+        "rm source/README",
+        "rm source/UpdateNotes.txt",
+        "rm source/vendor/DiscreteSampler/check",
+        "find source -type f -exec grep -Il '#!/usr/bin/perl -w' {} + | xargs sed -i 's|#!/usr/bin/perl -w|#!/usr/bin/env perl\\nuse warnings;|g'",
+        "cp -a source $PREFIX/MG5_aMC",
+        "cd $PREFIX/MG5_aMC/vendor/CutTools",
+        "echo -e \"\\n# Compiling CutTools\"",
+        "make FC=$FC FFLAGS=\"-fPIC -fno-automatic -O2 -funroll-all-loops $FFLAGS\"",
+        "find . -name \"*.o\" -exec rm {} +",
+        "cd -",
+        "rm -rf $PREFIX/MG5_aMC/vendor/IREGI",
+        "mkdir -p $PREFIX/MG5_aMC/vendor/IREGI/src",
+        "ln -s $PREFIX/lib/libiregi.a $PREFIX/MG5_aMC/vendor/IREGI/src/",
+        "for file in $PREFIX/include/iregi/*; do ln -s \"$file\" $PREFIX/MG5_aMC/vendor/IREGI/src/; done",
+        "mkdir -p $PREFIX/MG5_aMC/vendor/IREGI/src/qcdloop/ff",
+        "ln -s $PREFIX/lib/libff.a $PREFIX/MG5_aMC/vendor/IREGI/src/qcdloop/ff/",
+        "mkdir -p $PREFIX/MG5_aMC/vendor/IREGI/src/qcdloop/ql",
+        "ln -s $PREFIX/lib/libqcdloop.a $PREFIX/MG5_aMC/vendor/IREGI/src/qcdloop/ql/",
+        "cd $PREFIX/MG5_aMC/vendor/StdHEP",
+        "sed -i \"s|FFLAGS += -std=legacy|FFLAGS += -std=legacy -ffixed-line-length-none $FFLAGS|g\" makefile",
+        "sed -i \"s|CFLAGS += -Wno-implicit-function-declaration|CFLAGS += -Wno-implicit-function-declaration $CFLAGS|g\" makefile",
+        "echo -e \"\\n# Compiling StdHEP\"",
+        "make all FC=$FC F77=$FC CC=$CC --jobs=$CPU_COUNT",
+        "make clean",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/lib",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/include",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/oneloop",
+        "echo -e \"\\n# Symlinking OneLOop\"",
+        "ln -s $PREFIX/lib/libavh_olo.a $PREFIX/MG5_aMC/HEPTools/oneloop/",
+        "ln -s $PREFIX/lib/libavh_olo.a $PREFIX/MG5_aMC/HEPTools/lib/",
+        "for file in $PREFIX/include/oneloop/*; do ln -s \"$file\" $PREFIX/MG5_aMC/HEPTools/oneloop/; ln -s \"$file\" $PREFIX/MG5_aMC/HEPTools/include/; done",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/bin",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/ninja/lib",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/ninja/include",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/ninja/bin",
+        "echo -e \"\\n# Symlinking Ninja\"",
+        "ln -s $PREFIX/lib/libninja.a $PREFIX/MG5_aMC/HEPTools/ninja/lib/",
+        "ln -s $PREFIX/lib/libninja.a $PREFIX/MG5_aMC/HEPTools/lib/",
+        "ln -s $PREFIX/include/mninja.mod $PREFIX/MG5_aMC/HEPTools/ninja/include/",
+        "ln -s $PREFIX/include/ninjago_module.mod $PREFIX/MG5_aMC/HEPTools/ninja/include/",
+        "ln -s $PREFIX/include/ninjavholo.mod $PREFIX/MG5_aMC/HEPTools/ninja/include/",
+        "ln -s $PREFIX/include/ninja $PREFIX/MG5_aMC/HEPTools/ninja/include/ninja",
+        "ln -s $PREFIX/include/quadninja $PREFIX/MG5_aMC/HEPTools/ninja/include/quadninja",
+        "for file in $PREFIX/MG5_aMC/HEPTools/ninja/include/*.mod; do ln -s \"$file\" $PREFIX/MG5_aMC/HEPTools/include/; done",
+        "ln -s $PREFIX/MG5_aMC/HEPTools/ninja/include/ninja $PREFIX/MG5_aMC/HEPTools/include/ninja",
+        "ln -s $PREFIX/MG5_aMC/HEPTools/ninja/include/quadninja $PREFIX/MG5_aMC/HEPTools/include/quadninja",
+        "ln -s $PREFIX/bin/ninja-config $PREFIX/MG5_aMC/HEPTools/ninja/bin/",
+        "ln -s $PREFIX/bin/ninja-config $PREFIX/MG5_aMC/HEPTools/bin/",
+        "mkdir -p $PREFIX/MG5_aMC/HEPTools/collier/include",
+        "echo -e \"\\n# Symlinking Collier\"",
+        "ln -s $PREFIX/lib/libcollier.a $PREFIX/MG5_aMC/HEPTools/collier/",
+        "ln -s $PREFIX/lib/libcollier.a $PREFIX/MG5_aMC/HEPTools/lib/",
+        "ln -s $PREFIX/include/collier.mod $PREFIX/MG5_aMC/HEPTools/collier/include/",
+        "ln -s $PREFIX/include/collier.mod $PREFIX/MG5_aMC/HEPTools/include/",
+        "echo -e \"\\n# Configuring $PREFIX/MG5_aMC/input/mg5_configuration.txt\"",
+        "cp $RECIPE_DIR/mg5_configuration.txt .",
+        "sed -i \"s|REPLACE_WITH_PREFIX|$PREFIX|g\" mg5_configuration.txt",
+        "sed -i \"s|REPLACE_WITH_BASENAME_FC|$(basename ${FC_FOR_BUILD//$BUILD/$HOST})|g\" mg5_configuration.txt",
+        "sed -i \"s|REPLACE_WITH_BASENAME_CXX|$(basename ${CXX_FOR_BUILD//$BUILD/$HOST})|g\" mg5_configuration.txt",
+        "sed -i \"s|# automatic_html_opening = True|automatic_html_opening = False|g\" mg5_configuration.txt",
+        "sed -i '/ninja =/s/^# //g' mg5_configuration.txt",
+        "mv mg5_configuration.txt $PREFIX/MG5_aMC/input/mg5_configuration.txt",
+        "mkdir -p $PREFIX/bin",
+        "ln -s $PREFIX/MG5_aMC/bin/mg5_aMC $PREFIX/bin/mg5_aMC",
+        "mkdir -p $PREFIX/share/mg5_aMC",
+        "ln -s $PREFIX/MG5_aMC/proc_card.dat $PREFIX/share/mg5_aMC/proc_card.dat",
+        "mkdir -p $PREFIX/etc/conda/activate.d",
+        "cp \"${RECIPE_DIR}/activate.sh\" \"${PREFIX}/etc/conda/activate.d/zzz-${PKG_NAME}-activate.sh\"",
+        "cp \"${RECIPE_DIR}/activate.csh\" \"${PREFIX}/etc/conda/activate.d/zzz-${PKG_NAME}-activate.csh\"",
+        "cp \"${RECIPE_DIR}/activate.fish\" \"${PREFIX}/etc/conda/activate.d/zzz-${PKG_NAME}-activate.fish\"",
+        "mkdir -p $PREFIX/etc/conda/deactivate.d",
+        "cp \"${RECIPE_DIR}/deactivate.sh\" \"${PREFIX}/etc/conda/deactivate.d/zzz-${PKG_NAME}-deactivate.sh\"",
+        "cp \"${RECIPE_DIR}/deactivate.csh\" \"${PREFIX}/etc/conda/deactivate.d/zzz-${PKG_NAME}-deactivate.csh\"",
+        "cp \"${RECIPE_DIR}/deactivate.fish\" \"${PREFIX}/etc/conda/deactivate.d/zzz-${PKG_NAME}-deactivate.fish\"",
+        "ls -lhtra $PREFIX/etc/conda/activate.d/",
+        "ls -lhtra $PREFIX/etc/conda/deactivate.d/",
+        "echo \"exit\" | mg5_aMC"
+      ]
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "matthewfeickert"
+      ]
+    },
+    "outputs": [
+      {
+        "build": null,
+        "name": "mg5amcnlo",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "fortran_compiler_stub",
+            "make",
+            "sed",
+            "grep"
+          ],
+          "host": [
+            "python",
+            "six",
+            "ply",
+            "fastjet-cxx",
+            "emela",
+            "lhapdf",
+            "oneloop-static",
+            "iregi-static 1.1.0.*",
+            "qcdloop-fortran-static",
+            "ninja-hep-ph-static 1.1.*",
+            "collier-static",
+            "hepmc2",
+            "hepmc3"
+          ],
+          "run": [
+            "cxx-compiler",
+            "fortran-compiler",
+            "make",
+            "tar",
+            "wget",
+            "curl",
+            "perl",
+            "python",
+            "six",
+            "numpy",
+            "fastjet-contrib",
+            "emela",
+            "lhapdf",
+            "ply",
+            "bc",
+            "procps-ng",
+            "oneloop-static",
+            "iregi-static 1.1.0.*",
+            "qcdloop-fortran-static",
+            "libtirpc",
+            "ninja-hep-ph-static 1.1.*",
+            "collier-static",
+            "mg5amcnlo-pythia8-interface",
+            "hepmc2",
+            "hepmc3",
+            "ghostscript",
+            "gnuplot"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "bin": [
+                "mg5_aMC"
+              ],
+              "files": [
+                "MG5_aMC/aloha/*",
+                "MG5_aMC/bin/*",
+                "MG5_aMC/HELAS/*",
+                "MG5_aMC/input/*",
+                "MG5_aMC/madgraph/*",
+                "MG5_aMC/MadSpin/*",
+                "MG5_aMC/mg5decay/*",
+                "MG5_aMC/models/*",
+                "MG5_aMC/PLUGIN/*",
+                "MG5_aMC/Template/*",
+                "MG5_aMC/vendor/*",
+                "MG5_aMC/proc_card.dat",
+                "MG5_aMC/VERSION",
+                "MG5_aMC/input/mg5_configuration.txt",
+                "MG5_aMC/madgraph/LICENSE",
+                "MG5_aMC/vendor/CutTools/includects/libcts.a",
+                "MG5_aMC/vendor/IREGI/src/libiregi.a",
+                "MG5_aMC/vendor/IREGI/src/qcdloop/ff/libff.a",
+                "MG5_aMC/vendor/IREGI/src/qcdloop/ql/libqcdloop.a",
+                "MG5_aMC/vendor/StdHEP/lib/libstdhep.a",
+                "MG5_aMC/vendor/StdHEP/lib/libstdhepC.a",
+                "MG5_aMC/vendor/StdHEP/lib/libFmcfio.a"
+              ]
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "tutorial.mg5",
+                "tutorial_amc-at-nlo.mg5"
+              ]
+            },
+            "script": [
+              "echo -e \"\\n# Checking mg5_configuration.txt\"",
+              "cat $PREFIX/MG5_aMC/input/mg5_configuration.txt",
+              "mg5_aMC --help",
+              "echo \"exit\" | mg5_aMC",
+              "lhapdf install NNPDF23_lo_as_0130_qed &> download_log.txt",
+              "echo -e \"\\n# Running tutorial.mg5\"",
+              "mg5_aMC ./tutorial.mg5",
+              "ls -lhtra",
+              "test ! -f ME5_debug",
+              "lhapdf install NNPDF23_nlo_as_0119_qed &> download_log.txt",
+              "echo -e \"\\n# Running tutorial_amc-at-nlo.mg5\"",
+              "mg5_aMC ./tutorial_amc-at-nlo.mg5"
+            ]
+          }
+        ],
+        "version": "3.5.7"
+      },
+      {
+        "build": null,
+        "name": "mg5amcnlo",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "fortran_compiler_stub",
+            "make",
+            "sed",
+            "grep"
+          ],
+          "host": [
+            "python",
+            "six",
+            "ply",
+            "fastjet-cxx",
+            "emela",
+            "lhapdf",
+            "oneloop-static",
+            "iregi-static 1.1.0.*",
+            "qcdloop-fortran-static",
+            "ninja-hep-ph-static 1.1.*",
+            "collier-static",
+            "hepmc2",
+            "hepmc3"
+          ],
+          "run": [
+            "cxx-compiler",
+            "fortran-compiler",
+            "make",
+            "tar",
+            "wget",
+            "curl",
+            "perl",
+            "python",
+            "six",
+            "numpy",
+            "fastjet-contrib",
+            "emela",
+            "lhapdf",
+            "ply",
+            "bc",
+            "procps-ng",
+            "oneloop-static",
+            "iregi-static 1.1.0.*",
+            "qcdloop-fortran-static",
+            "libtirpc",
+            "ninja-hep-ph-static 1.1.*",
+            "collier-static",
+            "mg5amcnlo-pythia8-interface",
+            "hepmc2",
+            "hepmc3",
+            "ghostscript",
+            "gnuplot"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "bin": [
+                "mg5_aMC"
+              ],
+              "files": [
+                "MG5_aMC/aloha/*",
+                "MG5_aMC/bin/*",
+                "MG5_aMC/HELAS/*",
+                "MG5_aMC/input/*",
+                "MG5_aMC/madgraph/*",
+                "MG5_aMC/MadSpin/*",
+                "MG5_aMC/mg5decay/*",
+                "MG5_aMC/models/*",
+                "MG5_aMC/PLUGIN/*",
+                "MG5_aMC/Template/*",
+                "MG5_aMC/vendor/*",
+                "MG5_aMC/proc_card.dat",
+                "MG5_aMC/VERSION",
+                "MG5_aMC/input/mg5_configuration.txt",
+                "MG5_aMC/madgraph/LICENSE",
+                "MG5_aMC/vendor/CutTools/includects/libcts.a",
+                "MG5_aMC/vendor/IREGI/src/libiregi.a",
+                "MG5_aMC/vendor/IREGI/src/qcdloop/ff/libff.a",
+                "MG5_aMC/vendor/IREGI/src/qcdloop/ql/libqcdloop.a",
+                "MG5_aMC/vendor/StdHEP/lib/libstdhep.a",
+                "MG5_aMC/vendor/StdHEP/lib/libstdhepC.a",
+                "MG5_aMC/vendor/StdHEP/lib/libFmcfio.a"
+              ]
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "tutorial.mg5",
+                "tutorial_amc-at-nlo.mg5"
+              ]
+            },
+            "script": [
+              "echo -e \"\\n# Checking mg5_configuration.txt\"",
+              "cat $PREFIX/MG5_aMC/input/mg5_configuration.txt",
+              "mg5_aMC --help",
+              "echo \"exit\" | mg5_aMC",
+              "lhapdf install NNPDF23_lo_as_0130_qed &> download_log.txt",
+              "echo -e \"\\n# Running tutorial.mg5\"",
+              "mg5_aMC ./tutorial.mg5",
+              "ls -lhtra",
+              "test ! -f ME5_debug",
+              "lhapdf install NNPDF23_nlo_as_0119_qed &> download_log.txt",
+              "echo -e \"\\n# Running tutorial_amc-at-nlo.mg5\"",
+              "mg5_aMC ./tutorial_amc-at-nlo.mg5"
+            ]
+          }
+        ],
+        "version": "3.5.7"
+      }
+    ],
+    "package": {
+      "name": "mg5amcnlo",
+      "version": "3.5.7"
+    },
+    "requirements": {
+      "build": [
+        "c_stdlib_stub",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "make",
+        "sed",
+        "grep"
+      ],
+      "host": [
+        "python",
+        "six",
+        "ply",
+        "fastjet-cxx",
+        "emela",
+        "lhapdf",
+        "oneloop-static",
+        "iregi-static 1.1.0.*",
+        "qcdloop-fortran-static",
+        "ninja-hep-ph-static 1.1.*",
+        "collier-static",
+        "hepmc2",
+        "hepmc3"
+      ],
+      "run": [
+        "cxx-compiler",
+        "fortran-compiler",
+        "make",
+        "tar",
+        "wget",
+        "curl",
+        "perl",
+        "python",
+        "six",
+        "numpy",
+        "fastjet-contrib",
+        "emela",
+        "lhapdf",
+        "ply",
+        "bc",
+        "procps-ng",
+        "oneloop-static",
+        "iregi-static 1.1.0.*",
+        "qcdloop-fortran-static",
+        "libtirpc",
+        "ninja-hep-ph-static 1.1.*",
+        "collier-static",
+        "mg5amcnlo-pythia8-interface",
+        "hepmc2",
+        "hepmc3",
+        "ghostscript",
+        "gnuplot"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "patches": [
+        "remove-cuttools-compiler-requirement.patch",
+        "add-libtirpc-to-nlo-extralibs-for-xdr.patch"
+      ],
+      "sha256": "ca3e027f078438318bd4143a102aebc2d51358f537b5d52bbc574fe49a6a901e",
+      "url": "https://github.com/hep-packaging-coordination/mg5amcnlo-release-mirror/releases/download/3.5.7/MG5_aMC_v3.5.7.tar.gz"
+    }
+  },
+  "osx_arm64_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "grep",
+        "make",
+        "sed"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "collier-static",
+        "emela",
+        "fastjet-cxx",
+        "hepmc2",
+        "hepmc3",
+        "iregi-static",
+        "lhapdf",
+        "ninja-hep-ph-static",
+        "oneloop-static",
+        "ply",
+        "python",
+        "qcdloop-fortran-static",
+        "six"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "bc",
+        "collier-static",
+        "curl",
+        "cxx-compiler",
+        "emela",
+        "fastjet-contrib",
+        "fortran-compiler",
+        "ghostscript",
+        "gnuplot",
+        "hepmc2",
+        "hepmc3",
+        "iregi-static",
+        "lhapdf",
+        "libtirpc",
+        "make",
+        "mg5amcnlo-pythia8-interface",
+        "ninja-hep-ph-static",
+        "numpy",
+        "oneloop-static",
+        "perl",
+        "ply",
+        "procps-ng",
+        "python",
+        "qcdloop-fortran-static",
+        "six",
+        "tar",
+        "wget"
+      ]
+    },
+    "test": {
+      "__set__": true,
+      "elements": []
+    }
+  },
+  "outputs_names": {
+    "__set__": true,
+    "elements": [
+      "mg5amcnlo"
+    ]
+  },
+  "parsing_error": false,
+  "platforms": [
+    "linux_64",
+    "linux_aarch64",
+    "linux_ppc64le",
+    "osx_64",
+    "osx_arm64"
+  ],
+  "pr_info": {
+    "__lazy_json__": "pr_info/mg5amcnlo.json"
+  },
+  "raw_meta_yaml": "schema_version: 1\n\ncontext:\n  name: mg5amcnlo\n  version: \"3.5.7\"\n\npackage:\n  name: ${{ name }}\n  version: ${{ version }}\n\nsource:\n  - url: https://github.com/hep-packaging-coordination/mg5amcnlo-release-mirror/releases/download/${{ version }}/MG5_aMC_v${{ version }}.tar.gz\n    sha256: ca3e027f078438318bd4143a102aebc2d51358f537b5d52bbc574fe49a6a901e\n    target_directory: source\n    patches:\n      # c.f. https://github.com/conda-forge/mg5amcnlo-feedstock/issues/12\n      - remove-cuttools-compiler-requirement.patch\n      - add-libtirpc-to-nlo-extralibs-for-xdr.patch\n\nbuild:\n  # FIXME: mg5amcnlo doesn't support Python 3.12 yet\n  number: 6\n  skip: match(python, \"<3.7\") or match(python, \">3.11\") or win\n  script:\n    # Remove unnecessary files\n    - rm -r source/.github\n    - rm -r source/tests\n    - rm source/.bzrignore\n    - rm source/.gitignore\n    - rm source/code-notes\n    - rm source/README\n    - rm source/UpdateNotes.txt\n    # FIXME: Remove prebuilt binary added in tarball\n    - rm source/vendor/DiscreteSampler/check\n\n    # Fix bugs\n    # FIXME: Use user space perl instead of system perl\n    - find source -type f -exec grep -Il '#!/usr/bin/perl -w' {} + | xargs sed -i 's|#!/usr/bin/perl -w|#!/usr/bin/env perl\\nuse warnings;|g'\n\n    # Need to use -a to preserve symlinks\n    - cp -a source $PREFIX/MG5_aMC\n\n    # TODO: Use packaged versions of vendored code (CutTools, StdHEP)\n    # For now, compile the vendored CutTools\n    # c.f. https://github.com/conda-forge/mg5amcnlo-feedstock/issues/3#issuecomment-2660481386\n    # Provides $PREFIX/MG5_aMC/vendor/CutTools/includects/libcts.a\n    - cd $PREFIX/MG5_aMC/vendor/CutTools\n    - echo -e \"\\n# Compiling CutTools\"\n    # c.f. https://github.com/mg5amcnlo/mg5amcnlo/blob/3d6799de1bcabee5173e8a3711f657a5cd5940cf/Template/NLO/Source/makefile#L73\n    - make FC=$FC FFLAGS=\"-fPIC -fno-automatic -O2 -funroll-all-loops $FFLAGS\"\n    # Running 'make clean' deletes the files we want, so manually clean up\n    - find . -name \"*.o\" -exec rm {} +\n    - cd -\n\n    ## IREGI\n    # TODO: Compare https://github.com/mg5amcnlo/mg5amcnlo/blob/3.x/vendor/IREGI/src/oneloop/avh_olo_foriregi.f90 against avh_olo.f90 in oneloop\n    - rm -rf $PREFIX/MG5_aMC/vendor/IREGI\n    - mkdir -p $PREFIX/MG5_aMC/vendor/IREGI/src\n    - ln -s $PREFIX/lib/libiregi.a $PREFIX/MG5_aMC/vendor/IREGI/src/\n    - for file in $PREFIX/include/iregi/*; do ln -s \"$file\" $PREFIX/MG5_aMC/vendor/IREGI/src/; done\n    - mkdir -p $PREFIX/MG5_aMC/vendor/IREGI/src/qcdloop/ff\n    - ln -s $PREFIX/lib/libff.a $PREFIX/MG5_aMC/vendor/IREGI/src/qcdloop/ff/\n    - mkdir -p $PREFIX/MG5_aMC/vendor/IREGI/src/qcdloop/ql\n    - ln -s $PREFIX/lib/libqcdloop.a $PREFIX/MG5_aMC/vendor/IREGI/src/qcdloop/ql/\n\n    # Compile the vendored StdHEP\n    # TODO: Package this (https://github.com/conda-forge/staged-recipes/pull/29118)\n    - cd $PREFIX/MG5_aMC/vendor/StdHEP\n    # Patch makefile to ensure conda-forge FFLAGS and CFLAGS are used\n    - sed -i \"s|FFLAGS += -std=legacy|FFLAGS += -std=legacy -ffixed-line-length-none $FFLAGS|g\" makefile\n    - sed -i \"s|CFLAGS += -Wno-implicit-function-declaration|CFLAGS += -Wno-implicit-function-declaration $CFLAGS|g\" makefile\n    - echo -e \"\\n# Compiling StdHEP\"\n    # c.f. https://github.com/mg5amcnlo/mg5amcnlo/blob/3d6799de1bcabee5173e8a3711f657a5cd5940cf/Template/NLO/Source/makefile#L84\n    - make all FC=$FC F77=$FC CC=$CC --jobs=$CPU_COUNT\n    - make clean\n    - cd -\n\n    # Symlink libraries to HEPTools/ directory tree as mg5amcnlo looks there\n    - mkdir -p $PREFIX/MG5_aMC/HEPTools/lib\n    - mkdir -p $PREFIX/MG5_aMC/HEPTools/include\n    ## OneLOop\n    - mkdir -p $PREFIX/MG5_aMC/HEPTools/oneloop\n    - echo -e \"\\n# Symlinking OneLOop\"\n    - ln -s $PREFIX/lib/libavh_olo.a $PREFIX/MG5_aMC/HEPTools/oneloop/\n    - ln -s $PREFIX/lib/libavh_olo.a $PREFIX/MG5_aMC/HEPTools/lib/\n    - for file in $PREFIX/include/oneloop/*; do ln -s \"$file\" $PREFIX/MG5_aMC/HEPTools/oneloop/; ln -s \"$file\" $PREFIX/MG5_aMC/HEPTools/include/; done\n\n    - if: (linux and (x86_64 or ppc64le))\n      then:\n        ## Ninja\n        - mkdir -p $PREFIX/MG5_aMC/HEPTools/bin\n        - mkdir -p $PREFIX/MG5_aMC/HEPTools/ninja/lib\n        - mkdir -p $PREFIX/MG5_aMC/HEPTools/ninja/include\n        - mkdir -p $PREFIX/MG5_aMC/HEPTools/ninja/bin\n        - echo -e \"\\n# Symlinking Ninja\"\n        ### Ninja libs\n        - ln -s $PREFIX/lib/libninja.a $PREFIX/MG5_aMC/HEPTools/ninja/lib/\n        - ln -s $PREFIX/lib/libninja.a $PREFIX/MG5_aMC/HEPTools/lib/\n        ### Ninja includes\n        - ln -s $PREFIX/include/mninja.mod $PREFIX/MG5_aMC/HEPTools/ninja/include/\n        - ln -s $PREFIX/include/ninjago_module.mod $PREFIX/MG5_aMC/HEPTools/ninja/include/\n        - ln -s $PREFIX/include/ninjavholo.mod $PREFIX/MG5_aMC/HEPTools/ninja/include/\n        - ln -s $PREFIX/include/ninja $PREFIX/MG5_aMC/HEPTools/ninja/include/ninja\n        - ln -s $PREFIX/include/quadninja $PREFIX/MG5_aMC/HEPTools/ninja/include/quadninja\n        - for file in $PREFIX/MG5_aMC/HEPTools/ninja/include/*.mod; do ln -s \"$file\" $PREFIX/MG5_aMC/HEPTools/include/; done\n        - ln -s $PREFIX/MG5_aMC/HEPTools/ninja/include/ninja $PREFIX/MG5_aMC/HEPTools/include/ninja\n        - ln -s $PREFIX/MG5_aMC/HEPTools/ninja/include/quadninja $PREFIX/MG5_aMC/HEPTools/include/quadninja\n        ### Ninja bins\n        - ln -s $PREFIX/bin/ninja-config $PREFIX/MG5_aMC/HEPTools/ninja/bin/\n        - ln -s $PREFIX/bin/ninja-config $PREFIX/MG5_aMC/HEPTools/bin/\n\n    ## Collier\n    - mkdir -p $PREFIX/MG5_aMC/HEPTools/collier/include\n    - echo -e \"\\n# Symlinking Collier\"\n    - ln -s $PREFIX/lib/libcollier.a $PREFIX/MG5_aMC/HEPTools/collier/\n    - ln -s $PREFIX/lib/libcollier.a $PREFIX/MG5_aMC/HEPTools/lib/\n    - ln -s $PREFIX/include/collier.mod $PREFIX/MG5_aMC/HEPTools/collier/include/\n    - ln -s $PREFIX/include/collier.mod $PREFIX/MG5_aMC/HEPTools/include/\n\n    # Build configuration file be replacing placeholder values with PREFIX\n    - echo -e \"\\n# Configuring $PREFIX/MG5_aMC/input/mg5_configuration.txt\"\n    - cp $RECIPE_DIR/mg5_configuration.txt .\n    - sed -i \"s|REPLACE_WITH_PREFIX|$PREFIX|g\" mg5_configuration.txt\n    # Ensure that the HOST compiler names that will be used at runtime are included\n    # (needed for cross-compilation)\n    - sed -i \"s|REPLACE_WITH_BASENAME_FC|$(basename ${FC_FOR_BUILD//$BUILD/$HOST})|g\" mg5_configuration.txt\n    - sed -i \"s|REPLACE_WITH_BASENAME_CXX|$(basename ${CXX_FOR_BUILD//$BUILD/$HOST})|g\" mg5_configuration.txt\n    # c.f. https://github.com/conda-forge/mg5amcnlo-feedstock/issues/13\n    - sed -i \"s|# automatic_html_opening = True|automatic_html_opening = False|g\" mg5_configuration.txt\n    # Ninja settings in mg5_configuration.txt\n    - if: (linux and (x86_64 or ppc64le))\n      then: sed -i '/ninja =/s/^# //g' mg5_configuration.txt\n    - mv mg5_configuration.txt $PREFIX/MG5_aMC/input/mg5_configuration.txt\n\n    # Setup links\n    - mkdir -p $PREFIX/bin\n    - ln -s $PREFIX/MG5_aMC/bin/mg5_aMC $PREFIX/bin/mg5_aMC\n    - mkdir -p $PREFIX/share/mg5_aMC\n    - ln -s $PREFIX/MG5_aMC/proc_card.dat $PREFIX/share/mg5_aMC/proc_card.dat\n\n    # Copy activate and deactivate scripts\n    # The scripts are executed in lexicographical order, so use zzz- to ensure\n    # last to manipulate FFLAGS (lowercase letters have highest value)\n    - mkdir -p $PREFIX/etc/conda/activate.d\n    - cp \"${RECIPE_DIR}/activate.sh\" \"${PREFIX}/etc/conda/activate.d/zzz-${PKG_NAME}-activate.sh\"\n    - cp \"${RECIPE_DIR}/activate.csh\" \"${PREFIX}/etc/conda/activate.d/zzz-${PKG_NAME}-activate.csh\"\n    - cp \"${RECIPE_DIR}/activate.fish\" \"${PREFIX}/etc/conda/activate.d/zzz-${PKG_NAME}-activate.fish\"\n\n    - mkdir -p $PREFIX/etc/conda/deactivate.d\n    - cp \"${RECIPE_DIR}/deactivate.sh\" \"${PREFIX}/etc/conda/deactivate.d/zzz-${PKG_NAME}-deactivate.sh\"\n    - cp \"${RECIPE_DIR}/deactivate.csh\" \"${PREFIX}/etc/conda/deactivate.d/zzz-${PKG_NAME}-deactivate.csh\"\n    - cp \"${RECIPE_DIR}/deactivate.fish\" \"${PREFIX}/etc/conda/deactivate.d/zzz-${PKG_NAME}-deactivate.fish\"\n    - ls -lhtra $PREFIX/etc/conda/activate.d/\n    - ls -lhtra $PREFIX/etc/conda/deactivate.d/\n\n    # Generate initial files\n    # conda-build intentionally compiles .pyc files, so keep those.\n    # c.f. https://docs.conda.io/projects/conda-build/en/stable/resources/define-metadata.html#skip-compiling-some-py-files-into-pyc-files\n    - echo \"exit\" | mg5_aMC\n\nrequirements:\n  build:\n    - ${{ stdlib('c') }}\n    # Compilers needed to set names in mg5_configuration.txt and will be\n    # used in the future along with make\n    - ${{ compiler('cxx') }}\n    - ${{ compiler('fortran') }}\n    - make\n    - if: build_platform != target_platform\n      then:\n        # Need cross-python to be able to use Python libraries\n        - cross-python_${{ target_platform }}\n        - python\n    - sed\n    - grep\n  host:\n    - python\n    - six\n    - ply\n    - fastjet-cxx\n    - emela\n    - lhapdf\n    # Provide targets for symlink\n    - oneloop-static\n    - iregi-static 1.1.0.*\n    - qcdloop-fortran-static\n    # HEPTools\n    - if: linux and (x86_64 or ppc64le)\n      then: ninja-hep-ph-static 1.1.*\n    - collier-static\n    - hepmc2\n    - hepmc3\n  run:\n    # mg5amcnlo is a code generator and so requires a build system at runtime\n    - cxx-compiler\n    - fortran-compiler\n    - make\n    - tar\n    - wget  # for import_model_from_db in models/import_ufo.py\n    - curl  # for import_model_from_db in models/import_ufo.py\n    - perl\n    - python\n    - six\n    - numpy\n    - fastjet-contrib\n    - emela\n    - lhapdf\n    - ply\n    - bc  # Needed to run showering\n    - if: linux\n      then: procps-ng  # Needed for pgrep in madgraph/various/cluster.py\n    # MG5_aMC/vendor/ libraries\n    - oneloop-static\n    - iregi-static 1.1.0.*\n    - qcdloop-fortran-static\n    - libtirpc  # Needed for XDR library symbols used by StdHEP for NLO\n    # HEPTools\n    # ninja-hep-ph uses libquadmath and so does not support macOS or aarch64\n    # mg5amcnlo v3.5.7 requires ninja-hep-ph v1.1.0 and will fail to compile\n    # for ninja-hep-ph v1.2.0\n    - if: linux and (x86_64 or ppc64le)\n      then: ninja-hep-ph-static 1.1.*\n    - collier-static\n    # c.f. https://github.com/conda-forge/mg5amcnlo-pythia8-interface-feedstock/issues/2\n    - if: not (osx and x86_64)\n      then: mg5amcnlo-pythia8-interface\n    - hepmc2\n    - hepmc3\n    - ghostscript\n    - gnuplot\n\ntests:\n  - package_contents:\n      files:\n        - MG5_aMC/aloha/*\n        - MG5_aMC/bin/*\n        - MG5_aMC/HELAS/*\n        - MG5_aMC/input/*\n        - MG5_aMC/madgraph/*\n        - MG5_aMC/MadSpin/*\n        - MG5_aMC/mg5decay/*\n        - MG5_aMC/models/*\n        - MG5_aMC/PLUGIN/*\n        - MG5_aMC/Template/*\n        - MG5_aMC/vendor/*\n\n        - MG5_aMC/proc_card.dat\n        - MG5_aMC/VERSION\n        - MG5_aMC/input/mg5_configuration.txt\n        - MG5_aMC/madgraph/LICENSE\n\n        # Check vendored libraries got built\n        - MG5_aMC/vendor/CutTools/includects/libcts.a\n\n        - MG5_aMC/vendor/IREGI/src/libiregi.a\n        - MG5_aMC/vendor/IREGI/src/qcdloop/ff/libff.a\n        - MG5_aMC/vendor/IREGI/src/qcdloop/ql/libqcdloop.a\n\n        - MG5_aMC/vendor/StdHEP/lib/libstdhep.a\n        - MG5_aMC/vendor/StdHEP/lib/libstdhepC.a\n        - MG5_aMC/vendor/StdHEP/lib/libFmcfio.a\n      bin:\n        - mg5_aMC\n  - files:\n      recipe:\n        - tutorial.mg5\n        - tutorial_amc-at-nlo.mg5\n    script:\n      - echo -e \"\\n# Checking mg5_configuration.txt\"\n      - cat $PREFIX/MG5_aMC/input/mg5_configuration.txt\n\n      - mg5_aMC --help\n\n      - echo \"exit\" | mg5_aMC\n\n      # Download NNPDF23_lo_as_0130_qed in advance to avoid long output in CI logs\n      # Somehow downloading in advance causes a compilation error on x86 Linux only in CI\n      - lhapdf install NNPDF23_lo_as_0130_qed &> download_log.txt\n\n      - echo -e \"\\n# Running tutorial.mg5\"\n      - mg5_aMC ./tutorial.mg5\n      - ls -lhtra\n      # c.f. https://github.com/mg5amcnlo/mg5amcnlo/issues/194\n      - test ! -f ME5_debug\n\n      # c.f. https://github.com/conda-forge/mg5amcnlo-feedstock/issues/3\n      - if: (build_platform == target_platform) and not (osx and x86_64)\n        then:\n          - lhapdf install NNPDF23_nlo_as_0119_qed &> download_log.txt\n          - echo -e \"\\n# Running tutorial_amc-at-nlo.mg5\"\n          - mg5_aMC ./tutorial_amc-at-nlo.mg5\n          - ls -lhtra\n          - test ! -f ME5_debug\n\nabout:\n  summary: MadGraph5_aMC@NLO\n  description: |\n    MadGraph5_aMC@NLO is a framework that aims at providing all the elements\n    necessary for SM and BSM phenomenology, such as the computations of cross\n    sections, the generation of hard events and their matching with event\n    generators, and the use of a variety of tools relevant to event manipulation\n    and analysis.\n    Processes can be simulated to LO accuracy for any user-defined Lagrangian,\n    and the NLO accuracy in the case of models that support this kind of calculations\n    &mdash; prominent among these are QCD and EW corrections to SM processes.\n    Matrix elements at the tree- and one-loop-level can also be obtained.\n\n    MadGraph5_aMC@NLO is the new version of both MadGraph5 and aMC@NLO that unifies\n    the LO and NLO lines of development of automated tools within the MadGraph family.\n    As such, the code allows one to simulate processes in virtually all configurations\n    of interest, in particular for hadronic and e+e- colliders; starting from version\n    3.2.0, the latter include Initial State Radiation and beamstrahlung effects.\n  # modified University of Illinois/NCSA license\n  license: LicenseRef-NCSA\n  license_file: source/LICENSE\n  homepage: https://github.com/mg5amcnlo/mg5amcnlo\n  repository: https://github.com/mg5amcnlo/mg5amcnlo\n\nextra:\n  recipe-maintainers:\n    - matthewfeickert\n",
+  "req": {
+    "__set__": true,
+    "elements": [
+      "bc",
+      "c_stdlib_stub",
+      "collier-static",
+      "curl",
+      "cxx-compiler",
+      "cxx_compiler_stub",
+      "emela",
+      "fastjet-contrib",
+      "fastjet-cxx",
+      "fortran-compiler",
+      "fortran_compiler_stub",
+      "ghostscript",
+      "gnuplot",
+      "grep",
+      "hepmc2",
+      "hepmc3",
+      "iregi-static",
+      "lhapdf",
+      "libtirpc",
+      "make",
+      "mg5amcnlo-pythia8-interface",
+      "ninja-hep-ph-static",
+      "numpy",
+      "oneloop-static",
+      "perl",
+      "ply",
+      "procps-ng",
+      "python",
+      "qcdloop-fortran-static",
+      "sed",
+      "six",
+      "tar",
+      "wget"
+    ]
+  },
+  "requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "grep",
+        "make",
+        "sed"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "collier-static",
+        "cxx_compiler_stub",
+        "emela",
+        "fastjet-cxx",
+        "fortran_compiler_stub",
+        "hepmc2",
+        "hepmc3",
+        "iregi-static",
+        "lhapdf",
+        "ninja-hep-ph-static",
+        "oneloop-static",
+        "ply",
+        "python",
+        "qcdloop-fortran-static",
+        "six"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "bc",
+        "c_stdlib_stub",
+        "collier-static",
+        "curl",
+        "cxx-compiler",
+        "cxx_compiler_stub",
+        "emela",
+        "fastjet-contrib",
+        "fortran-compiler",
+        "fortran_compiler_stub",
+        "ghostscript",
+        "gnuplot",
+        "hepmc2",
+        "hepmc3",
+        "iregi-static",
+        "lhapdf",
+        "libtirpc",
+        "make",
+        "mg5amcnlo-pythia8-interface",
+        "ninja-hep-ph-static",
+        "numpy",
+        "oneloop-static",
+        "perl",
+        "ply",
+        "procps-ng",
+        "python",
+        "qcdloop-fortran-static",
+        "six",
+        "tar",
+        "wget"
+      ]
+    },
+    "test": {
+      "__set__": true,
+      "elements": []
+    }
+  },
+  "strong_exports": false,
+  "total_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "grep",
+        "make",
+        "sed"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "collier-static",
+        "emela",
+        "fastjet-cxx",
+        "hepmc2",
+        "hepmc3",
+        "iregi-static 1.1.0.*",
+        "lhapdf",
+        "ninja-hep-ph-static 1.1.*",
+        "oneloop-static",
+        "ply",
+        "python",
+        "qcdloop-fortran-static",
+        "six"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "bc",
+        "collier-static",
+        "curl",
+        "cxx-compiler",
+        "emela",
+        "fastjet-contrib",
+        "fortran-compiler",
+        "ghostscript",
+        "gnuplot",
+        "hepmc2",
+        "hepmc3",
+        "iregi-static 1.1.0.*",
+        "lhapdf",
+        "libtirpc",
+        "make",
+        "mg5amcnlo-pythia8-interface",
+        "ninja-hep-ph-static 1.1.*",
+        "numpy",
+        "oneloop-static",
+        "perl",
+        "ply",
+        "procps-ng",
+        "python",
+        "qcdloop-fortran-static",
+        "six",
+        "tar",
+        "wget"
+      ]
+    },
+    "test": {
+      "__set__": true,
+      "elements": []
+    }
+  },
+  "url": "https://github.com/hep-packaging-coordination/mg5amcnlo-release-mirror/releases/download/3.5.7/MG5_aMC_v3.5.7.tar.gz",
+  "version": "3.5.7",
+  "version_pr_info": {
+    "__lazy_json__": "version_pr_info/mg5amcnlo.json"
+  }
+}

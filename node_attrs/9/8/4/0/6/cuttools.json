@@ -1,0 +1,1323 @@
+{
+  "archived": false,
+  "branch": "main",
+  "ci_support_linux_64_.yaml": "c_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\ncdt_name:\n- conda\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\nfortran_compiler:\n- gfortran\nfortran_compiler_version:\n- '13'\ntarget_platform:\n- linux-64\n",
+  "conda-forge.yml": {
+    "build_platform": {
+      "linux_aarch64": "linux_64",
+      "linux_ppc64le": "linux_64",
+      "osx_arm64": "osx_64"
+    },
+    "conda_build": {
+      "error_overlinking": true
+    },
+    "conda_forge_output_validation": true,
+    "github": {
+      "branch_name": "main",
+      "tooling_branch_name": "main"
+    },
+    "provider": {
+      "linux_aarch64": "default",
+      "linux_ppc64le": "default"
+    },
+    "test": "native_and_emulated"
+  },
+  "feedstock_hash": "c5cca545308846ebd391cff156ac4ce7f8c41146",
+  "feedstock_hash_ts": 1738867354,
+  "feedstock_name": "cuttools",
+  "hash_type": "sha256",
+  "linux_64_meta_yaml": {
+    "about": {
+      "description": "CutTools is based on the following papers:\n  * G. Ossola, C. G. Papadopoulos and R. Pittau [JHEP 0803:042,2008](https://doi.org/10.1088/1126-6708/2008/03/042)\n  * G. Ossola, C. G. Papadopoulos and R. Pittau [Nucl. Phys. B 763 (2007) 147](https://doi.org/10.1016/j.nuclphysb.2006.11.012)\n",
+      "dev_url": "https://www.ugr.es/~pittau/CutTools/",
+      "doc_url": "https://www.ugr.es/~pittau/CutTools/",
+      "home": "https://www.ugr.es/~pittau/CutTools/",
+      "license": "MIT",
+      "license_family": "MIT",
+      "license_file": "source/LICENSE.txt",
+      "summary": "CutTools: Computing 1-loop amplitudes at the integrand level"
+    },
+    "build": {
+      "number": "0"
+    },
+    "extra": {
+      "feedstock-name": "cuttools",
+      "recipe-maintainers": [
+        "matthewfeickert"
+      ]
+    },
+    "outputs": [
+      {
+        "build": {
+          "script": [
+            "cd source",
+            "make PRECISION=QP FC=$FC FFLAGS=\"$FFLAGS -std=legacy -fno-automatic -O2 -funroll-all-loops -ffixed-line-length-none -I$PREFIX/include/mpfun90 -I$PREFIX/include/oneloop\"",
+            "rm includects/ffs.h",
+            "rm includects/ff.h",
+            "rm includects/aa.h",
+            "mv includects/libcts.a $PREFIX/lib/",
+            "mkdir -p $PREFIX/include/cts",
+            "mv includects/*.h $PREFIX/include/cts/",
+            "mv includects/*.mod $PREFIX/include/cts/",
+            "make clean"
+          ]
+        },
+        "name": "cuttools-static",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "make",
+            "libtool"
+          ],
+          "host": [
+            "mpfun90",
+            "oneloop"
+          ]
+        },
+        "test": {
+          "commands": [
+            "test -f $PREFIX/lib/libcts.a",
+            "test -f $PREFIX/include/cts/cts_mpr.h",
+            "test -f $PREFIX/include/cts/cts_mpc.h",
+            "test -f $PREFIX/include/cts/cts_dpr.h",
+            "test -f $PREFIX/include/cts/cts_dpc.h",
+            "test -f $PREFIX/include/cts/cts_mpinit.h",
+            "test -f $PREFIX/include/cts/cts_mprec.h",
+            "test -f $PREFIX/include/cts/def_propagator.mod",
+            "test -f $PREFIX/include/cts/def_solcut.mod",
+            "test -f $PREFIX/include/cts/def_mp_propagator.mod",
+            "test -f $PREFIX/include/cts/def_mp_solcut.mod",
+            "test -f $PREFIX/include/cts/tensor_operations.mod",
+            "test -f $PREFIX/include/cts/constants.mod",
+            "test -f $PREFIX/include/cts/mbnvalues.mod",
+            "test -f $PREFIX/include/cts/maxnumden.mod",
+            "test -f $PREFIX/include/cts/maxsolutions.mod",
+            "test -f $PREFIX/include/cts/combinatorics.mod",
+            "test -f $PREFIX/include/cts/dimensions.mod",
+            "test -f $PREFIX/include/cts/inout.mod",
+            "test -f $PREFIX/include/cts/scale.mod",
+            "test -f $PREFIX/include/cts/qt2value.mod",
+            "test -f $PREFIX/include/cts/denominators.mod",
+            "test -f $PREFIX/include/cts/cuttings.mod",
+            "test -f $PREFIX/include/cts/coefficients.mod",
+            "test -f $PREFIX/include/cts/loopfunctions.mod",
+            "test -f $PREFIX/include/cts/mp_loopfunctions.mod",
+            "test -f $PREFIX/include/cts/countdigits.mod",
+            "cd source/examples/",
+            "$FC numerators.f mpnumerators.f90 rambo.f random.f testmp.f -o testmp $FFLAGS -std=legacy -I$CONDA_PREFIX/include/cts -I$CONDA_PREFIX/include/mpfun90 $LDFLAGS -lcts -lavh_olo -lmpfun90 -lqcdloop -lff",
+            "./testmp",
+            "$FC numerators.f mpnumerators.f90 example0.f -o example0 $FFLAGS -std=legacy -I$CONDA_PREFIX/include/cts -I$CONDA_PREFIX/include/mpfun90 $LDFLAGS -lcts -lavh_olo -lmpfun90 -lqcdloop -lff",
+            "./example0",
+            "$FC numerators.f mpnumerators.f90 rambo.f random.f example1.f -o example1 $FFLAGS -std=legacy -I$CONDA_PREFIX/include/cts -I$CONDA_PREFIX/include/mpfun90 $LDFLAGS -lcts -lavh_olo -lmpfun90 -lqcdloop -lff",
+            "test -f ./example1"
+          ],
+          "requires": [
+            "fortran_compiler_stub",
+            "mpfun90",
+            "oneloop",
+            "qcdloop-fortran-static"
+          ],
+          "source_files": [
+            "source/examples/numerators.f",
+            "source/examples/mpnumerators.f90",
+            "source/examples/rambo.f",
+            "source/examples/random.f",
+            "source/examples/testmp.f",
+            "source/examples/example0.f",
+            "source/examples/example1.f"
+          ]
+        }
+      }
+    ],
+    "package": {
+      "name": "cuttools",
+      "version": "2.0"
+    },
+    "schema_version": 0,
+    "source": {
+      "folder": "source",
+      "patches": [
+        "build-only-cuttools-in-makefile.patch"
+      ],
+      "sha256": "288374088b4050bf9546babdc02ddfd8d53dce8e5b86e0762241acb425551f23",
+      "url": "https://www.ugr.es/~pittau/CutTools/cuttools_v2.0.tar.gz"
+    }
+  },
+  "linux_64_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "fortran_compiler_stub",
+        "libtool",
+        "make"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "mpfun90",
+        "oneloop"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": []
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "fortran_compiler_stub",
+        "mpfun90",
+        "oneloop",
+        "qcdloop-fortran-static"
+      ]
+    }
+  },
+  "linux_aarch64_meta_yaml": {
+    "about": {
+      "description": "CutTools is based on the following papers:\n  * G. Ossola, C. G. Papadopoulos and R. Pittau [JHEP 0803:042,2008](https://doi.org/10.1088/1126-6708/2008/03/042)\n  * G. Ossola, C. G. Papadopoulos and R. Pittau [Nucl. Phys. B 763 (2007) 147](https://doi.org/10.1016/j.nuclphysb.2006.11.012)\n",
+      "dev_url": "https://www.ugr.es/~pittau/CutTools/",
+      "doc_url": "https://www.ugr.es/~pittau/CutTools/",
+      "home": "https://www.ugr.es/~pittau/CutTools/",
+      "license": "MIT",
+      "license_family": "MIT",
+      "license_file": "source/LICENSE.txt",
+      "summary": "CutTools: Computing 1-loop amplitudes at the integrand level"
+    },
+    "build": {
+      "number": "0"
+    },
+    "extra": {
+      "feedstock-name": "cuttools",
+      "recipe-maintainers": [
+        "matthewfeickert"
+      ]
+    },
+    "outputs": [
+      {
+        "build": {
+          "script": [
+            "cd source",
+            "make PRECISION=QP FC=$FC FFLAGS=\"$FFLAGS -std=legacy -fno-automatic -O2 -funroll-all-loops -ffixed-line-length-none -I$PREFIX/include/mpfun90 -I$PREFIX/include/oneloop\"",
+            "rm includects/ffs.h",
+            "rm includects/ff.h",
+            "rm includects/aa.h",
+            "mv includects/libcts.a $PREFIX/lib/",
+            "mkdir -p $PREFIX/include/cts",
+            "mv includects/*.h $PREFIX/include/cts/",
+            "mv includects/*.mod $PREFIX/include/cts/",
+            "make clean"
+          ]
+        },
+        "name": "cuttools-static",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "make",
+            "libtool"
+          ],
+          "host": [
+            "mpfun90",
+            "oneloop"
+          ]
+        },
+        "test": {
+          "commands": [
+            "test -f $PREFIX/lib/libcts.a",
+            "test -f $PREFIX/include/cts/cts_mpr.h",
+            "test -f $PREFIX/include/cts/cts_mpc.h",
+            "test -f $PREFIX/include/cts/cts_dpr.h",
+            "test -f $PREFIX/include/cts/cts_dpc.h",
+            "test -f $PREFIX/include/cts/cts_mpinit.h",
+            "test -f $PREFIX/include/cts/cts_mprec.h",
+            "test -f $PREFIX/include/cts/def_propagator.mod",
+            "test -f $PREFIX/include/cts/def_solcut.mod",
+            "test -f $PREFIX/include/cts/def_mp_propagator.mod",
+            "test -f $PREFIX/include/cts/def_mp_solcut.mod",
+            "test -f $PREFIX/include/cts/tensor_operations.mod",
+            "test -f $PREFIX/include/cts/constants.mod",
+            "test -f $PREFIX/include/cts/mbnvalues.mod",
+            "test -f $PREFIX/include/cts/maxnumden.mod",
+            "test -f $PREFIX/include/cts/maxsolutions.mod",
+            "test -f $PREFIX/include/cts/combinatorics.mod",
+            "test -f $PREFIX/include/cts/dimensions.mod",
+            "test -f $PREFIX/include/cts/inout.mod",
+            "test -f $PREFIX/include/cts/scale.mod",
+            "test -f $PREFIX/include/cts/qt2value.mod",
+            "test -f $PREFIX/include/cts/denominators.mod",
+            "test -f $PREFIX/include/cts/cuttings.mod",
+            "test -f $PREFIX/include/cts/coefficients.mod",
+            "test -f $PREFIX/include/cts/loopfunctions.mod",
+            "test -f $PREFIX/include/cts/mp_loopfunctions.mod",
+            "test -f $PREFIX/include/cts/countdigits.mod",
+            "cd source/examples/",
+            "$FC numerators.f mpnumerators.f90 rambo.f random.f testmp.f -o testmp $FFLAGS -std=legacy -I$CONDA_PREFIX/include/cts -I$CONDA_PREFIX/include/mpfun90 $LDFLAGS -lcts -lavh_olo -lmpfun90 -lqcdloop -lff",
+            "./testmp",
+            "$FC numerators.f mpnumerators.f90 example0.f -o example0 $FFLAGS -std=legacy -I$CONDA_PREFIX/include/cts -I$CONDA_PREFIX/include/mpfun90 $LDFLAGS -lcts -lavh_olo -lmpfun90 -lqcdloop -lff",
+            "./example0",
+            "$FC numerators.f mpnumerators.f90 rambo.f random.f example1.f -o example1 $FFLAGS -std=legacy -I$CONDA_PREFIX/include/cts -I$CONDA_PREFIX/include/mpfun90 $LDFLAGS -lcts -lavh_olo -lmpfun90 -lqcdloop -lff",
+            "test -f ./example1"
+          ],
+          "requires": [
+            "fortran_compiler_stub",
+            "mpfun90",
+            "oneloop",
+            "qcdloop-fortran-static"
+          ],
+          "source_files": [
+            "source/examples/numerators.f",
+            "source/examples/mpnumerators.f90",
+            "source/examples/rambo.f",
+            "source/examples/random.f",
+            "source/examples/testmp.f",
+            "source/examples/example0.f",
+            "source/examples/example1.f"
+          ]
+        }
+      }
+    ],
+    "package": {
+      "name": "cuttools",
+      "version": "2.0"
+    },
+    "schema_version": 0,
+    "source": {
+      "folder": "source",
+      "patches": [
+        "build-only-cuttools-in-makefile.patch"
+      ],
+      "sha256": "288374088b4050bf9546babdc02ddfd8d53dce8e5b86e0762241acb425551f23",
+      "url": "https://www.ugr.es/~pittau/CutTools/cuttools_v2.0.tar.gz"
+    }
+  },
+  "linux_aarch64_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "fortran_compiler_stub",
+        "libtool",
+        "make"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "mpfun90",
+        "oneloop"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": []
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "fortran_compiler_stub",
+        "mpfun90",
+        "oneloop",
+        "qcdloop-fortran-static"
+      ]
+    }
+  },
+  "linux_ppc64le_meta_yaml": {
+    "about": {
+      "description": "CutTools is based on the following papers:\n  * G. Ossola, C. G. Papadopoulos and R. Pittau [JHEP 0803:042,2008](https://doi.org/10.1088/1126-6708/2008/03/042)\n  * G. Ossola, C. G. Papadopoulos and R. Pittau [Nucl. Phys. B 763 (2007) 147](https://doi.org/10.1016/j.nuclphysb.2006.11.012)\n",
+      "dev_url": "https://www.ugr.es/~pittau/CutTools/",
+      "doc_url": "https://www.ugr.es/~pittau/CutTools/",
+      "home": "https://www.ugr.es/~pittau/CutTools/",
+      "license": "MIT",
+      "license_family": "MIT",
+      "license_file": "source/LICENSE.txt",
+      "summary": "CutTools: Computing 1-loop amplitudes at the integrand level"
+    },
+    "build": {
+      "number": "0"
+    },
+    "extra": {
+      "feedstock-name": "cuttools",
+      "recipe-maintainers": [
+        "matthewfeickert"
+      ]
+    },
+    "outputs": [
+      {
+        "build": {
+          "script": [
+            "cd source",
+            "make PRECISION=QP FC=$FC FFLAGS=\"$FFLAGS -std=legacy -fno-automatic -O2 -funroll-all-loops -ffixed-line-length-none -I$PREFIX/include/mpfun90 -I$PREFIX/include/oneloop\"",
+            "rm includects/ffs.h",
+            "rm includects/ff.h",
+            "rm includects/aa.h",
+            "mv includects/libcts.a $PREFIX/lib/",
+            "mkdir -p $PREFIX/include/cts",
+            "mv includects/*.h $PREFIX/include/cts/",
+            "mv includects/*.mod $PREFIX/include/cts/",
+            "make clean"
+          ]
+        },
+        "name": "cuttools-static",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "make",
+            "libtool"
+          ],
+          "host": [
+            "mpfun90",
+            "oneloop"
+          ]
+        },
+        "test": {
+          "commands": [
+            "test -f $PREFIX/lib/libcts.a",
+            "test -f $PREFIX/include/cts/cts_mpr.h",
+            "test -f $PREFIX/include/cts/cts_mpc.h",
+            "test -f $PREFIX/include/cts/cts_dpr.h",
+            "test -f $PREFIX/include/cts/cts_dpc.h",
+            "test -f $PREFIX/include/cts/cts_mpinit.h",
+            "test -f $PREFIX/include/cts/cts_mprec.h",
+            "test -f $PREFIX/include/cts/def_propagator.mod",
+            "test -f $PREFIX/include/cts/def_solcut.mod",
+            "test -f $PREFIX/include/cts/def_mp_propagator.mod",
+            "test -f $PREFIX/include/cts/def_mp_solcut.mod",
+            "test -f $PREFIX/include/cts/tensor_operations.mod",
+            "test -f $PREFIX/include/cts/constants.mod",
+            "test -f $PREFIX/include/cts/mbnvalues.mod",
+            "test -f $PREFIX/include/cts/maxnumden.mod",
+            "test -f $PREFIX/include/cts/maxsolutions.mod",
+            "test -f $PREFIX/include/cts/combinatorics.mod",
+            "test -f $PREFIX/include/cts/dimensions.mod",
+            "test -f $PREFIX/include/cts/inout.mod",
+            "test -f $PREFIX/include/cts/scale.mod",
+            "test -f $PREFIX/include/cts/qt2value.mod",
+            "test -f $PREFIX/include/cts/denominators.mod",
+            "test -f $PREFIX/include/cts/cuttings.mod",
+            "test -f $PREFIX/include/cts/coefficients.mod",
+            "test -f $PREFIX/include/cts/loopfunctions.mod",
+            "test -f $PREFIX/include/cts/mp_loopfunctions.mod",
+            "test -f $PREFIX/include/cts/countdigits.mod",
+            "cd source/examples/",
+            "$FC numerators.f mpnumerators.f90 rambo.f random.f testmp.f -o testmp $FFLAGS -std=legacy -I$CONDA_PREFIX/include/cts -I$CONDA_PREFIX/include/mpfun90 $LDFLAGS -lcts -lavh_olo -lmpfun90 -lqcdloop -lff",
+            "./testmp",
+            "$FC numerators.f mpnumerators.f90 example0.f -o example0 $FFLAGS -std=legacy -I$CONDA_PREFIX/include/cts -I$CONDA_PREFIX/include/mpfun90 $LDFLAGS -lcts -lavh_olo -lmpfun90 -lqcdloop -lff",
+            "./example0",
+            "$FC numerators.f mpnumerators.f90 rambo.f random.f example1.f -o example1 $FFLAGS -std=legacy -I$CONDA_PREFIX/include/cts -I$CONDA_PREFIX/include/mpfun90 $LDFLAGS -lcts -lavh_olo -lmpfun90 -lqcdloop -lff",
+            "test -f ./example1"
+          ],
+          "requires": [
+            "fortran_compiler_stub",
+            "mpfun90",
+            "oneloop",
+            "qcdloop-fortran-static"
+          ],
+          "source_files": [
+            "source/examples/numerators.f",
+            "source/examples/mpnumerators.f90",
+            "source/examples/rambo.f",
+            "source/examples/random.f",
+            "source/examples/testmp.f",
+            "source/examples/example0.f",
+            "source/examples/example1.f"
+          ]
+        }
+      }
+    ],
+    "package": {
+      "name": "cuttools",
+      "version": "2.0"
+    },
+    "schema_version": 0,
+    "source": {
+      "folder": "source",
+      "patches": [
+        "build-only-cuttools-in-makefile.patch"
+      ],
+      "sha256": "288374088b4050bf9546babdc02ddfd8d53dce8e5b86e0762241acb425551f23",
+      "url": "https://www.ugr.es/~pittau/CutTools/cuttools_v2.0.tar.gz"
+    }
+  },
+  "linux_ppc64le_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "fortran_compiler_stub",
+        "libtool",
+        "make"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "mpfun90",
+        "oneloop"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": []
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "fortran_compiler_stub",
+        "mpfun90",
+        "oneloop",
+        "qcdloop-fortran-static"
+      ]
+    }
+  },
+  "meta_yaml": {
+    "about": {
+      "description": "CutTools is based on the following papers:\n  * G. Ossola, C. G. Papadopoulos and R. Pittau [JHEP 0803:042,2008](https://doi.org/10.1088/1126-6708/2008/03/042)\n  * G. Ossola, C. G. Papadopoulos and R. Pittau [Nucl. Phys. B 763 (2007) 147](https://doi.org/10.1016/j.nuclphysb.2006.11.012)\n",
+      "dev_url": "https://www.ugr.es/~pittau/CutTools/",
+      "doc_url": "https://www.ugr.es/~pittau/CutTools/",
+      "home": "https://www.ugr.es/~pittau/CutTools/",
+      "license": "MIT",
+      "license_family": "MIT",
+      "license_file": "source/LICENSE.txt",
+      "summary": "CutTools: Computing 1-loop amplitudes at the integrand level"
+    },
+    "build": {
+      "number": "0"
+    },
+    "extra": {
+      "feedstock-name": "cuttools",
+      "recipe-maintainers": [
+        "matthewfeickert"
+      ]
+    },
+    "outputs": [
+      {
+        "build": {
+          "script": [
+            "cd source",
+            "make PRECISION=QP FC=$FC FFLAGS=\"$FFLAGS -std=legacy -fno-automatic -O2 -funroll-all-loops -ffixed-line-length-none -I$PREFIX/include/mpfun90 -I$PREFIX/include/oneloop\"",
+            "rm includects/ffs.h",
+            "rm includects/ff.h",
+            "rm includects/aa.h",
+            "mv includects/libcts.a $PREFIX/lib/",
+            "mkdir -p $PREFIX/include/cts",
+            "mv includects/*.h $PREFIX/include/cts/",
+            "mv includects/*.mod $PREFIX/include/cts/",
+            "make clean"
+          ]
+        },
+        "name": "cuttools-static",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "make",
+            "libtool"
+          ],
+          "host": [
+            "mpfun90",
+            "oneloop"
+          ]
+        },
+        "test": {
+          "commands": [
+            "test -f $PREFIX/lib/libcts.a",
+            "test -f $PREFIX/include/cts/cts_mpr.h",
+            "test -f $PREFIX/include/cts/cts_mpc.h",
+            "test -f $PREFIX/include/cts/cts_dpr.h",
+            "test -f $PREFIX/include/cts/cts_dpc.h",
+            "test -f $PREFIX/include/cts/cts_mpinit.h",
+            "test -f $PREFIX/include/cts/cts_mprec.h",
+            "test -f $PREFIX/include/cts/def_propagator.mod",
+            "test -f $PREFIX/include/cts/def_solcut.mod",
+            "test -f $PREFIX/include/cts/def_mp_propagator.mod",
+            "test -f $PREFIX/include/cts/def_mp_solcut.mod",
+            "test -f $PREFIX/include/cts/tensor_operations.mod",
+            "test -f $PREFIX/include/cts/constants.mod",
+            "test -f $PREFIX/include/cts/mbnvalues.mod",
+            "test -f $PREFIX/include/cts/maxnumden.mod",
+            "test -f $PREFIX/include/cts/maxsolutions.mod",
+            "test -f $PREFIX/include/cts/combinatorics.mod",
+            "test -f $PREFIX/include/cts/dimensions.mod",
+            "test -f $PREFIX/include/cts/inout.mod",
+            "test -f $PREFIX/include/cts/scale.mod",
+            "test -f $PREFIX/include/cts/qt2value.mod",
+            "test -f $PREFIX/include/cts/denominators.mod",
+            "test -f $PREFIX/include/cts/cuttings.mod",
+            "test -f $PREFIX/include/cts/coefficients.mod",
+            "test -f $PREFIX/include/cts/loopfunctions.mod",
+            "test -f $PREFIX/include/cts/mp_loopfunctions.mod",
+            "test -f $PREFIX/include/cts/countdigits.mod",
+            "cd source/examples/",
+            "$FC numerators.f mpnumerators.f90 rambo.f random.f testmp.f -o testmp $FFLAGS -std=legacy -I$CONDA_PREFIX/include/cts -I$CONDA_PREFIX/include/mpfun90 $LDFLAGS -lcts -lavh_olo -lmpfun90 -lqcdloop -lff",
+            "./testmp",
+            "$FC numerators.f mpnumerators.f90 example0.f -o example0 $FFLAGS -std=legacy -I$CONDA_PREFIX/include/cts -I$CONDA_PREFIX/include/mpfun90 $LDFLAGS -lcts -lavh_olo -lmpfun90 -lqcdloop -lff",
+            "./example0",
+            "$FC numerators.f mpnumerators.f90 rambo.f random.f example1.f -o example1 $FFLAGS -std=legacy -I$CONDA_PREFIX/include/cts -I$CONDA_PREFIX/include/mpfun90 $LDFLAGS -lcts -lavh_olo -lmpfun90 -lqcdloop -lff",
+            "test -f ./example1"
+          ],
+          "requires": [
+            "fortran_compiler_stub",
+            "mpfun90",
+            "oneloop",
+            "qcdloop-fortran-static"
+          ],
+          "source_files": [
+            "source/examples/numerators.f",
+            "source/examples/mpnumerators.f90",
+            "source/examples/rambo.f",
+            "source/examples/random.f",
+            "source/examples/testmp.f",
+            "source/examples/example0.f",
+            "source/examples/example1.f"
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd source",
+            "make PRECISION=QP FC=$FC FFLAGS=\"$FFLAGS -std=legacy -fno-automatic -O2 -funroll-all-loops -ffixed-line-length-none -I$PREFIX/include/mpfun90 -I$PREFIX/include/oneloop\"",
+            "rm includects/ffs.h",
+            "rm includects/ff.h",
+            "rm includects/aa.h",
+            "mv includects/libcts.a $PREFIX/lib/",
+            "mkdir -p $PREFIX/include/cts",
+            "mv includects/*.h $PREFIX/include/cts/",
+            "mv includects/*.mod $PREFIX/include/cts/",
+            "make clean"
+          ]
+        },
+        "name": "cuttools-static",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "make",
+            "libtool"
+          ],
+          "host": [
+            "mpfun90",
+            "oneloop"
+          ]
+        },
+        "test": {
+          "commands": [
+            "test -f $PREFIX/lib/libcts.a",
+            "test -f $PREFIX/include/cts/cts_mpr.h",
+            "test -f $PREFIX/include/cts/cts_mpc.h",
+            "test -f $PREFIX/include/cts/cts_dpr.h",
+            "test -f $PREFIX/include/cts/cts_dpc.h",
+            "test -f $PREFIX/include/cts/cts_mpinit.h",
+            "test -f $PREFIX/include/cts/cts_mprec.h",
+            "test -f $PREFIX/include/cts/def_propagator.mod",
+            "test -f $PREFIX/include/cts/def_solcut.mod",
+            "test -f $PREFIX/include/cts/def_mp_propagator.mod",
+            "test -f $PREFIX/include/cts/def_mp_solcut.mod",
+            "test -f $PREFIX/include/cts/tensor_operations.mod",
+            "test -f $PREFIX/include/cts/constants.mod",
+            "test -f $PREFIX/include/cts/mbnvalues.mod",
+            "test -f $PREFIX/include/cts/maxnumden.mod",
+            "test -f $PREFIX/include/cts/maxsolutions.mod",
+            "test -f $PREFIX/include/cts/combinatorics.mod",
+            "test -f $PREFIX/include/cts/dimensions.mod",
+            "test -f $PREFIX/include/cts/inout.mod",
+            "test -f $PREFIX/include/cts/scale.mod",
+            "test -f $PREFIX/include/cts/qt2value.mod",
+            "test -f $PREFIX/include/cts/denominators.mod",
+            "test -f $PREFIX/include/cts/cuttings.mod",
+            "test -f $PREFIX/include/cts/coefficients.mod",
+            "test -f $PREFIX/include/cts/loopfunctions.mod",
+            "test -f $PREFIX/include/cts/mp_loopfunctions.mod",
+            "test -f $PREFIX/include/cts/countdigits.mod",
+            "cd source/examples/",
+            "$FC numerators.f mpnumerators.f90 rambo.f random.f testmp.f -o testmp $FFLAGS -std=legacy -I$CONDA_PREFIX/include/cts -I$CONDA_PREFIX/include/mpfun90 $LDFLAGS -lcts -lavh_olo -lmpfun90 -lqcdloop -lff",
+            "./testmp",
+            "$FC numerators.f mpnumerators.f90 example0.f -o example0 $FFLAGS -std=legacy -I$CONDA_PREFIX/include/cts -I$CONDA_PREFIX/include/mpfun90 $LDFLAGS -lcts -lavh_olo -lmpfun90 -lqcdloop -lff",
+            "./example0",
+            "$FC numerators.f mpnumerators.f90 rambo.f random.f example1.f -o example1 $FFLAGS -std=legacy -I$CONDA_PREFIX/include/cts -I$CONDA_PREFIX/include/mpfun90 $LDFLAGS -lcts -lavh_olo -lmpfun90 -lqcdloop -lff",
+            "test -f ./example1"
+          ],
+          "requires": [
+            "fortran_compiler_stub",
+            "mpfun90",
+            "oneloop",
+            "qcdloop-fortran-static"
+          ],
+          "source_files": [
+            "source/examples/numerators.f",
+            "source/examples/mpnumerators.f90",
+            "source/examples/rambo.f",
+            "source/examples/random.f",
+            "source/examples/testmp.f",
+            "source/examples/example0.f",
+            "source/examples/example1.f"
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd source",
+            "make PRECISION=QP FC=$FC FFLAGS=\"$FFLAGS -std=legacy -fno-automatic -O2 -funroll-all-loops -ffixed-line-length-none -I$PREFIX/include/mpfun90 -I$PREFIX/include/oneloop\"",
+            "rm includects/ffs.h",
+            "rm includects/ff.h",
+            "rm includects/aa.h",
+            "mv includects/libcts.a $PREFIX/lib/",
+            "mkdir -p $PREFIX/include/cts",
+            "mv includects/*.h $PREFIX/include/cts/",
+            "mv includects/*.mod $PREFIX/include/cts/",
+            "make clean"
+          ]
+        },
+        "name": "cuttools-static",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "make",
+            "libtool"
+          ],
+          "host": [
+            "mpfun90",
+            "oneloop"
+          ]
+        },
+        "test": {
+          "commands": [
+            "test -f $PREFIX/lib/libcts.a",
+            "test -f $PREFIX/include/cts/cts_mpr.h",
+            "test -f $PREFIX/include/cts/cts_mpc.h",
+            "test -f $PREFIX/include/cts/cts_dpr.h",
+            "test -f $PREFIX/include/cts/cts_dpc.h",
+            "test -f $PREFIX/include/cts/cts_mpinit.h",
+            "test -f $PREFIX/include/cts/cts_mprec.h",
+            "test -f $PREFIX/include/cts/def_propagator.mod",
+            "test -f $PREFIX/include/cts/def_solcut.mod",
+            "test -f $PREFIX/include/cts/def_mp_propagator.mod",
+            "test -f $PREFIX/include/cts/def_mp_solcut.mod",
+            "test -f $PREFIX/include/cts/tensor_operations.mod",
+            "test -f $PREFIX/include/cts/constants.mod",
+            "test -f $PREFIX/include/cts/mbnvalues.mod",
+            "test -f $PREFIX/include/cts/maxnumden.mod",
+            "test -f $PREFIX/include/cts/maxsolutions.mod",
+            "test -f $PREFIX/include/cts/combinatorics.mod",
+            "test -f $PREFIX/include/cts/dimensions.mod",
+            "test -f $PREFIX/include/cts/inout.mod",
+            "test -f $PREFIX/include/cts/scale.mod",
+            "test -f $PREFIX/include/cts/qt2value.mod",
+            "test -f $PREFIX/include/cts/denominators.mod",
+            "test -f $PREFIX/include/cts/cuttings.mod",
+            "test -f $PREFIX/include/cts/coefficients.mod",
+            "test -f $PREFIX/include/cts/loopfunctions.mod",
+            "test -f $PREFIX/include/cts/mp_loopfunctions.mod",
+            "test -f $PREFIX/include/cts/countdigits.mod",
+            "cd source/examples/",
+            "$FC numerators.f mpnumerators.f90 rambo.f random.f testmp.f -o testmp $FFLAGS -std=legacy -I$CONDA_PREFIX/include/cts -I$CONDA_PREFIX/include/mpfun90 $LDFLAGS -lcts -lavh_olo -lmpfun90 -lqcdloop -lff",
+            "./testmp",
+            "$FC numerators.f mpnumerators.f90 example0.f -o example0 $FFLAGS -std=legacy -I$CONDA_PREFIX/include/cts -I$CONDA_PREFIX/include/mpfun90 $LDFLAGS -lcts -lavh_olo -lmpfun90 -lqcdloop -lff",
+            "./example0",
+            "$FC numerators.f mpnumerators.f90 rambo.f random.f example1.f -o example1 $FFLAGS -std=legacy -I$CONDA_PREFIX/include/cts -I$CONDA_PREFIX/include/mpfun90 $LDFLAGS -lcts -lavh_olo -lmpfun90 -lqcdloop -lff",
+            "test -f ./example1"
+          ],
+          "requires": [
+            "fortran_compiler_stub",
+            "mpfun90",
+            "oneloop",
+            "qcdloop-fortran-static"
+          ],
+          "source_files": [
+            "source/examples/numerators.f",
+            "source/examples/mpnumerators.f90",
+            "source/examples/rambo.f",
+            "source/examples/random.f",
+            "source/examples/testmp.f",
+            "source/examples/example0.f",
+            "source/examples/example1.f"
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd source",
+            "make PRECISION=QP FC=$FC FFLAGS=\"$FFLAGS -std=legacy -fno-automatic -O2 -funroll-all-loops -ffixed-line-length-none -I$PREFIX/include/mpfun90 -I$PREFIX/include/oneloop\"",
+            "rm includects/ffs.h",
+            "rm includects/ff.h",
+            "rm includects/aa.h",
+            "mv includects/libcts.a $PREFIX/lib/",
+            "mkdir -p $PREFIX/include/cts",
+            "mv includects/*.h $PREFIX/include/cts/",
+            "mv includects/*.mod $PREFIX/include/cts/",
+            "make clean"
+          ]
+        },
+        "name": "cuttools-static",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "make",
+            "libtool"
+          ],
+          "host": [
+            "mpfun90",
+            "oneloop"
+          ]
+        },
+        "test": {
+          "commands": [
+            "test -f $PREFIX/lib/libcts.a",
+            "test -f $PREFIX/include/cts/cts_mpr.h",
+            "test -f $PREFIX/include/cts/cts_mpc.h",
+            "test -f $PREFIX/include/cts/cts_dpr.h",
+            "test -f $PREFIX/include/cts/cts_dpc.h",
+            "test -f $PREFIX/include/cts/cts_mpinit.h",
+            "test -f $PREFIX/include/cts/cts_mprec.h",
+            "test -f $PREFIX/include/cts/def_propagator.mod",
+            "test -f $PREFIX/include/cts/def_solcut.mod",
+            "test -f $PREFIX/include/cts/def_mp_propagator.mod",
+            "test -f $PREFIX/include/cts/def_mp_solcut.mod",
+            "test -f $PREFIX/include/cts/tensor_operations.mod",
+            "test -f $PREFIX/include/cts/constants.mod",
+            "test -f $PREFIX/include/cts/mbnvalues.mod",
+            "test -f $PREFIX/include/cts/maxnumden.mod",
+            "test -f $PREFIX/include/cts/maxsolutions.mod",
+            "test -f $PREFIX/include/cts/combinatorics.mod",
+            "test -f $PREFIX/include/cts/dimensions.mod",
+            "test -f $PREFIX/include/cts/inout.mod",
+            "test -f $PREFIX/include/cts/scale.mod",
+            "test -f $PREFIX/include/cts/qt2value.mod",
+            "test -f $PREFIX/include/cts/denominators.mod",
+            "test -f $PREFIX/include/cts/cuttings.mod",
+            "test -f $PREFIX/include/cts/coefficients.mod",
+            "test -f $PREFIX/include/cts/loopfunctions.mod",
+            "test -f $PREFIX/include/cts/mp_loopfunctions.mod",
+            "test -f $PREFIX/include/cts/countdigits.mod",
+            "cd source/examples/",
+            "$FC numerators.f mpnumerators.f90 rambo.f random.f testmp.f -o testmp $FFLAGS -std=legacy -I$CONDA_PREFIX/include/cts -I$CONDA_PREFIX/include/mpfun90 $LDFLAGS -lcts -lavh_olo -lmpfun90 -lqcdloop -lff",
+            "./testmp",
+            "$FC numerators.f mpnumerators.f90 example0.f -o example0 $FFLAGS -std=legacy -I$CONDA_PREFIX/include/cts -I$CONDA_PREFIX/include/mpfun90 $LDFLAGS -lcts -lavh_olo -lmpfun90 -lqcdloop -lff",
+            "./example0",
+            "$FC numerators.f mpnumerators.f90 rambo.f random.f example1.f -o example1 $FFLAGS -std=legacy -I$CONDA_PREFIX/include/cts -I$CONDA_PREFIX/include/mpfun90 $LDFLAGS -lcts -lavh_olo -lmpfun90 -lqcdloop -lff",
+            "test -f ./example1"
+          ],
+          "requires": [
+            "fortran_compiler_stub",
+            "mpfun90",
+            "oneloop",
+            "qcdloop-fortran-static"
+          ],
+          "source_files": [
+            "source/examples/numerators.f",
+            "source/examples/mpnumerators.f90",
+            "source/examples/rambo.f",
+            "source/examples/random.f",
+            "source/examples/testmp.f",
+            "source/examples/example0.f",
+            "source/examples/example1.f"
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd source",
+            "make PRECISION=QP FC=$FC FFLAGS=\"$FFLAGS -std=legacy -fno-automatic -O2 -funroll-all-loops -ffixed-line-length-none -I$PREFIX/include/mpfun90 -I$PREFIX/include/oneloop\"",
+            "rm includects/ffs.h",
+            "rm includects/ff.h",
+            "rm includects/aa.h",
+            "mv includects/libcts.a $PREFIX/lib/",
+            "mkdir -p $PREFIX/include/cts",
+            "mv includects/*.h $PREFIX/include/cts/",
+            "mv includects/*.mod $PREFIX/include/cts/",
+            "make clean"
+          ]
+        },
+        "name": "cuttools-static",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "make",
+            "libtool"
+          ],
+          "host": [
+            "mpfun90",
+            "oneloop"
+          ]
+        },
+        "test": {
+          "commands": [
+            "test -f $PREFIX/lib/libcts.a",
+            "test -f $PREFIX/include/cts/cts_mpr.h",
+            "test -f $PREFIX/include/cts/cts_mpc.h",
+            "test -f $PREFIX/include/cts/cts_dpr.h",
+            "test -f $PREFIX/include/cts/cts_dpc.h",
+            "test -f $PREFIX/include/cts/cts_mpinit.h",
+            "test -f $PREFIX/include/cts/cts_mprec.h",
+            "test -f $PREFIX/include/cts/def_propagator.mod",
+            "test -f $PREFIX/include/cts/def_solcut.mod",
+            "test -f $PREFIX/include/cts/def_mp_propagator.mod",
+            "test -f $PREFIX/include/cts/def_mp_solcut.mod",
+            "test -f $PREFIX/include/cts/tensor_operations.mod",
+            "test -f $PREFIX/include/cts/constants.mod",
+            "test -f $PREFIX/include/cts/mbnvalues.mod",
+            "test -f $PREFIX/include/cts/maxnumden.mod",
+            "test -f $PREFIX/include/cts/maxsolutions.mod",
+            "test -f $PREFIX/include/cts/combinatorics.mod",
+            "test -f $PREFIX/include/cts/dimensions.mod",
+            "test -f $PREFIX/include/cts/inout.mod",
+            "test -f $PREFIX/include/cts/scale.mod",
+            "test -f $PREFIX/include/cts/qt2value.mod",
+            "test -f $PREFIX/include/cts/denominators.mod",
+            "test -f $PREFIX/include/cts/cuttings.mod",
+            "test -f $PREFIX/include/cts/coefficients.mod",
+            "test -f $PREFIX/include/cts/loopfunctions.mod",
+            "test -f $PREFIX/include/cts/mp_loopfunctions.mod",
+            "test -f $PREFIX/include/cts/countdigits.mod",
+            "cd source/examples/",
+            "$FC numerators.f mpnumerators.f90 rambo.f random.f testmp.f -o testmp $FFLAGS -std=legacy -I$CONDA_PREFIX/include/cts -I$CONDA_PREFIX/include/mpfun90 $LDFLAGS -lcts -lavh_olo -lmpfun90 -lqcdloop -lff",
+            "./testmp",
+            "$FC numerators.f mpnumerators.f90 example0.f -o example0 $FFLAGS -std=legacy -I$CONDA_PREFIX/include/cts -I$CONDA_PREFIX/include/mpfun90 $LDFLAGS -lcts -lavh_olo -lmpfun90 -lqcdloop -lff",
+            "./example0",
+            "$FC numerators.f mpnumerators.f90 rambo.f random.f example1.f -o example1 $FFLAGS -std=legacy -I$CONDA_PREFIX/include/cts -I$CONDA_PREFIX/include/mpfun90 $LDFLAGS -lcts -lavh_olo -lmpfun90 -lqcdloop -lff",
+            "test -f ./example1"
+          ],
+          "requires": [
+            "fortran_compiler_stub",
+            "mpfun90",
+            "oneloop",
+            "qcdloop-fortran-static"
+          ],
+          "source_files": [
+            "source/examples/numerators.f",
+            "source/examples/mpnumerators.f90",
+            "source/examples/rambo.f",
+            "source/examples/random.f",
+            "source/examples/testmp.f",
+            "source/examples/example0.f",
+            "source/examples/example1.f"
+          ]
+        }
+      }
+    ],
+    "package": {
+      "name": "cuttools",
+      "version": "2.0"
+    },
+    "schema_version": 0,
+    "source": {
+      "folder": "source",
+      "patches": [
+        "build-only-cuttools-in-makefile.patch"
+      ],
+      "sha256": "288374088b4050bf9546babdc02ddfd8d53dce8e5b86e0762241acb425551f23",
+      "url": "https://www.ugr.es/~pittau/CutTools/cuttools_v2.0.tar.gz"
+    }
+  },
+  "name": "cuttools",
+  "osx_64_meta_yaml": {
+    "about": {
+      "description": "CutTools is based on the following papers:\n  * G. Ossola, C. G. Papadopoulos and R. Pittau [JHEP 0803:042,2008](https://doi.org/10.1088/1126-6708/2008/03/042)\n  * G. Ossola, C. G. Papadopoulos and R. Pittau [Nucl. Phys. B 763 (2007) 147](https://doi.org/10.1016/j.nuclphysb.2006.11.012)\n",
+      "dev_url": "https://www.ugr.es/~pittau/CutTools/",
+      "doc_url": "https://www.ugr.es/~pittau/CutTools/",
+      "home": "https://www.ugr.es/~pittau/CutTools/",
+      "license": "MIT",
+      "license_family": "MIT",
+      "license_file": "source/LICENSE.txt",
+      "summary": "CutTools: Computing 1-loop amplitudes at the integrand level"
+    },
+    "build": {
+      "number": "0"
+    },
+    "extra": {
+      "feedstock-name": "cuttools",
+      "recipe-maintainers": [
+        "matthewfeickert"
+      ]
+    },
+    "outputs": [
+      {
+        "build": {
+          "script": [
+            "cd source",
+            "make PRECISION=QP FC=$FC FFLAGS=\"$FFLAGS -std=legacy -fno-automatic -O2 -funroll-all-loops -ffixed-line-length-none -I$PREFIX/include/mpfun90 -I$PREFIX/include/oneloop\"",
+            "rm includects/ffs.h",
+            "rm includects/ff.h",
+            "rm includects/aa.h",
+            "mv includects/libcts.a $PREFIX/lib/",
+            "mkdir -p $PREFIX/include/cts",
+            "mv includects/*.h $PREFIX/include/cts/",
+            "mv includects/*.mod $PREFIX/include/cts/",
+            "make clean"
+          ]
+        },
+        "name": "cuttools-static",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "make",
+            "libtool"
+          ],
+          "host": [
+            "mpfun90",
+            "oneloop"
+          ]
+        },
+        "test": {
+          "commands": [
+            "test -f $PREFIX/lib/libcts.a",
+            "test -f $PREFIX/include/cts/cts_mpr.h",
+            "test -f $PREFIX/include/cts/cts_mpc.h",
+            "test -f $PREFIX/include/cts/cts_dpr.h",
+            "test -f $PREFIX/include/cts/cts_dpc.h",
+            "test -f $PREFIX/include/cts/cts_mpinit.h",
+            "test -f $PREFIX/include/cts/cts_mprec.h",
+            "test -f $PREFIX/include/cts/def_propagator.mod",
+            "test -f $PREFIX/include/cts/def_solcut.mod",
+            "test -f $PREFIX/include/cts/def_mp_propagator.mod",
+            "test -f $PREFIX/include/cts/def_mp_solcut.mod",
+            "test -f $PREFIX/include/cts/tensor_operations.mod",
+            "test -f $PREFIX/include/cts/constants.mod",
+            "test -f $PREFIX/include/cts/mbnvalues.mod",
+            "test -f $PREFIX/include/cts/maxnumden.mod",
+            "test -f $PREFIX/include/cts/maxsolutions.mod",
+            "test -f $PREFIX/include/cts/combinatorics.mod",
+            "test -f $PREFIX/include/cts/dimensions.mod",
+            "test -f $PREFIX/include/cts/inout.mod",
+            "test -f $PREFIX/include/cts/scale.mod",
+            "test -f $PREFIX/include/cts/qt2value.mod",
+            "test -f $PREFIX/include/cts/denominators.mod",
+            "test -f $PREFIX/include/cts/cuttings.mod",
+            "test -f $PREFIX/include/cts/coefficients.mod",
+            "test -f $PREFIX/include/cts/loopfunctions.mod",
+            "test -f $PREFIX/include/cts/mp_loopfunctions.mod",
+            "test -f $PREFIX/include/cts/countdigits.mod",
+            "cd source/examples/",
+            "$FC numerators.f mpnumerators.f90 rambo.f random.f testmp.f -o testmp $FFLAGS -std=legacy -I$CONDA_PREFIX/include/cts -I$CONDA_PREFIX/include/mpfun90 $LDFLAGS -lcts -lavh_olo -lmpfun90 -lqcdloop -lff",
+            "./testmp",
+            "$FC numerators.f mpnumerators.f90 example0.f -o example0 $FFLAGS -std=legacy -I$CONDA_PREFIX/include/cts -I$CONDA_PREFIX/include/mpfun90 $LDFLAGS -lcts -lavh_olo -lmpfun90 -lqcdloop -lff",
+            "./example0",
+            "$FC numerators.f mpnumerators.f90 rambo.f random.f example1.f -o example1 $FFLAGS -std=legacy -I$CONDA_PREFIX/include/cts -I$CONDA_PREFIX/include/mpfun90 $LDFLAGS -lcts -lavh_olo -lmpfun90 -lqcdloop -lff",
+            "test -f ./example1"
+          ],
+          "requires": [
+            "fortran_compiler_stub",
+            "mpfun90",
+            "oneloop",
+            "qcdloop-fortran-static"
+          ],
+          "source_files": [
+            "source/examples/numerators.f",
+            "source/examples/mpnumerators.f90",
+            "source/examples/rambo.f",
+            "source/examples/random.f",
+            "source/examples/testmp.f",
+            "source/examples/example0.f",
+            "source/examples/example1.f"
+          ]
+        }
+      }
+    ],
+    "package": {
+      "name": "cuttools",
+      "version": "2.0"
+    },
+    "schema_version": 0,
+    "source": {
+      "folder": "source",
+      "patches": [
+        "build-only-cuttools-in-makefile.patch"
+      ],
+      "sha256": "288374088b4050bf9546babdc02ddfd8d53dce8e5b86e0762241acb425551f23",
+      "url": "https://www.ugr.es/~pittau/CutTools/cuttools_v2.0.tar.gz"
+    }
+  },
+  "osx_64_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "fortran_compiler_stub",
+        "libtool",
+        "make"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "mpfun90",
+        "oneloop"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": []
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "fortran_compiler_stub",
+        "mpfun90",
+        "oneloop",
+        "qcdloop-fortran-static"
+      ]
+    }
+  },
+  "osx_arm64_meta_yaml": {
+    "about": {
+      "description": "CutTools is based on the following papers:\n  * G. Ossola, C. G. Papadopoulos and R. Pittau [JHEP 0803:042,2008](https://doi.org/10.1088/1126-6708/2008/03/042)\n  * G. Ossola, C. G. Papadopoulos and R. Pittau [Nucl. Phys. B 763 (2007) 147](https://doi.org/10.1016/j.nuclphysb.2006.11.012)\n",
+      "dev_url": "https://www.ugr.es/~pittau/CutTools/",
+      "doc_url": "https://www.ugr.es/~pittau/CutTools/",
+      "home": "https://www.ugr.es/~pittau/CutTools/",
+      "license": "MIT",
+      "license_family": "MIT",
+      "license_file": "source/LICENSE.txt",
+      "summary": "CutTools: Computing 1-loop amplitudes at the integrand level"
+    },
+    "build": {
+      "number": "0"
+    },
+    "extra": {
+      "feedstock-name": "cuttools",
+      "recipe-maintainers": [
+        "matthewfeickert"
+      ]
+    },
+    "outputs": [
+      {
+        "build": {
+          "script": [
+            "cd source",
+            "make PRECISION=QP FC=$FC FFLAGS=\"$FFLAGS -std=legacy -fno-automatic -O2 -funroll-all-loops -ffixed-line-length-none -I$PREFIX/include/mpfun90 -I$PREFIX/include/oneloop\"",
+            "rm includects/ffs.h",
+            "rm includects/ff.h",
+            "rm includects/aa.h",
+            "mv includects/libcts.a $PREFIX/lib/",
+            "mkdir -p $PREFIX/include/cts",
+            "mv includects/*.h $PREFIX/include/cts/",
+            "mv includects/*.mod $PREFIX/include/cts/",
+            "make clean"
+          ]
+        },
+        "name": "cuttools-static",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "make",
+            "libtool"
+          ],
+          "host": [
+            "mpfun90",
+            "oneloop"
+          ]
+        },
+        "test": {
+          "commands": [
+            "test -f $PREFIX/lib/libcts.a",
+            "test -f $PREFIX/include/cts/cts_mpr.h",
+            "test -f $PREFIX/include/cts/cts_mpc.h",
+            "test -f $PREFIX/include/cts/cts_dpr.h",
+            "test -f $PREFIX/include/cts/cts_dpc.h",
+            "test -f $PREFIX/include/cts/cts_mpinit.h",
+            "test -f $PREFIX/include/cts/cts_mprec.h",
+            "test -f $PREFIX/include/cts/def_propagator.mod",
+            "test -f $PREFIX/include/cts/def_solcut.mod",
+            "test -f $PREFIX/include/cts/def_mp_propagator.mod",
+            "test -f $PREFIX/include/cts/def_mp_solcut.mod",
+            "test -f $PREFIX/include/cts/tensor_operations.mod",
+            "test -f $PREFIX/include/cts/constants.mod",
+            "test -f $PREFIX/include/cts/mbnvalues.mod",
+            "test -f $PREFIX/include/cts/maxnumden.mod",
+            "test -f $PREFIX/include/cts/maxsolutions.mod",
+            "test -f $PREFIX/include/cts/combinatorics.mod",
+            "test -f $PREFIX/include/cts/dimensions.mod",
+            "test -f $PREFIX/include/cts/inout.mod",
+            "test -f $PREFIX/include/cts/scale.mod",
+            "test -f $PREFIX/include/cts/qt2value.mod",
+            "test -f $PREFIX/include/cts/denominators.mod",
+            "test -f $PREFIX/include/cts/cuttings.mod",
+            "test -f $PREFIX/include/cts/coefficients.mod",
+            "test -f $PREFIX/include/cts/loopfunctions.mod",
+            "test -f $PREFIX/include/cts/mp_loopfunctions.mod",
+            "test -f $PREFIX/include/cts/countdigits.mod",
+            "cd source/examples/",
+            "$FC numerators.f mpnumerators.f90 rambo.f random.f testmp.f -o testmp $FFLAGS -std=legacy -I$CONDA_PREFIX/include/cts -I$CONDA_PREFIX/include/mpfun90 $LDFLAGS -lcts -lavh_olo -lmpfun90 -lqcdloop -lff",
+            "./testmp",
+            "$FC numerators.f mpnumerators.f90 example0.f -o example0 $FFLAGS -std=legacy -I$CONDA_PREFIX/include/cts -I$CONDA_PREFIX/include/mpfun90 $LDFLAGS -lcts -lavh_olo -lmpfun90 -lqcdloop -lff",
+            "./example0",
+            "$FC numerators.f mpnumerators.f90 rambo.f random.f example1.f -o example1 $FFLAGS -std=legacy -I$CONDA_PREFIX/include/cts -I$CONDA_PREFIX/include/mpfun90 $LDFLAGS -lcts -lavh_olo -lmpfun90 -lqcdloop -lff",
+            "test -f ./example1"
+          ],
+          "requires": [
+            "fortran_compiler_stub",
+            "mpfun90",
+            "oneloop",
+            "qcdloop-fortran-static"
+          ],
+          "source_files": [
+            "source/examples/numerators.f",
+            "source/examples/mpnumerators.f90",
+            "source/examples/rambo.f",
+            "source/examples/random.f",
+            "source/examples/testmp.f",
+            "source/examples/example0.f",
+            "source/examples/example1.f"
+          ]
+        }
+      }
+    ],
+    "package": {
+      "name": "cuttools",
+      "version": "2.0"
+    },
+    "schema_version": 0,
+    "source": {
+      "folder": "source",
+      "patches": [
+        "build-only-cuttools-in-makefile.patch"
+      ],
+      "sha256": "288374088b4050bf9546babdc02ddfd8d53dce8e5b86e0762241acb425551f23",
+      "url": "https://www.ugr.es/~pittau/CutTools/cuttools_v2.0.tar.gz"
+    }
+  },
+  "osx_arm64_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "fortran_compiler_stub",
+        "libtool",
+        "make"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "mpfun90",
+        "oneloop"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": []
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "fortran_compiler_stub",
+        "mpfun90",
+        "oneloop",
+        "qcdloop-fortran-static"
+      ]
+    }
+  },
+  "outputs_names": {
+    "__set__": true,
+    "elements": [
+      "cuttools-static"
+    ]
+  },
+  "parsing_error": false,
+  "platforms": [
+    "linux_64",
+    "linux_aarch64",
+    "linux_ppc64le",
+    "osx_64",
+    "osx_arm64"
+  ],
+  "pr_info": {
+    "__lazy_json__": "pr_info/cuttools.json"
+  },
+  "raw_meta_yaml": "{% set name = \"cuttools\" %}\n{% set version = \"2.0\" %}\n\npackage:\n  name: {{ name }}\n  version: {{ version }}\n\nsource:\n    url: https://www.ugr.es/~pittau/CutTools/cuttools_v{{ version }}.tar.gz\n    sha256: 288374088b4050bf9546babdc02ddfd8d53dce8e5b86e0762241acb425551f23\n    folder: source\n    patches:\n      # Don't built CutTools dependencies as these are installed through conda-forge\n      - build-only-cuttools-in-makefile.patch\n\nbuild:\n  number: 0\n\noutputs:\n  - name: {{ name }}-static\n\n    build:\n      skip: true  # [win]\n      script:\n        # Enable extended-source with '-ffixed-line-length-none' for long lines\n        # c.f. https://gcc.gnu.org/onlinedocs/gfortran/Fortran-Dialect-Options.html#index-ffixed-line-length-n\n\n        # Build\n        - cd source\n        - make PRECISION=QP FC=$FC FFLAGS=\"$FFLAGS -std=legacy -fno-automatic -O2 -funroll-all-loops -ffixed-line-length-none -I$PREFIX/include/mpfun90 -I$PREFIX/include/oneloop\"\n\n        # Install\n        # Avoid vendoring FF headers and .dat\n        - rm includects/ffs.h\n        - rm includects/ff.h\n        - rm includects/aa.h\n\n        - mv includects/libcts.a $PREFIX/lib/\n        - mkdir -p $PREFIX/include/cts\n        - mv includects/*.h $PREFIX/include/cts/\n        - mv includects/*.mod $PREFIX/include/cts/\n\n        - make clean\n\n    requirements:\n      build:\n        - {{ stdlib('c') }}\n        - {{ compiler('fortran') }}\n        - make\n        - libtool\n      host:\n        - mpfun90\n        - oneloop\n\n    test:\n      source_files:\n        - source/examples/numerators.f\n        - source/examples/mpnumerators.f90\n        - source/examples/rambo.f\n        - source/examples/random.f\n        - source/examples/testmp.f\n        - source/examples/example0.f\n        - source/examples/example1.f\n      requires:\n        - {{ compiler('fortran') }}\n        - mpfun90\n        - oneloop\n        - qcdloop-fortran-static\n      commands:\n        - test -f $PREFIX/lib/libcts.a\n\n        # FIXME: Verify this isn't vendoring FF headers and .dat\n        - test -f $PREFIX/include/cts/cts_mpr.h\n        - test -f $PREFIX/include/cts/cts_mpc.h\n        - test -f $PREFIX/include/cts/cts_dpr.h\n        - test -f $PREFIX/include/cts/cts_dpc.h\n        - test -f $PREFIX/include/cts/cts_mpinit.h\n        - test -f $PREFIX/include/cts/cts_mprec.h\n        - test -f $PREFIX/include/cts/def_propagator.mod\n        - test -f $PREFIX/include/cts/def_solcut.mod\n        - test -f $PREFIX/include/cts/def_mp_propagator.mod\n        - test -f $PREFIX/include/cts/def_mp_solcut.mod\n        - test -f $PREFIX/include/cts/tensor_operations.mod\n        - test -f $PREFIX/include/cts/constants.mod\n        - test -f $PREFIX/include/cts/mbnvalues.mod\n        - test -f $PREFIX/include/cts/maxnumden.mod\n        - test -f $PREFIX/include/cts/maxsolutions.mod\n        - test -f $PREFIX/include/cts/combinatorics.mod\n        - test -f $PREFIX/include/cts/dimensions.mod\n        - test -f $PREFIX/include/cts/inout.mod\n        - test -f $PREFIX/include/cts/scale.mod\n        - test -f $PREFIX/include/cts/qt2value.mod\n        - test -f $PREFIX/include/cts/denominators.mod\n        - test -f $PREFIX/include/cts/cuttings.mod\n        - test -f $PREFIX/include/cts/coefficients.mod\n        - test -f $PREFIX/include/cts/loopfunctions.mod\n        - test -f $PREFIX/include/cts/mp_loopfunctions.mod\n        - test -f $PREFIX/include/cts/countdigits.mod\n\n        - cd source/examples/\n        - $FC numerators.f mpnumerators.f90 rambo.f random.f testmp.f -o testmp $FFLAGS -std=legacy -I$CONDA_PREFIX/include/cts -I$CONDA_PREFIX/include/mpfun90 $LDFLAGS -lcts -lavh_olo -lmpfun90 -lqcdloop -lff\n        - ./testmp\n\n        - $FC numerators.f mpnumerators.f90 example0.f -o example0 $FFLAGS -std=legacy -I$CONDA_PREFIX/include/cts -I$CONDA_PREFIX/include/mpfun90 $LDFLAGS -lcts -lavh_olo -lmpfun90 -lqcdloop -lff\n        - ./example0\n\n        # Execution requires user input\n        - $FC numerators.f mpnumerators.f90 rambo.f random.f example1.f -o example1 $FFLAGS -std=legacy -I$CONDA_PREFIX/include/cts -I$CONDA_PREFIX/include/mpfun90 $LDFLAGS -lcts -lavh_olo -lmpfun90 -lqcdloop -lff\n        - test -f ./example1\n\nabout:\n  home: https://www.ugr.es/~pittau/CutTools/\n  summary: 'CutTools: Computing 1-loop amplitudes at the integrand level'\n  description: |\n    CutTools is based on the following papers:\n      * G. Ossola, C. G. Papadopoulos and R. Pittau [JHEP 0803:042,2008](https://doi.org/10.1088/1126-6708/2008/03/042)\n      * G. Ossola, C. G. Papadopoulos and R. Pittau [Nucl. Phys. B 763 (2007) 147](https://doi.org/10.1016/j.nuclphysb.2006.11.012)\n  license: MIT\n  license_family: MIT\n  license_file: source/LICENSE.txt\n  dev_url: https://www.ugr.es/~pittau/CutTools/\n  doc_url: https://www.ugr.es/~pittau/CutTools/\n\nextra:\n  feedstock-name: cuttools\n  recipe-maintainers:\n    - matthewfeickert\n",
+  "req": {
+    "__set__": true,
+    "elements": [
+      "c_stdlib_stub",
+      "fortran_compiler_stub",
+      "libtool",
+      "make",
+      "mpfun90",
+      "oneloop"
+    ]
+  },
+  "requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "fortran_compiler_stub",
+        "libtool",
+        "make"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "fortran_compiler_stub",
+        "mpfun90",
+        "oneloop"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "fortran_compiler_stub"
+      ]
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "fortran_compiler_stub",
+        "mpfun90",
+        "oneloop",
+        "qcdloop-fortran-static"
+      ]
+    }
+  },
+  "strong_exports": false,
+  "total_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "fortran_compiler_stub",
+        "libtool",
+        "make"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "mpfun90",
+        "oneloop"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": []
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "fortran_compiler_stub",
+        "mpfun90",
+        "oneloop",
+        "qcdloop-fortran-static"
+      ]
+    }
+  },
+  "url": "https://www.ugr.es/~pittau/CutTools/cuttools_v2.0.tar.gz",
+  "version": "2.0",
+  "version_pr_info": {
+    "__lazy_json__": "version_pr_info/cuttools.json"
+  }
+}
