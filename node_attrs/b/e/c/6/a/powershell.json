@@ -5,7 +5,8 @@
   "conda-forge.yml": {
     "build_platform": {
       "linux_aarch64": "linux_64",
-      "osx_arm64": "osx_64"
+      "osx_arm64": "osx_64",
+      "win_arm64": "win_64"
     },
     "conda_build": {
       "error_overlinking": true
@@ -18,8 +19,8 @@
     },
     "test": "native"
   },
-  "feedstock_hash": "e072a7180388b8e04284ec257e6265c1c68ebe5a",
-  "feedstock_hash_ts": 1763685590,
+  "feedstock_hash": "e48271ccc25910c2bc640b41d299c5450b8d09e0",
+  "feedstock_hash_ts": 1767216407,
   "feedstock_name": "powershell",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -31,7 +32,7 @@
       "summary": "PowerShell for every system!"
     },
     "build": {
-      "number": "0",
+      "number": "1",
       "script": "mkdir -p $PREFIX/powershell\ncp -r powershell/* $PREFIX/powershell/\nchmod +x $PREFIX/powershell/pwsh\nmkdir -p $PREFIX/bin\ncp $RECIPE_DIR/pwsh.sh $PREFIX/bin/pwsh\nchmod +x $PREFIX/bin/pwsh\n"
     },
     "extra": {
@@ -106,7 +107,7 @@
       "summary": "PowerShell for every system!"
     },
     "build": {
-      "number": "0",
+      "number": "1",
       "script": "mkdir -p $PREFIX/powershell\ncp -r powershell/* $PREFIX/powershell/\nchmod +x $PREFIX/powershell/pwsh\nmkdir -p $PREFIX/bin\ncp $RECIPE_DIR/pwsh.sh $PREFIX/bin/pwsh\nchmod +x $PREFIX/bin/pwsh\n"
     },
     "extra": {
@@ -181,7 +182,7 @@
       "summary": "PowerShell for every system!"
     },
     "build": {
-      "number": "0",
+      "number": "1",
       "script": "mkdir -p $PREFIX/powershell\ncp -r powershell/* $PREFIX/powershell/\nchmod +x $PREFIX/powershell/pwsh\nmkdir -p $PREFIX/bin\ncp $RECIPE_DIR/pwsh.sh $PREFIX/bin/pwsh\nchmod +x $PREFIX/bin/pwsh\n"
     },
     "extra": {
@@ -190,6 +191,27 @@
       ]
     },
     "outputs": [
+      {
+        "build": null,
+        "name": "powershell",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "icu"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "which pwsh",
+              "test -x $PREFIX/powershell/pwsh",
+              "pwsh -Version"
+            ]
+          }
+        ],
+        "version": "7.5.4"
+      },
       {
         "build": null,
         "name": "powershell",
@@ -300,7 +322,7 @@
       "summary": "PowerShell for every system!"
     },
     "build": {
-      "number": "0",
+      "number": "1",
       "script": "mkdir -p $PREFIX/powershell\ncp -r powershell/* $PREFIX/powershell/\nchmod +x $PREFIX/powershell/pwsh\nmkdir -p $PREFIX/bin\ncp $RECIPE_DIR/pwsh.sh $PREFIX/bin/pwsh\nchmod +x $PREFIX/bin/pwsh\n"
     },
     "extra": {
@@ -377,12 +399,13 @@
     "linux_64",
     "linux_aarch64",
     "osx_arm64",
-    "win_64"
+    "win_64",
+    "win_arm64"
   ],
   "pr_info": {
     "__lazy_json__": "pr_info/powershell.json"
   },
-  "raw_meta_yaml": "context:\n  name: powershell\n  version: 7.5.4\n\npackage:\n  name: ${{ name|lower }}\n  version: ${{ version }}\n\nsource:\n  - url: https://raw.githubusercontent.com/PowerShell/PowerShell/refs/tags/v${{ version }}/assets/additionalAttributions.txt\n    sha256: cd2d609357d2eebb43ada3870b9a63eb2c155c237ca89ad6cfaa4215023a5dab\n    target_directory: powershell/assets\n  - if: win\n    then:\n      - url: https://github.com/PowerShell/PowerShell/releases/download/v${{ version }}/PowerShell-${{ version }}-win-x64.zip\n        sha256: b40d192ae95ba6ccc4cc362ff4e1b18ca6fb5055bebbcd3920684e12701fa8f6\n        target_directory: powershell\n  - if: linux and x86_64\n    then:\n      - url: https://github.com/PowerShell/PowerShell/releases/download/v${{ version }}/powershell-${{ version }}-linux-x64.tar.gz\n        sha256: 1fd7983fe56ca9e6233f126925edb24bf6b6b33e356b69996d925c4db94e2fef\n        target_directory: powershell\n  - if: linux and aarch64\n    then:\n      - url: https://github.com/PowerShell/PowerShell/releases/download/v${{ version }}/powershell-${{ version }}-linux-arm64.tar.gz\n        sha256: 4b32d4cb86a43dfb83d5602d0294295bf22fafbf9e0785d1aaef81938cda92f8\n        target_directory: powershell\n  - if: osx and arm64\n    then:\n      - url: https://github.com/PowerShell/PowerShell/releases/download/v${{ version }}/powershell-${{ version }}-osx-arm64.tar.gz\n        sha256: 3aaadd7ca62f1e4dbe59145b6af24e926d61f8da8a4782bc535e500c184135f0\n        target_directory: powershell\n\n\nbuild:\n  number: 0\n  skip:\n    - osx and x86_64  # Skip Intel macOS for now\n  script:\n    - if: win\n      then: |\n        xcopy powershell \"%PREFIX%\\powershell\" /E /I /F /B /Y\n        if %ERRORLEVEL% neq 0 exit 1\n        echo F | xcopy %RECIPE_DIR%\\pwsh.cmd %PREFIX%\\Scripts\\pwsh.cmd /F /Y\n        if %ERRORLEVEL% neq 0 exit 1\n    - if: unix\n      then: |\n        mkdir -p $PREFIX/powershell\n        cp -r powershell/* $PREFIX/powershell/\n        chmod +x $PREFIX/powershell/pwsh\n        mkdir -p $PREFIX/bin\n        cp $RECIPE_DIR/pwsh.sh $PREFIX/bin/pwsh\n        chmod +x $PREFIX/bin/pwsh\n\nrequirements:\n  run:\n    - if: linux\n      then:\n        - icu\n\n\ntests:\n  - script:\n      - if: win\n        then:\n          - where powershell\n          - if not exist %PREFIX%\\\\powershell\\\\pwsh.exe exit 1\n      - if: unix\n        then:\n          - which pwsh\n          - test -x $PREFIX/powershell/pwsh\n          - pwsh -Version\n\nabout:\n  summary: PowerShell for every system!\n  license: MIT\n  license_file:\n    - powershell/LICENSE.txt\n    - powershell/ThirdPartyNotices.txt\n    - powershell/assets/additionalAttributions.txt\n\n  homepage: https://github.com/PowerShell/PowerShell\n\nextra:\n  recipe-maintainers:\n    - dhirschfeld\n",
+  "raw_meta_yaml": "context:\n  name: powershell\n  version: 7.5.4\n\npackage:\n  name: ${{ name|lower }}\n  version: ${{ version }}\n\nsource:\n  - url: https://raw.githubusercontent.com/PowerShell/PowerShell/refs/tags/v${{ version }}/assets/additionalAttributions.txt\n    sha256: cd2d609357d2eebb43ada3870b9a63eb2c155c237ca89ad6cfaa4215023a5dab\n    target_directory: powershell/assets\n  - if: win and x86_64\n    then:\n      - url: https://github.com/PowerShell/PowerShell/releases/download/v${{ version }}/PowerShell-${{ version }}-win-x64.zip\n        sha256: b40d192ae95ba6ccc4cc362ff4e1b18ca6fb5055bebbcd3920684e12701fa8f6\n        target_directory: powershell\n  - if: win and arm64\n    then:\n      - url: https://github.com/PowerShell/PowerShell/releases/download/v${{ version }}/PowerShell-${{ version }}-win-arm64.zip\n        sha256: 0c0b2bf04e853917508280531cd49bba8b3049837e3c805ebc042e2741ca52b3\n        target_directory: powershell\n  - if: linux and x86_64\n    then:\n      - url: https://github.com/PowerShell/PowerShell/releases/download/v${{ version }}/powershell-${{ version }}-linux-x64.tar.gz\n        sha256: 1fd7983fe56ca9e6233f126925edb24bf6b6b33e356b69996d925c4db94e2fef\n        target_directory: powershell\n  - if: linux and aarch64\n    then:\n      - url: https://github.com/PowerShell/PowerShell/releases/download/v${{ version }}/powershell-${{ version }}-linux-arm64.tar.gz\n        sha256: 4b32d4cb86a43dfb83d5602d0294295bf22fafbf9e0785d1aaef81938cda92f8\n        target_directory: powershell\n  - if: osx and arm64\n    then:\n      - url: https://github.com/PowerShell/PowerShell/releases/download/v${{ version }}/powershell-${{ version }}-osx-arm64.tar.gz\n        sha256: 3aaadd7ca62f1e4dbe59145b6af24e926d61f8da8a4782bc535e500c184135f0\n        target_directory: powershell\n\n\nbuild:\n  number: 1\n  skip:\n    - osx and x86_64  # Skip Intel macOS for now\n  script:\n    - if: win\n      then: |\n        xcopy powershell \"%PREFIX%\\powershell\" /E /I /F /B /Y\n        if %ERRORLEVEL% neq 0 exit 1\n        echo F | xcopy %RECIPE_DIR%\\pwsh.cmd %PREFIX%\\Scripts\\pwsh.cmd /F /Y\n        if %ERRORLEVEL% neq 0 exit 1\n    - if: unix\n      then: |\n        mkdir -p $PREFIX/powershell\n        cp -r powershell/* $PREFIX/powershell/\n        chmod +x $PREFIX/powershell/pwsh\n        mkdir -p $PREFIX/bin\n        cp $RECIPE_DIR/pwsh.sh $PREFIX/bin/pwsh\n        chmod +x $PREFIX/bin/pwsh\n\nrequirements:\n  run:\n    - if: linux\n      then:\n        - icu\n\n\ntests:\n  - script:\n      - if: win\n        then:\n          - where powershell\n          - if not exist %PREFIX%\\\\powershell\\\\pwsh.exe exit 1\n      - if: unix\n        then:\n          - which pwsh\n          - test -x $PREFIX/powershell/pwsh\n          - pwsh -Version\n\nabout:\n  summary: PowerShell for every system!\n  license: MIT\n  license_file:\n    - powershell/LICENSE.txt\n    - powershell/ThirdPartyNotices.txt\n    - powershell/assets/additionalAttributions.txt\n\n  homepage: https://github.com/PowerShell/PowerShell\n\nextra:\n  recipe-maintainers:\n    - dhirschfeld\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -444,7 +467,7 @@
       "summary": "PowerShell for every system!"
     },
     "build": {
-      "number": "0",
+      "number": "1",
       "script": "mkdir -p $PREFIX/powershell\ncp -r powershell/* $PREFIX/powershell/\nchmod +x $PREFIX/powershell/pwsh\nmkdir -p $PREFIX/bin\ncp $RECIPE_DIR/pwsh.sh $PREFIX/bin/pwsh\nchmod +x $PREFIX/bin/pwsh\n"
     },
     "extra": {
@@ -491,6 +514,81 @@
     }
   },
   "win_64_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": []
+    },
+    "host": {
+      "__set__": true,
+      "elements": []
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "icu"
+      ]
+    },
+    "test": {
+      "__set__": true,
+      "elements": []
+    }
+  },
+  "win_arm64_meta_yaml": {
+    "about": {
+      "home": "https://github.com/PowerShell/PowerShell",
+      "license": "MIT",
+      "license_family": "MIT",
+      "license_file": "powershell/LICENSE.txt",
+      "summary": "PowerShell for every system!"
+    },
+    "build": {
+      "number": "1",
+      "script": "mkdir -p $PREFIX/powershell\ncp -r powershell/* $PREFIX/powershell/\nchmod +x $PREFIX/powershell/pwsh\nmkdir -p $PREFIX/bin\ncp $RECIPE_DIR/pwsh.sh $PREFIX/bin/pwsh\nchmod +x $PREFIX/bin/pwsh\n"
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "dhirschfeld"
+      ]
+    },
+    "outputs": [
+      {
+        "build": null,
+        "name": "powershell",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "icu"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "which pwsh",
+              "test -x $PREFIX/powershell/pwsh",
+              "pwsh -Version"
+            ]
+          }
+        ],
+        "version": "7.5.4"
+      }
+    ],
+    "package": {
+      "name": "powershell",
+      "version": "7.5.4"
+    },
+    "requirements": {
+      "run": [
+        "icu"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "sha256": "cd2d609357d2eebb43ada3870b9a63eb2c155c237ca89ad6cfaa4215023a5dab",
+      "url": "https://raw.githubusercontent.com/PowerShell/PowerShell/refs/tags/v7.5.4/assets/additionalAttributions.txt"
+    }
+  },
+  "win_arm64_requirements": {
     "build": {
       "__set__": true,
       "elements": []
