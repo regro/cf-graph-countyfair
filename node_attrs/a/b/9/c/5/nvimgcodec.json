@@ -21,8 +21,8 @@
       "linux_aarch64": "default"
     }
   },
-  "feedstock_hash": "be710ac1a5e5a5318161df58c2e1b311bd0410a6",
-  "feedstock_hash_ts": 1764956909,
+  "feedstock_hash": "1f5734d375f245ac10290f2da16233a07e5b386f",
+  "feedstock_hash_ts": 1767230113,
   "feedstock_name": "nvimgcodec",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -51,7 +51,7 @@
       "missing_dso_whitelist": [
         "*/libcuda.so.*"
       ],
-      "number": "1"
+      "number": "2"
     },
     "extra": {
       "feedstock-name": "nvimgcodec",
@@ -194,7 +194,7 @@
       "missing_dso_whitelist": [
         "*/libcuda.so.*"
       ],
-      "number": "1"
+      "number": "2"
     },
     "extra": {
       "feedstock-name": "nvimgcodec",
@@ -212,11 +212,13 @@
         "cuda_compiler_stub",
         "cxx_compiler_stub",
         "c_stdlib_stub",
+        "arm-variant * sbsa",
         "cmake >=3.19",
         "ninja",
         "pkg-config",
         "python-clang",
-        "file"
+        "file",
+        "arm-variant * tegra"
       ],
       "host": [
         "cuda-version 12.9",
@@ -266,6 +268,7 @@
     "build": {
       "__set__": true,
       "elements": [
+        "arm-variant",
         "c_compiler_stub",
         "c_stdlib_stub",
         "cmake",
@@ -338,7 +341,7 @@
         "*/libcuda.so.*",
         "*/nvcuda.dll"
       ],
-      "number": "1"
+      "number": "2"
     },
     "extra": {
       "feedstock-name": "nvimgcodec",
@@ -360,7 +363,9 @@
         "ninja",
         "pkg-config",
         "python-clang",
-        "file"
+        "file",
+        "arm-variant * sbsa",
+        "arm-variant * tegra"
       ],
       "host": [
         "cuda-version 12.9",
@@ -422,10 +427,11 @@
   "pr_info": {
     "__lazy_json__": "pr_info/nvimgcodec.json"
   },
-  "raw_meta_yaml": "# Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.\n#\n# Licensed under the Apache License, Version 2.0 (the \"License\");\n# you may not use this file except in compliance with the License.\n# You may obtain a copy of the License at\n#\n#     http://www.apache.org/licenses/LICENSE-2.0\n#\n# Unless required by applicable law or agreed to in writing, software\n# distributed under the License is distributed on an \"AS IS\" BASIS,\n# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n# See the License for the specific language governing permissions and\n# limitations under the License.\n{% set version = \"0.7.0\" %}\n\npackage:\n  name: nvimgcodec\n  version: {{ version }}\n\nsource:\n  url: https://github.com/NVIDIA/nvImageCodec/archive/refs/tags/v{{ version }}.tar.gz\n  sha256: a5ee0c3756ec6425e0bd9c879d7c3b06a7b3e4fb4ed13491ec202e56be317d92\n  patches:\n    - patches/0001-BLD-Use-only-dynamic-shared-library-links-to-CUDA-ta.patch\n    - patches/0002-BLD-Move-CMake-config-install-directory.patch\n    - patches/0003-BLD-Make-find_package-OpenCV-verbose-and-required.patch\n    - patches/0004-BLD-Disable-non-standard-CUDA-arch-checking.patch\n    - patches/0005-BUG-Skip-runtime-nvtiff-check-when-linking-at-build-.patch\n\nbuild:\n  number: 1\n  skip: true  # [cuda_compiler_version in (undefined, 'None')]\n  # Debug skips below\n  # skip: true  # [py != 312]\n  # skip: true  # [cuda_compiler_version != '12.9']\n  ignore_run_exports:\n    # Implement enhanced CUDA compatability\n    - cuda-version\n  ignore_run_exports_from:\n    - libnvjpeg-dev\n    - libjpeg-turbo\n    - zlib\n    - zstd\n    - libtiff\n  missing_dso_whitelist:\n    - '*/libcuda.so.*'  # [linux]\n    - '*/nvcuda.dll'  # [win]\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ compiler('cuda') }}\n    - {{ compiler('cxx') }}\n    - {{ stdlib('c') }}\n  # The python build requires CMake>=3.19 because of find_package syntax in cmake/Utils.cmake - @carterbox Jan 2025\n    - cmake >=3.19\n    - cross-python_{{ target_platform }}    # [build_platform != target_platform]\n    - ninja\n    - pkg-config\n    - python                                # [build_platform != target_platform]\n    - python-clang  # [not win]\n    - file  # [linux]\n  host:\n    - cuda-version {{ cuda_compiler_version }}\n    - cuda-cudart-dev\n    - libnvjpeg-dev\n    - dlpack\n    - libboost-headers\n    - libjpeg-turbo\n    - libnvimgcodec-dev {{ version }}\n    - libtiff\n    - pip\n    - pybind11\n    - python\n    - setuptools\n  run:\n    - {{ pin_compatible('cuda-version', min_pin='x', max_pin='x') }}\n    - python\n\ntest:\n  # TODO: Import requires cuda driver to be loaded; move build to open-stack server\n  # imports:\n  #   - nvidia.nvimgcodec\n  requires:\n    - pip\n    - libnvimgcodec-libjpeg-turbo-ext\n    - libnvimgcodec-libopencv-ext\n    - libnvimgcodec-libtiff-ext\n  commands:\n    - pip check\n    # - PYNVIMGCODEC_VERBOSITY=5 python -c \"import nvidia.nvimgcodec\"  # [linux]\n    # - set PYNVIMGCODEC_VERBOSITY=5 && python -c \"import nvidia.nvimgcodec\"  # [win]\n\n\nabout:\n  home: https://github.com/NVIDIA/nvImageCodec\n  summary: The Python API for nvImageCodec.\n  description: >\n    nvImageCodec is an open-source library of accelerated codecs with unified interface. This package is the Python-API only. See libnvimgcodec-dev for the C-API.\n  license: Apache-2.0\n  license_family: APACHE\n  license_file:\n    - LICENSE.txt\n    - Acknowledgements.txt\n\nextra:\n  feedstock-name: nvimgcodec\n  recipe-maintainers:\n    - conda-forge/cuda\n",
+  "raw_meta_yaml": "# Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.\n#\n# Licensed under the Apache License, Version 2.0 (the \"License\");\n# you may not use this file except in compliance with the License.\n# You may obtain a copy of the License at\n#\n#     http://www.apache.org/licenses/LICENSE-2.0\n#\n# Unless required by applicable law or agreed to in writing, software\n# distributed under the License is distributed on an \"AS IS\" BASIS,\n# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n# See the License for the specific language governing permissions and\n# limitations under the License.\n{% set version = \"0.7.0\" %}\n\npackage:\n  name: nvimgcodec\n  version: {{ version }}\n\nsource:\n  url: https://github.com/NVIDIA/nvImageCodec/archive/refs/tags/v{{ version }}.tar.gz\n  sha256: a5ee0c3756ec6425e0bd9c879d7c3b06a7b3e4fb4ed13491ec202e56be317d92\n  patches:\n    - patches/0001-BLD-Use-only-dynamic-shared-library-links-to-CUDA-ta.patch\n    - patches/0002-BLD-Move-CMake-config-install-directory.patch\n    - patches/0003-BLD-Make-find_package-OpenCV-verbose-and-required.patch\n    - patches/0004-BLD-Disable-non-standard-CUDA-arch-checking.patch\n    - patches/0005-BUG-Skip-runtime-nvtiff-check-when-linking-at-build-.patch\n\nbuild:\n  number: 2\n  skip: true  # [cuda_compiler_version in (undefined, 'None')]\n  # Debug skips below\n  # skip: true  # [py != 312]\n  # skip: true  # [cuda_compiler_version != '12.9']\n  ignore_run_exports:\n    # Implement enhanced CUDA compatability\n    - cuda-version\n  ignore_run_exports_from:\n    - libnvjpeg-dev\n    - libjpeg-turbo\n    - zlib\n    - zstd\n    - libtiff\n  missing_dso_whitelist:\n    - '*/libcuda.so.*'  # [linux]\n    - '*/nvcuda.dll'  # [win]\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ compiler('cuda') }}\n    - {{ compiler('cxx') }}\n    - {{ stdlib('c') }}\n    - arm-variant * {{ arm_variant_type }}  # [linux and aarch64 and cuda_compiler_version != \"None\"]\n  # The python build requires CMake>=3.19 because of find_package syntax in cmake/Utils.cmake - @carterbox Jan 2025\n    - cmake >=3.19\n    - cross-python_{{ target_platform }}    # [build_platform != target_platform]\n    - ninja\n    - pkg-config\n    - python                                # [build_platform != target_platform]\n    - python-clang  # [not win]\n    - file  # [linux]\n  host:\n    - cuda-version {{ cuda_compiler_version }}\n    - cuda-cudart-dev\n    - libnvjpeg-dev\n    - dlpack\n    - libboost-headers\n    - libjpeg-turbo\n    - libnvimgcodec-dev {{ version }}\n    - libtiff\n    - pip\n    - pybind11\n    - python\n    - setuptools\n  run:\n    - {{ pin_compatible('cuda-version', min_pin='x', max_pin='x') }}\n    - python\n\ntest:\n  # TODO: Import requires cuda driver to be loaded; move build to open-stack server\n  # imports:\n  #   - nvidia.nvimgcodec\n  requires:\n    - pip\n    - libnvimgcodec-libjpeg-turbo-ext\n    - libnvimgcodec-libopencv-ext\n    - libnvimgcodec-libtiff-ext\n  commands:\n    - pip check\n    # - PYNVIMGCODEC_VERBOSITY=5 python -c \"import nvidia.nvimgcodec\"  # [linux]\n    # - set PYNVIMGCODEC_VERBOSITY=5 && python -c \"import nvidia.nvimgcodec\"  # [win]\n\n\nabout:\n  home: https://github.com/NVIDIA/nvImageCodec\n  summary: The Python API for nvImageCodec.\n  description: >\n    nvImageCodec is an open-source library of accelerated codecs with unified interface. This package is the Python-API only. See libnvimgcodec-dev for the C-API.\n  license: Apache-2.0\n  license_family: APACHE\n  license_file:\n    - LICENSE.txt\n    - Acknowledgements.txt\n\nextra:\n  feedstock-name: nvimgcodec\n  recipe-maintainers:\n    - conda-forge/cuda\n",
   "req": {
     "__set__": true,
     "elements": [
+      "arm-variant",
       "c_compiler_stub",
       "c_stdlib_stub",
       "cmake",
@@ -453,6 +459,7 @@
     "build": {
       "__set__": true,
       "elements": [
+        "arm-variant",
         "c_compiler_stub",
         "c_stdlib_stub",
         "cmake",
@@ -467,6 +474,7 @@
     "host": {
       "__set__": true,
       "elements": [
+        "arm-variant",
         "c_compiler_stub",
         "c_stdlib_stub",
         "cuda-cudart-dev",
@@ -488,6 +496,7 @@
     "run": {
       "__set__": true,
       "elements": [
+        "arm-variant",
         "c_compiler_stub",
         "c_stdlib_stub",
         "cuda-version",
@@ -511,6 +520,8 @@
     "build": {
       "__set__": true,
       "elements": [
+        "arm-variant * sbsa",
+        "arm-variant * tegra",
         "c_compiler_stub",
         "c_stdlib_stub",
         "cmake >=3.19",
@@ -588,7 +599,7 @@
       "missing_dso_whitelist": [
         "*/nvcuda.dll"
       ],
-      "number": "1"
+      "number": "2"
     },
     "extra": {
       "feedstock-name": "nvimgcodec",
