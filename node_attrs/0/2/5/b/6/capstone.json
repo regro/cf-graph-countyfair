@@ -1,12 +1,14 @@
 {
   "archived": false,
   "branch": "main",
-  "ci_support_linux_64_.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\ncdt_name:\n- conda\nchannel_sources:\n- conda-forge\n- conda-forge\n- conda-forge\n- conda-forge\n- conda-forge,conda-forge/label/python_rc\nchannel_targets:\n- conda-forge main\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\npin_run_as_build:\n  python:\n    min_pin: x.x\n    max_pin: x.x\npython:\n- 3.10.* *_cpython\n- 3.11.* *_cpython\n- 3.12.* *_cpython\n- 3.13.* *_cp313\n- 3.14.* *_cp314\ntarget_platform:\n- linux-64\nzip_keys:\n- - python\n  - channel_sources\n",
+  "ci_support_linux_64_.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\npin_run_as_build:\n  python:\n    min_pin: x.x\n    max_pin: x.x\npython:\n- 3.10.* *_cpython\n- 3.11.* *_cpython\n- 3.12.* *_cpython\n- 3.13.* *_cp313\n- 3.14.* *_cp314\ntarget_platform:\n- linux-64\n",
   "conda-forge.yml": {
     "bot": {
       "automerge": true
     },
     "build_platform": {
+      "linux_aarch64": "linux_64",
+      "linux_ppc64le": "linux_64",
       "osx_arm64": "osx_64"
     },
     "conda_build": {
@@ -19,14 +21,14 @@
     },
     "test": "native_and_emulated"
   },
-  "feedstock_hash": "cd42da7a33095743db17d2900364667912f1a454",
-  "feedstock_hash_ts": 1756742247,
+  "feedstock_hash": "fa25f150759743e0c32d3690088df6806e8f759a",
+  "feedstock_hash_ts": 1767436988,
   "feedstock_name": "capstone",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
     "about": {
       "description": "Capstone is a lightweight multi-platform, multi-architecture disassembly framework\n",
-      "dev_url": "https://github.com/aquynh/capstone",
+      "dev_url": "https://github.com/capstone-engine/capstone",
       "doc_url": "http://www.capstone-engine.org/documentation.html",
       "home": "http://www.capstone-engine.org/",
       "license": "BSD-3-Clause",
@@ -35,7 +37,7 @@
       "summary": "The Ultimate Disassembler"
     },
     "build": {
-      "number": "1"
+      "number": "2"
     },
     "extra": {
       "feedstock-name": "capstone",
@@ -65,7 +67,8 @@
         "script": "install-lib.sh",
         "test": {
           "commands": [
-            "test -f $PREFIX/lib/libcapstone${SHLIB_EXT}"
+            "test -f $PREFIX/lib/libcapstone${SHLIB_EXT}",
+            "test ! -f $PREFIX/bin/cstool"
           ]
         }
       },
@@ -124,13 +127,19 @@
         "script": "install-py.sh",
         "test": {
           "commands": [
-            "pip check"
+            "pip check",
+            "python bindings/python/tests/test_all.py",
+            "test ! -f $SP_DIR/capstone/include/capstone/x86.h",
+            "test ! -f $SP_DIR/capstone/lib/libcapstone.so"
           ],
           "imports": [
             "capstone"
           ],
           "requires": [
             "pip"
+          ],
+          "source_files": [
+            "bindings/python/tests/"
           ]
         }
       }
@@ -142,10 +151,11 @@
     "schema_version": 0,
     "source": {
       "patches": [
-        "0001-Thin-build-on-osx-64.patch"
+        "patches/0002-rely-on-libcapstone-do-not-smuggle-lib-headers-into-.patch",
+        "patches/0003-split-build-and-install-steps-for-python-use-prefix.patch"
       ],
       "sha256": "240ebc834c51aae41ca9215d3190cc372fd132b9c5c8aa2d5f19ca0c325e28f9",
-      "url": "https://github.com/aquynh/capstone/archive/5.0.6.tar.gz"
+      "url": "https://github.com/capstone-engine/capstone/archive/5.0.6.tar.gz"
     }
   },
   "linux_64_requirements": {
@@ -185,10 +195,10 @@
       ]
     }
   },
-  "meta_yaml": {
+  "linux_aarch64_meta_yaml": {
     "about": {
       "description": "Capstone is a lightweight multi-platform, multi-architecture disassembly framework\n",
-      "dev_url": "https://github.com/aquynh/capstone",
+      "dev_url": "https://github.com/capstone-engine/capstone",
       "doc_url": "http://www.capstone-engine.org/documentation.html",
       "home": "http://www.capstone-engine.org/",
       "license": "BSD-3-Clause",
@@ -197,7 +207,7 @@
       "summary": "The Ultimate Disassembler"
     },
     "build": {
-      "number": "1"
+      "number": "2"
     },
     "extra": {
       "feedstock-name": "capstone",
@@ -227,7 +237,8 @@
         "script": "install-lib.sh",
         "test": {
           "commands": [
-            "test -f $PREFIX/lib/libcapstone${SHLIB_EXT}"
+            "test -f $PREFIX/lib/libcapstone${SHLIB_EXT}",
+            "test ! -f $PREFIX/bin/cstool"
           ]
         }
       },
@@ -286,622 +297,19 @@
         "script": "install-py.sh",
         "test": {
           "commands": [
-            "pip check"
+            "pip check",
+            "python bindings/python/tests/test_all.py",
+            "test ! -f $SP_DIR/capstone/include/capstone/x86.h",
+            "test ! -f $SP_DIR/capstone/lib/libcapstone.so"
           ],
           "imports": [
             "capstone"
           ],
           "requires": [
             "pip"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
-            "libcapstone"
-          ]
-        },
-        "name": "libcapstone",
-        "requirements": {
-          "build": [
-            "cmake",
-            "make",
-            "c_compiler_stub",
-            "c_stdlib_stub"
-          ]
-        },
-        "script": "install-lib.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/libcapstone${SHLIB_EXT}"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
-            "libcapstone"
-          ]
-        },
-        "name": "cstool",
-        "requirements": {
-          "build": [
-            "cmake",
-            "make",
-            "c_compiler_stub",
-            "c_stdlib_stub"
           ],
-          "host": [
-            "libcapstone"
-          ],
-          "run": [
-            "libcapstone"
-          ]
-        },
-        "script": "install-lib.sh",
-        "test": {
-          "commands": [
-            "cstool -v"
-          ]
-        }
-      },
-      {
-        "name": "capstone",
-        "requirements": {
-          "build": [
-            "c_compiler_stub",
-            "c_stdlib_stub",
-            "make",
-            "cmake"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "cython",
-            "pthread-stubs",
-            "libcapstone",
-            "setuptools"
-          ],
-          "run": [
-            "python",
-            "setuptools",
-            "importlib_resources",
-            "libcapstone"
-          ]
-        },
-        "script": "install-py.sh",
-        "test": {
-          "commands": [
-            "pip check"
-          ],
-          "imports": [
-            "capstone"
-          ],
-          "requires": [
-            "pip"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
-            "libcapstone"
-          ]
-        },
-        "name": "libcapstone",
-        "requirements": {
-          "build": [
-            "cmake",
-            "make",
-            "c_compiler_stub",
-            "c_stdlib_stub"
-          ]
-        },
-        "script": "install-lib.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/libcapstone${SHLIB_EXT}"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
-            "libcapstone"
-          ]
-        },
-        "name": "cstool",
-        "requirements": {
-          "build": [
-            "cmake",
-            "make",
-            "c_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "libcapstone"
-          ],
-          "run": [
-            "libcapstone"
-          ]
-        },
-        "script": "install-lib.sh",
-        "test": {
-          "commands": [
-            "cstool -v"
-          ]
-        }
-      },
-      {
-        "name": "capstone",
-        "requirements": {
-          "build": [
-            "c_compiler_stub",
-            "c_stdlib_stub",
-            "make",
-            "cmake"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "cython",
-            "pthread-stubs",
-            "libcapstone",
-            "setuptools"
-          ],
-          "run": [
-            "python",
-            "setuptools",
-            "importlib_resources",
-            "libcapstone"
-          ]
-        },
-        "script": "install-py.sh",
-        "test": {
-          "commands": [
-            "pip check"
-          ],
-          "imports": [
-            "capstone"
-          ],
-          "requires": [
-            "pip"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
-            "libcapstone"
-          ],
-          "skip": true
-        },
-        "name": "libcapstone",
-        "requirements": {
-          "build": [
-            "cmake",
-            "make",
-            "c_compiler_stub",
-            "c_stdlib_stub"
-          ]
-        },
-        "script": "install-lib.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/libcapstone${SHLIB_EXT}"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
-            "libcapstone"
-          ],
-          "skip": true
-        },
-        "name": "cstool",
-        "requirements": {
-          "build": [
-            "cmake",
-            "make",
-            "c_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "libcapstone"
-          ],
-          "run": [
-            "libcapstone"
-          ]
-        },
-        "script": "install-lib.sh",
-        "test": {
-          "commands": [
-            "cstool -v"
-          ]
-        }
-      },
-      {
-        "name": "capstone",
-        "requirements": {
-          "build": [
-            "c_compiler_stub",
-            "c_stdlib_stub",
-            "make",
-            "cmake"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "cython",
-            "pthread-stubs",
-            "setuptools"
-          ],
-          "run": [
-            "python",
-            "setuptools",
-            "importlib_resources"
-          ]
-        },
-        "script": "install-py.bat",
-        "test": {
-          "commands": [
-            "pip check"
-          ],
-          "imports": [
-            "capstone"
-          ],
-          "requires": [
-            "pip"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
-            "libcapstone"
-          ],
-          "skip": true
-        },
-        "name": "libcapstone",
-        "requirements": {
-          "build": [
-            "cmake",
-            "make",
-            "c_compiler_stub",
-            "c_stdlib_stub"
-          ]
-        },
-        "script": "install-lib.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/libcapstone${SHLIB_EXT}"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
-            "libcapstone"
-          ],
-          "skip": true
-        },
-        "name": "cstool",
-        "requirements": {
-          "build": [
-            "cmake",
-            "make",
-            "c_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "libcapstone"
-          ],
-          "run": [
-            "libcapstone"
-          ]
-        },
-        "script": "install-lib.sh",
-        "test": {
-          "commands": [
-            "cstool -v"
-          ]
-        }
-      },
-      {
-        "name": "capstone",
-        "requirements": {
-          "build": [
-            "c_compiler_stub",
-            "c_stdlib_stub",
-            "make",
-            "cmake"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "cython",
-            "pthread-stubs",
-            "setuptools"
-          ],
-          "run": [
-            "python",
-            "setuptools",
-            "importlib_resources"
-          ]
-        },
-        "script": "install-py.bat",
-        "test": {
-          "commands": [
-            "pip check"
-          ],
-          "imports": [
-            "capstone"
-          ],
-          "requires": [
-            "pip"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
-            "libcapstone"
-          ],
-          "skip": true
-        },
-        "name": "libcapstone",
-        "requirements": {
-          "build": [
-            "cmake",
-            "make",
-            "c_compiler_stub",
-            "c_stdlib_stub"
-          ]
-        },
-        "script": "install-lib.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/libcapstone${SHLIB_EXT}"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
-            "libcapstone"
-          ],
-          "skip": true
-        },
-        "name": "cstool",
-        "requirements": {
-          "build": [
-            "cmake",
-            "make",
-            "c_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "libcapstone"
-          ],
-          "run": [
-            "libcapstone"
-          ]
-        },
-        "script": "install-lib.sh",
-        "test": {
-          "commands": [
-            "cstool -v"
-          ]
-        }
-      },
-      {
-        "name": "capstone",
-        "requirements": {
-          "build": [
-            "c_compiler_stub",
-            "c_stdlib_stub",
-            "make",
-            "cmake"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "cython",
-            "pthread-stubs",
-            "setuptools"
-          ],
-          "run": [
-            "python",
-            "setuptools",
-            "importlib_resources"
-          ]
-        },
-        "script": "install-py.bat",
-        "test": {
-          "commands": [
-            "pip check"
-          ],
-          "imports": [
-            "capstone"
-          ],
-          "requires": [
-            "pip"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
-            "libcapstone"
-          ],
-          "skip": true
-        },
-        "name": "libcapstone",
-        "requirements": {
-          "build": [
-            "cmake",
-            "make",
-            "c_compiler_stub",
-            "c_stdlib_stub"
-          ]
-        },
-        "script": "install-lib.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/libcapstone${SHLIB_EXT}"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
-            "libcapstone"
-          ],
-          "skip": true
-        },
-        "name": "cstool",
-        "requirements": {
-          "build": [
-            "cmake",
-            "make",
-            "c_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "libcapstone"
-          ],
-          "run": [
-            "libcapstone"
-          ]
-        },
-        "script": "install-lib.sh",
-        "test": {
-          "commands": [
-            "cstool -v"
-          ]
-        }
-      },
-      {
-        "name": "capstone",
-        "requirements": {
-          "build": [
-            "c_compiler_stub",
-            "c_stdlib_stub",
-            "make",
-            "cmake"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "cython",
-            "pthread-stubs",
-            "setuptools"
-          ],
-          "run": [
-            "python",
-            "setuptools",
-            "importlib_resources"
-          ]
-        },
-        "script": "install-py.bat",
-        "test": {
-          "commands": [
-            "pip check"
-          ],
-          "imports": [
-            "capstone"
-          ],
-          "requires": [
-            "pip"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
-            "libcapstone"
-          ],
-          "skip": true
-        },
-        "name": "libcapstone",
-        "requirements": {
-          "build": [
-            "cmake",
-            "make",
-            "c_compiler_stub",
-            "c_stdlib_stub"
-          ]
-        },
-        "script": "install-lib.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/libcapstone${SHLIB_EXT}"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
-            "libcapstone"
-          ],
-          "skip": true
-        },
-        "name": "cstool",
-        "requirements": {
-          "build": [
-            "cmake",
-            "make",
-            "c_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "libcapstone"
-          ],
-          "run": [
-            "libcapstone"
-          ]
-        },
-        "script": "install-lib.sh",
-        "test": {
-          "commands": [
-            "cstool -v"
-          ]
-        }
-      },
-      {
-        "name": "capstone",
-        "requirements": {
-          "build": [
-            "c_compiler_stub",
-            "c_stdlib_stub",
-            "make",
-            "cmake"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "cython",
-            "pthread-stubs",
-            "setuptools"
-          ],
-          "run": [
-            "python",
-            "setuptools",
-            "importlib_resources"
-          ]
-        },
-        "script": "install-py.bat",
-        "test": {
-          "commands": [
-            "pip check"
-          ],
-          "imports": [
-            "capstone"
-          ],
-          "requires": [
-            "pip"
+          "source_files": [
+            "bindings/python/tests/"
           ]
         }
       }
@@ -913,18 +321,830 @@
     "schema_version": 0,
     "source": {
       "patches": [
-        "0001-Thin-build-on-osx-64.patch",
-        "osx.patch"
+        "patches/0002-rely-on-libcapstone-do-not-smuggle-lib-headers-into-.patch",
+        "patches/0003-split-build-and-install-steps-for-python-use-prefix.patch"
       ],
       "sha256": "240ebc834c51aae41ca9215d3190cc372fd132b9c5c8aa2d5f19ca0c325e28f9",
-      "url": "https://github.com/aquynh/capstone/archive/5.0.6.tar.gz"
+      "url": "https://github.com/capstone-engine/capstone/archive/5.0.6.tar.gz"
+    }
+  },
+  "linux_aarch64_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "cmake",
+        "make"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "cython",
+        "libcapstone",
+        "pip",
+        "pthread-stubs",
+        "python",
+        "setuptools"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "importlib_resources",
+        "libcapstone",
+        "python",
+        "setuptools"
+      ]
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "pip"
+      ]
+    }
+  },
+  "linux_ppc64le_meta_yaml": {
+    "about": {
+      "description": "Capstone is a lightweight multi-platform, multi-architecture disassembly framework\n",
+      "dev_url": "https://github.com/capstone-engine/capstone",
+      "doc_url": "http://www.capstone-engine.org/documentation.html",
+      "home": "http://www.capstone-engine.org/",
+      "license": "BSD-3-Clause",
+      "license_family": "BSD",
+      "license_file": "LICENSE.TXT",
+      "summary": "The Ultimate Disassembler"
+    },
+    "build": {
+      "number": "2"
+    },
+    "extra": {
+      "feedstock-name": "capstone",
+      "recipe-maintainers": [
+        "scopatz",
+        "CJ-Wright",
+        "thewchan",
+        "xhochy"
+      ]
+    },
+    "outputs": [
+      {
+        "build": {
+          "run_exports": [
+            "libcapstone"
+          ]
+        },
+        "name": "libcapstone",
+        "requirements": {
+          "build": [
+            "cmake",
+            "make",
+            "c_compiler_stub",
+            "c_stdlib_stub"
+          ]
+        },
+        "script": "install-lib.sh",
+        "test": {
+          "commands": [
+            "test -f $PREFIX/lib/libcapstone${SHLIB_EXT}",
+            "test ! -f $PREFIX/bin/cstool"
+          ]
+        }
+      },
+      {
+        "build": {
+          "run_exports": [
+            "libcapstone"
+          ]
+        },
+        "name": "cstool",
+        "requirements": {
+          "build": [
+            "cmake",
+            "make",
+            "c_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [
+            "libcapstone"
+          ],
+          "run": [
+            "libcapstone"
+          ]
+        },
+        "script": "install-lib.sh",
+        "test": {
+          "commands": [
+            "cstool -v"
+          ]
+        }
+      },
+      {
+        "name": "capstone",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "make",
+            "cmake"
+          ],
+          "host": [
+            "python",
+            "pip",
+            "cython",
+            "pthread-stubs",
+            "libcapstone",
+            "setuptools"
+          ],
+          "run": [
+            "python",
+            "setuptools",
+            "importlib_resources",
+            "libcapstone"
+          ]
+        },
+        "script": "install-py.sh",
+        "test": {
+          "commands": [
+            "pip check",
+            "python bindings/python/tests/test_all.py",
+            "test ! -f $SP_DIR/capstone/include/capstone/x86.h",
+            "test ! -f $SP_DIR/capstone/lib/libcapstone.so"
+          ],
+          "imports": [
+            "capstone"
+          ],
+          "requires": [
+            "pip"
+          ],
+          "source_files": [
+            "bindings/python/tests/"
+          ]
+        }
+      }
+    ],
+    "package": {
+      "name": "capstone-split",
+      "version": "5.0.6"
+    },
+    "schema_version": 0,
+    "source": {
+      "patches": [
+        "patches/0002-rely-on-libcapstone-do-not-smuggle-lib-headers-into-.patch",
+        "patches/0003-split-build-and-install-steps-for-python-use-prefix.patch"
+      ],
+      "sha256": "240ebc834c51aae41ca9215d3190cc372fd132b9c5c8aa2d5f19ca0c325e28f9",
+      "url": "https://github.com/capstone-engine/capstone/archive/5.0.6.tar.gz"
+    }
+  },
+  "linux_ppc64le_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "cmake",
+        "make"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "cython",
+        "libcapstone",
+        "pip",
+        "pthread-stubs",
+        "python",
+        "setuptools"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "importlib_resources",
+        "libcapstone",
+        "python",
+        "setuptools"
+      ]
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "pip"
+      ]
+    }
+  },
+  "meta_yaml": {
+    "about": {
+      "description": "Capstone is a lightweight multi-platform, multi-architecture disassembly framework\n",
+      "dev_url": "https://github.com/capstone-engine/capstone",
+      "doc_url": "http://www.capstone-engine.org/documentation.html",
+      "home": "http://www.capstone-engine.org/",
+      "license": "BSD-3-Clause",
+      "license_family": "BSD",
+      "license_file": "LICENSE.TXT",
+      "summary": "The Ultimate Disassembler"
+    },
+    "build": {
+      "number": "2"
+    },
+    "extra": {
+      "feedstock-name": "capstone",
+      "recipe-maintainers": [
+        "scopatz",
+        "CJ-Wright",
+        "thewchan",
+        "xhochy"
+      ]
+    },
+    "outputs": [
+      {
+        "build": {
+          "run_exports": [
+            "libcapstone"
+          ]
+        },
+        "name": "libcapstone",
+        "requirements": {
+          "build": [
+            "cmake",
+            "make",
+            "c_compiler_stub",
+            "c_stdlib_stub"
+          ]
+        },
+        "script": "install-lib.sh",
+        "test": {
+          "commands": [
+            "test -f $PREFIX/lib/libcapstone${SHLIB_EXT}",
+            "test ! -f $PREFIX/bin/cstool"
+          ]
+        }
+      },
+      {
+        "build": {
+          "run_exports": [
+            "libcapstone"
+          ]
+        },
+        "name": "cstool",
+        "requirements": {
+          "build": [
+            "cmake",
+            "make",
+            "c_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [
+            "libcapstone"
+          ],
+          "run": [
+            "libcapstone"
+          ]
+        },
+        "script": "install-lib.sh",
+        "test": {
+          "commands": [
+            "cstool -v"
+          ]
+        }
+      },
+      {
+        "name": "capstone",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "make",
+            "cmake"
+          ],
+          "host": [
+            "python",
+            "pip",
+            "cython",
+            "pthread-stubs",
+            "libcapstone",
+            "setuptools"
+          ],
+          "run": [
+            "python",
+            "setuptools",
+            "importlib_resources",
+            "libcapstone"
+          ]
+        },
+        "script": "install-py.sh",
+        "test": {
+          "commands": [
+            "pip check",
+            "python bindings/python/tests/test_all.py",
+            "test ! -f $SP_DIR/capstone/include/capstone/x86.h",
+            "test ! -f $SP_DIR/capstone/lib/libcapstone.so"
+          ],
+          "imports": [
+            "capstone"
+          ],
+          "requires": [
+            "pip"
+          ],
+          "source_files": [
+            "bindings/python/tests/"
+          ]
+        }
+      },
+      {
+        "build": {
+          "run_exports": [
+            "libcapstone"
+          ]
+        },
+        "name": "libcapstone",
+        "requirements": {
+          "build": [
+            "cmake",
+            "make",
+            "c_compiler_stub",
+            "c_stdlib_stub"
+          ]
+        },
+        "script": "install-lib.sh",
+        "test": {
+          "commands": [
+            "test -f $PREFIX/lib/libcapstone${SHLIB_EXT}",
+            "test ! -f $PREFIX/bin/cstool"
+          ]
+        }
+      },
+      {
+        "build": {
+          "run_exports": [
+            "libcapstone"
+          ]
+        },
+        "name": "cstool",
+        "requirements": {
+          "build": [
+            "cmake",
+            "make",
+            "c_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [
+            "libcapstone"
+          ],
+          "run": [
+            "libcapstone"
+          ]
+        },
+        "script": "install-lib.sh",
+        "test": {
+          "commands": [
+            "cstool -v"
+          ]
+        }
+      },
+      {
+        "name": "capstone",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "make",
+            "cmake"
+          ],
+          "host": [
+            "python",
+            "pip",
+            "cython",
+            "pthread-stubs",
+            "libcapstone",
+            "setuptools"
+          ],
+          "run": [
+            "python",
+            "setuptools",
+            "importlib_resources",
+            "libcapstone"
+          ]
+        },
+        "script": "install-py.sh",
+        "test": {
+          "commands": [
+            "pip check",
+            "python bindings/python/tests/test_all.py",
+            "test ! -f $SP_DIR/capstone/include/capstone/x86.h",
+            "test ! -f $SP_DIR/capstone/lib/libcapstone.so"
+          ],
+          "imports": [
+            "capstone"
+          ],
+          "requires": [
+            "pip"
+          ],
+          "source_files": [
+            "bindings/python/tests/"
+          ]
+        }
+      },
+      {
+        "build": {
+          "run_exports": [
+            "libcapstone"
+          ]
+        },
+        "name": "libcapstone",
+        "requirements": {
+          "build": [
+            "cmake",
+            "make",
+            "c_compiler_stub",
+            "c_stdlib_stub"
+          ]
+        },
+        "script": "install-lib.sh",
+        "test": {
+          "commands": [
+            "test -f $PREFIX/lib/libcapstone${SHLIB_EXT}",
+            "test ! -f $PREFIX/bin/cstool"
+          ]
+        }
+      },
+      {
+        "build": {
+          "run_exports": [
+            "libcapstone"
+          ]
+        },
+        "name": "cstool",
+        "requirements": {
+          "build": [
+            "cmake",
+            "make",
+            "c_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [
+            "libcapstone"
+          ],
+          "run": [
+            "libcapstone"
+          ]
+        },
+        "script": "install-lib.sh",
+        "test": {
+          "commands": [
+            "cstool -v"
+          ]
+        }
+      },
+      {
+        "name": "capstone",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "make",
+            "cmake"
+          ],
+          "host": [
+            "python",
+            "pip",
+            "cython",
+            "pthread-stubs",
+            "libcapstone",
+            "setuptools"
+          ],
+          "run": [
+            "python",
+            "setuptools",
+            "importlib_resources",
+            "libcapstone"
+          ]
+        },
+        "script": "install-py.sh",
+        "test": {
+          "commands": [
+            "pip check",
+            "python bindings/python/tests/test_all.py",
+            "test ! -f $SP_DIR/capstone/include/capstone/x86.h",
+            "test ! -f $SP_DIR/capstone/lib/libcapstone.so"
+          ],
+          "imports": [
+            "capstone"
+          ],
+          "requires": [
+            "pip"
+          ],
+          "source_files": [
+            "bindings/python/tests/"
+          ]
+        }
+      },
+      {
+        "build": {
+          "run_exports": [
+            "libcapstone"
+          ]
+        },
+        "name": "libcapstone",
+        "requirements": {
+          "build": [
+            "cmake",
+            "make",
+            "c_compiler_stub",
+            "c_stdlib_stub"
+          ]
+        },
+        "script": "install-lib.sh",
+        "test": {
+          "commands": [
+            "test -f $PREFIX/lib/libcapstone${SHLIB_EXT}",
+            "test ! -f $PREFIX/bin/cstool"
+          ]
+        }
+      },
+      {
+        "build": {
+          "run_exports": [
+            "libcapstone"
+          ]
+        },
+        "name": "cstool",
+        "requirements": {
+          "build": [
+            "cmake",
+            "make",
+            "c_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [
+            "libcapstone"
+          ],
+          "run": [
+            "libcapstone"
+          ]
+        },
+        "script": "install-lib.sh",
+        "test": {
+          "commands": [
+            "cstool -v"
+          ]
+        }
+      },
+      {
+        "name": "capstone",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "make",
+            "cmake"
+          ],
+          "host": [
+            "python",
+            "pip",
+            "cython",
+            "pthread-stubs",
+            "libcapstone",
+            "setuptools"
+          ],
+          "run": [
+            "python",
+            "setuptools",
+            "importlib_resources",
+            "libcapstone"
+          ]
+        },
+        "script": "install-py.sh",
+        "test": {
+          "commands": [
+            "pip check",
+            "python bindings/python/tests/test_all.py",
+            "test ! -f $SP_DIR/capstone/include/capstone/x86.h",
+            "test ! -f $SP_DIR/capstone/lib/libcapstone.dylib"
+          ],
+          "imports": [
+            "capstone"
+          ],
+          "requires": [
+            "pip"
+          ],
+          "source_files": [
+            "bindings/python/tests/"
+          ]
+        }
+      },
+      {
+        "build": {
+          "run_exports": [
+            "libcapstone"
+          ]
+        },
+        "name": "libcapstone",
+        "requirements": {
+          "build": [
+            "cmake",
+            "make",
+            "c_compiler_stub",
+            "c_stdlib_stub"
+          ]
+        },
+        "script": "install-lib.sh",
+        "test": {
+          "commands": [
+            "test -f $PREFIX/lib/libcapstone${SHLIB_EXT}",
+            "test ! -f $PREFIX/bin/cstool"
+          ]
+        }
+      },
+      {
+        "build": {
+          "run_exports": [
+            "libcapstone"
+          ]
+        },
+        "name": "cstool",
+        "requirements": {
+          "build": [
+            "cmake",
+            "make",
+            "c_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [
+            "libcapstone"
+          ],
+          "run": [
+            "libcapstone"
+          ]
+        },
+        "script": "install-lib.sh",
+        "test": {
+          "commands": [
+            "cstool -v"
+          ]
+        }
+      },
+      {
+        "name": "capstone",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "make",
+            "cmake"
+          ],
+          "host": [
+            "python",
+            "pip",
+            "cython",
+            "pthread-stubs",
+            "libcapstone",
+            "setuptools"
+          ],
+          "run": [
+            "python",
+            "setuptools",
+            "importlib_resources",
+            "libcapstone"
+          ]
+        },
+        "script": "install-py.sh",
+        "test": {
+          "commands": [
+            "pip check",
+            "python bindings/python/tests/test_all.py",
+            "test ! -f $SP_DIR/capstone/include/capstone/x86.h",
+            "test ! -f $SP_DIR/capstone/lib/libcapstone.dylib"
+          ],
+          "imports": [
+            "capstone"
+          ],
+          "requires": [
+            "pip"
+          ],
+          "source_files": [
+            "bindings/python/tests/"
+          ]
+        }
+      },
+      {
+        "build": {
+          "run_exports": [
+            "libcapstone"
+          ]
+        },
+        "name": "libcapstone",
+        "requirements": {
+          "build": [
+            "cmake",
+            "make",
+            "c_compiler_stub",
+            "c_stdlib_stub"
+          ]
+        },
+        "script": "install-lib.bat",
+        "test": {
+          "commands": [
+            "if not exist %LIBRARY_BIN%\\capstone.dll exit 1",
+            "if not exist %LIBRARY_LIB%\\capstone.lib exit 1",
+            "if exist %LIBRARY_BIN%\\cstool.exe exit 1"
+          ]
+        }
+      },
+      {
+        "build": {
+          "run_exports": [
+            "libcapstone"
+          ]
+        },
+        "name": "cstool",
+        "requirements": {
+          "build": [
+            "cmake",
+            "make",
+            "c_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [
+            "libcapstone"
+          ],
+          "run": [
+            "libcapstone"
+          ]
+        },
+        "script": "install-lib.bat",
+        "test": {
+          "commands": [
+            "cstool -v"
+          ]
+        }
+      },
+      {
+        "name": "capstone",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "make",
+            "cmake"
+          ],
+          "host": [
+            "python",
+            "pip",
+            "cython",
+            "pthread-stubs",
+            "libcapstone",
+            "setuptools"
+          ],
+          "run": [
+            "python",
+            "setuptools",
+            "importlib_resources",
+            "libcapstone"
+          ]
+        },
+        "script": "install-py.bat",
+        "test": {
+          "commands": [
+            "pip check",
+            "python bindings/python/tests/test_all.py",
+            "if exist %SP_DIR%\\capstone\\include\\capstone\\x86.h exit 1",
+            "if exist %SP_DIR%\\capstone\\lib\\capstone.dll exit 1"
+          ],
+          "imports": [
+            "capstone"
+          ],
+          "requires": [
+            "pip"
+          ],
+          "source_files": [
+            "bindings/python/tests/"
+          ]
+        }
+      }
+    ],
+    "package": {
+      "name": "capstone-split",
+      "version": "5.0.6"
+    },
+    "schema_version": 0,
+    "source": {
+      "patches": [
+        "patches/0002-rely-on-libcapstone-do-not-smuggle-lib-headers-into-.patch",
+        "patches/0003-split-build-and-install-steps-for-python-use-prefix.patch",
+        "patches/0001-skip-IS_APPLE-check-on-osx.patch"
+      ],
+      "sha256": "240ebc834c51aae41ca9215d3190cc372fd132b9c5c8aa2d5f19ca0c325e28f9",
+      "url": "https://github.com/capstone-engine/capstone/archive/5.0.6.tar.gz"
     }
   },
   "name": "capstone-split",
   "osx_64_meta_yaml": {
     "about": {
       "description": "Capstone is a lightweight multi-platform, multi-architecture disassembly framework\n",
-      "dev_url": "https://github.com/aquynh/capstone",
+      "dev_url": "https://github.com/capstone-engine/capstone",
       "doc_url": "http://www.capstone-engine.org/documentation.html",
       "home": "http://www.capstone-engine.org/",
       "license": "BSD-3-Clause",
@@ -933,7 +1153,7 @@
       "summary": "The Ultimate Disassembler"
     },
     "build": {
-      "number": "1"
+      "number": "2"
     },
     "extra": {
       "feedstock-name": "capstone",
@@ -963,7 +1183,8 @@
         "script": "install-lib.sh",
         "test": {
           "commands": [
-            "test -f $PREFIX/lib/libcapstone${SHLIB_EXT}"
+            "test -f $PREFIX/lib/libcapstone${SHLIB_EXT}",
+            "test ! -f $PREFIX/bin/cstool"
           ]
         }
       },
@@ -1022,13 +1243,19 @@
         "script": "install-py.sh",
         "test": {
           "commands": [
-            "pip check"
+            "pip check",
+            "python bindings/python/tests/test_all.py",
+            "test ! -f $SP_DIR/capstone/include/capstone/x86.h",
+            "test ! -f $SP_DIR/capstone/lib/libcapstone.dylib"
           ],
           "imports": [
             "capstone"
           ],
           "requires": [
             "pip"
+          ],
+          "source_files": [
+            "bindings/python/tests/"
           ]
         }
       }
@@ -1040,11 +1267,12 @@
     "schema_version": 0,
     "source": {
       "patches": [
-        "0001-Thin-build-on-osx-64.patch",
-        "osx.patch"
+        "patches/0001-skip-IS_APPLE-check-on-osx.patch",
+        "patches/0002-rely-on-libcapstone-do-not-smuggle-lib-headers-into-.patch",
+        "patches/0003-split-build-and-install-steps-for-python-use-prefix.patch"
       ],
       "sha256": "240ebc834c51aae41ca9215d3190cc372fd132b9c5c8aa2d5f19ca0c325e28f9",
-      "url": "https://github.com/aquynh/capstone/archive/5.0.6.tar.gz"
+      "url": "https://github.com/capstone-engine/capstone/archive/5.0.6.tar.gz"
     }
   },
   "osx_64_requirements": {
@@ -1087,7 +1315,7 @@
   "osx_arm64_meta_yaml": {
     "about": {
       "description": "Capstone is a lightweight multi-platform, multi-architecture disassembly framework\n",
-      "dev_url": "https://github.com/aquynh/capstone",
+      "dev_url": "https://github.com/capstone-engine/capstone",
       "doc_url": "http://www.capstone-engine.org/documentation.html",
       "home": "http://www.capstone-engine.org/",
       "license": "BSD-3-Clause",
@@ -1096,7 +1324,7 @@
       "summary": "The Ultimate Disassembler"
     },
     "build": {
-      "number": "1"
+      "number": "2"
     },
     "extra": {
       "feedstock-name": "capstone",
@@ -1126,7 +1354,8 @@
         "script": "install-lib.sh",
         "test": {
           "commands": [
-            "test -f $PREFIX/lib/libcapstone${SHLIB_EXT}"
+            "test -f $PREFIX/lib/libcapstone${SHLIB_EXT}",
+            "test ! -f $PREFIX/bin/cstool"
           ]
         }
       },
@@ -1185,13 +1414,19 @@
         "script": "install-py.sh",
         "test": {
           "commands": [
-            "pip check"
+            "pip check",
+            "python bindings/python/tests/test_all.py",
+            "test ! -f $SP_DIR/capstone/include/capstone/x86.h",
+            "test ! -f $SP_DIR/capstone/lib/libcapstone.dylib"
           ],
           "imports": [
             "capstone"
           ],
           "requires": [
             "pip"
+          ],
+          "source_files": [
+            "bindings/python/tests/"
           ]
         }
       }
@@ -1203,11 +1438,12 @@
     "schema_version": 0,
     "source": {
       "patches": [
-        "0001-Thin-build-on-osx-64.patch",
-        "osx.patch"
+        "patches/0001-skip-IS_APPLE-check-on-osx.patch",
+        "patches/0002-rely-on-libcapstone-do-not-smuggle-lib-headers-into-.patch",
+        "patches/0003-split-build-and-install-steps-for-python-use-prefix.patch"
       ],
       "sha256": "240ebc834c51aae41ca9215d3190cc372fd132b9c5c8aa2d5f19ca0c325e28f9",
-      "url": "https://github.com/aquynh/capstone/archive/5.0.6.tar.gz"
+      "url": "https://github.com/capstone-engine/capstone/archive/5.0.6.tar.gz"
     }
   },
   "osx_arm64_requirements": {
@@ -1258,6 +1494,8 @@
   "parsing_error": false,
   "platforms": [
     "linux_64",
+    "linux_aarch64",
+    "linux_ppc64le",
     "osx_64",
     "osx_arm64",
     "win_64"
@@ -1265,7 +1503,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/capstone.json"
   },
-  "raw_meta_yaml": "{% set name = \"capstone\" %}\n{% set version = \"5.0.6\" %}\n\npackage:\n  name: {{ name|lower }}-split\n  version: {{ version }}\n\nsource:\n  url: https://github.com/aquynh/{{ name }}/archive/{{ version }}.tar.gz\n  sha256: 240ebc834c51aae41ca9215d3190cc372fd132b9c5c8aa2d5f19ca0c325e28f9\n  patches:\n    - 0001-Thin-build-on-osx-64.patch\n    - osx.patch  # [osx]\n\nbuild:\n  number: 1\n\noutputs:\n  - name: libcapstone\n    script: install-lib.sh\n    build:\n      skip: true  # [win]\n      run_exports:\n        - {{ pin_subpackage(\"libcapstone\", max_pin=\"x.x.x\") }}\n    requirements:\n      build:\n        - cmake\n        - make\n        - {{ compiler('c') }}\n        - {{ stdlib(\"c\") }}\n    test:\n      commands:\n        - test -f $PREFIX/lib/libcapstone${SHLIB_EXT}\n  - name: cstool\n    script: install-lib.sh\n    build:\n      skip: true  # [win]\n      run_exports:\n        - {{ pin_subpackage(\"libcapstone\", max_pin=\"x.x.x\") }}\n    requirements:\n      build:\n        - cmake\n        - make\n        - {{ compiler('c') }}\n        - {{ stdlib(\"c\") }}\n      host:\n        - {{ pin_subpackage('libcapstone', exact=True) }}\n      run:\n        - {{ pin_subpackage('libcapstone', exact=True) }}\n    test:\n      commands:\n        - cstool -v\n  - name: capstone\n    script: install-py.sh  # [unix]\n    script: install-py.bat  # [win]\n    requirements:\n      build:\n        - python                                 # [build_platform != target_platform]\n        - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n        - cython                                 # [build_platform != target_platform]\n        - {{ compiler('c') }}\n        - {{ stdlib(\"c\") }}\n        - make\n        - cmake\n      host:\n        - python\n        - pip\n        - cython\n        - pthread-stubs\n        - {{ pin_subpackage('libcapstone', exact=True) }}  # [not win]\n        - setuptools\n      run:\n        - python\n        - setuptools\n        - importlib_resources\n        - {{ pin_subpackage('libcapstone', exact=True) }}  # [not win]\n    test:\n      imports:\n        - capstone\n      requires:\n        - pip\n      commands:\n        - pip check\n\nabout:\n  home: http://www.capstone-engine.org/\n  license: BSD-3-Clause\n  license_family: BSD\n  license_file: LICENSE.TXT\n  summary: The Ultimate Disassembler\n  description: |\n    Capstone is a lightweight multi-platform, multi-architecture disassembly framework\n  doc_url: http://www.capstone-engine.org/documentation.html\n  dev_url: https://github.com/aquynh/capstone\n\nextra:\n  feedstock-name: capstone\n  recipe-maintainers:\n    - scopatz\n    - CJ-Wright\n    - thewchan\n    - xhochy\n",
+  "raw_meta_yaml": "{% set version = \"5.0.6\" %}\n\npackage:\n  name: capstone-split\n  version: {{ version }}\n\nsource:\n  url: https://github.com/capstone-engine/capstone/archive/{{ version }}.tar.gz\n  sha256: 240ebc834c51aae41ca9215d3190cc372fd132b9c5c8aa2d5f19ca0c325e28f9\n  patches:\n    - patches/0001-skip-IS_APPLE-check-on-osx.patch  # [osx]\n    - patches/0002-rely-on-libcapstone-do-not-smuggle-lib-headers-into-.patch\n    - patches/0003-split-build-and-install-steps-for-python-use-prefix.patch\n\nbuild:\n  number: 2\n\noutputs:\n  - name: libcapstone\n    script: install-lib.sh   # [unix]\n    script: install-lib.bat  # [win]\n    build:\n      run_exports:\n        - {{ pin_subpackage(\"libcapstone\", max_pin=\"x.x.x\") }}\n    requirements:\n      build:\n        - cmake\n        - make\n        - {{ compiler('c') }}\n        - {{ stdlib(\"c\") }}\n    test:\n      commands:\n        - test -f $PREFIX/lib/libcapstone${SHLIB_EXT}       # [unix]\n        - if not exist %LIBRARY_BIN%\\capstone.dll exit 1    # [win]\n        - if not exist %LIBRARY_LIB%\\capstone.lib exit 1    # [win]\n        # absence of cstool\n        - test ! -f $PREFIX/bin/cstool                      # [unix]\n        - if exist %LIBRARY_BIN%\\cstool.exe exit 1          # [win]\n\n  - name: cstool\n    script: install-lib.sh   # [unix]\n    script: install-lib.bat  # [win]\n    build:\n      run_exports:\n        - {{ pin_subpackage(\"libcapstone\", max_pin=\"x.x.x\") }}\n    requirements:\n      build:\n        - cmake\n        - make\n        - {{ compiler('c') }}\n        - {{ stdlib(\"c\") }}\n      host:\n        - {{ pin_subpackage('libcapstone', exact=True) }}\n      run:\n        - {{ pin_subpackage('libcapstone', exact=True) }}\n    test:\n      commands:\n        - cstool -v\n\n  - name: capstone\n    script: install-py.sh  # [unix]\n    script: install-py.bat  # [win]\n    requirements:\n      build:\n        - python                                 # [build_platform != target_platform]\n        - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n        - cython                                 # [build_platform != target_platform]\n        - {{ compiler('c') }}\n        - {{ stdlib(\"c\") }}\n        - make\n        - cmake\n      host:\n        - python\n        - pip\n        - cython\n        - pthread-stubs\n        - {{ pin_subpackage('libcapstone', exact=True) }}\n        - setuptools\n      run:\n        - python\n        - setuptools\n        - importlib_resources\n        - {{ pin_subpackage('libcapstone', exact=True) }}\n    test:\n      source_files:\n        - bindings/python/tests/\n      imports:\n        - capstone\n      requires:\n        - pip\n      commands:\n        - pip check\n        - python bindings/python/tests/test_all.py\n        # absence of library & headers in site-packages\n        - test ! -f $SP_DIR/capstone/include/capstone/x86.h         # [unix]\n        - test ! -f $SP_DIR/capstone/lib/libcapstone.so             # [linux]\n        - test ! -f $SP_DIR/capstone/lib/libcapstone.dylib          # [osx]\n        - if exist %SP_DIR%\\capstone\\include\\capstone\\x86.h exit 1  # [win]\n        - if exist %SP_DIR%\\capstone\\lib\\capstone.dll exit 1        # [win]\n\nabout:\n  home: http://www.capstone-engine.org/\n  license: BSD-3-Clause\n  license_family: BSD\n  license_file: LICENSE.TXT\n  summary: The Ultimate Disassembler\n  description: |\n    Capstone is a lightweight multi-platform, multi-architecture disassembly framework\n  doc_url: http://www.capstone-engine.org/documentation.html\n  dev_url: https://github.com/capstone-engine/capstone\n\nextra:\n  feedstock-name: capstone\n  recipe-maintainers:\n    - scopatz\n    - CJ-Wright\n    - thewchan\n    - xhochy\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -1361,7 +1599,7 @@
       ]
     }
   },
-  "url": "https://github.com/aquynh/capstone/archive/5.0.6.tar.gz",
+  "url": "https://github.com/capstone-engine/capstone/archive/5.0.6.tar.gz",
   "version": "5.0.6",
   "version_pr_info": {
     "__lazy_json__": "version_pr_info/capstone.json"
@@ -1369,7 +1607,7 @@
   "win_64_meta_yaml": {
     "about": {
       "description": "Capstone is a lightweight multi-platform, multi-architecture disassembly framework\n",
-      "dev_url": "https://github.com/aquynh/capstone",
+      "dev_url": "https://github.com/capstone-engine/capstone",
       "doc_url": "http://www.capstone-engine.org/documentation.html",
       "home": "http://www.capstone-engine.org/",
       "license": "BSD-3-Clause",
@@ -1378,7 +1616,7 @@
       "summary": "The Ultimate Disassembler"
     },
     "build": {
-      "number": "1"
+      "number": "2"
     },
     "extra": {
       "feedstock-name": "capstone",
@@ -1394,8 +1632,7 @@
         "build": {
           "run_exports": [
             "libcapstone"
-          ],
-          "skip": true
+          ]
         },
         "name": "libcapstone",
         "requirements": {
@@ -1406,10 +1643,12 @@
             "c_stdlib_stub"
           ]
         },
-        "script": "install-lib.sh",
+        "script": "install-lib.bat",
         "test": {
           "commands": [
-            "test -f $PREFIX/lib/libcapstone${SHLIB_EXT}"
+            "if not exist %LIBRARY_BIN%\\capstone.dll exit 1",
+            "if not exist %LIBRARY_LIB%\\capstone.lib exit 1",
+            "if exist %LIBRARY_BIN%\\cstool.exe exit 1"
           ]
         }
       },
@@ -1417,8 +1656,7 @@
         "build": {
           "run_exports": [
             "libcapstone"
-          ],
-          "skip": true
+          ]
         },
         "name": "cstool",
         "requirements": {
@@ -1435,7 +1673,7 @@
             "libcapstone"
           ]
         },
-        "script": "install-lib.sh",
+        "script": "install-lib.bat",
         "test": {
           "commands": [
             "cstool -v"
@@ -1456,372 +1694,32 @@
             "pip",
             "cython",
             "pthread-stubs",
+            "libcapstone",
             "setuptools"
           ],
           "run": [
             "python",
             "setuptools",
-            "importlib_resources"
+            "importlib_resources",
+            "libcapstone"
           ]
         },
         "script": "install-py.bat",
         "test": {
           "commands": [
-            "pip check"
+            "pip check",
+            "python bindings/python/tests/test_all.py",
+            "if exist %SP_DIR%\\capstone\\include\\capstone\\x86.h exit 1",
+            "if exist %SP_DIR%\\capstone\\lib\\capstone.dll exit 1"
           ],
           "imports": [
             "capstone"
           ],
           "requires": [
             "pip"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
-            "libcapstone"
           ],
-          "skip": true
-        },
-        "name": "libcapstone",
-        "requirements": {
-          "build": [
-            "cmake",
-            "make",
-            "c_compiler_stub",
-            "c_stdlib_stub"
-          ]
-        },
-        "script": "install-lib.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/libcapstone${SHLIB_EXT}"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
-            "libcapstone"
-          ],
-          "skip": true
-        },
-        "name": "cstool",
-        "requirements": {
-          "build": [
-            "cmake",
-            "make",
-            "c_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "libcapstone"
-          ],
-          "run": [
-            "libcapstone"
-          ]
-        },
-        "script": "install-lib.sh",
-        "test": {
-          "commands": [
-            "cstool -v"
-          ]
-        }
-      },
-      {
-        "name": "capstone",
-        "requirements": {
-          "build": [
-            "c_compiler_stub",
-            "c_stdlib_stub",
-            "make",
-            "cmake"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "cython",
-            "pthread-stubs",
-            "setuptools"
-          ],
-          "run": [
-            "python",
-            "setuptools",
-            "importlib_resources"
-          ]
-        },
-        "script": "install-py.bat",
-        "test": {
-          "commands": [
-            "pip check"
-          ],
-          "imports": [
-            "capstone"
-          ],
-          "requires": [
-            "pip"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
-            "libcapstone"
-          ],
-          "skip": true
-        },
-        "name": "libcapstone",
-        "requirements": {
-          "build": [
-            "cmake",
-            "make",
-            "c_compiler_stub",
-            "c_stdlib_stub"
-          ]
-        },
-        "script": "install-lib.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/libcapstone${SHLIB_EXT}"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
-            "libcapstone"
-          ],
-          "skip": true
-        },
-        "name": "cstool",
-        "requirements": {
-          "build": [
-            "cmake",
-            "make",
-            "c_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "libcapstone"
-          ],
-          "run": [
-            "libcapstone"
-          ]
-        },
-        "script": "install-lib.sh",
-        "test": {
-          "commands": [
-            "cstool -v"
-          ]
-        }
-      },
-      {
-        "name": "capstone",
-        "requirements": {
-          "build": [
-            "c_compiler_stub",
-            "c_stdlib_stub",
-            "make",
-            "cmake"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "cython",
-            "pthread-stubs",
-            "setuptools"
-          ],
-          "run": [
-            "python",
-            "setuptools",
-            "importlib_resources"
-          ]
-        },
-        "script": "install-py.bat",
-        "test": {
-          "commands": [
-            "pip check"
-          ],
-          "imports": [
-            "capstone"
-          ],
-          "requires": [
-            "pip"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
-            "libcapstone"
-          ],
-          "skip": true
-        },
-        "name": "libcapstone",
-        "requirements": {
-          "build": [
-            "cmake",
-            "make",
-            "c_compiler_stub",
-            "c_stdlib_stub"
-          ]
-        },
-        "script": "install-lib.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/libcapstone${SHLIB_EXT}"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
-            "libcapstone"
-          ],
-          "skip": true
-        },
-        "name": "cstool",
-        "requirements": {
-          "build": [
-            "cmake",
-            "make",
-            "c_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "libcapstone"
-          ],
-          "run": [
-            "libcapstone"
-          ]
-        },
-        "script": "install-lib.sh",
-        "test": {
-          "commands": [
-            "cstool -v"
-          ]
-        }
-      },
-      {
-        "name": "capstone",
-        "requirements": {
-          "build": [
-            "c_compiler_stub",
-            "c_stdlib_stub",
-            "make",
-            "cmake"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "cython",
-            "pthread-stubs",
-            "setuptools"
-          ],
-          "run": [
-            "python",
-            "setuptools",
-            "importlib_resources"
-          ]
-        },
-        "script": "install-py.bat",
-        "test": {
-          "commands": [
-            "pip check"
-          ],
-          "imports": [
-            "capstone"
-          ],
-          "requires": [
-            "pip"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
-            "libcapstone"
-          ],
-          "skip": true
-        },
-        "name": "libcapstone",
-        "requirements": {
-          "build": [
-            "cmake",
-            "make",
-            "c_compiler_stub",
-            "c_stdlib_stub"
-          ]
-        },
-        "script": "install-lib.sh",
-        "test": {
-          "commands": [
-            "test -f $PREFIX/lib/libcapstone${SHLIB_EXT}"
-          ]
-        }
-      },
-      {
-        "build": {
-          "run_exports": [
-            "libcapstone"
-          ],
-          "skip": true
-        },
-        "name": "cstool",
-        "requirements": {
-          "build": [
-            "cmake",
-            "make",
-            "c_compiler_stub",
-            "c_stdlib_stub"
-          ],
-          "host": [
-            "libcapstone"
-          ],
-          "run": [
-            "libcapstone"
-          ]
-        },
-        "script": "install-lib.sh",
-        "test": {
-          "commands": [
-            "cstool -v"
-          ]
-        }
-      },
-      {
-        "name": "capstone",
-        "requirements": {
-          "build": [
-            "c_compiler_stub",
-            "c_stdlib_stub",
-            "make",
-            "cmake"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "cython",
-            "pthread-stubs",
-            "setuptools"
-          ],
-          "run": [
-            "python",
-            "setuptools",
-            "importlib_resources"
-          ]
-        },
-        "script": "install-py.bat",
-        "test": {
-          "commands": [
-            "pip check"
-          ],
-          "imports": [
-            "capstone"
-          ],
-          "requires": [
-            "pip"
+          "source_files": [
+            "bindings/python/tests/"
           ]
         }
       }
@@ -1833,10 +1731,11 @@
     "schema_version": 0,
     "source": {
       "patches": [
-        "0001-Thin-build-on-osx-64.patch"
+        "patches/0002-rely-on-libcapstone-do-not-smuggle-lib-headers-into-.patch",
+        "patches/0003-split-build-and-install-steps-for-python-use-prefix.patch"
       ],
       "sha256": "240ebc834c51aae41ca9215d3190cc372fd132b9c5c8aa2d5f19ca0c325e28f9",
-      "url": "https://github.com/aquynh/capstone/archive/5.0.6.tar.gz"
+      "url": "https://github.com/capstone-engine/capstone/archive/5.0.6.tar.gz"
     }
   },
   "win_64_requirements": {
