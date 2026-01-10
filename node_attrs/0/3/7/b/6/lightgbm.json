@@ -1,7 +1,7 @@
 {
   "archived": false,
   "branch": "main",
-  "ci_support_linux_64_c_stdlib_version2.17cuda_compiler_version12.9.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\ncdt_name:\n- conda\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ncuda_compiler:\n- cuda-nvcc\ncuda_compiler_version:\n- '12.9'\ncxx_compiler:\n- gxx\ncxx_compiler_version:\n- '14'\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\nlibboost_devel:\n- '1.88'\npython_min:\n- '3.10'\ntarget_platform:\n- linux-64\nzip_keys:\n- - c_compiler_version\n  - cxx_compiler_version\n  - c_stdlib_version\n  - cuda_compiler_version\n",
+  "ci_support_linux_64_cuda_compiler_version12.9.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ncuda_compiler:\n- cuda-nvcc\ncuda_compiler_version:\n- '12.9'\ncxx_compiler:\n- gxx\ncxx_compiler_version:\n- '14'\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\nlibboost_devel:\n- '1.88'\npython_min:\n- '3.10'\ntarget_platform:\n- linux-64\nzip_keys:\n- - c_compiler_version\n  - cxx_compiler_version\n  - c_stdlib_version\n  - cuda_compiler_version\n",
   "conda-forge.yml": {
     "azure": {
       "free_disk_space": true
@@ -14,6 +14,7 @@
     "conda_build": {
       "pkg_format": "2"
     },
+    "conda_build_tool": "rattler-build",
     "conda_forge_output_validation": true,
     "github": {
       "branch_name": "main",
@@ -26,13 +27,13 @@
     },
     "test": "native_and_emulated"
   },
-  "feedstock_hash": "9536503c87d8e093182cf78d558dda44c0caf15a",
-  "feedstock_hash_ts": 1760996572,
+  "feedstock_hash": "c18a10999190eb84a9bae578d8fd80033b7f9f85",
+  "feedstock_hash_ts": 1768021835,
   "feedstock_name": "lightgbm",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
     "about": {
-      "description": "A fast, distributed, high performance gradient boosting (GBDT, GBRT, GBM or MART) framework based on decision tree algorithms, used for ranking, classification and many other machine learning tasks.\n",
+      "description": "A fast, distributed, high performance gradient boosting (GBDT, GBRT, GBM or MART) framework based on decision tree algorithms, used for ranking, classification and many other machine learning tasks.",
       "dev_url": "https://github.com/microsoft/LightGBM",
       "doc_url": "https://lightgbm.readthedocs.io/en/v4.6.0/",
       "home": "https://github.com/microsoft/LightGBM",
@@ -42,11 +43,12 @@
       "summary": "LightGBM is a gradient boosting framework that uses tree based learning algorithms."
     },
     "build": {
-      "number": "6",
-      "run_exports": [
-        "liblightgbm"
-      ],
-      "string": "cuda130_h1234567_6"
+      "number": "7",
+      "run_exports": {
+        "weak": [
+          "liblightgbm"
+        ]
+      }
     },
     "extra": {
       "feedstock-name": "lightgbm",
@@ -60,77 +62,43 @@
     },
     "outputs": [
       {
-        "name": "liblightgbm"
-      },
-      {
         "build": {
-          "noarch": "python",
-          "string": "cuda129_py_6"
+          "strong": [],
+          "weak": [
+            "liblightgbm"
+          ]
         },
-        "name": "lightgbm",
+        "name": "liblightgbm",
         "requirements": {
-          "build": [],
+          "build": [
+            "cmake >=3.28",
+            "make",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "cuda_compiler_stub"
+          ],
           "host": [
-            "python 3.10",
-            "pip",
-            "setuptools"
+            "libgomp"
           ],
           "run": [
-            "python >=3.10",
-            "liblightgbm",
-            "__cuda",
-            "numpy >=1.17.0",
-            "scipy"
-          ],
-          "run_constrained": [
-            "cffi >=1.15.1",
-            "dask >=2.0.0",
-            "pandas >=0.24.0",
-            "pyarrow >=6.0.1",
-            "scikit-learn >=0.24.2"
+            "__cuda"
           ]
         },
-        "script": "install-python.sh",
-        "test": {
-          "commands": [
-            "pip check",
-            "python python_run_test.py",
-            "python -c \"from lightgbm import __version__\""
-          ],
-          "files": [
-            "python_run_test.py"
-          ],
-          "imports": [
-            "lightgbm",
-            "lightgbm.basic",
-            "lightgbm.callback",
-            "lightgbm.compat",
-            "lightgbm.dask",
-            "lightgbm.engine",
-            "lightgbm.libpath",
-            "lightgbm.plotting",
-            "lightgbm.sklearn"
-          ],
-          "requires": [
-            "pip",
-            "scikit-learn",
-            "python 3.10"
-          ]
-        }
+        "tests": [
+          {
+            "script": "test -f $PREFIX/lib/lib_lightgbm${SHLIB_EXT}"
+          }
+        ],
+        "version": "4.6.0"
       },
       {
-        "name": "liblightgbm"
-      },
-      {
-        "build": {
-          "noarch": "python",
-          "string": "cpu_py_6"
-        },
+        "build": null,
         "name": "lightgbm",
         "requirements": {
           "build": [],
           "host": [
-            "python 3.10",
+            "python 3.10.*",
             "pip",
             "setuptools"
           ],
@@ -138,102 +106,219 @@
             "python >=3.10",
             "liblightgbm",
             "numpy >=1.17.0",
-            "scipy"
-          ],
-          "run_constrained": [
-            "cffi >=1.15.1",
-            "dask >=2.0.0",
-            "pandas >=0.24.0",
-            "pyarrow >=6.0.1",
-            "scikit-learn >=0.24.2"
+            "scipy",
+            "__cuda"
           ]
         },
-        "script": "install-python.sh",
-        "test": {
-          "commands": [
-            "pip check",
-            "python python_run_test.py",
-            "python -c \"from lightgbm import __version__\""
-          ],
-          "files": [
-            "python_run_test.py"
-          ],
-          "imports": [
-            "lightgbm",
-            "lightgbm.basic",
-            "lightgbm.callback",
-            "lightgbm.compat",
-            "lightgbm.dask",
-            "lightgbm.engine",
-            "lightgbm.libpath",
-            "lightgbm.plotting",
-            "lightgbm.sklearn"
-          ],
-          "requires": [
-            "pip",
-            "scikit-learn",
-            "python 3.10"
-          ]
-        }
-      },
-      {
-        "name": "liblightgbm"
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "lightgbm",
+                "lightgbm.basic",
+                "lightgbm.callback",
+                "lightgbm.compat",
+                "lightgbm.dask",
+                "lightgbm.engine",
+                "lightgbm.libpath",
+                "lightgbm.plotting",
+                "lightgbm.sklearn"
+              ],
+              "python_version": "3.10.*"
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "python_run_test.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pip",
+                "scikit-learn",
+                "python 3.10.*"
+              ]
+            },
+            "script": [
+              "python python_run_test.py",
+              "python -c \"from lightgbm import __version__\""
+            ]
+          }
+        ],
+        "version": "4.6.0"
       },
       {
         "build": {
-          "noarch": "python",
-          "string": "cuda130_py_6"
+          "strong": [],
+          "weak": [
+            "liblightgbm"
+          ]
         },
+        "name": "liblightgbm",
+        "requirements": {
+          "build": [
+            "cmake >=3.28",
+            "make",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "cuda_compiler_stub"
+          ],
+          "host": [
+            "libgomp"
+          ],
+          "run": [
+            "__cuda"
+          ]
+        },
+        "tests": [
+          {
+            "script": "test -f $PREFIX/lib/lib_lightgbm${SHLIB_EXT}"
+          }
+        ],
+        "version": "4.6.0"
+      },
+      {
+        "build": null,
         "name": "lightgbm",
         "requirements": {
           "build": [],
           "host": [
-            "python 3.10",
+            "python 3.10.*",
             "pip",
             "setuptools"
           ],
           "run": [
             "python >=3.10",
             "liblightgbm",
-            "__cuda",
             "numpy >=1.17.0",
-            "scipy"
-          ],
-          "run_constrained": [
-            "cffi >=1.15.1",
-            "dask >=2.0.0",
-            "pandas >=0.24.0",
-            "pyarrow >=6.0.1",
-            "scikit-learn >=0.24.2"
+            "scipy",
+            "__cuda"
           ]
         },
-        "script": "install-python.sh",
-        "test": {
-          "commands": [
-            "pip check",
-            "python python_run_test.py",
-            "python -c \"from lightgbm import __version__\""
-          ],
-          "files": [
-            "python_run_test.py"
-          ],
-          "imports": [
-            "lightgbm",
-            "lightgbm.basic",
-            "lightgbm.callback",
-            "lightgbm.compat",
-            "lightgbm.dask",
-            "lightgbm.engine",
-            "lightgbm.libpath",
-            "lightgbm.plotting",
-            "lightgbm.sklearn"
-          ],
-          "requires": [
-            "pip",
-            "scikit-learn",
-            "python 3.10"
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "lightgbm",
+                "lightgbm.basic",
+                "lightgbm.callback",
+                "lightgbm.compat",
+                "lightgbm.dask",
+                "lightgbm.engine",
+                "lightgbm.libpath",
+                "lightgbm.plotting",
+                "lightgbm.sklearn"
+              ],
+              "python_version": "3.10.*"
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "python_run_test.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pip",
+                "scikit-learn",
+                "python 3.10.*"
+              ]
+            },
+            "script": [
+              "python python_run_test.py",
+              "python -c \"from lightgbm import __version__\""
+            ]
+          }
+        ],
+        "version": "4.6.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "liblightgbm"
           ]
-        }
+        },
+        "name": "liblightgbm",
+        "requirements": {
+          "build": [
+            "cmake >=3.28",
+            "make",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub"
+          ],
+          "host": [
+            "libgomp",
+            "libboost-devel",
+            "ocl-icd"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f $PREFIX/lib/lib_lightgbm${SHLIB_EXT}"
+          }
+        ],
+        "version": "4.6.0"
+      },
+      {
+        "build": null,
+        "name": "lightgbm",
+        "requirements": {
+          "build": [],
+          "host": [
+            "python 3.10.*",
+            "pip",
+            "setuptools"
+          ],
+          "run": [
+            "python >=3.10",
+            "liblightgbm",
+            "numpy >=1.17.0",
+            "scipy"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "lightgbm",
+                "lightgbm.basic",
+                "lightgbm.callback",
+                "lightgbm.compat",
+                "lightgbm.dask",
+                "lightgbm.engine",
+                "lightgbm.libpath",
+                "lightgbm.plotting",
+                "lightgbm.sklearn"
+              ],
+              "python_version": "3.10.*"
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "python_run_test.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pip",
+                "scikit-learn",
+                "python 3.10.*"
+              ]
+            },
+            "script": [
+              "python python_run_test.py",
+              "python -c \"from lightgbm import __version__\""
+            ]
+          }
+        ],
+        "version": "4.6.0"
       }
     ],
     "package": {
@@ -256,14 +341,9 @@
       ],
       "run": [
         "__cuda"
-      ],
-      "run_constrained": [
-        "lightgbm 4.6.0 cuda129_*_6",
-        "lightgbm 4.6.0 cpu_*_6",
-        "lightgbm 4.6.0 cuda130_*_6"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "patches": [
         "patches/0001-boost-shared.patch",
@@ -274,11 +354,6 @@
       ],
       "sha256": "cb1c59720eb569389c0ba74d14f52351b573af489f230032a1c9f314f8bab7fe",
       "url": "https://pypi.org/packages/source/l/lightgbm/lightgbm-4.6.0.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "test -f $PREFIX/lib/lib_lightgbm${SHLIB_EXT}"
-      ]
     }
   },
   "linux_64_requirements": {
@@ -325,7 +400,7 @@
   },
   "linux_aarch64_meta_yaml": {
     "about": {
-      "description": "A fast, distributed, high performance gradient boosting (GBDT, GBRT, GBM or MART) framework based on decision tree algorithms, used for ranking, classification and many other machine learning tasks.\n",
+      "description": "A fast, distributed, high performance gradient boosting (GBDT, GBRT, GBM or MART) framework based on decision tree algorithms, used for ranking, classification and many other machine learning tasks.",
       "dev_url": "https://github.com/microsoft/LightGBM",
       "doc_url": "https://lightgbm.readthedocs.io/en/v4.6.0/",
       "home": "https://github.com/microsoft/LightGBM",
@@ -335,11 +410,12 @@
       "summary": "LightGBM is a gradient boosting framework that uses tree based learning algorithms."
     },
     "build": {
-      "number": "6",
-      "run_exports": [
-        "liblightgbm"
-      ],
-      "string": "cuda130_h1234567_6"
+      "number": "7",
+      "run_exports": {
+        "weak": [
+          "liblightgbm"
+        ]
+      }
     },
     "extra": {
       "feedstock-name": "lightgbm",
@@ -353,77 +429,43 @@
     },
     "outputs": [
       {
-        "name": "liblightgbm"
-      },
-      {
         "build": {
-          "noarch": "python",
-          "string": "cuda129_py_6"
+          "strong": [],
+          "weak": [
+            "liblightgbm"
+          ]
         },
-        "name": "lightgbm",
+        "name": "liblightgbm",
         "requirements": {
-          "build": [],
+          "build": [
+            "cmake >=3.28",
+            "make",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "cuda_compiler_stub"
+          ],
           "host": [
-            "python 3.10",
-            "pip",
-            "setuptools"
+            "libgomp"
           ],
           "run": [
-            "python >=3.10",
-            "liblightgbm",
-            "__cuda",
-            "numpy >=1.17.0",
-            "scipy"
-          ],
-          "run_constrained": [
-            "cffi >=1.15.1",
-            "dask >=2.0.0",
-            "pandas >=0.24.0",
-            "pyarrow >=6.0.1",
-            "scikit-learn >=0.24.2"
+            "__cuda"
           ]
         },
-        "script": "install-python.sh",
-        "test": {
-          "commands": [
-            "pip check",
-            "python python_run_test.py",
-            "python -c \"from lightgbm import __version__\""
-          ],
-          "files": [
-            "python_run_test.py"
-          ],
-          "imports": [
-            "lightgbm",
-            "lightgbm.basic",
-            "lightgbm.callback",
-            "lightgbm.compat",
-            "lightgbm.dask",
-            "lightgbm.engine",
-            "lightgbm.libpath",
-            "lightgbm.plotting",
-            "lightgbm.sklearn"
-          ],
-          "requires": [
-            "pip",
-            "scikit-learn",
-            "python 3.10"
-          ]
-        }
+        "tests": [
+          {
+            "script": "test -f $PREFIX/lib/lib_lightgbm${SHLIB_EXT}"
+          }
+        ],
+        "version": "4.6.0"
       },
       {
-        "name": "liblightgbm"
-      },
-      {
-        "build": {
-          "noarch": "python",
-          "string": "cpu_py_6"
-        },
+        "build": null,
         "name": "lightgbm",
         "requirements": {
           "build": [],
           "host": [
-            "python 3.10",
+            "python 3.10.*",
             "pip",
             "setuptools"
           ],
@@ -431,102 +473,219 @@
             "python >=3.10",
             "liblightgbm",
             "numpy >=1.17.0",
-            "scipy"
-          ],
-          "run_constrained": [
-            "cffi >=1.15.1",
-            "dask >=2.0.0",
-            "pandas >=0.24.0",
-            "pyarrow >=6.0.1",
-            "scikit-learn >=0.24.2"
+            "scipy",
+            "__cuda"
           ]
         },
-        "script": "install-python.sh",
-        "test": {
-          "commands": [
-            "pip check",
-            "python python_run_test.py",
-            "python -c \"from lightgbm import __version__\""
-          ],
-          "files": [
-            "python_run_test.py"
-          ],
-          "imports": [
-            "lightgbm",
-            "lightgbm.basic",
-            "lightgbm.callback",
-            "lightgbm.compat",
-            "lightgbm.dask",
-            "lightgbm.engine",
-            "lightgbm.libpath",
-            "lightgbm.plotting",
-            "lightgbm.sklearn"
-          ],
-          "requires": [
-            "pip",
-            "scikit-learn",
-            "python 3.10"
-          ]
-        }
-      },
-      {
-        "name": "liblightgbm"
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "lightgbm",
+                "lightgbm.basic",
+                "lightgbm.callback",
+                "lightgbm.compat",
+                "lightgbm.dask",
+                "lightgbm.engine",
+                "lightgbm.libpath",
+                "lightgbm.plotting",
+                "lightgbm.sklearn"
+              ],
+              "python_version": "3.10.*"
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "python_run_test.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pip",
+                "scikit-learn",
+                "python 3.10.*"
+              ]
+            },
+            "script": [
+              "python python_run_test.py",
+              "python -c \"from lightgbm import __version__\""
+            ]
+          }
+        ],
+        "version": "4.6.0"
       },
       {
         "build": {
-          "noarch": "python",
-          "string": "cuda130_py_6"
+          "strong": [],
+          "weak": [
+            "liblightgbm"
+          ]
         },
+        "name": "liblightgbm",
+        "requirements": {
+          "build": [
+            "cmake >=3.28",
+            "make",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub"
+          ],
+          "host": [
+            "libgomp",
+            "libboost-devel",
+            "ocl-icd"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f $PREFIX/lib/lib_lightgbm${SHLIB_EXT}"
+          }
+        ],
+        "version": "4.6.0"
+      },
+      {
+        "build": null,
         "name": "lightgbm",
         "requirements": {
           "build": [],
           "host": [
-            "python 3.10",
+            "python 3.10.*",
             "pip",
             "setuptools"
           ],
           "run": [
             "python >=3.10",
             "liblightgbm",
-            "__cuda",
             "numpy >=1.17.0",
             "scipy"
-          ],
-          "run_constrained": [
-            "cffi >=1.15.1",
-            "dask >=2.0.0",
-            "pandas >=0.24.0",
-            "pyarrow >=6.0.1",
-            "scikit-learn >=0.24.2"
           ]
         },
-        "script": "install-python.sh",
-        "test": {
-          "commands": [
-            "pip check",
-            "python python_run_test.py",
-            "python -c \"from lightgbm import __version__\""
-          ],
-          "files": [
-            "python_run_test.py"
-          ],
-          "imports": [
-            "lightgbm",
-            "lightgbm.basic",
-            "lightgbm.callback",
-            "lightgbm.compat",
-            "lightgbm.dask",
-            "lightgbm.engine",
-            "lightgbm.libpath",
-            "lightgbm.plotting",
-            "lightgbm.sklearn"
-          ],
-          "requires": [
-            "pip",
-            "scikit-learn",
-            "python 3.10"
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "lightgbm",
+                "lightgbm.basic",
+                "lightgbm.callback",
+                "lightgbm.compat",
+                "lightgbm.dask",
+                "lightgbm.engine",
+                "lightgbm.libpath",
+                "lightgbm.plotting",
+                "lightgbm.sklearn"
+              ],
+              "python_version": "3.10.*"
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "python_run_test.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pip",
+                "scikit-learn",
+                "python 3.10.*"
+              ]
+            },
+            "script": [
+              "python python_run_test.py",
+              "python -c \"from lightgbm import __version__\""
+            ]
+          }
+        ],
+        "version": "4.6.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "liblightgbm"
           ]
-        }
+        },
+        "name": "liblightgbm",
+        "requirements": {
+          "build": [
+            "cmake >=3.28",
+            "make",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "cuda_compiler_stub"
+          ],
+          "host": [
+            "libgomp"
+          ],
+          "run": [
+            "__cuda"
+          ]
+        },
+        "tests": [
+          {
+            "script": "test -f $PREFIX/lib/lib_lightgbm${SHLIB_EXT}"
+          }
+        ],
+        "version": "4.6.0"
+      },
+      {
+        "build": null,
+        "name": "lightgbm",
+        "requirements": {
+          "build": [],
+          "host": [
+            "python 3.10.*",
+            "pip",
+            "setuptools"
+          ],
+          "run": [
+            "python >=3.10",
+            "liblightgbm",
+            "numpy >=1.17.0",
+            "scipy",
+            "__cuda"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "lightgbm",
+                "lightgbm.basic",
+                "lightgbm.callback",
+                "lightgbm.compat",
+                "lightgbm.dask",
+                "lightgbm.engine",
+                "lightgbm.libpath",
+                "lightgbm.plotting",
+                "lightgbm.sklearn"
+              ],
+              "python_version": "3.10.*"
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "python_run_test.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pip",
+                "scikit-learn",
+                "python 3.10.*"
+              ]
+            },
+            "script": [
+              "python python_run_test.py",
+              "python -c \"from lightgbm import __version__\""
+            ]
+          }
+        ],
+        "version": "4.6.0"
       }
     ],
     "package": {
@@ -549,14 +708,9 @@
       ],
       "run": [
         "__cuda"
-      ],
-      "run_constrained": [
-        "lightgbm 4.6.0 cuda129_*_6",
-        "lightgbm 4.6.0 cpu_*_6",
-        "lightgbm 4.6.0 cuda130_*_6"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "patches": [
         "patches/0001-boost-shared.patch",
@@ -567,11 +721,6 @@
       ],
       "sha256": "cb1c59720eb569389c0ba74d14f52351b573af489f230032a1c9f314f8bab7fe",
       "url": "https://pypi.org/packages/source/l/lightgbm/lightgbm-4.6.0.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "test -f $PREFIX/lib/lib_lightgbm${SHLIB_EXT}"
-      ]
     }
   },
   "linux_aarch64_requirements": {
@@ -618,7 +767,7 @@
   },
   "linux_ppc64le_meta_yaml": {
     "about": {
-      "description": "A fast, distributed, high performance gradient boosting (GBDT, GBRT, GBM or MART) framework based on decision tree algorithms, used for ranking, classification and many other machine learning tasks.\n",
+      "description": "A fast, distributed, high performance gradient boosting (GBDT, GBRT, GBM or MART) framework based on decision tree algorithms, used for ranking, classification and many other machine learning tasks.",
       "dev_url": "https://github.com/microsoft/LightGBM",
       "doc_url": "https://lightgbm.readthedocs.io/en/v4.6.0/",
       "home": "https://github.com/microsoft/LightGBM",
@@ -628,11 +777,12 @@
       "summary": "LightGBM is a gradient boosting framework that uses tree based learning algorithms."
     },
     "build": {
-      "number": "6",
-      "run_exports": [
-        "liblightgbm"
-      ],
-      "string": "cpu_h1234567_6"
+      "number": "7",
+      "run_exports": {
+        "weak": [
+          "liblightgbm"
+        ]
+      }
     },
     "extra": {
       "feedstock-name": "lightgbm",
@@ -646,18 +796,42 @@
     },
     "outputs": [
       {
-        "name": "liblightgbm"
+        "build": {
+          "strong": [],
+          "weak": [
+            "liblightgbm"
+          ]
+        },
+        "name": "liblightgbm",
+        "requirements": {
+          "build": [
+            "cmake >=3.28",
+            "make",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub"
+          ],
+          "host": [
+            "libgomp",
+            "libboost-devel",
+            "ocl-icd"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f $PREFIX/lib/lib_lightgbm${SHLIB_EXT}"
+          }
+        ],
+        "version": "4.6.0"
       },
       {
-        "build": {
-          "noarch": "python",
-          "string": "cpu_py_6"
-        },
+        "build": null,
         "name": "lightgbm",
         "requirements": {
           "build": [],
           "host": [
-            "python 3.10",
+            "python 3.10.*",
             "pip",
             "setuptools"
           ],
@@ -666,42 +840,45 @@
             "liblightgbm",
             "numpy >=1.17.0",
             "scipy"
-          ],
-          "run_constrained": [
-            "cffi >=1.15.1",
-            "dask >=2.0.0",
-            "pandas >=0.24.0",
-            "pyarrow >=6.0.1",
-            "scikit-learn >=0.24.2"
           ]
         },
-        "script": "install-python.sh",
-        "test": {
-          "commands": [
-            "pip check",
-            "python python_run_test.py",
-            "python -c \"from lightgbm import __version__\""
-          ],
-          "files": [
-            "python_run_test.py"
-          ],
-          "imports": [
-            "lightgbm",
-            "lightgbm.basic",
-            "lightgbm.callback",
-            "lightgbm.compat",
-            "lightgbm.dask",
-            "lightgbm.engine",
-            "lightgbm.libpath",
-            "lightgbm.plotting",
-            "lightgbm.sklearn"
-          ],
-          "requires": [
-            "pip",
-            "scikit-learn",
-            "python 3.10"
-          ]
-        }
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "lightgbm",
+                "lightgbm.basic",
+                "lightgbm.callback",
+                "lightgbm.compat",
+                "lightgbm.dask",
+                "lightgbm.engine",
+                "lightgbm.libpath",
+                "lightgbm.plotting",
+                "lightgbm.sklearn"
+              ],
+              "python_version": "3.10.*"
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "python_run_test.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pip",
+                "scikit-learn",
+                "python 3.10.*"
+              ]
+            },
+            "script": [
+              "python python_run_test.py",
+              "python -c \"from lightgbm import __version__\""
+            ]
+          }
+        ],
+        "version": "4.6.0"
       }
     ],
     "package": {
@@ -720,13 +897,9 @@
         "libgomp",
         "libboost-devel",
         "ocl-icd"
-      ],
-      "run": [],
-      "run_constrained": [
-        "lightgbm 4.6.0 cpu_*_6"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "patches": [
         "patches/0001-boost-shared.patch",
@@ -737,11 +910,6 @@
       ],
       "sha256": "cb1c59720eb569389c0ba74d14f52351b573af489f230032a1c9f314f8bab7fe",
       "url": "https://pypi.org/packages/source/l/lightgbm/lightgbm-4.6.0.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "test -f $PREFIX/lib/lib_lightgbm${SHLIB_EXT}"
-      ]
     }
   },
   "linux_ppc64le_requirements": {
@@ -786,7 +954,7 @@
   },
   "meta_yaml": {
     "about": {
-      "description": "A fast, distributed, high performance gradient boosting (GBDT, GBRT, GBM or MART) framework based on decision tree algorithms, used for ranking, classification and many other machine learning tasks.\n",
+      "description": "A fast, distributed, high performance gradient boosting (GBDT, GBRT, GBM or MART) framework based on decision tree algorithms, used for ranking, classification and many other machine learning tasks.",
       "dev_url": "https://github.com/microsoft/LightGBM",
       "doc_url": "https://lightgbm.readthedocs.io/en/v4.6.0/",
       "home": "https://github.com/microsoft/LightGBM",
@@ -796,11 +964,12 @@
       "summary": "LightGBM is a gradient boosting framework that uses tree based learning algorithms."
     },
     "build": {
-      "number": "6",
-      "run_exports": [
-        "liblightgbm"
-      ],
-      "string": "cpu_h1234567_6"
+      "number": "7",
+      "run_exports": {
+        "weak": [
+          "liblightgbm"
+        ]
+      }
     },
     "extra": {
       "feedstock-name": "lightgbm",
@@ -814,77 +983,43 @@
     },
     "outputs": [
       {
-        "name": "liblightgbm"
-      },
-      {
         "build": {
-          "noarch": "python",
-          "string": "cuda129_py_6"
+          "strong": [],
+          "weak": [
+            "liblightgbm"
+          ]
         },
-        "name": "lightgbm",
+        "name": "liblightgbm",
         "requirements": {
-          "build": [],
+          "build": [
+            "cmake >=3.28",
+            "make",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "cuda_compiler_stub"
+          ],
           "host": [
-            "python 3.10",
-            "pip",
-            "setuptools"
+            "libgomp"
           ],
           "run": [
-            "python >=3.10",
-            "liblightgbm",
-            "__cuda",
-            "numpy >=1.17.0",
-            "scipy"
-          ],
-          "run_constrained": [
-            "cffi >=1.15.1",
-            "dask >=2.0.0",
-            "pandas >=0.24.0",
-            "pyarrow >=6.0.1",
-            "scikit-learn >=0.24.2"
+            "__cuda"
           ]
         },
-        "script": "install-python.sh",
-        "test": {
-          "commands": [
-            "pip check",
-            "python python_run_test.py",
-            "python -c \"from lightgbm import __version__\""
-          ],
-          "files": [
-            "python_run_test.py"
-          ],
-          "imports": [
-            "lightgbm",
-            "lightgbm.basic",
-            "lightgbm.callback",
-            "lightgbm.compat",
-            "lightgbm.dask",
-            "lightgbm.engine",
-            "lightgbm.libpath",
-            "lightgbm.plotting",
-            "lightgbm.sklearn"
-          ],
-          "requires": [
-            "pip",
-            "scikit-learn",
-            "python 3.10"
-          ]
-        }
+        "tests": [
+          {
+            "script": "test -f $PREFIX/lib/lib_lightgbm${SHLIB_EXT}"
+          }
+        ],
+        "version": "4.6.0"
       },
       {
-        "name": "liblightgbm"
-      },
-      {
-        "build": {
-          "noarch": "python",
-          "string": "cpu_py_6"
-        },
+        "build": null,
         "name": "lightgbm",
         "requirements": {
           "build": [],
           "host": [
-            "python 3.10",
+            "python 3.10.*",
             "pip",
             "setuptools"
           ],
@@ -892,175 +1027,172 @@
             "python >=3.10",
             "liblightgbm",
             "numpy >=1.17.0",
-            "scipy"
-          ],
-          "run_constrained": [
-            "cffi >=1.15.1",
-            "dask >=2.0.0",
-            "pandas >=0.24.0",
-            "pyarrow >=6.0.1",
-            "scikit-learn >=0.24.2"
+            "scipy",
+            "__cuda"
           ]
         },
-        "script": "install-python.sh",
-        "test": {
-          "commands": [
-            "pip check",
-            "python python_run_test.py",
-            "python -c \"from lightgbm import __version__\""
-          ],
-          "files": [
-            "python_run_test.py"
-          ],
-          "imports": [
-            "lightgbm",
-            "lightgbm.basic",
-            "lightgbm.callback",
-            "lightgbm.compat",
-            "lightgbm.dask",
-            "lightgbm.engine",
-            "lightgbm.libpath",
-            "lightgbm.plotting",
-            "lightgbm.sklearn"
-          ],
-          "requires": [
-            "pip",
-            "scikit-learn",
-            "python 3.10"
-          ]
-        }
-      },
-      {
-        "name": "liblightgbm"
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "lightgbm",
+                "lightgbm.basic",
+                "lightgbm.callback",
+                "lightgbm.compat",
+                "lightgbm.dask",
+                "lightgbm.engine",
+                "lightgbm.libpath",
+                "lightgbm.plotting",
+                "lightgbm.sklearn"
+              ],
+              "python_version": "3.10.*"
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "python_run_test.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pip",
+                "scikit-learn",
+                "python 3.10.*"
+              ]
+            },
+            "script": [
+              "python python_run_test.py",
+              "python -c \"from lightgbm import __version__\""
+            ]
+          }
+        ],
+        "version": "4.6.0"
       },
       {
         "build": {
-          "noarch": "python",
-          "string": "cuda130_py_6"
+          "strong": [],
+          "weak": [
+            "liblightgbm"
+          ]
         },
+        "name": "liblightgbm",
+        "requirements": {
+          "build": [
+            "cmake >=3.28",
+            "make",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "cuda_compiler_stub"
+          ],
+          "host": [
+            "libgomp"
+          ],
+          "run": [
+            "__cuda"
+          ]
+        },
+        "tests": [
+          {
+            "script": "test -f $PREFIX/lib/lib_lightgbm${SHLIB_EXT}"
+          }
+        ],
+        "version": "4.6.0"
+      },
+      {
+        "build": null,
         "name": "lightgbm",
         "requirements": {
           "build": [],
           "host": [
-            "python 3.10",
+            "python 3.10.*",
             "pip",
             "setuptools"
           ],
           "run": [
             "python >=3.10",
             "liblightgbm",
-            "__cuda",
             "numpy >=1.17.0",
-            "scipy"
-          ],
-          "run_constrained": [
-            "cffi >=1.15.1",
-            "dask >=2.0.0",
-            "pandas >=0.24.0",
-            "pyarrow >=6.0.1",
-            "scikit-learn >=0.24.2"
+            "scipy",
+            "__cuda"
           ]
         },
-        "script": "install-python.sh",
-        "test": {
-          "commands": [
-            "pip check",
-            "python python_run_test.py",
-            "python -c \"from lightgbm import __version__\""
-          ],
-          "files": [
-            "python_run_test.py"
-          ],
-          "imports": [
-            "lightgbm",
-            "lightgbm.basic",
-            "lightgbm.callback",
-            "lightgbm.compat",
-            "lightgbm.dask",
-            "lightgbm.engine",
-            "lightgbm.libpath",
-            "lightgbm.plotting",
-            "lightgbm.sklearn"
-          ],
-          "requires": [
-            "pip",
-            "scikit-learn",
-            "python 3.10"
-          ]
-        }
-      },
-      {
-        "name": "liblightgbm"
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "lightgbm",
+                "lightgbm.basic",
+                "lightgbm.callback",
+                "lightgbm.compat",
+                "lightgbm.dask",
+                "lightgbm.engine",
+                "lightgbm.libpath",
+                "lightgbm.plotting",
+                "lightgbm.sklearn"
+              ],
+              "python_version": "3.10.*"
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "python_run_test.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pip",
+                "scikit-learn",
+                "python 3.10.*"
+              ]
+            },
+            "script": [
+              "python python_run_test.py",
+              "python -c \"from lightgbm import __version__\""
+            ]
+          }
+        ],
+        "version": "4.6.0"
       },
       {
         "build": {
-          "noarch": "python",
-          "string": "cuda129_py_6"
+          "strong": [],
+          "weak": [
+            "liblightgbm"
+          ]
         },
+        "name": "liblightgbm",
+        "requirements": {
+          "build": [
+            "cmake >=3.28",
+            "make",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub"
+          ],
+          "host": [
+            "libgomp",
+            "libboost-devel",
+            "ocl-icd"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f $PREFIX/lib/lib_lightgbm${SHLIB_EXT}"
+          }
+        ],
+        "version": "4.6.0"
+      },
+      {
+        "build": null,
         "name": "lightgbm",
         "requirements": {
           "build": [],
           "host": [
-            "python 3.10",
-            "pip",
-            "setuptools"
-          ],
-          "run": [
-            "python >=3.10",
-            "liblightgbm",
-            "__cuda",
-            "numpy >=1.17.0",
-            "scipy"
-          ],
-          "run_constrained": [
-            "cffi >=1.15.1",
-            "dask >=2.0.0",
-            "pandas >=0.24.0",
-            "pyarrow >=6.0.1",
-            "scikit-learn >=0.24.2"
-          ]
-        },
-        "script": "install-python.sh",
-        "test": {
-          "commands": [
-            "pip check",
-            "python python_run_test.py",
-            "python -c \"from lightgbm import __version__\""
-          ],
-          "files": [
-            "python_run_test.py"
-          ],
-          "imports": [
-            "lightgbm",
-            "lightgbm.basic",
-            "lightgbm.callback",
-            "lightgbm.compat",
-            "lightgbm.dask",
-            "lightgbm.engine",
-            "lightgbm.libpath",
-            "lightgbm.plotting",
-            "lightgbm.sklearn"
-          ],
-          "requires": [
-            "pip",
-            "scikit-learn",
-            "python 3.10"
-          ]
-        }
-      },
-      {
-        "name": "liblightgbm"
-      },
-      {
-        "build": {
-          "noarch": "python",
-          "string": "cpu_py_6"
-        },
-        "name": "lightgbm",
-        "requirements": {
-          "build": [],
-          "host": [
-            "python 3.10",
+            "python 3.10.*",
             "pip",
             "setuptools"
           ],
@@ -1069,115 +1201,84 @@
             "liblightgbm",
             "numpy >=1.17.0",
             "scipy"
-          ],
-          "run_constrained": [
-            "cffi >=1.15.1",
-            "dask >=2.0.0",
-            "pandas >=0.24.0",
-            "pyarrow >=6.0.1",
-            "scikit-learn >=0.24.2"
           ]
         },
-        "script": "install-python.sh",
-        "test": {
-          "commands": [
-            "pip check",
-            "python python_run_test.py",
-            "python -c \"from lightgbm import __version__\""
-          ],
-          "files": [
-            "python_run_test.py"
-          ],
-          "imports": [
-            "lightgbm",
-            "lightgbm.basic",
-            "lightgbm.callback",
-            "lightgbm.compat",
-            "lightgbm.dask",
-            "lightgbm.engine",
-            "lightgbm.libpath",
-            "lightgbm.plotting",
-            "lightgbm.sklearn"
-          ],
-          "requires": [
-            "pip",
-            "scikit-learn",
-            "python 3.10"
-          ]
-        }
-      },
-      {
-        "name": "liblightgbm"
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "lightgbm",
+                "lightgbm.basic",
+                "lightgbm.callback",
+                "lightgbm.compat",
+                "lightgbm.dask",
+                "lightgbm.engine",
+                "lightgbm.libpath",
+                "lightgbm.plotting",
+                "lightgbm.sklearn"
+              ],
+              "python_version": "3.10.*"
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "python_run_test.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pip",
+                "scikit-learn",
+                "python 3.10.*"
+              ]
+            },
+            "script": [
+              "python python_run_test.py",
+              "python -c \"from lightgbm import __version__\""
+            ]
+          }
+        ],
+        "version": "4.6.0"
       },
       {
         "build": {
-          "noarch": "python",
-          "string": "cuda130_py_6"
+          "strong": [],
+          "weak": [
+            "liblightgbm"
+          ]
         },
-        "name": "lightgbm",
+        "name": "liblightgbm",
         "requirements": {
-          "build": [],
+          "build": [
+            "cmake >=3.28",
+            "make",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "cuda_compiler_stub"
+          ],
           "host": [
-            "python 3.10",
-            "pip",
-            "setuptools"
+            "libgomp"
           ],
           "run": [
-            "python >=3.10",
-            "liblightgbm",
-            "__cuda",
-            "numpy >=1.17.0",
-            "scipy"
-          ],
-          "run_constrained": [
-            "cffi >=1.15.1",
-            "dask >=2.0.0",
-            "pandas >=0.24.0",
-            "pyarrow >=6.0.1",
-            "scikit-learn >=0.24.2"
+            "__cuda"
           ]
         },
-        "script": "install-python.sh",
-        "test": {
-          "commands": [
-            "pip check",
-            "python python_run_test.py",
-            "python -c \"from lightgbm import __version__\""
-          ],
-          "files": [
-            "python_run_test.py"
-          ],
-          "imports": [
-            "lightgbm",
-            "lightgbm.basic",
-            "lightgbm.callback",
-            "lightgbm.compat",
-            "lightgbm.dask",
-            "lightgbm.engine",
-            "lightgbm.libpath",
-            "lightgbm.plotting",
-            "lightgbm.sklearn"
-          ],
-          "requires": [
-            "pip",
-            "scikit-learn",
-            "python 3.10"
-          ]
-        }
+        "tests": [
+          {
+            "script": "test -f $PREFIX/lib/lib_lightgbm${SHLIB_EXT}"
+          }
+        ],
+        "version": "4.6.0"
       },
       {
-        "name": "liblightgbm"
-      },
-      {
-        "build": {
-          "noarch": "python",
-          "string": "cpu_py_6"
-        },
+        "build": null,
         "name": "lightgbm",
         "requirements": {
           "build": [],
           "host": [
-            "python 3.10",
+            "python 3.10.*",
             "pip",
             "setuptools"
           ],
@@ -1185,115 +1286,85 @@
             "python >=3.10",
             "liblightgbm",
             "numpy >=1.17.0",
-            "scipy"
-          ],
-          "run_constrained": [
-            "cffi >=1.15.1",
-            "dask >=2.0.0",
-            "pandas >=0.24.0",
-            "pyarrow >=6.0.1",
-            "scikit-learn >=0.24.2"
+            "scipy",
+            "__cuda"
           ]
         },
-        "script": "install-python.sh",
-        "test": {
-          "commands": [
-            "pip check",
-            "python python_run_test.py",
-            "python -c \"from lightgbm import __version__\""
-          ],
-          "files": [
-            "python_run_test.py"
-          ],
-          "imports": [
-            "lightgbm",
-            "lightgbm.basic",
-            "lightgbm.callback",
-            "lightgbm.compat",
-            "lightgbm.dask",
-            "lightgbm.engine",
-            "lightgbm.libpath",
-            "lightgbm.plotting",
-            "lightgbm.sklearn"
-          ],
-          "requires": [
-            "pip",
-            "scikit-learn",
-            "python 3.10"
-          ]
-        }
-      },
-      {
-        "name": "liblightgbm"
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "lightgbm",
+                "lightgbm.basic",
+                "lightgbm.callback",
+                "lightgbm.compat",
+                "lightgbm.dask",
+                "lightgbm.engine",
+                "lightgbm.libpath",
+                "lightgbm.plotting",
+                "lightgbm.sklearn"
+              ],
+              "python_version": "3.10.*"
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "python_run_test.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pip",
+                "scikit-learn",
+                "python 3.10.*"
+              ]
+            },
+            "script": [
+              "python python_run_test.py",
+              "python -c \"from lightgbm import __version__\""
+            ]
+          }
+        ],
+        "version": "4.6.0"
       },
       {
         "build": {
-          "noarch": "python",
-          "string": "cpu_py_6"
+          "strong": [],
+          "weak": [
+            "liblightgbm"
+          ]
         },
+        "name": "liblightgbm",
+        "requirements": {
+          "build": [
+            "cmake >=3.28",
+            "make",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub"
+          ],
+          "host": [
+            "libgomp",
+            "libboost-devel",
+            "ocl-icd"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f $PREFIX/lib/lib_lightgbm${SHLIB_EXT}"
+          }
+        ],
+        "version": "4.6.0"
+      },
+      {
+        "build": null,
         "name": "lightgbm",
         "requirements": {
           "build": [],
           "host": [
-            "python 3.10",
-            "pip",
-            "setuptools"
-          ],
-          "run": [
-            "python >=3.10",
-            "liblightgbm",
-            "numpy >=1.17.0",
-            "scipy"
-          ],
-          "run_constrained": [
-            "cffi >=1.15.1",
-            "dask >=2.0.0",
-            "pandas >=0.24.0",
-            "pyarrow >=6.0.1",
-            "scikit-learn >=0.24.2"
-          ]
-        },
-        "script": "install-python.sh",
-        "test": {
-          "commands": [
-            "pip check",
-            "python python_run_test.py",
-            "python -c \"from lightgbm import __version__\""
-          ],
-          "files": [
-            "python_run_test.py"
-          ],
-          "imports": [
-            "lightgbm",
-            "lightgbm.basic",
-            "lightgbm.callback",
-            "lightgbm.compat",
-            "lightgbm.dask",
-            "lightgbm.engine",
-            "lightgbm.libpath",
-            "lightgbm.plotting",
-            "lightgbm.sklearn"
-          ],
-          "requires": [
-            "pip",
-            "scikit-learn",
-            "python 3.10"
-          ]
-        }
-      },
-      {
-        "name": "liblightgbm"
-      },
-      {
-        "build": {
-          "noarch": "python",
-          "string": "cpu_py_6"
-        },
-        "name": "lightgbm",
-        "requirements": {
-          "build": [],
-          "host": [
-            "python 3.10",
+            "python 3.10.*",
             "pip",
             "setuptools"
           ],
@@ -1302,56 +1373,170 @@
             "liblightgbm",
             "numpy >=1.17.0",
             "scipy"
-          ],
-          "run_constrained": [
-            "cffi >=1.15.1",
-            "dask >=2.0.0",
-            "pandas >=0.24.0",
-            "pyarrow >=6.0.1",
-            "scikit-learn >=0.24.2"
           ]
         },
-        "script": "install-python.sh",
-        "test": {
-          "commands": [
-            "pip check",
-            "python python_run_test.py",
-            "python -c \"from lightgbm import __version__\""
-          ],
-          "files": [
-            "python_run_test.py"
-          ],
-          "imports": [
-            "lightgbm",
-            "lightgbm.basic",
-            "lightgbm.callback",
-            "lightgbm.compat",
-            "lightgbm.dask",
-            "lightgbm.engine",
-            "lightgbm.libpath",
-            "lightgbm.plotting",
-            "lightgbm.sklearn"
-          ],
-          "requires": [
-            "pip",
-            "scikit-learn",
-            "python 3.10"
-          ]
-        }
-      },
-      {
-        "name": "liblightgbm"
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "lightgbm",
+                "lightgbm.basic",
+                "lightgbm.callback",
+                "lightgbm.compat",
+                "lightgbm.dask",
+                "lightgbm.engine",
+                "lightgbm.libpath",
+                "lightgbm.plotting",
+                "lightgbm.sklearn"
+              ],
+              "python_version": "3.10.*"
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "python_run_test.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pip",
+                "scikit-learn",
+                "python 3.10.*"
+              ]
+            },
+            "script": [
+              "python python_run_test.py",
+              "python -c \"from lightgbm import __version__\""
+            ]
+          }
+        ],
+        "version": "4.6.0"
       },
       {
         "build": {
-          "noarch": "python",
-          "string": "cpu_py_6"
+          "strong": [],
+          "weak": [
+            "liblightgbm"
+          ]
         },
+        "name": "liblightgbm",
+        "requirements": {
+          "build": [
+            "cmake >=3.28",
+            "make",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "cuda_compiler_stub"
+          ],
+          "host": [
+            "libgomp"
+          ],
+          "run": [
+            "__cuda"
+          ]
+        },
+        "tests": [
+          {
+            "script": "test -f $PREFIX/lib/lib_lightgbm${SHLIB_EXT}"
+          }
+        ],
+        "version": "4.6.0"
+      },
+      {
+        "build": null,
         "name": "lightgbm",
         "requirements": {
           "build": [],
           "host": [
-            "python 3.10",
+            "python 3.10.*",
+            "pip",
+            "setuptools"
+          ],
+          "run": [
+            "python >=3.10",
+            "liblightgbm",
+            "numpy >=1.17.0",
+            "scipy",
+            "__cuda"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "lightgbm",
+                "lightgbm.basic",
+                "lightgbm.callback",
+                "lightgbm.compat",
+                "lightgbm.dask",
+                "lightgbm.engine",
+                "lightgbm.libpath",
+                "lightgbm.plotting",
+                "lightgbm.sklearn"
+              ],
+              "python_version": "3.10.*"
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "python_run_test.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pip",
+                "scikit-learn",
+                "python 3.10.*"
+              ]
+            },
+            "script": [
+              "python python_run_test.py",
+              "python -c \"from lightgbm import __version__\""
+            ]
+          }
+        ],
+        "version": "4.6.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "liblightgbm"
+          ]
+        },
+        "name": "liblightgbm",
+        "requirements": {
+          "build": [
+            "cmake >=3.28",
+            "make",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub"
+          ],
+          "host": [
+            "libgomp",
+            "libboost-devel",
+            "ocl-icd"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f $PREFIX/lib/lib_lightgbm${SHLIB_EXT}"
+          }
+        ],
+        "version": "4.6.0"
+      },
+      {
+        "build": null,
+        "name": "lightgbm",
+        "requirements": {
+          "build": [],
+          "host": [
+            "python 3.10.*",
             "pip",
             "setuptools"
           ],
@@ -1360,42 +1545,300 @@
             "liblightgbm",
             "numpy >=1.17.0",
             "scipy"
-          ],
-          "run_constrained": [
-            "cffi >=1.15.1",
-            "dask >=2.0.0",
-            "pandas >=0.24.0",
-            "pyarrow >=6.0.1",
-            "scikit-learn >=0.24.2"
           ]
         },
-        "script": "install-python.sh",
-        "test": {
-          "commands": [
-            "pip check",
-            "python python_run_test.py",
-            "python -c \"from lightgbm import __version__\""
-          ],
-          "files": [
-            "python_run_test.py"
-          ],
-          "imports": [
-            "lightgbm",
-            "lightgbm.basic",
-            "lightgbm.callback",
-            "lightgbm.compat",
-            "lightgbm.dask",
-            "lightgbm.engine",
-            "lightgbm.libpath",
-            "lightgbm.plotting",
-            "lightgbm.sklearn"
-          ],
-          "requires": [
-            "pip",
-            "scikit-learn",
-            "python 3.10"
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "lightgbm",
+                "lightgbm.basic",
+                "lightgbm.callback",
+                "lightgbm.compat",
+                "lightgbm.dask",
+                "lightgbm.engine",
+                "lightgbm.libpath",
+                "lightgbm.plotting",
+                "lightgbm.sklearn"
+              ],
+              "python_version": "3.10.*"
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "python_run_test.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pip",
+                "scikit-learn",
+                "python 3.10.*"
+              ]
+            },
+            "script": [
+              "python python_run_test.py",
+              "python -c \"from lightgbm import __version__\""
+            ]
+          }
+        ],
+        "version": "4.6.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "liblightgbm"
           ]
-        }
+        },
+        "name": "liblightgbm",
+        "requirements": {
+          "build": [
+            "cmake >=3.28",
+            "make",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub"
+          ],
+          "host": [
+            "libgomp",
+            "libboost-devel",
+            "ocl-icd"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f $PREFIX/lib/lib_lightgbm${SHLIB_EXT}"
+          }
+        ],
+        "version": "4.6.0"
+      },
+      {
+        "build": null,
+        "name": "lightgbm",
+        "requirements": {
+          "build": [],
+          "host": [
+            "python 3.10.*",
+            "pip",
+            "setuptools"
+          ],
+          "run": [
+            "python >=3.10",
+            "liblightgbm",
+            "numpy >=1.17.0",
+            "scipy"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "lightgbm",
+                "lightgbm.basic",
+                "lightgbm.callback",
+                "lightgbm.compat",
+                "lightgbm.dask",
+                "lightgbm.engine",
+                "lightgbm.libpath",
+                "lightgbm.plotting",
+                "lightgbm.sklearn"
+              ],
+              "python_version": "3.10.*"
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "python_run_test.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pip",
+                "scikit-learn",
+                "python 3.10.*"
+              ]
+            },
+            "script": [
+              "python python_run_test.py",
+              "python -c \"from lightgbm import __version__\""
+            ]
+          }
+        ],
+        "version": "4.6.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "liblightgbm"
+          ]
+        },
+        "name": "liblightgbm",
+        "requirements": {
+          "build": [
+            "cmake >=3.28",
+            "make",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub"
+          ],
+          "host": [
+            "libgomp",
+            "libboost-devel",
+            "ocl-icd"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f $PREFIX/lib/lib_lightgbm${SHLIB_EXT}"
+          }
+        ],
+        "version": "4.6.0"
+      },
+      {
+        "build": null,
+        "name": "lightgbm",
+        "requirements": {
+          "build": [],
+          "host": [
+            "python 3.10.*",
+            "pip",
+            "setuptools"
+          ],
+          "run": [
+            "python >=3.10",
+            "liblightgbm",
+            "numpy >=1.17.0",
+            "scipy"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "lightgbm",
+                "lightgbm.basic",
+                "lightgbm.callback",
+                "lightgbm.compat",
+                "lightgbm.dask",
+                "lightgbm.engine",
+                "lightgbm.libpath",
+                "lightgbm.plotting",
+                "lightgbm.sklearn"
+              ],
+              "python_version": "3.10.*"
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "python_run_test.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pip",
+                "scikit-learn",
+                "python 3.10.*"
+              ]
+            },
+            "script": [
+              "python python_run_test.py",
+              "python -c \"from lightgbm import __version__\""
+            ]
+          }
+        ],
+        "version": "4.6.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "liblightgbm"
+          ]
+        },
+        "name": "liblightgbm",
+        "requirements": {
+          "build": [
+            "cmake >=3.28",
+            "make",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub"
+          ],
+          "host": [
+            "libgomp",
+            "libboost-devel",
+            "ocl-icd"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f $PREFIX/lib/lib_lightgbm${SHLIB_EXT}"
+          }
+        ],
+        "version": "4.6.0"
+      },
+      {
+        "build": null,
+        "name": "lightgbm",
+        "requirements": {
+          "build": [],
+          "host": [
+            "python 3.10.*",
+            "pip",
+            "setuptools"
+          ],
+          "run": [
+            "python >=3.10",
+            "liblightgbm",
+            "numpy >=1.17.0",
+            "scipy"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "lightgbm",
+                "lightgbm.basic",
+                "lightgbm.callback",
+                "lightgbm.compat",
+                "lightgbm.dask",
+                "lightgbm.engine",
+                "lightgbm.libpath",
+                "lightgbm.plotting",
+                "lightgbm.sklearn"
+              ],
+              "python_version": "3.10.*"
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "python_run_test.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pip",
+                "scikit-learn",
+                "python 3.10.*"
+              ]
+            },
+            "script": [
+              "python python_run_test.py",
+              "python -c \"from lightgbm import __version__\""
+            ]
+          }
+        ],
+        "version": "4.6.0"
       }
     ],
     "package": {
@@ -1409,26 +1852,18 @@
         "c_compiler_stub",
         "c_stdlib_stub",
         "cxx_compiler_stub",
-        "cuda_compiler_stub",
-        "ninja"
+        "cuda_compiler_stub"
       ],
       "host": [
         "libgomp",
         "libboost-devel",
-        "ocl-icd",
-        "llvm-openmp",
-        "khronos-opencl-icd-loader"
+        "ocl-icd"
       ],
       "run": [
         "__cuda"
-      ],
-      "run_constrained": [
-        "lightgbm 4.6.0 cuda129_*_6",
-        "lightgbm 4.6.0 cpu_*_6",
-        "lightgbm 4.6.0 cuda130_*_6"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "patches": [
         "patches/0001-boost-shared.patch",
@@ -1439,15 +1874,12 @@
       ],
       "sha256": "cb1c59720eb569389c0ba74d14f52351b573af489f230032a1c9f314f8bab7fe",
       "url": "https://pypi.org/packages/source/l/lightgbm/lightgbm-4.6.0.tar.gz"
-    },
-    "test": {
-      "commands": null
     }
   },
   "name": "liblightgbm",
   "osx_64_meta_yaml": {
     "about": {
-      "description": "A fast, distributed, high performance gradient boosting (GBDT, GBRT, GBM or MART) framework based on decision tree algorithms, used for ranking, classification and many other machine learning tasks.\n",
+      "description": "A fast, distributed, high performance gradient boosting (GBDT, GBRT, GBM or MART) framework based on decision tree algorithms, used for ranking, classification and many other machine learning tasks.",
       "dev_url": "https://github.com/microsoft/LightGBM",
       "doc_url": "https://lightgbm.readthedocs.io/en/v4.6.0/",
       "home": "https://github.com/microsoft/LightGBM",
@@ -1457,11 +1889,12 @@
       "summary": "LightGBM is a gradient boosting framework that uses tree based learning algorithms."
     },
     "build": {
-      "number": "6",
-      "run_exports": [
-        "liblightgbm"
-      ],
-      "string": "cpu_h1234567_6"
+      "number": "7",
+      "run_exports": {
+        "weak": [
+          "liblightgbm"
+        ]
+      }
     },
     "extra": {
       "feedstock-name": "lightgbm",
@@ -1475,18 +1908,42 @@
     },
     "outputs": [
       {
-        "name": "liblightgbm"
+        "build": {
+          "strong": [],
+          "weak": [
+            "liblightgbm"
+          ]
+        },
+        "name": "liblightgbm",
+        "requirements": {
+          "build": [
+            "cmake >=3.28",
+            "make",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub"
+          ],
+          "host": [
+            "libgomp",
+            "libboost-devel",
+            "ocl-icd"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f $PREFIX/lib/lib_lightgbm${SHLIB_EXT}"
+          }
+        ],
+        "version": "4.6.0"
       },
       {
-        "build": {
-          "noarch": "python",
-          "string": "cpu_py_6"
-        },
+        "build": null,
         "name": "lightgbm",
         "requirements": {
           "build": [],
           "host": [
-            "python 3.10",
+            "python 3.10.*",
             "pip",
             "setuptools"
           ],
@@ -1495,42 +1952,45 @@
             "liblightgbm",
             "numpy >=1.17.0",
             "scipy"
-          ],
-          "run_constrained": [
-            "cffi >=1.15.1",
-            "dask >=2.0.0",
-            "pandas >=0.24.0",
-            "pyarrow >=6.0.1",
-            "scikit-learn >=0.24.2"
           ]
         },
-        "script": "install-python.sh",
-        "test": {
-          "commands": [
-            "pip check",
-            "python python_run_test.py",
-            "python -c \"from lightgbm import __version__\""
-          ],
-          "files": [
-            "python_run_test.py"
-          ],
-          "imports": [
-            "lightgbm",
-            "lightgbm.basic",
-            "lightgbm.callback",
-            "lightgbm.compat",
-            "lightgbm.dask",
-            "lightgbm.engine",
-            "lightgbm.libpath",
-            "lightgbm.plotting",
-            "lightgbm.sklearn"
-          ],
-          "requires": [
-            "pip",
-            "scikit-learn",
-            "python 3.10"
-          ]
-        }
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "lightgbm",
+                "lightgbm.basic",
+                "lightgbm.callback",
+                "lightgbm.compat",
+                "lightgbm.dask",
+                "lightgbm.engine",
+                "lightgbm.libpath",
+                "lightgbm.plotting",
+                "lightgbm.sklearn"
+              ],
+              "python_version": "3.10.*"
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "python_run_test.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pip",
+                "scikit-learn",
+                "python 3.10.*"
+              ]
+            },
+            "script": [
+              "python python_run_test.py",
+              "python -c \"from lightgbm import __version__\""
+            ]
+          }
+        ],
+        "version": "4.6.0"
       }
     ],
     "package": {
@@ -1546,16 +2006,12 @@
         "cxx_compiler_stub"
       ],
       "host": [
-        "llvm-openmp",
+        "libgomp",
         "libboost-devel",
-        "khronos-opencl-icd-loader"
-      ],
-      "run": [],
-      "run_constrained": [
-        "lightgbm 4.6.0 cpu_*_6"
+        "ocl-icd"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "patches": [
         "patches/0001-boost-shared.patch",
@@ -1566,11 +2022,6 @@
       ],
       "sha256": "cb1c59720eb569389c0ba74d14f52351b573af489f230032a1c9f314f8bab7fe",
       "url": "https://pypi.org/packages/source/l/lightgbm/lightgbm-4.6.0.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "test -f $PREFIX/lib/lib_lightgbm${SHLIB_EXT}"
-      ]
     }
   },
   "osx_64_requirements": {
@@ -1587,9 +2038,9 @@
     "host": {
       "__set__": true,
       "elements": [
-        "khronos-opencl-icd-loader",
         "libboost-devel",
-        "llvm-openmp",
+        "libgomp",
+        "ocl-icd",
         "pip",
         "python",
         "setuptools"
@@ -1615,7 +2066,7 @@
   },
   "osx_arm64_meta_yaml": {
     "about": {
-      "description": "A fast, distributed, high performance gradient boosting (GBDT, GBRT, GBM or MART) framework based on decision tree algorithms, used for ranking, classification and many other machine learning tasks.\n",
+      "description": "A fast, distributed, high performance gradient boosting (GBDT, GBRT, GBM or MART) framework based on decision tree algorithms, used for ranking, classification and many other machine learning tasks.",
       "dev_url": "https://github.com/microsoft/LightGBM",
       "doc_url": "https://lightgbm.readthedocs.io/en/v4.6.0/",
       "home": "https://github.com/microsoft/LightGBM",
@@ -1625,11 +2076,12 @@
       "summary": "LightGBM is a gradient boosting framework that uses tree based learning algorithms."
     },
     "build": {
-      "number": "6",
-      "run_exports": [
-        "liblightgbm"
-      ],
-      "string": "cpu_h1234567_6"
+      "number": "7",
+      "run_exports": {
+        "weak": [
+          "liblightgbm"
+        ]
+      }
     },
     "extra": {
       "feedstock-name": "lightgbm",
@@ -1643,18 +2095,42 @@
     },
     "outputs": [
       {
-        "name": "liblightgbm"
+        "build": {
+          "strong": [],
+          "weak": [
+            "liblightgbm"
+          ]
+        },
+        "name": "liblightgbm",
+        "requirements": {
+          "build": [
+            "cmake >=3.28",
+            "make",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub"
+          ],
+          "host": [
+            "libgomp",
+            "libboost-devel",
+            "ocl-icd"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f $PREFIX/lib/lib_lightgbm${SHLIB_EXT}"
+          }
+        ],
+        "version": "4.6.0"
       },
       {
-        "build": {
-          "noarch": "python",
-          "string": "cpu_py_6"
-        },
+        "build": null,
         "name": "lightgbm",
         "requirements": {
           "build": [],
           "host": [
-            "python 3.10",
+            "python 3.10.*",
             "pip",
             "setuptools"
           ],
@@ -1663,42 +2139,45 @@
             "liblightgbm",
             "numpy >=1.17.0",
             "scipy"
-          ],
-          "run_constrained": [
-            "cffi >=1.15.1",
-            "dask >=2.0.0",
-            "pandas >=0.24.0",
-            "pyarrow >=6.0.1",
-            "scikit-learn >=0.24.2"
           ]
         },
-        "script": "install-python.sh",
-        "test": {
-          "commands": [
-            "pip check",
-            "python python_run_test.py",
-            "python -c \"from lightgbm import __version__\""
-          ],
-          "files": [
-            "python_run_test.py"
-          ],
-          "imports": [
-            "lightgbm",
-            "lightgbm.basic",
-            "lightgbm.callback",
-            "lightgbm.compat",
-            "lightgbm.dask",
-            "lightgbm.engine",
-            "lightgbm.libpath",
-            "lightgbm.plotting",
-            "lightgbm.sklearn"
-          ],
-          "requires": [
-            "pip",
-            "scikit-learn",
-            "python 3.10"
-          ]
-        }
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "lightgbm",
+                "lightgbm.basic",
+                "lightgbm.callback",
+                "lightgbm.compat",
+                "lightgbm.dask",
+                "lightgbm.engine",
+                "lightgbm.libpath",
+                "lightgbm.plotting",
+                "lightgbm.sklearn"
+              ],
+              "python_version": "3.10.*"
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "python_run_test.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pip",
+                "scikit-learn",
+                "python 3.10.*"
+              ]
+            },
+            "script": [
+              "python python_run_test.py",
+              "python -c \"from lightgbm import __version__\""
+            ]
+          }
+        ],
+        "version": "4.6.0"
       }
     ],
     "package": {
@@ -1714,16 +2193,12 @@
         "cxx_compiler_stub"
       ],
       "host": [
-        "llvm-openmp",
+        "libgomp",
         "libboost-devel",
-        "khronos-opencl-icd-loader"
-      ],
-      "run": [],
-      "run_constrained": [
-        "lightgbm 4.6.0 cpu_*_6"
+        "ocl-icd"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "patches": [
         "patches/0001-boost-shared.patch",
@@ -1734,11 +2209,6 @@
       ],
       "sha256": "cb1c59720eb569389c0ba74d14f52351b573af489f230032a1c9f314f8bab7fe",
       "url": "https://pypi.org/packages/source/l/lightgbm/lightgbm-4.6.0.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "test -f $PREFIX/lib/lib_lightgbm${SHLIB_EXT}"
-      ]
     }
   },
   "osx_arm64_requirements": {
@@ -1755,9 +2225,9 @@
     "host": {
       "__set__": true,
       "elements": [
-        "khronos-opencl-icd-loader",
         "libboost-devel",
-        "llvm-openmp",
+        "libgomp",
+        "ocl-icd",
         "pip",
         "python",
         "setuptools"
@@ -1800,7 +2270,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/lightgbm.json"
   },
-  "raw_meta_yaml": "{% set version = \"4.6.0\" %}\n\npackage:\n  name: liblightgbm\n  version: {{ version }}\n\nsource:\n  url: https://pypi.org/packages/source/l/lightgbm/lightgbm-{{ version }}.tar.gz\n  sha256: cb1c59720eb569389c0ba74d14f52351b573af489f230032a1c9f314f8bab7fe\n  patches:\n    - patches/0001-boost-shared.patch\n    # Taken from https://github.com/microsoft/LightGBM/blob/v4.5.0/build-python.sh#L308-L316\n    # except that we don't copy lib_lightgbm.so to SP_DIR\n    - patches/0002-use-precompiled.patch\n    # Compatibility fix for Boost 1.86\n    - patches/0003-boost-sha1.patch\n    # use C++17\n    - patches/0004-use-cxx-17.patch\n    # avoid trying to compile for unsupported GPU architectures when targeting CUDA 13\n    - patches/0005-drop-arches-for-cuda13.patch\n\nbuild:\n  number: 6\n  string: cuda{{ cuda_compiler_version | replace('.', '') }}_h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version != \"None\"]\n  string: cpu_h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version == \"None\"]\n  # CUDA is not supported in windows\n  skip: true  # [cuda_compiler_version != \"None\" and win]\n  run_exports:\n    # Pin conservatively as we don't know ABI guarantees\n    - {{ pin_subpackage(\"liblightgbm\", max_pin=\"x.x.x\") }}\n\nrequirements:\n  build:\n    - cmake >=3.28\n    - make    # [not win]\n    - ninja   # [win]\n    - {{ compiler('c') }}\n    - {{ stdlib(\"c\") }}\n    - {{ compiler('cxx') }}\n    - {{ compiler('cuda') }}                 # [cuda_compiler_version != \"None\"]\n  host:\n    - llvm-openmp  # [osx]\n    - libgomp  # [linux]\n    - libboost-devel              # [cuda_compiler_version == \"None\"]\n    - ocl-icd                     # [cuda_compiler_version == \"None\" and linux]\n    - khronos-opencl-icd-loader   # [cuda_compiler_version == \"None\" and not linux]\n  run:\n    - __cuda                      # [cuda_compiler_version != \"None\"]\n  run_constrained:\n    - lightgbm {{ version }} cuda{{ cuda_compiler_version | replace('.', '') }}_*_{{ PKG_BUILDNUM }}   # [cuda_compiler_version != \"None\"]\n    - lightgbm {{ version }} cpu_*_{{ PKG_BUILDNUM }}    # [cuda_compiler_version == \"None\"]\n\ntest:\n  commands:\n    - test -f $PREFIX/lib/lib_lightgbm${SHLIB_EXT}  # [unix]\n\noutputs:\n  - name: liblightgbm\n\n  - name: lightgbm\n    script: install-python.sh\n    build:\n      noarch: python\n      string: cuda{{ cuda_compiler_version | replace('.', '') }}_py_{{ PKG_BUILDNUM }}  # [cuda_compiler_version != \"None\"]\n      string: cpu_py_{{ PKG_BUILDNUM }}   # [cuda_compiler_version == \"None\"]\n      # TODO: remove this when conda-build bug is fixed where `noarch` subpackages\n      # when tested does not find dependencies from target_platform.\n      skip: True  # [build_platform != target_platform]\n    requirements:\n      build:\n        - python                                 # [build_platform != target_platform]\n        - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n      host:\n        - python {{ python_min }}\n        - pip\n        - setuptools\n      run:\n        - python >={{ python_min }}\n        - {{ pin_subpackage(\"liblightgbm\", max_pin=\"x.x.x\") }}\n        - __cuda                                 # [cuda_compiler_version != \"None\"]\n        - numpy >=1.17.0\n        - scipy\n      # optional dependencies from [project.optional-dependencies]\n      # at https://github.com/microsoft/LightGBM/blob/master/python-package/pyproject.toml\n      run_constrained:\n        - cffi >=1.15.1\n        - dask >=2.0.0\n        - pandas >=0.24.0\n        - pyarrow >=6.0.1\n        - scikit-learn >=0.24.2\n    test:\n      files:\n        - python_run_test.py\n      imports:\n        - lightgbm\n        - lightgbm.basic\n        - lightgbm.callback\n        - lightgbm.compat\n        - lightgbm.dask\n        - lightgbm.engine\n        - lightgbm.libpath\n        - lightgbm.plotting\n        - lightgbm.sklearn\n      requires:\n        - pip\n        - scikit-learn\n        - python {{ python_min }}\n      commands:\n        - pip check\n        - python python_run_test.py\n        - python -c \"from lightgbm import __version__\"\n\nabout:\n  home: https://github.com/microsoft/LightGBM\n  license: MIT\n  license_family: MIT\n  license_file: LICENSE\n  summary: LightGBM is a gradient boosting framework that uses tree based learning algorithms.\n\n  description: |\n    A fast, distributed, high performance gradient boosting (GBDT, GBRT, GBM or MART) framework based on decision tree algorithms, used for ranking, classification and many other machine learning tasks.\n  doc_url: https://lightgbm.readthedocs.io/en/v{{ version }}/\n  dev_url: https://github.com/microsoft/LightGBM\n\nextra:\n  feedstock-name: lightgbm\n  recipe-maintainers:\n    - timkpaine\n    - synapticarbors\n    - aldanor\n    - xhochy\n    - jameslamb\n",
+  "raw_meta_yaml": "context:\n  build_number: 7\n  version: '4.6.0'\n\nrecipe:\n  name: liblightgbm\n  version: ${{ version }}\n\nsource:\n  url: https://pypi.org/packages/source/l/lightgbm/lightgbm-${{ version }}.tar.gz\n  sha256: cb1c59720eb569389c0ba74d14f52351b573af489f230032a1c9f314f8bab7fe\n  patches:\n    - patches/0001-boost-shared.patch\n    # Taken from https://github.com/microsoft/LightGBM/blob/v4.5.0/build-python.sh#L308-L316\n    # except that we don't copy lib_lightgbm.so to SP_DIR\n    - patches/0002-use-precompiled.patch\n    # Compatibility fix for Boost 1.86\n    - patches/0003-boost-sha1.patch\n    # use C++17\n    - patches/0004-use-cxx-17.patch\n    # avoid trying to compile for unsupported GPU architectures when targeting CUDA 13\n    - patches/0005-drop-arches-for-cuda13.patch\n\nbuild:\n  number: ${{ build_number }}\n  string: ${{ \"cpu\" if cuda_compiler_version == \"None\" else \"cuda\" + (cuda_compiler_version | replace('.', '')) }}_h${{ hash }}_${{ build_number }}\n  # CUDA is not supported in windows\n  skip: cuda_compiler_version != \"None\" and win\n\noutputs:\n  - package:\n      name: liblightgbm\n    requirements:\n      build:\n        - cmake >=3.28\n        - if: win\n          then:\n            - ninja\n          else:\n            - make\n        - ${{ compiler('c') }}\n        - ${{ stdlib(\"c\") }}\n        - ${{ compiler('cxx') }}\n        - if: cuda_compiler_version != \"None\"\n          then:\n            - ${{ compiler('cuda') }}\n      host:\n        - if: osx\n          then:\n            - llvm-openmp\n        - if: linux\n          then:\n            - libgomp\n        - if: cuda_compiler_version == \"None\"\n          then:\n            - libboost-devel\n        - if: cuda_compiler_version == \"None\" and linux\n          then:\n            - ocl-icd\n        - if: cuda_compiler_version == \"None\" and not linux\n          then:\n            - khronos-opencl-icd-loader\n      run:\n        - if: cuda_compiler_version != \"None\"\n          then:\n            - __cuda\n      run_constraints:\n        - if: cuda_compiler_version == \"None\"\n          then:\n            - lightgbm ==${{ version }} cpu_*_${{ build_number }}\n          else:\n            - lightgbm ==${{ version }} cuda${{ cuda_compiler_version | replace('.', '') }}_*_${{ build_number }}\n      run_exports:\n        # Pin conservatively as we don't know ABI guarantees\n        - ${{ pin_subpackage(\"liblightgbm\", upper_bound=\"x.x.x\") }}\n    tests:\n      - if: unix\n        then:\n          - script:\n              - test -f $PREFIX/lib/lib_lightgbm${SHLIB_EXT}\n\n  - package:\n      name: lightgbm\n    build:\n      noarch: python\n      script:\n        file: install-python\n      string: ${{ \"cpu_py\" if cuda_compiler_version == \"None\" else \"cuda\" + (cuda_compiler_version | replace('.', '')) }}_h${{ hash }}_${{ build_number }}\n    requirements:\n      build:\n        - if: build_platform != target_platform\n          then:\n            - python ${{ python_min }}.*\n            - cross-python_${{ target_platform }}\n      host:\n        - python ${{ python_min }}.*\n        - pip\n        - setuptools\n      run:\n        - python >=${{ python_min }}\n        - ${{ pin_subpackage(\"liblightgbm\", upper_bound=\"x.x.x\") }}\n        - numpy >=1.17.0\n        - scipy\n        - if: cuda_compiler_version != \"None\"\n          then:\n            - __cuda\n      # optional dependencies from [project.optional-dependencies]\n      # at https://github.com/microsoft/LightGBM/blob/master/python-package/pyproject.toml\n      run_constraints:\n        - cffi >=1.15.1\n        - dask >=2.0.0\n        - pandas >=0.24.0\n        - pyarrow >=6.0.1\n        - scikit-learn >=0.24.2\n    tests:\n      - python:\n          imports:\n            - lightgbm\n            - lightgbm.basic\n            - lightgbm.callback\n            - lightgbm.compat\n            - lightgbm.dask\n            - lightgbm.engine\n            - lightgbm.libpath\n            - lightgbm.plotting\n            - lightgbm.sklearn\n          pip_check: true\n          python_version: ${{ python_min }}.*\n      - script:\n          - python python_run_test.py\n          - python -c \"from lightgbm import __version__\"\n        files:\n          recipe:\n            - python_run_test.py\n        requirements:\n            run:\n              - pip\n              - scikit-learn\n              - python ${{ python_min }}.*\n\nabout:\n  homepage: https://github.com/microsoft/LightGBM\n  license: MIT\n  license_family: MIT\n  license_file: LICENSE\n  summary: LightGBM is a gradient boosting framework that uses tree based learning algorithms.\n\n  description: |\n    A fast, distributed, high performance gradient boosting (GBDT, GBRT, GBM or MART) framework based on decision tree algorithms, used for ranking, classification and many other machine learning tasks.\n  documentation: https://lightgbm.readthedocs.io/en/v${{ version }}/\n  repository: https://github.com/microsoft/LightGBM\n\nextra:\n  feedstock-name: lightgbm\n  recipe-maintainers:\n    - timkpaine\n    - synapticarbors\n    - aldanor\n    - xhochy\n    - jameslamb\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -1810,13 +2280,10 @@
       "cmake",
       "cuda_compiler_stub",
       "cxx_compiler_stub",
-      "khronos-opencl-icd-loader",
       "libboost-devel",
       "libgomp",
       "liblightgbm",
-      "llvm-openmp",
       "make",
-      "ninja",
       "numpy",
       "ocl-icd",
       "pip",
@@ -1834,8 +2301,7 @@
         "cmake",
         "cuda_compiler_stub",
         "cxx_compiler_stub",
-        "make",
-        "ninja"
+        "make"
       ]
     },
     "host": {
@@ -1846,12 +2312,9 @@
         "ctng-compilers",
         "cuda_compiler_stub",
         "cxx_compiler_stub",
-        "khronos-opencl-icd-loader",
         "libboost-devel",
         "libgomp",
-        "llvm-openmp",
         "ocl-icd",
-        "openmp",
         "pip",
         "python",
         "setuptools"
@@ -1868,7 +2331,6 @@
         "cxx_compiler_stub",
         "liblightgbm",
         "numpy",
-        "openmp",
         "python",
         "scipy"
       ]
@@ -1892,20 +2354,17 @@
         "cmake >=3.28",
         "cuda_compiler_stub",
         "cxx_compiler_stub",
-        "make",
-        "ninja"
+        "make"
       ]
     },
     "host": {
       "__set__": true,
       "elements": [
-        "khronos-opencl-icd-loader",
         "libboost-devel",
         "libgomp",
-        "llvm-openmp",
         "ocl-icd",
         "pip",
-        "python 3.10",
+        "python 3.10.*",
         "setuptools"
       ]
     },
@@ -1923,7 +2382,7 @@
       "__set__": true,
       "elements": [
         "pip",
-        "python 3.10",
+        "python 3.10.*",
         "scikit-learn"
       ]
     }
@@ -1935,7 +2394,7 @@
   },
   "win_64_meta_yaml": {
     "about": {
-      "description": "A fast, distributed, high performance gradient boosting (GBDT, GBRT, GBM or MART) framework based on decision tree algorithms, used for ranking, classification and many other machine learning tasks.\n",
+      "description": "A fast, distributed, high performance gradient boosting (GBDT, GBRT, GBM or MART) framework based on decision tree algorithms, used for ranking, classification and many other machine learning tasks.",
       "dev_url": "https://github.com/microsoft/LightGBM",
       "doc_url": "https://lightgbm.readthedocs.io/en/v4.6.0/",
       "home": "https://github.com/microsoft/LightGBM",
@@ -1945,11 +2404,12 @@
       "summary": "LightGBM is a gradient boosting framework that uses tree based learning algorithms."
     },
     "build": {
-      "number": "6",
-      "run_exports": [
-        "liblightgbm"
-      ],
-      "string": "cpu_h1234567_6"
+      "number": "7",
+      "run_exports": {
+        "weak": [
+          "liblightgbm"
+        ]
+      }
     },
     "extra": {
       "feedstock-name": "lightgbm",
@@ -1963,18 +2423,42 @@
     },
     "outputs": [
       {
-        "name": "liblightgbm"
+        "build": {
+          "strong": [],
+          "weak": [
+            "liblightgbm"
+          ]
+        },
+        "name": "liblightgbm",
+        "requirements": {
+          "build": [
+            "cmake >=3.28",
+            "make",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub"
+          ],
+          "host": [
+            "libgomp",
+            "libboost-devel",
+            "ocl-icd"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f $PREFIX/lib/lib_lightgbm${SHLIB_EXT}"
+          }
+        ],
+        "version": "4.6.0"
       },
       {
-        "build": {
-          "noarch": "python",
-          "string": "cpu_py_6"
-        },
+        "build": null,
         "name": "lightgbm",
         "requirements": {
           "build": [],
           "host": [
-            "python 3.10",
+            "python 3.10.*",
             "pip",
             "setuptools"
           ],
@@ -1983,42 +2467,45 @@
             "liblightgbm",
             "numpy >=1.17.0",
             "scipy"
-          ],
-          "run_constrained": [
-            "cffi >=1.15.1",
-            "dask >=2.0.0",
-            "pandas >=0.24.0",
-            "pyarrow >=6.0.1",
-            "scikit-learn >=0.24.2"
           ]
         },
-        "script": "install-python.sh",
-        "test": {
-          "commands": [
-            "pip check",
-            "python python_run_test.py",
-            "python -c \"from lightgbm import __version__\""
-          ],
-          "files": [
-            "python_run_test.py"
-          ],
-          "imports": [
-            "lightgbm",
-            "lightgbm.basic",
-            "lightgbm.callback",
-            "lightgbm.compat",
-            "lightgbm.dask",
-            "lightgbm.engine",
-            "lightgbm.libpath",
-            "lightgbm.plotting",
-            "lightgbm.sklearn"
-          ],
-          "requires": [
-            "pip",
-            "scikit-learn",
-            "python 3.10"
-          ]
-        }
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "lightgbm",
+                "lightgbm.basic",
+                "lightgbm.callback",
+                "lightgbm.compat",
+                "lightgbm.dask",
+                "lightgbm.engine",
+                "lightgbm.libpath",
+                "lightgbm.plotting",
+                "lightgbm.sklearn"
+              ],
+              "python_version": "3.10.*"
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "python_run_test.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pip",
+                "scikit-learn",
+                "python 3.10.*"
+              ]
+            },
+            "script": [
+              "python python_run_test.py",
+              "python -c \"from lightgbm import __version__\""
+            ]
+          }
+        ],
+        "version": "4.6.0"
       }
     ],
     "package": {
@@ -2028,21 +2515,18 @@
     "requirements": {
       "build": [
         "cmake >=3.28",
-        "ninja",
+        "make",
         "c_compiler_stub",
         "c_stdlib_stub",
         "cxx_compiler_stub"
       ],
       "host": [
+        "libgomp",
         "libboost-devel",
-        "khronos-opencl-icd-loader"
-      ],
-      "run": [],
-      "run_constrained": [
-        "lightgbm 4.6.0 cpu_*_6"
+        "ocl-icd"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "patches": [
         "patches/0001-boost-shared.patch",
@@ -2053,9 +2537,6 @@
       ],
       "sha256": "cb1c59720eb569389c0ba74d14f52351b573af489f230032a1c9f314f8bab7fe",
       "url": "https://pypi.org/packages/source/l/lightgbm/lightgbm-4.6.0.tar.gz"
-    },
-    "test": {
-      "commands": null
     }
   },
   "win_64_requirements": {
@@ -2066,14 +2547,15 @@
         "c_stdlib_stub",
         "cmake",
         "cxx_compiler_stub",
-        "ninja"
+        "make"
       ]
     },
     "host": {
       "__set__": true,
       "elements": [
-        "khronos-opencl-icd-loader",
         "libboost-devel",
+        "libgomp",
+        "ocl-icd",
         "pip",
         "python",
         "setuptools"
