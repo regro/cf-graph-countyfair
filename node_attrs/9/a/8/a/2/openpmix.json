@@ -1,7 +1,7 @@
 {
   "archived": false,
   "branch": "main",
-  "ci_support_linux_64_.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\ncdt_name:\n- conda\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\nlibevent:\n- 2.1.12\nlibhwloc:\n- 2.12.1\ntarget_platform:\n- linux-64\nzlib:\n- '1'\n",
+  "ci_support_linux_64_.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\nlibevent:\n- 2.1.12\nlibhwloc:\n- 2.12.2\ntarget_platform:\n- linux-64\nzlib:\n- '1'\n",
   "conda-forge.yml": {
     "bot": {
       "abi_migration_branches": [
@@ -27,8 +27,8 @@
     },
     "test": "native_and_emulated"
   },
-  "feedstock_hash": "8cf513ce8419e5836978f223e3277cdb9e373de4",
-  "feedstock_hash_ts": 1754762811,
+  "feedstock_hash": "b2027dc961e8f587514c6e9b0b5a008222b1976f",
+  "feedstock_hash_ts": 1768154562,
   "feedstock_name": "openpmix",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -42,7 +42,7 @@
       "summary": "OpenPMIx Implementation of the PMIx Standard"
     },
     "build": {
-      "number": "1"
+      "number": "2"
     },
     "extra": {
       "feedstock-name": "openpmix",
@@ -221,7 +221,7 @@
       "summary": "OpenPMIx Implementation of the PMIx Standard"
     },
     "build": {
-      "number": "1"
+      "number": "2"
     },
     "extra": {
       "feedstock-name": "openpmix",
@@ -400,7 +400,7 @@
       "summary": "OpenPMIx Implementation of the PMIx Standard"
     },
     "build": {
-      "number": "1"
+      "number": "2"
     },
     "extra": {
       "feedstock-name": "openpmix",
@@ -579,7 +579,7 @@
       "summary": "OpenPMIx Implementation of the PMIx Standard"
     },
     "build": {
-      "number": "1"
+      "number": "2"
     },
     "extra": {
       "feedstock-name": "openpmix",
@@ -1117,7 +1117,7 @@
       "summary": "OpenPMIx Implementation of the PMIx Standard"
     },
     "build": {
-      "number": "1"
+      "number": "2"
     },
     "extra": {
       "feedstock-name": "openpmix",
@@ -1296,7 +1296,7 @@
       "summary": "OpenPMIx Implementation of the PMIx Standard"
     },
     "build": {
-      "number": "1"
+      "number": "2"
     },
     "extra": {
       "feedstock-name": "openpmix",
@@ -1483,7 +1483,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/openpmix.json"
   },
-  "raw_meta_yaml": "{% set name = \"openpmix\" %}\n{% set version = \"6.0.0\" %}\n\npackage:\n  name: openpmix-feedstock\n  version: {{ version }}\n\nsource:\n  url: https://github.com/openpmix/openpmix/releases/download/v{{ version }}/pmix-{{ version }}.tar.bz2\n  sha256: bfe969966d0ce82e032739cac286239bd5ad74a831d7adae013284919f125318\n\nbuild:\n  skip: true  # [win]\n  number: 1\n\n# one top-level build\n# outputs select which files to include\n# from this build\n# but don't run any build scripts themselves\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ stdlib('c') }}\n    - make\n    - flex\n    - pkg-config\n    - python 3.12\n  host:\n    - libevent\n    - libhwloc\n    - zlib\n\noutputs:\n  - name: libpmix\n    files:\n      # libpmix has everything except for specific exclusions\n      include:\n        - '**/*'\n      exclude:\n        # these are in -bin\n        - bin/\n        # these are in -devel\n        - include/\n        - lib/pkgconfig/\n        # exclude docs (not packaged)\n        - share/doc/\n        - share/man/\n    build:\n      run_exports:\n        - {{ pin_subpackage('libpmix', max_pin='x') }}\n    requirements:\n      # only need requirements with run_exports here\n      # no build is actually run\n      # TODO: remove extras when recipe name is fixed to not match this output\n      build:\n        - {{ compiler('c') }}\n        - {{ stdlib('c') }}\n        - make\n        - pkg-config\n        - python 3.12\n      host:\n        - libevent\n        - libhwloc\n        - zlib\n\n    test:\n      commands:\n        - test -f $PREFIX/lib/libpmix${SHLIB_EXT}\n        - test ! -f $PREFIX/lib/libpmpix.a\n        - test ! -f $PREFIX/bin/pmix_info\n        - test ! -d $PREFIX/include/pmix/src\n        - test ! -d $PREFIX/share/doc/pmix\n\n  - name: libpmix-devel\n    build:\n      run_exports:\n        - {{ pin_subpackage('libpmix', max_pin='x') }}\n    files:\n      include:\n        - include/\n        - lib/pkgconfig/\n    requirements:\n      run:\n        - {{ pin_subpackage('libpmix', exact=True) }}\n    test:\n      requires:\n        - pkg-config\n      commands:\n        - test -f $PREFIX/include/pmix.h\n        - test -d $PREFIX/include/pmix/src\n        - test -f $PREFIX/lib/libpmix${SHLIB_EXT}\n        - pkg-config --cflags --libs pmix\n\n  - name: pmix-bin\n    files:\n      # should only include files excluded by libpmix\n      include:\n        - bin/\n    requirements:\n      build:\n        - {{ compiler('c') }}\n        - {{ stdlib('c') }}\n      host:\n        - {{ pin_subpackage('libpmix', exact=True) }}\n      run:\n        - {{ pin_subpackage('libpmix', exact=True) }}\n    test:\n      commands:\n        - pmix_info\n\nabout:\n  home: https://pmix.org\n  summary: OpenPMIx Implementation of the PMIx Standard\n  description: |\n    Reference Implementation of the Process Management Interface Exascale (PMIx) standard\n  license: BSD-3-Clause\n  license_file: LICENSE\n  doc_url: https://docs.openpmix.org\n  dev_url: https://github.com/openpmix/openpmix\n\nextra:\n  feedstock-name: openpmix\n  recipe-maintainers:\n    - j34ni\n    - minrk\n",
+  "raw_meta_yaml": "{% set name = \"openpmix\" %}\n{% set version = \"6.0.0\" %}\n\npackage:\n  name: openpmix-feedstock\n  version: {{ version }}\n\nsource:\n  url: https://github.com/openpmix/openpmix/releases/download/v{{ version }}/pmix-{{ version }}.tar.bz2\n  sha256: bfe969966d0ce82e032739cac286239bd5ad74a831d7adae013284919f125318\n\nbuild:\n  skip: true  # [win]\n  number: 2\n\n# one top-level build\n# outputs select which files to include\n# from this build\n# but don't run any build scripts themselves\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ stdlib('c') }}\n    - make\n    - flex\n    - pkg-config\n    - python 3.12\n  host:\n    - libevent\n    - libhwloc\n    - zlib\n\noutputs:\n  - name: libpmix\n    files:\n      # libpmix has everything except for specific exclusions\n      include:\n        - '**/*'\n      exclude:\n        # these are in -bin\n        - bin/\n        # these are in -devel\n        - include/\n        - lib/pkgconfig/\n        # exclude docs (not packaged)\n        - share/doc/\n        - share/man/\n    build:\n      run_exports:\n        - {{ pin_subpackage('libpmix', max_pin='x') }}\n    requirements:\n      # only need requirements with run_exports here\n      # no build is actually run\n      # TODO: remove extras when recipe name is fixed to not match this output\n      build:\n        - {{ compiler('c') }}\n        - {{ stdlib('c') }}\n        - make\n        - pkg-config\n        - python 3.12\n      host:\n        - libevent\n        - libhwloc\n        - zlib\n\n    test:\n      commands:\n        - test -f $PREFIX/lib/libpmix${SHLIB_EXT}\n        - test ! -f $PREFIX/lib/libpmpix.a\n        - test ! -f $PREFIX/bin/pmix_info\n        - test ! -d $PREFIX/include/pmix/src\n        - test ! -d $PREFIX/share/doc/pmix\n\n  - name: libpmix-devel\n    build:\n      run_exports:\n        - {{ pin_subpackage('libpmix', max_pin='x') }}\n    files:\n      include:\n        - include/\n        - lib/pkgconfig/\n    requirements:\n      run:\n        - {{ pin_subpackage('libpmix', exact=True) }}\n    test:\n      requires:\n        - pkg-config\n      commands:\n        - test -f $PREFIX/include/pmix.h\n        - test -d $PREFIX/include/pmix/src\n        - test -f $PREFIX/lib/libpmix${SHLIB_EXT}\n        - pkg-config --cflags --libs pmix\n\n  - name: pmix-bin\n    files:\n      # should only include files excluded by libpmix\n      include:\n        - bin/\n    requirements:\n      build:\n        - {{ compiler('c') }}\n        - {{ stdlib('c') }}\n      host:\n        - {{ pin_subpackage('libpmix', exact=True) }}\n      run:\n        - {{ pin_subpackage('libpmix', exact=True) }}\n    test:\n      commands:\n        - pmix_info\n\nabout:\n  home: https://pmix.org\n  summary: OpenPMIx Implementation of the PMIx Standard\n  description: |\n    Reference Implementation of the Process Management Interface Exascale (PMIx) standard\n  license: BSD-3-Clause\n  license_file: LICENSE\n  doc_url: https://docs.openpmix.org\n  dev_url: https://github.com/openpmix/openpmix\n\nextra:\n  feedstock-name: openpmix\n  recipe-maintainers:\n    - j34ni\n    - minrk\n",
   "req": {
     "__set__": true,
     "elements": [
