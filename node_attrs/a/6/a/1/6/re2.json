@@ -1,7 +1,7 @@
 {
   "archived": false,
   "branch": "main",
-  "ci_support_linux_64_.yaml": "ace:\n- 8.0.5\nc_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ncxx_compiler:\n- gxx\ncxx_compiler_version:\n- '14'\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\nlibabseil:\n- '20250512'\nre2:\n- 2025.08.12\ntarget_platform:\n- linux-64\nzip_keys:\n- - c_compiler_version\n  - cxx_compiler_version\n",
+  "ci_support_linux_64_.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ncxx_compiler:\n- gxx\ncxx_compiler_version:\n- '14'\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\nlibabseil:\n- '20260107'\nre2:\n- 2025.08.12\ntarget_platform:\n- linux-64\nzip_keys:\n- - c_compiler_version\n  - cxx_compiler_version\n",
   "conda-forge.yml": {
     "build_platform": {
       "linux_aarch64": "linux_64",
@@ -18,8 +18,8 @@
     },
     "test": "native_and_emulated"
   },
-  "feedstock_hash": "ee151ca6923de7b4b81f1e79d1a1f03c2ec8c58a",
-  "feedstock_hash_ts": 1762397320,
+  "feedstock_hash": "496d733cd1340495e286b7c9bd127bf32dbe7104",
+  "feedstock_hash_ts": 1768189658,
   "feedstock_name": "re2",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -32,7 +32,7 @@
     },
     "build": {
       "detect_binary_files_with_prefix": true,
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "feedstock-name": "re2",
@@ -188,7 +188,7 @@
     },
     "build": {
       "detect_binary_files_with_prefix": true,
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "feedstock-name": "re2",
@@ -344,7 +344,7 @@
     },
     "build": {
       "detect_binary_files_with_prefix": true,
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "feedstock-name": "re2",
@@ -500,7 +500,7 @@
     },
     "build": {
       "detect_binary_files_with_prefix": true,
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "feedstock-name": "re2",
@@ -971,7 +971,7 @@
     },
     "build": {
       "detect_binary_files_with_prefix": true,
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "feedstock-name": "re2",
@@ -1127,7 +1127,7 @@
     },
     "build": {
       "detect_binary_files_with_prefix": true,
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "feedstock-name": "re2",
@@ -1292,7 +1292,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/re2.json"
   },
-  "raw_meta_yaml": "{% set version = \"2025-11-05\" %}\n{% set dotversion = version.replace('-', '.') %}\n\n# see https://github.com/google/re2/blob/2023-06-01/CMakeLists.txt#L32-L34\n# changes more rarely than version\n{% set soversion = \"11\" %}\n\npackage:\n  name: re2-split\n  version: {{ dotversion }}\n\nsource:\n  url: http://github.com/google/re2/archive/{{ version }}.tar.gz\n  sha256: 87f6029d2f6de8aa023654240a03ada90e876ce9a4676e258dd01ea4c26ffd67\n\nbuild:\n  number: 0\n  detect_binary_files_with_prefix: true\n\nrequirements:\n  build:\n    - cmake\n    - ninja\n    - {{ stdlib('c') }}\n    - {{ compiler('c') }}\n    - {{ compiler('cxx') }}\n  host:\n    - libabseil\n    # only for build testing; these don't have run-exports\n    - benchmark  # [build_platform == target_platform]\n    - gtest      # [build_platform == target_platform]\n\noutputs:\n  # re2 has a rarely-changing SOVERSION, and it's enough to depend on\n  # (and run-export) the output that contains the library artefact\n  - name: re2\n    script: install.sh  # [unix]\n    script: install.bat  # [win]\n    build:\n      run_exports:\n        - {{ pin_subpackage(\"libre2-\" ~ soversion, max_pin=None) }}\n        # by adding this run-export, we avoid that different libre2-{X,Y} builds\n        # can be co-installed, because they then depend on different re2-versions\n        # (see below), and each re2 in turn requires a specific soversion.\n        - re2\n    requirements:\n      build:\n        - cmake\n      host:\n        - {{ pin_subpackage(\"libre2-\" ~ soversion, exact=True) }}\n      run:\n        - {{ pin_subpackage(\"libre2-\" ~ soversion, exact=True) }}\n    test:\n      requires:\n        - {{ compiler('cxx') }}\n        - cmake\n        - ninja\n        - pkg-config\n      files:\n        - cmake_test/\n      commands:\n        # presence of shared libs (unix) & import lib (win)\n        - test -f ${PREFIX}/lib/libre2.so               # [linux]\n        - test -f ${PREFIX}/lib/libre2.dylib            # [osx]\n        - if not exist %LIBRARY_LIB%\\re2.lib exit 1     # [win]\n\n        # absence of static libs\n        - test ! -f ${PREFIX}/lib/libre2.a              # [unix]\n        - if exist %LIBRARY_LIB%\\re2_static.lib exit 1  # [win]\n\n        # presence of header\n        - test -f ${PREFIX}/include/re2/re2.h           # [unix]\n        - if not exist %LIBRARY_INC%\\re2\\re2.h exit 1   # [win]\n\n        # test correctness of pkg-config metadata\n        - pkg-config --print-errors --exact-version \"{{ soversion }}.0.0\" re2\n\n        # CMake integration\n        - cd cmake_test\n        - cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_STANDARD=17 .\n        - cmake --build .\n        - ./re2_example    # [unix]\n        - re2_example.exe  # [win]\n\n    # the versioned library artefact\n  - name: libre2-{{ soversion }}\n    script: install.sh  # [unix]\n    script: install.bat  # [win]\n    build:\n      run_exports:\n        - {{ pin_subpackage(\"libre2-\" ~ soversion, max_pin=None) }}\n    requirements:\n      build:\n        # for strong run-exports\n        - {{ stdlib('c') }}\n        - {{ compiler('c') }}\n        - {{ compiler('cxx') }}\n      host:\n        - libabseil\n      run_constrained:\n        # this ensures that libre2-{X,Y} cannot be co-installed, see above\n        - re2 {{ dotversion }}.*\n    test:\n      commands:\n        # presence of versioned shared lib (unix) & plain dll (win)\n        - test -f ${PREFIX}/lib/libre2.so.{{ soversion }}       # [linux]\n        - test -f ${PREFIX}/lib/libre2.{{ soversion }}.dylib    # [osx]\n        - if not exist %LIBRARY_BIN%\\re2.dll exit 1             # [win]\n\n        # absence of unversioned shared lib (unix) & import lib (win)\n        - test ! -f ${PREFIX}/lib/libre2.so             # [linux]\n        - test ! -f ${PREFIX}/lib/libre2.dylib          # [osx]\n        - if exist %LIBRARY_LIB%\\re2.lib exit 1         # [win]\n\nabout:\n  home: https://github.com/google/re2/\n  license: BSD-3-Clause\n  license_file: LICENSE\n  summary: |\n    RE2 is a fast, safe, thread-friendly alternative to backtracking regular expression\n    engines like those used in PCRE, Perl, and Python. It is a C++ library.\n  dev_url: https://github.com/google/re2/\n\nextra:\n  recipe-maintainers:\n    - h-vetinari\n    - scopatz\n    - isuruf\n    - wesm\n    - xhochy\n    - kszucs\n    - pitrou\n  feedstock-name: re2\n",
+  "raw_meta_yaml": "{% set version = \"2025-11-05\" %}\n{% set dotversion = version.replace('-', '.') %}\n\n# see https://github.com/google/re2/blob/2023-06-01/CMakeLists.txt#L32-L34\n# changes more rarely than version\n{% set soversion = \"11\" %}\n\npackage:\n  name: re2-split\n  version: {{ dotversion }}\n\nsource:\n  url: http://github.com/google/re2/archive/{{ version }}.tar.gz\n  sha256: 87f6029d2f6de8aa023654240a03ada90e876ce9a4676e258dd01ea4c26ffd67\n\nbuild:\n  number: 1\n  detect_binary_files_with_prefix: true\n\nrequirements:\n  build:\n    - cmake\n    - ninja\n    - {{ stdlib('c') }}\n    - {{ compiler('c') }}\n    - {{ compiler('cxx') }}\n  host:\n    - libabseil\n    # only for build testing; these don't have run-exports\n    - benchmark  # [build_platform == target_platform]\n    - gtest      # [build_platform == target_platform]\n\noutputs:\n  # re2 has a rarely-changing SOVERSION, and it's enough to depend on\n  # (and run-export) the output that contains the library artefact\n  - name: re2\n    script: install.sh  # [unix]\n    script: install.bat  # [win]\n    build:\n      run_exports:\n        - {{ pin_subpackage(\"libre2-\" ~ soversion, max_pin=None) }}\n        # by adding this run-export, we avoid that different libre2-{X,Y} builds\n        # can be co-installed, because they then depend on different re2-versions\n        # (see below), and each re2 in turn requires a specific soversion.\n        - re2\n    requirements:\n      build:\n        - cmake\n      host:\n        - {{ pin_subpackage(\"libre2-\" ~ soversion, exact=True) }}\n      run:\n        - {{ pin_subpackage(\"libre2-\" ~ soversion, exact=True) }}\n    test:\n      requires:\n        - {{ compiler('cxx') }}\n        - cmake\n        - ninja\n        - pkg-config\n      files:\n        - cmake_test/\n      commands:\n        # presence of shared libs (unix) & import lib (win)\n        - test -f ${PREFIX}/lib/libre2.so               # [linux]\n        - test -f ${PREFIX}/lib/libre2.dylib            # [osx]\n        - if not exist %LIBRARY_LIB%\\re2.lib exit 1     # [win]\n\n        # absence of static libs\n        - test ! -f ${PREFIX}/lib/libre2.a              # [unix]\n        - if exist %LIBRARY_LIB%\\re2_static.lib exit 1  # [win]\n\n        # presence of header\n        - test -f ${PREFIX}/include/re2/re2.h           # [unix]\n        - if not exist %LIBRARY_INC%\\re2\\re2.h exit 1   # [win]\n\n        # test correctness of pkg-config metadata\n        - pkg-config --print-errors --exact-version \"{{ soversion }}.0.0\" re2\n\n        # CMake integration\n        - cd cmake_test\n        - cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_STANDARD=17 .\n        - cmake --build .\n        - ./re2_example    # [unix]\n        - re2_example.exe  # [win]\n\n    # the versioned library artefact\n  - name: libre2-{{ soversion }}\n    script: install.sh  # [unix]\n    script: install.bat  # [win]\n    build:\n      run_exports:\n        - {{ pin_subpackage(\"libre2-\" ~ soversion, max_pin=None) }}\n    requirements:\n      build:\n        # for strong run-exports\n        - {{ stdlib('c') }}\n        - {{ compiler('c') }}\n        - {{ compiler('cxx') }}\n      host:\n        - libabseil\n      run_constrained:\n        # this ensures that libre2-{X,Y} cannot be co-installed, see above\n        - re2 {{ dotversion }}.*\n    test:\n      commands:\n        # presence of versioned shared lib (unix) & plain dll (win)\n        - test -f ${PREFIX}/lib/libre2.so.{{ soversion }}       # [linux]\n        - test -f ${PREFIX}/lib/libre2.{{ soversion }}.dylib    # [osx]\n        - if not exist %LIBRARY_BIN%\\re2.dll exit 1             # [win]\n\n        # absence of unversioned shared lib (unix) & import lib (win)\n        - test ! -f ${PREFIX}/lib/libre2.so             # [linux]\n        - test ! -f ${PREFIX}/lib/libre2.dylib          # [osx]\n        - if exist %LIBRARY_LIB%\\re2.lib exit 1         # [win]\n\nabout:\n  home: https://github.com/google/re2/\n  license: BSD-3-Clause\n  license_file: LICENSE\n  summary: |\n    RE2 is a fast, safe, thread-friendly alternative to backtracking regular expression\n    engines like those used in PCRE, Perl, and Python. It is a C++ library.\n  dev_url: https://github.com/google/re2/\n\nextra:\n  recipe-maintainers:\n    - h-vetinari\n    - scopatz\n    - isuruf\n    - wesm\n    - xhochy\n    - kszucs\n    - pitrou\n  feedstock-name: re2\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -1401,7 +1401,7 @@
     },
     "build": {
       "detect_binary_files_with_prefix": true,
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "feedstock-name": "re2",
