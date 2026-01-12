@@ -28,8 +28,8 @@
     },
     "test": "native_and_emulated"
   },
-  "feedstock_hash": "23b5058b177e3eaddb30c04c98d6f7ae36e6063a",
-  "feedstock_hash_ts": 1765914426,
+  "feedstock_hash": "33a3737d71d9bad11c6102db809d5e8309585bcf",
+  "feedstock_hash_ts": 1768232849,
   "feedstock_name": "llama.cpp",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -43,7 +43,7 @@
     },
     "build": {
       "number": "200",
-      "script": "# This is a hotfix for https://github.com/NVIDIA/cccl/issues/4967, backporting\n# https://github.com/NVIDIA/cccl/pull/4972 on the fly for the installed headers\n{%- if match(cuda_compiler_version, \"12.*\") and linux and x86_64 %}\nCCCL_PREPROCESSOR_H_TO_PATCH=\"$PREFIX/targets/x86_64-linux/include/cuda/std/__cccl/preprocessor.h\"\n{%- endif %}\n\n{%- if match(cuda_compiler_version, \"12.*\") and linux and aarch64 %}\nCCCL_PREPROCESSOR_H_TO_PATCH=\"$PREFIX/targets/sbsa-linux/include/cuda/std/__cccl/preprocessor.h\"\n{%- endif %}\n\n{%- if match(cuda_compiler_version, \"12.*\") and linux %}\nROOT_DIR=\"$(dirname \"${CCCL_PREPROCESSOR_H_TO_PATCH}\")/../../../..\"\npatch -p1 -d \"${ROOT_DIR}\" -i \"${RECIPE_DIR}/cuda12_cccl_arch_all.patch\"\n{%- endif %}\n\necho hello\nLLAMA_ARGS=\"-DLLAMA_BUILD_TESTS=OFF\"\n\n{%- macro llama_args(value) %}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_${{ value }}\"\n{%- endmacro %}\n\n{%- macro cmake_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -D${{ value }}\"\n{%- endmacro %}\n\n{% macro ggml_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DGGML_${{ value }}\"\n{%- endmacro %}\n\n${{ cmake_args(\"BUILD_SHARED_LIBS=ON\") }}\n${{ llama_args(\"CURL=ON\") }}\n\n{%- if osx and arm64 %}\n${{ ggml_args(\"NATIVE=OFF\") }}\n${{ ggml_args(\"AVX=OFF\") }}\n${{ ggml_args(\"AVX2=OFF\") }}\n${{ ggml_args(\"FMA=OFF\") }}\n${{ ggml_args(\"F16C=OFF\") }}\n${{ ggml_args(\"METAL=ON\") }}\n${{ ggml_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n\n{%- if osx and x86_64 %}\n${{ ggml_args(\"METAL=OFF\") }}\n${{ ggml_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n\n{%- if cuda_compiler_version != \"None\" %}\n${{ ggml_args(\"CUDA=ON\") }}\n${{ cmake_args(\"CMAKE_CUDA_ARCHITECTURES=all\") }}\n{%- endif %}\n\n{%- if linux and x86_64 and cuda_compiler_version == \"None\" %}\n${{ ggml_args(\"BLAS=ON\") }}\n\n{%- if blas_impl == \"mkl\" %}\n${{ ggml_args(\"BLAS_VENDOR=Intel10_64_dyn\") }}\n{%- endif %}\n\n{%- endif %}\n\necho $LLAMA_ARGS\ncmake -S . -B build -G Ninja ${CMAKE_ARGS} ${LLAMA_ARGS}\ncmake --build build\ncmake --install build\n"
+      "script": "# This is a hotfix for https://github.com/NVIDIA/cccl/issues/4967, backporting\n# https://github.com/NVIDIA/cccl/pull/4972 on the fly for the installed headers\n{%- if match(cuda_compiler_version, \"12.*\") and linux and x86_64 %}\nCCCL_PREPROCESSOR_H_TO_PATCH=\"$PREFIX/targets/x86_64-linux/include/cuda/std/__cccl/preprocessor.h\"\n{%- endif %}\n\n{%- if match(cuda_compiler_version, \"12.*\") and linux and aarch64 %}\nCCCL_PREPROCESSOR_H_TO_PATCH=\"$PREFIX/targets/sbsa-linux/include/cuda/std/__cccl/preprocessor.h\"\n{%- endif %}\n\n{%- if match(cuda_compiler_version, \"12.*\") and linux %}\nROOT_DIR=\"$(dirname \"${CCCL_PREPROCESSOR_H_TO_PATCH}\")/../../../..\"\npatch -p1 -d \"${ROOT_DIR}\" -i \"${RECIPE_DIR}/cuda12_cccl_arch_all.patch\"\n{%- endif %}\n\necho hello\nLLAMA_ARGS=\"-DLLAMA_BUILD_TESTS=OFF\"\n\n{%- macro llama_args(value) %}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_${{ value }}\"\n{%- endmacro %}\n\n{%- macro cmake_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -D${{ value }}\"\n{%- endmacro %}\n\n{% macro ggml_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DGGML_${{ value }}\"\n{%- endmacro %}\n\n${{ cmake_args(\"BUILD_SHARED_LIBS=ON\") }}\n${{ llama_args(\"CURL=ON\") }}\n\n{%- if osx and arm64 %}\n${{ ggml_args(\"NATIVE=OFF\") }}\n${{ ggml_args(\"AVX=OFF\") }}\n${{ ggml_args(\"AVX2=OFF\") }}\n${{ ggml_args(\"FMA=OFF\") }}\n${{ ggml_args(\"F16C=OFF\") }}\n${{ ggml_args(\"METAL=ON\") }}\n${{ ggml_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n\n{%- if osx and x86_64 %}\n${{ ggml_args(\"METAL=OFF\") }}\n${{ ggml_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n\n{%- if cuda_compiler_version | default(\"None\") != \"None\" %}\n${{ ggml_args(\"CUDA=ON\") }}\n# Exclude sm_120 (compute capability 12.0) as it doesn't support MXFP4 instructions\n# Explicitly list all architectures except 120\n${{ cmake_args(\"CMAKE_CUDA_ARCHITECTURES=80-virtual;86-real;89-real;120a-real;121a-real\") }}\n{%- endif %}\n\n{%- if linux and x86_64 and cuda_compiler_version == \"None\" %}\n${{ ggml_args(\"BLAS=ON\") }}\n\n{%- if blas_impl == \"mkl\" %}\n${{ ggml_args(\"BLAS_VENDOR=Intel10_64_dyn\") }}\n{%- endif %}\n\n{%- endif %}\n\necho $LLAMA_ARGS\ncmake -S . -B build -G Ninja ${CMAKE_ARGS} ${LLAMA_ARGS}\ncmake --build build\ncmake --install build\n"
     },
     "extra": {
       "recipe-maintainers": [
@@ -115,7 +115,6 @@
               "check_file \"$PREFIX/bin/llama-perplexity\" \"llama-perplexity\"",
               "check_file \"$PREFIX/bin/llama-quantize\" \"llama-quantize\"",
               "check_file \"$PREFIX/bin/llama-retrieval\" \"llama-retrieval\"",
-              "check_file \"$PREFIX/bin/llama-run\" \"llama-run\"",
               "check_file \"$PREFIX/bin/llama-save-load-state\" \"llama-save-load-state\"",
               "check_file \"$PREFIX/bin/llama-server\" \"llama-server\"",
               "check_file \"$PREFIX/bin/llama-simple\" \"llama-simple\"",
@@ -142,8 +141,6 @@
               "check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"",
               "check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"",
               "check_file \"$PREFIX/include/llama.h\" \"llama.h\"",
-              "check_file \"$PREFIX/include/mtmd-helper.h\" \"mtmd-helper.h\"",
-              "check_file \"$PREFIX/include/mtmd.h\" \"mtmd.h\"",
               "echo \"Checking CMake configuration files...\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-config.cmake\" \"ggml-config.cmake\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-version.cmake\" \"ggml-version.cmake\"",
@@ -161,7 +158,7 @@
             ]
           }
         ],
-        "version": "7423"
+        "version": "7700"
       },
       {
         "build": null,
@@ -216,7 +213,6 @@
               "check_file \"$PREFIX/bin/llama-perplexity\" \"llama-perplexity\"",
               "check_file \"$PREFIX/bin/llama-quantize\" \"llama-quantize\"",
               "check_file \"$PREFIX/bin/llama-retrieval\" \"llama-retrieval\"",
-              "check_file \"$PREFIX/bin/llama-run\" \"llama-run\"",
               "check_file \"$PREFIX/bin/llama-save-load-state\" \"llama-save-load-state\"",
               "check_file \"$PREFIX/bin/llama-server\" \"llama-server\"",
               "check_file \"$PREFIX/bin/llama-simple\" \"llama-simple\"",
@@ -243,8 +239,6 @@
               "check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"",
               "check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"",
               "check_file \"$PREFIX/include/llama.h\" \"llama.h\"",
-              "check_file \"$PREFIX/include/mtmd-helper.h\" \"mtmd-helper.h\"",
-              "check_file \"$PREFIX/include/mtmd.h\" \"mtmd.h\"",
               "echo \"Checking CMake configuration files...\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-config.cmake\" \"ggml-config.cmake\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-version.cmake\" \"ggml-version.cmake\"",
@@ -264,12 +258,11 @@
           {
             "script": [
               "llama-cli --help",
-              "llama-server --help",
-              "llama-run smollm:135m"
+              "llama-server --help"
             ]
           }
         ],
-        "version": "7423"
+        "version": "7700"
       },
       {
         "build": null,
@@ -330,7 +323,6 @@
               "check_file \"$PREFIX/bin/llama-perplexity\" \"llama-perplexity\"",
               "check_file \"$PREFIX/bin/llama-quantize\" \"llama-quantize\"",
               "check_file \"$PREFIX/bin/llama-retrieval\" \"llama-retrieval\"",
-              "check_file \"$PREFIX/bin/llama-run\" \"llama-run\"",
               "check_file \"$PREFIX/bin/llama-save-load-state\" \"llama-save-load-state\"",
               "check_file \"$PREFIX/bin/llama-server\" \"llama-server\"",
               "check_file \"$PREFIX/bin/llama-simple\" \"llama-simple\"",
@@ -357,8 +349,6 @@
               "check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"",
               "check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"",
               "check_file \"$PREFIX/include/llama.h\" \"llama.h\"",
-              "check_file \"$PREFIX/include/mtmd-helper.h\" \"mtmd-helper.h\"",
-              "check_file \"$PREFIX/include/mtmd.h\" \"mtmd.h\"",
               "echo \"Checking CMake configuration files...\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-config.cmake\" \"ggml-config.cmake\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-version.cmake\" \"ggml-version.cmake\"",
@@ -376,12 +366,12 @@
             ]
           }
         ],
-        "version": "7423"
+        "version": "7700"
       }
     ],
     "package": {
       "name": "llama.cpp",
-      "version": "7423"
+      "version": "7700"
     },
     "requirements": {
       "build": [
@@ -414,8 +404,8 @@
     },
     "schema_version": 1,
     "source": {
-      "sha256": "a242db6cdea125665d9ed6e1372fbfbcae96ad0b3853e1d9f5f70b394887fb47",
-      "url": "https://github.com/ggml-org/llama.cpp/archive/b7423.tar.gz"
+      "sha256": "3cfb6fbe53c6d35a4ed87870da08df2ed545c77df10e4a1a193d82cfa2b8c359",
+      "url": "https://github.com/ggml-org/llama.cpp/archive/b7700.tar.gz"
     }
   },
   "linux_64_requirements": {
@@ -467,7 +457,7 @@
     },
     "build": {
       "number": "200",
-      "script": "# This is a hotfix for https://github.com/NVIDIA/cccl/issues/4967, backporting\n# https://github.com/NVIDIA/cccl/pull/4972 on the fly for the installed headers\n{%- if match(cuda_compiler_version, \"12.*\") and linux and x86_64 %}\nCCCL_PREPROCESSOR_H_TO_PATCH=\"$PREFIX/targets/x86_64-linux/include/cuda/std/__cccl/preprocessor.h\"\n{%- endif %}\n\n{%- if match(cuda_compiler_version, \"12.*\") and linux and aarch64 %}\nCCCL_PREPROCESSOR_H_TO_PATCH=\"$PREFIX/targets/sbsa-linux/include/cuda/std/__cccl/preprocessor.h\"\n{%- endif %}\n\n{%- if match(cuda_compiler_version, \"12.*\") and linux %}\nROOT_DIR=\"$(dirname \"${CCCL_PREPROCESSOR_H_TO_PATCH}\")/../../../..\"\npatch -p1 -d \"${ROOT_DIR}\" -i \"${RECIPE_DIR}/cuda12_cccl_arch_all.patch\"\n{%- endif %}\n\necho hello\nLLAMA_ARGS=\"-DLLAMA_BUILD_TESTS=OFF\"\n\n{%- macro llama_args(value) %}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_${{ value }}\"\n{%- endmacro %}\n\n{%- macro cmake_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -D${{ value }}\"\n{%- endmacro %}\n\n{% macro ggml_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DGGML_${{ value }}\"\n{%- endmacro %}\n\n${{ cmake_args(\"BUILD_SHARED_LIBS=ON\") }}\n${{ llama_args(\"CURL=ON\") }}\n\n{%- if osx and arm64 %}\n${{ ggml_args(\"NATIVE=OFF\") }}\n${{ ggml_args(\"AVX=OFF\") }}\n${{ ggml_args(\"AVX2=OFF\") }}\n${{ ggml_args(\"FMA=OFF\") }}\n${{ ggml_args(\"F16C=OFF\") }}\n${{ ggml_args(\"METAL=ON\") }}\n${{ ggml_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n\n{%- if osx and x86_64 %}\n${{ ggml_args(\"METAL=OFF\") }}\n${{ ggml_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n\n{%- if cuda_compiler_version != \"None\" %}\n${{ ggml_args(\"CUDA=ON\") }}\n${{ cmake_args(\"CMAKE_CUDA_ARCHITECTURES=all\") }}\n{%- endif %}\n\n{%- if linux and x86_64 and cuda_compiler_version == \"None\" %}\n${{ ggml_args(\"BLAS=ON\") }}\n\n{%- if blas_impl == \"mkl\" %}\n${{ ggml_args(\"BLAS_VENDOR=Intel10_64_dyn\") }}\n{%- endif %}\n\n{%- endif %}\n\necho $LLAMA_ARGS\ncmake -S . -B build -G Ninja ${CMAKE_ARGS} ${LLAMA_ARGS}\ncmake --build build\ncmake --install build\n"
+      "script": "# This is a hotfix for https://github.com/NVIDIA/cccl/issues/4967, backporting\n# https://github.com/NVIDIA/cccl/pull/4972 on the fly for the installed headers\n{%- if match(cuda_compiler_version, \"12.*\") and linux and x86_64 %}\nCCCL_PREPROCESSOR_H_TO_PATCH=\"$PREFIX/targets/x86_64-linux/include/cuda/std/__cccl/preprocessor.h\"\n{%- endif %}\n\n{%- if match(cuda_compiler_version, \"12.*\") and linux and aarch64 %}\nCCCL_PREPROCESSOR_H_TO_PATCH=\"$PREFIX/targets/sbsa-linux/include/cuda/std/__cccl/preprocessor.h\"\n{%- endif %}\n\n{%- if match(cuda_compiler_version, \"12.*\") and linux %}\nROOT_DIR=\"$(dirname \"${CCCL_PREPROCESSOR_H_TO_PATCH}\")/../../../..\"\npatch -p1 -d \"${ROOT_DIR}\" -i \"${RECIPE_DIR}/cuda12_cccl_arch_all.patch\"\n{%- endif %}\n\necho hello\nLLAMA_ARGS=\"-DLLAMA_BUILD_TESTS=OFF\"\n\n{%- macro llama_args(value) %}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_${{ value }}\"\n{%- endmacro %}\n\n{%- macro cmake_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -D${{ value }}\"\n{%- endmacro %}\n\n{% macro ggml_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DGGML_${{ value }}\"\n{%- endmacro %}\n\n${{ cmake_args(\"BUILD_SHARED_LIBS=ON\") }}\n${{ llama_args(\"CURL=ON\") }}\n\n{%- if osx and arm64 %}\n${{ ggml_args(\"NATIVE=OFF\") }}\n${{ ggml_args(\"AVX=OFF\") }}\n${{ ggml_args(\"AVX2=OFF\") }}\n${{ ggml_args(\"FMA=OFF\") }}\n${{ ggml_args(\"F16C=OFF\") }}\n${{ ggml_args(\"METAL=ON\") }}\n${{ ggml_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n\n{%- if osx and x86_64 %}\n${{ ggml_args(\"METAL=OFF\") }}\n${{ ggml_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n\n{%- if cuda_compiler_version | default(\"None\") != \"None\" %}\n${{ ggml_args(\"CUDA=ON\") }}\n# Exclude sm_120 (compute capability 12.0) as it doesn't support MXFP4 instructions\n# Explicitly list all architectures except 120\n${{ cmake_args(\"CMAKE_CUDA_ARCHITECTURES=80-virtual;86-real;89-real;120a-real;121a-real\") }}\n{%- endif %}\n\n{%- if linux and x86_64 and cuda_compiler_version == \"None\" %}\n${{ ggml_args(\"BLAS=ON\") }}\n\n{%- if blas_impl == \"mkl\" %}\n${{ ggml_args(\"BLAS_VENDOR=Intel10_64_dyn\") }}\n{%- endif %}\n\n{%- endif %}\n\necho $LLAMA_ARGS\ncmake -S . -B build -G Ninja ${CMAKE_ARGS} ${LLAMA_ARGS}\ncmake --build build\ncmake --install build\n"
     },
     "extra": {
       "recipe-maintainers": [
@@ -539,7 +529,6 @@
               "check_file \"$PREFIX/bin/llama-perplexity\" \"llama-perplexity\"",
               "check_file \"$PREFIX/bin/llama-quantize\" \"llama-quantize\"",
               "check_file \"$PREFIX/bin/llama-retrieval\" \"llama-retrieval\"",
-              "check_file \"$PREFIX/bin/llama-run\" \"llama-run\"",
               "check_file \"$PREFIX/bin/llama-save-load-state\" \"llama-save-load-state\"",
               "check_file \"$PREFIX/bin/llama-server\" \"llama-server\"",
               "check_file \"$PREFIX/bin/llama-simple\" \"llama-simple\"",
@@ -566,8 +555,6 @@
               "check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"",
               "check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"",
               "check_file \"$PREFIX/include/llama.h\" \"llama.h\"",
-              "check_file \"$PREFIX/include/mtmd-helper.h\" \"mtmd-helper.h\"",
-              "check_file \"$PREFIX/include/mtmd.h\" \"mtmd.h\"",
               "echo \"Checking CMake configuration files...\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-config.cmake\" \"ggml-config.cmake\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-version.cmake\" \"ggml-version.cmake\"",
@@ -585,7 +572,7 @@
             ]
           }
         ],
-        "version": "7423"
+        "version": "7700"
       },
       {
         "build": null,
@@ -638,7 +625,6 @@
               "check_file \"$PREFIX/bin/llama-perplexity\" \"llama-perplexity\"",
               "check_file \"$PREFIX/bin/llama-quantize\" \"llama-quantize\"",
               "check_file \"$PREFIX/bin/llama-retrieval\" \"llama-retrieval\"",
-              "check_file \"$PREFIX/bin/llama-run\" \"llama-run\"",
               "check_file \"$PREFIX/bin/llama-save-load-state\" \"llama-save-load-state\"",
               "check_file \"$PREFIX/bin/llama-server\" \"llama-server\"",
               "check_file \"$PREFIX/bin/llama-simple\" \"llama-simple\"",
@@ -665,8 +651,6 @@
               "check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"",
               "check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"",
               "check_file \"$PREFIX/include/llama.h\" \"llama.h\"",
-              "check_file \"$PREFIX/include/mtmd-helper.h\" \"mtmd-helper.h\"",
-              "check_file \"$PREFIX/include/mtmd.h\" \"mtmd.h\"",
               "echo \"Checking CMake configuration files...\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-config.cmake\" \"ggml-config.cmake\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-version.cmake\" \"ggml-version.cmake\"",
@@ -686,12 +670,11 @@
           {
             "script": [
               "llama-cli --help",
-              "llama-server --help",
-              "llama-run smollm:135m"
+              "llama-server --help"
             ]
           }
         ],
-        "version": "7423"
+        "version": "7700"
       },
       {
         "build": null,
@@ -752,7 +735,6 @@
               "check_file \"$PREFIX/bin/llama-perplexity\" \"llama-perplexity\"",
               "check_file \"$PREFIX/bin/llama-quantize\" \"llama-quantize\"",
               "check_file \"$PREFIX/bin/llama-retrieval\" \"llama-retrieval\"",
-              "check_file \"$PREFIX/bin/llama-run\" \"llama-run\"",
               "check_file \"$PREFIX/bin/llama-save-load-state\" \"llama-save-load-state\"",
               "check_file \"$PREFIX/bin/llama-server\" \"llama-server\"",
               "check_file \"$PREFIX/bin/llama-simple\" \"llama-simple\"",
@@ -779,8 +761,6 @@
               "check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"",
               "check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"",
               "check_file \"$PREFIX/include/llama.h\" \"llama.h\"",
-              "check_file \"$PREFIX/include/mtmd-helper.h\" \"mtmd-helper.h\"",
-              "check_file \"$PREFIX/include/mtmd.h\" \"mtmd.h\"",
               "echo \"Checking CMake configuration files...\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-config.cmake\" \"ggml-config.cmake\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-version.cmake\" \"ggml-version.cmake\"",
@@ -798,12 +778,12 @@
             ]
           }
         ],
-        "version": "7423"
+        "version": "7700"
       }
     ],
     "package": {
       "name": "llama.cpp",
-      "version": "7423"
+      "version": "7700"
     },
     "requirements": {
       "build": [
@@ -834,8 +814,8 @@
     },
     "schema_version": 1,
     "source": {
-      "sha256": "a242db6cdea125665d9ed6e1372fbfbcae96ad0b3853e1d9f5f70b394887fb47",
-      "url": "https://github.com/ggml-org/llama.cpp/archive/b7423.tar.gz"
+      "sha256": "3cfb6fbe53c6d35a4ed87870da08df2ed545c77df10e4a1a193d82cfa2b8c359",
+      "url": "https://github.com/ggml-org/llama.cpp/archive/b7700.tar.gz"
     }
   },
   "linux_aarch64_requirements": {
@@ -885,7 +865,7 @@
     },
     "build": {
       "number": "0",
-      "script": "# This is a hotfix for https://github.com/NVIDIA/cccl/issues/4967, backporting\n# https://github.com/NVIDIA/cccl/pull/4972 on the fly for the installed headers\n{%- if match(cuda_compiler_version, \"12.*\") and linux and x86_64 %}\nCCCL_PREPROCESSOR_H_TO_PATCH=\"$PREFIX/targets/x86_64-linux/include/cuda/std/__cccl/preprocessor.h\"\n{%- endif %}\n\n{%- if match(cuda_compiler_version, \"12.*\") and linux and aarch64 %}\nCCCL_PREPROCESSOR_H_TO_PATCH=\"$PREFIX/targets/sbsa-linux/include/cuda/std/__cccl/preprocessor.h\"\n{%- endif %}\n\n{%- if match(cuda_compiler_version, \"12.*\") and linux %}\nROOT_DIR=\"$(dirname \"${CCCL_PREPROCESSOR_H_TO_PATCH}\")/../../../..\"\npatch -p1 -d \"${ROOT_DIR}\" -i \"${RECIPE_DIR}/cuda12_cccl_arch_all.patch\"\n{%- endif %}\n\necho hello\nLLAMA_ARGS=\"-DLLAMA_BUILD_TESTS=OFF\"\n\n{%- macro llama_args(value) %}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_${{ value }}\"\n{%- endmacro %}\n\n{%- macro cmake_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -D${{ value }}\"\n{%- endmacro %}\n\n{% macro ggml_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DGGML_${{ value }}\"\n{%- endmacro %}\n\n${{ cmake_args(\"BUILD_SHARED_LIBS=ON\") }}\n${{ llama_args(\"CURL=ON\") }}\n\n{%- if osx and arm64 %}\n${{ ggml_args(\"NATIVE=OFF\") }}\n${{ ggml_args(\"AVX=OFF\") }}\n${{ ggml_args(\"AVX2=OFF\") }}\n${{ ggml_args(\"FMA=OFF\") }}\n${{ ggml_args(\"F16C=OFF\") }}\n${{ ggml_args(\"METAL=ON\") }}\n${{ ggml_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n\n{%- if osx and x86_64 %}\n${{ ggml_args(\"METAL=OFF\") }}\n${{ ggml_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n\n{%- if cuda_compiler_version != \"None\" %}\n${{ ggml_args(\"CUDA=ON\") }}\n${{ cmake_args(\"CMAKE_CUDA_ARCHITECTURES=all\") }}\n{%- endif %}\n\n{%- if linux and x86_64 and cuda_compiler_version == \"None\" %}\n${{ ggml_args(\"BLAS=ON\") }}\n\n{%- if blas_impl == \"mkl\" %}\n${{ ggml_args(\"BLAS_VENDOR=Intel10_64_dyn\") }}\n{%- endif %}\n\n{%- endif %}\n\necho $LLAMA_ARGS\ncmake -S . -B build -G Ninja ${CMAKE_ARGS} ${LLAMA_ARGS}\ncmake --build build\ncmake --install build\n"
+      "script": "# This is a hotfix for https://github.com/NVIDIA/cccl/issues/4967, backporting\n# https://github.com/NVIDIA/cccl/pull/4972 on the fly for the installed headers\n{%- if match(cuda_compiler_version, \"12.*\") and linux and x86_64 %}\nCCCL_PREPROCESSOR_H_TO_PATCH=\"$PREFIX/targets/x86_64-linux/include/cuda/std/__cccl/preprocessor.h\"\n{%- endif %}\n\n{%- if match(cuda_compiler_version, \"12.*\") and linux and aarch64 %}\nCCCL_PREPROCESSOR_H_TO_PATCH=\"$PREFIX/targets/sbsa-linux/include/cuda/std/__cccl/preprocessor.h\"\n{%- endif %}\n\n{%- if match(cuda_compiler_version, \"12.*\") and linux %}\nROOT_DIR=\"$(dirname \"${CCCL_PREPROCESSOR_H_TO_PATCH}\")/../../../..\"\npatch -p1 -d \"${ROOT_DIR}\" -i \"${RECIPE_DIR}/cuda12_cccl_arch_all.patch\"\n{%- endif %}\n\necho hello\nLLAMA_ARGS=\"-DLLAMA_BUILD_TESTS=OFF\"\n\n{%- macro llama_args(value) %}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_${{ value }}\"\n{%- endmacro %}\n\n{%- macro cmake_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -D${{ value }}\"\n{%- endmacro %}\n\n{% macro ggml_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DGGML_${{ value }}\"\n{%- endmacro %}\n\n${{ cmake_args(\"BUILD_SHARED_LIBS=ON\") }}\n${{ llama_args(\"CURL=ON\") }}\n\n{%- if osx and arm64 %}\n${{ ggml_args(\"NATIVE=OFF\") }}\n${{ ggml_args(\"AVX=OFF\") }}\n${{ ggml_args(\"AVX2=OFF\") }}\n${{ ggml_args(\"FMA=OFF\") }}\n${{ ggml_args(\"F16C=OFF\") }}\n${{ ggml_args(\"METAL=ON\") }}\n${{ ggml_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n\n{%- if osx and x86_64 %}\n${{ ggml_args(\"METAL=OFF\") }}\n${{ ggml_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n\n{%- if cuda_compiler_version | default(\"None\") != \"None\" %}\n${{ ggml_args(\"CUDA=ON\") }}\n# Exclude sm_120 (compute capability 12.0) as it doesn't support MXFP4 instructions\n# Explicitly list all architectures except 120\n${{ cmake_args(\"CMAKE_CUDA_ARCHITECTURES=80-virtual;86-real;89-real;120a-real;121a-real\") }}\n{%- endif %}\n\n{%- if linux and x86_64 and cuda_compiler_version == \"None\" %}\n${{ ggml_args(\"BLAS=ON\") }}\n\n{%- if blas_impl == \"mkl\" %}\n${{ ggml_args(\"BLAS_VENDOR=Intel10_64_dyn\") }}\n{%- endif %}\n\n{%- endif %}\n\necho $LLAMA_ARGS\ncmake -S . -B build -G Ninja ${CMAKE_ARGS} ${LLAMA_ARGS}\ncmake --build build\ncmake --install build\n"
     },
     "extra": {
       "recipe-maintainers": [
@@ -957,7 +937,6 @@
               "check_file \"$PREFIX/bin/llama-perplexity\" \"llama-perplexity\"",
               "check_file \"$PREFIX/bin/llama-quantize\" \"llama-quantize\"",
               "check_file \"$PREFIX/bin/llama-retrieval\" \"llama-retrieval\"",
-              "check_file \"$PREFIX/bin/llama-run\" \"llama-run\"",
               "check_file \"$PREFIX/bin/llama-save-load-state\" \"llama-save-load-state\"",
               "check_file \"$PREFIX/bin/llama-server\" \"llama-server\"",
               "check_file \"$PREFIX/bin/llama-simple\" \"llama-simple\"",
@@ -984,8 +963,6 @@
               "check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"",
               "check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"",
               "check_file \"$PREFIX/include/llama.h\" \"llama.h\"",
-              "check_file \"$PREFIX/include/mtmd-helper.h\" \"mtmd-helper.h\"",
-              "check_file \"$PREFIX/include/mtmd.h\" \"mtmd.h\"",
               "echo \"Checking CMake configuration files...\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-config.cmake\" \"ggml-config.cmake\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-version.cmake\" \"ggml-version.cmake\"",
@@ -1003,7 +980,7 @@
             ]
           }
         ],
-        "version": "7423"
+        "version": "7700"
       },
       {
         "build": null,
@@ -1058,7 +1035,6 @@
               "check_file \"$PREFIX/bin/llama-perplexity\" \"llama-perplexity\"",
               "check_file \"$PREFIX/bin/llama-quantize\" \"llama-quantize\"",
               "check_file \"$PREFIX/bin/llama-retrieval\" \"llama-retrieval\"",
-              "check_file \"$PREFIX/bin/llama-run\" \"llama-run\"",
               "check_file \"$PREFIX/bin/llama-save-load-state\" \"llama-save-load-state\"",
               "check_file \"$PREFIX/bin/llama-server\" \"llama-server\"",
               "check_file \"$PREFIX/bin/llama-simple\" \"llama-simple\"",
@@ -1085,8 +1061,6 @@
               "check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"",
               "check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"",
               "check_file \"$PREFIX/include/llama.h\" \"llama.h\"",
-              "check_file \"$PREFIX/include/mtmd-helper.h\" \"mtmd-helper.h\"",
-              "check_file \"$PREFIX/include/mtmd.h\" \"mtmd.h\"",
               "echo \"Checking CMake configuration files...\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-config.cmake\" \"ggml-config.cmake\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-version.cmake\" \"ggml-version.cmake\"",
@@ -1106,12 +1080,11 @@
           {
             "script": [
               "llama-cli --help",
-              "llama-server --help",
-              "llama-run smollm:135m"
+              "llama-server --help"
             ]
           }
         ],
-        "version": "7423"
+        "version": "7700"
       },
       {
         "build": null,
@@ -1172,7 +1145,6 @@
               "check_file \"$PREFIX/bin/llama-perplexity\" \"llama-perplexity\"",
               "check_file \"$PREFIX/bin/llama-quantize\" \"llama-quantize\"",
               "check_file \"$PREFIX/bin/llama-retrieval\" \"llama-retrieval\"",
-              "check_file \"$PREFIX/bin/llama-run\" \"llama-run\"",
               "check_file \"$PREFIX/bin/llama-save-load-state\" \"llama-save-load-state\"",
               "check_file \"$PREFIX/bin/llama-server\" \"llama-server\"",
               "check_file \"$PREFIX/bin/llama-simple\" \"llama-simple\"",
@@ -1199,8 +1171,6 @@
               "check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"",
               "check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"",
               "check_file \"$PREFIX/include/llama.h\" \"llama.h\"",
-              "check_file \"$PREFIX/include/mtmd-helper.h\" \"mtmd-helper.h\"",
-              "check_file \"$PREFIX/include/mtmd.h\" \"mtmd.h\"",
               "echo \"Checking CMake configuration files...\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-config.cmake\" \"ggml-config.cmake\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-version.cmake\" \"ggml-version.cmake\"",
@@ -1218,7 +1188,7 @@
             ]
           }
         ],
-        "version": "7423"
+        "version": "7700"
       },
       {
         "build": null,
@@ -1279,7 +1249,6 @@
               "check_file \"$PREFIX/bin/llama-perplexity\" \"llama-perplexity\"",
               "check_file \"$PREFIX/bin/llama-quantize\" \"llama-quantize\"",
               "check_file \"$PREFIX/bin/llama-retrieval\" \"llama-retrieval\"",
-              "check_file \"$PREFIX/bin/llama-run\" \"llama-run\"",
               "check_file \"$PREFIX/bin/llama-save-load-state\" \"llama-save-load-state\"",
               "check_file \"$PREFIX/bin/llama-server\" \"llama-server\"",
               "check_file \"$PREFIX/bin/llama-simple\" \"llama-simple\"",
@@ -1306,8 +1275,6 @@
               "check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"",
               "check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"",
               "check_file \"$PREFIX/include/llama.h\" \"llama.h\"",
-              "check_file \"$PREFIX/include/mtmd-helper.h\" \"mtmd-helper.h\"",
-              "check_file \"$PREFIX/include/mtmd.h\" \"mtmd.h\"",
               "echo \"Checking CMake configuration files...\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-config.cmake\" \"ggml-config.cmake\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-version.cmake\" \"ggml-version.cmake\"",
@@ -1325,7 +1292,7 @@
             ]
           }
         ],
-        "version": "7423"
+        "version": "7700"
       },
       {
         "build": null,
@@ -1378,7 +1345,6 @@
               "check_file \"$PREFIX/bin/llama-perplexity\" \"llama-perplexity\"",
               "check_file \"$PREFIX/bin/llama-quantize\" \"llama-quantize\"",
               "check_file \"$PREFIX/bin/llama-retrieval\" \"llama-retrieval\"",
-              "check_file \"$PREFIX/bin/llama-run\" \"llama-run\"",
               "check_file \"$PREFIX/bin/llama-save-load-state\" \"llama-save-load-state\"",
               "check_file \"$PREFIX/bin/llama-server\" \"llama-server\"",
               "check_file \"$PREFIX/bin/llama-simple\" \"llama-simple\"",
@@ -1405,8 +1371,6 @@
               "check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"",
               "check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"",
               "check_file \"$PREFIX/include/llama.h\" \"llama.h\"",
-              "check_file \"$PREFIX/include/mtmd-helper.h\" \"mtmd-helper.h\"",
-              "check_file \"$PREFIX/include/mtmd.h\" \"mtmd.h\"",
               "echo \"Checking CMake configuration files...\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-config.cmake\" \"ggml-config.cmake\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-version.cmake\" \"ggml-version.cmake\"",
@@ -1426,12 +1390,11 @@
           {
             "script": [
               "llama-cli --help",
-              "llama-server --help",
-              "llama-run smollm:135m"
+              "llama-server --help"
             ]
           }
         ],
-        "version": "7423"
+        "version": "7700"
       },
       {
         "build": null,
@@ -1492,7 +1455,6 @@
               "check_file \"$PREFIX/bin/llama-perplexity\" \"llama-perplexity\"",
               "check_file \"$PREFIX/bin/llama-quantize\" \"llama-quantize\"",
               "check_file \"$PREFIX/bin/llama-retrieval\" \"llama-retrieval\"",
-              "check_file \"$PREFIX/bin/llama-run\" \"llama-run\"",
               "check_file \"$PREFIX/bin/llama-save-load-state\" \"llama-save-load-state\"",
               "check_file \"$PREFIX/bin/llama-server\" \"llama-server\"",
               "check_file \"$PREFIX/bin/llama-simple\" \"llama-simple\"",
@@ -1519,8 +1481,6 @@
               "check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"",
               "check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"",
               "check_file \"$PREFIX/include/llama.h\" \"llama.h\"",
-              "check_file \"$PREFIX/include/mtmd-helper.h\" \"mtmd-helper.h\"",
-              "check_file \"$PREFIX/include/mtmd.h\" \"mtmd.h\"",
               "echo \"Checking CMake configuration files...\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-config.cmake\" \"ggml-config.cmake\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-version.cmake\" \"ggml-version.cmake\"",
@@ -1538,7 +1498,7 @@
             ]
           }
         ],
-        "version": "7423"
+        "version": "7700"
       },
       {
         "build": null,
@@ -1591,7 +1551,6 @@
               "check_file \"$PREFIX/bin/llama-perplexity\" \"llama-perplexity\"",
               "check_file \"$PREFIX/bin/llama-quantize\" \"llama-quantize\"",
               "check_file \"$PREFIX/bin/llama-retrieval\" \"llama-retrieval\"",
-              "check_file \"$PREFIX/bin/llama-run\" \"llama-run\"",
               "check_file \"$PREFIX/bin/llama-save-load-state\" \"llama-save-load-state\"",
               "check_file \"$PREFIX/bin/llama-server\" \"llama-server\"",
               "check_file \"$PREFIX/bin/llama-simple\" \"llama-simple\"",
@@ -1618,8 +1577,6 @@
               "check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"",
               "check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"",
               "check_file \"$PREFIX/include/llama.h\" \"llama.h\"",
-              "check_file \"$PREFIX/include/mtmd-helper.h\" \"mtmd-helper.h\"",
-              "check_file \"$PREFIX/include/mtmd.h\" \"mtmd.h\"",
               "echo \"Checking CMake configuration files...\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-config.cmake\" \"ggml-config.cmake\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-version.cmake\" \"ggml-version.cmake\"",
@@ -1639,12 +1596,11 @@
           {
             "script": [
               "llama-cli --help",
-              "llama-server --help",
-              "llama-run smollm:135m"
+              "llama-server --help"
             ]
           }
         ],
-        "version": "7423"
+        "version": "7700"
       },
       {
         "build": null,
@@ -1697,7 +1653,6 @@
               "check_file \"$PREFIX/bin/llama-perplexity\" \"llama-perplexity\"",
               "check_file \"$PREFIX/bin/llama-quantize\" \"llama-quantize\"",
               "check_file \"$PREFIX/bin/llama-retrieval\" \"llama-retrieval\"",
-              "check_file \"$PREFIX/bin/llama-run\" \"llama-run\"",
               "check_file \"$PREFIX/bin/llama-save-load-state\" \"llama-save-load-state\"",
               "check_file \"$PREFIX/bin/llama-server\" \"llama-server\"",
               "check_file \"$PREFIX/bin/llama-simple\" \"llama-simple\"",
@@ -1724,8 +1679,6 @@
               "check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"",
               "check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"",
               "check_file \"$PREFIX/include/llama.h\" \"llama.h\"",
-              "check_file \"$PREFIX/include/mtmd-helper.h\" \"mtmd-helper.h\"",
-              "check_file \"$PREFIX/include/mtmd.h\" \"mtmd.h\"",
               "echo \"Checking CMake configuration files...\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-config.cmake\" \"ggml-config.cmake\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-version.cmake\" \"ggml-version.cmake\"",
@@ -1745,12 +1698,11 @@
           {
             "script": [
               "llama-cli --help",
-              "llama-server --help",
-              "llama-run smollm:135m"
+              "llama-server --help"
             ]
           }
         ],
-        "version": "7423"
+        "version": "7700"
       },
       {
         "build": null,
@@ -1811,7 +1763,6 @@
               "check_file \"$PREFIX/bin/llama-perplexity\" \"llama-perplexity\"",
               "check_file \"$PREFIX/bin/llama-quantize\" \"llama-quantize\"",
               "check_file \"$PREFIX/bin/llama-retrieval\" \"llama-retrieval\"",
-              "check_file \"$PREFIX/bin/llama-run\" \"llama-run\"",
               "check_file \"$PREFIX/bin/llama-save-load-state\" \"llama-save-load-state\"",
               "check_file \"$PREFIX/bin/llama-server\" \"llama-server\"",
               "check_file \"$PREFIX/bin/llama-simple\" \"llama-simple\"",
@@ -1838,8 +1789,6 @@
               "check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"",
               "check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"",
               "check_file \"$PREFIX/include/llama.h\" \"llama.h\"",
-              "check_file \"$PREFIX/include/mtmd-helper.h\" \"mtmd-helper.h\"",
-              "check_file \"$PREFIX/include/mtmd.h\" \"mtmd.h\"",
               "echo \"Checking CMake configuration files...\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-config.cmake\" \"ggml-config.cmake\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-version.cmake\" \"ggml-version.cmake\"",
@@ -1857,7 +1806,7 @@
             ]
           }
         ],
-        "version": "7423"
+        "version": "7700"
       },
       {
         "build": null,
@@ -1918,7 +1867,6 @@
               "check_file \"$PREFIX/bin/llama-perplexity\" \"llama-perplexity\"",
               "check_file \"$PREFIX/bin/llama-quantize\" \"llama-quantize\"",
               "check_file \"$PREFIX/bin/llama-retrieval\" \"llama-retrieval\"",
-              "check_file \"$PREFIX/bin/llama-run\" \"llama-run\"",
               "check_file \"$PREFIX/bin/llama-save-load-state\" \"llama-save-load-state\"",
               "check_file \"$PREFIX/bin/llama-server\" \"llama-server\"",
               "check_file \"$PREFIX/bin/llama-simple\" \"llama-simple\"",
@@ -1945,8 +1893,6 @@
               "check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"",
               "check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"",
               "check_file \"$PREFIX/include/llama.h\" \"llama.h\"",
-              "check_file \"$PREFIX/include/mtmd-helper.h\" \"mtmd-helper.h\"",
-              "check_file \"$PREFIX/include/mtmd.h\" \"mtmd.h\"",
               "echo \"Checking CMake configuration files...\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-config.cmake\" \"ggml-config.cmake\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-version.cmake\" \"ggml-version.cmake\"",
@@ -1964,7 +1910,7 @@
             ]
           }
         ],
-        "version": "7423"
+        "version": "7700"
       },
       {
         "build": null,
@@ -2019,7 +1965,6 @@
               "check_file \"$PREFIX/bin/llama-perplexity\" \"llama-perplexity\"",
               "check_file \"$PREFIX/bin/llama-quantize\" \"llama-quantize\"",
               "check_file \"$PREFIX/bin/llama-retrieval\" \"llama-retrieval\"",
-              "check_file \"$PREFIX/bin/llama-run\" \"llama-run\"",
               "check_file \"$PREFIX/bin/llama-save-load-state\" \"llama-save-load-state\"",
               "check_file \"$PREFIX/bin/llama-server\" \"llama-server\"",
               "check_file \"$PREFIX/bin/llama-simple\" \"llama-simple\"",
@@ -2046,8 +1991,6 @@
               "check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"",
               "check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"",
               "check_file \"$PREFIX/include/llama.h\" \"llama.h\"",
-              "check_file \"$PREFIX/include/mtmd-helper.h\" \"mtmd-helper.h\"",
-              "check_file \"$PREFIX/include/mtmd.h\" \"mtmd.h\"",
               "echo \"Checking CMake configuration files...\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-config.cmake\" \"ggml-config.cmake\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-version.cmake\" \"ggml-version.cmake\"",
@@ -2067,17 +2010,16 @@
           {
             "script": [
               "llama-cli --help",
-              "llama-server --help",
-              "llama-run smollm:135m"
+              "llama-server --help"
             ]
           }
         ],
-        "version": "7423"
+        "version": "7700"
       }
     ],
     "package": {
       "name": "llama.cpp",
-      "version": "7423"
+      "version": "7700"
     },
     "requirements": {
       "build": [
@@ -2110,8 +2052,8 @@
     },
     "schema_version": 1,
     "source": {
-      "sha256": "a242db6cdea125665d9ed6e1372fbfbcae96ad0b3853e1d9f5f70b394887fb47",
-      "url": "https://github.com/ggml-org/llama.cpp/archive/b7423.tar.gz"
+      "sha256": "3cfb6fbe53c6d35a4ed87870da08df2ed545c77df10e4a1a193d82cfa2b8c359",
+      "url": "https://github.com/ggml-org/llama.cpp/archive/b7700.tar.gz"
     }
   },
   "name": "llama.cpp",
@@ -2126,7 +2068,7 @@
     },
     "build": {
       "number": "0",
-      "script": "# This is a hotfix for https://github.com/NVIDIA/cccl/issues/4967, backporting\n# https://github.com/NVIDIA/cccl/pull/4972 on the fly for the installed headers\n{%- if match(cuda_compiler_version, \"12.*\") and linux and x86_64 %}\nCCCL_PREPROCESSOR_H_TO_PATCH=\"$PREFIX/targets/x86_64-linux/include/cuda/std/__cccl/preprocessor.h\"\n{%- endif %}\n\n{%- if match(cuda_compiler_version, \"12.*\") and linux and aarch64 %}\nCCCL_PREPROCESSOR_H_TO_PATCH=\"$PREFIX/targets/sbsa-linux/include/cuda/std/__cccl/preprocessor.h\"\n{%- endif %}\n\n{%- if match(cuda_compiler_version, \"12.*\") and linux %}\nROOT_DIR=\"$(dirname \"${CCCL_PREPROCESSOR_H_TO_PATCH}\")/../../../..\"\npatch -p1 -d \"${ROOT_DIR}\" -i \"${RECIPE_DIR}/cuda12_cccl_arch_all.patch\"\n{%- endif %}\n\necho hello\nLLAMA_ARGS=\"-DLLAMA_BUILD_TESTS=OFF\"\n\n{%- macro llama_args(value) %}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_${{ value }}\"\n{%- endmacro %}\n\n{%- macro cmake_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -D${{ value }}\"\n{%- endmacro %}\n\n{% macro ggml_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DGGML_${{ value }}\"\n{%- endmacro %}\n\n${{ cmake_args(\"BUILD_SHARED_LIBS=ON\") }}\n${{ llama_args(\"CURL=ON\") }}\n\n{%- if osx and arm64 %}\n${{ ggml_args(\"NATIVE=OFF\") }}\n${{ ggml_args(\"AVX=OFF\") }}\n${{ ggml_args(\"AVX2=OFF\") }}\n${{ ggml_args(\"FMA=OFF\") }}\n${{ ggml_args(\"F16C=OFF\") }}\n${{ ggml_args(\"METAL=ON\") }}\n${{ ggml_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n\n{%- if osx and x86_64 %}\n${{ ggml_args(\"METAL=OFF\") }}\n${{ ggml_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n\n{%- if cuda_compiler_version != \"None\" %}\n${{ ggml_args(\"CUDA=ON\") }}\n${{ cmake_args(\"CMAKE_CUDA_ARCHITECTURES=all\") }}\n{%- endif %}\n\n{%- if linux and x86_64 and cuda_compiler_version == \"None\" %}\n${{ ggml_args(\"BLAS=ON\") }}\n\n{%- if blas_impl == \"mkl\" %}\n${{ ggml_args(\"BLAS_VENDOR=Intel10_64_dyn\") }}\n{%- endif %}\n\n{%- endif %}\n\necho $LLAMA_ARGS\ncmake -S . -B build -G Ninja ${CMAKE_ARGS} ${LLAMA_ARGS}\ncmake --build build\ncmake --install build\n"
+      "script": "# This is a hotfix for https://github.com/NVIDIA/cccl/issues/4967, backporting\n# https://github.com/NVIDIA/cccl/pull/4972 on the fly for the installed headers\n{%- if match(cuda_compiler_version, \"12.*\") and linux and x86_64 %}\nCCCL_PREPROCESSOR_H_TO_PATCH=\"$PREFIX/targets/x86_64-linux/include/cuda/std/__cccl/preprocessor.h\"\n{%- endif %}\n\n{%- if match(cuda_compiler_version, \"12.*\") and linux and aarch64 %}\nCCCL_PREPROCESSOR_H_TO_PATCH=\"$PREFIX/targets/sbsa-linux/include/cuda/std/__cccl/preprocessor.h\"\n{%- endif %}\n\n{%- if match(cuda_compiler_version, \"12.*\") and linux %}\nROOT_DIR=\"$(dirname \"${CCCL_PREPROCESSOR_H_TO_PATCH}\")/../../../..\"\npatch -p1 -d \"${ROOT_DIR}\" -i \"${RECIPE_DIR}/cuda12_cccl_arch_all.patch\"\n{%- endif %}\n\necho hello\nLLAMA_ARGS=\"-DLLAMA_BUILD_TESTS=OFF\"\n\n{%- macro llama_args(value) %}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_${{ value }}\"\n{%- endmacro %}\n\n{%- macro cmake_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -D${{ value }}\"\n{%- endmacro %}\n\n{% macro ggml_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DGGML_${{ value }}\"\n{%- endmacro %}\n\n${{ cmake_args(\"BUILD_SHARED_LIBS=ON\") }}\n${{ llama_args(\"CURL=ON\") }}\n\n{%- if osx and arm64 %}\n${{ ggml_args(\"NATIVE=OFF\") }}\n${{ ggml_args(\"AVX=OFF\") }}\n${{ ggml_args(\"AVX2=OFF\") }}\n${{ ggml_args(\"FMA=OFF\") }}\n${{ ggml_args(\"F16C=OFF\") }}\n${{ ggml_args(\"METAL=ON\") }}\n${{ ggml_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n\n{%- if osx and x86_64 %}\n${{ ggml_args(\"METAL=OFF\") }}\n${{ ggml_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n\n{%- if cuda_compiler_version | default(\"None\") != \"None\" %}\n${{ ggml_args(\"CUDA=ON\") }}\n# Exclude sm_120 (compute capability 12.0) as it doesn't support MXFP4 instructions\n# Explicitly list all architectures except 120\n${{ cmake_args(\"CMAKE_CUDA_ARCHITECTURES=80-virtual;86-real;89-real;120a-real;121a-real\") }}\n{%- endif %}\n\n{%- if linux and x86_64 and cuda_compiler_version == \"None\" %}\n${{ ggml_args(\"BLAS=ON\") }}\n\n{%- if blas_impl == \"mkl\" %}\n${{ ggml_args(\"BLAS_VENDOR=Intel10_64_dyn\") }}\n{%- endif %}\n\n{%- endif %}\n\necho $LLAMA_ARGS\ncmake -S . -B build -G Ninja ${CMAKE_ARGS} ${LLAMA_ARGS}\ncmake --build build\ncmake --install build\n"
     },
     "extra": {
       "recipe-maintainers": [
@@ -2190,7 +2132,6 @@
               "check_file \"$PREFIX/bin/llama-perplexity\" \"llama-perplexity\"",
               "check_file \"$PREFIX/bin/llama-quantize\" \"llama-quantize\"",
               "check_file \"$PREFIX/bin/llama-retrieval\" \"llama-retrieval\"",
-              "check_file \"$PREFIX/bin/llama-run\" \"llama-run\"",
               "check_file \"$PREFIX/bin/llama-save-load-state\" \"llama-save-load-state\"",
               "check_file \"$PREFIX/bin/llama-server\" \"llama-server\"",
               "check_file \"$PREFIX/bin/llama-simple\" \"llama-simple\"",
@@ -2217,8 +2158,6 @@
               "check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"",
               "check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"",
               "check_file \"$PREFIX/include/llama.h\" \"llama.h\"",
-              "check_file \"$PREFIX/include/mtmd-helper.h\" \"mtmd-helper.h\"",
-              "check_file \"$PREFIX/include/mtmd.h\" \"mtmd.h\"",
               "echo \"Checking CMake configuration files...\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-config.cmake\" \"ggml-config.cmake\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-version.cmake\" \"ggml-version.cmake\"",
@@ -2238,17 +2177,16 @@
           {
             "script": [
               "llama-cli --help",
-              "llama-server --help",
-              "llama-run smollm:135m"
+              "llama-server --help"
             ]
           }
         ],
-        "version": "7423"
+        "version": "7700"
       }
     ],
     "package": {
       "name": "llama.cpp",
-      "version": "7423"
+      "version": "7700"
     },
     "requirements": {
       "build": [
@@ -2266,8 +2204,8 @@
     },
     "schema_version": 1,
     "source": {
-      "sha256": "a242db6cdea125665d9ed6e1372fbfbcae96ad0b3853e1d9f5f70b394887fb47",
-      "url": "https://github.com/ggml-org/llama.cpp/archive/b7423.tar.gz"
+      "sha256": "3cfb6fbe53c6d35a4ed87870da08df2ed545c77df10e4a1a193d82cfa2b8c359",
+      "url": "https://github.com/ggml-org/llama.cpp/archive/b7700.tar.gz"
     }
   },
   "osx_64_requirements": {
@@ -2309,7 +2247,7 @@
     },
     "build": {
       "number": "0",
-      "script": "# This is a hotfix for https://github.com/NVIDIA/cccl/issues/4967, backporting\n# https://github.com/NVIDIA/cccl/pull/4972 on the fly for the installed headers\n{%- if match(cuda_compiler_version, \"12.*\") and linux and x86_64 %}\nCCCL_PREPROCESSOR_H_TO_PATCH=\"$PREFIX/targets/x86_64-linux/include/cuda/std/__cccl/preprocessor.h\"\n{%- endif %}\n\n{%- if match(cuda_compiler_version, \"12.*\") and linux and aarch64 %}\nCCCL_PREPROCESSOR_H_TO_PATCH=\"$PREFIX/targets/sbsa-linux/include/cuda/std/__cccl/preprocessor.h\"\n{%- endif %}\n\n{%- if match(cuda_compiler_version, \"12.*\") and linux %}\nROOT_DIR=\"$(dirname \"${CCCL_PREPROCESSOR_H_TO_PATCH}\")/../../../..\"\npatch -p1 -d \"${ROOT_DIR}\" -i \"${RECIPE_DIR}/cuda12_cccl_arch_all.patch\"\n{%- endif %}\n\necho hello\nLLAMA_ARGS=\"-DLLAMA_BUILD_TESTS=OFF\"\n\n{%- macro llama_args(value) %}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_${{ value }}\"\n{%- endmacro %}\n\n{%- macro cmake_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -D${{ value }}\"\n{%- endmacro %}\n\n{% macro ggml_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DGGML_${{ value }}\"\n{%- endmacro %}\n\n${{ cmake_args(\"BUILD_SHARED_LIBS=ON\") }}\n${{ llama_args(\"CURL=ON\") }}\n\n{%- if osx and arm64 %}\n${{ ggml_args(\"NATIVE=OFF\") }}\n${{ ggml_args(\"AVX=OFF\") }}\n${{ ggml_args(\"AVX2=OFF\") }}\n${{ ggml_args(\"FMA=OFF\") }}\n${{ ggml_args(\"F16C=OFF\") }}\n${{ ggml_args(\"METAL=ON\") }}\n${{ ggml_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n\n{%- if osx and x86_64 %}\n${{ ggml_args(\"METAL=OFF\") }}\n${{ ggml_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n\n{%- if cuda_compiler_version != \"None\" %}\n${{ ggml_args(\"CUDA=ON\") }}\n${{ cmake_args(\"CMAKE_CUDA_ARCHITECTURES=all\") }}\n{%- endif %}\n\n{%- if linux and x86_64 and cuda_compiler_version == \"None\" %}\n${{ ggml_args(\"BLAS=ON\") }}\n\n{%- if blas_impl == \"mkl\" %}\n${{ ggml_args(\"BLAS_VENDOR=Intel10_64_dyn\") }}\n{%- endif %}\n\n{%- endif %}\n\necho $LLAMA_ARGS\ncmake -S . -B build -G Ninja ${CMAKE_ARGS} ${LLAMA_ARGS}\ncmake --build build\ncmake --install build\n"
+      "script": "# This is a hotfix for https://github.com/NVIDIA/cccl/issues/4967, backporting\n# https://github.com/NVIDIA/cccl/pull/4972 on the fly for the installed headers\n{%- if match(cuda_compiler_version, \"12.*\") and linux and x86_64 %}\nCCCL_PREPROCESSOR_H_TO_PATCH=\"$PREFIX/targets/x86_64-linux/include/cuda/std/__cccl/preprocessor.h\"\n{%- endif %}\n\n{%- if match(cuda_compiler_version, \"12.*\") and linux and aarch64 %}\nCCCL_PREPROCESSOR_H_TO_PATCH=\"$PREFIX/targets/sbsa-linux/include/cuda/std/__cccl/preprocessor.h\"\n{%- endif %}\n\n{%- if match(cuda_compiler_version, \"12.*\") and linux %}\nROOT_DIR=\"$(dirname \"${CCCL_PREPROCESSOR_H_TO_PATCH}\")/../../../..\"\npatch -p1 -d \"${ROOT_DIR}\" -i \"${RECIPE_DIR}/cuda12_cccl_arch_all.patch\"\n{%- endif %}\n\necho hello\nLLAMA_ARGS=\"-DLLAMA_BUILD_TESTS=OFF\"\n\n{%- macro llama_args(value) %}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_${{ value }}\"\n{%- endmacro %}\n\n{%- macro cmake_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -D${{ value }}\"\n{%- endmacro %}\n\n{% macro ggml_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DGGML_${{ value }}\"\n{%- endmacro %}\n\n${{ cmake_args(\"BUILD_SHARED_LIBS=ON\") }}\n${{ llama_args(\"CURL=ON\") }}\n\n{%- if osx and arm64 %}\n${{ ggml_args(\"NATIVE=OFF\") }}\n${{ ggml_args(\"AVX=OFF\") }}\n${{ ggml_args(\"AVX2=OFF\") }}\n${{ ggml_args(\"FMA=OFF\") }}\n${{ ggml_args(\"F16C=OFF\") }}\n${{ ggml_args(\"METAL=ON\") }}\n${{ ggml_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n\n{%- if osx and x86_64 %}\n${{ ggml_args(\"METAL=OFF\") }}\n${{ ggml_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n\n{%- if cuda_compiler_version | default(\"None\") != \"None\" %}\n${{ ggml_args(\"CUDA=ON\") }}\n# Exclude sm_120 (compute capability 12.0) as it doesn't support MXFP4 instructions\n# Explicitly list all architectures except 120\n${{ cmake_args(\"CMAKE_CUDA_ARCHITECTURES=80-virtual;86-real;89-real;120a-real;121a-real\") }}\n{%- endif %}\n\n{%- if linux and x86_64 and cuda_compiler_version == \"None\" %}\n${{ ggml_args(\"BLAS=ON\") }}\n\n{%- if blas_impl == \"mkl\" %}\n${{ ggml_args(\"BLAS_VENDOR=Intel10_64_dyn\") }}\n{%- endif %}\n\n{%- endif %}\n\necho $LLAMA_ARGS\ncmake -S . -B build -G Ninja ${CMAKE_ARGS} ${LLAMA_ARGS}\ncmake --build build\ncmake --install build\n"
     },
     "extra": {
       "recipe-maintainers": [
@@ -2373,7 +2311,6 @@
               "check_file \"$PREFIX/bin/llama-perplexity\" \"llama-perplexity\"",
               "check_file \"$PREFIX/bin/llama-quantize\" \"llama-quantize\"",
               "check_file \"$PREFIX/bin/llama-retrieval\" \"llama-retrieval\"",
-              "check_file \"$PREFIX/bin/llama-run\" \"llama-run\"",
               "check_file \"$PREFIX/bin/llama-save-load-state\" \"llama-save-load-state\"",
               "check_file \"$PREFIX/bin/llama-server\" \"llama-server\"",
               "check_file \"$PREFIX/bin/llama-simple\" \"llama-simple\"",
@@ -2400,8 +2337,6 @@
               "check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"",
               "check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"",
               "check_file \"$PREFIX/include/llama.h\" \"llama.h\"",
-              "check_file \"$PREFIX/include/mtmd-helper.h\" \"mtmd-helper.h\"",
-              "check_file \"$PREFIX/include/mtmd.h\" \"mtmd.h\"",
               "echo \"Checking CMake configuration files...\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-config.cmake\" \"ggml-config.cmake\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-version.cmake\" \"ggml-version.cmake\"",
@@ -2421,17 +2356,16 @@
           {
             "script": [
               "llama-cli --help",
-              "llama-server --help",
-              "llama-run smollm:135m"
+              "llama-server --help"
             ]
           }
         ],
-        "version": "7423"
+        "version": "7700"
       }
     ],
     "package": {
       "name": "llama.cpp",
-      "version": "7423"
+      "version": "7700"
     },
     "requirements": {
       "build": [
@@ -2449,8 +2383,8 @@
     },
     "schema_version": 1,
     "source": {
-      "sha256": "a242db6cdea125665d9ed6e1372fbfbcae96ad0b3853e1d9f5f70b394887fb47",
-      "url": "https://github.com/ggml-org/llama.cpp/archive/b7423.tar.gz"
+      "sha256": "3cfb6fbe53c6d35a4ed87870da08df2ed545c77df10e4a1a193d82cfa2b8c359",
+      "url": "https://github.com/ggml-org/llama.cpp/archive/b7700.tar.gz"
     }
   },
   "osx_arm64_requirements": {
@@ -2498,7 +2432,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/llama.cpp.json"
   },
-  "raw_meta_yaml": "context:\n  name: llama.cpp\n  version: \"7423\"\n  build: 0\n\npackage:\n  name: ${{ name|lower }}\n  version: ${{ version }}\n\nsource:\n  url: https://github.com/ggml-org/${{ name }}/archive/b${{ version ~ \"\" | split(\".\") | list | last }}.tar.gz\n  sha256: a242db6cdea125665d9ed6e1372fbfbcae96ad0b3853e1d9f5f70b394887fb47\n\nbuild:\n  # See https://conda-forge.org/docs/user/tipsandtricks/#installing-cuda-enabled-packages-like-tensorflow-and-pytorch\n  # Similar to https://github.com/conda-forge/jaxlib-feedstock/blob/4471f8d7b0096942f228a9c5a4324bfa75139e22/recipe/recipe.yaml#L22\n  number: ${{ build if cuda_compiler_version == \"None\" else build + 200 }}\n  string: '{%- if cuda_compiler_version != \"None\" -%}cuda${{ cuda_compiler_version | replace(\".\", \"\") }}_h${{ hash }}_${{ build }}{%- elif (osx and x86_64) or cuda_compiler_version == \"None\" -%}cpu_${{ blas_impl }}_h${{ hash }}_${{ build }}{%- elif osx and arm64 -%}mps_h${{ hash }}_${{ build }}{%- endif -%}'\n\n  script:\n    - if: unix\n      then: |\n        # This is a hotfix for https://github.com/NVIDIA/cccl/issues/4967, backporting\n        # https://github.com/NVIDIA/cccl/pull/4972 on the fly for the installed headers\n        {%- if match(cuda_compiler_version, \"12.*\") and linux and x86_64 %}\n        CCCL_PREPROCESSOR_H_TO_PATCH=\"$PREFIX/targets/x86_64-linux/include/cuda/std/__cccl/preprocessor.h\"\n        {%- endif %}\n\n        {%- if match(cuda_compiler_version, \"12.*\") and linux and aarch64 %}\n        CCCL_PREPROCESSOR_H_TO_PATCH=\"$PREFIX/targets/sbsa-linux/include/cuda/std/__cccl/preprocessor.h\"\n        {%- endif %}\n\n        {%- if match(cuda_compiler_version, \"12.*\") and linux %}\n        ROOT_DIR=\"$(dirname \"${CCCL_PREPROCESSOR_H_TO_PATCH}\")/../../../..\"\n        patch -p1 -d \"${ROOT_DIR}\" -i \"${RECIPE_DIR}/cuda12_cccl_arch_all.patch\"\n        {%- endif %}\n\n        echo hello\n        LLAMA_ARGS=\"-DLLAMA_BUILD_TESTS=OFF\"\n\n        {%- macro llama_args(value) %}\n        LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_${{ value }}\"\n        {%- endmacro %}\n\n        {%- macro cmake_args(value) -%}\n        LLAMA_ARGS=\"${LLAMA_ARGS} -D${{ value }}\"\n        {%- endmacro %}\n\n        {% macro ggml_args(value) -%}\n        LLAMA_ARGS=\"${LLAMA_ARGS} -DGGML_${{ value }}\"\n        {%- endmacro %}\n\n        ${{ cmake_args(\"BUILD_SHARED_LIBS=ON\") }}\n        ${{ llama_args(\"CURL=ON\") }}\n\n        {%- if osx and arm64 %}\n        ${{ ggml_args(\"NATIVE=OFF\") }}\n        ${{ ggml_args(\"AVX=OFF\") }}\n        ${{ ggml_args(\"AVX2=OFF\") }}\n        ${{ ggml_args(\"FMA=OFF\") }}\n        ${{ ggml_args(\"F16C=OFF\") }}\n        ${{ ggml_args(\"METAL=ON\") }}\n        ${{ ggml_args(\"ACCELERATE=ON\") }}\n        {%- endif %}\n\n        {%- if osx and x86_64 %}\n        ${{ ggml_args(\"METAL=OFF\") }}\n        ${{ ggml_args(\"ACCELERATE=ON\") }}\n        {%- endif %}\n\n        {%- if cuda_compiler_version != \"None\" %}\n        ${{ ggml_args(\"CUDA=ON\") }}\n        ${{ cmake_args(\"CMAKE_CUDA_ARCHITECTURES=all\") }}\n        {%- endif %}\n\n        {%- if linux and x86_64 and cuda_compiler_version == \"None\" %}\n        ${{ ggml_args(\"BLAS=ON\") }}\n\n        {%- if blas_impl == \"mkl\" %}\n        ${{ ggml_args(\"BLAS_VENDOR=Intel10_64_dyn\") }}\n        {%- endif %}\n\n        {%- endif %}\n\n        echo $LLAMA_ARGS\n        cmake -S . -B build -G Ninja ${CMAKE_ARGS} ${LLAMA_ARGS}\n        cmake --build build\n        cmake --install build\n    - if: win\n      then: |\n        echo hello\n        set LLAMA_ARGS=-DLLAMA_BUILD_TESTS=OFF\n\n        {% macro llama_args(value) -%}\n        set LLAMA_ARGS=%LLAMA_ARGS% -DLLAMA_${{ value }}\n        {%- endmacro %}\n\n        {% macro cmake_args(value) -%}\n        set LLAMA_ARGS=%LLAMA_ARGS% -D${{ value }}\n        {%- endmacro %}\n\n        {% macro ggml_args(value) -%}\n        set LLAMA_ARGS=%LLAMA_ARGS% -DGGML_${{ value }}\n        {%- endmacro %}\n\n        ${{ cmake_args(\"BUILD_SHARED_LIBS=ON\") }}\n        ${{ llama_args(\"CURL=ON\") }}\n\n        ${{ ggml_args(\"NATIVE=OFF\") }}\n\n        {%- if cuda_compiler_version != \"None\" %}\n        ${{ ggml_args(\"CUDA=ON\") }}\n\n        :: NOTE: is it necessary to set `CMAKE_CUDA_ARCHITECTURES=all`\n        :: on Windows, or is it a nice-to-have?\n        :: ${{ cmake_args(\"CMAKE_CUDA_ARCHITECTURES=all\") }}\n\n        {%- else %}\n\n        ${{ ggml_args(\"BLAS=ON\") }}\n\n        {%- if blas_impl == \"mkl\" %}\n        ${{ ggml_args(\"BLAS_VENDOR=Intel10_64_dyn\") }}\n        {%- endif %}\n\n        {%- endif %}\n\n        set LLAMA_ARGS\n        cmake -S . -B build -G Ninja %CMAKE_ARGS% %LLAMA_ARGS%\n        cmake --build build\n        cmake --install build\n  dynamic_linking:\n    missing_dso_allowlist:\n      - if: win\n        then:\n          - \"*/nvcuda.dll\"\n      - if: linux\n        then:\n          - \"*/libcuda.so.1\"\n\nrequirements:\n  build:\n    - ${{ compiler('c') }}\n    - ${{ stdlib('c') }}\n    - ${{ compiler('cxx') }}\n    - if: cuda_compiler_version != \"None\"\n      then:\n        - ${{ compiler('cuda') }}\n    - cmake\n    - git\n    - ninja\n    - pkgconfig\n  host:\n    - libcurl\n    - if: cuda_compiler_version != \"None\"\n      then:\n        # NOTE: Without cuda-version, we are installing cuda-toolkit 11.8 instead of 11.2!\n        - cuda-version ${{ cuda_compiler_version }}.*\n        - cuda-cudart-dev ${{ cuda_compiler_version }}.*\n        - libcublas-dev ${{ cuda_compiler_version }}.*\n\n    - if: (not osx) and (cuda_compiler_version == \"None\") and (blas_impl == \"mkl\")\n      then:\n        - blas-devel * *_${{ blas_impl }}\n        - mkl-devel ${{ mkl }}.*\n  run:\n    - if: cuda_compiler_version != \"None\"\n      then:\n        - cuda-version ${{ cuda_compiler_version }}.*\n        - __cuda\n        - cuda-nvcc-tools\n  run_constraints:\n    # whisper.cpp also vendors ggml\n    - whisper.cpp <0.0.0a0\n\ntests:\n  # Test for presence of header files, libraries, and configuration files\n  - if: unix\n    then:\n      - script:\n        # Define function to check file existence with verbose output\n          - |\n            check_file() {\n              local file=\"$1\"\n              local description=\"$2\"\n              if test -f \"$file\"; then\n                echo \"✓ Found: $description\"\n              else\n                echo \"✗ Missing: $description\"\n                return 1\n              fi\n            }\n\n        # Check binaries\n          - echo \"Checking binary files...\"\n          - check_file \"$PREFIX/bin/convert_hf_to_gguf.py\" \"convert_hf_to_gguf.py\"\n          - check_file \"$PREFIX/bin/llama-batched\" \"llama-batched\"\n          - check_file \"$PREFIX/bin/llama-batched-bench\" \"llama-batched-bench\"\n          - check_file \"$PREFIX/bin/llama-bench\" \"llama-bench\"\n          - check_file \"$PREFIX/bin/llama-cli\" \"llama-cli\"\n          - check_file \"$PREFIX/bin/llama-convert-llama2c-to-ggml\" \"llama-convert-llama2c-to-ggml\"\n          - check_file \"$PREFIX/bin/llama-cvector-generator\" \"llama-cvector-generator\"\n          - check_file \"$PREFIX/bin/llama-embedding\" \"llama-embedding\"\n          - check_file \"$PREFIX/bin/llama-diffusion-cli\" \"llama-diffusion-cli\"\n          - check_file \"$PREFIX/bin/llama-eval-callback\" \"llama-eval-callback\"\n          - check_file \"$PREFIX/bin/llama-export-lora\" \"llama-export-lora\"\n          - check_file \"$PREFIX/bin/llama-finetune\" \"llama-finetune\"\n          - check_file \"$PREFIX/bin/llama-gen-docs\" \"llama-gen-docs\"\n          - check_file \"$PREFIX/bin/llama-gguf\" \"llama-gguf\"\n          - check_file \"$PREFIX/bin/llama-gguf-hash\" \"llama-gguf-hash\"\n          - check_file \"$PREFIX/bin/llama-gguf-split\" \"llama-gguf-split\"\n          - check_file \"$PREFIX/bin/llama-imatrix\" \"llama-imatrix\"\n          - check_file \"$PREFIX/bin/llama-lookahead\" \"llama-lookahead\"\n          - check_file \"$PREFIX/bin/llama-lookup\" \"llama-lookup\"\n          - check_file \"$PREFIX/bin/llama-lookup-create\" \"llama-lookup-create\"\n          - check_file \"$PREFIX/bin/llama-lookup-merge\" \"llama-lookup-merge\"\n          - check_file \"$PREFIX/bin/llama-lookup-stats\" \"llama-lookup-stats\"\n          - check_file \"$PREFIX/bin/llama-mtmd-cli\" \"llama-mtmd-cli\"\n          - check_file \"$PREFIX/bin/llama-parallel\" \"llama-parallel\"\n          - check_file \"$PREFIX/bin/llama-passkey\" \"llama-passkey\"\n          - check_file \"$PREFIX/bin/llama-perplexity\" \"llama-perplexity\"\n          - check_file \"$PREFIX/bin/llama-quantize\" \"llama-quantize\"\n          - check_file \"$PREFIX/bin/llama-retrieval\" \"llama-retrieval\"\n          - check_file \"$PREFIX/bin/llama-run\" \"llama-run\"\n          - check_file \"$PREFIX/bin/llama-save-load-state\" \"llama-save-load-state\"\n          - check_file \"$PREFIX/bin/llama-server\" \"llama-server\"\n          - check_file \"$PREFIX/bin/llama-simple\" \"llama-simple\"\n          - check_file \"$PREFIX/bin/llama-simple-chat\" \"llama-simple-chat\"\n          - check_file \"$PREFIX/bin/llama-speculative\" \"llama-speculative\"\n          - check_file \"$PREFIX/bin/llama-speculative-simple\" \"llama-speculative-simple\"\n          - check_file \"$PREFIX/bin/llama-tokenize\" \"llama-tokenize\"\n          - check_file \"$PREFIX/bin/llama-tts\" \"llama-tts\"\n\n        # Check header files\n          - echo \"Checking header files...\"\n          - check_file \"$PREFIX/include/ggml-alloc.h\" \"ggml-alloc.h\"\n          - check_file \"$PREFIX/include/ggml-backend.h\" \"ggml-backend.h\"\n          - check_file \"$PREFIX/include/ggml-blas.h\" \"ggml-blas.h\"\n          - check_file \"$PREFIX/include/ggml-cann.h\" \"ggml-cann.h\"\n          - check_file \"$PREFIX/include/ggml-cpp.h\" \"ggml-cpp.h\"\n          - check_file \"$PREFIX/include/ggml-cpu.h\" \"ggml-cpu.h\"\n          - check_file \"$PREFIX/include/ggml-cuda.h\" \"ggml-cuda.h\"\n          - check_file \"$PREFIX/include/ggml-metal.h\" \"ggml-metal.h\"\n          - check_file \"$PREFIX/include/ggml-opt.h\" \"ggml-opt.h\"\n          - check_file \"$PREFIX/include/ggml-rpc.h\" \"ggml-rpc.h\"\n          - check_file \"$PREFIX/include/ggml-sycl.h\" \"ggml-sycl.h\"\n          - check_file \"$PREFIX/include/ggml-vulkan.h\" \"ggml-vulkan.h\"\n          - check_file \"$PREFIX/include/ggml-webgpu.h\" \"ggml-webgpu.h\"\n          - check_file \"$PREFIX/include/ggml.h\" \"ggml.h\"\n          - check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"\n          - check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"\n          - check_file \"$PREFIX/include/llama.h\" \"llama.h\"\n          - check_file \"$PREFIX/include/mtmd-helper.h\" \"mtmd-helper.h\"\n          - check_file \"$PREFIX/include/mtmd.h\" \"mtmd.h\"\n\n        # Check CMake configuration files\n          - echo \"Checking CMake configuration files...\"\n          - check_file \"$PREFIX/lib/cmake/ggml/ggml-config.cmake\" \"ggml-config.cmake\"\n          - check_file \"$PREFIX/lib/cmake/ggml/ggml-version.cmake\" \"ggml-version.cmake\"\n          - check_file \"$PREFIX/lib/cmake/llama/llama-config.cmake\" \"llama-config.cmake\"\n          - check_file \"$PREFIX/lib/cmake/llama/llama-version.cmake\" \"llama-version.cmake\"\n\n        # Check libraries\n          - echo \"Checking library files...\"\n          - check_file \"$PREFIX/lib/libggml-base${SHLIB_EXT}\" \"libggml-base${SHLIB_EXT}\"\n          - check_file \"$PREFIX/lib/libggml-cpu${SHLIB_EXT}\" \"libggml-cpu${SHLIB_EXT}\"\n          - check_file \"$PREFIX/lib/libggml${SHLIB_EXT}\" \"libggml${SHLIB_EXT}\"\n          - check_file \"$PREFIX/lib/libllama${SHLIB_EXT}\" \"libllama${SHLIB_EXT}\"\n          - check_file \"$PREFIX/lib/libmtmd${SHLIB_EXT}\" \"libmtmd${SHLIB_EXT}\"\n\n        # CUDA libraries\n          - if: cuda_compiler_version != \"None\"\n            then:\n              - check_file \"$PREFIX/lib/libggml-cuda${SHLIB_EXT}\" \"libggml-cuda${SHLIB_EXT}\"\n\n        # Packaged everywhere but for CUDA builds and on linux_aarch64\n          - if: (not (linux and aarch64)) and (cuda_compiler_version == \"None\")\n            then:\n              - check_file \"$PREFIX/lib/libggml-blas${SHLIB_EXT}\" \"libggml-blas${SHLIB_EXT}\"\n\n        # Check pkg-config file\n          - echo \"Checking pkg-config file...\"\n          - check_file \"$PREFIX/lib/pkgconfig/llama.pc\" \"llama.pc\"\n\n  - if: (build_platform == target_platform) and (cuda_compiler_version == \"None\")\n    then:\n      - script:\n          - llama-cli --help\n          - llama-server --help\n          - if: not win\n            then:\n              # Test downloading a smol model (using libcurl) and running it.\n              # TODO: Understand why this fails on Windows.\n              - llama-run smollm:135m\n        requirements:\n          run:\n            - if: cuda_compiler_version != \"None\"\n              then:\n                - cuda-version ${{ cuda_compiler_version }}\n\nabout:\n  homepage: https://github.com/ggml-org/llama.cpp\n  repository: https://github.com/ggml-org/llama.cpp\n  summary: Port of Facebook's LLaMA model in C/C++\n  license: MIT\n  license_file: LICENSE\n\nextra:\n  recipe-maintainers:\n    - traversaro\n    - jjerphan\n    - jonashaag\n    - frankier\n    - sodre\n    - pavelzw\n",
+  "raw_meta_yaml": "context:\n  name: llama.cpp\n  version: \"7700\"\n  build: 0\n\npackage:\n  name: ${{ name|lower }}\n  version: ${{ version }}\n\nsource:\n  url: https://github.com/ggml-org/${{ name }}/archive/b${{ version ~ \"\" | split(\".\") | list | last }}.tar.gz\n  sha256: 3cfb6fbe53c6d35a4ed87870da08df2ed545c77df10e4a1a193d82cfa2b8c359\n\nbuild:\n  # See https://conda-forge.org/docs/user/tipsandtricks/#installing-cuda-enabled-packages-like-tensorflow-and-pytorch\n  # Similar to https://github.com/conda-forge/jaxlib-feedstock/blob/4471f8d7b0096942f228a9c5a4324bfa75139e22/recipe/recipe.yaml#L22\n  number: ${{ build if cuda_compiler_version == \"None\" else build + 200 }}\n  string: '{%- if cuda_compiler_version != \"None\" -%}cuda${{ cuda_compiler_version | replace(\".\", \"\") }}_h${{ hash }}_${{ build }}{%- elif (osx and x86_64) or cuda_compiler_version == \"None\" -%}cpu_${{ blas_impl }}_h${{ hash }}_${{ build }}{%- elif osx and arm64 -%}mps_h${{ hash }}_${{ build }}{%- endif -%}'\n\n  script:\n    - if: unix\n      then: |\n        # This is a hotfix for https://github.com/NVIDIA/cccl/issues/4967, backporting\n        # https://github.com/NVIDIA/cccl/pull/4972 on the fly for the installed headers\n        {%- if match(cuda_compiler_version, \"12.*\") and linux and x86_64 %}\n        CCCL_PREPROCESSOR_H_TO_PATCH=\"$PREFIX/targets/x86_64-linux/include/cuda/std/__cccl/preprocessor.h\"\n        {%- endif %}\n\n        {%- if match(cuda_compiler_version, \"12.*\") and linux and aarch64 %}\n        CCCL_PREPROCESSOR_H_TO_PATCH=\"$PREFIX/targets/sbsa-linux/include/cuda/std/__cccl/preprocessor.h\"\n        {%- endif %}\n\n        {%- if match(cuda_compiler_version, \"12.*\") and linux %}\n        ROOT_DIR=\"$(dirname \"${CCCL_PREPROCESSOR_H_TO_PATCH}\")/../../../..\"\n        patch -p1 -d \"${ROOT_DIR}\" -i \"${RECIPE_DIR}/cuda12_cccl_arch_all.patch\"\n        {%- endif %}\n\n        echo hello\n        LLAMA_ARGS=\"-DLLAMA_BUILD_TESTS=OFF\"\n\n        {%- macro llama_args(value) %}\n        LLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_${{ value }}\"\n        {%- endmacro %}\n\n        {%- macro cmake_args(value) -%}\n        LLAMA_ARGS=\"${LLAMA_ARGS} -D${{ value }}\"\n        {%- endmacro %}\n\n        {% macro ggml_args(value) -%}\n        LLAMA_ARGS=\"${LLAMA_ARGS} -DGGML_${{ value }}\"\n        {%- endmacro %}\n\n        ${{ cmake_args(\"BUILD_SHARED_LIBS=ON\") }}\n        ${{ llama_args(\"CURL=ON\") }}\n\n        {%- if osx and arm64 %}\n        ${{ ggml_args(\"NATIVE=OFF\") }}\n        ${{ ggml_args(\"AVX=OFF\") }}\n        ${{ ggml_args(\"AVX2=OFF\") }}\n        ${{ ggml_args(\"FMA=OFF\") }}\n        ${{ ggml_args(\"F16C=OFF\") }}\n        ${{ ggml_args(\"METAL=ON\") }}\n        ${{ ggml_args(\"ACCELERATE=ON\") }}\n        {%- endif %}\n\n        {%- if osx and x86_64 %}\n        ${{ ggml_args(\"METAL=OFF\") }}\n        ${{ ggml_args(\"ACCELERATE=ON\") }}\n        {%- endif %}\n\n        {%- if cuda_compiler_version | default(\"None\") != \"None\" %}\n        ${{ ggml_args(\"CUDA=ON\") }}\n        # Exclude sm_120 (compute capability 12.0) as it doesn't support MXFP4 instructions\n        # Explicitly list all architectures except 120\n        ${{ cmake_args(\"CMAKE_CUDA_ARCHITECTURES=80-virtual;86-real;89-real;120a-real;121a-real\") }}\n        {%- endif %}\n\n        {%- if linux and x86_64 and cuda_compiler_version == \"None\" %}\n        ${{ ggml_args(\"BLAS=ON\") }}\n\n        {%- if blas_impl == \"mkl\" %}\n        ${{ ggml_args(\"BLAS_VENDOR=Intel10_64_dyn\") }}\n        {%- endif %}\n\n        {%- endif %}\n\n        echo $LLAMA_ARGS\n        cmake -S . -B build -G Ninja ${CMAKE_ARGS} ${LLAMA_ARGS}\n        cmake --build build\n        cmake --install build\n    - if: win\n      then: |\n        echo hello\n        set LLAMA_ARGS=-DLLAMA_BUILD_TESTS=OFF\n\n        {% macro llama_args(value) -%}\n        set LLAMA_ARGS=%LLAMA_ARGS% -DLLAMA_${{ value }}\n        {%- endmacro %}\n\n        {% macro cmake_args(value) -%}\n        set LLAMA_ARGS=%LLAMA_ARGS% -D${{ value }}\n        {%- endmacro %}\n\n        {% macro ggml_args(value) -%}\n        set LLAMA_ARGS=%LLAMA_ARGS% -DGGML_${{ value }}\n        {%- endmacro %}\n\n        ${{ cmake_args(\"BUILD_SHARED_LIBS=ON\") }}\n        ${{ llama_args(\"CURL=ON\") }}\n\n        ${{ ggml_args(\"NATIVE=OFF\") }}\n\n        {%- if cuda_compiler_version | default(\"None\") != \"None\" %}\n        ${{ ggml_args(\"CUDA=ON\") }}\n        :: Exclude sm_120 (compute capability 12.0) as it doesn't support MXFP4 instructions\n        :: Explicitly list all architectures except 120\n        ${{ cmake_args(\"CMAKE_CUDA_ARCHITECTURES=80-virtual;86-real;89-real;120a-real;121a-real\") }}\n\n        {%- else %}\n\n        ${{ ggml_args(\"BLAS=ON\") }}\n\n        {%- if blas_impl == \"mkl\" %}\n        ${{ ggml_args(\"BLAS_VENDOR=Intel10_64_dyn\") }}\n        {%- endif %}\n\n        {%- endif %}\n\n        set LLAMA_ARGS\n        cmake -S . -B build -G Ninja %CMAKE_ARGS% %LLAMA_ARGS%\n        cmake --build build\n        cmake --install build\n  dynamic_linking:\n    missing_dso_allowlist:\n      - if: win\n        then:\n          - \"*/nvcuda.dll\"\n      - if: linux\n        then:\n          - \"*/libcuda.so.1\"\n\nrequirements:\n  build:\n    - ${{ compiler('c') }}\n    - ${{ stdlib('c') }}\n    - ${{ compiler('cxx') }}\n    - if: cuda_compiler_version != \"None\"\n      then:\n        - ${{ compiler('cuda') }}\n    - cmake\n    - git\n    - ninja\n    - pkgconfig\n  host:\n    - libcurl\n    - if: cuda_compiler_version != \"None\"\n      then:\n        # NOTE: Without cuda-version, we are installing cuda-toolkit 11.8 instead of 11.2!\n        - cuda-version ${{ cuda_compiler_version }}.*\n        - cuda-cudart-dev ${{ cuda_compiler_version }}.*\n        - libcublas-dev ${{ cuda_compiler_version }}.*\n\n    - if: (not osx) and (cuda_compiler_version == \"None\") and (blas_impl == \"mkl\")\n      then:\n        - blas-devel * *_${{ blas_impl }}\n        - mkl-devel ${{ mkl }}.*\n    - if: osx\n      then:\n        - llvm-openmp\n  run:\n    - if: cuda_compiler_version != \"None\"\n      then:\n        - cuda-version ${{ cuda_compiler_version }}.*\n        - __cuda\n        - cuda-nvcc-tools\n  run_constraints:\n    # whisper.cpp also vendors ggml\n    - whisper.cpp <0.0.0a0\n\ntests:\n  # Test for presence of header files, libraries, and configuration files\n  - if: unix\n    then:\n      - script:\n        # Define function to check file existence with verbose output\n          - |\n            check_file() {\n              local file=\"$1\"\n              local description=\"$2\"\n              if test -f \"$file\"; then\n                echo \"✓ Found: $description\"\n              else\n                echo \"✗ Missing: $description\"\n                return 1\n              fi\n            }\n\n        # Check binaries\n          - echo \"Checking binary files...\"\n          - check_file \"$PREFIX/bin/convert_hf_to_gguf.py\" \"convert_hf_to_gguf.py\"\n          - check_file \"$PREFIX/bin/llama-batched\" \"llama-batched\"\n          - check_file \"$PREFIX/bin/llama-batched-bench\" \"llama-batched-bench\"\n          - check_file \"$PREFIX/bin/llama-bench\" \"llama-bench\"\n          - check_file \"$PREFIX/bin/llama-cli\" \"llama-cli\"\n          - check_file \"$PREFIX/bin/llama-convert-llama2c-to-ggml\" \"llama-convert-llama2c-to-ggml\"\n          - check_file \"$PREFIX/bin/llama-cvector-generator\" \"llama-cvector-generator\"\n          - check_file \"$PREFIX/bin/llama-embedding\" \"llama-embedding\"\n          - check_file \"$PREFIX/bin/llama-diffusion-cli\" \"llama-diffusion-cli\"\n          - check_file \"$PREFIX/bin/llama-eval-callback\" \"llama-eval-callback\"\n          - check_file \"$PREFIX/bin/llama-export-lora\" \"llama-export-lora\"\n          - check_file \"$PREFIX/bin/llama-finetune\" \"llama-finetune\"\n          - check_file \"$PREFIX/bin/llama-gen-docs\" \"llama-gen-docs\"\n          - check_file \"$PREFIX/bin/llama-gguf\" \"llama-gguf\"\n          - check_file \"$PREFIX/bin/llama-gguf-hash\" \"llama-gguf-hash\"\n          - check_file \"$PREFIX/bin/llama-gguf-split\" \"llama-gguf-split\"\n          - check_file \"$PREFIX/bin/llama-imatrix\" \"llama-imatrix\"\n          - check_file \"$PREFIX/bin/llama-lookahead\" \"llama-lookahead\"\n          - check_file \"$PREFIX/bin/llama-lookup\" \"llama-lookup\"\n          - check_file \"$PREFIX/bin/llama-lookup-create\" \"llama-lookup-create\"\n          - check_file \"$PREFIX/bin/llama-lookup-merge\" \"llama-lookup-merge\"\n          - check_file \"$PREFIX/bin/llama-lookup-stats\" \"llama-lookup-stats\"\n          - check_file \"$PREFIX/bin/llama-mtmd-cli\" \"llama-mtmd-cli\"\n          - check_file \"$PREFIX/bin/llama-parallel\" \"llama-parallel\"\n          - check_file \"$PREFIX/bin/llama-passkey\" \"llama-passkey\"\n          - check_file \"$PREFIX/bin/llama-perplexity\" \"llama-perplexity\"\n          - check_file \"$PREFIX/bin/llama-quantize\" \"llama-quantize\"\n          - check_file \"$PREFIX/bin/llama-retrieval\" \"llama-retrieval\"\n          - check_file \"$PREFIX/bin/llama-save-load-state\" \"llama-save-load-state\"\n          - check_file \"$PREFIX/bin/llama-server\" \"llama-server\"\n          - check_file \"$PREFIX/bin/llama-simple\" \"llama-simple\"\n          - check_file \"$PREFIX/bin/llama-simple-chat\" \"llama-simple-chat\"\n          - check_file \"$PREFIX/bin/llama-speculative\" \"llama-speculative\"\n          - check_file \"$PREFIX/bin/llama-speculative-simple\" \"llama-speculative-simple\"\n          - check_file \"$PREFIX/bin/llama-tokenize\" \"llama-tokenize\"\n          - check_file \"$PREFIX/bin/llama-tts\" \"llama-tts\"\n\n        # Check header files\n          - echo \"Checking header files...\"\n          - check_file \"$PREFIX/include/ggml-alloc.h\" \"ggml-alloc.h\"\n          - check_file \"$PREFIX/include/ggml-backend.h\" \"ggml-backend.h\"\n          - check_file \"$PREFIX/include/ggml-blas.h\" \"ggml-blas.h\"\n          - check_file \"$PREFIX/include/ggml-cann.h\" \"ggml-cann.h\"\n          - check_file \"$PREFIX/include/ggml-cpp.h\" \"ggml-cpp.h\"\n          - check_file \"$PREFIX/include/ggml-cpu.h\" \"ggml-cpu.h\"\n          - check_file \"$PREFIX/include/ggml-cuda.h\" \"ggml-cuda.h\"\n          - check_file \"$PREFIX/include/ggml-metal.h\" \"ggml-metal.h\"\n          - check_file \"$PREFIX/include/ggml-opt.h\" \"ggml-opt.h\"\n          - check_file \"$PREFIX/include/ggml-rpc.h\" \"ggml-rpc.h\"\n          - check_file \"$PREFIX/include/ggml-sycl.h\" \"ggml-sycl.h\"\n          - check_file \"$PREFIX/include/ggml-vulkan.h\" \"ggml-vulkan.h\"\n          - check_file \"$PREFIX/include/ggml-webgpu.h\" \"ggml-webgpu.h\"\n          - check_file \"$PREFIX/include/ggml.h\" \"ggml.h\"\n          - check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"\n          - check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"\n          - check_file \"$PREFIX/include/llama.h\" \"llama.h\"\n\n        # Check CMake configuration files\n          - echo \"Checking CMake configuration files...\"\n          - check_file \"$PREFIX/lib/cmake/ggml/ggml-config.cmake\" \"ggml-config.cmake\"\n          - check_file \"$PREFIX/lib/cmake/ggml/ggml-version.cmake\" \"ggml-version.cmake\"\n          - check_file \"$PREFIX/lib/cmake/llama/llama-config.cmake\" \"llama-config.cmake\"\n          - check_file \"$PREFIX/lib/cmake/llama/llama-version.cmake\" \"llama-version.cmake\"\n\n        # Check libraries\n          - echo \"Checking library files...\"\n          - check_file \"$PREFIX/lib/libggml-base${SHLIB_EXT}\" \"libggml-base${SHLIB_EXT}\"\n          - check_file \"$PREFIX/lib/libggml-cpu${SHLIB_EXT}\" \"libggml-cpu${SHLIB_EXT}\"\n          - check_file \"$PREFIX/lib/libggml${SHLIB_EXT}\" \"libggml${SHLIB_EXT}\"\n          - check_file \"$PREFIX/lib/libllama${SHLIB_EXT}\" \"libllama${SHLIB_EXT}\"\n          - check_file \"$PREFIX/lib/libmtmd${SHLIB_EXT}\" \"libmtmd${SHLIB_EXT}\"\n\n        # CUDA libraries\n          - if: cuda_compiler_version != \"None\"\n            then:\n              - check_file \"$PREFIX/lib/libggml-cuda${SHLIB_EXT}\" \"libggml-cuda${SHLIB_EXT}\"\n\n        # Packaged everywhere but for CUDA builds and on linux_aarch64\n          - if: (not (linux and aarch64)) and (cuda_compiler_version == \"None\")\n            then:\n              - check_file \"$PREFIX/lib/libggml-blas${SHLIB_EXT}\" \"libggml-blas${SHLIB_EXT}\"\n\n        # Check pkg-config file\n          - echo \"Checking pkg-config file...\"\n          - check_file \"$PREFIX/lib/pkgconfig/llama.pc\" \"llama.pc\"\n\n  - if: (build_platform == target_platform) and (cuda_compiler_version == \"None\")\n    then:\n      - script:\n          - llama-cli --help\n          - llama-server --help\n        requirements:\n          run:\n            - if: cuda_compiler_version != \"None\"\n              then:\n                - cuda-version ${{ cuda_compiler_version }}\n\nabout:\n  homepage: https://github.com/ggml-org/llama.cpp\n  repository: https://github.com/ggml-org/llama.cpp\n  summary: Port of Facebook's LLaMA model in C/C++\n  license: MIT\n  license_file: LICENSE\n\nextra:\n  recipe-maintainers:\n    - traversaro\n    - jjerphan\n    - jonashaag\n    - frankier\n    - sodre\n    - pavelzw\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -2609,8 +2543,8 @@
       "elements": []
     }
   },
-  "url": "https://github.com/ggml-org/llama.cpp/archive/b7423.tar.gz",
-  "version": "7423",
+  "url": "https://github.com/ggml-org/llama.cpp/archive/b7700.tar.gz",
+  "version": "7700",
   "version_pr_info": {
     "__lazy_json__": "version_pr_info/llama.cpp.json"
   },
@@ -2625,7 +2559,7 @@
     },
     "build": {
       "number": "0",
-      "script": "# This is a hotfix for https://github.com/NVIDIA/cccl/issues/4967, backporting\n# https://github.com/NVIDIA/cccl/pull/4972 on the fly for the installed headers\n{%- if match(cuda_compiler_version, \"12.*\") and linux and x86_64 %}\nCCCL_PREPROCESSOR_H_TO_PATCH=\"$PREFIX/targets/x86_64-linux/include/cuda/std/__cccl/preprocessor.h\"\n{%- endif %}\n\n{%- if match(cuda_compiler_version, \"12.*\") and linux and aarch64 %}\nCCCL_PREPROCESSOR_H_TO_PATCH=\"$PREFIX/targets/sbsa-linux/include/cuda/std/__cccl/preprocessor.h\"\n{%- endif %}\n\n{%- if match(cuda_compiler_version, \"12.*\") and linux %}\nROOT_DIR=\"$(dirname \"${CCCL_PREPROCESSOR_H_TO_PATCH}\")/../../../..\"\npatch -p1 -d \"${ROOT_DIR}\" -i \"${RECIPE_DIR}/cuda12_cccl_arch_all.patch\"\n{%- endif %}\n\necho hello\nLLAMA_ARGS=\"-DLLAMA_BUILD_TESTS=OFF\"\n\n{%- macro llama_args(value) %}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_${{ value }}\"\n{%- endmacro %}\n\n{%- macro cmake_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -D${{ value }}\"\n{%- endmacro %}\n\n{% macro ggml_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DGGML_${{ value }}\"\n{%- endmacro %}\n\n${{ cmake_args(\"BUILD_SHARED_LIBS=ON\") }}\n${{ llama_args(\"CURL=ON\") }}\n\n{%- if osx and arm64 %}\n${{ ggml_args(\"NATIVE=OFF\") }}\n${{ ggml_args(\"AVX=OFF\") }}\n${{ ggml_args(\"AVX2=OFF\") }}\n${{ ggml_args(\"FMA=OFF\") }}\n${{ ggml_args(\"F16C=OFF\") }}\n${{ ggml_args(\"METAL=ON\") }}\n${{ ggml_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n\n{%- if osx and x86_64 %}\n${{ ggml_args(\"METAL=OFF\") }}\n${{ ggml_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n\n{%- if cuda_compiler_version != \"None\" %}\n${{ ggml_args(\"CUDA=ON\") }}\n${{ cmake_args(\"CMAKE_CUDA_ARCHITECTURES=all\") }}\n{%- endif %}\n\n{%- if linux and x86_64 and cuda_compiler_version == \"None\" %}\n${{ ggml_args(\"BLAS=ON\") }}\n\n{%- if blas_impl == \"mkl\" %}\n${{ ggml_args(\"BLAS_VENDOR=Intel10_64_dyn\") }}\n{%- endif %}\n\n{%- endif %}\n\necho $LLAMA_ARGS\ncmake -S . -B build -G Ninja ${CMAKE_ARGS} ${LLAMA_ARGS}\ncmake --build build\ncmake --install build\n"
+      "script": "# This is a hotfix for https://github.com/NVIDIA/cccl/issues/4967, backporting\n# https://github.com/NVIDIA/cccl/pull/4972 on the fly for the installed headers\n{%- if match(cuda_compiler_version, \"12.*\") and linux and x86_64 %}\nCCCL_PREPROCESSOR_H_TO_PATCH=\"$PREFIX/targets/x86_64-linux/include/cuda/std/__cccl/preprocessor.h\"\n{%- endif %}\n\n{%- if match(cuda_compiler_version, \"12.*\") and linux and aarch64 %}\nCCCL_PREPROCESSOR_H_TO_PATCH=\"$PREFIX/targets/sbsa-linux/include/cuda/std/__cccl/preprocessor.h\"\n{%- endif %}\n\n{%- if match(cuda_compiler_version, \"12.*\") and linux %}\nROOT_DIR=\"$(dirname \"${CCCL_PREPROCESSOR_H_TO_PATCH}\")/../../../..\"\npatch -p1 -d \"${ROOT_DIR}\" -i \"${RECIPE_DIR}/cuda12_cccl_arch_all.patch\"\n{%- endif %}\n\necho hello\nLLAMA_ARGS=\"-DLLAMA_BUILD_TESTS=OFF\"\n\n{%- macro llama_args(value) %}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DLLAMA_${{ value }}\"\n{%- endmacro %}\n\n{%- macro cmake_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -D${{ value }}\"\n{%- endmacro %}\n\n{% macro ggml_args(value) -%}\nLLAMA_ARGS=\"${LLAMA_ARGS} -DGGML_${{ value }}\"\n{%- endmacro %}\n\n${{ cmake_args(\"BUILD_SHARED_LIBS=ON\") }}\n${{ llama_args(\"CURL=ON\") }}\n\n{%- if osx and arm64 %}\n${{ ggml_args(\"NATIVE=OFF\") }}\n${{ ggml_args(\"AVX=OFF\") }}\n${{ ggml_args(\"AVX2=OFF\") }}\n${{ ggml_args(\"FMA=OFF\") }}\n${{ ggml_args(\"F16C=OFF\") }}\n${{ ggml_args(\"METAL=ON\") }}\n${{ ggml_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n\n{%- if osx and x86_64 %}\n${{ ggml_args(\"METAL=OFF\") }}\n${{ ggml_args(\"ACCELERATE=ON\") }}\n{%- endif %}\n\n{%- if cuda_compiler_version | default(\"None\") != \"None\" %}\n${{ ggml_args(\"CUDA=ON\") }}\n# Exclude sm_120 (compute capability 12.0) as it doesn't support MXFP4 instructions\n# Explicitly list all architectures except 120\n${{ cmake_args(\"CMAKE_CUDA_ARCHITECTURES=80-virtual;86-real;89-real;120a-real;121a-real\") }}\n{%- endif %}\n\n{%- if linux and x86_64 and cuda_compiler_version == \"None\" %}\n${{ ggml_args(\"BLAS=ON\") }}\n\n{%- if blas_impl == \"mkl\" %}\n${{ ggml_args(\"BLAS_VENDOR=Intel10_64_dyn\") }}\n{%- endif %}\n\n{%- endif %}\n\necho $LLAMA_ARGS\ncmake -S . -B build -G Ninja ${CMAKE_ARGS} ${LLAMA_ARGS}\ncmake --build build\ncmake --install build\n"
     },
     "extra": {
       "recipe-maintainers": [
@@ -2697,7 +2631,6 @@
               "check_file \"$PREFIX/bin/llama-perplexity\" \"llama-perplexity\"",
               "check_file \"$PREFIX/bin/llama-quantize\" \"llama-quantize\"",
               "check_file \"$PREFIX/bin/llama-retrieval\" \"llama-retrieval\"",
-              "check_file \"$PREFIX/bin/llama-run\" \"llama-run\"",
               "check_file \"$PREFIX/bin/llama-save-load-state\" \"llama-save-load-state\"",
               "check_file \"$PREFIX/bin/llama-server\" \"llama-server\"",
               "check_file \"$PREFIX/bin/llama-simple\" \"llama-simple\"",
@@ -2724,8 +2657,6 @@
               "check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"",
               "check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"",
               "check_file \"$PREFIX/include/llama.h\" \"llama.h\"",
-              "check_file \"$PREFIX/include/mtmd-helper.h\" \"mtmd-helper.h\"",
-              "check_file \"$PREFIX/include/mtmd.h\" \"mtmd.h\"",
               "echo \"Checking CMake configuration files...\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-config.cmake\" \"ggml-config.cmake\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-version.cmake\" \"ggml-version.cmake\"",
@@ -2743,7 +2674,7 @@
             ]
           }
         ],
-        "version": "7423"
+        "version": "7700"
       },
       {
         "build": null,
@@ -2804,7 +2735,6 @@
               "check_file \"$PREFIX/bin/llama-perplexity\" \"llama-perplexity\"",
               "check_file \"$PREFIX/bin/llama-quantize\" \"llama-quantize\"",
               "check_file \"$PREFIX/bin/llama-retrieval\" \"llama-retrieval\"",
-              "check_file \"$PREFIX/bin/llama-run\" \"llama-run\"",
               "check_file \"$PREFIX/bin/llama-save-load-state\" \"llama-save-load-state\"",
               "check_file \"$PREFIX/bin/llama-server\" \"llama-server\"",
               "check_file \"$PREFIX/bin/llama-simple\" \"llama-simple\"",
@@ -2831,8 +2761,6 @@
               "check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"",
               "check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"",
               "check_file \"$PREFIX/include/llama.h\" \"llama.h\"",
-              "check_file \"$PREFIX/include/mtmd-helper.h\" \"mtmd-helper.h\"",
-              "check_file \"$PREFIX/include/mtmd.h\" \"mtmd.h\"",
               "echo \"Checking CMake configuration files...\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-config.cmake\" \"ggml-config.cmake\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-version.cmake\" \"ggml-version.cmake\"",
@@ -2850,7 +2778,7 @@
             ]
           }
         ],
-        "version": "7423"
+        "version": "7700"
       },
       {
         "build": null,
@@ -2905,7 +2833,6 @@
               "check_file \"$PREFIX/bin/llama-perplexity\" \"llama-perplexity\"",
               "check_file \"$PREFIX/bin/llama-quantize\" \"llama-quantize\"",
               "check_file \"$PREFIX/bin/llama-retrieval\" \"llama-retrieval\"",
-              "check_file \"$PREFIX/bin/llama-run\" \"llama-run\"",
               "check_file \"$PREFIX/bin/llama-save-load-state\" \"llama-save-load-state\"",
               "check_file \"$PREFIX/bin/llama-server\" \"llama-server\"",
               "check_file \"$PREFIX/bin/llama-simple\" \"llama-simple\"",
@@ -2932,8 +2859,6 @@
               "check_file \"$PREFIX/include/gguf.h\" \"gguf.h\"",
               "check_file \"$PREFIX/include/llama-cpp.h\" \"llama-cpp.h\"",
               "check_file \"$PREFIX/include/llama.h\" \"llama.h\"",
-              "check_file \"$PREFIX/include/mtmd-helper.h\" \"mtmd-helper.h\"",
-              "check_file \"$PREFIX/include/mtmd.h\" \"mtmd.h\"",
               "echo \"Checking CMake configuration files...\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-config.cmake\" \"ggml-config.cmake\"",
               "check_file \"$PREFIX/lib/cmake/ggml/ggml-version.cmake\" \"ggml-version.cmake\"",
@@ -2953,17 +2878,16 @@
           {
             "script": [
               "llama-cli --help",
-              "llama-server --help",
-              "llama-run smollm:135m"
+              "llama-server --help"
             ]
           }
         ],
-        "version": "7423"
+        "version": "7700"
       }
     ],
     "package": {
       "name": "llama.cpp",
-      "version": "7423"
+      "version": "7700"
     },
     "requirements": {
       "build": [
@@ -2996,8 +2920,8 @@
     },
     "schema_version": 1,
     "source": {
-      "sha256": "a242db6cdea125665d9ed6e1372fbfbcae96ad0b3853e1d9f5f70b394887fb47",
-      "url": "https://github.com/ggml-org/llama.cpp/archive/b7423.tar.gz"
+      "sha256": "3cfb6fbe53c6d35a4ed87870da08df2ed545c77df10e4a1a193d82cfa2b8c359",
+      "url": "https://github.com/ggml-org/llama.cpp/archive/b7700.tar.gz"
     }
   },
   "win_64_requirements": {
