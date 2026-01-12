@@ -3,6 +3,11 @@
   "branch": "main",
   "ci_support_linux_64_.yaml": "c_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ncxx_compiler:\n- gxx\ncxx_compiler_version:\n- '14'\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\ntarget_platform:\n- linux-64\n",
   "conda-forge.yml": {
+    "build_platform": {
+      "linux_aarch64": "linux_64",
+      "linux_ppc64le": "linux_64",
+      "osx_arm64": "osx_64"
+    },
     "conda_build": {
       "error_overlinking": true
     },
@@ -11,10 +16,11 @@
     "github": {
       "branch_name": "main",
       "tooling_branch_name": "main"
-    }
+    },
+    "test": "native_and_emulated"
   },
-  "feedstock_hash": "09479cebd3e14e222ad0c4b2bedd199027ca8b7a",
-  "feedstock_hash_ts": 1768204787,
+  "feedstock_hash": "5af53e032118ce4cd58f3d0b8d3f979998d8f5b6",
+  "feedstock_hash_ts": 1768229683,
   "feedstock_name": "zeem",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -29,7 +35,7 @@
       "summary": "A C++ Module Library offering a full XML library with validating parser, DOM tree, XPaths and serialization."
     },
     "build": {
-      "number": "0",
+      "number": "1",
       "run_exports": {
         "weak": [
           "zeem"
@@ -37,7 +43,7 @@
       },
       "script": [
         "sed -i.bak 's#CPMAddPackage(\"gh:catchorg/Catch2@3.4.0\")#find_package(Catch2 REQUIRED)#' test/CMakeLists.txt",
-        "set -exo pipefail\nexport CXXFLAGS=\"${CXXFLAGS} -D_LIBCPP_DISABLE_AVAILABILITY\"\ncmake -S . -B build ${CMAKE_ARGS} -DBUILD_TESTING=ON -DBUILD_SHARED_LIBS=ON\ncmake --build build --config Release --parallel ${CPU_COUNT}\nctest -V -C Release --test-dir build\ncmake --install build\n"
+        "set -exo pipefail\n\nexport CXXFLAGS=\"${CXXFLAGS} -D_LIBCPP_DISABLE_AVAILABILITY\"\n\nif [[ ${build_platform} != ${target_platform} ]]; then\n  extra_cmake_args=\"-DTEST_STD_CHRONO_FROM_STREAM_R=ON -DCMAKE_CROSSCOMPILING=ON\"\nfi\n\n# Skip tests for cross compilation for macos\nif [[ ${build_platform} != ${target_platform} && ${target_platform} == \"osx-arm64\" ]]; then\n  cmake -S . -B build ${CMAKE_ARGS} -DBUILD_TESTING=OFF -DBUILD_SHARED_LIBS=ON\nelse\n  cmake -S . -B build ${CMAKE_ARGS} -DBUILD_TESTING=ON -DBUILD_SHARED_LIBS=ON ${extra_cmake_args}\nfi\n\ncmake --build build --config Release --parallel ${CPU_COUNT}\nctest -V -C Release --test-dir build\ncmake --install build\n"
       ]
     },
     "extra": {
@@ -129,6 +135,230 @@
       "elements": []
     }
   },
+  "linux_aarch64_meta_yaml": {
+    "about": {
+      "description": "This is a feature complete XML library containing a validating parser as well as a modern C++ API for the data structures. It also supports serializing custom data structures.\nThe core of this library is a validating XML parser with DTD processing and all. On top of this are implemented an API for manipulating XML data in a DOM like fashion and a serialization API. As a bonus there’s also an XPath implementation, albeit this is limited to XPath 1.0.\nThis XML library was extracted from [libzeep](https://github.com/mhekkel/libzeep) since having a separate and simple XML library is more convenient. The API is unfortunately no longer compatible since the goal was to be more standards compliant. E.g., zeem::element should now be a complete [Sequence Container](https://en.cppreference.com/w/cpp/named_req/SequenceContainer).",
+      "dev_url": "https://github.com/mhekkel/zeem",
+      "doc_url": "https://mhekkel.github.io/zeem",
+      "home": "https://mhekkel.github.io/zeem",
+      "license": "BSD-2-Clause",
+      "license_family": "BSD-2-Clause",
+      "license_file": "LICENSE",
+      "summary": "A C++ Module Library offering a full XML library with validating parser, DOM tree, XPaths and serialization."
+    },
+    "build": {
+      "number": "1",
+      "run_exports": {
+        "weak": [
+          "zeem"
+        ]
+      },
+      "script": [
+        "sed -i.bak 's#CPMAddPackage(\"gh:catchorg/Catch2@3.4.0\")#find_package(Catch2 REQUIRED)#' test/CMakeLists.txt",
+        "set -exo pipefail\n\nexport CXXFLAGS=\"${CXXFLAGS} -D_LIBCPP_DISABLE_AVAILABILITY\"\n\nif [[ ${build_platform} != ${target_platform} ]]; then\n  extra_cmake_args=\"-DTEST_STD_CHRONO_FROM_STREAM_R=ON -DCMAKE_CROSSCOMPILING=ON\"\nfi\n\n# Skip tests for cross compilation for macos\nif [[ ${build_platform} != ${target_platform} && ${target_platform} == \"osx-arm64\" ]]; then\n  cmake -S . -B build ${CMAKE_ARGS} -DBUILD_TESTING=OFF -DBUILD_SHARED_LIBS=ON\nelse\n  cmake -S . -B build ${CMAKE_ARGS} -DBUILD_TESTING=ON -DBUILD_SHARED_LIBS=ON ${extra_cmake_args}\nfi\n\ncmake --build build --config Release --parallel ${CPU_COUNT}\nctest -V -C Release --test-dir build\ncmake --install build\n"
+      ]
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "eunos-1128"
+      ]
+    },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "zeem"
+          ]
+        },
+        "name": "zeem",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "pkg-config"
+          ],
+          "host": [
+            "catch2",
+            "fast_float",
+            "howardhinnant_date"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -d ${PREFIX}/include/zeem\ntest -f ${PREFIX}/lib/libzeem${SHLIB_EXT}\n"
+          }
+        ],
+        "version": "2.0.5"
+      }
+    ],
+    "package": {
+      "name": "zeem",
+      "version": "2.0.5"
+    },
+    "requirements": {
+      "build": [
+        "cxx_compiler_stub",
+        "c_stdlib_stub",
+        "cmake",
+        "make",
+        "pkg-config"
+      ],
+      "host": [
+        "catch2",
+        "fast_float",
+        "howardhinnant_date"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "sha256": "cf82135e85c856e700ecaeb0a046769c84827166e6218b34839bf06301466e6f",
+      "url": "https://github.com/mhekkel/zeem/archive/refs/tags/v2.0.5.tar.gz"
+    }
+  },
+  "linux_aarch64_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "cmake",
+        "cxx_compiler_stub",
+        "make",
+        "pkg-config"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "catch2",
+        "fast_float",
+        "howardhinnant_date"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": []
+    },
+    "test": {
+      "__set__": true,
+      "elements": []
+    }
+  },
+  "linux_ppc64le_meta_yaml": {
+    "about": {
+      "description": "This is a feature complete XML library containing a validating parser as well as a modern C++ API for the data structures. It also supports serializing custom data structures.\nThe core of this library is a validating XML parser with DTD processing and all. On top of this are implemented an API for manipulating XML data in a DOM like fashion and a serialization API. As a bonus there’s also an XPath implementation, albeit this is limited to XPath 1.0.\nThis XML library was extracted from [libzeep](https://github.com/mhekkel/libzeep) since having a separate and simple XML library is more convenient. The API is unfortunately no longer compatible since the goal was to be more standards compliant. E.g., zeem::element should now be a complete [Sequence Container](https://en.cppreference.com/w/cpp/named_req/SequenceContainer).",
+      "dev_url": "https://github.com/mhekkel/zeem",
+      "doc_url": "https://mhekkel.github.io/zeem",
+      "home": "https://mhekkel.github.io/zeem",
+      "license": "BSD-2-Clause",
+      "license_family": "BSD-2-Clause",
+      "license_file": "LICENSE",
+      "summary": "A C++ Module Library offering a full XML library with validating parser, DOM tree, XPaths and serialization."
+    },
+    "build": {
+      "number": "1",
+      "run_exports": {
+        "weak": [
+          "zeem"
+        ]
+      },
+      "script": [
+        "sed -i.bak 's#CPMAddPackage(\"gh:catchorg/Catch2@3.4.0\")#find_package(Catch2 REQUIRED)#' test/CMakeLists.txt",
+        "set -exo pipefail\n\nexport CXXFLAGS=\"${CXXFLAGS} -D_LIBCPP_DISABLE_AVAILABILITY\"\n\nif [[ ${build_platform} != ${target_platform} ]]; then\n  extra_cmake_args=\"-DTEST_STD_CHRONO_FROM_STREAM_R=ON -DCMAKE_CROSSCOMPILING=ON\"\nfi\n\n# Skip tests for cross compilation for macos\nif [[ ${build_platform} != ${target_platform} && ${target_platform} == \"osx-arm64\" ]]; then\n  cmake -S . -B build ${CMAKE_ARGS} -DBUILD_TESTING=OFF -DBUILD_SHARED_LIBS=ON\nelse\n  cmake -S . -B build ${CMAKE_ARGS} -DBUILD_TESTING=ON -DBUILD_SHARED_LIBS=ON ${extra_cmake_args}\nfi\n\ncmake --build build --config Release --parallel ${CPU_COUNT}\nctest -V -C Release --test-dir build\ncmake --install build\n"
+      ]
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "eunos-1128"
+      ]
+    },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "zeem"
+          ]
+        },
+        "name": "zeem",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "pkg-config"
+          ],
+          "host": [
+            "catch2",
+            "fast_float",
+            "howardhinnant_date"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -d ${PREFIX}/include/zeem\ntest -f ${PREFIX}/lib/libzeem${SHLIB_EXT}\n"
+          }
+        ],
+        "version": "2.0.5"
+      }
+    ],
+    "package": {
+      "name": "zeem",
+      "version": "2.0.5"
+    },
+    "requirements": {
+      "build": [
+        "cxx_compiler_stub",
+        "c_stdlib_stub",
+        "cmake",
+        "make",
+        "pkg-config"
+      ],
+      "host": [
+        "catch2",
+        "fast_float",
+        "howardhinnant_date"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "sha256": "cf82135e85c856e700ecaeb0a046769c84827166e6218b34839bf06301466e6f",
+      "url": "https://github.com/mhekkel/zeem/archive/refs/tags/v2.0.5.tar.gz"
+    }
+  },
+  "linux_ppc64le_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "cmake",
+        "cxx_compiler_stub",
+        "make",
+        "pkg-config"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "catch2",
+        "fast_float",
+        "howardhinnant_date"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": []
+    },
+    "test": {
+      "__set__": true,
+      "elements": []
+    }
+  },
   "meta_yaml": {
     "about": {
       "description": "This is a feature complete XML library containing a validating parser as well as a modern C++ API for the data structures. It also supports serializing custom data structures.\nThe core of this library is a validating XML parser with DTD processing and all. On top of this are implemented an API for manipulating XML data in a DOM like fashion and a serialization API. As a bonus there’s also an XPath implementation, albeit this is limited to XPath 1.0.\nThis XML library was extracted from [libzeep](https://github.com/mhekkel/libzeep) since having a separate and simple XML library is more convenient. The API is unfortunately no longer compatible since the goal was to be more standards compliant. E.g., zeem::element should now be a complete [Sequence Container](https://en.cppreference.com/w/cpp/named_req/SequenceContainer).",
@@ -141,7 +371,7 @@
       "summary": "A C++ Module Library offering a full XML library with validating parser, DOM tree, XPaths and serialization."
     },
     "build": {
-      "number": "0",
+      "number": "1",
       "run_exports": {
         "weak": [
           "zeem"
@@ -149,7 +379,7 @@
       },
       "script": [
         "sed -i.bak 's#CPMAddPackage(\"gh:catchorg/Catch2@3.4.0\")#find_package(Catch2 REQUIRED)#' test/CMakeLists.txt",
-        "set -exo pipefail\nexport CXXFLAGS=\"${CXXFLAGS} -D_LIBCPP_DISABLE_AVAILABILITY\"\ncmake -S . -B build ${CMAKE_ARGS} -DBUILD_TESTING=ON -DBUILD_SHARED_LIBS=ON\ncmake --build build --config Release --parallel ${CPU_COUNT}\nctest -V -C Release --test-dir build\ncmake --install build\n"
+        "set -exo pipefail\n\nexport CXXFLAGS=\"${CXXFLAGS} -D_LIBCPP_DISABLE_AVAILABILITY\"\n\nif [[ ${build_platform} != ${target_platform} ]]; then\n  extra_cmake_args=\"-DTEST_STD_CHRONO_FROM_STREAM_R=ON -DCMAKE_CROSSCOMPILING=ON\"\nfi\n\n# Skip tests for cross compilation for macos\nif [[ ${build_platform} != ${target_platform} && ${target_platform} == \"osx-arm64\" ]]; then\n  cmake -S . -B build ${CMAKE_ARGS} -DBUILD_TESTING=OFF -DBUILD_SHARED_LIBS=ON\nelse\n  cmake -S . -B build ${CMAKE_ARGS} -DBUILD_TESTING=ON -DBUILD_SHARED_LIBS=ON ${extra_cmake_args}\nfi\n\ncmake --build build --config Release --parallel ${CPU_COUNT}\nctest -V -C Release --test-dir build\ncmake --install build\n"
       ]
     },
     "extra": {
@@ -158,6 +388,96 @@
       ]
     },
     "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "zeem"
+          ]
+        },
+        "name": "zeem",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "pkg-config"
+          ],
+          "host": [
+            "catch2",
+            "fast_float",
+            "howardhinnant_date"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -d ${PREFIX}/include/zeem\ntest -f ${PREFIX}/lib/libzeem${SHLIB_EXT}\n"
+          }
+        ],
+        "version": "2.0.5"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "zeem"
+          ]
+        },
+        "name": "zeem",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "pkg-config"
+          ],
+          "host": [
+            "catch2",
+            "fast_float",
+            "howardhinnant_date"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -d ${PREFIX}/include/zeem\ntest -f ${PREFIX}/lib/libzeem${SHLIB_EXT}\n"
+          }
+        ],
+        "version": "2.0.5"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "zeem"
+          ]
+        },
+        "name": "zeem",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "pkg-config"
+          ],
+          "host": [
+            "catch2",
+            "fast_float",
+            "howardhinnant_date"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -d ${PREFIX}/include/zeem\ntest -f ${PREFIX}/lib/libzeem${SHLIB_EXT}\n"
+          }
+        ],
+        "version": "2.0.5"
+      },
       {
         "build": {
           "strong": [],
@@ -286,7 +606,7 @@
       "summary": "A C++ Module Library offering a full XML library with validating parser, DOM tree, XPaths and serialization."
     },
     "build": {
-      "number": "0",
+      "number": "1",
       "run_exports": {
         "weak": [
           "zeem"
@@ -294,7 +614,7 @@
       },
       "script": [
         "sed -i.bak 's#CPMAddPackage(\"gh:catchorg/Catch2@3.4.0\")#find_package(Catch2 REQUIRED)#' test/CMakeLists.txt",
-        "set -exo pipefail\nexport CXXFLAGS=\"${CXXFLAGS} -D_LIBCPP_DISABLE_AVAILABILITY\"\ncmake -S . -B build ${CMAKE_ARGS} -DBUILD_TESTING=ON -DBUILD_SHARED_LIBS=ON\ncmake --build build --config Release --parallel ${CPU_COUNT}\nctest -V -C Release --test-dir build\ncmake --install build\n"
+        "set -exo pipefail\n\nexport CXXFLAGS=\"${CXXFLAGS} -D_LIBCPP_DISABLE_AVAILABILITY\"\n\nif [[ ${build_platform} != ${target_platform} ]]; then\n  extra_cmake_args=\"-DTEST_STD_CHRONO_FROM_STREAM_R=ON -DCMAKE_CROSSCOMPILING=ON\"\nfi\n\n# Skip tests for cross compilation for macos\nif [[ ${build_platform} != ${target_platform} && ${target_platform} == \"osx-arm64\" ]]; then\n  cmake -S . -B build ${CMAKE_ARGS} -DBUILD_TESTING=OFF -DBUILD_SHARED_LIBS=ON\nelse\n  cmake -S . -B build ${CMAKE_ARGS} -DBUILD_TESTING=ON -DBUILD_SHARED_LIBS=ON ${extra_cmake_args}\nfi\n\ncmake --build build --config Release --parallel ${CPU_COUNT}\nctest -V -C Release --test-dir build\ncmake --install build\n"
       ]
     },
     "extra": {
@@ -386,6 +706,118 @@
       "elements": []
     }
   },
+  "osx_arm64_meta_yaml": {
+    "about": {
+      "description": "This is a feature complete XML library containing a validating parser as well as a modern C++ API for the data structures. It also supports serializing custom data structures.\nThe core of this library is a validating XML parser with DTD processing and all. On top of this are implemented an API for manipulating XML data in a DOM like fashion and a serialization API. As a bonus there’s also an XPath implementation, albeit this is limited to XPath 1.0.\nThis XML library was extracted from [libzeep](https://github.com/mhekkel/libzeep) since having a separate and simple XML library is more convenient. The API is unfortunately no longer compatible since the goal was to be more standards compliant. E.g., zeem::element should now be a complete [Sequence Container](https://en.cppreference.com/w/cpp/named_req/SequenceContainer).",
+      "dev_url": "https://github.com/mhekkel/zeem",
+      "doc_url": "https://mhekkel.github.io/zeem",
+      "home": "https://mhekkel.github.io/zeem",
+      "license": "BSD-2-Clause",
+      "license_family": "BSD-2-Clause",
+      "license_file": "LICENSE",
+      "summary": "A C++ Module Library offering a full XML library with validating parser, DOM tree, XPaths and serialization."
+    },
+    "build": {
+      "number": "1",
+      "run_exports": {
+        "weak": [
+          "zeem"
+        ]
+      },
+      "script": [
+        "sed -i.bak 's#CPMAddPackage(\"gh:catchorg/Catch2@3.4.0\")#find_package(Catch2 REQUIRED)#' test/CMakeLists.txt",
+        "set -exo pipefail\n\nexport CXXFLAGS=\"${CXXFLAGS} -D_LIBCPP_DISABLE_AVAILABILITY\"\n\nif [[ ${build_platform} != ${target_platform} ]]; then\n  extra_cmake_args=\"-DTEST_STD_CHRONO_FROM_STREAM_R=ON -DCMAKE_CROSSCOMPILING=ON\"\nfi\n\n# Skip tests for cross compilation for macos\nif [[ ${build_platform} != ${target_platform} && ${target_platform} == \"osx-arm64\" ]]; then\n  cmake -S . -B build ${CMAKE_ARGS} -DBUILD_TESTING=OFF -DBUILD_SHARED_LIBS=ON\nelse\n  cmake -S . -B build ${CMAKE_ARGS} -DBUILD_TESTING=ON -DBUILD_SHARED_LIBS=ON ${extra_cmake_args}\nfi\n\ncmake --build build --config Release --parallel ${CPU_COUNT}\nctest -V -C Release --test-dir build\ncmake --install build\n"
+      ]
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "eunos-1128"
+      ]
+    },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "zeem"
+          ]
+        },
+        "name": "zeem",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "pkg-config"
+          ],
+          "host": [
+            "catch2",
+            "fast_float",
+            "howardhinnant_date"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -d ${PREFIX}/include/zeem\ntest -f ${PREFIX}/lib/libzeem${SHLIB_EXT}\n"
+          }
+        ],
+        "version": "2.0.5"
+      }
+    ],
+    "package": {
+      "name": "zeem",
+      "version": "2.0.5"
+    },
+    "requirements": {
+      "build": [
+        "cxx_compiler_stub",
+        "c_stdlib_stub",
+        "cmake",
+        "make",
+        "pkg-config"
+      ],
+      "host": [
+        "catch2",
+        "fast_float",
+        "howardhinnant_date"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "sha256": "cf82135e85c856e700ecaeb0a046769c84827166e6218b34839bf06301466e6f",
+      "url": "https://github.com/mhekkel/zeem/archive/refs/tags/v2.0.5.tar.gz"
+    }
+  },
+  "osx_arm64_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "cmake",
+        "cxx_compiler_stub",
+        "make",
+        "pkg-config"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "catch2",
+        "fast_float",
+        "howardhinnant_date"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": []
+    },
+    "test": {
+      "__set__": true,
+      "elements": []
+    }
+  },
   "outputs_names": {
     "__set__": true,
     "elements": [
@@ -395,13 +827,16 @@
   "parsing_error": false,
   "platforms": [
     "linux_64",
+    "linux_aarch64",
+    "linux_ppc64le",
     "osx_64",
+    "osx_arm64",
     "win_64"
   ],
   "pr_info": {
     "__lazy_json__": "pr_info/zeem.json"
   },
-  "raw_meta_yaml": "context:\n  version: \"2.0.5\"\n\npackage:\n  name: zeem\n  version: ${{ version }}\n\nsource:\n  url: https://github.com/mhekkel/zeem/archive/refs/tags/v${{ version }}.tar.gz\n  sha256: cf82135e85c856e700ecaeb0a046769c84827166e6218b34839bf06301466e6f\n\nbuild:\n  number: 0\n  script:\n    # Use locally installed Catch2\n    - sed -i.bak 's#CPMAddPackage(\"gh:catchorg/Catch2@3.4.0\")#find_package(Catch2 REQUIRED)#' test/CMakeLists.txt\n\n    - if: unix\n      then: |\n        set -exo pipefail\n        export CXXFLAGS=\"${CXXFLAGS} -D_LIBCPP_DISABLE_AVAILABILITY\"\n        cmake -S . -B build ${CMAKE_ARGS} -DBUILD_TESTING=ON -DBUILD_SHARED_LIBS=ON\n        cmake --build build --config Release --parallel ${CPU_COUNT}\n        ctest -V -C Release --test-dir build\n        cmake --install build\n    - if: win\n      then: |\n        @echo on\n        set PATH=%SRC_DIR%\\build;%SRC_DIR%\\build\\bin;%SRC_DIR%\\build\\Release;%SRC_DIR%\\build\\release;%PATH%\n        if errorlevel 1 exit 1\n        cmake -S . -B build -G \"NMake Makefiles JOM\" %CMAKE_ARGS% -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON -DBUILD_TESTING=ON -DBUILD_SHARED_LIBS=ON\n        if errorlevel 1 exit 1\n        cmake --build build --config Release --parallel %CPU_COUNT%\n        if errorlevel 1 exit 1\n        ctest -V -C Release --test-dir build\n        if errorlevel 1 exit 1\n        cmake --install build\n        if errorlevel 1 exit 1\n\nrequirements:\n  build:\n    - ${{ compiler(\"cxx\") }}\n    - ${{ stdlib(\"c\") }}\n    - cmake\n    - if: unix\n      then: make\n    - pkg-config\n    - if: win\n      then:\n        - jom\n        - m2-sed\n  host:\n    - catch2\n    - fast_float\n    - howardhinnant_date\n  run_exports:\n    # Patch version update may be breakable\n    - ${{ pin_subpackage(\"zeem\", upper_bound=\"x.x.x\") }}\n  ignore_run_exports:\n    by_name:\n      - catch2\n\ntests:\n  - script:\n      - if: unix\n        then: |\n          test -d ${PREFIX}/include/zeem\n          test -f ${PREFIX}/lib/libzeem${SHLIB_EXT}\n        else: |\n          if not exist \"%LIBRARY_PREFIX%\\include\\zeem\\\" exit /b 1\n          if not exist \"%LIBRARY_PREFIX%\\lib\\zeem.lib\" exit /b 1\n          if not exist \"%LIBRARY_PREFIX%\\bin\\zeem.dll\" exit /b 1\n\nabout:\n  homepage: https://mhekkel.github.io/zeem\n  repository: https://github.com/mhekkel/zeem\n  documentation: https://mhekkel.github.io/zeem\n  license: BSD-2-Clause\n  license_file: LICENSE\n  summary: \"A C++ Module Library offering a full XML library with validating parser, DOM tree, XPaths and serialization.\"\n  description: >\n    This is a feature complete XML library containing a validating parser as well as a modern C++ API for the data structures.\n    It also supports serializing custom data structures.\n\n    The core of this library is a validating XML parser with DTD processing and all.\n    On top of this are implemented an API for manipulating XML data in a DOM like fashion and a serialization API.\n    As a bonus there’s also an XPath implementation, albeit this is limited to XPath 1.0.\n\n    This XML library was extracted from [libzeep](https://github.com/mhekkel/libzeep) since having a separate and simple XML library is more convenient.\n    The API is unfortunately no longer compatible since the goal was to be more standards compliant.\n    E.g., zeem::element should now be a complete [Sequence Container](https://en.cppreference.com/w/cpp/named_req/SequenceContainer).\n\nextra:\n  recipe-maintainers:\n    - eunos-1128\n",
+  "raw_meta_yaml": "context:\n  version: \"2.0.5\"\n\npackage:\n  name: zeem\n  version: ${{ version }}\n\nsource:\n  url: https://github.com/mhekkel/zeem/archive/refs/tags/v${{ version }}.tar.gz\n  sha256: cf82135e85c856e700ecaeb0a046769c84827166e6218b34839bf06301466e6f\n\nbuild:\n  number: 1\n  script:\n    # Use locally installed Catch2\n    - sed -i.bak 's#CPMAddPackage(\"gh:catchorg/Catch2@3.4.0\")#find_package(Catch2 REQUIRED)#' test/CMakeLists.txt\n\n    - if: unix\n      then: |\n        set -exo pipefail\n        \n        export CXXFLAGS=\"${CXXFLAGS} -D_LIBCPP_DISABLE_AVAILABILITY\"\n        \n        if [[ ${build_platform} != ${target_platform} ]]; then\n          extra_cmake_args=\"-DTEST_STD_CHRONO_FROM_STREAM_R=ON -DCMAKE_CROSSCOMPILING=ON\"\n        fi\n\n        # Skip tests for cross compilation for macos\n        if [[ ${build_platform} != ${target_platform} && ${target_platform} == \"osx-arm64\" ]]; then\n          cmake -S . -B build ${CMAKE_ARGS} -DBUILD_TESTING=OFF -DBUILD_SHARED_LIBS=ON\n        else\n          cmake -S . -B build ${CMAKE_ARGS} -DBUILD_TESTING=ON -DBUILD_SHARED_LIBS=ON ${extra_cmake_args}\n        fi\n\n        cmake --build build --config Release --parallel ${CPU_COUNT}\n        ctest -V -C Release --test-dir build\n        cmake --install build\n    - if: win\n      then: |\n        @echo on\n        set PATH=%SRC_DIR%\\build;%SRC_DIR%\\build\\bin;%SRC_DIR%\\build\\Release;%SRC_DIR%\\build\\release;%PATH%\n        if errorlevel 1 exit 1\n        cmake -S . -B build -G \"NMake Makefiles JOM\" %CMAKE_ARGS% -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON -DBUILD_TESTING=ON -DBUILD_SHARED_LIBS=ON\n        if errorlevel 1 exit 1\n        cmake --build build --config Release --parallel %CPU_COUNT%\n        if errorlevel 1 exit 1\n        ctest -V -C Release --test-dir build\n        if errorlevel 1 exit 1\n        cmake --install build\n        if errorlevel 1 exit 1\n\nrequirements:\n  build:\n    - ${{ compiler(\"cxx\") }}\n    - ${{ stdlib(\"c\") }}\n    - cmake\n    - if: unix\n      then: make\n    - pkg-config\n    - if: win\n      then:\n        - jom\n        - m2-sed\n  host:\n    - catch2\n    - fast_float\n    - howardhinnant_date\n  run_exports:\n    # Patch version update may be breakable\n    - ${{ pin_subpackage(\"zeem\", upper_bound=\"x.x.x\") }}\n  ignore_run_exports:\n    by_name:\n      - catch2\n\ntests:\n  - script:\n      - if: unix\n        then: |\n          test -d ${PREFIX}/include/zeem\n          test -f ${PREFIX}/lib/libzeem${SHLIB_EXT}\n        else: |\n          if not exist \"%LIBRARY_PREFIX%\\include\\zeem\\\" exit /b 1\n          if not exist \"%LIBRARY_PREFIX%\\lib\\zeem.lib\" exit /b 1\n          if not exist \"%LIBRARY_PREFIX%\\bin\\zeem.dll\" exit /b 1\n\nabout:\n  homepage: https://mhekkel.github.io/zeem\n  repository: https://github.com/mhekkel/zeem\n  documentation: https://mhekkel.github.io/zeem\n  license: BSD-2-Clause\n  license_file: LICENSE\n  summary: \"A C++ Module Library offering a full XML library with validating parser, DOM tree, XPaths and serialization.\"\n  description: >\n    This is a feature complete XML library containing a validating parser as well as a modern C++ API for the data structures.\n    It also supports serializing custom data structures.\n\n    The core of this library is a validating XML parser with DTD processing and all.\n    On top of this are implemented an API for manipulating XML data in a DOM like fashion and a serialization API.\n    As a bonus there’s also an XPath implementation, albeit this is limited to XPath 1.0.\n\n    This XML library was extracted from [libzeep](https://github.com/mhekkel/libzeep) since having a separate and simple XML library is more convenient.\n    The API is unfortunately no longer compatible since the goal was to be more standards compliant.\n    E.g., zeem::element should now be a complete [Sequence Container](https://en.cppreference.com/w/cpp/named_req/SequenceContainer).\n\nextra:\n  recipe-maintainers:\n    - eunos-1128\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -494,7 +929,7 @@
       "summary": "A C++ Module Library offering a full XML library with validating parser, DOM tree, XPaths and serialization."
     },
     "build": {
-      "number": "0",
+      "number": "1",
       "run_exports": {
         "weak": [
           "zeem"
@@ -502,7 +937,7 @@
       },
       "script": [
         "sed -i.bak 's#CPMAddPackage(\"gh:catchorg/Catch2@3.4.0\")#find_package(Catch2 REQUIRED)#' test/CMakeLists.txt",
-        "set -exo pipefail\nexport CXXFLAGS=\"${CXXFLAGS} -D_LIBCPP_DISABLE_AVAILABILITY\"\ncmake -S . -B build ${CMAKE_ARGS} -DBUILD_TESTING=ON -DBUILD_SHARED_LIBS=ON\ncmake --build build --config Release --parallel ${CPU_COUNT}\nctest -V -C Release --test-dir build\ncmake --install build\n"
+        "set -exo pipefail\n\nexport CXXFLAGS=\"${CXXFLAGS} -D_LIBCPP_DISABLE_AVAILABILITY\"\n\nif [[ ${build_platform} != ${target_platform} ]]; then\n  extra_cmake_args=\"-DTEST_STD_CHRONO_FROM_STREAM_R=ON -DCMAKE_CROSSCOMPILING=ON\"\nfi\n\n# Skip tests for cross compilation for macos\nif [[ ${build_platform} != ${target_platform} && ${target_platform} == \"osx-arm64\" ]]; then\n  cmake -S . -B build ${CMAKE_ARGS} -DBUILD_TESTING=OFF -DBUILD_SHARED_LIBS=ON\nelse\n  cmake -S . -B build ${CMAKE_ARGS} -DBUILD_TESTING=ON -DBUILD_SHARED_LIBS=ON ${extra_cmake_args}\nfi\n\ncmake --build build --config Release --parallel ${CPU_COUNT}\nctest -V -C Release --test-dir build\ncmake --install build\n"
       ]
     },
     "extra": {
