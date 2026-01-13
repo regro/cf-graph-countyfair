@@ -22,8 +22,8 @@
     },
     "test": "native_and_emulated"
   },
-  "feedstock_hash": "0c07ad7728de1098cd3bb29c3009acba059cc99a",
-  "feedstock_hash_ts": 1768270626,
+  "feedstock_hash": "5ea931c39b6636a88db3c0af0e6cea682d0e0ab1",
+  "feedstock_hash_ts": 1768272370,
   "feedstock_name": "libjxl-split",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -40,7 +40,7 @@
       "summary": "JPEG XL image format reference implementation"
     },
     "build": {
-      "number": "6",
+      "number": "7",
       "script": [
         "mkdir build"
       ]
@@ -229,7 +229,7 @@
       "summary": "JPEG XL image format reference implementation"
     },
     "build": {
-      "number": "6",
+      "number": "7",
       "script": [
         "mkdir build"
       ]
@@ -418,7 +418,7 @@
       "summary": "JPEG XL image format reference implementation"
     },
     "build": {
-      "number": "6",
+      "number": "7",
       "script": [
         "mkdir build"
       ]
@@ -607,7 +607,7 @@
       "summary": "JPEG XL image format reference implementation"
     },
     "build": {
-      "number": "6",
+      "number": "7",
       "script": [
         "mkdir build"
       ]
@@ -1331,7 +1331,7 @@
       "summary": "JPEG XL image format reference implementation"
     },
     "build": {
-      "number": "6",
+      "number": "7",
       "script": [
         "mkdir build"
       ]
@@ -1520,7 +1520,7 @@
       "summary": "JPEG XL image format reference implementation"
     },
     "build": {
-      "number": "6",
+      "number": "7",
       "script": [
         "mkdir build"
       ]
@@ -1714,7 +1714,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/libjxl-split.json"
   },
-  "raw_meta_yaml": "{% set version = \"0.11.1\" %}\n{% set skcms_version = \"42030a771244ba67f86b1c1c76a6493f873c5f91\" %}\n{% set jpeg_turbo_version = \"8ecba3647edb6dd940463fedf38ca33a8e2a73d1\" %}\n\npackage:\n  name: libjxl-split\n  version: {{ version }}\n\nsource:\n  - url: https://github.com/libjxl/libjxl/archive/v{{ version }}.tar.gz\n    sha256: 1492dfef8dd6c3036446ac3b340005d92ab92f7d48ee3271b5dac1d36945d3d9\n    patches:\n      # Fix https://github.com/libjxl/libjxl/pull/582\n      - patches/0001-CHECK_EXCLUDE_LIBS.patch\n      # Remove libm dependency when building with Windows/macOS (fixed upstream in 0.12+ partially, but in our case since we use clang it needs to exclude WIN32 and not just MSVC), remove this patch when upgrading after whole fix is in upstream)\n      - patches/0002-BACKPORT_FIX_LM_PKGCONFIG_LIBJXL_CMAKE.patch\n      # Similar to 0002-BACKPORT_FIX_LM_PKGCONFIG_LIBJXL_CMAKE.patch but for libjxl_cms.cmake\n      # This one has never been fixed upstream as of 9 january 2026.\n      - patches/0003-FIX_LM_PKGCONFIG_LIBJXL_CMS_CMAKE.patch\n      # Similar to 0002-BACKPORT_FIX_LM_PKGCONFIG_LIBJXL_CMAKE.patch but for libjxl_threads.cmake\n      # This one has never been fixed upstream as of 11 january 2026.\n      - patches/0004-FIX_LM_PKGCONFIG_LIBJXL_THREADS_CMAKE.patch\n  # No tags, versions, or stable ABIs are exposed in the skcms repo\n  # so I don't think it fits well in conda's versioning system.\n  - git_url: https://skia.googlesource.com/skcms\n    git_rev: {{ skcms_version }}\n    folder: third_party/skcms\n  # They pull in 3 headers from here and copy them into jpegli\n  - url: https://github.com/libjpeg-turbo/libjpeg-turbo/archive/{{ jpeg_turbo_version }}.tar.gz\n    sha256: ed729127097af5000bfeddc6b3e679c4363bb1618ebfc07efb6b47f576471b4b\n    folder: third_party/libjpeg-turbo\n\nbuild:\n  number: 6\n  script:\n    - mkdir build\n\noutputs:\n  - name: libjxl\n    build:\n      script_env:\n        - JPEGXL_ENABLE_TOOLS=OFF\n      run_exports:\n        - {{ pin_subpackage('libjxl', min_pin='x.x', max_pin='x.x') }}\n      ignore_run_exports:\n        - libbrotlicommon\n    requirements:\n      build:\n        - {{ compiler('c') }}\n        - {{ stdlib(\"c\") }}\n        - {{ compiler('cxx') }}\n        - pkg-config\n        - cmake >=3.16\n        - make  # [not win]\n      host:\n        - brotli\n        - libhwy\n    script: install.sh  # [not win]\n    script: install.bat  # [win]\n    test:\n      commands:\n        - test -f \"$PREFIX\"/include/jxl/encode.h  # [not win]\n        - test -f \"$PREFIX\"/lib/libjxl\"$SHLIB_EXT\"  # [not win]\n        - test ! -f \"$PREFIX\"/bin/cjxl  # [not win]\n        - if not exist %LIBRARY_INC%\\\\jxl\\\\encode.h exit 1  # [win]\n        - if not exist %LIBRARY_BIN%\\\\jxl.dll exit 1  # [win]\n        - if exist %LIBRARY_BIN%\\\\cjxl.exe exit 1  # [win]\n\n        # CFEP-18: Static libs shouldn't be part of the main package\n        - test ! -f \"$PREFIX\"/lib/libjxl.a  # [not win]\n        - if exist %LIBRARY_LIB%\\\\jxl-static.lib exit 1  # [win]\n  - name: libjxl-tools\n    build:\n      script_env:\n        - JPEGXL_ENABLE_TOOLS=ON\n      ignore_run_exports:\n        - libbrotlicommon\n        - libzlib\n    requirements:\n      build:\n        - {{ compiler('c') }}\n        - {{ stdlib(\"c\") }}\n        - {{ compiler('cxx') }}\n        - pkg-config\n        - cmake\n        - make  # [not win]\n      host:\n        - brotli\n        - libhwy\n        - giflib\n        - libjpeg-turbo\n        - openexr\n        - libpng\n        - zlib  # by libpng\n        - {{ pin_subpackage('libjxl', exact=True) }}\n      run:\n        - {{ pin_subpackage('libjxl', exact=True) }}\n    script: install.sh  # [not win]\n    script: install.bat  # [win]\n    test:\n      requires:\n        - pkg-config\n        - {{ compiler('c') }}  # [not win]\n        - clang                # [win]\n      files:\n        - test_pkgconfig_link.sh   # [not win]\n        - test_pkgconfig_link.bat  # [win]\n      commands:\n        - cjxl --version\n        - djxl --version\n        - cjpegli --help\n        - djpegli --help\n        - jxlinfo --help\n\n        # Encode & decode tests\n        - printf \"P6 1 1 63 000\" > test.ppm  # [not win]\n        - echo | set /p dummy=\"P6 1 1 63 000\" > test.ppm  # [win]\n        - cjxl test.ppm test.jxl\n        - djxl test.jxl test.ppm\n        - jxlinfo test.jxl\n        # tests libjxl correct linking via pkg-config\n        - pkg-config --print-errors --exact-version \"{{ version }}\" libjxl\n        # does a minimal compile/link/test of a program using libjxl and libjxl_threads\n        - bash test_pkgconfig_link.sh  # [not win]\n        - test_pkgconfig_link.bat      # [win]\n\nabout:\n  home: https://jpeg.org/jpegxl/\n  summary: JPEG XL image format reference implementation\n  license: BSD-3-Clause\n  license_family: BSD\n  license_file:\n    - LICENSE\n    - third_party/skcms/LICENSE\n  dev_url: https://github.com/libjxl/libjxl\n  description: |\n    This repository contains a reference implementation of JPEG XL (encoder and decoder),\n    called libjxl. This software library is used by many applications that support JPEG XL.\n\n    `libjxl` provides the core library.\n    For `cjxl`, `djxl`, `libjxl_extras_codec`, and other tools, use `libjxl-tools`.\n\nextra:\n  recipe-maintainers:\n    - sshockwave\n  feedstock-name: libjxl\n",
+  "raw_meta_yaml": "{% set version = \"0.11.1\" %}\n{% set skcms_version = \"42030a771244ba67f86b1c1c76a6493f873c5f91\" %}\n{% set jpeg_turbo_version = \"8ecba3647edb6dd940463fedf38ca33a8e2a73d1\" %}\n\npackage:\n  name: libjxl-split\n  version: {{ version }}\n\nsource:\n  - url: https://github.com/libjxl/libjxl/archive/v{{ version }}.tar.gz\n    sha256: 1492dfef8dd6c3036446ac3b340005d92ab92f7d48ee3271b5dac1d36945d3d9\n    patches:\n      # Fix https://github.com/libjxl/libjxl/pull/582\n      - patches/0001-CHECK_EXCLUDE_LIBS.patch\n      # Remove libm dependency when building with Windows/macOS (fixed upstream in 0.12+ partially, but in our case since we use clang it needs to exclude WIN32 and not just MSVC), remove this patch when upgrading after whole fix is in upstream)\n      - patches/0002-BACKPORT_FIX_LM_PKGCONFIG_LIBJXL_CMAKE.patch\n      # Similar to 0002-BACKPORT_FIX_LM_PKGCONFIG_LIBJXL_CMAKE.patch but for libjxl_cms.cmake\n      # This one has never been fixed upstream as of 9 january 2026.\n      - patches/0003-FIX_LM_PKGCONFIG_LIBJXL_CMS_CMAKE.patch\n      # Similar to 0002-BACKPORT_FIX_LM_PKGCONFIG_LIBJXL_CMAKE.patch but for libjxl_threads.cmake\n      # This one has never been fixed upstream as of 11 january 2026.\n      - patches/0004-FIX_LM_PKGCONFIG_LIBJXL_THREADS_CMAKE.patch\n  # No tags, versions, or stable ABIs are exposed in the skcms repo\n  # so I don't think it fits well in conda's versioning system.\n  - git_url: https://skia.googlesource.com/skcms\n    git_rev: {{ skcms_version }}\n    folder: third_party/skcms\n  # They pull in 3 headers from here and copy them into jpegli\n  - url: https://github.com/libjpeg-turbo/libjpeg-turbo/archive/{{ jpeg_turbo_version }}.tar.gz\n    sha256: ed729127097af5000bfeddc6b3e679c4363bb1618ebfc07efb6b47f576471b4b\n    folder: third_party/libjpeg-turbo\n\nbuild:\n  number: 7\n  script:\n    - mkdir build\n\noutputs:\n  - name: libjxl\n    build:\n      script_env:\n        - JPEGXL_ENABLE_TOOLS=OFF\n      run_exports:\n        - {{ pin_subpackage('libjxl', min_pin='x.x', max_pin='x.x') }}\n      ignore_run_exports:\n        - libbrotlicommon\n    requirements:\n      build:\n        - {{ compiler('c') }}\n        - {{ stdlib(\"c\") }}\n        - {{ compiler('cxx') }}\n        - pkg-config\n        - cmake >=3.16\n        - make  # [not win]\n      host:\n        - brotli\n        - libhwy\n    script: install.sh  # [not win]\n    script: install.bat  # [win]\n    test:\n      commands:\n        - test -f \"$PREFIX\"/include/jxl/encode.h  # [not win]\n        - test -f \"$PREFIX\"/lib/libjxl\"$SHLIB_EXT\"  # [not win]\n        - test ! -f \"$PREFIX\"/bin/cjxl  # [not win]\n        - if not exist %LIBRARY_INC%\\\\jxl\\\\encode.h exit 1  # [win]\n        - if not exist %LIBRARY_BIN%\\\\jxl.dll exit 1  # [win]\n        - if exist %LIBRARY_BIN%\\\\cjxl.exe exit 1  # [win]\n\n        # CFEP-18: Static libs shouldn't be part of the main package\n        - test ! -f \"$PREFIX\"/lib/libjxl.a  # [not win]\n        - if exist %LIBRARY_LIB%\\\\jxl-static.lib exit 1  # [win]\n  - name: libjxl-tools\n    build:\n      script_env:\n        - JPEGXL_ENABLE_TOOLS=ON\n      ignore_run_exports:\n        - libbrotlicommon\n        - libzlib\n    requirements:\n      build:\n        - {{ compiler('c') }}\n        - {{ stdlib(\"c\") }}\n        - {{ compiler('cxx') }}\n        - pkg-config\n        - cmake\n        - make  # [not win]\n      host:\n        - brotli\n        - libhwy\n        - giflib\n        - libjpeg-turbo\n        - openexr\n        - libpng\n        - zlib  # by libpng\n        - {{ pin_subpackage('libjxl', exact=True) }}\n      run:\n        - {{ pin_subpackage('libjxl', exact=True) }}\n    script: install.sh  # [not win]\n    script: install.bat  # [win]\n    test:\n      requires:\n        - pkg-config\n        - {{ compiler('c') }}  # [not win]\n        - clang                # [win]\n      files:\n        - test_pkgconfig_link.sh   # [not win]\n        - test_pkgconfig_link.bat  # [win]\n      commands:\n        - cjxl --version\n        - djxl --version\n        - cjpegli --help\n        - djpegli --help\n        - jxlinfo --help\n\n        # Encode & decode tests\n        - printf \"P6 1 1 63 000\" > test.ppm  # [not win]\n        - echo | set /p dummy=\"P6 1 1 63 000\" > test.ppm  # [win]\n        - cjxl test.ppm test.jxl\n        - djxl test.jxl test.ppm\n        - jxlinfo test.jxl\n        # tests libjxl correct linking via pkg-config\n        - pkg-config --print-errors --exact-version \"{{ version }}\" libjxl\n        # does a minimal compile/link/test of a program using libjxl and libjxl_threads\n        - bash test_pkgconfig_link.sh  # [not win]\n        - test_pkgconfig_link.bat      # [win]\n\nabout:\n  home: https://jpeg.org/jpegxl/\n  summary: JPEG XL image format reference implementation\n  license: BSD-3-Clause\n  license_family: BSD\n  license_file:\n    - LICENSE\n    - third_party/skcms/LICENSE\n  dev_url: https://github.com/libjxl/libjxl\n  description: |\n    This repository contains a reference implementation of JPEG XL (encoder and decoder),\n    called libjxl. This software library is used by many applications that support JPEG XL.\n\n    `libjxl` provides the core library.\n    For `cjxl`, `djxl`, `libjxl_extras_codec`, and other tools, use `libjxl-tools`.\n\nextra:\n  recipe-maintainers:\n    - sshockwave\n  feedstock-name: libjxl\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -1841,7 +1841,7 @@
       "summary": "JPEG XL image format reference implementation"
     },
     "build": {
-      "number": "6",
+      "number": "7",
       "script": [
         "mkdir build"
       ]
