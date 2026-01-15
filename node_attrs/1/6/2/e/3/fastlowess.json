@@ -12,63 +12,405 @@
       "tooling_branch_name": "main"
     }
   },
-  "feedstock_hash": "17a5c2b0a3dcf48aba95982cf8712420125d8249",
-  "feedstock_hash_ts": 1768284888,
+  "feedstock_hash": "fa35e537a7bb29768502d466e864b4f0ce1aa2e5",
+  "feedstock_hash_ts": 1768461069,
   "feedstock_name": "fastlowess",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
     "about": {
+      "description": "Fast, efficient, and robust Locally Weighted Scatterplot Smoothing (LOWESS)\nimplementation in Rust with bindings for Python, R, and C++.\n",
       "home": "https://github.com/thisisamirv/lowess-project",
       "license": "MIT AND Apache-2.0",
       "license_file": [
         "LICENSE-MIT",
-        "LICENSE-APACHE",
-        "THIRDPARTY.yml"
+        "LICENSE-APACHE"
       ],
-      "summary": "High-performance LOWESS smoothing for Rust, Python, and R"
+      "summary": "High-performance LOWESS smoothing associated bindings"
     },
     "build": {
-      "number": "0",
-      "script": [
-        "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml",
-        "PYTHON -m pip install . -vv --no-build-isolation"
-      ]
+      "number": "0"
     },
     "extra": {
       "recipe-maintainers": [
         "thisisamirv"
       ]
     },
+    "outputs": [
+      {
+        "build": {
+          "missing_dso_whitelist": [
+            "*/libR.so"
+          ],
+          "script": [
+            "cd bindings/r",
+            "cd src && tar --extract --xz -f vendor.tar.xz && cd ..",
+            "unset CARGO_BUILD_TARGET && $R CMD INSTALL --build ."
+          ]
+        },
+        "name": "r-rfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ],
+          "host": [
+            "r-base >=4.3"
+          ],
+          "run": [
+            "r-base >=4.3"
+          ]
+        },
+        "test": {
+          "commands": [
+            "$R -e \"library('rfastlowess')\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/python",
+            "$PYTHON -m pip install . -vv --no-build-isolation",
+            "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml"
+          ]
+        },
+        "name": "fastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub",
+            "cargo-bundle-licenses"
+          ],
+          "host": [
+            "python",
+            "pip",
+            "maturin >=1.0,<2.0"
+          ],
+          "run": [
+            "python",
+            "numpy >=1.20.0"
+          ]
+        },
+        "test": {
+          "imports": [
+            "fastlowess"
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/cpp",
+            "cargo build --release",
+            "mkdir -p $PREFIX/lib",
+            "mkdir -p $PREFIX/include",
+            "find ../../target -name \"libfastlowess_cpp.so\" -type f -exec cp {} $PREFIX/lib/libfastlowess.so \\;",
+            "cp include/fastlowess.h $PREFIX/include/"
+          ]
+        },
+        "name": "libfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ]
+        },
+        "test": {
+          "commands": [
+            "test -f $PREFIX/include/fastlowess.h",
+            "test -f $PREFIX/lib/libfastlowess.so"
+          ]
+        }
+      },
+      {
+        "build": {
+          "missing_dso_whitelist": [
+            "*/libR.so"
+          ],
+          "script": [
+            "cd bindings/r",
+            "cd src && tar --extract --xz -f vendor.tar.xz && cd ..",
+            "unset CARGO_BUILD_TARGET && $R CMD INSTALL --build ."
+          ]
+        },
+        "name": "r-rfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ],
+          "host": [
+            "r-base >=4.3"
+          ],
+          "run": [
+            "r-base >=4.3"
+          ]
+        },
+        "test": {
+          "commands": [
+            "$R -e \"library('rfastlowess')\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/python",
+            "$PYTHON -m pip install . -vv --no-build-isolation",
+            "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml"
+          ]
+        },
+        "name": "fastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub",
+            "cargo-bundle-licenses"
+          ],
+          "host": [
+            "python",
+            "pip",
+            "maturin >=1.0,<2.0"
+          ],
+          "run": [
+            "python",
+            "numpy >=1.20.0"
+          ]
+        },
+        "test": {
+          "imports": [
+            "fastlowess"
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/cpp",
+            "cargo build --release",
+            "mkdir -p $PREFIX/lib",
+            "mkdir -p $PREFIX/include",
+            "find ../../target -name \"libfastlowess_cpp.so\" -type f -exec cp {} $PREFIX/lib/libfastlowess.so \\;",
+            "cp include/fastlowess.h $PREFIX/include/"
+          ]
+        },
+        "name": "libfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ]
+        },
+        "test": {
+          "commands": [
+            "test -f $PREFIX/include/fastlowess.h",
+            "test -f $PREFIX/lib/libfastlowess.so"
+          ]
+        }
+      },
+      {
+        "build": {
+          "missing_dso_whitelist": [
+            "*/libR.so"
+          ],
+          "script": [
+            "cd bindings/r",
+            "cd src && tar --extract --xz -f vendor.tar.xz && cd ..",
+            "unset CARGO_BUILD_TARGET && $R CMD INSTALL --build ."
+          ]
+        },
+        "name": "r-rfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ],
+          "host": [
+            "r-base >=4.3"
+          ],
+          "run": [
+            "r-base >=4.3"
+          ]
+        },
+        "test": {
+          "commands": [
+            "$R -e \"library('rfastlowess')\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/python",
+            "$PYTHON -m pip install . -vv --no-build-isolation",
+            "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml"
+          ]
+        },
+        "name": "fastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub",
+            "cargo-bundle-licenses"
+          ],
+          "host": [
+            "python",
+            "pip",
+            "maturin >=1.0,<2.0"
+          ],
+          "run": [
+            "python",
+            "numpy >=1.20.0"
+          ]
+        },
+        "test": {
+          "imports": [
+            "fastlowess"
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/cpp",
+            "cargo build --release",
+            "mkdir -p $PREFIX/lib",
+            "mkdir -p $PREFIX/include",
+            "find ../../target -name \"libfastlowess_cpp.so\" -type f -exec cp {} $PREFIX/lib/libfastlowess.so \\;",
+            "cp include/fastlowess.h $PREFIX/include/"
+          ]
+        },
+        "name": "libfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ]
+        },
+        "test": {
+          "commands": [
+            "test -f $PREFIX/include/fastlowess.h",
+            "test -f $PREFIX/lib/libfastlowess.so"
+          ]
+        }
+      },
+      {
+        "build": {
+          "missing_dso_whitelist": [
+            "*/libR.so"
+          ],
+          "script": [
+            "cd bindings/r",
+            "cd src && tar --extract --xz -f vendor.tar.xz && cd ..",
+            "unset CARGO_BUILD_TARGET && $R CMD INSTALL --build ."
+          ]
+        },
+        "name": "r-rfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ],
+          "host": [
+            "r-base >=4.3"
+          ],
+          "run": [
+            "r-base >=4.3"
+          ]
+        },
+        "test": {
+          "commands": [
+            "$R -e \"library('rfastlowess')\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/python",
+            "$PYTHON -m pip install . -vv --no-build-isolation",
+            "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml"
+          ]
+        },
+        "name": "fastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub",
+            "cargo-bundle-licenses"
+          ],
+          "host": [
+            "python",
+            "pip",
+            "maturin >=1.0,<2.0"
+          ],
+          "run": [
+            "python",
+            "numpy >=1.20.0"
+          ]
+        },
+        "test": {
+          "imports": [
+            "fastlowess"
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/cpp",
+            "cargo build --release",
+            "mkdir -p $PREFIX/lib",
+            "mkdir -p $PREFIX/include",
+            "find ../../target -name \"libfastlowess_cpp.so\" -type f -exec cp {} $PREFIX/lib/libfastlowess.so \\;",
+            "cp include/fastlowess.h $PREFIX/include/"
+          ]
+        },
+        "name": "libfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ]
+        },
+        "test": {
+          "commands": [
+            "test -f $PREFIX/include/fastlowess.h",
+            "test -f $PREFIX/lib/libfastlowess.so"
+          ]
+        }
+      }
+    ],
     "package": {
       "name": "fastlowess",
-      "version": "0.99.7"
+      "version": "0.99.8"
     },
     "requirements": {
       "build": [
         "c_compiler_stub",
         "c_stdlib_stub",
         "rust_compiler_stub",
-        "cargo-bundle-licenses"
-      ],
-      "host": [
-        "python",
-        "pip",
-        "maturin >=1.0,<2.0"
-      ],
-      "run": [
-        "python",
-        "numpy >=1.20.0"
+        "cargo-bundle-licenses",
+        "pkg-config",
+        "make"
       ]
     },
     "schema_version": 0,
     "source": {
-      "sha256": "d0b075660b4cc5eb392f13e1a6d0602e07b230880ea0606f8fb92c07b84ac517",
-      "url": "https://pypi.org/packages/source/f/fastlowess/fastlowess-0.99.7.tar.gz"
-    },
-    "test": {
-      "imports": [
-        "fastlowess"
-      ]
+      "sha256": "507d6a8da57d7692a5f5cb1417dc5ee17b592b9f8d2a41a5813c19f773d94b1c",
+      "url": "https://github.com/thisisamirv/lowess-project/archive/refs/tags/v0.99.8.tar.gz"
     }
   },
   "linux_64_requirements": {
@@ -78,6 +420,8 @@
         "c_compiler_stub",
         "c_stdlib_stub",
         "cargo-bundle-licenses",
+        "make",
+        "pkg-config",
         "rust_compiler_stub"
       ]
     },
@@ -86,14 +430,16 @@
       "elements": [
         "maturin",
         "pip",
-        "python"
+        "python",
+        "r-base"
       ]
     },
     "run": {
       "__set__": true,
       "elements": [
         "numpy",
-        "python"
+        "python",
+        "r-base"
       ]
     },
     "test": {
@@ -103,113 +449,1509 @@
   },
   "meta_yaml": {
     "about": {
+      "description": "Fast, efficient, and robust Locally Weighted Scatterplot Smoothing (LOWESS)\nimplementation in Rust with bindings for Python, R, and C++.\n",
       "home": "https://github.com/thisisamirv/lowess-project",
       "license": "MIT AND Apache-2.0",
       "license_file": [
         "LICENSE-MIT",
-        "LICENSE-APACHE",
-        "THIRDPARTY.yml"
+        "LICENSE-APACHE"
       ],
-      "summary": "High-performance LOWESS smoothing for Rust, Python, and R"
+      "summary": "High-performance LOWESS smoothing associated bindings"
     },
     "build": {
-      "number": "0",
-      "script": [
-        "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml",
-        "PYTHON -m pip install . -vv --no-build-isolation"
-      ]
+      "number": "0"
     },
     "extra": {
       "recipe-maintainers": [
         "thisisamirv"
       ]
     },
+    "outputs": [
+      {
+        "build": {
+          "missing_dso_whitelist": [
+            "*/libR.so"
+          ],
+          "script": [
+            "cd bindings/r",
+            "cd src && tar --extract --xz -f vendor.tar.xz && cd ..",
+            "unset CARGO_BUILD_TARGET && $R CMD INSTALL --build ."
+          ]
+        },
+        "name": "r-rfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ],
+          "host": [
+            "r-base >=4.3"
+          ],
+          "run": [
+            "r-base >=4.3"
+          ]
+        },
+        "test": {
+          "commands": [
+            "$R -e \"library('rfastlowess')\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/python",
+            "$PYTHON -m pip install . -vv --no-build-isolation",
+            "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml"
+          ]
+        },
+        "name": "fastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub",
+            "cargo-bundle-licenses"
+          ],
+          "host": [
+            "python",
+            "pip",
+            "maturin >=1.0,<2.0"
+          ],
+          "run": [
+            "python",
+            "numpy >=1.20.0"
+          ]
+        },
+        "test": {
+          "imports": [
+            "fastlowess"
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/cpp",
+            "cargo build --release",
+            "mkdir -p $PREFIX/lib",
+            "mkdir -p $PREFIX/include",
+            "find ../../target -name \"libfastlowess_cpp.so\" -type f -exec cp {} $PREFIX/lib/libfastlowess.so \\;",
+            "cp include/fastlowess.h $PREFIX/include/"
+          ]
+        },
+        "name": "libfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ]
+        },
+        "test": {
+          "commands": [
+            "test -f $PREFIX/include/fastlowess.h",
+            "test -f $PREFIX/lib/libfastlowess.so"
+          ]
+        }
+      },
+      {
+        "build": {
+          "missing_dso_whitelist": [
+            "*/libR.so"
+          ],
+          "script": [
+            "cd bindings/r",
+            "cd src && tar --extract --xz -f vendor.tar.xz && cd ..",
+            "unset CARGO_BUILD_TARGET && $R CMD INSTALL --build ."
+          ]
+        },
+        "name": "r-rfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ],
+          "host": [
+            "r-base >=4.3"
+          ],
+          "run": [
+            "r-base >=4.3"
+          ]
+        },
+        "test": {
+          "commands": [
+            "$R -e \"library('rfastlowess')\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/python",
+            "$PYTHON -m pip install . -vv --no-build-isolation",
+            "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml"
+          ]
+        },
+        "name": "fastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub",
+            "cargo-bundle-licenses"
+          ],
+          "host": [
+            "python",
+            "pip",
+            "maturin >=1.0,<2.0"
+          ],
+          "run": [
+            "python",
+            "numpy >=1.20.0"
+          ]
+        },
+        "test": {
+          "imports": [
+            "fastlowess"
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/cpp",
+            "cargo build --release",
+            "mkdir -p $PREFIX/lib",
+            "mkdir -p $PREFIX/include",
+            "find ../../target -name \"libfastlowess_cpp.so\" -type f -exec cp {} $PREFIX/lib/libfastlowess.so \\;",
+            "cp include/fastlowess.h $PREFIX/include/"
+          ]
+        },
+        "name": "libfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ]
+        },
+        "test": {
+          "commands": [
+            "test -f $PREFIX/include/fastlowess.h",
+            "test -f $PREFIX/lib/libfastlowess.so"
+          ]
+        }
+      },
+      {
+        "build": {
+          "missing_dso_whitelist": [
+            "*/libR.so"
+          ],
+          "script": [
+            "cd bindings/r",
+            "cd src && tar --extract --xz -f vendor.tar.xz && cd ..",
+            "unset CARGO_BUILD_TARGET && $R CMD INSTALL --build ."
+          ]
+        },
+        "name": "r-rfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ],
+          "host": [
+            "r-base >=4.3"
+          ],
+          "run": [
+            "r-base >=4.3"
+          ]
+        },
+        "test": {
+          "commands": [
+            "$R -e \"library('rfastlowess')\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/python",
+            "$PYTHON -m pip install . -vv --no-build-isolation",
+            "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml"
+          ]
+        },
+        "name": "fastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub",
+            "cargo-bundle-licenses"
+          ],
+          "host": [
+            "python",
+            "pip",
+            "maturin >=1.0,<2.0"
+          ],
+          "run": [
+            "python",
+            "numpy >=1.20.0"
+          ]
+        },
+        "test": {
+          "imports": [
+            "fastlowess"
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/cpp",
+            "cargo build --release",
+            "mkdir -p $PREFIX/lib",
+            "mkdir -p $PREFIX/include",
+            "find ../../target -name \"libfastlowess_cpp.so\" -type f -exec cp {} $PREFIX/lib/libfastlowess.so \\;",
+            "cp include/fastlowess.h $PREFIX/include/"
+          ]
+        },
+        "name": "libfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ]
+        },
+        "test": {
+          "commands": [
+            "test -f $PREFIX/include/fastlowess.h",
+            "test -f $PREFIX/lib/libfastlowess.so"
+          ]
+        }
+      },
+      {
+        "build": {
+          "missing_dso_whitelist": [
+            "*/libR.so"
+          ],
+          "script": [
+            "cd bindings/r",
+            "cd src && tar --extract --xz -f vendor.tar.xz && cd ..",
+            "unset CARGO_BUILD_TARGET && $R CMD INSTALL --build ."
+          ]
+        },
+        "name": "r-rfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ],
+          "host": [
+            "r-base >=4.3"
+          ],
+          "run": [
+            "r-base >=4.3"
+          ]
+        },
+        "test": {
+          "commands": [
+            "$R -e \"library('rfastlowess')\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/python",
+            "$PYTHON -m pip install . -vv --no-build-isolation",
+            "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml"
+          ]
+        },
+        "name": "fastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub",
+            "cargo-bundle-licenses"
+          ],
+          "host": [
+            "python",
+            "pip",
+            "maturin >=1.0,<2.0"
+          ],
+          "run": [
+            "python",
+            "numpy >=1.20.0"
+          ]
+        },
+        "test": {
+          "imports": [
+            "fastlowess"
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/cpp",
+            "cargo build --release",
+            "mkdir -p $PREFIX/lib",
+            "mkdir -p $PREFIX/include",
+            "find ../../target -name \"libfastlowess_cpp.so\" -type f -exec cp {} $PREFIX/lib/libfastlowess.so \\;",
+            "cp include/fastlowess.h $PREFIX/include/"
+          ]
+        },
+        "name": "libfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ]
+        },
+        "test": {
+          "commands": [
+            "test -f $PREFIX/include/fastlowess.h",
+            "test -f $PREFIX/lib/libfastlowess.so"
+          ]
+        }
+      },
+      {
+        "build": {
+          "missing_dso_whitelist": [
+            "*/libR.so"
+          ],
+          "script": [
+            "cd bindings/r",
+            "cd src && tar --extract --xz -f vendor.tar.xz && cd ..",
+            "unset CARGO_BUILD_TARGET && $R CMD INSTALL --build ."
+          ]
+        },
+        "name": "r-rfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ],
+          "host": [
+            "r-base >=4.3"
+          ],
+          "run": [
+            "r-base >=4.3"
+          ]
+        },
+        "test": {
+          "commands": [
+            "$R -e \"library('rfastlowess')\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/python",
+            "$PYTHON -m pip install . -vv --no-build-isolation",
+            "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml"
+          ]
+        },
+        "name": "fastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub",
+            "cargo-bundle-licenses"
+          ],
+          "host": [
+            "python",
+            "pip",
+            "maturin >=1.0,<2.0"
+          ],
+          "run": [
+            "python",
+            "numpy >=1.20.0"
+          ]
+        },
+        "test": {
+          "imports": [
+            "fastlowess"
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/cpp",
+            "cargo build --release",
+            "mkdir -p $PREFIX/lib",
+            "mkdir -p $PREFIX/include",
+            "find ../../target -name \"libfastlowess_cpp.dylib\" -type f -exec cp {} $PREFIX/lib/libfastlowess.dylib \\;",
+            "cp include/fastlowess.h $PREFIX/include/"
+          ]
+        },
+        "name": "libfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ]
+        },
+        "test": {
+          "commands": [
+            "test -f $PREFIX/include/fastlowess.h"
+          ]
+        }
+      },
+      {
+        "build": {
+          "missing_dso_whitelist": [
+            "*/libR.so"
+          ],
+          "script": [
+            "cd bindings/r",
+            "cd src && tar --extract --xz -f vendor.tar.xz && cd ..",
+            "unset CARGO_BUILD_TARGET && $R CMD INSTALL --build ."
+          ]
+        },
+        "name": "r-rfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ],
+          "host": [
+            "r-base >=4.3"
+          ],
+          "run": [
+            "r-base >=4.3"
+          ]
+        },
+        "test": {
+          "commands": [
+            "$R -e \"library('rfastlowess')\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/python",
+            "$PYTHON -m pip install . -vv --no-build-isolation",
+            "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml"
+          ]
+        },
+        "name": "fastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub",
+            "cargo-bundle-licenses"
+          ],
+          "host": [
+            "python",
+            "pip",
+            "maturin >=1.0,<2.0"
+          ],
+          "run": [
+            "python",
+            "numpy >=1.20.0"
+          ]
+        },
+        "test": {
+          "imports": [
+            "fastlowess"
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/cpp",
+            "cargo build --release",
+            "mkdir -p $PREFIX/lib",
+            "mkdir -p $PREFIX/include",
+            "find ../../target -name \"libfastlowess_cpp.dylib\" -type f -exec cp {} $PREFIX/lib/libfastlowess.dylib \\;",
+            "cp include/fastlowess.h $PREFIX/include/"
+          ]
+        },
+        "name": "libfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ]
+        },
+        "test": {
+          "commands": [
+            "test -f $PREFIX/include/fastlowess.h"
+          ]
+        }
+      },
+      {
+        "build": {
+          "missing_dso_whitelist": [
+            "*/libR.so"
+          ],
+          "script": [
+            "cd bindings/r",
+            "cd src && tar --extract --xz -f vendor.tar.xz && cd ..",
+            "unset CARGO_BUILD_TARGET && $R CMD INSTALL --build ."
+          ]
+        },
+        "name": "r-rfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ],
+          "host": [
+            "r-base >=4.3"
+          ],
+          "run": [
+            "r-base >=4.3"
+          ]
+        },
+        "test": {
+          "commands": [
+            "$R -e \"library('rfastlowess')\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/python",
+            "$PYTHON -m pip install . -vv --no-build-isolation",
+            "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml"
+          ]
+        },
+        "name": "fastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub",
+            "cargo-bundle-licenses"
+          ],
+          "host": [
+            "python",
+            "pip",
+            "maturin >=1.0,<2.0"
+          ],
+          "run": [
+            "python",
+            "numpy >=1.20.0"
+          ]
+        },
+        "test": {
+          "imports": [
+            "fastlowess"
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/cpp",
+            "cargo build --release",
+            "mkdir -p $PREFIX/lib",
+            "mkdir -p $PREFIX/include",
+            "find ../../target -name \"libfastlowess_cpp.dylib\" -type f -exec cp {} $PREFIX/lib/libfastlowess.dylib \\;",
+            "cp include/fastlowess.h $PREFIX/include/"
+          ]
+        },
+        "name": "libfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ]
+        },
+        "test": {
+          "commands": [
+            "test -f $PREFIX/include/fastlowess.h"
+          ]
+        }
+      },
+      {
+        "build": {
+          "missing_dso_whitelist": [
+            "*/libR.so"
+          ],
+          "script": [
+            "cd bindings/r",
+            "cd src && tar --extract --xz -f vendor.tar.xz && cd ..",
+            "unset CARGO_BUILD_TARGET && $R CMD INSTALL --build ."
+          ]
+        },
+        "name": "r-rfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ],
+          "host": [
+            "r-base >=4.3"
+          ],
+          "run": [
+            "r-base >=4.3"
+          ]
+        },
+        "test": {
+          "commands": [
+            "$R -e \"library('rfastlowess')\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/python",
+            "$PYTHON -m pip install . -vv --no-build-isolation",
+            "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml"
+          ]
+        },
+        "name": "fastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub",
+            "cargo-bundle-licenses"
+          ],
+          "host": [
+            "python",
+            "pip",
+            "maturin >=1.0,<2.0"
+          ],
+          "run": [
+            "python",
+            "numpy >=1.20.0"
+          ]
+        },
+        "test": {
+          "imports": [
+            "fastlowess"
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/cpp",
+            "cargo build --release",
+            "mkdir -p $PREFIX/lib",
+            "mkdir -p $PREFIX/include",
+            "find ../../target -name \"libfastlowess_cpp.dylib\" -type f -exec cp {} $PREFIX/lib/libfastlowess.dylib \\;",
+            "cp include/fastlowess.h $PREFIX/include/"
+          ]
+        },
+        "name": "libfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ]
+        },
+        "test": {
+          "commands": [
+            "test -f $PREFIX/include/fastlowess.h"
+          ]
+        }
+      },
+      {
+        "build": {
+          "missing_dso_whitelist": [
+            "*/libR.so"
+          ],
+          "script": [
+            "cd bindings/r",
+            "cd src && tar --extract --xz -f vendor.tar.xz && cd ..",
+            "unset CARGO_BUILD_TARGET && $R CMD INSTALL --build ."
+          ],
+          "skip": true
+        },
+        "name": "r-rfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ],
+          "host": [
+            "r-base >=4.3"
+          ],
+          "run": [
+            "r-base >=4.3"
+          ]
+        },
+        "test": {
+          "commands": [
+            "$R -e \"library('rfastlowess')\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/python",
+            "$PYTHON -m pip install . -vv --no-build-isolation",
+            "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml"
+          ]
+        },
+        "name": "fastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub",
+            "cargo-bundle-licenses"
+          ],
+          "host": [
+            "python",
+            "pip",
+            "maturin >=1.0,<2.0"
+          ],
+          "run": [
+            "python",
+            "numpy >=1.20.0"
+          ]
+        },
+        "test": {
+          "imports": [
+            "fastlowess"
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/cpp",
+            "cargo build --release",
+            "if not exist \"%PREFIX%\\\\Library\\\\lib\" mkdir \"%PREFIX%\\\\Library\\\\lib\"",
+            "if not exist \"%PREFIX%\\\\Library\\\\bin\" mkdir \"%PREFIX%\\\\Library\\\\bin\"",
+            "if not exist \"%PREFIX%\\\\Library\\\\include\" mkdir \"%PREFIX%\\\\Library\\\\include\"",
+            "copy ..\\\\..\\\\target\\\\release\\\\fastlowess_cpp.dll \"%PREFIX%\\\\Library\\\\bin\\\\fastlowess.dll\"",
+            "copy ..\\\\..\\\\target\\\\release\\\\fastlowess_cpp.dll.lib \"%PREFIX%\\\\Library\\\\lib\\\\fastlowess.lib\"",
+            "copy include\\\\fastlowess.h \"%PREFIX%\\\\Library\\\\include\\\\\""
+          ]
+        },
+        "name": "libfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ]
+        },
+        "test": {
+          "commands": [
+            "if not exist \"%PREFIX%\\\\Library\\\\include\\\\fastlowess.h\" exit 1"
+          ]
+        }
+      },
+      {
+        "build": {
+          "missing_dso_whitelist": [
+            "*/libR.so"
+          ],
+          "script": [
+            "cd bindings/r",
+            "cd src && tar --extract --xz -f vendor.tar.xz && cd ..",
+            "unset CARGO_BUILD_TARGET && $R CMD INSTALL --build ."
+          ],
+          "skip": true
+        },
+        "name": "r-rfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ],
+          "host": [
+            "r-base >=4.3"
+          ],
+          "run": [
+            "r-base >=4.3"
+          ]
+        },
+        "test": {
+          "commands": [
+            "$R -e \"library('rfastlowess')\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/python",
+            "$PYTHON -m pip install . -vv --no-build-isolation",
+            "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml"
+          ]
+        },
+        "name": "fastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub",
+            "cargo-bundle-licenses"
+          ],
+          "host": [
+            "python",
+            "pip",
+            "maturin >=1.0,<2.0"
+          ],
+          "run": [
+            "python",
+            "numpy >=1.20.0"
+          ]
+        },
+        "test": {
+          "imports": [
+            "fastlowess"
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/cpp",
+            "cargo build --release",
+            "if not exist \"%PREFIX%\\\\Library\\\\lib\" mkdir \"%PREFIX%\\\\Library\\\\lib\"",
+            "if not exist \"%PREFIX%\\\\Library\\\\bin\" mkdir \"%PREFIX%\\\\Library\\\\bin\"",
+            "if not exist \"%PREFIX%\\\\Library\\\\include\" mkdir \"%PREFIX%\\\\Library\\\\include\"",
+            "copy ..\\\\..\\\\target\\\\release\\\\fastlowess_cpp.dll \"%PREFIX%\\\\Library\\\\bin\\\\fastlowess.dll\"",
+            "copy ..\\\\..\\\\target\\\\release\\\\fastlowess_cpp.dll.lib \"%PREFIX%\\\\Library\\\\lib\\\\fastlowess.lib\"",
+            "copy include\\\\fastlowess.h \"%PREFIX%\\\\Library\\\\include\\\\\""
+          ]
+        },
+        "name": "libfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ]
+        },
+        "test": {
+          "commands": [
+            "if not exist \"%PREFIX%\\\\Library\\\\include\\\\fastlowess.h\" exit 1"
+          ]
+        }
+      },
+      {
+        "build": {
+          "missing_dso_whitelist": [
+            "*/libR.so"
+          ],
+          "script": [
+            "cd bindings/r",
+            "cd src && tar --extract --xz -f vendor.tar.xz && cd ..",
+            "unset CARGO_BUILD_TARGET && $R CMD INSTALL --build ."
+          ],
+          "skip": true
+        },
+        "name": "r-rfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ],
+          "host": [
+            "r-base >=4.3"
+          ],
+          "run": [
+            "r-base >=4.3"
+          ]
+        },
+        "test": {
+          "commands": [
+            "$R -e \"library('rfastlowess')\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/python",
+            "$PYTHON -m pip install . -vv --no-build-isolation",
+            "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml"
+          ]
+        },
+        "name": "fastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub",
+            "cargo-bundle-licenses"
+          ],
+          "host": [
+            "python",
+            "pip",
+            "maturin >=1.0,<2.0"
+          ],
+          "run": [
+            "python",
+            "numpy >=1.20.0"
+          ]
+        },
+        "test": {
+          "imports": [
+            "fastlowess"
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/cpp",
+            "cargo build --release",
+            "if not exist \"%PREFIX%\\\\Library\\\\lib\" mkdir \"%PREFIX%\\\\Library\\\\lib\"",
+            "if not exist \"%PREFIX%\\\\Library\\\\bin\" mkdir \"%PREFIX%\\\\Library\\\\bin\"",
+            "if not exist \"%PREFIX%\\\\Library\\\\include\" mkdir \"%PREFIX%\\\\Library\\\\include\"",
+            "copy ..\\\\..\\\\target\\\\release\\\\fastlowess_cpp.dll \"%PREFIX%\\\\Library\\\\bin\\\\fastlowess.dll\"",
+            "copy ..\\\\..\\\\target\\\\release\\\\fastlowess_cpp.dll.lib \"%PREFIX%\\\\Library\\\\lib\\\\fastlowess.lib\"",
+            "copy include\\\\fastlowess.h \"%PREFIX%\\\\Library\\\\include\\\\\""
+          ]
+        },
+        "name": "libfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ]
+        },
+        "test": {
+          "commands": [
+            "if not exist \"%PREFIX%\\\\Library\\\\include\\\\fastlowess.h\" exit 1"
+          ]
+        }
+      },
+      {
+        "build": {
+          "missing_dso_whitelist": [
+            "*/libR.so"
+          ],
+          "script": [
+            "cd bindings/r",
+            "cd src && tar --extract --xz -f vendor.tar.xz && cd ..",
+            "unset CARGO_BUILD_TARGET && $R CMD INSTALL --build ."
+          ],
+          "skip": true
+        },
+        "name": "r-rfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ],
+          "host": [
+            "r-base >=4.3"
+          ],
+          "run": [
+            "r-base >=4.3"
+          ]
+        },
+        "test": {
+          "commands": [
+            "$R -e \"library('rfastlowess')\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/python",
+            "$PYTHON -m pip install . -vv --no-build-isolation",
+            "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml"
+          ]
+        },
+        "name": "fastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub",
+            "cargo-bundle-licenses"
+          ],
+          "host": [
+            "python",
+            "pip",
+            "maturin >=1.0,<2.0"
+          ],
+          "run": [
+            "python",
+            "numpy >=1.20.0"
+          ]
+        },
+        "test": {
+          "imports": [
+            "fastlowess"
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/cpp",
+            "cargo build --release",
+            "if not exist \"%PREFIX%\\\\Library\\\\lib\" mkdir \"%PREFIX%\\\\Library\\\\lib\"",
+            "if not exist \"%PREFIX%\\\\Library\\\\bin\" mkdir \"%PREFIX%\\\\Library\\\\bin\"",
+            "if not exist \"%PREFIX%\\\\Library\\\\include\" mkdir \"%PREFIX%\\\\Library\\\\include\"",
+            "copy ..\\\\..\\\\target\\\\release\\\\fastlowess_cpp.dll \"%PREFIX%\\\\Library\\\\bin\\\\fastlowess.dll\"",
+            "copy ..\\\\..\\\\target\\\\release\\\\fastlowess_cpp.dll.lib \"%PREFIX%\\\\Library\\\\lib\\\\fastlowess.lib\"",
+            "copy include\\\\fastlowess.h \"%PREFIX%\\\\Library\\\\include\\\\\""
+          ]
+        },
+        "name": "libfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ]
+        },
+        "test": {
+          "commands": [
+            "if not exist \"%PREFIX%\\\\Library\\\\include\\\\fastlowess.h\" exit 1"
+          ]
+        }
+      }
+    ],
     "package": {
       "name": "fastlowess",
-      "version": "0.99.7"
+      "version": "0.99.8"
     },
     "requirements": {
       "build": [
         "c_compiler_stub",
         "c_stdlib_stub",
         "rust_compiler_stub",
-        "cargo-bundle-licenses"
-      ],
-      "host": [
-        "python",
-        "pip",
-        "maturin >=1.0,<2.0"
-      ],
-      "run": [
-        "python",
-        "numpy >=1.20.0"
+        "cargo-bundle-licenses",
+        "pkg-config",
+        "make"
       ]
     },
     "schema_version": 0,
     "source": {
-      "sha256": "d0b075660b4cc5eb392f13e1a6d0602e07b230880ea0606f8fb92c07b84ac517",
-      "url": "https://pypi.org/packages/source/f/fastlowess/fastlowess-0.99.7.tar.gz"
-    },
-    "test": {
-      "imports": [
-        "fastlowess"
-      ]
+      "sha256": "507d6a8da57d7692a5f5cb1417dc5ee17b592b9f8d2a41a5813c19f773d94b1c",
+      "url": "https://github.com/thisisamirv/lowess-project/archive/refs/tags/v0.99.8.tar.gz"
     }
   },
   "name": "fastlowess",
   "osx_64_meta_yaml": {
     "about": {
+      "description": "Fast, efficient, and robust Locally Weighted Scatterplot Smoothing (LOWESS)\nimplementation in Rust with bindings for Python, R, and C++.\n",
       "home": "https://github.com/thisisamirv/lowess-project",
       "license": "MIT AND Apache-2.0",
       "license_file": [
         "LICENSE-MIT",
-        "LICENSE-APACHE",
-        "THIRDPARTY.yml"
+        "LICENSE-APACHE"
       ],
-      "summary": "High-performance LOWESS smoothing for Rust, Python, and R"
+      "summary": "High-performance LOWESS smoothing associated bindings"
     },
     "build": {
-      "number": "0",
-      "script": [
-        "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml",
-        "PYTHON -m pip install . -vv --no-build-isolation"
-      ]
+      "number": "0"
     },
     "extra": {
       "recipe-maintainers": [
         "thisisamirv"
       ]
     },
+    "outputs": [
+      {
+        "build": {
+          "missing_dso_whitelist": [
+            "*/libR.so"
+          ],
+          "script": [
+            "cd bindings/r",
+            "cd src && tar --extract --xz -f vendor.tar.xz && cd ..",
+            "unset CARGO_BUILD_TARGET && $R CMD INSTALL --build ."
+          ]
+        },
+        "name": "r-rfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ],
+          "host": [
+            "r-base >=4.3"
+          ],
+          "run": [
+            "r-base >=4.3"
+          ]
+        },
+        "test": {
+          "commands": [
+            "$R -e \"library('rfastlowess')\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/python",
+            "$PYTHON -m pip install . -vv --no-build-isolation",
+            "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml"
+          ]
+        },
+        "name": "fastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub",
+            "cargo-bundle-licenses"
+          ],
+          "host": [
+            "python",
+            "pip",
+            "maturin >=1.0,<2.0"
+          ],
+          "run": [
+            "python",
+            "numpy >=1.20.0"
+          ]
+        },
+        "test": {
+          "imports": [
+            "fastlowess"
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/cpp",
+            "cargo build --release",
+            "mkdir -p $PREFIX/lib",
+            "mkdir -p $PREFIX/include",
+            "find ../../target -name \"libfastlowess_cpp.dylib\" -type f -exec cp {} $PREFIX/lib/libfastlowess.dylib \\;",
+            "cp include/fastlowess.h $PREFIX/include/"
+          ]
+        },
+        "name": "libfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ]
+        },
+        "test": {
+          "commands": [
+            "test -f $PREFIX/include/fastlowess.h"
+          ]
+        }
+      },
+      {
+        "build": {
+          "missing_dso_whitelist": [
+            "*/libR.so"
+          ],
+          "script": [
+            "cd bindings/r",
+            "cd src && tar --extract --xz -f vendor.tar.xz && cd ..",
+            "unset CARGO_BUILD_TARGET && $R CMD INSTALL --build ."
+          ]
+        },
+        "name": "r-rfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ],
+          "host": [
+            "r-base >=4.3"
+          ],
+          "run": [
+            "r-base >=4.3"
+          ]
+        },
+        "test": {
+          "commands": [
+            "$R -e \"library('rfastlowess')\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/python",
+            "$PYTHON -m pip install . -vv --no-build-isolation",
+            "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml"
+          ]
+        },
+        "name": "fastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub",
+            "cargo-bundle-licenses"
+          ],
+          "host": [
+            "python",
+            "pip",
+            "maturin >=1.0,<2.0"
+          ],
+          "run": [
+            "python",
+            "numpy >=1.20.0"
+          ]
+        },
+        "test": {
+          "imports": [
+            "fastlowess"
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/cpp",
+            "cargo build --release",
+            "mkdir -p $PREFIX/lib",
+            "mkdir -p $PREFIX/include",
+            "find ../../target -name \"libfastlowess_cpp.dylib\" -type f -exec cp {} $PREFIX/lib/libfastlowess.dylib \\;",
+            "cp include/fastlowess.h $PREFIX/include/"
+          ]
+        },
+        "name": "libfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ]
+        },
+        "test": {
+          "commands": [
+            "test -f $PREFIX/include/fastlowess.h"
+          ]
+        }
+      },
+      {
+        "build": {
+          "missing_dso_whitelist": [
+            "*/libR.so"
+          ],
+          "script": [
+            "cd bindings/r",
+            "cd src && tar --extract --xz -f vendor.tar.xz && cd ..",
+            "unset CARGO_BUILD_TARGET && $R CMD INSTALL --build ."
+          ]
+        },
+        "name": "r-rfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ],
+          "host": [
+            "r-base >=4.3"
+          ],
+          "run": [
+            "r-base >=4.3"
+          ]
+        },
+        "test": {
+          "commands": [
+            "$R -e \"library('rfastlowess')\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/python",
+            "$PYTHON -m pip install . -vv --no-build-isolation",
+            "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml"
+          ]
+        },
+        "name": "fastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub",
+            "cargo-bundle-licenses"
+          ],
+          "host": [
+            "python",
+            "pip",
+            "maturin >=1.0,<2.0"
+          ],
+          "run": [
+            "python",
+            "numpy >=1.20.0"
+          ]
+        },
+        "test": {
+          "imports": [
+            "fastlowess"
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/cpp",
+            "cargo build --release",
+            "mkdir -p $PREFIX/lib",
+            "mkdir -p $PREFIX/include",
+            "find ../../target -name \"libfastlowess_cpp.dylib\" -type f -exec cp {} $PREFIX/lib/libfastlowess.dylib \\;",
+            "cp include/fastlowess.h $PREFIX/include/"
+          ]
+        },
+        "name": "libfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ]
+        },
+        "test": {
+          "commands": [
+            "test -f $PREFIX/include/fastlowess.h"
+          ]
+        }
+      },
+      {
+        "build": {
+          "missing_dso_whitelist": [
+            "*/libR.so"
+          ],
+          "script": [
+            "cd bindings/r",
+            "cd src && tar --extract --xz -f vendor.tar.xz && cd ..",
+            "unset CARGO_BUILD_TARGET && $R CMD INSTALL --build ."
+          ]
+        },
+        "name": "r-rfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ],
+          "host": [
+            "r-base >=4.3"
+          ],
+          "run": [
+            "r-base >=4.3"
+          ]
+        },
+        "test": {
+          "commands": [
+            "$R -e \"library('rfastlowess')\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/python",
+            "$PYTHON -m pip install . -vv --no-build-isolation",
+            "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml"
+          ]
+        },
+        "name": "fastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub",
+            "cargo-bundle-licenses"
+          ],
+          "host": [
+            "python",
+            "pip",
+            "maturin >=1.0,<2.0"
+          ],
+          "run": [
+            "python",
+            "numpy >=1.20.0"
+          ]
+        },
+        "test": {
+          "imports": [
+            "fastlowess"
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/cpp",
+            "cargo build --release",
+            "mkdir -p $PREFIX/lib",
+            "mkdir -p $PREFIX/include",
+            "find ../../target -name \"libfastlowess_cpp.dylib\" -type f -exec cp {} $PREFIX/lib/libfastlowess.dylib \\;",
+            "cp include/fastlowess.h $PREFIX/include/"
+          ]
+        },
+        "name": "libfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ]
+        },
+        "test": {
+          "commands": [
+            "test -f $PREFIX/include/fastlowess.h"
+          ]
+        }
+      }
+    ],
     "package": {
       "name": "fastlowess",
-      "version": "0.99.7"
+      "version": "0.99.8"
     },
     "requirements": {
       "build": [
         "c_compiler_stub",
         "c_stdlib_stub",
         "rust_compiler_stub",
-        "cargo-bundle-licenses"
-      ],
-      "host": [
-        "python",
-        "pip",
-        "maturin >=1.0,<2.0"
-      ],
-      "run": [
-        "python",
-        "numpy >=1.20.0"
+        "cargo-bundle-licenses",
+        "pkg-config",
+        "make"
       ]
     },
     "schema_version": 0,
     "source": {
-      "sha256": "d0b075660b4cc5eb392f13e1a6d0602e07b230880ea0606f8fb92c07b84ac517",
-      "url": "https://pypi.org/packages/source/f/fastlowess/fastlowess-0.99.7.tar.gz"
-    },
-    "test": {
-      "imports": [
-        "fastlowess"
-      ]
+      "sha256": "507d6a8da57d7692a5f5cb1417dc5ee17b592b9f8d2a41a5813c19f773d94b1c",
+      "url": "https://github.com/thisisamirv/lowess-project/archive/refs/tags/v0.99.8.tar.gz"
     }
   },
   "osx_64_requirements": {
@@ -219,6 +1961,8 @@
         "c_compiler_stub",
         "c_stdlib_stub",
         "cargo-bundle-licenses",
+        "make",
+        "pkg-config",
         "rust_compiler_stub"
       ]
     },
@@ -227,14 +1971,16 @@
       "elements": [
         "maturin",
         "pip",
-        "python"
+        "python",
+        "r-base"
       ]
     },
     "run": {
       "__set__": true,
       "elements": [
         "numpy",
-        "python"
+        "python",
+        "r-base"
       ]
     },
     "test": {
@@ -245,7 +1991,9 @@
   "outputs_names": {
     "__set__": true,
     "elements": [
-      "fastlowess"
+      "fastlowess",
+      "libfastlowess",
+      "r-rfastlowess"
     ]
   },
   "parsing_error": false,
@@ -257,17 +2005,20 @@
   "pr_info": {
     "__lazy_json__": "pr_info/fastlowess.json"
   },
-  "raw_meta_yaml": "{% set name = \"fastlowess\" %}\n{% set version = \"0.99.7\" %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz\n  sha256: d0b075660b4cc5eb392f13e1a6d0602e07b230880ea0606f8fb92c07b84ac517\n\nbuild:\n  number: 0\n  script:\n    - cargo-bundle-licenses --format yaml --output THIRDPARTY.yml\n    - {{ PYTHON }} -m pip install . -vv --no-build-isolation\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ stdlib('c') }}\n    - {{ compiler('rust') }}\n    - cargo-bundle-licenses\n  host:\n    - python\n    - pip\n    - maturin >=1.0,<2.0\n  run:\n    - python\n    - numpy >=1.20.0\n\ntest:\n  imports:\n    - fastlowess\n\nabout:\n  home: https://github.com/thisisamirv/lowess-project\n  license: MIT AND Apache-2.0\n  license_file:\n    - LICENSE-MIT\n    - LICENSE-APACHE\n    - THIRDPARTY.yml\n  summary: High-performance LOWESS smoothing for Rust, Python, and R\n\nextra:\n  recipe-maintainers:\n    - thisisamirv\n",
+  "raw_meta_yaml": "{% set name = \"fastlowess\" %}\n{% set version = \"0.99.8\" %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\n# ==============================================================================\n# Source Configuration\n# ==============================================================================\nsource:\n  url: https://github.com/thisisamirv/lowess-project/archive/refs/tags/v{{ version }}.tar.gz\n  sha256: 507d6a8da57d7692a5f5cb1417dc5ee17b592b9f8d2a41a5813c19f773d94b1c\n\nbuild:\n  number: 0\n\n# ==============================================================================\n# Global Build Requirements\n# ==============================================================================\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ stdlib('c') }}\n    - {{ compiler('rust') }}\n    - cargo-bundle-licenses\n    - pkg-config\n    - make\n\n# ==============================================================================\n# Multi-Output Package Definitions\n# ==============================================================================\noutputs:\n  # ----------------------------------------------------------------------------\n  # Output 1: R Package (r-rfastlowess)\n  # Note: Skip on Windows because Conda's Rust (MSVC) cannot compile for GNU\n  # target needed by Conda R (MinGW-GCC). Windows users can use Rtools/CRAN.\n  # ----------------------------------------------------------------------------\n  - name: r-rfastlowess\n    build:\n      skip: true  # [win]\n      missing_dso_whitelist:\n        - \"*/libR.so\"\n      script:\n        - cd bindings/r\n        # Extract vendored dependencies before R CMD INSTALL runs configure\n        - cd src && tar --extract --xz -f vendor.tar.xz && cd ..\n        # Unset CARGO_BUILD_TARGET to ensure configure and cargo use the same library path\n        - unset CARGO_BUILD_TARGET && $R CMD INSTALL --build .\n    requirements:\n      build:\n        - {{ compiler('c') }}\n        - {{ stdlib('c') }}\n        - {{ compiler('rust') }}\n      host:\n        - r-base >=4.3\n      run:\n        - r-base >=4.3\n    test:\n      commands:\n        - $R -e \"library('rfastlowess')\"\n\n  # ----------------------------------------------------------------------------\n  # Output 2: Python Package (fastlowess)\n  # ----------------------------------------------------------------------------\n  - name: fastlowess\n    build:\n      script:\n        # Build python package using maturin\n        - cd bindings/python\n        - $PYTHON -m pip install . -vv --no-build-isolation\n        - cargo-bundle-licenses --format yaml --output THIRDPARTY.yml\n    requirements:\n      build:\n        - {{ compiler('c') }}\n        - {{ stdlib('c') }}\n        - {{ compiler('rust') }}\n        - cargo-bundle-licenses\n      host:\n        - python\n        - pip\n        - maturin >=1.0,<2.0\n      run:\n        - python\n        - numpy >=1.20.0\n    test:\n      imports:\n        - fastlowess\n\n  # ----------------------------------------------------------------------------\n  # Output 3: C++ Library (libfastlowess)\n  # ----------------------------------------------------------------------------\n  - name: libfastlowess\n    build:\n      script:\n        - cd bindings/cpp\n        - cargo build --release\n        # Install headers and libs to PREFIX (use platform-appropriate commands)\n        - mkdir -p $PREFIX/lib  # [unix]\n        - mkdir -p $PREFIX/include  # [unix]\n        - if not exist \"%PREFIX%\\\\Library\\\\lib\" mkdir \"%PREFIX%\\\\Library\\\\lib\"  # [win]\n        - if not exist \"%PREFIX%\\\\Library\\\\bin\" mkdir \"%PREFIX%\\\\Library\\\\bin\"  # [win]\n        - if not exist \"%PREFIX%\\\\Library\\\\include\" mkdir \"%PREFIX%\\\\Library\\\\include\"  # [win]\n        - find ../../target -name \"libfastlowess_cpp.so\" -type f -exec cp {} $PREFIX/lib/libfastlowess.so \\;  # [linux]\n        - find ../../target -name \"libfastlowess_cpp.dylib\" -type f -exec cp {} $PREFIX/lib/libfastlowess.dylib \\;  # [osx]\n        - copy ..\\\\..\\\\target\\\\release\\\\fastlowess_cpp.dll \"%PREFIX%\\\\Library\\\\bin\\\\fastlowess.dll\"  # [win]\n        - copy ..\\\\..\\\\target\\\\release\\\\fastlowess_cpp.dll.lib \"%PREFIX%\\\\Library\\\\lib\\\\fastlowess.lib\"  # [win]\n        - cp include/fastlowess.h $PREFIX/include/  # [unix]\n        - copy include\\\\fastlowess.h \"%PREFIX%\\\\Library\\\\include\\\\\"  # [win]\n    requirements:\n      build:\n        - {{ compiler('c') }}\n        - {{ stdlib('c') }}\n        - {{ compiler('rust') }}\n    test:\n      commands:\n        - test -f $PREFIX/include/fastlowess.h  # [unix]\n        - test -f $PREFIX/lib/libfastlowess.so  # [linux]\n        - if not exist \"%PREFIX%\\\\Library\\\\include\\\\fastlowess.h\" exit 1  # [win]\n\n# ==============================================================================\n# Package Metadata & Maintainers\n# ==============================================================================\nabout:\n  home: https://github.com/thisisamirv/lowess-project\n  license: MIT AND Apache-2.0\n  license_file:\n    - LICENSE-MIT\n    - LICENSE-APACHE\n  summary: High-performance LOWESS smoothing associated bindings\n  description: |\n    Fast, efficient, and robust Locally Weighted Scatterplot Smoothing (LOWESS)\n    implementation in Rust with bindings for Python, R, and C++.\n\nextra:\n  recipe-maintainers:\n    - thisisamirv\n",
   "req": {
     "__set__": true,
     "elements": [
       "c_compiler_stub",
       "c_stdlib_stub",
       "cargo-bundle-licenses",
+      "make",
       "maturin",
       "numpy",
       "pip",
+      "pkg-config",
       "python",
+      "r-base",
       "rust_compiler_stub"
     ]
   },
@@ -278,6 +2029,8 @@
         "c_compiler_stub",
         "c_stdlib_stub",
         "cargo-bundle-licenses",
+        "make",
+        "pkg-config",
         "rust_compiler_stub"
       ]
     },
@@ -288,7 +2041,8 @@
         "c_stdlib_stub",
         "maturin",
         "pip",
-        "python"
+        "python",
+        "r-base"
       ]
     },
     "run": {
@@ -297,7 +2051,8 @@
         "c_compiler_stub",
         "c_stdlib_stub",
         "numpy",
-        "python"
+        "python",
+        "r-base"
       ]
     },
     "test": {
@@ -313,6 +2068,8 @@
         "c_compiler_stub",
         "c_stdlib_stub",
         "cargo-bundle-licenses",
+        "make",
+        "pkg-config",
         "rust_compiler_stub"
       ]
     },
@@ -321,14 +2078,16 @@
       "elements": [
         "maturin >=1.0,<2.0",
         "pip",
-        "python"
+        "python",
+        "r-base >=4.3"
       ]
     },
     "run": {
       "__set__": true,
       "elements": [
         "numpy >=1.20.0",
-        "python"
+        "python",
+        "r-base >=4.3"
       ]
     },
     "test": {
@@ -336,64 +2095,414 @@
       "elements": []
     }
   },
-  "url": "https://pypi.org/packages/source/f/fastlowess/fastlowess-0.99.7.tar.gz",
-  "version": "0.99.7",
+  "url": "https://github.com/thisisamirv/lowess-project/archive/refs/tags/v0.99.8.tar.gz",
+  "version": "0.99.8",
   "version_pr_info": {
     "__lazy_json__": "version_pr_info/fastlowess.json"
   },
   "win_64_meta_yaml": {
     "about": {
+      "description": "Fast, efficient, and robust Locally Weighted Scatterplot Smoothing (LOWESS)\nimplementation in Rust with bindings for Python, R, and C++.\n",
       "home": "https://github.com/thisisamirv/lowess-project",
       "license": "MIT AND Apache-2.0",
       "license_file": [
         "LICENSE-MIT",
-        "LICENSE-APACHE",
-        "THIRDPARTY.yml"
+        "LICENSE-APACHE"
       ],
-      "summary": "High-performance LOWESS smoothing for Rust, Python, and R"
+      "summary": "High-performance LOWESS smoothing associated bindings"
     },
     "build": {
-      "number": "0",
-      "script": [
-        "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml",
-        "PYTHON -m pip install . -vv --no-build-isolation"
-      ]
+      "number": "0"
     },
     "extra": {
       "recipe-maintainers": [
         "thisisamirv"
       ]
     },
+    "outputs": [
+      {
+        "build": {
+          "missing_dso_whitelist": [
+            "*/libR.so"
+          ],
+          "script": [
+            "cd bindings/r",
+            "cd src && tar --extract --xz -f vendor.tar.xz && cd ..",
+            "unset CARGO_BUILD_TARGET && $R CMD INSTALL --build ."
+          ],
+          "skip": true
+        },
+        "name": "r-rfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ],
+          "host": [
+            "r-base >=4.3"
+          ],
+          "run": [
+            "r-base >=4.3"
+          ]
+        },
+        "test": {
+          "commands": [
+            "$R -e \"library('rfastlowess')\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/python",
+            "$PYTHON -m pip install . -vv --no-build-isolation",
+            "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml"
+          ]
+        },
+        "name": "fastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub",
+            "cargo-bundle-licenses"
+          ],
+          "host": [
+            "python",
+            "pip",
+            "maturin >=1.0,<2.0"
+          ],
+          "run": [
+            "python",
+            "numpy >=1.20.0"
+          ]
+        },
+        "test": {
+          "imports": [
+            "fastlowess"
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/cpp",
+            "cargo build --release",
+            "if not exist \"%PREFIX%\\\\Library\\\\lib\" mkdir \"%PREFIX%\\\\Library\\\\lib\"",
+            "if not exist \"%PREFIX%\\\\Library\\\\bin\" mkdir \"%PREFIX%\\\\Library\\\\bin\"",
+            "if not exist \"%PREFIX%\\\\Library\\\\include\" mkdir \"%PREFIX%\\\\Library\\\\include\"",
+            "copy ..\\\\..\\\\target\\\\release\\\\fastlowess_cpp.dll \"%PREFIX%\\\\Library\\\\bin\\\\fastlowess.dll\"",
+            "copy ..\\\\..\\\\target\\\\release\\\\fastlowess_cpp.dll.lib \"%PREFIX%\\\\Library\\\\lib\\\\fastlowess.lib\"",
+            "copy include\\\\fastlowess.h \"%PREFIX%\\\\Library\\\\include\\\\\""
+          ]
+        },
+        "name": "libfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ]
+        },
+        "test": {
+          "commands": [
+            "if not exist \"%PREFIX%\\\\Library\\\\include\\\\fastlowess.h\" exit 1"
+          ]
+        }
+      },
+      {
+        "build": {
+          "missing_dso_whitelist": [
+            "*/libR.so"
+          ],
+          "script": [
+            "cd bindings/r",
+            "cd src && tar --extract --xz -f vendor.tar.xz && cd ..",
+            "unset CARGO_BUILD_TARGET && $R CMD INSTALL --build ."
+          ],
+          "skip": true
+        },
+        "name": "r-rfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ],
+          "host": [
+            "r-base >=4.3"
+          ],
+          "run": [
+            "r-base >=4.3"
+          ]
+        },
+        "test": {
+          "commands": [
+            "$R -e \"library('rfastlowess')\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/python",
+            "$PYTHON -m pip install . -vv --no-build-isolation",
+            "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml"
+          ]
+        },
+        "name": "fastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub",
+            "cargo-bundle-licenses"
+          ],
+          "host": [
+            "python",
+            "pip",
+            "maturin >=1.0,<2.0"
+          ],
+          "run": [
+            "python",
+            "numpy >=1.20.0"
+          ]
+        },
+        "test": {
+          "imports": [
+            "fastlowess"
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/cpp",
+            "cargo build --release",
+            "if not exist \"%PREFIX%\\\\Library\\\\lib\" mkdir \"%PREFIX%\\\\Library\\\\lib\"",
+            "if not exist \"%PREFIX%\\\\Library\\\\bin\" mkdir \"%PREFIX%\\\\Library\\\\bin\"",
+            "if not exist \"%PREFIX%\\\\Library\\\\include\" mkdir \"%PREFIX%\\\\Library\\\\include\"",
+            "copy ..\\\\..\\\\target\\\\release\\\\fastlowess_cpp.dll \"%PREFIX%\\\\Library\\\\bin\\\\fastlowess.dll\"",
+            "copy ..\\\\..\\\\target\\\\release\\\\fastlowess_cpp.dll.lib \"%PREFIX%\\\\Library\\\\lib\\\\fastlowess.lib\"",
+            "copy include\\\\fastlowess.h \"%PREFIX%\\\\Library\\\\include\\\\\""
+          ]
+        },
+        "name": "libfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ]
+        },
+        "test": {
+          "commands": [
+            "if not exist \"%PREFIX%\\\\Library\\\\include\\\\fastlowess.h\" exit 1"
+          ]
+        }
+      },
+      {
+        "build": {
+          "missing_dso_whitelist": [
+            "*/libR.so"
+          ],
+          "script": [
+            "cd bindings/r",
+            "cd src && tar --extract --xz -f vendor.tar.xz && cd ..",
+            "unset CARGO_BUILD_TARGET && $R CMD INSTALL --build ."
+          ],
+          "skip": true
+        },
+        "name": "r-rfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ],
+          "host": [
+            "r-base >=4.3"
+          ],
+          "run": [
+            "r-base >=4.3"
+          ]
+        },
+        "test": {
+          "commands": [
+            "$R -e \"library('rfastlowess')\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/python",
+            "$PYTHON -m pip install . -vv --no-build-isolation",
+            "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml"
+          ]
+        },
+        "name": "fastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub",
+            "cargo-bundle-licenses"
+          ],
+          "host": [
+            "python",
+            "pip",
+            "maturin >=1.0,<2.0"
+          ],
+          "run": [
+            "python",
+            "numpy >=1.20.0"
+          ]
+        },
+        "test": {
+          "imports": [
+            "fastlowess"
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/cpp",
+            "cargo build --release",
+            "if not exist \"%PREFIX%\\\\Library\\\\lib\" mkdir \"%PREFIX%\\\\Library\\\\lib\"",
+            "if not exist \"%PREFIX%\\\\Library\\\\bin\" mkdir \"%PREFIX%\\\\Library\\\\bin\"",
+            "if not exist \"%PREFIX%\\\\Library\\\\include\" mkdir \"%PREFIX%\\\\Library\\\\include\"",
+            "copy ..\\\\..\\\\target\\\\release\\\\fastlowess_cpp.dll \"%PREFIX%\\\\Library\\\\bin\\\\fastlowess.dll\"",
+            "copy ..\\\\..\\\\target\\\\release\\\\fastlowess_cpp.dll.lib \"%PREFIX%\\\\Library\\\\lib\\\\fastlowess.lib\"",
+            "copy include\\\\fastlowess.h \"%PREFIX%\\\\Library\\\\include\\\\\""
+          ]
+        },
+        "name": "libfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ]
+        },
+        "test": {
+          "commands": [
+            "if not exist \"%PREFIX%\\\\Library\\\\include\\\\fastlowess.h\" exit 1"
+          ]
+        }
+      },
+      {
+        "build": {
+          "missing_dso_whitelist": [
+            "*/libR.so"
+          ],
+          "script": [
+            "cd bindings/r",
+            "cd src && tar --extract --xz -f vendor.tar.xz && cd ..",
+            "unset CARGO_BUILD_TARGET && $R CMD INSTALL --build ."
+          ],
+          "skip": true
+        },
+        "name": "r-rfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ],
+          "host": [
+            "r-base >=4.3"
+          ],
+          "run": [
+            "r-base >=4.3"
+          ]
+        },
+        "test": {
+          "commands": [
+            "$R -e \"library('rfastlowess')\""
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/python",
+            "$PYTHON -m pip install . -vv --no-build-isolation",
+            "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml"
+          ]
+        },
+        "name": "fastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub",
+            "cargo-bundle-licenses"
+          ],
+          "host": [
+            "python",
+            "pip",
+            "maturin >=1.0,<2.0"
+          ],
+          "run": [
+            "python",
+            "numpy >=1.20.0"
+          ]
+        },
+        "test": {
+          "imports": [
+            "fastlowess"
+          ]
+        }
+      },
+      {
+        "build": {
+          "script": [
+            "cd bindings/cpp",
+            "cargo build --release",
+            "if not exist \"%PREFIX%\\\\Library\\\\lib\" mkdir \"%PREFIX%\\\\Library\\\\lib\"",
+            "if not exist \"%PREFIX%\\\\Library\\\\bin\" mkdir \"%PREFIX%\\\\Library\\\\bin\"",
+            "if not exist \"%PREFIX%\\\\Library\\\\include\" mkdir \"%PREFIX%\\\\Library\\\\include\"",
+            "copy ..\\\\..\\\\target\\\\release\\\\fastlowess_cpp.dll \"%PREFIX%\\\\Library\\\\bin\\\\fastlowess.dll\"",
+            "copy ..\\\\..\\\\target\\\\release\\\\fastlowess_cpp.dll.lib \"%PREFIX%\\\\Library\\\\lib\\\\fastlowess.lib\"",
+            "copy include\\\\fastlowess.h \"%PREFIX%\\\\Library\\\\include\\\\\""
+          ]
+        },
+        "name": "libfastlowess",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "rust_compiler_stub"
+          ]
+        },
+        "test": {
+          "commands": [
+            "if not exist \"%PREFIX%\\\\Library\\\\include\\\\fastlowess.h\" exit 1"
+          ]
+        }
+      }
+    ],
     "package": {
       "name": "fastlowess",
-      "version": "0.99.7"
+      "version": "0.99.8"
     },
     "requirements": {
       "build": [
         "c_compiler_stub",
         "c_stdlib_stub",
         "rust_compiler_stub",
-        "cargo-bundle-licenses"
-      ],
-      "host": [
-        "python",
-        "pip",
-        "maturin >=1.0,<2.0"
-      ],
-      "run": [
-        "python",
-        "numpy >=1.20.0"
+        "cargo-bundle-licenses",
+        "pkg-config",
+        "make"
       ]
     },
     "schema_version": 0,
     "source": {
-      "sha256": "d0b075660b4cc5eb392f13e1a6d0602e07b230880ea0606f8fb92c07b84ac517",
-      "url": "https://pypi.org/packages/source/f/fastlowess/fastlowess-0.99.7.tar.gz"
-    },
-    "test": {
-      "imports": [
-        "fastlowess"
-      ]
+      "sha256": "507d6a8da57d7692a5f5cb1417dc5ee17b592b9f8d2a41a5813c19f773d94b1c",
+      "url": "https://github.com/thisisamirv/lowess-project/archive/refs/tags/v0.99.8.tar.gz"
     }
   },
   "win_64_requirements": {
@@ -403,6 +2512,8 @@
         "c_compiler_stub",
         "c_stdlib_stub",
         "cargo-bundle-licenses",
+        "make",
+        "pkg-config",
         "rust_compiler_stub"
       ]
     },
@@ -411,14 +2522,16 @@
       "elements": [
         "maturin",
         "pip",
-        "python"
+        "python",
+        "r-base"
       ]
     },
     "run": {
       "__set__": true,
       "elements": [
         "numpy",
-        "python"
+        "python",
+        "r-base"
       ]
     },
     "test": {
