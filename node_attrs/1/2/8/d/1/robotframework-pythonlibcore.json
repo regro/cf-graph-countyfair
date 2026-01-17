@@ -4,36 +4,40 @@
   "ci_support_linux_64_.yaml": "channel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\npython_min:\n- '3.10'\n",
   "conda-forge.yml": {
     "bot": {
-      "inspection": "hint-all"
+      "inspection": "hint-grayskull"
     },
     "conda_build": {
       "pkg_format": "2"
     },
+    "conda_build_tool": "rattler-build",
     "conda_forge_output_validation": true,
+    "conda_install_tool": "pixi",
     "github": {
       "branch_name": "main",
       "tooling_branch_name": "main"
     }
   },
-  "feedstock_hash": "59f9be1ed8989266dfbe3ad85809eed855a21590",
-  "feedstock_hash_ts": 1768658150,
+  "feedstock_hash": "10c33714362bd2814ce8a620921f8617ede7aa5f",
+  "feedstock_hash_ts": 1768663408,
   "feedstock_name": "robotframework-pythonlibcore",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
     "about": {
       "description": "The Robot Framework hybrid and dynamic library API gives more flexibility for\nlibrary than the static library API, but they also sets requirements for\nlibraries which needs to be implemented in the library side. PythonLibCore\neases the problem by providing simpler interface and handling all the\nrequirements towards the Robot Framework library APIs.",
-      "home": "https://github.com/robotframework/PythonLibCore",
+      "dev_url": "https://github.com/robotframework/PythonLibCore",
+      "home": "https://pypi.org/project/robotframework-pythonlibcore",
       "license": "Apache-2.0",
-      "license_file": [
-        "LICENSE.txt",
-        "COPYRIGHT.txt"
-      ],
+      "license_family": "Apache-2.0",
+      "license_file": "dist/LICENSE.txt",
       "summary": "Tools to ease creating larger test libraries for Robot Framework using Python."
     },
     "build": {
       "noarch": "python",
-      "number": "0",
-      "script": "PYTHON -m pip install . -vv --no-deps"
+      "number": "1",
+      "script": [
+        "cd dist",
+        "${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation --disable-pip-version-check"
+      ]
     },
     "extra": {
       "recipe-maintainers": [
@@ -41,6 +45,66 @@
         "martinRenou"
       ]
     },
+    "outputs": [
+      {
+        "build": null,
+        "name": "robotframework-pythonlibcore",
+        "requirements": {
+          "build": [],
+          "host": [
+            "pip",
+            "python 3.10.*",
+            "setuptools"
+          ],
+          "run": [
+            "python >=3.10",
+            "robotframework"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "robotlibcore"
+              ],
+              "python_version": [
+                "3.10.*",
+                "3.14.*"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "src/utest",
+                "src/atest"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "approvaltests >=11.1.1",
+                "coverage",
+                "pytest",
+                "python 3.10.*",
+                "robotframework",
+                "robotstatuschecker"
+              ]
+            },
+            "script": [
+              "cd src",
+              "${{ (\"del \" if win else \"rm \") ~ test_rm if test_rm else \"echo no tests deleted\" }}",
+              "export \"PYTHONPATH=$(pwd)/atest:$(pwd)/utest/helpers\"",
+              "echo \"tool.coverage.run.patch = ['subprocess']\" > pyproject.toml",
+              "${{ test_cov_run }} -m pytest -vv --tb=long --color=yes",
+              "${{ test_cov_run }} atest/run.py",
+              "coverage combine",
+              "coverage report --show-missing --skip-covered --fail-under=${{ test_cov_fail_under }}"
+            ]
+          }
+        ],
+        "version": "4.5.0"
+      }
+    ],
     "package": {
       "name": "robotframework-pythonlibcore",
       "version": "4.5.0"
@@ -48,29 +112,18 @@
     "requirements": {
       "host": [
         "pip",
-        "python 3.10"
+        "python 3.10.*",
+        "setuptools"
       ],
       "run": [
         "python >=3.10",
         "robotframework"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "sha256": "54ad47c592b2959bffe865e006fd4517f3c46dfb9df5b68a3f335ab842ab065e",
       "url": "https://pypi.org/packages/source/r/robotframework-pythonlibcore/robotframework_pythonlibcore-4.5.0.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "pip check"
-      ],
-      "imports": [
-        "robotlibcore"
-      ],
-      "requires": [
-        "pip",
-        "python 3.10"
-      ]
     }
   },
   "linux_64_requirements": {
@@ -82,7 +135,8 @@
       "__set__": true,
       "elements": [
         "pip",
-        "python"
+        "python",
+        "setuptools"
       ]
     },
     "run": {
@@ -95,26 +149,33 @@
     "test": {
       "__set__": true,
       "elements": [
+        "approvaltests",
+        "coverage",
         "pip",
-        "python"
+        "pytest",
+        "python",
+        "robotframework",
+        "robotstatuschecker"
       ]
     }
   },
   "meta_yaml": {
     "about": {
       "description": "The Robot Framework hybrid and dynamic library API gives more flexibility for\nlibrary than the static library API, but they also sets requirements for\nlibraries which needs to be implemented in the library side. PythonLibCore\neases the problem by providing simpler interface and handling all the\nrequirements towards the Robot Framework library APIs.",
-      "home": "https://github.com/robotframework/PythonLibCore",
+      "dev_url": "https://github.com/robotframework/PythonLibCore",
+      "home": "https://pypi.org/project/robotframework-pythonlibcore",
       "license": "Apache-2.0",
-      "license_file": [
-        "LICENSE.txt",
-        "COPYRIGHT.txt"
-      ],
+      "license_family": "Apache-2.0",
+      "license_file": "dist/LICENSE.txt",
       "summary": "Tools to ease creating larger test libraries for Robot Framework using Python."
     },
     "build": {
       "noarch": "python",
-      "number": "0",
-      "script": "PYTHON -m pip install . -vv --no-deps"
+      "number": "1",
+      "script": [
+        "cd dist",
+        "${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation --disable-pip-version-check"
+      ]
     },
     "extra": {
       "recipe-maintainers": [
@@ -122,6 +183,66 @@
         "martinRenou"
       ]
     },
+    "outputs": [
+      {
+        "build": null,
+        "name": "robotframework-pythonlibcore",
+        "requirements": {
+          "build": [],
+          "host": [
+            "pip",
+            "python 3.10.*",
+            "setuptools"
+          ],
+          "run": [
+            "python >=3.10",
+            "robotframework"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "robotlibcore"
+              ],
+              "python_version": [
+                "3.10.*",
+                "3.14.*"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "src/utest",
+                "src/atest"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "approvaltests >=11.1.1",
+                "coverage",
+                "pytest",
+                "python 3.10.*",
+                "robotframework",
+                "robotstatuschecker"
+              ]
+            },
+            "script": [
+              "cd src",
+              "${{ (\"del \" if win else \"rm \") ~ test_rm if test_rm else \"echo no tests deleted\" }}",
+              "export \"PYTHONPATH=$(pwd)/atest:$(pwd)/utest/helpers\"",
+              "echo \"tool.coverage.run.patch = ['subprocess']\" > pyproject.toml",
+              "${{ test_cov_run }} -m pytest -vv --tb=long --color=yes",
+              "${{ test_cov_run }} atest/run.py",
+              "coverage combine",
+              "coverage report --show-missing --skip-covered --fail-under=${{ test_cov_fail_under }}"
+            ]
+          }
+        ],
+        "version": "4.5.0"
+      }
+    ],
     "package": {
       "name": "robotframework-pythonlibcore",
       "version": "4.5.0"
@@ -129,29 +250,18 @@
     "requirements": {
       "host": [
         "pip",
-        "python 3.10"
+        "python 3.10.*",
+        "setuptools"
       ],
       "run": [
         "python >=3.10",
         "robotframework"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "sha256": "54ad47c592b2959bffe865e006fd4517f3c46dfb9df5b68a3f335ab842ab065e",
       "url": "https://pypi.org/packages/source/r/robotframework-pythonlibcore/robotframework_pythonlibcore-4.5.0.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "pip check"
-      ],
-      "imports": [
-        "robotlibcore"
-      ],
-      "requires": [
-        "pip",
-        "python 3.10"
-      ]
     }
   },
   "name": "robotframework-pythonlibcore",
@@ -168,13 +278,14 @@
   "pr_info": {
     "__lazy_json__": "pr_info/robotframework-pythonlibcore.json"
   },
-  "raw_meta_yaml": "{% set version = \"4.5.0\" %}\n\npackage:\n  name: robotframework-pythonlibcore\n  version: {{ version }}\n\nsource:\n  url: https://pypi.org/packages/source/r/robotframework-pythonlibcore/robotframework_pythonlibcore-{{ version }}.tar.gz\n  sha256: 54ad47c592b2959bffe865e006fd4517f3c46dfb9df5b68a3f335ab842ab065e\n\nbuild:\n  number: 0\n  noarch: python\n  script: {{ PYTHON }} -m pip install . -vv --no-deps\n\nrequirements:\n  host:\n    - pip\n    - python {{ python_min }}\n  run:\n    - python >={{ python_min }}\n    - robotframework\n\ntest:\n  imports:\n    - robotlibcore\n  commands:\n    - pip check\n  requires:\n    - pip\n    - python {{ python_min }}\n\nabout:\n  home: https://github.com/robotframework/PythonLibCore\n  summary: Tools to ease creating larger test libraries for Robot Framework using Python.\n  license: Apache-2.0\n  license_file:\n    - LICENSE.txt\n    - COPYRIGHT.txt\n  description: |-\n    The Robot Framework hybrid and dynamic library API gives more flexibility for\n    library than the static library API, but they also sets requirements for\n    libraries which needs to be implemented in the library side. PythonLibCore\n    eases the problem by providing simpler interface and handling all the\n    requirements towards the Robot Framework library APIs.\n\nextra:\n  recipe-maintainers:\n    - bollwyvl\n    - martinRenou\n",
+  "raw_meta_yaml": "# yaml-language-server: $schema=https://raw.githubusercontent.com/prefix-dev/recipe-format/main/schema.json\nschema_version: 1\n\ncontext:\n  version: \"4.5.0\"\n  python_check_max: \"3.14\"\n  # space-delimited paths to undiscoverable test tiles\n  ## - test_get_keyword_source.py needs pytest-mockito\n  test_rm: utest/test_get_keyword_source.py\n  test_cov_run: coverage run --source=robotlibcore --branch\n  test_cov_fail_under: \"85\"\n\npackage:\n  name: robotframework-pythonlibcore\n  version: ${{ version }}\n\nsource:\n  - target_directory: dist\n    url: https://pypi.org/packages/source/r/robotframework-pythonlibcore/robotframework_pythonlibcore-${{ version }}.tar.gz\n    sha256: 54ad47c592b2959bffe865e006fd4517f3c46dfb9df5b68a3f335ab842ab065e\n  - target_directory: src\n    url: https://github.com/robotframework/PythonLibCore/archive/refs/tags/v${{ version }}.tar.gz\n    sha256: 08ea0c1b04d207557d3dda6c2afbcd2cf31d7b344ee75e02a4a6afe3380d7893\n\nbuild:\n  number: 1\n  noarch: python\n  script:\n    - cd dist\n    - ${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation --disable-pip-version-check\n\nrequirements:\n  host:\n    - pip\n    - python ${{ python_min }}.*\n    - setuptools\n  run:\n    - python >=${{ python_min }}\n    - robotframework\n\ntests:\n  - python:\n      imports: robotlibcore\n      pip_check: true\n      python_version:\n        - ${{ python_min }}.*\n        - ${{ python_check_max }}.*\n  - files:\n      source:\n        - src/utest\n        - src/atest\n    requirements:\n      run:\n        - approvaltests >=11.1.1\n        - coverage\n        - pytest\n        - python ${{ python_min }}.*\n        - robotframework\n        - robotstatuschecker\n        # needs packaging\n        # - pytest-mockito\n    script:\n      - cd src\n      - ${{ (\"del \" if win else \"rm \") ~ test_rm if test_rm else \"echo no tests deleted\" }}\n      - if: unix\n        then: export \"PYTHONPATH=$(pwd)/atest:$(pwd)/utest/helpers\"\n        else: set \"PYTHONPATH=%cd%\\atest;%cd%\\utest\\helpers\"\n      - echo \"tool.coverage.run.patch = ['subprocess']\" > pyproject.toml\n      - ${{ test_cov_run }} -m pytest -vv --tb=long --color=yes\n      - ${{ test_cov_run }} atest/run.py\n      - coverage combine\n      - coverage report --show-missing --skip-covered --fail-under=${{ test_cov_fail_under }}\n\nabout:\n  summary: Tools to ease creating larger test libraries for Robot Framework using Python.\n  license: Apache-2.0\n  license_file:\n    - dist/LICENSE.txt\n    - dist/COPYRIGHT.txt\n  homepage: https://pypi.org/project/robotframework-pythonlibcore\n  repository: https://github.com/robotframework/PythonLibCore\n  description: |-\n    The Robot Framework hybrid and dynamic library API gives more flexibility for\n    library than the static library API, but they also sets requirements for\n    libraries which needs to be implemented in the library side. PythonLibCore\n    eases the problem by providing simpler interface and handling all the\n    requirements towards the Robot Framework library APIs.\n\nextra:\n  recipe-maintainers:\n    - bollwyvl\n    - martinRenou\n",
   "req": {
     "__set__": true,
     "elements": [
       "pip",
       "python",
-      "robotframework"
+      "robotframework",
+      "setuptools"
     ]
   },
   "requirements": {
@@ -186,7 +297,8 @@
       "__set__": true,
       "elements": [
         "pip",
-        "python"
+        "python",
+        "setuptools"
       ]
     },
     "run": {
@@ -199,8 +311,13 @@
     "test": {
       "__set__": true,
       "elements": [
+        "approvaltests",
+        "coverage",
         "pip",
-        "python"
+        "pytest",
+        "python",
+        "robotframework",
+        "robotstatuschecker"
       ]
     }
   },
@@ -214,7 +331,8 @@
       "__set__": true,
       "elements": [
         "pip",
-        "python 3.10"
+        "python 3.10.*",
+        "setuptools"
       ]
     },
     "run": {
@@ -227,8 +345,13 @@
     "test": {
       "__set__": true,
       "elements": [
+        "approvaltests >=11.1.1",
+        "coverage",
         "pip",
-        "python 3.10"
+        "pytest",
+        "python 3.10.*",
+        "robotframework",
+        "robotstatuschecker"
       ]
     }
   },
