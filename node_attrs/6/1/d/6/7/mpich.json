@@ -1,7 +1,7 @@
 {
   "archived": false,
   "branch": "main",
-  "ci_support_linux_64_channel_targetsconda-forge_mainmpi_typeconda.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ncxx_compiler:\n- gxx\ncxx_compiler_version:\n- '14'\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\nfortran_compiler:\n- gfortran\nfortran_compiler_version:\n- '14'\nlibfabric:\n- '1.19'\nlibhwloc:\n- 2.12.2\nmpi_type:\n- conda\nmpich:\n- '4'\ntarget_platform:\n- linux-64\nucx:\n- '1.20'\nzip_keys:\n- - c_compiler_version\n  - cxx_compiler_version\n  - fortran_compiler_version\n- - mpi_type\n  - channel_targets\n",
+  "ci_support_linux_64_channel_targetsconda-forge_mainmpi_typeconda.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ncxx_compiler:\n- gxx\ncxx_compiler_version:\n- '14'\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\nfortran_compiler:\n- gfortran\nfortran_compiler_version:\n- '14'\nlibfabric:\n- '1.19'\nlibhwloc:\n- 2.12.2\nmpi_type:\n- conda\ntarget_platform:\n- linux-64\nucx:\n- '1.20'\nzip_keys:\n- - c_compiler_version\n  - cxx_compiler_version\n  - fortran_compiler_version\n- - mpi_type\n  - channel_targets\n",
   "conda-forge.yml": {
     "bot": {
       "abi_migration_branches": [
@@ -16,6 +16,7 @@
     "conda_build": {
       "pkg_format": "2"
     },
+    "conda_build_tool": "rattler-build",
     "conda_forge_output_validation": true,
     "github": {
       "branch_name": "main",
@@ -28,23 +29,34 @@
     },
     "test": "native_and_emulated"
   },
-  "feedstock_hash": "55ab0ef6f1747d11829e91594da550a454642d39",
-  "feedstock_hash_ts": 1768670070,
+  "feedstock_hash": "58474f08c1775eae5dba548bdc96d8d699040fa4",
+  "feedstock_hash_ts": 1768958192,
   "feedstock_name": "mpich",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
     "about": {
-      "description": "MPICH is a high performance and widely portable implementation of the\nMessage Passing Interface (MPI) standard.\n",
+      "description": "MPICH is a high performance and widely portable implementation of the\nMessage Passing Interface (MPI) standard.",
       "dev_url": "https://github.com/pmodels/mpich",
       "doc_url": "https://www.mpich.org/documentation/guides",
       "home": "https://www.mpich.org/",
       "license": "LicenseRef-MPICH",
-      "license_family": "Other",
+      "license_family": "LicenseRef-MPICH",
       "license_file": "COPYRIGHT",
       "summary": "A high performance widely portable implementation of the MPI standard."
     },
     "build": {
-      "number": "104"
+      "number": "105",
+      "run_exports": {
+        "weak": [
+          "mpich"
+        ]
+      },
+      "script": {
+        "env": {
+          "mpi_type": "external"
+        },
+        "file": "build-mpi"
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -60,7 +72,8 @@
     "outputs": [
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "mpich"
           ]
         },
@@ -72,9 +85,7 @@
             "fortran_compiler_stub",
             "c_stdlib_stub",
             "make",
-            "autoconf",
-            "automake",
-            "libtool"
+            "python 3.14.*"
           ],
           "host": [
             "libfabric-devel 1.19.*",
@@ -85,108 +96,145 @@
             "mpi 1.0.* mpich"
           ]
         },
-        "script": "build-mpi.sh",
-        "test": {
-          "commands": [
-            "test ! -f $PREFIX/doc/mpich",
-            "test ! -f $PREFIX/share/man/man3/MPI_Barrier.3"
-          ],
-          "files": [
-            "mpiexec.sh",
-            "tests/helloworld.sh"
-          ],
-          "script": "run_test.sh"
-        }
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.sh"
+              ]
+            },
+            "script": [
+              "test ! -f $PREFIX/doc/mpich",
+              "test ! -f $PREFIX/share/man/man3/MPI_Barrier.3"
+            ]
+          }
+        ],
+        "version": "4.3.2"
       },
       {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
-        "name": "mpich-mpicc",
-        "requirements": {
-          "run": [
-            "mpich",
-            "c_compiler_stub"
-          ]
-        },
-        "test": {
-          "files": [
-            "mpiexec.sh",
-            "tests/helloworld.c"
-          ],
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
-        "name": "mpich-mpicxx",
-        "requirements": {
-          "run": [
-            "mpich",
-            "cxx_compiler_stub"
-          ]
-        },
-        "test": {
-          "files": [
-            "mpiexec.sh",
-            "tests/helloworld.cxx"
-          ],
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
+        "build": null,
         "name": "mpich-mpifort",
         "requirements": {
+          "build": [],
+          "host": [],
           "run": [
             "mpich",
             "fortran_compiler_stub"
           ]
         },
-        "test": {
-          "files": [
-            "mpiexec.sh",
-            "tests/helloworld.f",
-            "tests/helloworld.f90",
-            "tests/helloworld.f08"
-          ],
-          "script": "run_test.sh"
-        }
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.f",
+                "tests/helloworld.f90",
+                "tests/helloworld.f08"
+              ]
+            },
+            "script": {
+              "env": {
+                "target_platform": "linux-64"
+              },
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "4.3.2"
       },
       {
-        "build": {
-          "string": "external_h1234567_104"
+        "build": null,
+        "name": "mpich-mpicxx",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "mpich",
+            "cxx_compiler_stub"
+          ]
         },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.cxx"
+              ]
+            },
+            "script": {
+              "env": {
+                "target_platform": "linux-64"
+              },
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "4.3.2"
+      },
+      {
+        "build": null,
+        "name": "mpich-mpicc",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "mpich",
+            "c_compiler_stub"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.c"
+              ]
+            },
+            "script": {
+              "env": {
+                "target_platform": "linux-64"
+              },
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "4.3.2"
+      },
+      {
+        "build": null,
         "name": "mpich",
         "requirements": {
+          "build": [],
+          "host": [],
           "run": [
             "mpi 1.0.* mpich"
           ]
         },
-        "test": {
-          "commands": [
-            "echo \"It works!\""
-          ]
-        }
+        "tests": [],
+        "version": "4.3.2"
       }
     ],
     "package": {
-      "name": "mpich-mpi",
+      "name": "mpich",
       "version": "4.3.2"
     },
-    "schema_version": 0,
+    "requirements": {
+      "build": [
+        "c_compiler_stub",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "c_stdlib_stub",
+        "make",
+        "python 3.14.*"
+      ],
+      "host": [
+        "libfabric-devel 1.19.*",
+        "libhwloc",
+        "ucx"
+      ],
+      "run": [
+        "mpi 1.0.* mpich"
+      ]
+    },
+    "schema_version": 1,
     "source": {
-      "fn": "mpich-4.3.2.tar.gz",
       "sha256": "47d774587a7156a53752218c811c852e70ac44db9c502dc3f399b4cb817e3818",
       "url": "https://www.mpich.org/static/downloads/4.3.2/mpich-4.3.2.tar.gz"
     }
@@ -195,14 +243,12 @@
     "build": {
       "__set__": true,
       "elements": [
-        "autoconf",
-        "automake",
         "c_compiler_stub",
         "c_stdlib_stub",
         "cxx_compiler_stub",
         "fortran_compiler_stub",
-        "libtool",
-        "make"
+        "make",
+        "python"
       ]
     },
     "host": {
@@ -230,17 +276,28 @@
   },
   "linux_aarch64_meta_yaml": {
     "about": {
-      "description": "MPICH is a high performance and widely portable implementation of the\nMessage Passing Interface (MPI) standard.\n",
+      "description": "MPICH is a high performance and widely portable implementation of the\nMessage Passing Interface (MPI) standard.",
       "dev_url": "https://github.com/pmodels/mpich",
       "doc_url": "https://www.mpich.org/documentation/guides",
       "home": "https://www.mpich.org/",
       "license": "LicenseRef-MPICH",
-      "license_family": "Other",
+      "license_family": "LicenseRef-MPICH",
       "license_file": "COPYRIGHT",
       "summary": "A high performance widely portable implementation of the MPI standard."
     },
     "build": {
-      "number": "104"
+      "number": "105",
+      "run_exports": {
+        "weak": [
+          "mpich"
+        ]
+      },
+      "script": {
+        "env": {
+          "mpi_type": "external"
+        },
+        "file": "build-mpi"
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -256,7 +313,8 @@
     "outputs": [
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "mpich"
           ]
         },
@@ -268,9 +326,7 @@
             "fortran_compiler_stub",
             "c_stdlib_stub",
             "make",
-            "autoconf",
-            "automake",
-            "libtool"
+            "python 3.14.*"
           ],
           "host": [
             "libfabric-devel 1.19.*",
@@ -281,108 +337,145 @@
             "mpi 1.0.* mpich"
           ]
         },
-        "script": "build-mpi.sh",
-        "test": {
-          "commands": [
-            "test ! -f $PREFIX/doc/mpich",
-            "test ! -f $PREFIX/share/man/man3/MPI_Barrier.3"
-          ],
-          "files": [
-            "mpiexec.sh",
-            "tests/helloworld.sh"
-          ],
-          "script": "run_test.sh"
-        }
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.sh"
+              ]
+            },
+            "script": [
+              "test ! -f $PREFIX/doc/mpich",
+              "test ! -f $PREFIX/share/man/man3/MPI_Barrier.3"
+            ]
+          }
+        ],
+        "version": "4.3.2"
       },
       {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
-        "name": "mpich-mpicc",
-        "requirements": {
-          "run": [
-            "mpich",
-            "c_compiler_stub"
-          ]
-        },
-        "test": {
-          "files": [
-            "mpiexec.sh",
-            "tests/helloworld.c"
-          ],
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
-        "name": "mpich-mpicxx",
-        "requirements": {
-          "run": [
-            "mpich",
-            "cxx_compiler_stub"
-          ]
-        },
-        "test": {
-          "files": [
-            "mpiexec.sh",
-            "tests/helloworld.cxx"
-          ],
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
+        "build": null,
         "name": "mpich-mpifort",
         "requirements": {
+          "build": [],
+          "host": [],
           "run": [
             "mpich",
             "fortran_compiler_stub"
           ]
         },
-        "test": {
-          "files": [
-            "mpiexec.sh",
-            "tests/helloworld.f",
-            "tests/helloworld.f90",
-            "tests/helloworld.f08"
-          ],
-          "script": "run_test.sh"
-        }
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.f",
+                "tests/helloworld.f90",
+                "tests/helloworld.f08"
+              ]
+            },
+            "script": {
+              "env": {
+                "target_platform": "linux-64"
+              },
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "4.3.2"
       },
       {
-        "build": {
-          "string": "external_h1234567_104"
+        "build": null,
+        "name": "mpich-mpicxx",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "mpich",
+            "cxx_compiler_stub"
+          ]
         },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.cxx"
+              ]
+            },
+            "script": {
+              "env": {
+                "target_platform": "linux-64"
+              },
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "4.3.2"
+      },
+      {
+        "build": null,
+        "name": "mpich-mpicc",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "mpich",
+            "c_compiler_stub"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.c"
+              ]
+            },
+            "script": {
+              "env": {
+                "target_platform": "linux-64"
+              },
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "4.3.2"
+      },
+      {
+        "build": null,
         "name": "mpich",
         "requirements": {
+          "build": [],
+          "host": [],
           "run": [
             "mpi 1.0.* mpich"
           ]
         },
-        "test": {
-          "commands": [
-            "echo \"It works!\""
-          ]
-        }
+        "tests": [],
+        "version": "4.3.2"
       }
     ],
     "package": {
-      "name": "mpich-mpi",
+      "name": "mpich",
       "version": "4.3.2"
     },
-    "schema_version": 0,
+    "requirements": {
+      "build": [
+        "c_compiler_stub",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "c_stdlib_stub",
+        "make",
+        "python 3.14.*"
+      ],
+      "host": [
+        "libfabric-devel 1.19.*",
+        "libhwloc",
+        "ucx"
+      ],
+      "run": [
+        "mpi 1.0.* mpich"
+      ]
+    },
+    "schema_version": 1,
     "source": {
-      "fn": "mpich-4.3.2.tar.gz",
       "sha256": "47d774587a7156a53752218c811c852e70ac44db9c502dc3f399b4cb817e3818",
       "url": "https://www.mpich.org/static/downloads/4.3.2/mpich-4.3.2.tar.gz"
     }
@@ -391,14 +484,12 @@
     "build": {
       "__set__": true,
       "elements": [
-        "autoconf",
-        "automake",
         "c_compiler_stub",
         "c_stdlib_stub",
         "cxx_compiler_stub",
         "fortran_compiler_stub",
-        "libtool",
-        "make"
+        "make",
+        "python"
       ]
     },
     "host": {
@@ -426,17 +517,28 @@
   },
   "linux_ppc64le_meta_yaml": {
     "about": {
-      "description": "MPICH is a high performance and widely portable implementation of the\nMessage Passing Interface (MPI) standard.\n",
+      "description": "MPICH is a high performance and widely portable implementation of the\nMessage Passing Interface (MPI) standard.",
       "dev_url": "https://github.com/pmodels/mpich",
       "doc_url": "https://www.mpich.org/documentation/guides",
       "home": "https://www.mpich.org/",
       "license": "LicenseRef-MPICH",
-      "license_family": "Other",
+      "license_family": "LicenseRef-MPICH",
       "license_file": "COPYRIGHT",
       "summary": "A high performance widely portable implementation of the MPI standard."
     },
     "build": {
-      "number": "104"
+      "number": "105",
+      "run_exports": {
+        "weak": [
+          "mpich"
+        ]
+      },
+      "script": {
+        "env": {
+          "mpi_type": "external"
+        },
+        "file": "build-mpi"
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -452,7 +554,8 @@
     "outputs": [
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "mpich"
           ]
         },
@@ -464,120 +567,156 @@
             "fortran_compiler_stub",
             "c_stdlib_stub",
             "make",
-            "autoconf",
-            "automake",
-            "libtool"
+            "python 3.14.*"
           ],
           "host": [
             "libfabric-devel 1.19.*",
-            "libhwloc"
+            "libhwloc",
+            "ucx"
           ],
           "run": [
             "mpi 1.0.* mpich"
           ]
         },
-        "script": "build-mpi.sh",
-        "test": {
-          "commands": [
-            "test ! -f $PREFIX/doc/mpich",
-            "test ! -f $PREFIX/share/man/man3/MPI_Barrier.3"
-          ],
-          "files": [
-            "mpiexec.sh",
-            "tests/helloworld.sh"
-          ],
-          "script": "run_test.sh"
-        }
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.sh"
+              ]
+            },
+            "script": [
+              "test ! -f $PREFIX/doc/mpich",
+              "test ! -f $PREFIX/share/man/man3/MPI_Barrier.3"
+            ]
+          }
+        ],
+        "version": "4.3.2"
       },
       {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
-        "name": "mpich-mpicc",
-        "requirements": {
-          "run": [
-            "mpich",
-            "c_compiler_stub"
-          ]
-        },
-        "test": {
-          "files": [
-            "mpiexec.sh",
-            "tests/helloworld.c"
-          ],
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
-        "name": "mpich-mpicxx",
-        "requirements": {
-          "run": [
-            "mpich",
-            "cxx_compiler_stub"
-          ]
-        },
-        "test": {
-          "files": [
-            "mpiexec.sh",
-            "tests/helloworld.cxx"
-          ],
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
+        "build": null,
         "name": "mpich-mpifort",
         "requirements": {
+          "build": [],
+          "host": [],
           "run": [
             "mpich",
             "fortran_compiler_stub"
           ]
         },
-        "test": {
-          "files": [
-            "mpiexec.sh",
-            "tests/helloworld.f",
-            "tests/helloworld.f90",
-            "tests/helloworld.f08"
-          ],
-          "script": "run_test.sh"
-        }
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.f",
+                "tests/helloworld.f90",
+                "tests/helloworld.f08"
+              ]
+            },
+            "script": {
+              "env": {
+                "target_platform": "linux-64"
+              },
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "4.3.2"
       },
       {
-        "build": {
-          "string": "external_h1234567_104"
+        "build": null,
+        "name": "mpich-mpicxx",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "mpich",
+            "cxx_compiler_stub"
+          ]
         },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.cxx"
+              ]
+            },
+            "script": {
+              "env": {
+                "target_platform": "linux-64"
+              },
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "4.3.2"
+      },
+      {
+        "build": null,
+        "name": "mpich-mpicc",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "mpich",
+            "c_compiler_stub"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.c"
+              ]
+            },
+            "script": {
+              "env": {
+                "target_platform": "linux-64"
+              },
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "4.3.2"
+      },
+      {
+        "build": null,
         "name": "mpich",
         "requirements": {
+          "build": [],
+          "host": [],
           "run": [
             "mpi 1.0.* mpich"
           ]
         },
-        "test": {
-          "commands": [
-            "echo \"It works!\""
-          ]
-        }
+        "tests": [],
+        "version": "4.3.2"
       }
     ],
     "package": {
-      "name": "mpich-mpi",
+      "name": "mpich",
       "version": "4.3.2"
     },
-    "schema_version": 0,
+    "requirements": {
+      "build": [
+        "c_compiler_stub",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "c_stdlib_stub",
+        "make",
+        "python 3.14.*"
+      ],
+      "host": [
+        "libfabric-devel 1.19.*",
+        "libhwloc",
+        "ucx"
+      ],
+      "run": [
+        "mpi 1.0.* mpich"
+      ]
+    },
+    "schema_version": 1,
     "source": {
-      "fn": "mpich-4.3.2.tar.gz",
       "sha256": "47d774587a7156a53752218c811c852e70ac44db9c502dc3f399b4cb817e3818",
       "url": "https://www.mpich.org/static/downloads/4.3.2/mpich-4.3.2.tar.gz"
     }
@@ -586,21 +725,20 @@
     "build": {
       "__set__": true,
       "elements": [
-        "autoconf",
-        "automake",
         "c_compiler_stub",
         "c_stdlib_stub",
         "cxx_compiler_stub",
         "fortran_compiler_stub",
-        "libtool",
-        "make"
+        "make",
+        "python"
       ]
     },
     "host": {
       "__set__": true,
       "elements": [
         "libfabric-devel",
-        "libhwloc"
+        "libhwloc",
+        "ucx"
       ]
     },
     "run": {
@@ -620,17 +758,28 @@
   },
   "meta_yaml": {
     "about": {
-      "description": "MPICH is a high performance and widely portable implementation of the\nMessage Passing Interface (MPI) standard.\n",
+      "description": "MPICH is a high performance and widely portable implementation of the\nMessage Passing Interface (MPI) standard.",
       "dev_url": "https://github.com/pmodels/mpich",
       "doc_url": "https://www.mpich.org/documentation/guides",
       "home": "https://www.mpich.org/",
       "license": "LicenseRef-MPICH",
-      "license_family": "Other",
+      "license_family": "LicenseRef-MPICH",
       "license_file": "COPYRIGHT",
       "summary": "A high performance widely portable implementation of the MPI standard."
     },
     "build": {
-      "number": "104"
+      "number": "105",
+      "run_exports": {
+        "weak": [
+          "mpich"
+        ]
+      },
+      "script": {
+        "env": {
+          "mpi_type": "conda"
+        },
+        "file": "build-mpi"
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -646,7 +795,8 @@
     "outputs": [
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "mpich"
           ]
         },
@@ -658,9 +808,7 @@
             "fortran_compiler_stub",
             "c_stdlib_stub",
             "make",
-            "autoconf",
-            "automake",
-            "libtool"
+            "python 3.14.*"
           ],
           "host": [
             "libfabric-devel 1.19.*",
@@ -671,103 +819,124 @@
             "mpi 1.0.* mpich"
           ]
         },
-        "script": "build-mpi.sh",
-        "test": {
-          "commands": [
-            "test ! -f $PREFIX/doc/mpich",
-            "test ! -f $PREFIX/share/man/man3/MPI_Barrier.3"
-          ],
-          "files": [
-            "mpiexec.sh",
-            "tests/helloworld.sh"
-          ],
-          "script": "run_test.sh"
-        }
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.sh"
+              ]
+            },
+            "script": [
+              "test ! -f $PREFIX/doc/mpich",
+              "test ! -f $PREFIX/share/man/man3/MPI_Barrier.3"
+            ]
+          }
+        ],
+        "version": "4.3.2"
       },
       {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
-        "name": "mpich-mpicc",
-        "requirements": {
-          "run": [
-            "mpich",
-            "c_compiler_stub"
-          ]
-        },
-        "test": {
-          "files": [
-            "mpiexec.sh",
-            "tests/helloworld.c"
-          ],
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
-        "name": "mpich-mpicxx",
-        "requirements": {
-          "run": [
-            "mpich",
-            "cxx_compiler_stub"
-          ]
-        },
-        "test": {
-          "files": [
-            "mpiexec.sh",
-            "tests/helloworld.cxx"
-          ],
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
+        "build": null,
         "name": "mpich-mpifort",
         "requirements": {
+          "build": [],
+          "host": [],
           "run": [
             "mpich",
             "fortran_compiler_stub"
           ]
         },
-        "test": {
-          "files": [
-            "mpiexec.sh",
-            "tests/helloworld.f",
-            "tests/helloworld.f90",
-            "tests/helloworld.f08"
-          ],
-          "script": "run_test.sh"
-        }
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.f",
+                "tests/helloworld.f90",
+                "tests/helloworld.f08"
+              ]
+            },
+            "script": {
+              "env": {
+                "target_platform": "linux-64"
+              },
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "4.3.2"
       },
       {
-        "build": {
-          "string": "external_h1234567_104"
+        "build": null,
+        "name": "mpich-mpicxx",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "mpich",
+            "cxx_compiler_stub"
+          ]
         },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.cxx"
+              ]
+            },
+            "script": {
+              "env": {
+                "target_platform": "linux-64"
+              },
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "4.3.2"
+      },
+      {
+        "build": null,
+        "name": "mpich-mpicc",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "mpich",
+            "c_compiler_stub"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.c"
+              ]
+            },
+            "script": {
+              "env": {
+                "target_platform": "linux-64"
+              },
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "4.3.2"
+      },
+      {
+        "build": null,
         "name": "mpich",
         "requirements": {
+          "build": [],
+          "host": [],
           "run": [
             "mpi 1.0.* mpich"
           ]
         },
-        "test": {
-          "commands": [
-            "echo \"It works!\""
-          ]
-        }
+        "tests": [],
+        "version": "4.3.2"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "mpich"
           ]
         },
@@ -779,9 +948,7 @@
             "fortran_compiler_stub",
             "c_stdlib_stub",
             "make",
-            "autoconf",
-            "automake",
-            "libtool"
+            "python 3.14.*"
           ],
           "host": [
             "libfabric-devel 1.19.*",
@@ -792,103 +959,124 @@
             "mpi 1.0.* mpich"
           ]
         },
-        "script": "build-mpi.sh",
-        "test": {
-          "commands": [
-            "test ! -f $PREFIX/doc/mpich",
-            "test ! -f $PREFIX/share/man/man3/MPI_Barrier.3"
-          ],
-          "files": [
-            "mpiexec.sh",
-            "tests/helloworld.sh"
-          ],
-          "script": "run_test.sh"
-        }
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.sh"
+              ]
+            },
+            "script": [
+              "test ! -f $PREFIX/doc/mpich",
+              "test ! -f $PREFIX/share/man/man3/MPI_Barrier.3"
+            ]
+          }
+        ],
+        "version": "4.3.2"
       },
       {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
-        "name": "mpich-mpicc",
-        "requirements": {
-          "run": [
-            "mpich",
-            "c_compiler_stub"
-          ]
-        },
-        "test": {
-          "files": [
-            "mpiexec.sh",
-            "tests/helloworld.c"
-          ],
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
-        "name": "mpich-mpicxx",
-        "requirements": {
-          "run": [
-            "mpich",
-            "cxx_compiler_stub"
-          ]
-        },
-        "test": {
-          "files": [
-            "mpiexec.sh",
-            "tests/helloworld.cxx"
-          ],
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
+        "build": null,
         "name": "mpich-mpifort",
         "requirements": {
+          "build": [],
+          "host": [],
           "run": [
             "mpich",
             "fortran_compiler_stub"
           ]
         },
-        "test": {
-          "files": [
-            "mpiexec.sh",
-            "tests/helloworld.f",
-            "tests/helloworld.f90",
-            "tests/helloworld.f08"
-          ],
-          "script": "run_test.sh"
-        }
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.f",
+                "tests/helloworld.f90",
+                "tests/helloworld.f08"
+              ]
+            },
+            "script": {
+              "env": {
+                "target_platform": "linux-64"
+              },
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "4.3.2"
       },
       {
-        "build": {
-          "string": "external_h1234567_104"
+        "build": null,
+        "name": "mpich-mpicxx",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "mpich",
+            "cxx_compiler_stub"
+          ]
         },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.cxx"
+              ]
+            },
+            "script": {
+              "env": {
+                "target_platform": "linux-64"
+              },
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "4.3.2"
+      },
+      {
+        "build": null,
+        "name": "mpich-mpicc",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "mpich",
+            "c_compiler_stub"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.c"
+              ]
+            },
+            "script": {
+              "env": {
+                "target_platform": "linux-64"
+              },
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "4.3.2"
+      },
+      {
+        "build": null,
         "name": "mpich",
         "requirements": {
+          "build": [],
+          "host": [],
           "run": [
             "mpi 1.0.* mpich"
           ]
         },
-        "test": {
-          "commands": [
-            "echo \"It works!\""
-          ]
-        }
+        "tests": [],
+        "version": "4.3.2"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "mpich"
           ]
         },
@@ -900,115 +1088,135 @@
             "fortran_compiler_stub",
             "c_stdlib_stub",
             "make",
-            "autoconf",
-            "automake",
-            "libtool"
+            "python 3.14.*"
           ],
           "host": [
             "libfabric-devel 1.19.*",
-            "libhwloc"
+            "libhwloc",
+            "ucx"
           ],
           "run": [
             "mpi 1.0.* mpich"
           ]
         },
-        "script": "build-mpi.sh",
-        "test": {
-          "commands": [
-            "test ! -f $PREFIX/doc/mpich",
-            "test ! -f $PREFIX/share/man/man3/MPI_Barrier.3"
-          ],
-          "files": [
-            "mpiexec.sh",
-            "tests/helloworld.sh"
-          ],
-          "script": "run_test.sh"
-        }
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.sh"
+              ]
+            },
+            "script": [
+              "test ! -f $PREFIX/doc/mpich",
+              "test ! -f $PREFIX/share/man/man3/MPI_Barrier.3"
+            ]
+          }
+        ],
+        "version": "4.3.2"
       },
       {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
-        "name": "mpich-mpicc",
-        "requirements": {
-          "run": [
-            "mpich",
-            "c_compiler_stub"
-          ]
-        },
-        "test": {
-          "files": [
-            "mpiexec.sh",
-            "tests/helloworld.c"
-          ],
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
-        "name": "mpich-mpicxx",
-        "requirements": {
-          "run": [
-            "mpich",
-            "cxx_compiler_stub"
-          ]
-        },
-        "test": {
-          "files": [
-            "mpiexec.sh",
-            "tests/helloworld.cxx"
-          ],
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
+        "build": null,
         "name": "mpich-mpifort",
         "requirements": {
+          "build": [],
+          "host": [],
           "run": [
             "mpich",
             "fortran_compiler_stub"
           ]
         },
-        "test": {
-          "files": [
-            "mpiexec.sh",
-            "tests/helloworld.f",
-            "tests/helloworld.f90",
-            "tests/helloworld.f08"
-          ],
-          "script": "run_test.sh"
-        }
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.f",
+                "tests/helloworld.f90",
+                "tests/helloworld.f08"
+              ]
+            },
+            "script": {
+              "env": {
+                "target_platform": "linux-64"
+              },
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "4.3.2"
       },
       {
-        "build": {
-          "string": "external_h1234567_104"
+        "build": null,
+        "name": "mpich-mpicxx",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "mpich",
+            "cxx_compiler_stub"
+          ]
         },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.cxx"
+              ]
+            },
+            "script": {
+              "env": {
+                "target_platform": "linux-64"
+              },
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "4.3.2"
+      },
+      {
+        "build": null,
+        "name": "mpich-mpicc",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "mpich",
+            "c_compiler_stub"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.c"
+              ]
+            },
+            "script": {
+              "env": {
+                "target_platform": "linux-64"
+              },
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "4.3.2"
+      },
+      {
+        "build": null,
         "name": "mpich",
         "requirements": {
+          "build": [],
+          "host": [],
           "run": [
             "mpi 1.0.* mpich"
           ]
         },
-        "test": {
-          "commands": [
-            "echo \"It works!\""
-          ]
-        }
+        "tests": [],
+        "version": "4.3.2"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "mpich"
           ]
         },
@@ -1020,99 +1228,122 @@
             "fortran_compiler_stub",
             "c_stdlib_stub",
             "make",
-            "autoconf",
-            "automake",
-            "libtool"
+            "python 3.14.*"
           ],
           "host": [
             "libfabric-devel 1.19.*",
-            "libhwloc"
+            "libhwloc",
+            "ucx"
           ],
           "run": [
             "mpi 1.0.* mpich"
           ]
         },
-        "script": "build-mpi.sh",
-        "test": {
-          "commands": [
-            "test ! -f $PREFIX/doc/mpich",
-            "test ! -f $PREFIX/share/man/man3/MPI_Barrier.3"
-          ],
-          "files": [
-            "mpiexec.sh",
-            "tests/helloworld.sh"
-          ],
-          "script": "run_test.sh"
-        }
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.sh"
+              ]
+            },
+            "script": [
+              "test ! -f $PREFIX/doc/mpich",
+              "test ! -f $PREFIX/share/man/man3/MPI_Barrier.3"
+            ]
+          }
+        ],
+        "version": "4.3.2"
       },
       {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
-        "name": "mpich-mpicc",
-        "requirements": {
-          "run": [
-            "mpich",
-            "c_compiler_stub"
-          ]
-        },
-        "test": {
-          "files": [
-            "mpiexec.sh",
-            "tests/helloworld.c"
-          ],
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
-        "name": "mpich-mpicxx",
-        "requirements": {
-          "run": [
-            "mpich",
-            "cxx_compiler_stub"
-          ]
-        },
-        "test": {
-          "files": [
-            "mpiexec.sh",
-            "tests/helloworld.cxx"
-          ],
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
+        "build": null,
         "name": "mpich-mpifort",
         "requirements": {
+          "build": [],
+          "host": [],
           "run": [
             "mpich",
             "fortran_compiler_stub"
           ]
         },
-        "test": {
-          "files": [
-            "mpiexec.sh",
-            "tests/helloworld.f",
-            "tests/helloworld.f90",
-            "tests/helloworld.f08"
-          ],
-          "script": "run_test.sh"
-        }
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.f",
+                "tests/helloworld.f90",
+                "tests/helloworld.f08"
+              ]
+            },
+            "script": {
+              "env": {
+                "target_platform": "linux-64"
+              },
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "4.3.2"
+      },
+      {
+        "build": null,
+        "name": "mpich-mpicxx",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "mpich",
+            "cxx_compiler_stub"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.cxx"
+              ]
+            },
+            "script": {
+              "env": {
+                "target_platform": "linux-64"
+              },
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "4.3.2"
+      },
+      {
+        "build": null,
+        "name": "mpich-mpicc",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "mpich",
+            "c_compiler_stub"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.c"
+              ]
+            },
+            "script": {
+              "env": {
+                "target_platform": "linux-64"
+              },
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "4.3.2"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "mpich"
           ]
         },
@@ -1124,123 +1355,172 @@
             "fortran_compiler_stub",
             "c_stdlib_stub",
             "make",
-            "autoconf",
-            "automake",
-            "libtool",
-            "gnuconfig"
+            "python 3.14.*"
           ],
           "host": [
             "libfabric-devel 1.19.*",
-            "libhwloc"
+            "libhwloc",
+            "ucx"
           ],
           "run": [
             "mpi 1.0.* mpich"
           ]
         },
-        "script": "build-mpi.sh",
-        "test": {
-          "commands": [
-            "test ! -f $PREFIX/doc/mpich",
-            "test ! -f $PREFIX/share/man/man3/MPI_Barrier.3"
-          ],
-          "files": [
-            "mpiexec.sh",
-            "tests/helloworld.sh"
-          ],
-          "script": "run_test.sh"
-        }
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.sh"
+              ]
+            },
+            "script": [
+              "test ! -f $PREFIX/doc/mpich",
+              "test ! -f $PREFIX/share/man/man3/MPI_Barrier.3"
+            ]
+          }
+        ],
+        "version": "4.3.2"
       },
       {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
-        "name": "mpich-mpicc",
-        "requirements": {
-          "run": [
-            "mpich",
-            "c_compiler_stub"
-          ]
-        },
-        "test": {
-          "files": [
-            "mpiexec.sh",
-            "tests/helloworld.c"
-          ],
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
-        "name": "mpich-mpicxx",
-        "requirements": {
-          "run": [
-            "mpich",
-            "cxx_compiler_stub"
-          ]
-        },
-        "test": {
-          "files": [
-            "mpiexec.sh",
-            "tests/helloworld.cxx"
-          ],
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
+        "build": null,
         "name": "mpich-mpifort",
         "requirements": {
+          "build": [],
+          "host": [],
           "run": [
             "mpich",
             "fortran_compiler_stub"
           ]
         },
-        "test": {
-          "files": [
-            "mpiexec.sh",
-            "tests/helloworld.f",
-            "tests/helloworld.f90",
-            "tests/helloworld.f08"
-          ],
-          "script": "run_test.sh"
-        }
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.f",
+                "tests/helloworld.f90",
+                "tests/helloworld.f08"
+              ]
+            },
+            "script": {
+              "env": {
+                "target_platform": "linux-64"
+              },
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "4.3.2"
+      },
+      {
+        "build": null,
+        "name": "mpich-mpicxx",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "mpich",
+            "cxx_compiler_stub"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.cxx"
+              ]
+            },
+            "script": {
+              "env": {
+                "target_platform": "linux-64"
+              },
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "4.3.2"
+      },
+      {
+        "build": null,
+        "name": "mpich-mpicc",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "mpich",
+            "c_compiler_stub"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.c"
+              ]
+            },
+            "script": {
+              "env": {
+                "target_platform": "linux-64"
+              },
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "4.3.2"
       }
     ],
     "package": {
-      "name": "mpich-mpi",
+      "name": "mpich",
       "version": "4.3.2"
     },
-    "schema_version": 0,
+    "requirements": {
+      "build": [
+        "c_compiler_stub",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "c_stdlib_stub",
+        "make",
+        "python 3.14.*"
+      ],
+      "host": [
+        "libfabric-devel 1.19.*",
+        "libhwloc",
+        "ucx"
+      ],
+      "run": [
+        "mpi 1.0.* mpich"
+      ]
+    },
+    "schema_version": 1,
     "source": {
-      "fn": "mpich-4.3.2.tar.gz",
       "sha256": "47d774587a7156a53752218c811c852e70ac44db9c502dc3f399b4cb817e3818",
       "url": "https://www.mpich.org/static/downloads/4.3.2/mpich-4.3.2.tar.gz"
     }
   },
-  "name": "mpich-mpi",
+  "name": "mpich",
   "osx_64_meta_yaml": {
     "about": {
-      "description": "MPICH is a high performance and widely portable implementation of the\nMessage Passing Interface (MPI) standard.\n",
+      "description": "MPICH is a high performance and widely portable implementation of the\nMessage Passing Interface (MPI) standard.",
       "dev_url": "https://github.com/pmodels/mpich",
       "doc_url": "https://www.mpich.org/documentation/guides",
       "home": "https://www.mpich.org/",
       "license": "LicenseRef-MPICH",
-      "license_family": "Other",
+      "license_family": "LicenseRef-MPICH",
       "license_file": "COPYRIGHT",
       "summary": "A high performance widely portable implementation of the MPI standard."
     },
     "build": {
-      "number": "104"
+      "number": "105",
+      "run_exports": {
+        "weak": [
+          "mpich"
+        ]
+      },
+      "script": {
+        "env": {
+          "mpi_type": "conda"
+        },
+        "file": "build-mpi"
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -1256,7 +1536,8 @@
     "outputs": [
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "mpich"
           ]
         },
@@ -1268,104 +1549,143 @@
             "fortran_compiler_stub",
             "c_stdlib_stub",
             "make",
-            "autoconf",
-            "automake",
-            "libtool"
+            "python 3.14.*"
           ],
           "host": [
             "libfabric-devel 1.19.*",
-            "libhwloc"
+            "libhwloc",
+            "ucx"
           ],
           "run": [
             "mpi 1.0.* mpich"
           ]
         },
-        "script": "build-mpi.sh",
-        "test": {
-          "commands": [
-            "test ! -f $PREFIX/doc/mpich",
-            "test ! -f $PREFIX/share/man/man3/MPI_Barrier.3"
-          ],
-          "files": [
-            "mpiexec.sh",
-            "tests/helloworld.sh"
-          ],
-          "script": "run_test.sh"
-        }
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.sh"
+              ]
+            },
+            "script": [
+              "test ! -f $PREFIX/doc/mpich",
+              "test ! -f $PREFIX/share/man/man3/MPI_Barrier.3"
+            ]
+          }
+        ],
+        "version": "4.3.2"
       },
       {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
-        "name": "mpich-mpicc",
-        "requirements": {
-          "run": [
-            "mpich",
-            "c_compiler_stub"
-          ]
-        },
-        "test": {
-          "files": [
-            "mpiexec.sh",
-            "tests/helloworld.c"
-          ],
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
-        "name": "mpich-mpicxx",
-        "requirements": {
-          "run": [
-            "mpich",
-            "cxx_compiler_stub"
-          ]
-        },
-        "test": {
-          "files": [
-            "mpiexec.sh",
-            "tests/helloworld.cxx"
-          ],
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
+        "build": null,
         "name": "mpich-mpifort",
         "requirements": {
+          "build": [],
+          "host": [],
           "run": [
             "mpich",
             "fortran_compiler_stub"
           ]
         },
-        "test": {
-          "files": [
-            "mpiexec.sh",
-            "tests/helloworld.f",
-            "tests/helloworld.f90",
-            "tests/helloworld.f08"
-          ],
-          "script": "run_test.sh"
-        }
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.f",
+                "tests/helloworld.f90",
+                "tests/helloworld.f08"
+              ]
+            },
+            "script": {
+              "env": {
+                "target_platform": "linux-64"
+              },
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "4.3.2"
+      },
+      {
+        "build": null,
+        "name": "mpich-mpicxx",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "mpich",
+            "cxx_compiler_stub"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.cxx"
+              ]
+            },
+            "script": {
+              "env": {
+                "target_platform": "linux-64"
+              },
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "4.3.2"
+      },
+      {
+        "build": null,
+        "name": "mpich-mpicc",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "mpich",
+            "c_compiler_stub"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.c"
+              ]
+            },
+            "script": {
+              "env": {
+                "target_platform": "linux-64"
+              },
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "4.3.2"
       }
     ],
     "package": {
-      "name": "mpich-mpi",
+      "name": "mpich",
       "version": "4.3.2"
     },
-    "schema_version": 0,
+    "requirements": {
+      "build": [
+        "c_compiler_stub",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "c_stdlib_stub",
+        "make",
+        "python 3.14.*"
+      ],
+      "host": [
+        "libfabric-devel 1.19.*",
+        "libhwloc",
+        "ucx"
+      ],
+      "run": [
+        "mpi 1.0.* mpich"
+      ]
+    },
+    "schema_version": 1,
     "source": {
-      "fn": "mpich-4.3.2.tar.gz",
       "sha256": "47d774587a7156a53752218c811c852e70ac44db9c502dc3f399b4cb817e3818",
       "url": "https://www.mpich.org/static/downloads/4.3.2/mpich-4.3.2.tar.gz"
     }
@@ -1374,21 +1694,20 @@
     "build": {
       "__set__": true,
       "elements": [
-        "autoconf",
-        "automake",
         "c_compiler_stub",
         "c_stdlib_stub",
         "cxx_compiler_stub",
         "fortran_compiler_stub",
-        "libtool",
-        "make"
+        "make",
+        "python"
       ]
     },
     "host": {
       "__set__": true,
       "elements": [
         "libfabric-devel",
-        "libhwloc"
+        "libhwloc",
+        "ucx"
       ]
     },
     "run": {
@@ -1408,17 +1727,28 @@
   },
   "osx_arm64_meta_yaml": {
     "about": {
-      "description": "MPICH is a high performance and widely portable implementation of the\nMessage Passing Interface (MPI) standard.\n",
+      "description": "MPICH is a high performance and widely portable implementation of the\nMessage Passing Interface (MPI) standard.",
       "dev_url": "https://github.com/pmodels/mpich",
       "doc_url": "https://www.mpich.org/documentation/guides",
       "home": "https://www.mpich.org/",
       "license": "LicenseRef-MPICH",
-      "license_family": "Other",
+      "license_family": "LicenseRef-MPICH",
       "license_file": "COPYRIGHT",
       "summary": "A high performance widely portable implementation of the MPI standard."
     },
     "build": {
-      "number": "104"
+      "number": "105",
+      "run_exports": {
+        "weak": [
+          "mpich"
+        ]
+      },
+      "script": {
+        "env": {
+          "mpi_type": "conda"
+        },
+        "file": "build-mpi"
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -1434,7 +1764,8 @@
     "outputs": [
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "mpich"
           ]
         },
@@ -1446,105 +1777,143 @@
             "fortran_compiler_stub",
             "c_stdlib_stub",
             "make",
-            "autoconf",
-            "automake",
-            "libtool",
-            "gnuconfig"
+            "python 3.14.*"
           ],
           "host": [
             "libfabric-devel 1.19.*",
-            "libhwloc"
+            "libhwloc",
+            "ucx"
           ],
           "run": [
             "mpi 1.0.* mpich"
           ]
         },
-        "script": "build-mpi.sh",
-        "test": {
-          "commands": [
-            "test ! -f $PREFIX/doc/mpich",
-            "test ! -f $PREFIX/share/man/man3/MPI_Barrier.3"
-          ],
-          "files": [
-            "mpiexec.sh",
-            "tests/helloworld.sh"
-          ],
-          "script": "run_test.sh"
-        }
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.sh"
+              ]
+            },
+            "script": [
+              "test ! -f $PREFIX/doc/mpich",
+              "test ! -f $PREFIX/share/man/man3/MPI_Barrier.3"
+            ]
+          }
+        ],
+        "version": "4.3.2"
       },
       {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
-        "name": "mpich-mpicc",
-        "requirements": {
-          "run": [
-            "mpich",
-            "c_compiler_stub"
-          ]
-        },
-        "test": {
-          "files": [
-            "mpiexec.sh",
-            "tests/helloworld.c"
-          ],
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
-        "name": "mpich-mpicxx",
-        "requirements": {
-          "run": [
-            "mpich",
-            "cxx_compiler_stub"
-          ]
-        },
-        "test": {
-          "files": [
-            "mpiexec.sh",
-            "tests/helloworld.cxx"
-          ],
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
+        "build": null,
         "name": "mpich-mpifort",
         "requirements": {
+          "build": [],
+          "host": [],
           "run": [
             "mpich",
             "fortran_compiler_stub"
           ]
         },
-        "test": {
-          "files": [
-            "mpiexec.sh",
-            "tests/helloworld.f",
-            "tests/helloworld.f90",
-            "tests/helloworld.f08"
-          ],
-          "script": "run_test.sh"
-        }
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.f",
+                "tests/helloworld.f90",
+                "tests/helloworld.f08"
+              ]
+            },
+            "script": {
+              "env": {
+                "target_platform": "linux-64"
+              },
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "4.3.2"
+      },
+      {
+        "build": null,
+        "name": "mpich-mpicxx",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "mpich",
+            "cxx_compiler_stub"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.cxx"
+              ]
+            },
+            "script": {
+              "env": {
+                "target_platform": "linux-64"
+              },
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "4.3.2"
+      },
+      {
+        "build": null,
+        "name": "mpich-mpicc",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "mpich",
+            "c_compiler_stub"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.c"
+              ]
+            },
+            "script": {
+              "env": {
+                "target_platform": "linux-64"
+              },
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "4.3.2"
       }
     ],
     "package": {
-      "name": "mpich-mpi",
+      "name": "mpich",
       "version": "4.3.2"
     },
-    "schema_version": 0,
+    "requirements": {
+      "build": [
+        "c_compiler_stub",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "c_stdlib_stub",
+        "make",
+        "python 3.14.*"
+      ],
+      "host": [
+        "libfabric-devel 1.19.*",
+        "libhwloc",
+        "ucx"
+      ],
+      "run": [
+        "mpi 1.0.* mpich"
+      ]
+    },
+    "schema_version": 1,
     "source": {
-      "fn": "mpich-4.3.2.tar.gz",
       "sha256": "47d774587a7156a53752218c811c852e70ac44db9c502dc3f399b4cb817e3818",
       "url": "https://www.mpich.org/static/downloads/4.3.2/mpich-4.3.2.tar.gz"
     }
@@ -1553,22 +1922,20 @@
     "build": {
       "__set__": true,
       "elements": [
-        "autoconf",
-        "automake",
         "c_compiler_stub",
         "c_stdlib_stub",
         "cxx_compiler_stub",
         "fortran_compiler_stub",
-        "gnuconfig",
-        "libtool",
-        "make"
+        "make",
+        "python"
       ]
     },
     "host": {
       "__set__": true,
       "elements": [
         "libfabric-devel",
-        "libhwloc"
+        "libhwloc",
+        "ucx"
       ]
     },
     "run": {
@@ -1606,23 +1973,20 @@
   "pr_info": {
     "__lazy_json__": "pr_info/mpich.json"
   },
-  "raw_meta_yaml": "{% set version = \"4.3.2\" %}\n{% set build = 104 %}\n\npackage:\n  # must not match any outputs for requirements to be handled correctly\n  name: mpich-mpi\n  version: {{ version }}\n\nsource:\n  fn: mpich-{{ version }}.tar.gz\n  url: https://www.mpich.org/static/downloads/{{ version }}/mpich-{{ version }}.tar.gz\n  sha256: 47d774587a7156a53752218c811c852e70ac44db9c502dc3f399b4cb817e3818\n\nbuild:\n  number: {{ build }}\n  skip: true  # [win]\n\noutputs:\n  - name: mpich\n    {% if mpi_type == 'conda' %}\n    script: build-mpi.sh\n    {% endif %}\n    build:\n      {% if mpi_type == 'conda' %}\n      run_exports:\n        - {{ pin_subpackage('mpich', max_pin='x') }}\n      {% else %}\n      string: {{ mpi_type }}_h{{ PKG_HASH }}_{{ build }}\n      {% endif %}\n    requirements:\n      {% if mpi_type == 'conda' %}\n      build:\n        - {{ compiler('c') }}\n        - {{ compiler('cxx') }}\n        - {{ compiler('fortran') }}\n        - {{ stdlib(\"c\") }}\n        - make\n        # FIXME: autoconf/automake/libtool required to apply PR 6932 patch\n        - autoconf\n        - automake\n        - libtool\n        - gnuconfig  # [osx and arm64]\n      host:\n        - libfabric-devel {{ libfabric }}.*\n        - libhwloc\n        - ucx  # [linux and not ppc64le]\n      {% endif %}\n      run:\n        - mpi 1.0.* mpich\n    test:\n      {% if mpi_type == 'conda' %}\n      script: run_test.sh\n      files:\n        - mpiexec.sh\n        - tests/helloworld.sh\n      {% endif %}\n      commands:\n      {% if mpi_type == 'conda' %}\n        - test ! -f $PREFIX/doc/mpich\n        - test ! -f $PREFIX/share/man/man3/MPI_Barrier.3\n      {% else %}\n        - echo \"It works!\"\n      {% endif %}\n\n  {% if mpi_type == 'conda' %}\n  - name: mpich-mpicc\n    build:\n      script:\n        - echo 'ok'\n    requirements:\n      run:\n        - {{ pin_subpackage('mpich', exact=True) }}\n        # host C compilers work fine (better) on mac\n        - {{ compiler('c') }}\n    test:\n      script: run_test.sh\n      files:\n        - mpiexec.sh\n        - tests/helloworld.c\n\n  - name: mpich-mpicxx\n    build:\n      script:\n        - echo 'ok'\n    requirements:\n      run:\n        - {{ pin_subpackage('mpich', exact=True) }}\n        # host C compilers work fine (better) on mac\n        - {{ compiler('cxx') }}\n    test:\n      script: run_test.sh\n      files:\n        - mpiexec.sh\n        - tests/helloworld.cxx\n\n  - name: mpich-mpifort\n    build:\n      script:\n        - echo 'ok'\n    requirements:\n      run:\n        - {{ pin_subpackage('mpich', exact=True) }}\n        - {{ compiler('fortran') }}\n    test:\n      script: run_test.sh\n      files:\n        - mpiexec.sh\n        - tests/helloworld.f\n        - tests/helloworld.f90\n        - tests/helloworld.f08\n  {% endif %}\n\nabout:\n  home: https://www.mpich.org/\n  license: LicenseRef-MPICH\n  license_file: COPYRIGHT\n  license_family: Other\n  summary: A high performance widely portable implementation of the MPI standard.\n  description: |\n    MPICH is a high performance and widely portable implementation of the\n    Message Passing Interface (MPI) standard.\n  doc_url: https://www.mpich.org/documentation/guides\n  dev_url: https://github.com/pmodels/mpich\n\nextra:\n  recipe-maintainers:\n    - astrofrog\n    - bekozi\n    - dalcinl\n    - minrk\n    - msarahan\n    - ocefpaf\n    - j34ni\n",
+  "raw_meta_yaml": "schema_version: 1\n\ncontext:\n  version: 4.3.2\n  build: 105\n  mpi_type: ${{ mpi_type | default('conda') }}\n\nrecipe:\n  name: mpich\n  version: ${{ version }}\n\nsource:\n  url: https://www.mpich.org/static/downloads/${{ version }}/mpich-${{ version }}.tar.gz\n  sha256: 47d774587a7156a53752218c811c852e70ac44db9c502dc3f399b4cb817e3818\n\nbuild:\n  number: ${{ build }}\n  skip: win\n\noutputs:\n  - package:\n      name: mpich\n    build:\n      script:\n        file: build-mpi\n        env:\n          mpi_type: ${{ mpi_type }}\n    requirements:\n      build:\n        - if: mpi_type != 'external'\n          then:\n            - ${{ compiler('c') }}\n            - ${{ compiler('cxx') }}\n            - ${{ compiler('fortran') }}\n            - ${{ stdlib(\"c\") }}\n            - make\n            - python 3.14.*\n            - if: osx and arm64\n              then:\n                - gnuconfig\n      host:\n        - if: mpi_type != 'external'\n          then:\n            - libfabric-devel ${{ libfabric }}.*\n            - libhwloc\n            - if: linux and not ppc64le\n              then: ucx\n      run:\n        - mpi 1.0.* mpich\n      run_exports:\n        - if: mpi_type != 'external'\n          then:\n            - ${{ pin_subpackage('mpich', upper_bound='x', lower_bound='x.x') }}\n    tests:\n      - if: mpi_type != 'external'\n        then:\n          - script:\n              - test ! -f $PREFIX/doc/mpich\n              - test ! -f $PREFIX/share/man/man3/MPI_Barrier.3\n            files:\n              recipe:\n                - tests/helloworld.sh\n\n  - package:\n      name: mpich-mpicc\n    build:\n      skip: win or mpi_type == 'external'\n      script:\n        - \"echo 'ok'\"\n    requirements:\n      run:\n        - ${{ pin_subpackage('mpich', exact=True) }}\n        - ${{ compiler('c') }}\n    tests:\n      - script:\n          file: run_test\n          env:\n            target_platform: ${{ target_platform }}\n        files:\n          recipe:\n            - tests/helloworld.c\n  - package:\n      name: mpich-mpicxx\n    build:\n      skip: win or mpi_type == 'external'\n      script:\n        - \"echo 'ok'\"\n    requirements:\n      run:\n        - ${{ pin_subpackage('mpich', exact=True) }}\n        - ${{ compiler('cxx') }}\n    tests:\n      - script:\n          file: run_test\n          env:\n            target_platform: ${{ target_platform }}\n        files:\n          recipe:\n            - tests/helloworld.cxx\n  - package:\n      name: mpich-mpifort\n    build:\n      skip: win or mpi_type == 'external'\n      script:\n        - \"echo 'ok'\"\n    requirements:\n      run:\n        - ${{ pin_subpackage('mpich', exact=True) }}\n        - ${{ compiler('fortran') }}\n    tests:\n      - script:\n          file: run_test\n          env:\n            target_platform: ${{ target_platform }}\n        files:\n          recipe:\n            - tests/helloworld.f\n            - tests/helloworld.f90\n            - tests/helloworld.f08\n\nabout:\n  license: LicenseRef-MPICH\n  license_file: COPYRIGHT\n  summary: A high performance widely portable implementation of the MPI standard.\n  description: |\n    MPICH is a high performance and widely portable implementation of the\n    Message Passing Interface (MPI) standard.\n  homepage: https://www.mpich.org/\n  repository: https://github.com/pmodels/mpich\n  documentation: https://www.mpich.org/documentation/guides\n\nextra:\n  recipe-maintainers:\n    - astrofrog\n    - bekozi\n    - dalcinl\n    - minrk\n    - msarahan\n    - ocefpaf\n    - j34ni\n",
   "req": {
     "__set__": true,
     "elements": [
-      "autoconf",
-      "automake",
       "c_compiler_stub",
       "c_stdlib_stub",
       "cxx_compiler_stub",
       "fortran_compiler_stub",
-      "gnuconfig",
       "libfabric-devel",
       "libhwloc",
-      "libtool",
       "make",
       "mpi",
       "mpich",
+      "python",
       "ucx"
     ]
   },
@@ -1630,15 +1994,12 @@
     "build": {
       "__set__": true,
       "elements": [
-        "autoconf",
-        "automake",
         "c_compiler_stub",
         "c_stdlib_stub",
         "cxx_compiler_stub",
         "fortran_compiler_stub",
-        "gnuconfig",
-        "libtool",
-        "make"
+        "make",
+        "python"
       ]
     },
     "host": {
@@ -1674,15 +2035,12 @@
     "build": {
       "__set__": true,
       "elements": [
-        "autoconf",
-        "automake",
         "c_compiler_stub",
         "c_stdlib_stub",
         "cxx_compiler_stub",
         "fortran_compiler_stub",
-        "gnuconfig",
-        "libtool",
-        "make"
+        "make",
+        "python 3.14.*"
       ]
     },
     "host": {
