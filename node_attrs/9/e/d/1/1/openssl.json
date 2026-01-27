@@ -28,8 +28,8 @@
     },
     "test": "native_and_emulated"
   },
-  "feedstock_hash": "1f09086bf82fe5ad88d86ee83f81ee04b0cbaf20",
-  "feedstock_hash_ts": 1762838076,
+  "feedstock_hash": "6ce65e0eadf8682da1f45c650be30dff4b5353e2",
+  "feedstock_hash_ts": 1769547155,
   "feedstock_name": "openssl",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -43,7 +43,7 @@
       "summary": "OpenSSL is an open-source implementation of the SSL and TLS protocols"
     },
     "build": {
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "feedstock-name": "openssl",
@@ -168,7 +168,7 @@
       "summary": "OpenSSL is an open-source implementation of the SSL and TLS protocols"
     },
     "build": {
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "feedstock-name": "openssl",
@@ -293,7 +293,7 @@
       "summary": "OpenSSL is an open-source implementation of the SSL and TLS protocols"
     },
     "build": {
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "feedstock-name": "openssl",
@@ -418,7 +418,7 @@
       "summary": "OpenSSL is an open-source implementation of the SSL and TLS protocols"
     },
     "build": {
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "feedstock-name": "openssl",
@@ -716,6 +716,7 @@
             "copy NUL checksum.txt",
             "%LIBRARY_BIN%\\openssl sha256 checksum.txt",
             "if not exist \"%SSL_CERT_FILE%\" exit 1",
+            "if not exist \"%LIBRARY_INC%\"\\\\openssl\\\\applink.c exit 1",
             "pkg-config --print-errors --exact-version \"3.6.0\" openssl",
             "type %CONDA_PREFIX%\\etc\\conda\\activate.d\\openssl_activate-win.sh | rg \\r & if ERRORLEVEL ==1 (exit 0) else (exit 1)",
             "type %CONDA_PREFIX%\\etc\\conda\\deactivate.d\\openssl_deactivate-win.sh | rg \\r & if ERRORLEVEL ==1 (exit 0) else (exit 1)"
@@ -770,6 +771,7 @@
             "copy NUL checksum.txt",
             "%LIBRARY_BIN%\\openssl sha256 checksum.txt",
             "if not exist \"%SSL_CERT_FILE%\" exit 1",
+            "if not exist \"%LIBRARY_INC%\"\\\\openssl\\\\applink.c exit 1",
             "pkg-config --print-errors --exact-version \"3.6.0\" openssl",
             "type %CONDA_PREFIX%\\etc\\conda\\activate.d\\openssl_activate-win.sh | rg \\r & if ERRORLEVEL ==1 (exit 0) else (exit 1)",
             "type %CONDA_PREFIX%\\etc\\conda\\deactivate.d\\openssl_deactivate-win.sh | rg \\r & if ERRORLEVEL ==1 (exit 0) else (exit 1)"
@@ -832,7 +834,7 @@
       "summary": "OpenSSL is an open-source implementation of the SSL and TLS protocols"
     },
     "build": {
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "feedstock-name": "openssl",
@@ -957,7 +959,7 @@
       "summary": "OpenSSL is an open-source implementation of the SSL and TLS protocols"
     },
     "build": {
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "feedstock-name": "openssl",
@@ -1091,7 +1093,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/openssl.json"
   },
-  "raw_meta_yaml": "{% set version = \"3.6.0\" %}\n\npackage:\n  name: openssl_split\n  version: {{ version }}\n\nsource:\n  url: https://github.com/openssl/openssl/releases/download/openssl-{{ version }}/openssl-{{ version }}.tar.gz\n  sha256: b6a5f44b7eb69e3fa35dbf15524405b44837a481d43d81daddde3ff21fcbb8e9\n\nbuild:\n  number: 0\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ stdlib('c') }}\n    - nasm               # [win]\n    - make               # [unix]\n    - perl *\n  # Empty host section to ensure that this is identified as cb3\n  host:\n\noutputs:\n  - name: openssl\n    script: install_openssl.sh  # [unix]\n    script: install_openssl.bat  # [win]\n    build:\n      run_exports:\n        # openssl's versioning used to be X.Y.Z(rev), but is MAJOR.MINOR.PATCH since 3.0.0;\n        # see https://www.openssl.org/policies/releasestrat.html\n        - {{ pin_subpackage('openssl', max_pin='x') }}\n    requirements:\n      build:\n        - {{ compiler('c') }}\n        - {{ stdlib('c') }}\n        - make\n        - perl *\n      # Empty host section to ensure that this is identified as cb3\n      # FIXME: this doesn't seem to be enough. We need a compiler in build\n      # with `compiler` jinja used to not use legacy cb2 build==host\n      host:\n      run:\n        - ca-certificates\n    test:\n      requires:\n        - pkg-config\n        - ripgrep\n      commands:\n        - copy NUL checksum.txt        # [win]\n        - touch checksum.txt           # [unix]\n        - $PREFIX/bin/openssl sha256 checksum.txt       # [unix]\n        - '%LIBRARY_BIN%\\openssl sha256 checksum.txt'   # [win]\n        - if not exist \"%SSL_CERT_FILE%\" exit 1         # [win]\n\n        # test pkgconfig metadata\n        - pkg-config --print-errors --exact-version \"{{ version }}\" openssl\n        # test prefix is set as well (see #155)\n        - if [[ \"$(pkg-config --variable=prefix openssl)\" == \"\" ]]; then exit 1; fi     # [unix]\n\n        # ensure (de)activation scripts for bash-on-win do not contain crlf line endings;\n        # ripgrep will return exit code 1 if no match is found, which is what we want after\n        # filtering to the carriage-return character that shouldn't be there.\n        {% for task in [\"activate\", \"deactivate\"] %}\n        - type %CONDA_PREFIX%\\etc\\conda\\{{ task }}.d\\openssl_{{ task }}-win.sh | rg \\r & if ERRORLEVEL ==1 (exit 0) else (exit 1)  # [win]\n        # do not use %ERRORLEVEL% or !ERRORLEVEL!, but ERRORLEVEL, c.f.\n        # https://devblogs.microsoft.com/oldnewthing/20080926-00/?p=20743;\n        # while `if ... NEQ 1 exit 1` would be nicer, NEQ is incompatible with\n        # using bare ERRORLEVEL, see https://stackoverflow.com/a/74148543\n        {% endfor %}\n\n  - name: libopenssl-static\n    script: install_libopenssl-static.sh  # [unix]\n    script: install_libopenssl-static.bat  # [win]\n    requirements:\n      build:\n        - {{ compiler('c') }}\n        - {{ stdlib('c') }}\n      run:\n        - {{ pin_subpackage('openssl', exact=True) }}\n    test:\n      commands:\n        - test -f ${PREFIX}/lib/libcrypto.a                   # [unix]\n        - test -f ${PREFIX}/lib/libssl.a                      # [unix]\n        - if not exist %LIBRARY_LIB%\\libcrypto_static.lib exit 1    # [win]\n        - if not exist %LIBRARY_LIB%\\libssl_static.lib exit 1       # [win]\n\nabout:\n  home: https://www.openssl.org/\n  license_file: LICENSE.txt\n  license: Apache-2.0\n  license_family: Apache\n  summary: OpenSSL is an open-source implementation of the SSL and TLS protocols\n  dev_url: https://github.com/openssl/openssl\n  doc_url: https://docs.openssl.org/master/\n\nextra:\n  recipe-maintainers:\n    - jakirkham\n    - msarahan\n    - ocefpaf\n    - pelson\n    - h-vetinari\n  feedstock-name: openssl\n",
+  "raw_meta_yaml": "{% set version = \"3.6.0\" %}\n\npackage:\n  name: openssl_split\n  version: {{ version }}\n\nsource:\n  url: https://github.com/openssl/openssl/releases/download/openssl-{{ version }}/openssl-{{ version }}.tar.gz\n  sha256: b6a5f44b7eb69e3fa35dbf15524405b44837a481d43d81daddde3ff21fcbb8e9\n\nbuild:\n  number: 1\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ stdlib('c') }}\n    - nasm               # [win]\n    - make               # [unix]\n    - perl *\n  # Empty host section to ensure that this is identified as cb3\n  host:\n\noutputs:\n  - name: openssl\n    script: install_openssl.sh  # [unix]\n    script: install_openssl.bat  # [win]\n    build:\n      run_exports:\n        # openssl's versioning used to be X.Y.Z(rev), but is MAJOR.MINOR.PATCH since 3.0.0;\n        # see https://www.openssl.org/policies/releasestrat.html\n        - {{ pin_subpackage('openssl', max_pin='x') }}\n    requirements:\n      build:\n        - {{ compiler('c') }}\n        - {{ stdlib('c') }}\n        - make\n        - perl *\n      # Empty host section to ensure that this is identified as cb3\n      # FIXME: this doesn't seem to be enough. We need a compiler in build\n      # with `compiler` jinja used to not use legacy cb2 build==host\n      host:\n      run:\n        - ca-certificates\n    test:\n      requires:\n        - pkg-config\n        - ripgrep\n      commands:\n        - copy NUL checksum.txt        # [win]\n        - touch checksum.txt           # [unix]\n        - $PREFIX/bin/openssl sha256 checksum.txt       # [unix]\n        - '%LIBRARY_BIN%\\openssl sha256 checksum.txt'   # [win]\n        - if not exist \"%SSL_CERT_FILE%\" exit 1         # [win]\n        - if not exist \"%LIBRARY_INC%\"\\\\openssl\\\\applink.c exit 1    # [win]\n\n        # test pkgconfig metadata\n        - pkg-config --print-errors --exact-version \"{{ version }}\" openssl\n        # test prefix is set as well (see #155)\n        - if [[ \"$(pkg-config --variable=prefix openssl)\" == \"\" ]]; then exit 1; fi     # [unix]\n\n        # ensure (de)activation scripts for bash-on-win do not contain crlf line endings;\n        # ripgrep will return exit code 1 if no match is found, which is what we want after\n        # filtering to the carriage-return character that shouldn't be there.\n        {% for task in [\"activate\", \"deactivate\"] %}\n        - type %CONDA_PREFIX%\\etc\\conda\\{{ task }}.d\\openssl_{{ task }}-win.sh | rg \\r & if ERRORLEVEL ==1 (exit 0) else (exit 1)  # [win]\n        # do not use %ERRORLEVEL% or !ERRORLEVEL!, but ERRORLEVEL, c.f.\n        # https://devblogs.microsoft.com/oldnewthing/20080926-00/?p=20743;\n        # while `if ... NEQ 1 exit 1` would be nicer, NEQ is incompatible with\n        # using bare ERRORLEVEL, see https://stackoverflow.com/a/74148543\n        {% endfor %}\n\n  - name: libopenssl-static\n    script: install_libopenssl-static.sh  # [unix]\n    script: install_libopenssl-static.bat  # [win]\n    requirements:\n      build:\n        - {{ compiler('c') }}\n        - {{ stdlib('c') }}\n      run:\n        - {{ pin_subpackage('openssl', exact=True) }}\n    test:\n      commands:\n        - test -f ${PREFIX}/lib/libcrypto.a                   # [unix]\n        - test -f ${PREFIX}/lib/libssl.a                      # [unix]\n        - if not exist %LIBRARY_LIB%\\libcrypto_static.lib exit 1    # [win]\n        - if not exist %LIBRARY_LIB%\\libssl_static.lib exit 1       # [win]\n\nabout:\n  home: https://www.openssl.org/\n  license_file: LICENSE.txt\n  license: Apache-2.0\n  license_family: Apache\n  summary: OpenSSL is an open-source implementation of the SSL and TLS protocols\n  dev_url: https://github.com/openssl/openssl\n  doc_url: https://docs.openssl.org/master/\n\nextra:\n  recipe-maintainers:\n    - jakirkham\n    - msarahan\n    - ocefpaf\n    - pelson\n    - h-vetinari\n  feedstock-name: openssl\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -1186,7 +1188,7 @@
       "summary": "OpenSSL is an open-source implementation of the SSL and TLS protocols"
     },
     "build": {
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "feedstock-name": "openssl",
@@ -1224,6 +1226,7 @@
             "copy NUL checksum.txt",
             "%LIBRARY_BIN%\\openssl sha256 checksum.txt",
             "if not exist \"%SSL_CERT_FILE%\" exit 1",
+            "if not exist \"%LIBRARY_INC%\"\\\\openssl\\\\applink.c exit 1",
             "pkg-config --print-errors --exact-version \"3.6.0\" openssl",
             "type %CONDA_PREFIX%\\etc\\conda\\activate.d\\openssl_activate-win.sh | rg \\r & if ERRORLEVEL ==1 (exit 0) else (exit 1)",
             "type %CONDA_PREFIX%\\etc\\conda\\deactivate.d\\openssl_deactivate-win.sh | rg \\r & if ERRORLEVEL ==1 (exit 0) else (exit 1)"
@@ -1314,7 +1317,7 @@
       "summary": "OpenSSL is an open-source implementation of the SSL and TLS protocols"
     },
     "build": {
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "feedstock-name": "openssl",
@@ -1352,6 +1355,7 @@
             "copy NUL checksum.txt",
             "%LIBRARY_BIN%\\openssl sha256 checksum.txt",
             "if not exist \"%SSL_CERT_FILE%\" exit 1",
+            "if not exist \"%LIBRARY_INC%\"\\\\openssl\\\\applink.c exit 1",
             "pkg-config --print-errors --exact-version \"3.6.0\" openssl",
             "type %CONDA_PREFIX%\\etc\\conda\\activate.d\\openssl_activate-win.sh | rg \\r & if ERRORLEVEL ==1 (exit 0) else (exit 1)",
             "type %CONDA_PREFIX%\\etc\\conda\\deactivate.d\\openssl_deactivate-win.sh | rg \\r & if ERRORLEVEL ==1 (exit 0) else (exit 1)"
