@@ -3,13 +3,6 @@
   "branch": "main",
   "ci_support_linux_64_.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ncxx_compiler:\n- gxx\ncxx_compiler_version:\n- '14'\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\nlibblas:\n- 3.9.* *netlib\nlibcblas:\n- 3.9.* *netlib\nlibjpeg_turbo:\n- '3'\nliblapack:\n- 3.9.* *netlib\nliblapacke:\n- 3.9.* *netlib\nlibopencv:\n- 4.12.0\nlibpng:\n- '1.6'\nlibrealsense:\n- '2.56'\nlibxml2:\n- '2.14'\nnumpy:\n- '2'\npin_run_as_build:\n  python:\n    min_pin: x.x\n    max_pin: x.x\npython:\n- 3.10.* *_cpython\n- 3.11.* *_cpython\n- 3.12.* *_cpython\n- 3.13.* *_cp313\ntarget_platform:\n- linux-64\nzip_keys:\n- - c_compiler_version\n  - cxx_compiler_version\n",
   "conda-forge.yml": {
-    "azure": {
-      "settings_osx": {
-        "pool": {
-          "vmImage": "macos-14"
-        }
-      }
-    },
     "build_platform": {
       "linux_aarch64": "linux_64",
       "osx_arm64": "osx_64"
@@ -28,8 +21,8 @@
     },
     "test": "native_and_emulated"
   },
-  "feedstock_hash": "3dcbcd39af94ed4980f486759609b78460184f45",
-  "feedstock_hash_ts": 1769424008,
+  "feedstock_hash": "33c22c34243bce2b9d2948edd9eceaa924f87965",
+  "feedstock_hash_ts": 1769503722,
   "feedstock_name": "visp",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -44,7 +37,7 @@
       "summary": "A cross-platform library for prototyping and developing applications using visual tracking and visual servoing technic."
     },
     "build": {
-      "number": "1",
+      "number": "2",
       "run_exports": {
         "weak": [
           "libvisp"
@@ -534,7 +527,7 @@
       "summary": "A cross-platform library for prototyping and developing applications using visual tracking and visual servoing technic."
     },
     "build": {
-      "number": "1",
+      "number": "2",
       "run_exports": {
         "weak": [
           "libvisp"
@@ -1024,7 +1017,7 @@
       "summary": "A cross-platform library for prototyping and developing applications using visual tracking and visual servoing technic."
     },
     "build": {
-      "number": "1",
+      "number": "2",
       "run_exports": {
         "weak": [
           "libvisp"
@@ -2977,7 +2970,7 @@
       "summary": "A cross-platform library for prototyping and developing applications using visual tracking and visual servoing technic."
     },
     "build": {
-      "number": "1",
+      "number": "2",
       "run_exports": {
         "weak": [
           "libvisp"
@@ -3467,7 +3460,7 @@
       "summary": "A cross-platform library for prototyping and developing applications using visual tracking and visual servoing technic."
     },
     "build": {
-      "number": "1",
+      "number": "2",
       "run_exports": {
         "weak": [
           "libvisp"
@@ -3964,7 +3957,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/visp.json"
   },
-  "raw_meta_yaml": "context:\n  name: visp\n  version: 3.7.0\n\nrecipe:\n  name: ${{ name|lower }}\n  version: ${{ version }}\n\nsource:\n  url: https://github.com/lagadic/visp/archive/refs/tags/v${{ version }}.tar.gz\n  sha256: 997f247f3702c83f0a8a6dc2f72ff98cfe3a5dcbd82f7c9f01d37ccd3b8ea97a\n  patches:\n    - patches/0001-add-an-option-to-build-python-stubs-or-not.patch\n    # Current version of this package do not enable AVX support. The Windows build uses\n    # the Clang-cl compiler wich fails to build the embedded Simd library on AVX instructions\n    # even when AVX flags are not on for some unknown reason, so we have to force\n    # disabling AVX support at the Simd library level.\n    - if: win\n      then: patches/0010-Disable-AVX-and-AVX2-for-Simd-embedded-lib.patch\n\nbuild:\n  number: 1\n\noutputs:\n  - package:\n      name: libvisp\n    build:\n      script: scripts/build-lib\n    requirements:\n      build:\n        - ${{ compiler('cxx') }}\n        - ${{ stdlib('c') }}\n        - cmake\n        - ninja\n        - pkgconfig\n        - if: win\n          then:\n            - clang\n      host:\n        - if: unix\n          then:\n            - xorg-libx11\n            - xorg-libxfixes\n            - xorg-xorgproto\n            - libxml2\n            - libdc1394 >=2.2.6\n            - librealsense\n        - if: osx\n          then:\n            - llvm-openmp\n        - libopencv\n        - eigen\n        - libjpeg-turbo\n        - libpng\n        - libblas\n        - libcblas\n        - liblapack\n        - liblapacke\n        - nlohmann_json\n        - panda3d\n      run:\n        - if: osx\n          then: libcxx\n        - eigen\n      run_exports:\n        - ${{ pin_subpackage('libvisp', upper_bound='x.x') }}\n    tests:\n      - package_contents:\n          include:\n            - visp3/visp.h\n          lib:\n            # win libs contains version specific strings that are not available for now from jinja\n            # https://github.com/prefix-dev/rattler-build/issues/1068\n            - if: unix\n              then:\n                - visp_core\n              else:\n                - visp_core*\n      - script:\n        - cmake-package-check VISP\n        requirements:\n          run:\n            - cmake-package-check\n            - ${{ compiler('c') }}\n            - ${{ compiler('cxx') }}            \n      - script:\n          - if: unix\n            then: visp-config --version\n          # Broken with rattler-build\n          - if: win\n            then:\n              - dir\n              - call Library\\bin\\visp-config.bat --version\n\n  - package:\n      name: visp-python\n    build:  \n      script: scripts/build-python\n    requirements:\n      build:\n        - if: build_platform != target_platform\n          then:\n            - python\n            - cross-python_${{ target_platform }}\n            - numpy\n            - pybind11\n        - ${{ compiler('cxx') }}\n        - ${{ stdlib('c') }}\n        - cmake\n        - ninja\n        - pkgconfig\n        - if: win\n          then:\n            - clang\n      host:\n        - python\n        - numpy\n        - pybind11\n        - pip\n        - setuptools\n        - cxxheaderparser\n        - doxmlparser\n        - pcpp\n        - tqdm\n        - mypy\n        - if: unix\n          then:\n            - xorg-xorgproto\n        - panda3d\n        - ${{ pin_subpackage('libvisp', exact=true) }}\n      run:\n        - python\n        - ${{ pin_subpackage('libvisp', exact=true) }}\n    tests:\n      - python:\n          imports:\n            - visp\n\n  - package:\n      name: ${{ name }}\n    requirements:\n      run:\n        - ${{ pin_subpackage('libvisp', exact=true) }}\n        - ${{ pin_subpackage('visp-python', exact=true) }}\n      run_exports:\n        - ${{ pin_subpackage('libvisp', upper_bound='x.x') }}\n    tests:\n      - script:\n        - cmake-package-check VISP\n        requirements:\n          run:\n            - cmake-package-check\n            - ${{ compiler('c') }}\n            - ${{ compiler('cxx') }}\n      - python:\n          imports:\n            - visp\n\nabout:\n  summary: A cross-platform library for prototyping and developing applications using visual tracking and visual servoing technic.\n  description: C++ development libraries and Python bidings for ViSP.\n  license: GPL-2.0-only\n  license_file: LICENSE.txt\n  homepage: https://visp.inria.fr/\n  repository: https://github.com/lagadic/visp\n  documentation: https://visp-doc.inria.fr/doxygen/visp-${{ version }}/\n  \nextra:\n  recipe-maintainers:\n    - rolalaro\n    - olivier-roussel\n    - fspindle\n",
+  "raw_meta_yaml": "context:\n  name: visp\n  version: 3.7.0\n\nrecipe:\n  name: ${{ name|lower }}\n  version: ${{ version }}\n\nsource:\n  url: https://github.com/lagadic/visp/archive/refs/tags/v${{ version }}.tar.gz\n  sha256: 997f247f3702c83f0a8a6dc2f72ff98cfe3a5dcbd82f7c9f01d37ccd3b8ea97a\n  patches:\n    # https://github.com/lagadic/visp/pull/1890\n    - patches/0001-add-an-option-to-build-python-stubs-or-not.patch\n    # Current version of this package do not enable AVX support. The Windows build uses\n    # the Clang-cl compiler wich fails to build the embedded Simd library on AVX instructions\n    # even when AVX flags are not on for some unknown reason, so we have to force\n    # disabling AVX support at the Simd library level.\n    - if: win\n      then: patches/0010-Disable-AVX-and-AVX2-for-Simd-embedded-lib.patch\n\nbuild:\n  number: 2\n\noutputs:\n  - package:\n      name: libvisp\n    build:\n      script: scripts/build-lib\n    requirements:\n      build:\n        - ${{ compiler('cxx') }}\n        - ${{ stdlib('c') }}\n        - cmake\n        - ninja\n        - pkgconfig\n        - if: win\n          then:\n            - clang\n      host:\n        - if: unix\n          then:\n            - xorg-libx11\n            - xorg-libxfixes\n            - xorg-xorgproto\n            - libxml2\n            - libdc1394 >=2.2.6\n            - librealsense\n        - if: osx\n          then:\n            - llvm-openmp\n        - libopencv\n        - eigen\n        - libjpeg-turbo\n        - libpng\n        - libblas\n        - libcblas\n        - liblapack\n        - liblapacke\n        - nlohmann_json\n        - panda3d\n      run:\n        - if: osx\n          then: libcxx\n        - eigen\n      run_exports:\n        - ${{ pin_subpackage('libvisp', upper_bound='x.x') }}\n    tests:\n      - package_contents:\n          include:\n            - visp3/visp.h\n          lib:\n            # win libs contains version specific strings that are not available for now from jinja\n            # https://github.com/prefix-dev/rattler-build/issues/1068\n            - if: unix\n              then:\n                - visp_core\n              else:\n                - visp_core*\n      - script:\n        - cmake-package-check VISP\n        requirements:\n          run:\n            - cmake-package-check\n            - ${{ compiler('c') }}\n            - ${{ compiler('cxx') }}            \n      - script:\n          - if: unix\n            then: visp-config --version\n          # Broken with rattler-build\n          - if: win\n            then:\n              - dir\n              - call Library\\bin\\visp-config.bat --version\n\n  - package:\n      name: visp-python\n    build:  \n      script: scripts/build-python\n    requirements:\n      build:\n        - if: build_platform != target_platform\n          then:\n            - python\n            - cross-python_${{ target_platform }}\n            - numpy\n            - pybind11\n        - ${{ compiler('cxx') }}\n        - ${{ stdlib('c') }}\n        - cmake\n        - ninja\n        - pkgconfig\n        - if: win\n          then:\n            - clang\n      host:\n        - python\n        - numpy\n        - pybind11\n        - pip\n        - setuptools\n        - cxxheaderparser\n        - doxmlparser\n        - pcpp\n        - tqdm\n        - mypy\n        - if: unix\n          then:\n            - xorg-xorgproto\n        - panda3d\n        - ${{ pin_subpackage('libvisp', exact=true) }}\n      run:\n        - python\n        - ${{ pin_subpackage('libvisp', exact=true) }}\n    tests:\n      - python:\n          imports:\n            - visp\n\n  - package:\n      name: ${{ name }}\n    requirements:\n      run:\n        - ${{ pin_subpackage('libvisp', exact=true) }}\n        - ${{ pin_subpackage('visp-python', exact=true) }}\n      run_exports:\n        - ${{ pin_subpackage('libvisp', upper_bound='x.x') }}\n    tests:\n      - script:\n        - cmake-package-check VISP\n        requirements:\n          run:\n            - cmake-package-check\n            - ${{ compiler('c') }}\n            - ${{ compiler('cxx') }}\n      - python:\n          imports:\n            - visp\n\nabout:\n  summary: A cross-platform library for prototyping and developing applications using visual tracking and visual servoing technic.\n  description: C++ development libraries and Python bidings for ViSP.\n  license: GPL-2.0-only\n  license_file: LICENSE.txt\n  homepage: https://visp.inria.fr/\n  repository: https://github.com/lagadic/visp\n  documentation: https://visp-doc.inria.fr/doxygen/visp-${{ version }}/\n  \nextra:\n  recipe-maintainers:\n    - rolalaro\n    - olivier-roussel\n    - fspindle\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -4151,7 +4144,7 @@
       "summary": "A cross-platform library for prototyping and developing applications using visual tracking and visual servoing technic."
     },
     "build": {
-      "number": "1",
+      "number": "2",
       "run_exports": {
         "weak": [
           "libvisp"
