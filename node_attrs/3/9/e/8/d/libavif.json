@@ -1,7 +1,7 @@
 {
   "archived": false,
   "branch": "main",
-  "ci_support_linux_64_.yaml": "aom:\n- '3.9'\nc_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ndav1d:\n- 1.2.1\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\nlibavif:\n- '1'\nrav1e:\n- '0.7'\nsvt_av1:\n- 4.0.0\ntarget_platform:\n- linux-64\n",
+  "ci_support_linux_64_.yaml": "aom:\n- '3.9'\nc_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ndav1d:\n- 1.2.1\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\nlibavif:\n- '1'\nrav1e:\n- '0.7'\nsvt_av1:\n- 4.0.1\ntarget_platform:\n- linux-64\n",
   "conda-forge.yml": {
     "build_platform": {
       "linux_aarch64": "linux_64",
@@ -22,8 +22,8 @@
     },
     "test": "native_and_emulated"
   },
-  "feedstock_hash": "9e954f08dccdcf58126d629bf05c745e8fd25876",
-  "feedstock_hash_ts": 1769476727,
+  "feedstock_hash": "e3286e562b7c85c9fca041e626c74e4b7a7cb86f",
+  "feedstock_hash_ts": 1769712407,
   "feedstock_name": "libavif",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -36,7 +36,7 @@
       "summary": "A friendly, portable C implementation of the AV1 Image File Format"
     },
     "build": {
-      "number": "3"
+      "number": "4"
     },
     "extra": {
       "feedstock-name": "libavif",
@@ -197,7 +197,7 @@
       "summary": "A friendly, portable C implementation of the AV1 Image File Format"
     },
     "build": {
-      "number": "3"
+      "number": "4"
     },
     "extra": {
       "feedstock-name": "libavif",
@@ -358,7 +358,7 @@
       "summary": "A friendly, portable C implementation of the AV1 Image File Format"
     },
     "build": {
-      "number": "3"
+      "number": "4"
     },
     "extra": {
       "feedstock-name": "libavif",
@@ -519,7 +519,7 @@
       "summary": "A friendly, portable C implementation of the AV1 Image File Format"
     },
     "build": {
-      "number": "3"
+      "number": "4"
     },
     "extra": {
       "feedstock-name": "libavif",
@@ -1060,7 +1060,7 @@
       "summary": "A friendly, portable C implementation of the AV1 Image File Format"
     },
     "build": {
-      "number": "3"
+      "number": "4"
     },
     "extra": {
       "feedstock-name": "libavif",
@@ -1221,7 +1221,7 @@
       "summary": "A friendly, portable C implementation of the AV1 Image File Format"
     },
     "build": {
-      "number": "3"
+      "number": "4"
     },
     "extra": {
       "feedstock-name": "libavif",
@@ -1392,7 +1392,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/libavif.json"
   },
-  "raw_meta_yaml": "# NOTE: Humans must also update the library version in the tests section of this recipe\n{% set version = \"1.3.0\" %}\n# Look in the libavif top level CMakeLists.txt for the updated library\n# version (not the same as the project version) to update parameters for existence checks\n# The SO name changes every version https://github.com/AOMediaCodec/libavif/issues/799\n{% set so_version = \"16.\" ~ version.split('.')[1] ~ \".\" ~ version.split('.')[2] %}\n{% set so_major_version = so_version.split('.')[0] %}\n\npackage:\n  name: libavif-split\n  version: {{ version }}\n\nsource:\n  url: https://github.com/AOMediaCodec/libavif/archive/refs/tags/v{{ version }}.tar.gz\n  sha256: 0a545e953cc049bf5bcf4ee467306a2f113a75110edf59e61248873101cd26c1\n  patches:\n   # https://github.com/AOMediaCodec/libavif/pull/2971\n   - 2971-svt140.patch\n\nbuild:\n  number: 3\n\nrequirements:\n  build:\n    - cmake\n    - {{ compiler('c') }}\n    - {{ stdlib('c') }}\n    - ninja\n    - m2-sed  # [win]\n  host:\n    - aom\n    - dav1d\n    # - libpng\n    # - jpeg\n    - rav1e\n    - svt-av1\n\noutputs:\n  - name: libavif\n    script: install.py\n    build:\n      run_exports:\n        - {{ pin_subpackage('libavif' ~ so_major_version) }}\n    requirements:\n      build:\n        - cmake\n        - {{ compiler('c') }}\n        - {{ stdlib('c') }}\n        - ninja\n      host:\n        - aom\n        - dav1d\n        # - libpng\n        # - jpeg\n        - rav1e\n        - svt-av1\n      run:\n        - {{ pin_subpackage('libavif' ~ so_major_version, exact=True) }}\n    test:\n      commands:\n        - test -f ${PREFIX}/include/avif/avif.h                         # [unix]\n        - if not exist %PREFIX%\\\\Library\\\\include\\\\avif\\\\avif.h exit 1  # [win]\n        - test -f ${PREFIX}/lib/libavif${SHLIB_EXT}                   # [unix]\n        - test -f ${PREFIX}/lib/libavif.so.{{ so_major_version }}     # [linux]\n        - test -f ${PREFIX}/lib/libavif.so.{{ so_version }}           # [linux]\n        - test -f ${PREFIX}/lib/libavif.{{ so_major_version }}.dylib  # [osx]\n        - test -f ${PREFIX}/lib/libavif.{{ so_version }}.dylib        # [osx]\n        - if not exist %PREFIX%\\\\Library\\\\bin\\\\avif.dll exit 1        # [win]\n        - if not exist %PREFIX%\\\\Library\\\\lib\\\\avif.lib exit 1        # [win]\n        - test -f ${PREFIX}/lib/pkgconfig/libavif.pc                         # [unix]\n        - if not exist %PREFIX%\\\\Library\\\\lib\\\\pkgconfig\\\\libavif.pc exit 1  # [win]\n        - test -f ${PREFIX}/lib/cmake/libavif/libavif-config.cmake           # [unix]\n        - test -f ${PREFIX}/lib/cmake/libavif/libavif-config-release.cmake   # [unix]\n        - test -f ${PREFIX}/lib/cmake/libavif/libavif-config-version.cmake   # [unix]\n        - if not exist %PREFIX%\\\\Library\\\\lib\\\\cmake\\\\libavif\\\\libavif-config.cmake exit 1          # [win]\n        - if not exist %PREFIX%\\\\Library\\\\lib\\\\cmake\\\\libavif\\\\libavif-config-release.cmake exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\lib\\\\cmake\\\\libavif\\\\libavif-config-version.cmake exit 1  # [win]\n\n  - name: libavif{{ so_major_version }}\n    script: install.py\n    build:\n      run_exports:\n        - {{ pin_subpackage('libavif' ~ so_major_version) }}\n    requirements:\n      build:\n        - cmake\n        - {{ compiler('c') }}\n        - {{ stdlib(\"c\") }}\n        - ninja\n      host:\n        - aom\n        - dav1d\n        # - libpng\n        # - jpeg\n        - rav1e\n        - svt-av1\n      run:\n        - {{ pin_subpackage('_libavif_api', max_pin='x.x.x') }}               # [win]\n    test:\n      commands:\n      # Need these\n        - test -f ${PREFIX}/lib/libavif.so.{{ so_major_version }}             # [linux]\n        - test -f ${PREFIX}/lib/libavif.so.{{ so_version }}                   # [linux]\n        - test -f ${PREFIX}/lib/libavif.{{ so_major_version }}.dylib          # [osx]\n        - test -f ${PREFIX}/lib/libavif.{{ so_version }}.dylib                # [osx]\n        - if not exist %PREFIX%\\\\Library\\\\bin\\\\avif.dll exit 1                # [win]\n      # Exclude these\n        - test ! -f ${PREFIX}/include/avif/avif.h                             # [unix]\n        - test ! -f ${PREFIX}/lib/libavif{{ SHLIB_EXT }}                      # [unix]\n        - test ! -f ${PREFIX}/lib/pkgconfig/libavif.pc                        # [unix]\n        - test ! -f ${PREFIX}/lib/cmake/libavif/libavif-config.cmake          # [unix]\n        - test ! -f ${PREFIX}/lib/cmake/libavif/libavif-config-release.cmake  # [unix]\n        - test ! -f ${PREFIX}/lib/cmake/libavif/libavif-config-version.cmake  # [unix]\n        - if exist %PREFIX%\\\\Library\\\\lib\\\\avif.lib exit 1                    # [win]\n\n  # Clobber preventer for Windows; prevents multiple dll files from being\n  # installed simultaneously. This lets us avoid exporting a strict pin on the\n  # API which is not strictly correlated with the ABI.\n  - name: _libavif_api\n    build:\n      skip: true  # [not win]\n    about:\n      summary: >\n        An empty package that prevents multiple ABIs being installed simultaneously on Windows.\n\nabout:\n  home: https://github.com/AOMediaCodec/libavif\n  license: BSD-2-Clause\n  license_family: BSD\n  license_file: LICENSE\n  summary: A friendly, portable C implementation of the AV1 Image File Format\n  description: |\n    This library aims to be a friendly, portable C implementation of the AV1\n    Image File Format, as described here\n    <https://aomediacodec.github.io/av1-avif/>.\n\nextra:\n  feedstock-name: libavif\n  recipe-maintainers:\n    - carterbox\n    - hmaarrfk\n",
+  "raw_meta_yaml": "# NOTE: Humans must also update the library version in the tests section of this recipe\n{% set version = \"1.3.0\" %}\n# Look in the libavif top level CMakeLists.txt for the updated library\n# version (not the same as the project version) to update parameters for existence checks\n# The SO name changes every version https://github.com/AOMediaCodec/libavif/issues/799\n{% set so_version = \"16.\" ~ version.split('.')[1] ~ \".\" ~ version.split('.')[2] %}\n{% set so_major_version = so_version.split('.')[0] %}\n\npackage:\n  name: libavif-split\n  version: {{ version }}\n\nsource:\n  url: https://github.com/AOMediaCodec/libavif/archive/refs/tags/v{{ version }}.tar.gz\n  sha256: 0a545e953cc049bf5bcf4ee467306a2f113a75110edf59e61248873101cd26c1\n  patches:\n   # https://github.com/AOMediaCodec/libavif/pull/2971\n   - 2971-svt140.patch\n\nbuild:\n  number: 4\n\nrequirements:\n  build:\n    - cmake\n    - {{ compiler('c') }}\n    - {{ stdlib('c') }}\n    - ninja\n    - m2-sed  # [win]\n  host:\n    - aom\n    - dav1d\n    # - libpng\n    # - jpeg\n    - rav1e\n    - svt-av1\n\noutputs:\n  - name: libavif\n    script: install.py\n    build:\n      run_exports:\n        - {{ pin_subpackage('libavif' ~ so_major_version) }}\n    requirements:\n      build:\n        - cmake\n        - {{ compiler('c') }}\n        - {{ stdlib('c') }}\n        - ninja\n      host:\n        - aom\n        - dav1d\n        # - libpng\n        # - jpeg\n        - rav1e\n        - svt-av1\n      run:\n        - {{ pin_subpackage('libavif' ~ so_major_version, exact=True) }}\n    test:\n      commands:\n        - test -f ${PREFIX}/include/avif/avif.h                         # [unix]\n        - if not exist %PREFIX%\\\\Library\\\\include\\\\avif\\\\avif.h exit 1  # [win]\n        - test -f ${PREFIX}/lib/libavif${SHLIB_EXT}                   # [unix]\n        - test -f ${PREFIX}/lib/libavif.so.{{ so_major_version }}     # [linux]\n        - test -f ${PREFIX}/lib/libavif.so.{{ so_version }}           # [linux]\n        - test -f ${PREFIX}/lib/libavif.{{ so_major_version }}.dylib  # [osx]\n        - test -f ${PREFIX}/lib/libavif.{{ so_version }}.dylib        # [osx]\n        - if not exist %PREFIX%\\\\Library\\\\bin\\\\avif.dll exit 1        # [win]\n        - if not exist %PREFIX%\\\\Library\\\\lib\\\\avif.lib exit 1        # [win]\n        - test -f ${PREFIX}/lib/pkgconfig/libavif.pc                         # [unix]\n        - if not exist %PREFIX%\\\\Library\\\\lib\\\\pkgconfig\\\\libavif.pc exit 1  # [win]\n        - test -f ${PREFIX}/lib/cmake/libavif/libavif-config.cmake           # [unix]\n        - test -f ${PREFIX}/lib/cmake/libavif/libavif-config-release.cmake   # [unix]\n        - test -f ${PREFIX}/lib/cmake/libavif/libavif-config-version.cmake   # [unix]\n        - if not exist %PREFIX%\\\\Library\\\\lib\\\\cmake\\\\libavif\\\\libavif-config.cmake exit 1          # [win]\n        - if not exist %PREFIX%\\\\Library\\\\lib\\\\cmake\\\\libavif\\\\libavif-config-release.cmake exit 1  # [win]\n        - if not exist %PREFIX%\\\\Library\\\\lib\\\\cmake\\\\libavif\\\\libavif-config-version.cmake exit 1  # [win]\n\n  - name: libavif{{ so_major_version }}\n    script: install.py\n    build:\n      run_exports:\n        - {{ pin_subpackage('libavif' ~ so_major_version) }}\n    requirements:\n      build:\n        - cmake\n        - {{ compiler('c') }}\n        - {{ stdlib(\"c\") }}\n        - ninja\n      host:\n        - aom\n        - dav1d\n        # - libpng\n        # - jpeg\n        - rav1e\n        - svt-av1\n      run:\n        - {{ pin_subpackage('_libavif_api', max_pin='x.x.x') }}               # [win]\n    test:\n      commands:\n      # Need these\n        - test -f ${PREFIX}/lib/libavif.so.{{ so_major_version }}             # [linux]\n        - test -f ${PREFIX}/lib/libavif.so.{{ so_version }}                   # [linux]\n        - test -f ${PREFIX}/lib/libavif.{{ so_major_version }}.dylib          # [osx]\n        - test -f ${PREFIX}/lib/libavif.{{ so_version }}.dylib                # [osx]\n        - if not exist %PREFIX%\\\\Library\\\\bin\\\\avif.dll exit 1                # [win]\n      # Exclude these\n        - test ! -f ${PREFIX}/include/avif/avif.h                             # [unix]\n        - test ! -f ${PREFIX}/lib/libavif{{ SHLIB_EXT }}                      # [unix]\n        - test ! -f ${PREFIX}/lib/pkgconfig/libavif.pc                        # [unix]\n        - test ! -f ${PREFIX}/lib/cmake/libavif/libavif-config.cmake          # [unix]\n        - test ! -f ${PREFIX}/lib/cmake/libavif/libavif-config-release.cmake  # [unix]\n        - test ! -f ${PREFIX}/lib/cmake/libavif/libavif-config-version.cmake  # [unix]\n        - if exist %PREFIX%\\\\Library\\\\lib\\\\avif.lib exit 1                    # [win]\n\n  # Clobber preventer for Windows; prevents multiple dll files from being\n  # installed simultaneously. This lets us avoid exporting a strict pin on the\n  # API which is not strictly correlated with the ABI.\n  - name: _libavif_api\n    build:\n      skip: true  # [not win]\n    about:\n      summary: >\n        An empty package that prevents multiple ABIs being installed simultaneously on Windows.\n\nabout:\n  home: https://github.com/AOMediaCodec/libavif\n  license: BSD-2-Clause\n  license_family: BSD\n  license_file: LICENSE\n  summary: A friendly, portable C implementation of the AV1 Image File Format\n  description: |\n    This library aims to be a friendly, portable C implementation of the AV1\n    Image File Format, as described here\n    <https://aomediacodec.github.io/av1-avif/>.\n\nextra:\n  feedstock-name: libavif\n  recipe-maintainers:\n    - carterbox\n    - hmaarrfk\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -1493,7 +1493,7 @@
       "summary": "A friendly, portable C implementation of the AV1 Image File Format"
     },
     "build": {
-      "number": "3"
+      "number": "4"
     },
     "extra": {
       "feedstock-name": "libavif",
