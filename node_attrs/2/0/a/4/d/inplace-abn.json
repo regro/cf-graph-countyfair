@@ -1,7 +1,7 @@
 {
   "archived": false,
   "branch": "main",
-  "ci_support_linux_64_cuda_compiler_version12.9python3.10.____cpython.yaml": "c_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ncuda_compiler:\n- cuda-nvcc\ncuda_compiler_version:\n- '12.9'\ncxx_compiler:\n- gxx\ncxx_compiler_version:\n- '14'\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\npin_run_as_build:\n  python:\n    min_pin: x.x\n    max_pin: x.x\npython:\n- 3.10.* *_cpython\npytorch:\n- '2.10'\ntarget_platform:\n- linux-64\nzip_keys:\n- - cxx_compiler_version\n  - c_stdlib_version\n  - cuda_compiler_version\n",
+  "ci_support_linux_64_c_stdlib_version2.17cuda_compiler_version12.9python3.10.____cpython.yaml": "c_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ncuda_compiler:\n- cuda-nvcc\ncuda_compiler_version:\n- '12.9'\ncxx_compiler:\n- gxx\ncxx_compiler_version:\n- '14'\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\npin_run_as_build:\n  python:\n    min_pin: x.x\n    max_pin: x.x\npython:\n- 3.10.* *_cpython\npytorch:\n- '2.10'\ntarget_platform:\n- linux-64\nzip_keys:\n- - cxx_compiler_version\n  - c_stdlib_version\n  - cuda_compiler_version\n",
   "conda-forge.yml": {
     "azure": {
       "free_disk_space": true
@@ -18,8 +18,8 @@
       "tooling_branch_name": "main"
     }
   },
-  "feedstock_hash": "b2fba2b12e1ca42a2402a2f74b8969e88ab0c9d8",
-  "feedstock_hash_ts": 1769616844,
+  "feedstock_hash": "0ddfe1f1e4aff2c2a3f38b06204e480512e7c466",
+  "feedstock_hash_ts": 1769726269,
   "feedstock_name": "inplace-abn",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -30,9 +30,9 @@
       "summary": "In-Place Activated BatchNorm for Memory-Optimized Training of DNNs"
     },
     "build": {
-      "number": "16",
+      "number": "17",
       "skip": true,
-      "string": "cpu_py313_h1234567_16"
+      "string": "cuda130_py313_h1234567_17"
     },
     "extra": {
       "recipe-maintainers": [
@@ -56,7 +56,8 @@
         "python",
         "pytorch >=2.4.0",
         "setuptools",
-        "setuptools-scm"
+        "setuptools-scm",
+        "cuda-version 13.0"
       ],
       "run": [
         "cuda-cudart",
@@ -127,9 +128,9 @@
       "summary": "In-Place Activated BatchNorm for Memory-Optimized Training of DNNs"
     },
     "build": {
-      "number": "16",
+      "number": "17",
       "skip": true,
-      "string": "cpu_py313_h1234567_16"
+      "string": "cpu_py313_h1234567_17"
     },
     "extra": {
       "recipe-maintainers": [
@@ -153,7 +154,8 @@
         "python",
         "pytorch >=2.4.0",
         "setuptools",
-        "setuptools-scm"
+        "setuptools-scm",
+        "cuda-version 13.0"
       ],
       "run": [
         "cuda-cudart",
@@ -188,8 +190,8 @@
       "summary": "In-Place Activated BatchNorm for Memory-Optimized Training of DNNs"
     },
     "build": {
-      "number": "16",
-      "string": "cpu_py313_h1234567_16"
+      "number": "17",
+      "string": "cpu_py313_h1234567_17"
     },
     "extra": {
       "recipe-maintainers": [
@@ -282,7 +284,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/inplace-abn.json"
   },
-  "raw_meta_yaml": "{% set name = \"inplace-abn\" %}\n{% set version = \"1.1.0\" %}\n\n{% if cuda_compiler_version in (None, \"None\", True, False) %}\n{% set cuda_major = 0 %}\n{% else %}\n{% set cuda_major = environ.get(\"cuda_compiler_version\", \"11.8\").split(\".\")[0] | int %}\n{% endif %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/inplace-abn-{{ version }}.tar.gz\n  sha256: 7c286ca53d35cb37b0d1f8b9beb5a910c694129d3d4f7b8e53188370bb260c27\n\nbuild:\n  number: 16\n  skip: true  # [win]\n  {% if cuda_major < 12 %}\n  skip: true  # [cuda_compiler_version != \"None\"]\n  {% endif %}\n  string: cpu_py{{ CONDA_PY }}_h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version == \"None\"]\n  string: cuda{{ cuda_compiler_version | replace('.', '') }}_py{{ CONDA_PY }}_h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version != \"None\"]\n\nrequirements:\n  build:\n    - {{ compiler(\"cxx\") }}\n    - {{ compiler(\"cuda\") }}  # [cuda_compiler_version != \"None\"]\n    - {{ stdlib(\"c\") }}\n    - cuda-toolkit            # [cuda_compiler_version != \"None\" and build_platform != target_platform]\n  host:\n    # GPU requirements\n    - cuda-version {{ cuda_compiler_version }}  # [cuda_compiler_version != \"None\"]\n    - cuda-toolkit                              # [cuda_compiler_version != \"None\"]\n    - pip\n    - python\n    - pytorch >=2.4.0\n    - setuptools\n    - setuptools-scm\n  run:\n    - cuda-cudart  # [cuda_compiler_version != \"None\"]\n    - python\n    - pytorch\n\ntest:\n  imports:\n    - inplace_abn\n  commands:\n    - pip check\n  requires:\n    - pip\n    - setuptools\n\nabout:\n  home: https://github.com/mapillary/inplace_abn\n  summary: In-Place Activated BatchNorm for Memory-Optimized Training of DNNs\n  license: BSD-3-Clause\n  license_file: LICENSE\n\nextra:\n  recipe-maintainers:\n    - jeongseok-meta\n",
+  "raw_meta_yaml": "{% set name = \"inplace-abn\" %}\n{% set version = \"1.1.0\" %}\n\n{% if cuda_compiler_version in (None, \"None\", True, False) %}\n{% set cuda_major = 0 %}\n{% else %}\n{% set cuda_major = environ.get(\"cuda_compiler_version\", \"11.8\").split(\".\")[0] | int %}\n{% endif %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/inplace-abn-{{ version }}.tar.gz\n  sha256: 7c286ca53d35cb37b0d1f8b9beb5a910c694129d3d4f7b8e53188370bb260c27\n\nbuild:\n  number: 17\n  skip: true  # [win]\n  {% if cuda_major < 12 %}\n  skip: true  # [cuda_compiler_version != \"None\"]\n  {% endif %}\n  string: cpu_py{{ CONDA_PY }}_h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version == \"None\"]\n  string: cuda{{ cuda_compiler_version | replace('.', '') }}_py{{ CONDA_PY }}_h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version != \"None\"]\n\nrequirements:\n  build:\n    - {{ compiler(\"cxx\") }}\n    - {{ compiler(\"cuda\") }}  # [cuda_compiler_version != \"None\"]\n    - {{ stdlib(\"c\") }}\n    - cuda-toolkit            # [cuda_compiler_version != \"None\" and build_platform != target_platform]\n  host:\n    # GPU requirements\n    - cuda-version {{ cuda_compiler_version }}  # [cuda_compiler_version != \"None\"]\n    - cuda-toolkit                              # [cuda_compiler_version != \"None\"]\n    - pip\n    - python\n    - pytorch >=2.4.0\n    - setuptools\n    - setuptools-scm\n  run:\n    - cuda-cudart  # [cuda_compiler_version != \"None\"]\n    - python\n    - pytorch\n\ntest:\n  imports:\n    - inplace_abn\n  commands:\n    - pip check\n  requires:\n    - pip\n    - setuptools\n\nabout:\n  home: https://github.com/mapillary/inplace_abn\n  summary: In-Place Activated BatchNorm for Memory-Optimized Training of DNNs\n  license: BSD-3-Clause\n  license_file: LICENSE\n\nextra:\n  recipe-maintainers:\n    - jeongseok-meta\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -357,6 +359,7 @@
       "elements": [
         "cuda-toolkit",
         "cuda-version 12.9",
+        "cuda-version 13.0",
         "pip",
         "python",
         "pytorch >=2.4.0",
