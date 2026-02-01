@@ -1,7 +1,7 @@
 {
   "archived": false,
   "branch": "main",
-  "ci_support_linux_64_cuda_compiler_version12.9python3.10.____cpython.yaml": "c_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ncuda_compiler:\n- cuda-nvcc\ncuda_compiler_version:\n- '12.9'\ncxx_compiler:\n- gxx\ncxx_compiler_version:\n- '14'\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\npin_run_as_build:\n  python:\n    min_pin: x.x\n    max_pin: x.x\npython:\n- 3.10.* *_cpython\ntarget_platform:\n- linux-64\nzip_keys:\n- - cxx_compiler_version\n  - c_stdlib_version\n  - cuda_compiler_version\n",
+  "ci_support_linux_64_cuda_compiler_version12.9github_actions_labelscirun-openstack-gpu-2xlargepython3.10.____cpython.yaml": "c_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ncuda_compiler:\n- cuda-nvcc\ncuda_compiler_version:\n- '12.9'\ncxx_compiler:\n- gxx\ncxx_compiler_version:\n- '14'\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\ngithub_actions_labels:\n- cirun-openstack-gpu-2xlarge\npin_run_as_build:\n  python:\n    min_pin: x.x\n    max_pin: x.x\npython:\n- 3.10.* *_cpython\ntarget_platform:\n- linux-64\nzip_keys:\n- - cxx_compiler_version\n  - c_stdlib_version\n  - cuda_compiler_version\n",
   "conda-forge.yml": {
     "azure": {
       "free_disk_space": true,
@@ -13,22 +13,33 @@
       }
     },
     "build_platform": {
-      "linux_aarch64": "linux_64",
-      "osx_arm64": "osx_64"
+      "linux_aarch64": "linux_64"
     },
     "conda_build": {
       "error_overlinking": true
     },
     "conda_build_tool": "rattler-build",
     "conda_forge_output_validation": true,
+    "conda_install_tool": "pixi",
     "github": {
       "branch_name": "main",
       "tooling_branch_name": "main"
     },
+    "github_actions": {
+      "self_hosted": true,
+      "triggers": [
+        "push",
+        "pull_request"
+      ]
+    },
+    "provider": {
+      "linux_64": "github_actions",
+      "osx_arm64": "github_actions"
+    },
     "test": "native_and_emulated"
   },
-  "feedstock_hash": "b83fdba9656d00565910474db74920f3ea0d0169",
-  "feedstock_hash_ts": 1767590048,
+  "feedstock_hash": "f6c998daae8d5cd3c0c750bc5a09c3bd1414fe60",
+  "feedstock_hash_ts": 1769908641,
   "feedstock_name": "tinygrad",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -43,7 +54,7 @@
       "summary": "You like pytorch? You like micrograd? You love tinygrad! ❤️"
     },
     "build": {
-      "number": "1",
+      "number": "2",
       "script": "python -m pip install . -vv"
     },
     "extra": {
@@ -73,8 +84,10 @@
             "llvmdev",
             "clangxx_linux-64",
             "clang",
+            "clang >18",
             "__cuda",
             "cuda-nvcc_linux-64",
+            "cuda-nvrtc-dev",
             "triton"
           ]
         },
@@ -88,6 +101,9 @@
             }
           },
           {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
+          },
+          {
             "files": {
               "source": [
                 "examples/beautiful_mnist.py"
@@ -99,7 +115,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -166,7 +183,8 @@
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
                 "tests_to_skip += \" or test_bf16_disk_write_read\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "tests_to_skip += \" or TestBEAM or test_beam\"",
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -194,8 +212,10 @@
             "llvmdev",
             "clangxx_linux-64",
             "clang",
+            "clang >18",
             "__cuda",
             "cuda-nvcc_linux-64",
+            "cuda-nvrtc-dev",
             "triton"
           ]
         },
@@ -209,6 +229,9 @@
             }
           },
           {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
+          },
+          {
             "files": {
               "source": [
                 "examples/beautiful_mnist.py"
@@ -220,7 +243,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -287,7 +311,8 @@
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
                 "tests_to_skip += \" or test_bf16_disk_write_read\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "tests_to_skip += \" or TestBEAM or test_beam\"",
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -315,8 +340,10 @@
             "llvmdev",
             "clangxx_linux-64",
             "clang",
+            "clang >18",
             "__cuda",
             "cuda-nvcc_linux-64",
+            "cuda-nvrtc-dev",
             "triton"
           ]
         },
@@ -330,6 +357,9 @@
             }
           },
           {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
+          },
+          {
             "files": {
               "source": [
                 "examples/beautiful_mnist.py"
@@ -341,7 +371,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -408,7 +439,8 @@
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
                 "tests_to_skip += \" or test_bf16_disk_write_read\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "tests_to_skip += \" or TestBEAM or test_beam\"",
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -436,8 +468,10 @@
             "llvmdev",
             "clangxx_linux-64",
             "clang",
+            "clang >18",
             "__cuda",
             "cuda-nvcc_linux-64",
+            "cuda-nvrtc-dev",
             "triton"
           ]
         },
@@ -451,6 +485,9 @@
             }
           },
           {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
+          },
+          {
             "files": {
               "source": [
                 "examples/beautiful_mnist.py"
@@ -462,7 +499,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -529,7 +567,8 @@
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
                 "tests_to_skip += \" or test_bf16_disk_write_read\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "tests_to_skip += \" or TestBEAM or test_beam\"",
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -552,7 +591,8 @@
             "capstone",
             "llvmdev",
             "clangxx_linux-64",
-            "clang"
+            "clang",
+            "clang >18"
           ]
         },
         "tests": [
@@ -563,6 +603,9 @@
                 "tinygrad.runtime.autogen.llvm"
               ]
             }
+          },
+          {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
           },
           {
             "files": {
@@ -576,7 +619,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -642,7 +686,7 @@
                 "tests_to_skip += \" or testCopySHMtoDefault\"",
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -665,7 +709,8 @@
             "capstone",
             "llvmdev",
             "clangxx_linux-64",
-            "clang"
+            "clang",
+            "clang >18"
           ]
         },
         "tests": [
@@ -676,6 +721,9 @@
                 "tinygrad.runtime.autogen.llvm"
               ]
             }
+          },
+          {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
           },
           {
             "files": {
@@ -689,7 +737,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -755,7 +804,7 @@
                 "tests_to_skip += \" or testCopySHMtoDefault\"",
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -778,7 +827,8 @@
             "capstone",
             "llvmdev",
             "clangxx_linux-64",
-            "clang"
+            "clang",
+            "clang >18"
           ]
         },
         "tests": [
@@ -789,6 +839,9 @@
                 "tinygrad.runtime.autogen.llvm"
               ]
             }
+          },
+          {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
           },
           {
             "files": {
@@ -802,7 +855,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -868,7 +922,7 @@
                 "tests_to_skip += \" or testCopySHMtoDefault\"",
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -891,7 +945,8 @@
             "capstone",
             "llvmdev",
             "clangxx_linux-64",
-            "clang"
+            "clang",
+            "clang >18"
           ]
         },
         "tests": [
@@ -902,6 +957,9 @@
                 "tinygrad.runtime.autogen.llvm"
               ]
             }
+          },
+          {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
           },
           {
             "files": {
@@ -915,7 +973,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -981,7 +1040,7 @@
                 "tests_to_skip += \" or testCopySHMtoDefault\"",
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -1011,8 +1070,10 @@
         "llvmdev",
         "clangxx_linux-64",
         "clang",
+        "clang >18",
         "__cuda",
         "cuda-nvcc_linux-64",
+        "cuda-nvrtc-dev",
         "triton"
       ]
     },
@@ -1022,7 +1083,10 @@
         "patches/0001-point-to-our-own-llvmdev.patch",
         "patches/0002-move-frontend-dir-to-nn-pr-12470.patch",
         "patches/0003-update-accuracy-for-every-step-in-beautiful_mnist.py.patch",
-        "patches/0004-make-apple-disassembler-runnable-when-installed.patch"
+        "patches/0004-make-apple-disassembler-runnable-when-installed.patch",
+        "patches/0007-torch-backend-no-aten.detach-for-torch-2.10-compat-1.patch",
+        "patches/0008-add-needs_second_gpu-decorator-13543.patch",
+        "patches/0009-add-target_dir-based-include-paths-for-CUDA-compiler.patch"
       ],
       "sha256": "e5e7b0f2319a8cc8e5de14dbc6ee91a403efd2414681b874b526a8b39d7fa86f",
       "url": "https://github.com/tinygrad/tinygrad/archive/refs/tags/v0.11.0.tar.gz"
@@ -1053,6 +1117,7 @@
         "clang",
         "clangxx_linux-64",
         "cuda-nvcc_linux-64",
+        "cuda-nvrtc-dev",
         "llvmdev",
         "python",
         "tinygrad",
@@ -1106,7 +1171,7 @@
       "summary": "You like pytorch? You like micrograd? You love tinygrad! ❤️"
     },
     "build": {
-      "number": "1",
+      "number": "2",
       "script": "python -m pip install . -vv"
     },
     "extra": {
@@ -1136,8 +1201,10 @@
             "llvmdev",
             "clangxx_linux-64",
             "clang",
+            "clang >18",
             "__cuda",
             "cuda-nvcc_linux-64",
+            "cuda-nvrtc-dev",
             "triton"
           ]
         },
@@ -1151,6 +1218,9 @@
             }
           },
           {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
+          },
+          {
             "files": {
               "source": [
                 "examples/beautiful_mnist.py"
@@ -1162,7 +1232,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -1229,7 +1300,8 @@
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
                 "tests_to_skip += \" or test_bf16_disk_write_read\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "tests_to_skip += \" or TestBEAM or test_beam\"",
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -1257,8 +1329,10 @@
             "llvmdev",
             "clangxx_linux-64",
             "clang",
+            "clang >18",
             "__cuda",
             "cuda-nvcc_linux-64",
+            "cuda-nvrtc-dev",
             "triton"
           ]
         },
@@ -1272,6 +1346,9 @@
             }
           },
           {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
+          },
+          {
             "files": {
               "source": [
                 "examples/beautiful_mnist.py"
@@ -1283,7 +1360,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -1350,7 +1428,8 @@
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
                 "tests_to_skip += \" or test_bf16_disk_write_read\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "tests_to_skip += \" or TestBEAM or test_beam\"",
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -1378,8 +1457,10 @@
             "llvmdev",
             "clangxx_linux-64",
             "clang",
+            "clang >18",
             "__cuda",
             "cuda-nvcc_linux-64",
+            "cuda-nvrtc-dev",
             "triton"
           ]
         },
@@ -1393,6 +1474,9 @@
             }
           },
           {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
+          },
+          {
             "files": {
               "source": [
                 "examples/beautiful_mnist.py"
@@ -1404,7 +1488,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -1471,7 +1556,8 @@
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
                 "tests_to_skip += \" or test_bf16_disk_write_read\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "tests_to_skip += \" or TestBEAM or test_beam\"",
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -1499,8 +1585,10 @@
             "llvmdev",
             "clangxx_linux-64",
             "clang",
+            "clang >18",
             "__cuda",
             "cuda-nvcc_linux-64",
+            "cuda-nvrtc-dev",
             "triton"
           ]
         },
@@ -1514,6 +1602,9 @@
             }
           },
           {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
+          },
+          {
             "files": {
               "source": [
                 "examples/beautiful_mnist.py"
@@ -1525,7 +1616,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -1592,7 +1684,8 @@
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
                 "tests_to_skip += \" or test_bf16_disk_write_read\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "tests_to_skip += \" or TestBEAM or test_beam\"",
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -1615,7 +1708,8 @@
             "capstone",
             "llvmdev",
             "clangxx_linux-64",
-            "clang"
+            "clang",
+            "clang >18"
           ]
         },
         "tests": [
@@ -1626,6 +1720,9 @@
                 "tinygrad.runtime.autogen.llvm"
               ]
             }
+          },
+          {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
           },
           {
             "files": {
@@ -1639,7 +1736,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -1705,7 +1803,7 @@
                 "tests_to_skip += \" or testCopySHMtoDefault\"",
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -1728,7 +1826,8 @@
             "capstone",
             "llvmdev",
             "clangxx_linux-64",
-            "clang"
+            "clang",
+            "clang >18"
           ]
         },
         "tests": [
@@ -1739,6 +1838,9 @@
                 "tinygrad.runtime.autogen.llvm"
               ]
             }
+          },
+          {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
           },
           {
             "files": {
@@ -1752,7 +1854,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -1818,7 +1921,7 @@
                 "tests_to_skip += \" or testCopySHMtoDefault\"",
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -1841,7 +1944,8 @@
             "capstone",
             "llvmdev",
             "clangxx_linux-64",
-            "clang"
+            "clang",
+            "clang >18"
           ]
         },
         "tests": [
@@ -1852,6 +1956,9 @@
                 "tinygrad.runtime.autogen.llvm"
               ]
             }
+          },
+          {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
           },
           {
             "files": {
@@ -1865,7 +1972,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -1931,7 +2039,7 @@
                 "tests_to_skip += \" or testCopySHMtoDefault\"",
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -1954,7 +2062,8 @@
             "capstone",
             "llvmdev",
             "clangxx_linux-64",
-            "clang"
+            "clang",
+            "clang >18"
           ]
         },
         "tests": [
@@ -1965,6 +2074,9 @@
                 "tinygrad.runtime.autogen.llvm"
               ]
             }
+          },
+          {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
           },
           {
             "files": {
@@ -1978,7 +2090,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -2044,7 +2157,7 @@
                 "tests_to_skip += \" or testCopySHMtoDefault\"",
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -2074,8 +2187,10 @@
         "llvmdev",
         "clangxx_linux-64",
         "clang",
+        "clang >18",
         "__cuda",
         "cuda-nvcc_linux-64",
+        "cuda-nvrtc-dev",
         "triton"
       ]
     },
@@ -2085,7 +2200,10 @@
         "patches/0001-point-to-our-own-llvmdev.patch",
         "patches/0002-move-frontend-dir-to-nn-pr-12470.patch",
         "patches/0003-update-accuracy-for-every-step-in-beautiful_mnist.py.patch",
-        "patches/0004-make-apple-disassembler-runnable-when-installed.patch"
+        "patches/0004-make-apple-disassembler-runnable-when-installed.patch",
+        "patches/0007-torch-backend-no-aten.detach-for-torch-2.10-compat-1.patch",
+        "patches/0008-add-needs_second_gpu-decorator-13543.patch",
+        "patches/0009-add-target_dir-based-include-paths-for-CUDA-compiler.patch"
       ],
       "sha256": "e5e7b0f2319a8cc8e5de14dbc6ee91a403efd2414681b874b526a8b39d7fa86f",
       "url": "https://github.com/tinygrad/tinygrad/archive/refs/tags/v0.11.0.tar.gz"
@@ -2116,6 +2234,7 @@
         "clang",
         "clangxx_linux-64",
         "cuda-nvcc_linux-64",
+        "cuda-nvrtc-dev",
         "llvmdev",
         "python",
         "tinygrad",
@@ -2169,7 +2288,7 @@
       "summary": "You like pytorch? You like micrograd? You love tinygrad! ❤️"
     },
     "build": {
-      "number": "1",
+      "number": "2",
       "script": "python -m pip install . -vv"
     },
     "extra": {
@@ -2199,8 +2318,10 @@
             "llvmdev",
             "clangxx_linux-64",
             "clang",
+            "clang >18",
             "__cuda",
             "cuda-nvcc_linux-64",
+            "cuda-nvrtc-dev",
             "triton"
           ]
         },
@@ -2214,6 +2335,9 @@
             }
           },
           {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
+          },
+          {
             "files": {
               "source": [
                 "examples/beautiful_mnist.py"
@@ -2225,7 +2349,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -2292,7 +2417,8 @@
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
                 "tests_to_skip += \" or test_bf16_disk_write_read\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "tests_to_skip += \" or TestBEAM or test_beam\"",
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -2320,8 +2446,10 @@
             "llvmdev",
             "clangxx_linux-64",
             "clang",
+            "clang >18",
             "__cuda",
             "cuda-nvcc_linux-64",
+            "cuda-nvrtc-dev",
             "triton"
           ]
         },
@@ -2335,6 +2463,9 @@
             }
           },
           {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
+          },
+          {
             "files": {
               "source": [
                 "examples/beautiful_mnist.py"
@@ -2346,7 +2477,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -2413,7 +2545,8 @@
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
                 "tests_to_skip += \" or test_bf16_disk_write_read\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "tests_to_skip += \" or TestBEAM or test_beam\"",
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -2441,8 +2574,10 @@
             "llvmdev",
             "clangxx_linux-64",
             "clang",
+            "clang >18",
             "__cuda",
             "cuda-nvcc_linux-64",
+            "cuda-nvrtc-dev",
             "triton"
           ]
         },
@@ -2456,6 +2591,9 @@
             }
           },
           {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
+          },
+          {
             "files": {
               "source": [
                 "examples/beautiful_mnist.py"
@@ -2467,7 +2605,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -2534,7 +2673,8 @@
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
                 "tests_to_skip += \" or test_bf16_disk_write_read\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "tests_to_skip += \" or TestBEAM or test_beam\"",
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -2562,8 +2702,10 @@
             "llvmdev",
             "clangxx_linux-64",
             "clang",
+            "clang >18",
             "__cuda",
             "cuda-nvcc_linux-64",
+            "cuda-nvrtc-dev",
             "triton"
           ]
         },
@@ -2577,6 +2719,9 @@
             }
           },
           {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
+          },
+          {
             "files": {
               "source": [
                 "examples/beautiful_mnist.py"
@@ -2588,7 +2733,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -2655,7 +2801,8 @@
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
                 "tests_to_skip += \" or test_bf16_disk_write_read\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "tests_to_skip += \" or TestBEAM or test_beam\"",
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -2678,7 +2825,8 @@
             "capstone",
             "llvmdev",
             "clangxx_linux-64",
-            "clang"
+            "clang",
+            "clang >18"
           ]
         },
         "tests": [
@@ -2689,6 +2837,9 @@
                 "tinygrad.runtime.autogen.llvm"
               ]
             }
+          },
+          {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
           },
           {
             "files": {
@@ -2702,7 +2853,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -2768,7 +2920,7 @@
                 "tests_to_skip += \" or testCopySHMtoDefault\"",
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -2791,7 +2943,8 @@
             "capstone",
             "llvmdev",
             "clangxx_linux-64",
-            "clang"
+            "clang",
+            "clang >18"
           ]
         },
         "tests": [
@@ -2802,6 +2955,9 @@
                 "tinygrad.runtime.autogen.llvm"
               ]
             }
+          },
+          {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
           },
           {
             "files": {
@@ -2815,7 +2971,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -2881,7 +3038,7 @@
                 "tests_to_skip += \" or testCopySHMtoDefault\"",
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -2904,7 +3061,8 @@
             "capstone",
             "llvmdev",
             "clangxx_linux-64",
-            "clang"
+            "clang",
+            "clang >18"
           ]
         },
         "tests": [
@@ -2915,6 +3073,9 @@
                 "tinygrad.runtime.autogen.llvm"
               ]
             }
+          },
+          {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
           },
           {
             "files": {
@@ -2928,7 +3089,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -2994,7 +3156,7 @@
                 "tests_to_skip += \" or testCopySHMtoDefault\"",
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -3017,7 +3179,8 @@
             "capstone",
             "llvmdev",
             "clangxx_linux-64",
-            "clang"
+            "clang",
+            "clang >18"
           ]
         },
         "tests": [
@@ -3028,6 +3191,9 @@
                 "tinygrad.runtime.autogen.llvm"
               ]
             }
+          },
+          {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
           },
           {
             "files": {
@@ -3041,7 +3207,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -3107,7 +3274,7 @@
                 "tests_to_skip += \" or testCopySHMtoDefault\"",
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -3135,8 +3302,10 @@
             "llvmdev",
             "clangxx_linux-64",
             "clang",
+            "clang >18",
             "__cuda",
             "cuda-nvcc_linux-64",
+            "cuda-nvrtc-dev",
             "triton"
           ]
         },
@@ -3150,6 +3319,9 @@
             }
           },
           {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
+          },
+          {
             "files": {
               "source": [
                 "examples/beautiful_mnist.py"
@@ -3161,7 +3333,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -3228,7 +3401,8 @@
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
                 "tests_to_skip += \" or test_bf16_disk_write_read\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "tests_to_skip += \" or TestBEAM or test_beam\"",
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -3256,8 +3430,10 @@
             "llvmdev",
             "clangxx_linux-64",
             "clang",
+            "clang >18",
             "__cuda",
             "cuda-nvcc_linux-64",
+            "cuda-nvrtc-dev",
             "triton"
           ]
         },
@@ -3271,6 +3447,9 @@
             }
           },
           {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
+          },
+          {
             "files": {
               "source": [
                 "examples/beautiful_mnist.py"
@@ -3282,7 +3461,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -3349,7 +3529,8 @@
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
                 "tests_to_skip += \" or test_bf16_disk_write_read\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "tests_to_skip += \" or TestBEAM or test_beam\"",
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -3377,8 +3558,10 @@
             "llvmdev",
             "clangxx_linux-64",
             "clang",
+            "clang >18",
             "__cuda",
             "cuda-nvcc_linux-64",
+            "cuda-nvrtc-dev",
             "triton"
           ]
         },
@@ -3392,6 +3575,9 @@
             }
           },
           {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
+          },
+          {
             "files": {
               "source": [
                 "examples/beautiful_mnist.py"
@@ -3403,7 +3589,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -3470,7 +3657,8 @@
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
                 "tests_to_skip += \" or test_bf16_disk_write_read\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "tests_to_skip += \" or TestBEAM or test_beam\"",
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -3498,8 +3686,10 @@
             "llvmdev",
             "clangxx_linux-64",
             "clang",
+            "clang >18",
             "__cuda",
             "cuda-nvcc_linux-64",
+            "cuda-nvrtc-dev",
             "triton"
           ]
         },
@@ -3513,6 +3703,9 @@
             }
           },
           {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
+          },
+          {
             "files": {
               "source": [
                 "examples/beautiful_mnist.py"
@@ -3524,7 +3717,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -3591,7 +3785,8 @@
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
                 "tests_to_skip += \" or test_bf16_disk_write_read\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "tests_to_skip += \" or TestBEAM or test_beam\"",
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -3614,7 +3809,8 @@
             "capstone",
             "llvmdev",
             "clangxx_linux-64",
-            "clang"
+            "clang",
+            "clang >18"
           ]
         },
         "tests": [
@@ -3625,6 +3821,9 @@
                 "tinygrad.runtime.autogen.llvm"
               ]
             }
+          },
+          {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
           },
           {
             "files": {
@@ -3638,7 +3837,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -3704,7 +3904,7 @@
                 "tests_to_skip += \" or testCopySHMtoDefault\"",
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -3727,7 +3927,8 @@
             "capstone",
             "llvmdev",
             "clangxx_linux-64",
-            "clang"
+            "clang",
+            "clang >18"
           ]
         },
         "tests": [
@@ -3738,6 +3939,9 @@
                 "tinygrad.runtime.autogen.llvm"
               ]
             }
+          },
+          {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
           },
           {
             "files": {
@@ -3751,7 +3955,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -3817,7 +4022,7 @@
                 "tests_to_skip += \" or testCopySHMtoDefault\"",
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -3840,7 +4045,8 @@
             "capstone",
             "llvmdev",
             "clangxx_linux-64",
-            "clang"
+            "clang",
+            "clang >18"
           ]
         },
         "tests": [
@@ -3851,6 +4057,9 @@
                 "tinygrad.runtime.autogen.llvm"
               ]
             }
+          },
+          {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
           },
           {
             "files": {
@@ -3864,7 +4073,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -3930,7 +4140,7 @@
                 "tests_to_skip += \" or testCopySHMtoDefault\"",
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -3953,7 +4163,8 @@
             "capstone",
             "llvmdev",
             "clangxx_linux-64",
-            "clang"
+            "clang",
+            "clang >18"
           ]
         },
         "tests": [
@@ -3964,6 +4175,9 @@
                 "tinygrad.runtime.autogen.llvm"
               ]
             }
+          },
+          {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
           },
           {
             "files": {
@@ -3977,7 +4191,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -4043,7 +4258,7 @@
                 "tests_to_skip += \" or testCopySHMtoDefault\"",
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -4066,7 +4281,8 @@
             "capstone",
             "llvmdev",
             "clangxx_linux-64",
-            "clang"
+            "clang",
+            "clang >18"
           ]
         },
         "tests": [
@@ -4077,6 +4293,9 @@
                 "tinygrad.runtime.autogen.llvm"
               ]
             }
+          },
+          {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
           },
           {
             "files": {
@@ -4090,7 +4309,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -4156,7 +4376,7 @@
                 "tests_to_skip += \" or testCopySHMtoDefault\"",
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -4179,7 +4399,8 @@
             "capstone",
             "llvmdev",
             "clangxx_linux-64",
-            "clang"
+            "clang",
+            "clang >18"
           ]
         },
         "tests": [
@@ -4190,6 +4411,9 @@
                 "tinygrad.runtime.autogen.llvm"
               ]
             }
+          },
+          {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
           },
           {
             "files": {
@@ -4203,7 +4427,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -4269,7 +4494,7 @@
                 "tests_to_skip += \" or testCopySHMtoDefault\"",
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -4292,7 +4517,8 @@
             "capstone",
             "llvmdev",
             "clangxx_linux-64",
-            "clang"
+            "clang",
+            "clang >18"
           ]
         },
         "tests": [
@@ -4303,6 +4529,9 @@
                 "tinygrad.runtime.autogen.llvm"
               ]
             }
+          },
+          {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
           },
           {
             "files": {
@@ -4316,7 +4545,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -4382,7 +4612,7 @@
                 "tests_to_skip += \" or testCopySHMtoDefault\"",
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -4405,7 +4635,8 @@
             "capstone",
             "llvmdev",
             "clangxx_linux-64",
-            "clang"
+            "clang",
+            "clang >18"
           ]
         },
         "tests": [
@@ -4416,6 +4647,9 @@
                 "tinygrad.runtime.autogen.llvm"
               ]
             }
+          },
+          {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
           },
           {
             "files": {
@@ -4429,7 +4663,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -4495,7 +4730,7 @@
                 "tests_to_skip += \" or testCopySHMtoDefault\"",
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -4518,7 +4753,8 @@
             "capstone",
             "llvmdev",
             "clangxx_linux-64",
-            "clang"
+            "clang",
+            "clang >18"
           ]
         },
         "tests": [
@@ -4529,6 +4765,9 @@
                 "tinygrad.runtime.autogen.llvm"
               ]
             }
+          },
+          {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
           },
           {
             "files": {
@@ -4542,7 +4781,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -4608,7 +4848,7 @@
                 "tests_to_skip += \" or testCopySHMtoDefault\"",
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -4631,7 +4871,8 @@
             "capstone",
             "llvmdev",
             "clangxx_linux-64",
-            "clang"
+            "clang",
+            "clang >18"
           ]
         },
         "tests": [
@@ -4642,6 +4883,9 @@
                 "tinygrad.runtime.autogen.llvm"
               ]
             }
+          },
+          {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
           },
           {
             "files": {
@@ -4655,7 +4899,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -4721,7 +4966,7 @@
                 "tests_to_skip += \" or testCopySHMtoDefault\"",
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -4744,7 +4989,8 @@
             "capstone",
             "llvmdev",
             "clangxx_linux-64",
-            "clang"
+            "clang",
+            "clang >18"
           ]
         },
         "tests": [
@@ -4755,6 +5001,9 @@
                 "tinygrad.runtime.autogen.llvm"
               ]
             }
+          },
+          {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
           },
           {
             "files": {
@@ -4768,7 +5017,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -4834,7 +5084,7 @@
                 "tests_to_skip += \" or testCopySHMtoDefault\"",
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -4857,7 +5107,8 @@
             "capstone",
             "llvmdev",
             "clangxx_linux-64",
-            "clang"
+            "clang",
+            "clang >18"
           ]
         },
         "tests": [
@@ -4868,6 +5119,9 @@
                 "tinygrad.runtime.autogen.llvm"
               ]
             }
+          },
+          {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
           },
           {
             "files": {
@@ -4881,7 +5135,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -4947,7 +5202,7 @@
                 "tests_to_skip += \" or testCopySHMtoDefault\"",
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -4975,8 +5230,10 @@
             "llvmdev",
             "clangxx_linux-64",
             "clang",
+            "clang >18",
             "__cuda",
             "cuda-nvcc_linux-64",
+            "cuda-nvrtc-dev",
             "triton"
           ]
         },
@@ -4990,6 +5247,9 @@
             }
           },
           {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
+          },
+          {
             "files": {
               "source": [
                 "examples/beautiful_mnist.py"
@@ -5001,7 +5261,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -5068,7 +5329,8 @@
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
                 "tests_to_skip += \" or test_bf16_disk_write_read\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "tests_to_skip += \" or TestBEAM or test_beam\"",
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -5096,8 +5358,10 @@
             "llvmdev",
             "clangxx_linux-64",
             "clang",
+            "clang >18",
             "__cuda",
             "cuda-nvcc_linux-64",
+            "cuda-nvrtc-dev",
             "triton"
           ]
         },
@@ -5111,6 +5375,9 @@
             }
           },
           {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
+          },
+          {
             "files": {
               "source": [
                 "examples/beautiful_mnist.py"
@@ -5122,7 +5389,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -5189,7 +5457,8 @@
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
                 "tests_to_skip += \" or test_bf16_disk_write_read\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "tests_to_skip += \" or TestBEAM or test_beam\"",
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -5217,8 +5486,10 @@
             "llvmdev",
             "clangxx_linux-64",
             "clang",
+            "clang >18",
             "__cuda",
             "cuda-nvcc_linux-64",
+            "cuda-nvrtc-dev",
             "triton"
           ]
         },
@@ -5232,6 +5503,9 @@
             }
           },
           {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
+          },
+          {
             "files": {
               "source": [
                 "examples/beautiful_mnist.py"
@@ -5243,7 +5517,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -5310,7 +5585,8 @@
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
                 "tests_to_skip += \" or test_bf16_disk_write_read\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "tests_to_skip += \" or TestBEAM or test_beam\"",
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -5338,8 +5614,10 @@
             "llvmdev",
             "clangxx_linux-64",
             "clang",
+            "clang >18",
             "__cuda",
             "cuda-nvcc_linux-64",
+            "cuda-nvrtc-dev",
             "triton"
           ]
         },
@@ -5353,6 +5631,9 @@
             }
           },
           {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
+          },
+          {
             "files": {
               "source": [
                 "examples/beautiful_mnist.py"
@@ -5364,7 +5645,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -5431,7 +5713,8 @@
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
                 "tests_to_skip += \" or test_bf16_disk_write_read\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "tests_to_skip += \" or TestBEAM or test_beam\"",
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -5454,7 +5737,8 @@
             "capstone",
             "llvmdev",
             "clangxx_linux-64",
-            "clang"
+            "clang",
+            "clang >18"
           ]
         },
         "tests": [
@@ -5465,6 +5749,9 @@
                 "tinygrad.runtime.autogen.llvm"
               ]
             }
+          },
+          {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
           },
           {
             "files": {
@@ -5478,7 +5765,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -5544,7 +5832,7 @@
                 "tests_to_skip += \" or testCopySHMtoDefault\"",
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -5567,7 +5855,8 @@
             "capstone",
             "llvmdev",
             "clangxx_linux-64",
-            "clang"
+            "clang",
+            "clang >18"
           ]
         },
         "tests": [
@@ -5578,6 +5867,9 @@
                 "tinygrad.runtime.autogen.llvm"
               ]
             }
+          },
+          {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
           },
           {
             "files": {
@@ -5591,7 +5883,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -5657,7 +5950,7 @@
                 "tests_to_skip += \" or testCopySHMtoDefault\"",
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -5680,7 +5973,8 @@
             "capstone",
             "llvmdev",
             "clangxx_linux-64",
-            "clang"
+            "clang",
+            "clang >18"
           ]
         },
         "tests": [
@@ -5691,6 +5985,9 @@
                 "tinygrad.runtime.autogen.llvm"
               ]
             }
+          },
+          {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
           },
           {
             "files": {
@@ -5704,7 +6001,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -5770,7 +6068,7 @@
                 "tests_to_skip += \" or testCopySHMtoDefault\"",
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -5793,7 +6091,8 @@
             "capstone",
             "llvmdev",
             "clangxx_linux-64",
-            "clang"
+            "clang",
+            "clang >18"
           ]
         },
         "tests": [
@@ -5804,6 +6103,9 @@
                 "tinygrad.runtime.autogen.llvm"
               ]
             }
+          },
+          {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
           },
           {
             "files": {
@@ -5817,7 +6119,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -5883,7 +6186,7 @@
                 "tests_to_skip += \" or testCopySHMtoDefault\"",
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -5913,8 +6216,10 @@
         "llvmdev",
         "clangxx_linux-64",
         "clang",
+        "clang >18",
         "__cuda",
         "cuda-nvcc_linux-64",
+        "cuda-nvrtc-dev",
         "triton"
       ]
     },
@@ -5924,7 +6229,10 @@
         "patches/0001-point-to-our-own-llvmdev.patch",
         "patches/0002-move-frontend-dir-to-nn-pr-12470.patch",
         "patches/0003-update-accuracy-for-every-step-in-beautiful_mnist.py.patch",
-        "patches/0004-make-apple-disassembler-runnable-when-installed.patch"
+        "patches/0004-make-apple-disassembler-runnable-when-installed.patch",
+        "patches/0007-torch-backend-no-aten.detach-for-torch-2.10-compat-1.patch",
+        "patches/0008-add-needs_second_gpu-decorator-13543.patch",
+        "patches/0009-add-target_dir-based-include-paths-for-CUDA-compiler.patch"
       ],
       "sha256": "e5e7b0f2319a8cc8e5de14dbc6ee91a403efd2414681b874b526a8b39d7fa86f",
       "url": "https://github.com/tinygrad/tinygrad/archive/refs/tags/v0.11.0.tar.gz"
@@ -5943,7 +6251,7 @@
       "summary": "You like pytorch? You like micrograd? You love tinygrad! ❤️"
     },
     "build": {
-      "number": "1",
+      "number": "2",
       "script": "python -m pip install . -vv"
     },
     "extra": {
@@ -5968,7 +6276,8 @@
             "capstone",
             "llvmdev",
             "clangxx_linux-64",
-            "clang"
+            "clang",
+            "clang >18"
           ]
         },
         "tests": [
@@ -5979,6 +6288,9 @@
                 "tinygrad.runtime.autogen.llvm"
               ]
             }
+          },
+          {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
           },
           {
             "files": {
@@ -5992,7 +6304,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -6058,7 +6371,7 @@
                 "tests_to_skip += \" or testCopySHMtoDefault\"",
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -6081,7 +6394,8 @@
             "capstone",
             "llvmdev",
             "clangxx_linux-64",
-            "clang"
+            "clang",
+            "clang >18"
           ]
         },
         "tests": [
@@ -6092,6 +6406,9 @@
                 "tinygrad.runtime.autogen.llvm"
               ]
             }
+          },
+          {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
           },
           {
             "files": {
@@ -6105,7 +6422,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -6171,7 +6489,7 @@
                 "tests_to_skip += \" or testCopySHMtoDefault\"",
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -6194,7 +6512,8 @@
             "capstone",
             "llvmdev",
             "clangxx_linux-64",
-            "clang"
+            "clang",
+            "clang >18"
           ]
         },
         "tests": [
@@ -6205,6 +6524,9 @@
                 "tinygrad.runtime.autogen.llvm"
               ]
             }
+          },
+          {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
           },
           {
             "files": {
@@ -6218,7 +6540,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -6284,7 +6607,7 @@
                 "tests_to_skip += \" or testCopySHMtoDefault\"",
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -6307,7 +6630,8 @@
             "capstone",
             "llvmdev",
             "clangxx_linux-64",
-            "clang"
+            "clang",
+            "clang >18"
           ]
         },
         "tests": [
@@ -6318,6 +6642,9 @@
                 "tinygrad.runtime.autogen.llvm"
               ]
             }
+          },
+          {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
           },
           {
             "files": {
@@ -6331,7 +6658,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -6397,7 +6725,7 @@
                 "tests_to_skip += \" or testCopySHMtoDefault\"",
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -6421,7 +6749,8 @@
         "capstone",
         "llvmdev",
         "clangxx_linux-64",
-        "clang"
+        "clang",
+        "clang >18"
       ]
     },
     "schema_version": 1,
@@ -6430,7 +6759,10 @@
         "patches/0001-point-to-our-own-llvmdev.patch",
         "patches/0002-move-frontend-dir-to-nn-pr-12470.patch",
         "patches/0003-update-accuracy-for-every-step-in-beautiful_mnist.py.patch",
-        "patches/0004-make-apple-disassembler-runnable-when-installed.patch"
+        "patches/0004-make-apple-disassembler-runnable-when-installed.patch",
+        "patches/0007-torch-backend-no-aten.detach-for-torch-2.10-compat-1.patch",
+        "patches/0008-add-needs_second_gpu-decorator-13543.patch",
+        "patches/0009-add-target_dir-based-include-paths-for-CUDA-compiler.patch"
       ],
       "sha256": "e5e7b0f2319a8cc8e5de14dbc6ee91a403efd2414681b874b526a8b39d7fa86f",
       "url": "https://github.com/tinygrad/tinygrad/archive/refs/tags/v0.11.0.tar.gz"
@@ -6507,7 +6839,7 @@
       "summary": "You like pytorch? You like micrograd? You love tinygrad! ❤️"
     },
     "build": {
-      "number": "1",
+      "number": "2",
       "script": "python -m pip install . -vv"
     },
     "extra": {
@@ -6532,7 +6864,8 @@
             "capstone",
             "llvmdev",
             "clangxx_linux-64",
-            "clang"
+            "clang",
+            "clang >18"
           ]
         },
         "tests": [
@@ -6543,6 +6876,9 @@
                 "tinygrad.runtime.autogen.llvm"
               ]
             }
+          },
+          {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
           },
           {
             "files": {
@@ -6556,7 +6892,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -6622,7 +6959,7 @@
                 "tests_to_skip += \" or testCopySHMtoDefault\"",
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -6645,7 +6982,8 @@
             "capstone",
             "llvmdev",
             "clangxx_linux-64",
-            "clang"
+            "clang",
+            "clang >18"
           ]
         },
         "tests": [
@@ -6656,6 +6994,9 @@
                 "tinygrad.runtime.autogen.llvm"
               ]
             }
+          },
+          {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
           },
           {
             "files": {
@@ -6669,7 +7010,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -6735,7 +7077,7 @@
                 "tests_to_skip += \" or testCopySHMtoDefault\"",
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -6758,7 +7100,8 @@
             "capstone",
             "llvmdev",
             "clangxx_linux-64",
-            "clang"
+            "clang",
+            "clang >18"
           ]
         },
         "tests": [
@@ -6769,6 +7112,9 @@
                 "tinygrad.runtime.autogen.llvm"
               ]
             }
+          },
+          {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
           },
           {
             "files": {
@@ -6782,7 +7128,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -6848,7 +7195,7 @@
                 "tests_to_skip += \" or testCopySHMtoDefault\"",
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -6871,7 +7218,8 @@
             "capstone",
             "llvmdev",
             "clangxx_linux-64",
-            "clang"
+            "clang",
+            "clang >18"
           ]
         },
         "tests": [
@@ -6882,6 +7230,9 @@
                 "tinygrad.runtime.autogen.llvm"
               ]
             }
+          },
+          {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
           },
           {
             "files": {
@@ -6895,7 +7246,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -6961,7 +7313,7 @@
                 "tests_to_skip += \" or testCopySHMtoDefault\"",
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -6985,7 +7337,8 @@
         "capstone",
         "llvmdev",
         "clangxx_linux-64",
-        "clang"
+        "clang",
+        "clang >18"
       ]
     },
     "schema_version": 1,
@@ -6994,7 +7347,10 @@
         "patches/0001-point-to-our-own-llvmdev.patch",
         "patches/0002-move-frontend-dir-to-nn-pr-12470.patch",
         "patches/0003-update-accuracy-for-every-step-in-beautiful_mnist.py.patch",
-        "patches/0004-make-apple-disassembler-runnable-when-installed.patch"
+        "patches/0004-make-apple-disassembler-runnable-when-installed.patch",
+        "patches/0007-torch-backend-no-aten.detach-for-torch-2.10-compat-1.patch",
+        "patches/0008-add-needs_second_gpu-decorator-13543.patch",
+        "patches/0009-add-target_dir-based-include-paths-for-CUDA-compiler.patch"
       ],
       "sha256": "e5e7b0f2319a8cc8e5de14dbc6ee91a403efd2414681b874b526a8b39d7fa86f",
       "url": "https://github.com/tinygrad/tinygrad/archive/refs/tags/v0.11.0.tar.gz"
@@ -7077,7 +7433,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/tinygrad.json"
   },
-  "raw_meta_yaml": "context:\n  version: \"0.11.0\"\n  build_number: 1\n  # see github.com/conda-forge/conda-forge.github.io/issues/1059 for naming discussion\n  proc_type: ${{ \"cuda\" ~ cuda_compiler_version | version_to_buildstring if cuda_compiler_version != \"None\" else \"cpu\" }}\n\nrecipe:\n  name: tinygrad\n  version: ${{ version }}\n\nsource:\n  - url: https://github.com/tinygrad/tinygrad/archive/refs/tags/v${{ version }}.tar.gz\n    sha256: e5e7b0f2319a8cc8e5de14dbc6ee91a403efd2414681b874b526a8b39d7fa86f\n    patches:\n      - patches/0001-point-to-our-own-llvmdev.patch\n      # backport https://github.com/tinygrad/tinygrad/pull/12470 to make tests runnable out-of-tree\n      - patches/0002-move-frontend-dir-to-nn-pr-12470.patch\n      # see more clearly what's happening in mnist test\n      - patches/0003-update-accuracy-for-every-step-in-beautiful_mnist.py.patch\n      # ensure we find vendored applegpu\n      - patches/0004-make-apple-disassembler-runnable-when-installed.patch\n  - if: osx\n    then:\n      - target_directory: tinygrad/extra/disassemblers/applegpu\n        git: https://github.com/dougallj/applegpu\n        rev: \"797862eea0cee1f1eba74be3d0d02be4b3d2bd0d\"\n\nbuild:\n  number: ${{ build_number }}\n  string: ${{ proc_type }}_py${{ python | version_to_buildstring }}_h${{ hash }}_${{ build_number }}\n\noutputs:\n  - package:\n      name: tinygrad\n    build:\n      script:\n        - python -m pip install . -vv\n        - if: false\n          then:\n            - mkdir -p $SP_DIR/tinygrad/extra/disassemblers/applegpu\n            - cp -R ./tinygrad/extra/disassemblers/applegpu/* $SP_DIR/tinygrad/extra/disassemblers/applegpu\n            - cd $SP_DIR/tinygrad/extra/disassemblers/applegpu/compiler_explorer_tools\n            - make\n    requirements:\n      build:\n        - if: build_platform != host_platform\n          then:\n            - python\n            - cross-python_${{ host_platform }}\n        # this is just here so smithy creates separate jobs for the CUDA variants\n        - if: cuda_compiler_version != \"None\"\n          then:\n            - ${{ stdlib(\"c\") }}\n            - ${{ compiler(\"cxx\") }}\n            - ${{ compiler(\"cuda\") }}\n        - if: osx\n          then:\n            - make\n            # for bare clang/clang++ symlinks, see\n            # https://github.com/dougallj/applegpu/blob/main/compiler_explorer_tools/Makefile\n            - clang\n            - clangxx\n      host:\n        - python\n        - pip\n        - setuptools\n      run:\n        - python\n        - capstone\n        - llvmdev\n        - clangxx_${{ host_platform }}\n        # ensure `bin/clang` symlink is present\n        - clang\n        - if: cuda_compiler_version != \"None\"\n          then:\n            - __cuda\n            - cuda-nvcc_${{ host_platform }}\n            - if: linux\n              then:\n                - triton\n      run_constraints:\n        - if: win\n          then:\n            # avoid pulling in old MSVC activation\n            - vs2019_win-64 <0.0a0\n    tests:\n      - python:\n          imports:\n            - tinygrad\n            - tinygrad.runtime.autogen.llvm\n          pip_check: true\n      # integration-test in addition to test suite below\n      - files:\n          source:\n            - examples/beautiful_mnist.py\n        script:\n          # reduce number of steps; we just need to show that it's functional\n          # however, accuracy should at least trend in the right direction\n          - if: unix\n            then:\n              - export STEPS=25\n              - export TARGET_EVAL_ACC_PCT=90\n            else:\n              - set \"STEPS=25\"\n              - set \"TARGET_EVAL_ACC_PCT=90\"\n          - if: aarch64\n            then:\n              # reduce number of steps in emulation\n              - export STEPS=3\n              - export TARGET_EVAL_ACC_PCT=30\n          - if: osx\n            then:\n              # loss decreases as expected, but accuracy appears to be mis-computed\n              - unset TARGET_EVAL_ACC_PCT\n          - python ./examples/beautiful_mnist.py\n          # run again with high DEBUG value; exercises different paths, e.g. needs capstone\n          - if: unix\n            then:\n              - export STEPS=1\n              - export DEBUG=10\n              - unset TARGET_EVAL_ACC_PCT\n            else:\n              - set \"STEPS=1\"\n              - set \"DEBUG=10\"\n              - set \"TARGET_EVAL_ACC_PCT=\"\n          - if: not aarch64\n            then:\n              - python ./examples/beautiful_mnist.py\n\n  - package:\n      name: tinygrad-tests\n    build:\n      # splitting off what conda packages under etc/conda/test-files when using test.files.source\n      script:\n        - if: unix\n          # silly: https://github.com/prefix-dev/rattler-build/pull/1367\n          then: true\n          else:\n            - echo \"nothing\"\n\n    requirements:\n      run:\n        - ${{ pin_subpackage('tinygrad', exact=True) }}\n    tests:\n      - requirements:\n          run:\n            # minimal\n            - pytest\n            - pytest-xdist\n            - hypothesis\n            - ml_dtypes\n            - numpy\n            - pytorch\n            - z3-solver\n            # optional\n            - blobfile\n            - boto3\n            - bottle\n            # https://github.com/conda-forge/staged-recipes/issues/29179\n            # - ggml-python\n            - if: unix\n              then:\n                # not available on windows yet\n                - jax\n            - librosa\n            - networkx\n            - nibabel\n            - onnx2torch\n            - onnx\n            - onnxruntime\n            - pandas\n            - py-opencv\n            - pybind11\n            - pycocotools\n            - pillow\n            - safetensors\n            - sentencepiece\n            - tabulate\n            - tiktoken\n            - tqdm\n            - transformers\n        files:\n          source:\n            - examples/\n            - extra/\n            - test/\n        script:\n          interpreter: python\n          content:\n            - 'import pytest'\n            - 'import sys'\n            - 'tests_to_skip = \"_not_a_real_test\"'\n            - if: linux\n              then:\n                # fails `assert Device.DEFAULT in failed_platforms`\n                - 'tests_to_skip += \" or (TestLinearizerFailures and test_failure_27)\"'\n                # Causes `Fatal Python error: Bus error` + segfault\n                - 'tests_to_skip += \" or testCopySHMtoDefault\"'\n                # RuntimeError: Attempting to relocate against an undefined symbol 'fmaxf'\n                - 'tests_to_skip += \" or test_backward_sum_acc_dtype\"'\n                # cannot load onnx model from some temporary location\n                - 'tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"'\n            - if: linux and cuda_compiler_version != \"None\"\n              then:\n                # RuntimeError: Attribute list does not match Module context!\n                - 'tests_to_skip += \" or test_bf16_disk_write_read\"'\n            - if: osx\n              then:\n                # signed int32 overflow\n                - 'tests_to_skip += \" or test_float_midcast_int32\"'\n                # tinygrad.codegen.kernel.KernelOptError: must have tensor cores or TC=2\n                - 'tests_to_skip += \" or test_unmerged_ifs\"'\n                # RuntimeError: The MPS backend is supported on MacOS 14.0+\n                - 'tests_to_skip += \" or test_torch_interop\"'\n                # element mismatch in array\n                - 'tests_to_skip += \" or test_conv2d_fused\"'\n                # flaky hypothesis test\n                - 'tests_to_skip += \" or test_float_cast_to_unsigned\"'\n                # beam-related stuff seems to hang\n                - 'tests_to_skip += \" or TestBEAM or test_beam\"'\n                # another apparent hang\n                - 'tests_to_skip += \" or test_getotherprocess\"'\n                # forking too early\n                - 'tests_to_skip += \" or test_putotherprocess\"'\n                # running into weakly-referenced object no longer exists\n                - 'tests_to_skip += \" or TestGC or test_gc\"'\n\n            # test suite in emulation on aarch is super slow, skip it there\n            - if: unix and build_platform == host_platform\n              then:\n                - 'sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))'\n\nabout:\n  homepage: https://github.com/tinygrad/tinygrad\n  summary: 'You like pytorch? You like micrograd? You love tinygrad! ❤️'\n  description: |\n    This may not be the best deep learning framework, but it is a deep learning framework.\n\n    Due to its extreme simplicity, it aims to be the easiest framework to add new accelerators to,\n    with support for both inference and training. If XLA is CISC, tinygrad is RISC.\n  license: MIT AND BSD-3-Clause\n  license_file:\n    - LICENSE\n    - applegpu_LICENSE\n  documentation: https://docs.tinygrad.org/\n  repository: https://github.com/tinygrad/tinygrad\n\nextra:\n  recipe-maintainers:\n    - h-vetinari\n  feedstock-name: tinygrad\n",
+  "raw_meta_yaml": "context:\n  version: \"0.11.0\"\n  build_number: 2\n  # see github.com/conda-forge/conda-forge.github.io/issues/1059 for naming discussion\n  proc_type: ${{ \"cuda\" ~ cuda_compiler_version | version_to_buildstring if cuda_compiler_version != \"None\" else \"cpu\" }}\n\nrecipe:\n  name: tinygrad\n  version: ${{ version }}\n\nsource:\n  - url: https://github.com/tinygrad/tinygrad/archive/refs/tags/v${{ version }}.tar.gz\n    sha256: e5e7b0f2319a8cc8e5de14dbc6ee91a403efd2414681b874b526a8b39d7fa86f\n    patches:\n      - patches/0001-point-to-our-own-llvmdev.patch\n      # backport https://github.com/tinygrad/tinygrad/pull/12470 to make tests runnable out-of-tree\n      - patches/0002-move-frontend-dir-to-nn-pr-12470.patch\n      # see more clearly what's happening in mnist test\n      - patches/0003-update-accuracy-for-every-step-in-beautiful_mnist.py.patch\n      # ensure we find vendored applegpu\n      - patches/0004-make-apple-disassembler-runnable-when-installed.patch\n      - if: osx and x86_64\n        then:\n          # disable metal on osx\n          - patches/0005-default-to-CPU-as-device-on-osx-64-remove-metal.patch\n      - if: osx and arm64\n        then:\n          # cannot disassemble metal when using vanilla clang; see\n          # https://github.com/tinygrad/tinygrad/issues/14005\n          - patches/0006-skip-metal-disassembly-for-vanilla-clang.patch\n      # backport https://github.com/tinygrad/tinygrad/pull/13381\n      - patches/0007-torch-backend-no-aten.detach-for-torch-2.10-compat-1.patch\n      # backport https://github.com/tinygrad/tinygrad/pull/13543\n      # avoid multi-GPU tests and failure in new pytorch due to eps=0\n      - patches/0008-add-needs_second_gpu-decorator-13543.patch\n      # help nvcc find target-specific headers\n      - patches/0009-add-target_dir-based-include-paths-for-CUDA-compiler.patch\n  - if: osx and arm64\n    then:\n      - target_directory: tinygrad/extra/disassemblers/applegpu\n        git: https://github.com/dougallj/applegpu\n        rev: \"797862eea0cee1f1eba74be3d0d02be4b3d2bd0d\"\n\nbuild:\n  number: ${{ build_number }}\n  string: ${{ proc_type }}_py${{ python | version_to_buildstring }}_h${{ hash }}_${{ build_number }}\n  skip:\n    # CUDA builds on GPU agents, non-CUDA builds on CPU agents; skip could be avoided\n    # using https://github.com/conda-forge/conda-forge-pinning-feedstock/pull/6910\n    - cuda_compiler_version == \"None\" and \"gpu\" in github_actions_labels\n    - cuda_compiler_version != \"None\" and \"cpu\" in github_actions_labels\n\noutputs:\n  - package:\n      name: tinygrad\n    build:\n      script:\n        - python -m pip install . -vv\n        - if: osx and arm64\n          then:\n            - mkdir -p $SP_DIR/tinygrad/extra/disassemblers/applegpu\n            - cp -R ./tinygrad/extra/disassemblers/applegpu/* $SP_DIR/tinygrad/extra/disassemblers/applegpu\n            - cd $SP_DIR/tinygrad/extra/disassemblers/applegpu/compiler_explorer_tools\n            - make\n    requirements:\n      build:\n        - if: build_platform != host_platform\n          then:\n            - python\n            - cross-python_${{ host_platform }}\n        # this is just here so smithy creates separate jobs for the CUDA variants\n        - if: cuda_compiler_version != \"None\"\n          then:\n            - ${{ stdlib(\"c\") }}\n            - ${{ compiler(\"cxx\") }}\n            - ${{ compiler(\"cuda\") }}\n        - if: osx and arm64\n          then:\n            - make\n            # for bare clang/clang++ symlinks, see\n            # https://github.com/dougallj/applegpu/blob/main/compiler_explorer_tools/Makefile\n            - clang\n            - clangxx\n      host:\n        - python\n        - pip\n        - setuptools\n      run:\n        - python\n        - capstone\n        - llvmdev\n        - clangxx_${{ host_platform }}\n        # ensure `bin/clang` symlink is present\n        - clang\n        # avoid solver choosing ancient clang versions\n        - clang >18\n        - if: cuda_compiler_version != \"None\"\n          then:\n            - __cuda\n            - cuda-nvcc_${{ host_platform }}\n            - cuda-nvrtc-dev\n            - if: linux\n              then:\n                - triton\n      run_constraints:\n        - if: linux\n          then:\n            # avoid wrong compiler activation that interferes with clang_<target>\n            - gcc_linux-64 <0.0a0\n            - gxx_linux-64 <0.0a0\n            - gcc_linux-aarch64 <0.0a0\n            - gxx_linux-aarch64 <0.0a0\n        - if: win\n          then:\n            # avoid pulling in old MSVC activation\n            - vs2019_win-64 <0.0a0\n    tests:\n      - python:\n          imports:\n            - tinygrad\n            - tinygrad.runtime.autogen.llvm\n          pip_check: true\n      - script:\n          - if: linux\n            then:\n              # cannot do a bare import test, because libc.syscall is a member, not a package\n              - python -c \"from tinygrad.runtime.autogen.libc import syscall\"\n            else:\n              - echo nothing\n      # integration-test in addition to test suite below\n      - files:\n          source:\n            - examples/beautiful_mnist.py\n        script:\n          # reduce number of steps; we just need to show that it's functional\n          # however, accuracy should at least trend in the right direction\n          - if: unix\n            then:\n              - export STEPS=25\n              - export TARGET_EVAL_ACC_PCT=90\n            else:\n              - set \"STEPS=25\"\n              - set \"TARGET_EVAL_ACC_PCT=90\"\n          - if: aarch64\n            then:\n              # reduce number of steps in emulation\n              - export STEPS=3\n              - export TARGET_EVAL_ACC_PCT=30\n          - python ./examples/beautiful_mnist.py\n          # run again with high DEBUG value; exercises different paths, e.g. needs capstone\n          - if: unix\n            then:\n              - export STEPS=1\n              - export DEBUG=10\n              - unset TARGET_EVAL_ACC_PCT\n            else:\n              - set \"STEPS=1\"\n              - set \"DEBUG=10\"\n              - set \"TARGET_EVAL_ACC_PCT=\"\n          - if: not aarch64\n            then:\n              # suppress enormously noisy output; re-enable if things actually fail\n              - python ./examples/beautiful_mnist.py > /dev/null\n\n  - package:\n      name: tinygrad-tests\n    build:\n      # splitting off what conda packages under etc/conda/test-files when using test.files.source\n      script:\n        - if: unix\n          # silly: https://github.com/prefix-dev/rattler-build/pull/1367\n          then: true\n          else:\n            - echo \"nothing\"\n\n    requirements:\n      run:\n        - ${{ pin_subpackage('tinygrad', exact=True) }}\n    tests:\n      - requirements:\n          run:\n            # minimal\n            - pytest\n            - pytest-xdist\n            - hypothesis\n            - ml_dtypes\n            - numpy\n            - pytorch\n            - z3-solver\n            # optional\n            - blobfile\n            - boto3\n            - bottle\n            # https://github.com/conda-forge/staged-recipes/issues/29179\n            # - ggml-python\n            - if: unix\n              then:\n                # not available on windows yet\n                - jax\n            - librosa\n            - networkx\n            - nibabel\n            - onnx2torch\n            - onnx\n            - onnxruntime\n            - pandas\n            - py-opencv\n            - pybind11\n            - pycocotools\n            - pillow\n            - safetensors\n            - sentencepiece\n            - tabulate\n            - tiktoken\n            - tqdm\n            - transformers\n        files:\n          source:\n            - examples/\n            - extra/\n            - test/\n        script:\n          interpreter: python\n          content:\n            - 'import pytest'\n            - 'import sys'\n            - 'tests_to_skip = \"_not_a_real_test\"'\n            - if: linux\n              then:\n                # fails `assert Device.DEFAULT in failed_platforms`\n                - 'tests_to_skip += \" or (TestLinearizerFailures and test_failure_27)\"'\n                # Causes `Fatal Python error: Bus error` + segfault\n                - 'tests_to_skip += \" or testCopySHMtoDefault\"'\n                # RuntimeError: Attempting to relocate against an undefined symbol 'fmaxf'\n                - 'tests_to_skip += \" or test_backward_sum_acc_dtype\"'\n                # cannot load onnx model from some temporary location\n                - 'tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"'\n            - if: linux and cuda_compiler_version != \"None\"\n              then:\n                # RuntimeError: Attribute list does not match Module context!\n                - 'tests_to_skip += \" or test_bf16_disk_write_read\"'\n            - if: osx or (linux and cuda_compiler_version != \"None\")\n              then:\n                # beam-related stuff seems to hang on metal, OOM/crash with CUDA\n                - 'tests_to_skip += \" or TestBEAM or test_beam\"'\n            - if: osx\n              then:\n                # another apparent hang\n                - 'tests_to_skip += \" or test_getotherprocess\"'\n                # forking too early\n                - 'tests_to_skip += \" or test_putotherprocess\"'\n                # running into weakly-referenced object no longer exists\n                - 'tests_to_skip += \" or TestGC or test_gc\"'\n            - if: osx and arm64\n              then:\n                - 'tests_to_skip += \" or (TestOpsUint8 and test_cast)\"'\n            - if: osx and x86_64\n              then:\n                # signed int32 overflow\n                - 'tests_to_skip += \" or test_float_midcast_int32\"'\n                # tinygrad.codegen.kernel.KernelOptError: must have tensor cores or TC=2\n                - 'tests_to_skip += \" or test_unmerged_ifs\"'\n                # RuntimeError: The MPS backend is supported on MacOS 14.0+\n                - 'tests_to_skip += \" or test_torch_interop\"'\n                # element mismatch in array\n                - 'tests_to_skip += \" or test_conv2d_fused\"'\n                # flaky hypothesis test\n                - 'tests_to_skip += \" or test_float_cast_to_unsigned\"'\n                # less operations on CPU than expected on metal, apparently\n                - 'tests_to_skip += \" or test_jit_split_simple\"'\n\n            # test suite in emulation on aarch is super slow, skip it there\n            - if: unix and build_platform == host_platform\n              then:\n                - 'sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))'\n\nabout:\n  homepage: https://github.com/tinygrad/tinygrad\n  summary: 'You like pytorch? You like micrograd? You love tinygrad! ❤️'\n  description: |\n    This may not be the best deep learning framework, but it is a deep learning framework.\n\n    Due to its extreme simplicity, it aims to be the easiest framework to add new accelerators to,\n    with support for both inference and training. If XLA is CISC, tinygrad is RISC.\n  license: MIT AND BSD-3-Clause\n  license_file:\n    - LICENSE\n    - applegpu_LICENSE\n  documentation: https://docs.tinygrad.org/\n  repository: https://github.com/tinygrad/tinygrad\n\nextra:\n  recipe-maintainers:\n    - h-vetinari\n  feedstock-name: tinygrad\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -7087,6 +7443,7 @@
       "clang",
       "clangxx_linux-64",
       "cuda-nvcc_linux-64",
+      "cuda-nvrtc-dev",
       "cuda_compiler_stub",
       "cxx_compiler_stub",
       "llvmdev",
@@ -7128,6 +7485,7 @@
         "clangxx_linux-64",
         "ctng-compiler-activation",
         "cuda-nvcc_linux-64",
+        "cuda-nvrtc-dev",
         "cuda_compiler_stub",
         "cxx_compiler_stub",
         "llvmdev",
@@ -7195,8 +7553,10 @@
         "__cuda",
         "capstone",
         "clang",
+        "clang >18",
         "clangxx_linux-64",
         "cuda-nvcc_linux-64",
+        "cuda-nvrtc-dev",
         "llvmdev",
         "python",
         "tinygrad",
@@ -7255,7 +7615,7 @@
       "summary": "You like pytorch? You like micrograd? You love tinygrad! ❤️"
     },
     "build": {
-      "number": "1",
+      "number": "2",
       "script": "python -m pip install . -vv"
     },
     "extra": {
@@ -7285,8 +7645,10 @@
             "llvmdev",
             "clangxx_linux-64",
             "clang",
+            "clang >18",
             "__cuda",
             "cuda-nvcc_linux-64",
+            "cuda-nvrtc-dev",
             "triton"
           ]
         },
@@ -7300,6 +7662,9 @@
             }
           },
           {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
+          },
+          {
             "files": {
               "source": [
                 "examples/beautiful_mnist.py"
@@ -7311,7 +7676,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -7378,7 +7744,8 @@
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
                 "tests_to_skip += \" or test_bf16_disk_write_read\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "tests_to_skip += \" or TestBEAM or test_beam\"",
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -7406,8 +7773,10 @@
             "llvmdev",
             "clangxx_linux-64",
             "clang",
+            "clang >18",
             "__cuda",
             "cuda-nvcc_linux-64",
+            "cuda-nvrtc-dev",
             "triton"
           ]
         },
@@ -7421,6 +7790,9 @@
             }
           },
           {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
+          },
+          {
             "files": {
               "source": [
                 "examples/beautiful_mnist.py"
@@ -7432,7 +7804,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -7499,7 +7872,8 @@
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
                 "tests_to_skip += \" or test_bf16_disk_write_read\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "tests_to_skip += \" or TestBEAM or test_beam\"",
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -7527,8 +7901,10 @@
             "llvmdev",
             "clangxx_linux-64",
             "clang",
+            "clang >18",
             "__cuda",
             "cuda-nvcc_linux-64",
+            "cuda-nvrtc-dev",
             "triton"
           ]
         },
@@ -7542,6 +7918,9 @@
             }
           },
           {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
+          },
+          {
             "files": {
               "source": [
                 "examples/beautiful_mnist.py"
@@ -7553,7 +7932,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -7620,7 +8000,8 @@
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
                 "tests_to_skip += \" or test_bf16_disk_write_read\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "tests_to_skip += \" or TestBEAM or test_beam\"",
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -7648,8 +8029,10 @@
             "llvmdev",
             "clangxx_linux-64",
             "clang",
+            "clang >18",
             "__cuda",
             "cuda-nvcc_linux-64",
+            "cuda-nvrtc-dev",
             "triton"
           ]
         },
@@ -7663,6 +8046,9 @@
             }
           },
           {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
+          },
+          {
             "files": {
               "source": [
                 "examples/beautiful_mnist.py"
@@ -7674,7 +8060,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -7741,7 +8128,8 @@
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
                 "tests_to_skip += \" or test_bf16_disk_write_read\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "tests_to_skip += \" or TestBEAM or test_beam\"",
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -7764,7 +8152,8 @@
             "capstone",
             "llvmdev",
             "clangxx_linux-64",
-            "clang"
+            "clang",
+            "clang >18"
           ]
         },
         "tests": [
@@ -7775,6 +8164,9 @@
                 "tinygrad.runtime.autogen.llvm"
               ]
             }
+          },
+          {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
           },
           {
             "files": {
@@ -7788,7 +8180,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -7854,7 +8247,7 @@
                 "tests_to_skip += \" or testCopySHMtoDefault\"",
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -7877,7 +8270,8 @@
             "capstone",
             "llvmdev",
             "clangxx_linux-64",
-            "clang"
+            "clang",
+            "clang >18"
           ]
         },
         "tests": [
@@ -7888,6 +8282,9 @@
                 "tinygrad.runtime.autogen.llvm"
               ]
             }
+          },
+          {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
           },
           {
             "files": {
@@ -7901,7 +8298,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -7967,7 +8365,7 @@
                 "tests_to_skip += \" or testCopySHMtoDefault\"",
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -7990,7 +8388,8 @@
             "capstone",
             "llvmdev",
             "clangxx_linux-64",
-            "clang"
+            "clang",
+            "clang >18"
           ]
         },
         "tests": [
@@ -8001,6 +8400,9 @@
                 "tinygrad.runtime.autogen.llvm"
               ]
             }
+          },
+          {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
           },
           {
             "files": {
@@ -8014,7 +8416,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -8080,7 +8483,7 @@
                 "tests_to_skip += \" or testCopySHMtoDefault\"",
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -8103,7 +8506,8 @@
             "capstone",
             "llvmdev",
             "clangxx_linux-64",
-            "clang"
+            "clang",
+            "clang >18"
           ]
         },
         "tests": [
@@ -8114,6 +8518,9 @@
                 "tinygrad.runtime.autogen.llvm"
               ]
             }
+          },
+          {
+            "script": "python -c \"from tinygrad.runtime.autogen.libc import syscall\""
           },
           {
             "files": {
@@ -8127,7 +8534,8 @@
               "python ./examples/beautiful_mnist.py",
               "export STEPS=1",
               "export DEBUG=10",
-              "unset TARGET_EVAL_ACC_PCT"
+              "unset TARGET_EVAL_ACC_PCT",
+              "python ./examples/beautiful_mnist.py > /dev/null"
             ]
           }
         ],
@@ -8193,7 +8601,7 @@
                 "tests_to_skip += \" or testCopySHMtoDefault\"",
                 "tests_to_skip += \" or test_backward_sum_acc_dtype\"",
                 "tests_to_skip += \" or (TestQuantizeOnnxCPU and test_quant_128)\"",
-                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\"]))"
+                "sys.exit(pytest.main([\"-v\", \"test/\", \"-k\", f\"not ({tests_to_skip})\", \"--durations=50\", \"--maxfail=20\"]))"
               ],
               "interpreter": "python"
             }
@@ -8223,8 +8631,10 @@
         "llvmdev",
         "clangxx_linux-64",
         "clang",
+        "clang >18",
         "__cuda",
         "cuda-nvcc_linux-64",
+        "cuda-nvrtc-dev",
         "triton"
       ]
     },
@@ -8234,7 +8644,10 @@
         "patches/0001-point-to-our-own-llvmdev.patch",
         "patches/0002-move-frontend-dir-to-nn-pr-12470.patch",
         "patches/0003-update-accuracy-for-every-step-in-beautiful_mnist.py.patch",
-        "patches/0004-make-apple-disassembler-runnable-when-installed.patch"
+        "patches/0004-make-apple-disassembler-runnable-when-installed.patch",
+        "patches/0007-torch-backend-no-aten.detach-for-torch-2.10-compat-1.patch",
+        "patches/0008-add-needs_second_gpu-decorator-13543.patch",
+        "patches/0009-add-target_dir-based-include-paths-for-CUDA-compiler.patch"
       ],
       "sha256": "e5e7b0f2319a8cc8e5de14dbc6ee91a403efd2414681b874b526a8b39d7fa86f",
       "url": "https://github.com/tinygrad/tinygrad/archive/refs/tags/v0.11.0.tar.gz"
@@ -8265,6 +8678,7 @@
         "clang",
         "clangxx_linux-64",
         "cuda-nvcc_linux-64",
+        "cuda-nvrtc-dev",
         "llvmdev",
         "python",
         "tinygrad",
