@@ -11,7 +11,9 @@
     "conda_build": {
       "pkg_format": "2"
     },
+    "conda_build_tool": "rattler-build",
     "conda_forge_output_validation": true,
+    "conda_install_tool": "pixi",
     "github": {
       "branch_name": "main",
       "tooling_branch_name": "main"
@@ -22,8 +24,8 @@
     },
     "test": "native_and_emulated"
   },
-  "feedstock_hash": "fe6edef5fe6fa83566ca898b9305fe4339a3da48",
-  "feedstock_hash_ts": 1764403207,
+  "feedstock_hash": "54fb93ff9c20a7682c30caa13ac4190136d9f267",
+  "feedstock_hash_ts": 1770031998,
   "feedstock_name": "parallelio",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -32,21 +34,20 @@
       "doc_url": "https://ncar.github.io/ParallelIO/",
       "home": "https://github.com/NCAR/ParallelIO",
       "license": "Apache-2.0",
-      "license_family": "Apache",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "A high-level Parallel I/O Library for structured grid applications"
     },
     "build": {
-      "ignore_run_exports_from": [
-        "netcdf-fortran"
-      ],
       "number": "0",
-      "run_exports": [
-        "parallelio mpi_mpi_serial_*",
-        "parallelio mpi_mpich_*",
-        "parallelio mpi_openmpi_*"
-      ],
-      "string": "mpi_openmpi_h1234567_0"
+      "run_exports": {
+        "weak": [
+          "parallelio",
+          "parallelio * mpi_mpi_serial_*",
+          "parallelio * mpi_mpich_*",
+          "parallelio * mpi_openmpi_*"
+        ]
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -55,9 +56,129 @@
         "jedwards4b"
       ]
     },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "parallelio",
+            "parallelio * mpi_mpi_serial_*"
+          ]
+        },
+        "name": "parallelio",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "fortran_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "pkg-config"
+          ],
+          "host": [
+            "mpi_serial",
+            "libnetcdf",
+            "libnetcdf * nompi_*",
+            "netcdf-fortran",
+            "netcdf-fortran * nompi_*"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/lib/libpioc${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/libpiof${SHLIB_EXT}",
+              "test -f ${PREFIX}/include/pio.h"
+            ]
+          }
+        ],
+        "version": "2.6.9"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "parallelio",
+            "parallelio * mpi_mpich_*"
+          ]
+        },
+        "name": "parallelio",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "fortran_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "pkg-config"
+          ],
+          "host": [
+            "mpich",
+            "libnetcdf",
+            "libnetcdf * mpi_mpich_*",
+            "libpnetcdf",
+            "libpnetcdf * mpi_mpich_*",
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_mpich_*"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/lib/libpioc${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/libpiof${SHLIB_EXT}",
+              "test -f ${PREFIX}/include/pio.h"
+            ]
+          }
+        ],
+        "version": "2.6.9"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "parallelio",
+            "parallelio * mpi_openmpi_*"
+          ]
+        },
+        "name": "parallelio",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "fortran_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "pkg-config"
+          ],
+          "host": [
+            "openmpi",
+            "libnetcdf",
+            "libnetcdf * mpi_openmpi_*",
+            "libpnetcdf",
+            "libpnetcdf * mpi_openmpi_*",
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_openmpi_*"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/lib/libpioc${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/libpiof${SHLIB_EXT}",
+              "test -f ${PREFIX}/include/pio.h"
+            ]
+          }
+        ],
+        "version": "2.6.9"
+      }
+    ],
     "package": {
       "name": "parallelio",
-      "version": "2_6_8"
+      "version": "2.6.9"
     },
     "requirements": {
       "build": [
@@ -65,7 +186,8 @@
         "fortran_compiler_stub",
         "c_stdlib_stub",
         "cmake",
-        "make"
+        "make",
+        "pkg-config"
       ],
       "host": [
         "mpi_serial",
@@ -84,20 +206,14 @@
         "netcdf-fortran * mpi_openmpi_*"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "patches": [
-        "mpi-cmakelists.patch"
+        "0001-mpi-cmakelists.patch",
+        "0002-mpi-serial-detection.patch"
       ],
-      "sha256": "ed6c92129b8a5e2d77587fd9656abc0aa7cf82a26a5ad21f8c6a9a79afa2c301",
-      "url": "https://github.com/NCAR/ParallelIO/archive/refs/tags/pio2_6_8.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "test -f ${PREFIX}/lib/libpioc${SHLIB_EXT}",
-        "test -f ${PREFIX}/lib/libpiof${SHLIB_EXT}",
-        "test -f ${PREFIX}/include/pio.h"
-      ]
+      "sha256": "22f34258f0e8b9e8271383bc7c6c657f4bbee560d33f87e3c0db53e0da8c8f3b",
+      "url": "https://github.com/NCAR/ParallelIO/archive/refs/tags/pio2_6_9.tar.gz"
     }
   },
   "linux_64_requirements": {
@@ -108,7 +224,8 @@
         "c_stdlib_stub",
         "cmake",
         "fortran_compiler_stub",
-        "make"
+        "make",
+        "pkg-config"
       ]
     },
     "host": {
@@ -137,21 +254,20 @@
       "doc_url": "https://ncar.github.io/ParallelIO/",
       "home": "https://github.com/NCAR/ParallelIO",
       "license": "Apache-2.0",
-      "license_family": "Apache",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "A high-level Parallel I/O Library for structured grid applications"
     },
     "build": {
-      "ignore_run_exports_from": [
-        "netcdf-fortran"
-      ],
       "number": "0",
-      "run_exports": [
-        "parallelio mpi_mpi_serial_*",
-        "parallelio mpi_mpich_*",
-        "parallelio mpi_openmpi_*"
-      ],
-      "string": "mpi_openmpi_h1234567_0"
+      "run_exports": {
+        "weak": [
+          "parallelio",
+          "parallelio * mpi_mpi_serial_*",
+          "parallelio * mpi_mpich_*",
+          "parallelio * mpi_openmpi_*"
+        ]
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -160,9 +276,129 @@
         "jedwards4b"
       ]
     },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "parallelio",
+            "parallelio * mpi_mpi_serial_*"
+          ]
+        },
+        "name": "parallelio",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "fortran_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "pkg-config"
+          ],
+          "host": [
+            "mpi_serial",
+            "libnetcdf",
+            "libnetcdf * nompi_*",
+            "netcdf-fortran",
+            "netcdf-fortran * nompi_*"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/lib/libpioc${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/libpiof${SHLIB_EXT}",
+              "test -f ${PREFIX}/include/pio.h"
+            ]
+          }
+        ],
+        "version": "2.6.9"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "parallelio",
+            "parallelio * mpi_mpich_*"
+          ]
+        },
+        "name": "parallelio",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "fortran_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "pkg-config"
+          ],
+          "host": [
+            "mpich",
+            "libnetcdf",
+            "libnetcdf * mpi_mpich_*",
+            "libpnetcdf",
+            "libpnetcdf * mpi_mpich_*",
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_mpich_*"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/lib/libpioc${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/libpiof${SHLIB_EXT}",
+              "test -f ${PREFIX}/include/pio.h"
+            ]
+          }
+        ],
+        "version": "2.6.9"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "parallelio",
+            "parallelio * mpi_openmpi_*"
+          ]
+        },
+        "name": "parallelio",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "fortran_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "pkg-config"
+          ],
+          "host": [
+            "openmpi",
+            "libnetcdf",
+            "libnetcdf * mpi_openmpi_*",
+            "libpnetcdf",
+            "libpnetcdf * mpi_openmpi_*",
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_openmpi_*"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/lib/libpioc${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/libpiof${SHLIB_EXT}",
+              "test -f ${PREFIX}/include/pio.h"
+            ]
+          }
+        ],
+        "version": "2.6.9"
+      }
+    ],
     "package": {
       "name": "parallelio",
-      "version": "2_6_8"
+      "version": "2.6.9"
     },
     "requirements": {
       "build": [
@@ -170,7 +406,8 @@
         "fortran_compiler_stub",
         "c_stdlib_stub",
         "cmake",
-        "make"
+        "make",
+        "pkg-config"
       ],
       "host": [
         "mpi_serial",
@@ -189,20 +426,14 @@
         "netcdf-fortran * mpi_openmpi_*"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "patches": [
-        "mpi-cmakelists.patch"
+        "0001-mpi-cmakelists.patch",
+        "0002-mpi-serial-detection.patch"
       ],
-      "sha256": "ed6c92129b8a5e2d77587fd9656abc0aa7cf82a26a5ad21f8c6a9a79afa2c301",
-      "url": "https://github.com/NCAR/ParallelIO/archive/refs/tags/pio2_6_8.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "test -f ${PREFIX}/lib/libpioc${SHLIB_EXT}",
-        "test -f ${PREFIX}/lib/libpiof${SHLIB_EXT}",
-        "test -f ${PREFIX}/include/pio.h"
-      ]
+      "sha256": "22f34258f0e8b9e8271383bc7c6c657f4bbee560d33f87e3c0db53e0da8c8f3b",
+      "url": "https://github.com/NCAR/ParallelIO/archive/refs/tags/pio2_6_9.tar.gz"
     }
   },
   "linux_aarch64_requirements": {
@@ -213,7 +444,8 @@
         "c_stdlib_stub",
         "cmake",
         "fortran_compiler_stub",
-        "make"
+        "make",
+        "pkg-config"
       ]
     },
     "host": {
@@ -242,21 +474,20 @@
       "doc_url": "https://ncar.github.io/ParallelIO/",
       "home": "https://github.com/NCAR/ParallelIO",
       "license": "Apache-2.0",
-      "license_family": "Apache",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "A high-level Parallel I/O Library for structured grid applications"
     },
     "build": {
-      "ignore_run_exports_from": [
-        "netcdf-fortran"
-      ],
       "number": "0",
-      "run_exports": [
-        "parallelio mpi_mpi_serial_*",
-        "parallelio mpi_mpich_*",
-        "parallelio mpi_openmpi_*"
-      ],
-      "string": "mpi_openmpi_h1234567_0"
+      "run_exports": {
+        "weak": [
+          "parallelio",
+          "parallelio * mpi_mpi_serial_*",
+          "parallelio * mpi_mpich_*",
+          "parallelio * mpi_openmpi_*"
+        ]
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -265,9 +496,129 @@
         "jedwards4b"
       ]
     },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "parallelio",
+            "parallelio * mpi_mpi_serial_*"
+          ]
+        },
+        "name": "parallelio",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "fortran_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "pkg-config"
+          ],
+          "host": [
+            "mpi_serial",
+            "libnetcdf",
+            "libnetcdf * nompi_*",
+            "netcdf-fortran",
+            "netcdf-fortran * nompi_*"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/lib/libpioc${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/libpiof${SHLIB_EXT}",
+              "test -f ${PREFIX}/include/pio.h"
+            ]
+          }
+        ],
+        "version": "2.6.9"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "parallelio",
+            "parallelio * mpi_mpich_*"
+          ]
+        },
+        "name": "parallelio",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "fortran_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "pkg-config"
+          ],
+          "host": [
+            "mpich",
+            "libnetcdf",
+            "libnetcdf * mpi_mpich_*",
+            "libpnetcdf",
+            "libpnetcdf * mpi_mpich_*",
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_mpich_*"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/lib/libpioc${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/libpiof${SHLIB_EXT}",
+              "test -f ${PREFIX}/include/pio.h"
+            ]
+          }
+        ],
+        "version": "2.6.9"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "parallelio",
+            "parallelio * mpi_openmpi_*"
+          ]
+        },
+        "name": "parallelio",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "fortran_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "pkg-config"
+          ],
+          "host": [
+            "openmpi",
+            "libnetcdf",
+            "libnetcdf * mpi_openmpi_*",
+            "libpnetcdf",
+            "libpnetcdf * mpi_openmpi_*",
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_openmpi_*"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/lib/libpioc${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/libpiof${SHLIB_EXT}",
+              "test -f ${PREFIX}/include/pio.h"
+            ]
+          }
+        ],
+        "version": "2.6.9"
+      }
+    ],
     "package": {
       "name": "parallelio",
-      "version": "2_6_8"
+      "version": "2.6.9"
     },
     "requirements": {
       "build": [
@@ -275,7 +626,8 @@
         "fortran_compiler_stub",
         "c_stdlib_stub",
         "cmake",
-        "make"
+        "make",
+        "pkg-config"
       ],
       "host": [
         "mpi_serial",
@@ -294,20 +646,14 @@
         "netcdf-fortran * mpi_openmpi_*"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "patches": [
-        "mpi-cmakelists.patch"
+        "0001-mpi-cmakelists.patch",
+        "0002-mpi-serial-detection.patch"
       ],
-      "sha256": "ed6c92129b8a5e2d77587fd9656abc0aa7cf82a26a5ad21f8c6a9a79afa2c301",
-      "url": "https://github.com/NCAR/ParallelIO/archive/refs/tags/pio2_6_8.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "test -f ${PREFIX}/lib/libpioc${SHLIB_EXT}",
-        "test -f ${PREFIX}/lib/libpiof${SHLIB_EXT}",
-        "test -f ${PREFIX}/include/pio.h"
-      ]
+      "sha256": "22f34258f0e8b9e8271383bc7c6c657f4bbee560d33f87e3c0db53e0da8c8f3b",
+      "url": "https://github.com/NCAR/ParallelIO/archive/refs/tags/pio2_6_9.tar.gz"
     }
   },
   "linux_ppc64le_requirements": {
@@ -318,7 +664,8 @@
         "c_stdlib_stub",
         "cmake",
         "fortran_compiler_stub",
-        "make"
+        "make",
+        "pkg-config"
       ]
     },
     "host": {
@@ -347,21 +694,20 @@
       "doc_url": "https://ncar.github.io/ParallelIO/",
       "home": "https://github.com/NCAR/ParallelIO",
       "license": "Apache-2.0",
-      "license_family": "Apache",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "A high-level Parallel I/O Library for structured grid applications"
     },
     "build": {
-      "ignore_run_exports_from": [
-        "netcdf-fortran"
-      ],
       "number": "0",
-      "run_exports": [
-        "parallelio mpi_mpi_serial_*",
-        "parallelio mpi_mpich_*",
-        "parallelio mpi_openmpi_*"
-      ],
-      "string": "mpi_openmpi_h1234567_0"
+      "run_exports": {
+        "weak": [
+          "parallelio",
+          "parallelio * mpi_mpi_serial_*",
+          "parallelio * mpi_mpich_*",
+          "parallelio * mpi_openmpi_*"
+        ]
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -370,9 +716,601 @@
         "jedwards4b"
       ]
     },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "parallelio",
+            "parallelio * mpi_mpi_serial_*"
+          ]
+        },
+        "name": "parallelio",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "fortran_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "pkg-config"
+          ],
+          "host": [
+            "mpi_serial",
+            "libnetcdf",
+            "libnetcdf * nompi_*",
+            "netcdf-fortran",
+            "netcdf-fortran * nompi_*"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/lib/libpioc${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/libpiof${SHLIB_EXT}",
+              "test -f ${PREFIX}/include/pio.h"
+            ]
+          }
+        ],
+        "version": "2.6.9"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "parallelio",
+            "parallelio * mpi_mpich_*"
+          ]
+        },
+        "name": "parallelio",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "fortran_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "pkg-config"
+          ],
+          "host": [
+            "mpich",
+            "libnetcdf",
+            "libnetcdf * mpi_mpich_*",
+            "libpnetcdf",
+            "libpnetcdf * mpi_mpich_*",
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_mpich_*"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/lib/libpioc${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/libpiof${SHLIB_EXT}",
+              "test -f ${PREFIX}/include/pio.h"
+            ]
+          }
+        ],
+        "version": "2.6.9"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "parallelio",
+            "parallelio * mpi_openmpi_*"
+          ]
+        },
+        "name": "parallelio",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "fortran_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "pkg-config"
+          ],
+          "host": [
+            "openmpi",
+            "libnetcdf",
+            "libnetcdf * mpi_openmpi_*",
+            "libpnetcdf",
+            "libpnetcdf * mpi_openmpi_*",
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_openmpi_*"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/lib/libpioc${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/libpiof${SHLIB_EXT}",
+              "test -f ${PREFIX}/include/pio.h"
+            ]
+          }
+        ],
+        "version": "2.6.9"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "parallelio",
+            "parallelio * mpi_mpi_serial_*"
+          ]
+        },
+        "name": "parallelio",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "fortran_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "pkg-config"
+          ],
+          "host": [
+            "mpi_serial",
+            "libnetcdf",
+            "libnetcdf * nompi_*",
+            "netcdf-fortran",
+            "netcdf-fortran * nompi_*"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/lib/libpioc${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/libpiof${SHLIB_EXT}",
+              "test -f ${PREFIX}/include/pio.h"
+            ]
+          }
+        ],
+        "version": "2.6.9"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "parallelio",
+            "parallelio * mpi_mpich_*"
+          ]
+        },
+        "name": "parallelio",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "fortran_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "pkg-config"
+          ],
+          "host": [
+            "mpich",
+            "libnetcdf",
+            "libnetcdf * mpi_mpich_*",
+            "libpnetcdf",
+            "libpnetcdf * mpi_mpich_*",
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_mpich_*"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/lib/libpioc${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/libpiof${SHLIB_EXT}",
+              "test -f ${PREFIX}/include/pio.h"
+            ]
+          }
+        ],
+        "version": "2.6.9"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "parallelio",
+            "parallelio * mpi_openmpi_*"
+          ]
+        },
+        "name": "parallelio",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "fortran_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "pkg-config"
+          ],
+          "host": [
+            "openmpi",
+            "libnetcdf",
+            "libnetcdf * mpi_openmpi_*",
+            "libpnetcdf",
+            "libpnetcdf * mpi_openmpi_*",
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_openmpi_*"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/lib/libpioc${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/libpiof${SHLIB_EXT}",
+              "test -f ${PREFIX}/include/pio.h"
+            ]
+          }
+        ],
+        "version": "2.6.9"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "parallelio",
+            "parallelio * mpi_mpi_serial_*"
+          ]
+        },
+        "name": "parallelio",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "fortran_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "pkg-config"
+          ],
+          "host": [
+            "mpi_serial",
+            "libnetcdf",
+            "libnetcdf * nompi_*",
+            "netcdf-fortran",
+            "netcdf-fortran * nompi_*"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/lib/libpioc${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/libpiof${SHLIB_EXT}",
+              "test -f ${PREFIX}/include/pio.h"
+            ]
+          }
+        ],
+        "version": "2.6.9"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "parallelio",
+            "parallelio * mpi_mpich_*"
+          ]
+        },
+        "name": "parallelio",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "fortran_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "pkg-config"
+          ],
+          "host": [
+            "mpich",
+            "libnetcdf",
+            "libnetcdf * mpi_mpich_*",
+            "libpnetcdf",
+            "libpnetcdf * mpi_mpich_*",
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_mpich_*"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/lib/libpioc${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/libpiof${SHLIB_EXT}",
+              "test -f ${PREFIX}/include/pio.h"
+            ]
+          }
+        ],
+        "version": "2.6.9"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "parallelio",
+            "parallelio * mpi_openmpi_*"
+          ]
+        },
+        "name": "parallelio",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "fortran_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "pkg-config"
+          ],
+          "host": [
+            "openmpi",
+            "libnetcdf",
+            "libnetcdf * mpi_openmpi_*",
+            "libpnetcdf",
+            "libpnetcdf * mpi_openmpi_*",
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_openmpi_*"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/lib/libpioc${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/libpiof${SHLIB_EXT}",
+              "test -f ${PREFIX}/include/pio.h"
+            ]
+          }
+        ],
+        "version": "2.6.9"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "parallelio",
+            "parallelio * mpi_mpi_serial_*"
+          ]
+        },
+        "name": "parallelio",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "fortran_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "pkg-config"
+          ],
+          "host": [
+            "mpi_serial",
+            "libnetcdf",
+            "libnetcdf * nompi_*",
+            "netcdf-fortran",
+            "netcdf-fortran * nompi_*"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/lib/libpioc${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/libpiof${SHLIB_EXT}",
+              "test -f ${PREFIX}/include/pio.h"
+            ]
+          }
+        ],
+        "version": "2.6.9"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "parallelio",
+            "parallelio * mpi_mpich_*"
+          ]
+        },
+        "name": "parallelio",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "fortran_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "pkg-config"
+          ],
+          "host": [
+            "mpich",
+            "libnetcdf",
+            "libnetcdf * mpi_mpich_*",
+            "libpnetcdf",
+            "libpnetcdf * mpi_mpich_*",
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_mpich_*"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/lib/libpioc${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/libpiof${SHLIB_EXT}",
+              "test -f ${PREFIX}/include/pio.h"
+            ]
+          }
+        ],
+        "version": "2.6.9"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "parallelio",
+            "parallelio * mpi_openmpi_*"
+          ]
+        },
+        "name": "parallelio",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "fortran_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "pkg-config"
+          ],
+          "host": [
+            "openmpi",
+            "libnetcdf",
+            "libnetcdf * mpi_openmpi_*",
+            "libpnetcdf",
+            "libpnetcdf * mpi_openmpi_*",
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_openmpi_*"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/lib/libpioc${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/libpiof${SHLIB_EXT}",
+              "test -f ${PREFIX}/include/pio.h"
+            ]
+          }
+        ],
+        "version": "2.6.9"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "parallelio",
+            "parallelio * mpi_mpi_serial_*"
+          ]
+        },
+        "name": "parallelio",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "fortran_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "pkg-config"
+          ],
+          "host": [
+            "mpi_serial",
+            "libnetcdf",
+            "libnetcdf * nompi_*",
+            "netcdf-fortran",
+            "netcdf-fortran * nompi_*"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/lib/libpioc${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/libpiof${SHLIB_EXT}",
+              "test -f ${PREFIX}/include/pio.h"
+            ]
+          }
+        ],
+        "version": "2.6.9"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "parallelio",
+            "parallelio * mpi_mpich_*"
+          ]
+        },
+        "name": "parallelio",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "fortran_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "pkg-config"
+          ],
+          "host": [
+            "mpich",
+            "libnetcdf",
+            "libnetcdf * mpi_mpich_*",
+            "libpnetcdf",
+            "libpnetcdf * mpi_mpich_*",
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_mpich_*"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/lib/libpioc${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/libpiof${SHLIB_EXT}",
+              "test -f ${PREFIX}/include/pio.h"
+            ]
+          }
+        ],
+        "version": "2.6.9"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "parallelio",
+            "parallelio * mpi_openmpi_*"
+          ]
+        },
+        "name": "parallelio",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "fortran_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "pkg-config"
+          ],
+          "host": [
+            "openmpi",
+            "libnetcdf",
+            "libnetcdf * mpi_openmpi_*",
+            "libpnetcdf",
+            "libpnetcdf * mpi_openmpi_*",
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_openmpi_*"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/lib/libpioc${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/libpiof${SHLIB_EXT}",
+              "test -f ${PREFIX}/include/pio.h"
+            ]
+          }
+        ],
+        "version": "2.6.9"
+      }
+    ],
     "package": {
       "name": "parallelio",
-      "version": "2_6_8"
+      "version": "2.6.9"
     },
     "requirements": {
       "build": [
@@ -380,7 +1318,8 @@
         "fortran_compiler_stub",
         "c_stdlib_stub",
         "cmake",
-        "make"
+        "make",
+        "pkg-config"
       ],
       "host": [
         "mpi_serial",
@@ -399,20 +1338,14 @@
         "netcdf-fortran * mpi_openmpi_*"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "patches": [
-        "mpi-cmakelists.patch"
+        "0001-mpi-cmakelists.patch",
+        "0002-mpi-serial-detection.patch"
       ],
-      "sha256": "ed6c92129b8a5e2d77587fd9656abc0aa7cf82a26a5ad21f8c6a9a79afa2c301",
-      "url": "https://github.com/NCAR/ParallelIO/archive/refs/tags/pio2_6_8.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "test -f ${PREFIX}/lib/libpioc${SHLIB_EXT}",
-        "test -f ${PREFIX}/lib/libpiof${SHLIB_EXT}",
-        "test -f ${PREFIX}/include/pio.h"
-      ]
+      "sha256": "22f34258f0e8b9e8271383bc7c6c657f4bbee560d33f87e3c0db53e0da8c8f3b",
+      "url": "https://github.com/NCAR/ParallelIO/archive/refs/tags/pio2_6_9.tar.gz"
     }
   },
   "name": "parallelio",
@@ -422,21 +1355,20 @@
       "doc_url": "https://ncar.github.io/ParallelIO/",
       "home": "https://github.com/NCAR/ParallelIO",
       "license": "Apache-2.0",
-      "license_family": "Apache",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "A high-level Parallel I/O Library for structured grid applications"
     },
     "build": {
-      "ignore_run_exports_from": [
-        "netcdf-fortran"
-      ],
       "number": "0",
-      "run_exports": [
-        "parallelio mpi_mpi_serial_*",
-        "parallelio mpi_mpich_*",
-        "parallelio mpi_openmpi_*"
-      ],
-      "string": "mpi_openmpi_h1234567_0"
+      "run_exports": {
+        "weak": [
+          "parallelio",
+          "parallelio * mpi_mpi_serial_*",
+          "parallelio * mpi_mpich_*",
+          "parallelio * mpi_openmpi_*"
+        ]
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -445,9 +1377,129 @@
         "jedwards4b"
       ]
     },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "parallelio",
+            "parallelio * mpi_mpi_serial_*"
+          ]
+        },
+        "name": "parallelio",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "fortran_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "pkg-config"
+          ],
+          "host": [
+            "mpi_serial",
+            "libnetcdf",
+            "libnetcdf * nompi_*",
+            "netcdf-fortran",
+            "netcdf-fortran * nompi_*"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/lib/libpioc${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/libpiof${SHLIB_EXT}",
+              "test -f ${PREFIX}/include/pio.h"
+            ]
+          }
+        ],
+        "version": "2.6.9"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "parallelio",
+            "parallelio * mpi_mpich_*"
+          ]
+        },
+        "name": "parallelio",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "fortran_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "pkg-config"
+          ],
+          "host": [
+            "mpich",
+            "libnetcdf",
+            "libnetcdf * mpi_mpich_*",
+            "libpnetcdf",
+            "libpnetcdf * mpi_mpich_*",
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_mpich_*"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/lib/libpioc${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/libpiof${SHLIB_EXT}",
+              "test -f ${PREFIX}/include/pio.h"
+            ]
+          }
+        ],
+        "version": "2.6.9"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "parallelio",
+            "parallelio * mpi_openmpi_*"
+          ]
+        },
+        "name": "parallelio",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "fortran_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "pkg-config"
+          ],
+          "host": [
+            "openmpi",
+            "libnetcdf",
+            "libnetcdf * mpi_openmpi_*",
+            "libpnetcdf",
+            "libpnetcdf * mpi_openmpi_*",
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_openmpi_*"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/lib/libpioc${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/libpiof${SHLIB_EXT}",
+              "test -f ${PREFIX}/include/pio.h"
+            ]
+          }
+        ],
+        "version": "2.6.9"
+      }
+    ],
     "package": {
       "name": "parallelio",
-      "version": "2_6_8"
+      "version": "2.6.9"
     },
     "requirements": {
       "build": [
@@ -455,7 +1507,8 @@
         "fortran_compiler_stub",
         "c_stdlib_stub",
         "cmake",
-        "make"
+        "make",
+        "pkg-config"
       ],
       "host": [
         "mpi_serial",
@@ -474,20 +1527,14 @@
         "netcdf-fortran * mpi_openmpi_*"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "patches": [
-        "mpi-cmakelists.patch"
+        "0001-mpi-cmakelists.patch",
+        "0002-mpi-serial-detection.patch"
       ],
-      "sha256": "ed6c92129b8a5e2d77587fd9656abc0aa7cf82a26a5ad21f8c6a9a79afa2c301",
-      "url": "https://github.com/NCAR/ParallelIO/archive/refs/tags/pio2_6_8.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "test -f ${PREFIX}/lib/libpioc${SHLIB_EXT}",
-        "test -f ${PREFIX}/lib/libpiof${SHLIB_EXT}",
-        "test -f ${PREFIX}/include/pio.h"
-      ]
+      "sha256": "22f34258f0e8b9e8271383bc7c6c657f4bbee560d33f87e3c0db53e0da8c8f3b",
+      "url": "https://github.com/NCAR/ParallelIO/archive/refs/tags/pio2_6_9.tar.gz"
     }
   },
   "osx_64_requirements": {
@@ -498,7 +1545,8 @@
         "c_stdlib_stub",
         "cmake",
         "fortran_compiler_stub",
-        "make"
+        "make",
+        "pkg-config"
       ]
     },
     "host": {
@@ -527,21 +1575,20 @@
       "doc_url": "https://ncar.github.io/ParallelIO/",
       "home": "https://github.com/NCAR/ParallelIO",
       "license": "Apache-2.0",
-      "license_family": "Apache",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "A high-level Parallel I/O Library for structured grid applications"
     },
     "build": {
-      "ignore_run_exports_from": [
-        "netcdf-fortran"
-      ],
       "number": "0",
-      "run_exports": [
-        "parallelio mpi_mpi_serial_*",
-        "parallelio mpi_mpich_*",
-        "parallelio mpi_openmpi_*"
-      ],
-      "string": "mpi_openmpi_h1234567_0"
+      "run_exports": {
+        "weak": [
+          "parallelio",
+          "parallelio * mpi_mpi_serial_*",
+          "parallelio * mpi_mpich_*",
+          "parallelio * mpi_openmpi_*"
+        ]
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -550,9 +1597,129 @@
         "jedwards4b"
       ]
     },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "parallelio",
+            "parallelio * mpi_mpi_serial_*"
+          ]
+        },
+        "name": "parallelio",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "fortran_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "pkg-config"
+          ],
+          "host": [
+            "mpi_serial",
+            "libnetcdf",
+            "libnetcdf * nompi_*",
+            "netcdf-fortran",
+            "netcdf-fortran * nompi_*"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/lib/libpioc${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/libpiof${SHLIB_EXT}",
+              "test -f ${PREFIX}/include/pio.h"
+            ]
+          }
+        ],
+        "version": "2.6.9"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "parallelio",
+            "parallelio * mpi_mpich_*"
+          ]
+        },
+        "name": "parallelio",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "fortran_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "pkg-config"
+          ],
+          "host": [
+            "mpich",
+            "libnetcdf",
+            "libnetcdf * mpi_mpich_*",
+            "libpnetcdf",
+            "libpnetcdf * mpi_mpich_*",
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_mpich_*"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/lib/libpioc${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/libpiof${SHLIB_EXT}",
+              "test -f ${PREFIX}/include/pio.h"
+            ]
+          }
+        ],
+        "version": "2.6.9"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "parallelio",
+            "parallelio * mpi_openmpi_*"
+          ]
+        },
+        "name": "parallelio",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "fortran_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "pkg-config"
+          ],
+          "host": [
+            "openmpi",
+            "libnetcdf",
+            "libnetcdf * mpi_openmpi_*",
+            "libpnetcdf",
+            "libpnetcdf * mpi_openmpi_*",
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_openmpi_*"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f ${PREFIX}/lib/libpioc${SHLIB_EXT}",
+              "test -f ${PREFIX}/lib/libpiof${SHLIB_EXT}",
+              "test -f ${PREFIX}/include/pio.h"
+            ]
+          }
+        ],
+        "version": "2.6.9"
+      }
+    ],
     "package": {
       "name": "parallelio",
-      "version": "2_6_8"
+      "version": "2.6.9"
     },
     "requirements": {
       "build": [
@@ -560,7 +1727,8 @@
         "fortran_compiler_stub",
         "c_stdlib_stub",
         "cmake",
-        "make"
+        "make",
+        "pkg-config"
       ],
       "host": [
         "mpi_serial",
@@ -579,20 +1747,14 @@
         "netcdf-fortran * mpi_openmpi_*"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "patches": [
-        "mpi-cmakelists.patch"
+        "0001-mpi-cmakelists.patch",
+        "0002-mpi-serial-detection.patch"
       ],
-      "sha256": "ed6c92129b8a5e2d77587fd9656abc0aa7cf82a26a5ad21f8c6a9a79afa2c301",
-      "url": "https://github.com/NCAR/ParallelIO/archive/refs/tags/pio2_6_8.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "test -f ${PREFIX}/lib/libpioc${SHLIB_EXT}",
-        "test -f ${PREFIX}/lib/libpiof${SHLIB_EXT}",
-        "test -f ${PREFIX}/include/pio.h"
-      ]
+      "sha256": "22f34258f0e8b9e8271383bc7c6c657f4bbee560d33f87e3c0db53e0da8c8f3b",
+      "url": "https://github.com/NCAR/ParallelIO/archive/refs/tags/pio2_6_9.tar.gz"
     }
   },
   "osx_arm64_requirements": {
@@ -603,7 +1765,8 @@
         "c_stdlib_stub",
         "cmake",
         "fortran_compiler_stub",
-        "make"
+        "make",
+        "pkg-config"
       ]
     },
     "host": {
@@ -643,7 +1806,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/parallelio.json"
   },
-  "raw_meta_yaml": "{% set version = \"2_6_8\" %}\n{% set ver = version.replace(\".\", \"_\") %}\n{% set build = 0 %}\n\n# recipe-lint fails if mpi is undefined\n{% set mpi = mpi or 'mpich' %}\n{% if mpi == \"mpich\" %}\n  # prioritize mpich via build number\n  {% set build = build + 100 %}\n{% endif %}\n\n{% set mpi_prefix = \"mpi_\" + mpi %}\n\n{% if mpi == \"mpi_serial\" %}\n  # we want to use the \"nompi\" versions of dependencies\n  {% set mpi_dep_prefix = \"nompi\" %}\n{% else %}\n  {% set mpi_dep_prefix = mpi_prefix %}\n{% endif %}\n\npackage:\n  name: parallelio\n  version: {{ version }}\n\nsource:\n  url: https://github.com/NCAR/ParallelIO/archive/refs/tags/pio{{ ver }}.tar.gz\n  sha256: ed6c92129b8a5e2d77587fd9656abc0aa7cf82a26a5ad21f8c6a9a79afa2c301\n  patches:\n    - mpi-cmakelists.patch\n\nbuild:\n  number: {{ build }}\n  skip: true  # [win]\n  # add build string so packages can depend on mpi variants dependencies:\n  # `PKG_NAME * mpi_mpich_*` for mpich\n  # `PKG_NAME * mpi_*` for any mpi\n  string: {{ mpi_prefix }}_h{{ PKG_HASH }}_{{ build }}\n  run_exports:\n    - {{ pin_subpackage('parallelio', max_pin='x.x.x') }} {{ mpi_prefix }}_*\n  ignore_run_exports_from:\n    - netcdf-fortran\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ compiler('fortran') }}\n    - {{ stdlib('c') }}\n    - cmake\n    - make\n    - {{ mpi }}  # [mpi == 'openmpi' and build_platform != target_platform]\n  host:\n    - {{ mpi }}\n    # these need to be listed twice so conda-smithy build picks up the pins\n    - libnetcdf\n    - libnetcdf * {{ mpi_dep_prefix }}_*\n    - libpnetcdf  # [mpi != 'mpi_serial']\n    - libpnetcdf * {{ mpi_dep_prefix }}_*  # [mpi != 'mpi_serial']\n    - netcdf-fortran\n    - netcdf-fortran * {{ mpi_dep_prefix }}_*\n\ntest:\n  commands:\n    - test -f ${PREFIX}/lib/libpioc${SHLIB_EXT}\n    - test -f ${PREFIX}/lib/libpiof${SHLIB_EXT}\n    - test -f ${PREFIX}/include/pio.h\n\nabout:\n  home: https://github.com/NCAR/ParallelIO\n  license: Apache-2.0\n  license_family: Apache\n  license_file: LICENSE\n  summary: A high-level Parallel I/O Library for structured grid applications\n  dev_url: https://github.com/NCAR/ParallelIO\n  doc_url: https://ncar.github.io/ParallelIO/\n\nextra:\n  recipe-maintainers:\n    - zklaus\n    - xylar\n    - jedwards4b\n",
+  "raw_meta_yaml": "schema_version: 1\n\ncontext:\n  name: parallelio\n  version: \"2.6.9\"\n  ver_underscores: ${{ version | replace(\".\", \"_\") }}\n  build: 0\n  # recipe-lint fails if mpi is undefined\n  mpi: ${{ mpi or \"mpich\" }}\n  # prioritize mpich via build number\n  build_number: ${{ build + 100 if mpi == \"mpich\" else build }}\n  mpi_prefix: ${{ \"mpi_\" + mpi }}\n  # we want to use the \"nompi\" versions of dependencies\n  mpi_dep_prefix: ${{ \"nompi\" if mpi == \"mpi_serial\" else mpi_prefix }}\n\npackage:\n  name: ${{ name }}\n  version: ${{ version }}\n\nsource:\n  url: https://github.com/NCAR/ParallelIO/archive/refs/tags/pio${{ ver_underscores }}.tar.gz\n  sha256: 22f34258f0e8b9e8271383bc7c6c657f4bbee560d33f87e3c0db53e0da8c8f3b\n  patches:\n    - 0001-mpi-cmakelists.patch\n    - 0002-mpi-serial-detection.patch\n\nbuild:\n  number: ${{ build_number }}\n  skip:\n    - win\n  # add build string so packages can depend on mpi variants dependencies:\n  # `PKG_NAME * mpi_mpich_*` for mpich\n  # `PKG_NAME * mpi_*` for any mpi\n  string: ${{ mpi_prefix }}_h${{ hash }}_${{ build_number }}\n\nrequirements:\n  build:\n    - ${{ compiler(\"c\") }}\n    - ${{ compiler(\"fortran\") }}\n    - ${{ stdlib(\"c\") }}\n    - cmake\n    - make\n    - pkg-config\n    - if: mpi == \"openmpi\" and build_platform != target_platform\n      then:\n        - ${{ mpi }}\n  host:\n    - ${{ mpi }}\n    # these need to be listed twice so conda-smithy build picks up the pins\n    - libnetcdf\n    - libnetcdf * ${{ mpi_dep_prefix }}_*\n    - if: mpi != \"mpi_serial\"\n      then:\n        - libpnetcdf\n        - libpnetcdf * ${{ mpi_dep_prefix }}_*\n    - netcdf-fortran\n    - netcdf-fortran * ${{ mpi_dep_prefix }}_*\n  run_exports:\n    - ${{ pin_subpackage(\"parallelio\", upper_bound=\"x.x.x\") }}\n    - parallelio *  ${{ mpi_prefix }}_*\n  ignore_run_exports:\n    from_package:\n      - netcdf-fortran\ntests:\n  - script:\n      - test -f ${PREFIX}/lib/libpioc${SHLIB_EXT}\n      - test -f ${PREFIX}/lib/libpiof${SHLIB_EXT}\n      - test -f ${PREFIX}/include/pio.h\n\nabout:\n  homepage: https://github.com/NCAR/ParallelIO\n  license: Apache-2.0\n  license_file: LICENSE\n  summary: A high-level Parallel I/O Library for structured grid applications\n  repository: https://github.com/NCAR/ParallelIO\n  documentation: https://ncar.github.io/ParallelIO/\n\nextra:\n  recipe-maintainers:\n    - zklaus\n    - xylar\n    - jedwards4b\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -657,7 +1820,8 @@
       "mpi_serial",
       "mpich",
       "netcdf-fortran",
-      "openmpi"
+      "openmpi",
+      "pkg-config"
     ]
   },
   "requirements": {
@@ -668,7 +1832,8 @@
         "c_stdlib_stub",
         "cmake",
         "fortran_compiler_stub",
-        "make"
+        "make",
+        "pkg-config"
       ]
     },
     "host": {
@@ -707,7 +1872,8 @@
         "c_stdlib_stub",
         "cmake",
         "fortran_compiler_stub",
-        "make"
+        "make",
+        "pkg-config"
       ]
     },
     "host": {
@@ -738,8 +1904,8 @@
       "elements": []
     }
   },
-  "url": "https://github.com/NCAR/ParallelIO/archive/refs/tags/pio2_6_8.tar.gz",
-  "version": "2_6_8",
+  "url": "https://github.com/NCAR/ParallelIO/archive/refs/tags/pio2_6_9.tar.gz",
+  "version": "2.6.9",
   "version_pr_info": {
     "__lazy_json__": "version_pr_info/parallelio.json"
   }
