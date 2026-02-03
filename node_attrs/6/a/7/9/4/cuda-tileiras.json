@@ -20,8 +20,8 @@
       "linux_aarch64": "default"
     }
   },
-  "feedstock_hash": "0d4e757654615740f4c4d3a518d56b1ae95439ea",
-  "feedstock_hash_ts": 1770093088,
+  "feedstock_hash": "13c39c2dd72f829a5308c20b43818ce59c4c656a",
+  "feedstock_hash_ts": 1770140855,
   "feedstock_name": "cuda-tileiras",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -35,7 +35,7 @@
       "summary": "TileIR is a portable and language agnostic intermediate representation for CUDA kernels"
     },
     "build": {
-      "number": "2"
+      "number": "3"
     },
     "extra": {
       "feedstock-name": "cuda-tileiras",
@@ -45,6 +45,9 @@
     },
     "outputs": [
       {
+        "build": {
+          "binary_relocation": false
+        },
         "files": [
           "bin/tileiras"
         ],
@@ -60,7 +63,8 @@
           ],
           "run": [
             "cuda-version",
-            "cuda-nvcc"
+            "cuda-nvcc-tools",
+            "cuda-nvvm-impl"
           ]
         },
         "test": {
@@ -105,7 +109,8 @@
     "run": {
       "__set__": true,
       "elements": [
-        "cuda-nvcc",
+        "cuda-nvcc-tools",
+        "cuda-nvvm-impl",
         "cuda-version"
       ]
     },
@@ -125,7 +130,7 @@
       "summary": "TileIR is a portable and language agnostic intermediate representation for CUDA kernels"
     },
     "build": {
-      "number": "2"
+      "number": "3"
     },
     "extra": {
       "feedstock-name": "cuda-tileiras",
@@ -135,6 +140,9 @@
     },
     "outputs": [
       {
+        "build": {
+          "binary_relocation": false
+        },
         "files": [
           "bin/tileiras"
         ],
@@ -151,7 +159,8 @@
           ],
           "run": [
             "cuda-version",
-            "cuda-nvcc"
+            "cuda-nvcc-tools",
+            "cuda-nvvm-impl"
           ]
         },
         "test": {
@@ -197,7 +206,8 @@
     "run": {
       "__set__": true,
       "elements": [
-        "cuda-nvcc",
+        "cuda-nvcc-tools",
+        "cuda-nvvm-impl",
         "cuda-version"
       ]
     },
@@ -217,7 +227,7 @@
       "summary": "TileIR is a portable and language agnostic intermediate representation for CUDA kernels"
     },
     "build": {
-      "number": "2"
+      "number": "3"
     },
     "extra": {
       "feedstock-name": "cuda-tileiras",
@@ -227,6 +237,9 @@
     },
     "outputs": [
       {
+        "build": {
+          "binary_relocation": false
+        },
         "files": [
           "bin/tileiras"
         ],
@@ -242,7 +255,8 @@
           ],
           "run": [
             "cuda-version",
-            "cuda-nvcc"
+            "cuda-nvcc-tools",
+            "cuda-nvvm-impl"
           ]
         },
         "test": {
@@ -253,6 +267,9 @@
         }
       },
       {
+        "build": {
+          "binary_relocation": false
+        },
         "files": [
           "bin/tileiras"
         ],
@@ -269,7 +286,8 @@
           ],
           "run": [
             "cuda-version",
-            "cuda-nvcc"
+            "cuda-nvcc-tools",
+            "cuda-nvvm-impl"
           ]
         },
         "test": {
@@ -281,6 +299,7 @@
       },
       {
         "build": {
+          "binary_relocation": false,
           "script": [
             "move bin\\* %LIBRARY_BIN%"
           ]
@@ -297,7 +316,8 @@
           ],
           "run": [
             "cuda-version",
-            "cuda-nvcc"
+            "cuda-nvcc-tools",
+            "cuda-nvvm-impl"
           ]
         },
         "test": {
@@ -339,7 +359,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/cuda-tileiras.json"
   },
-  "raw_meta_yaml": "{% set version = \"13.1.80\" %}\n{% set arm_variant_type = arm_variant_type | default(\"sbsa\") %}\n{% set cuda_version = \"13.1\" %}\n{% set platform = \"linux-x86_64\" %}  # [linux64]\n{% set platform = \"linux-sbsa\" %}  # [linux and aarch64]\n{% set platform = \"windows-x86_64\" %}  # [win]\n{% set extension = \"tar.xz\" %}  # [not win]\n{% set extension = \"zip\" %}  # [win]\n\n{% set soname = version.split(\".\")[0] %}\n\n{% set sha256 = \"e3f427f96492956527614c1283760463f7c02319d3e44c4b062fca17429d5951\" %}  # [linux64]\n{% set sha256 = \"94704a1cc2609d471ac1c157e43cc9d89cc437de3b85ec3b2df45199cf66d1f9\" %}  # [linux and aarch64]\n{% set sha256 = \"9215c7ed572ed74c6167589c32f135a65853cbc35e7d417ec29ddd886be85d43\" %}  # [win]\n\npackage:\n  name: cuda-tileiras-split\n  version: {{ version }}\n\nsource:\n  url: https://developer.download.nvidia.com/compute/cuda/redist/cuda_tileiras/{{ platform }}/cuda_tileiras-{{ platform }}-{{ version }}-archive.{{ extension }}\n  sha256: {{ sha256 }}\n\nbuild:\n  number: 2\n  skip: true  # [osx or ppc64le]\n\nrequirements:\n  build:\n    - cf-nvidia-tools 1  # [linux]\n\noutputs:\n  - name: cuda-tileiras\n    build:   # [win]\n      script:   # [win]\n        - move bin\\* %LIBRARY_BIN%   # [win]\n    files:   # [linux]\n      - bin/tileiras   # [linux]\n    requirements:\n      build:\n        - {{ compiler('c') }}\n        - {{ compiler('cxx') }}\n        - {{ stdlib('c') }}\n        - arm-variant * {{ arm_variant_type }}  # [linux and aarch64]\n      host:\n        - cuda-version {{ cuda_version }}\n      run:\n        - {{ pin_compatible(\"cuda-version\", max_pin=\"x.x\") }}\n        - cuda-nvcc\n    test:\n      commands:\n        - test -f $PREFIX/bin/tileiras                    # [linux]\n        - if not exist %LIBRARY_BIN%\\tileiras.exe exit 1  # [win]\n        - tileiras --version\n\nabout:\n  home: https://developer.nvidia.com/cuda-toolkit\n  license_file: LICENSE\n  license: LicenseRef-NVIDIA-End-User-License-Agreement\n  license_url: https://docs.nvidia.com/cuda/eula/index.html\n  summary: TileIR is a portable and language agnostic intermediate representation for CUDA kernels\n  description: With Tile IR, we introduce a new operation set and programming model to retain CUDA’s performance across architectures while regaining portability and improving productivity for developers using matrix operations on new architectures. We virtualize tensor-cores and their associated programming model to the\n    point that we can innovate new approaches in hardware without invalidating investments in software.\n  doc_url: https://docs.nvidia.com/cuda/index.html\n\nextra:\n  feedstock-name: cuda-tileiras\n  recipe-maintainers:\n    - conda-forge/cuda\n",
+  "raw_meta_yaml": "{% set version = \"13.1.80\" %}\n{% set arm_variant_type = arm_variant_type | default(\"sbsa\") %}\n{% set cuda_version = \"13.1\" %}\n{% set platform = \"linux-x86_64\" %}  # [linux64]\n{% set platform = \"linux-sbsa\" %}  # [linux and aarch64]\n{% set platform = \"windows-x86_64\" %}  # [win]\n{% set extension = \"tar.xz\" %}  # [not win]\n{% set extension = \"zip\" %}  # [win]\n\n{% set soname = version.split(\".\")[0] %}\n\n{% set sha256 = \"e3f427f96492956527614c1283760463f7c02319d3e44c4b062fca17429d5951\" %}  # [linux64]\n{% set sha256 = \"94704a1cc2609d471ac1c157e43cc9d89cc437de3b85ec3b2df45199cf66d1f9\" %}  # [linux and aarch64]\n{% set sha256 = \"9215c7ed572ed74c6167589c32f135a65853cbc35e7d417ec29ddd886be85d43\" %}  # [win]\n\npackage:\n  name: cuda-tileiras-split\n  version: {{ version }}\n\nsource:\n  url: https://developer.download.nvidia.com/compute/cuda/redist/cuda_tileiras/{{ platform }}/cuda_tileiras-{{ platform }}-{{ version }}-archive.{{ extension }}\n  sha256: {{ sha256 }}\n\nbuild:\n  number: 3\n  skip: true  # [osx or ppc64le]\n\nrequirements:\n  build:\n    - cf-nvidia-tools 1  # [linux]\n\noutputs:\n  - name: cuda-tileiras\n    build:\n      binary_relocation: false\n      script:                        # [win]\n         - move bin\\* %LIBRARY_BIN%  # [win]\n    files:             # [linux]\n      - bin/tileiras   # [linux]\n    requirements:\n      build:\n        - {{ compiler('c') }}\n        - {{ compiler('cxx') }}\n        - {{ stdlib('c') }}\n        - arm-variant * {{ arm_variant_type }}  # [linux and aarch64]\n      host:\n        - cuda-version {{ cuda_version }}\n      run:\n        - {{ pin_compatible(\"cuda-version\", max_pin=\"x.x\") }}\n        - cuda-nvcc-tools\n        - cuda-nvvm-impl\n    test:\n      commands:\n        - test -f $PREFIX/bin/tileiras                    # [linux]\n        - if not exist %LIBRARY_BIN%\\tileiras.exe exit 1  # [win]\n        - tileiras --version\n\nabout:\n  home: https://developer.nvidia.com/cuda-toolkit\n  license_file: LICENSE\n  license: LicenseRef-NVIDIA-End-User-License-Agreement\n  license_url: https://docs.nvidia.com/cuda/eula/index.html\n  summary: TileIR is a portable and language agnostic intermediate representation for CUDA kernels\n  description: With Tile IR, we introduce a new operation set and programming model to retain CUDA’s performance across architectures while regaining portability and improving productivity for developers using matrix operations on new architectures. We virtualize tensor-cores and their associated programming model to the\n    point that we can innovate new approaches in hardware without invalidating investments in software.\n  doc_url: https://docs.nvidia.com/cuda/index.html\n\nextra:\n  feedstock-name: cuda-tileiras\n  recipe-maintainers:\n    - conda-forge/cuda\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -347,7 +367,8 @@
       "c_compiler_stub",
       "c_stdlib_stub",
       "cf-nvidia-tools",
-      "cuda-nvcc",
+      "cuda-nvcc-tools",
+      "cuda-nvvm-impl",
       "cuda-version",
       "cxx_compiler_stub"
     ]
@@ -379,7 +400,8 @@
         "arm-variant",
         "c_compiler_stub",
         "c_stdlib_stub",
-        "cuda-nvcc",
+        "cuda-nvcc-tools",
+        "cuda-nvvm-impl",
         "cuda-version",
         "cxx_compiler_stub"
       ]
@@ -410,7 +432,8 @@
     "run": {
       "__set__": true,
       "elements": [
-        "cuda-nvcc",
+        "cuda-nvcc-tools",
+        "cuda-nvvm-impl",
         "cuda-version"
       ]
     },
@@ -435,7 +458,7 @@
       "summary": "TileIR is a portable and language agnostic intermediate representation for CUDA kernels"
     },
     "build": {
-      "number": "2"
+      "number": "3"
     },
     "extra": {
       "feedstock-name": "cuda-tileiras",
@@ -446,6 +469,7 @@
     "outputs": [
       {
         "build": {
+          "binary_relocation": false,
           "script": [
             "move bin\\* %LIBRARY_BIN%"
           ]
@@ -462,7 +486,8 @@
           ],
           "run": [
             "cuda-version",
-            "cuda-nvcc"
+            "cuda-nvcc-tools",
+            "cuda-nvvm-impl"
           ]
         },
         "test": {
@@ -504,7 +529,8 @@
     "run": {
       "__set__": true,
       "elements": [
-        "cuda-nvcc",
+        "cuda-nvcc-tools",
+        "cuda-nvvm-impl",
         "cuda-version"
       ]
     },
