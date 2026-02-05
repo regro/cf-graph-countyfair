@@ -1,7 +1,7 @@
 {
   "archived": false,
   "branch": "main",
-  "ci_support_linux_64_.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ncxx_compiler:\n- gxx\ncxx_compiler_version:\n- '14'\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\nfftw:\n- '3'\nfmt:\n- '12.1'\nhdf5:\n- 1.14.6\nlibblas:\n- 3.9.* *netlib\nliblapack:\n- 3.9.* *netlib\nspdlog:\n- '1.17'\ntarget_platform:\n- linux-64\nzip_keys:\n- - c_compiler_version\n  - cxx_compiler_version\nzlib:\n- '1'\n",
+  "ci_support_linux_64_.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ncxx_compiler:\n- gxx\ncxx_compiler_version:\n- '14'\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\nfftw:\n- '3'\nfmt:\n- '12.1'\nhdf5:\n- 1.14.6\nlibblas:\n- 3.9.* *netlib\nliblapack:\n- 3.9.* *netlib\nnumpy:\n- '2'\npin_run_as_build:\n  python:\n    min_pin: x.x\n    max_pin: x.x\npybind11_abi:\n- '4'\npython:\n- 3.10.* *_cpython\n- 3.11.* *_cpython\n- 3.12.* *_cpython\n- 3.13.* *_cp313\nspdlog:\n- '1.17'\ntarget_platform:\n- linux-64\nzip_keys:\n- - c_compiler_version\n  - cxx_compiler_version\nzlib:\n- '1'\n",
   "conda-forge.yml": {
     "build_platform": {
       "osx_arm64": "osx_64"
@@ -16,8 +16,8 @@
     },
     "test": "native_and_emulated"
   },
-  "feedstock_hash": "d5b5107b366105fcbdd7ac3a3cc567c91e82033d",
-  "feedstock_hash_ts": 1767837866,
+  "feedstock_hash": "0df1213ed30a5dd6f9c3aabd38ce1f78007beeb1",
+  "feedstock_hash_ts": 1770307080,
   "feedstock_name": "einsums",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -36,7 +36,7 @@
     },
     "build": {
       "binary_relocation": true,
-      "number": "3"
+      "number": "0"
     },
     "extra": {
       "feedstock-name": "einsums",
@@ -58,7 +58,7 @@
             "c_stdlib_stub",
             "c_compiler_stub",
             "cxx_compiler_stub",
-            "cmake 3.29.*",
+            "cmake",
             "ninja",
             "catch2"
           ],
@@ -92,16 +92,76 @@
             "ldd -v $PREFIX/lib/libEinsums$SHLIB_EXT"
           ]
         }
+      },
+      {
+        "build": {
+          "ignore_run_exports_from": [
+            "libblas",
+            "liblapack",
+            "fftw",
+            "cpp-argparse",
+            "zlib",
+            "cpptrace"
+          ]
+        },
+        "name": "pyeinsums",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "c_compiler_stub",
+            "cxx_compiler_stub",
+            "cmake",
+            "ninja",
+            "catch2"
+          ],
+          "host": [
+            "python",
+            "pybind11",
+            "pybind11-abi",
+            "numpy",
+            "libgomp",
+            "hdf5",
+            "libblas",
+            "liblapack",
+            "fftw",
+            "fmt",
+            "cpp-argparse",
+            "spdlog",
+            "zlib",
+            "cpptrace",
+            "einsums"
+          ],
+          "run": [
+            "einsums",
+            "python",
+            "numpy"
+          ]
+        },
+        "script": "build-py.sh",
+        "test": {
+          "commands": [
+            "test -f $SP_DIR/einsums/core*.so",
+            "ldd -v $SP_DIR/einsums/core*.so",
+            "pytest -v -rws --color yes --durations 10 -n auto -k \"not 1000\" $SP_DIR/einsums"
+          ],
+          "imports": [
+            "einsums"
+          ],
+          "requires": [
+            "pytest-xdist",
+            "scipy"
+          ]
+        }
       }
     ],
     "package": {
       "name": "einsums-split",
-      "version": "1.1.1"
+      "version": "1.1.2"
     },
     "schema_version": 0,
     "source": {
-      "sha256": "d2d98be0748cbec3a8076cf42b005fa1f9d794a403f1e0622477d2244f4e1e2b",
-      "url": "https://github.com/Einsums/Einsums/archive/v1.1.1.tar.gz"
+      "sha256": "73f43a6b10780e5cca7149c55c2fd5b03ce4269b56fdd2cc83e949a025bde8f7",
+      "url": "https://github.com/Einsums/Einsums/archive/v1.1.2.tar.gz"
     }
   },
   "linux_64_requirements": {
@@ -121,12 +181,17 @@
       "elements": [
         "cpp-argparse",
         "cpptrace",
+        "einsums",
         "fftw",
         "fmt",
         "hdf5",
         "libblas",
         "libgomp",
         "liblapack",
+        "numpy",
+        "pybind11",
+        "pybind11-abi",
+        "python",
         "spdlog",
         "zlib"
       ]
@@ -134,12 +199,18 @@
     "run": {
       "__set__": true,
       "elements": [
-        "cpp-argparse"
+        "cpp-argparse",
+        "einsums",
+        "numpy",
+        "python"
       ]
     },
     "test": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "pytest-xdist",
+        "scipy"
+      ]
     }
   },
   "meta_yaml": {
@@ -158,7 +229,7 @@
     },
     "build": {
       "binary_relocation": true,
-      "number": "3"
+      "number": "0"
     },
     "extra": {
       "feedstock-name": "einsums",
@@ -180,7 +251,7 @@
             "c_stdlib_stub",
             "c_compiler_stub",
             "cxx_compiler_stub",
-            "cmake 3.29.*",
+            "cmake",
             "ninja",
             "catch2"
           ],
@@ -217,6 +288,66 @@
       },
       {
         "build": {
+          "ignore_run_exports_from": [
+            "libblas",
+            "liblapack",
+            "fftw",
+            "cpp-argparse",
+            "zlib",
+            "cpptrace"
+          ]
+        },
+        "name": "pyeinsums",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "c_compiler_stub",
+            "cxx_compiler_stub",
+            "cmake",
+            "ninja",
+            "catch2"
+          ],
+          "host": [
+            "python",
+            "pybind11",
+            "pybind11-abi",
+            "numpy",
+            "libgomp",
+            "hdf5",
+            "libblas",
+            "liblapack",
+            "fftw",
+            "fmt",
+            "cpp-argparse",
+            "spdlog",
+            "zlib",
+            "cpptrace",
+            "einsums"
+          ],
+          "run": [
+            "einsums",
+            "python",
+            "numpy"
+          ]
+        },
+        "script": "build-py.sh",
+        "test": {
+          "commands": [
+            "test -f $SP_DIR/einsums/core*.so",
+            "ldd -v $SP_DIR/einsums/core*.so",
+            "pytest -v -rws --color yes --durations 10 -n auto -k \"not 1000\" $SP_DIR/einsums"
+          ],
+          "imports": [
+            "einsums"
+          ],
+          "requires": [
+            "pytest-xdist",
+            "scipy"
+          ]
+        }
+      },
+      {
+        "build": {
           "run_exports": [
             "einsums"
           ]
@@ -227,7 +358,7 @@
             "c_stdlib_stub",
             "c_compiler_stub",
             "cxx_compiler_stub",
-            "cmake 3.29.*",
+            "cmake",
             "ninja",
             "catch2"
           ],
@@ -264,6 +395,66 @@
       },
       {
         "build": {
+          "ignore_run_exports_from": [
+            "libblas",
+            "liblapack",
+            "fftw",
+            "cpp-argparse",
+            "zlib",
+            "cpptrace"
+          ]
+        },
+        "name": "pyeinsums",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "c_compiler_stub",
+            "cxx_compiler_stub",
+            "cmake",
+            "ninja",
+            "catch2"
+          ],
+          "host": [
+            "python",
+            "pybind11",
+            "pybind11-abi",
+            "numpy",
+            "llvm-openmp",
+            "hdf5",
+            "libblas",
+            "liblapack",
+            "fftw",
+            "fmt",
+            "cpp-argparse",
+            "spdlog",
+            "zlib",
+            "cpptrace",
+            "einsums"
+          ],
+          "run": [
+            "einsums",
+            "python",
+            "numpy"
+          ]
+        },
+        "script": "build-py.sh",
+        "test": {
+          "commands": [
+            "test -f $SP_DIR/einsums/core*.so",
+            "otool -L $SP_DIR/einsums/core*.so",
+            "pytest -v -rws --color yes --durations 10 -n auto -k \"not 1000\" $SP_DIR/einsums"
+          ],
+          "imports": [
+            "einsums"
+          ],
+          "requires": [
+            "pytest-xdist",
+            "scipy"
+          ]
+        }
+      },
+      {
+        "build": {
           "run_exports": [
             "einsums"
           ]
@@ -274,7 +465,7 @@
             "c_stdlib_stub",
             "c_compiler_stub",
             "cxx_compiler_stub",
-            "cmake 3.29.*",
+            "cmake",
             "ninja",
             "catch2"
           ],
@@ -308,16 +499,76 @@
             "otool -L $PREFIX/lib/libEinsums$SHLIB_EXT"
           ]
         }
+      },
+      {
+        "build": {
+          "ignore_run_exports_from": [
+            "libblas",
+            "liblapack",
+            "fftw",
+            "cpp-argparse",
+            "zlib",
+            "cpptrace"
+          ]
+        },
+        "name": "pyeinsums",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "c_compiler_stub",
+            "cxx_compiler_stub",
+            "cmake",
+            "ninja",
+            "catch2"
+          ],
+          "host": [
+            "python",
+            "pybind11",
+            "pybind11-abi",
+            "numpy",
+            "llvm-openmp",
+            "hdf5",
+            "libblas",
+            "liblapack",
+            "fftw",
+            "fmt",
+            "cpp-argparse",
+            "spdlog",
+            "zlib",
+            "cpptrace",
+            "einsums"
+          ],
+          "run": [
+            "einsums",
+            "python",
+            "numpy"
+          ]
+        },
+        "script": "build-py.sh",
+        "test": {
+          "commands": [
+            "test -f $SP_DIR/einsums/core*.so",
+            "otool -L $SP_DIR/einsums/core*.so",
+            "pytest -v -rws --color yes --durations 10 -n auto -k \"not 1000\" $SP_DIR/einsums"
+          ],
+          "imports": [
+            "einsums"
+          ],
+          "requires": [
+            "pytest-xdist",
+            "scipy"
+          ]
+        }
       }
     ],
     "package": {
       "name": "einsums-split",
-      "version": "1.1.1"
+      "version": "1.1.2"
     },
     "schema_version": 0,
     "source": {
-      "sha256": "d2d98be0748cbec3a8076cf42b005fa1f9d794a403f1e0622477d2244f4e1e2b",
-      "url": "https://github.com/Einsums/Einsums/archive/v1.1.1.tar.gz"
+      "sha256": "73f43a6b10780e5cca7149c55c2fd5b03ce4269b56fdd2cc83e949a025bde8f7",
+      "url": "https://github.com/Einsums/Einsums/archive/v1.1.2.tar.gz"
     }
   },
   "name": "einsums-split",
@@ -337,7 +588,7 @@
     },
     "build": {
       "binary_relocation": true,
-      "number": "3"
+      "number": "0"
     },
     "extra": {
       "feedstock-name": "einsums",
@@ -359,7 +610,7 @@
             "c_stdlib_stub",
             "c_compiler_stub",
             "cxx_compiler_stub",
-            "cmake 3.29.*",
+            "cmake",
             "ninja",
             "catch2"
           ],
@@ -393,16 +644,76 @@
             "otool -L $PREFIX/lib/libEinsums$SHLIB_EXT"
           ]
         }
+      },
+      {
+        "build": {
+          "ignore_run_exports_from": [
+            "libblas",
+            "liblapack",
+            "fftw",
+            "cpp-argparse",
+            "zlib",
+            "cpptrace"
+          ]
+        },
+        "name": "pyeinsums",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "c_compiler_stub",
+            "cxx_compiler_stub",
+            "cmake",
+            "ninja",
+            "catch2"
+          ],
+          "host": [
+            "python",
+            "pybind11",
+            "pybind11-abi",
+            "numpy",
+            "llvm-openmp",
+            "hdf5",
+            "libblas",
+            "liblapack",
+            "fftw",
+            "fmt",
+            "cpp-argparse",
+            "spdlog",
+            "zlib",
+            "cpptrace",
+            "einsums"
+          ],
+          "run": [
+            "einsums",
+            "python",
+            "numpy"
+          ]
+        },
+        "script": "build-py.sh",
+        "test": {
+          "commands": [
+            "test -f $SP_DIR/einsums/core*.so",
+            "otool -L $SP_DIR/einsums/core*.so",
+            "pytest -v -rws --color yes --durations 10 -n auto -k \"not 1000\" $SP_DIR/einsums"
+          ],
+          "imports": [
+            "einsums"
+          ],
+          "requires": [
+            "pytest-xdist",
+            "scipy"
+          ]
+        }
       }
     ],
     "package": {
       "name": "einsums-split",
-      "version": "1.1.1"
+      "version": "1.1.2"
     },
     "schema_version": 0,
     "source": {
-      "sha256": "d2d98be0748cbec3a8076cf42b005fa1f9d794a403f1e0622477d2244f4e1e2b",
-      "url": "https://github.com/Einsums/Einsums/archive/v1.1.1.tar.gz"
+      "sha256": "73f43a6b10780e5cca7149c55c2fd5b03ce4269b56fdd2cc83e949a025bde8f7",
+      "url": "https://github.com/Einsums/Einsums/archive/v1.1.2.tar.gz"
     }
   },
   "osx_64_requirements": {
@@ -422,12 +733,17 @@
       "elements": [
         "cpp-argparse",
         "cpptrace",
+        "einsums",
         "fftw",
         "fmt",
         "hdf5",
         "libblas",
         "liblapack",
         "llvm-openmp",
+        "numpy",
+        "pybind11",
+        "pybind11-abi",
+        "python",
         "spdlog",
         "zlib"
       ]
@@ -435,12 +751,18 @@
     "run": {
       "__set__": true,
       "elements": [
-        "cpp-argparse"
+        "cpp-argparse",
+        "einsums",
+        "numpy",
+        "python"
       ]
     },
     "test": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "pytest-xdist",
+        "scipy"
+      ]
     }
   },
   "osx_arm64_meta_yaml": {
@@ -459,7 +781,7 @@
     },
     "build": {
       "binary_relocation": true,
-      "number": "3"
+      "number": "0"
     },
     "extra": {
       "feedstock-name": "einsums",
@@ -481,7 +803,7 @@
             "c_stdlib_stub",
             "c_compiler_stub",
             "cxx_compiler_stub",
-            "cmake 3.29.*",
+            "cmake",
             "ninja",
             "catch2"
           ],
@@ -515,16 +837,76 @@
             "otool -L $PREFIX/lib/libEinsums$SHLIB_EXT"
           ]
         }
+      },
+      {
+        "build": {
+          "ignore_run_exports_from": [
+            "libblas",
+            "liblapack",
+            "fftw",
+            "cpp-argparse",
+            "zlib",
+            "cpptrace"
+          ]
+        },
+        "name": "pyeinsums",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "c_compiler_stub",
+            "cxx_compiler_stub",
+            "cmake",
+            "ninja",
+            "catch2"
+          ],
+          "host": [
+            "python",
+            "pybind11",
+            "pybind11-abi",
+            "numpy",
+            "llvm-openmp",
+            "hdf5",
+            "libblas",
+            "liblapack",
+            "fftw",
+            "fmt",
+            "cpp-argparse",
+            "spdlog",
+            "zlib",
+            "cpptrace",
+            "einsums"
+          ],
+          "run": [
+            "einsums",
+            "python",
+            "numpy"
+          ]
+        },
+        "script": "build-py.sh",
+        "test": {
+          "commands": [
+            "test -f $SP_DIR/einsums/core*.so",
+            "otool -L $SP_DIR/einsums/core*.so",
+            "pytest -v -rws --color yes --durations 10 -n auto -k \"not 1000\" $SP_DIR/einsums"
+          ],
+          "imports": [
+            "einsums"
+          ],
+          "requires": [
+            "pytest-xdist",
+            "scipy"
+          ]
+        }
       }
     ],
     "package": {
       "name": "einsums-split",
-      "version": "1.1.1"
+      "version": "1.1.2"
     },
     "schema_version": 0,
     "source": {
-      "sha256": "d2d98be0748cbec3a8076cf42b005fa1f9d794a403f1e0622477d2244f4e1e2b",
-      "url": "https://github.com/Einsums/Einsums/archive/v1.1.1.tar.gz"
+      "sha256": "73f43a6b10780e5cca7149c55c2fd5b03ce4269b56fdd2cc83e949a025bde8f7",
+      "url": "https://github.com/Einsums/Einsums/archive/v1.1.2.tar.gz"
     }
   },
   "osx_arm64_requirements": {
@@ -544,12 +926,17 @@
       "elements": [
         "cpp-argparse",
         "cpptrace",
+        "einsums",
         "fftw",
         "fmt",
         "hdf5",
         "libblas",
         "liblapack",
         "llvm-openmp",
+        "numpy",
+        "pybind11",
+        "pybind11-abi",
+        "python",
         "spdlog",
         "zlib"
       ]
@@ -557,18 +944,25 @@
     "run": {
       "__set__": true,
       "elements": [
-        "cpp-argparse"
+        "cpp-argparse",
+        "einsums",
+        "numpy",
+        "python"
       ]
     },
     "test": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "pytest-xdist",
+        "scipy"
+      ]
     }
   },
   "outputs_names": {
     "__set__": true,
     "elements": [
-      "einsums"
+      "einsums",
+      "pyeinsums"
     ]
   },
   "parsing_error": false,
@@ -580,7 +974,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/einsums.json"
   },
-  "raw_meta_yaml": "{% set version = \"1.1.1\" %}\n{% set build_number = 3 %}\n\npackage:\n  name: einsums-split\n  version: {{ version }}\n\nsource:\n  url: https://github.com/Einsums/Einsums/archive/v{{ version }}.tar.gz\n  sha256: d2d98be0748cbec3a8076cf42b005fa1f9d794a403f1e0622477d2244f4e1e2b\n\nbuild:\n  number: {{ build_number }}\n  binary_relocation: true\n  skip: true  # [win]\n\noutputs:\n  - name: einsums\n    script: build-cxx.sh\n    build:\n      run_exports:\n        - {{ pin_subpackage('einsums', max_pin='x.x') }}\n\n    requirements:\n      build:\n        - {{ stdlib(\"c\") }}\n        - {{ compiler(\"c\") }}\n        - {{ compiler(\"cxx\") }}\n        - cmake 3.29.*                           # 3.30 failing for intel mac\n        - ninja\n        - catch2\n      host:\n        - hdf5\n        - libblas\n        - liblapack\n        - llvm-openmp                            # [osx]\n        - libgomp                                # [linux]\n        - fftw\n        - fmt\n        - cpp-argparse\n        - spdlog\n        - zlib\n        - cpptrace\n      run:\n        - cpp-argparse\n\n    test:\n      commands:\n        # Verify library\n        - test -f $PREFIX/lib/libEinsums$SHLIB_EXT                             # [unix]\n        - test ! -f $PREFIX/lib/libEinsums.a                                   # [unix]\n        - test -f $PREFIX/lib/libEinsumsExperimental$SHLIB_EXT                 # [unix]\n        - test ! -f $PREFIX/lib/libEinsumsExperimental.a                       # [unix]\n        # Verify accessories\n        - test -f $PREFIX/include/Einsums/Tensor.hpp                           # [unix]\n        - test -f $PREFIX/include/Einsums/h5cpp/H5Pall.hpp                     # [unix]\n        - test -f $PREFIX/share/cmake/Einsums/EinsumsConfig.cmake              # [unix]\n        - test -f $PREFIX/share/cmake/Einsums/EinsumsTargets.cmake             # [unix]\n        # Inspect linkage\n        - ldd -v $PREFIX/lib/libEinsums$SHLIB_EXT                              # [linux]\n        - otool -L $PREFIX/lib/libEinsums$SHLIB_EXT                            # [osx]\n\nabout:\n  home: https://github.com/Einsums/Einsums\n  dev_url: https://github.com/Einsums/Einsums\n  doc_url: https://einsums.github.io/Einsums\n  license: MIT AND BSD-3-Clause\n  license_url: https://opensource.org/license/mit/\n  license_file:\n    - LICENSE.txt\n    - THIRD-PARTY-LICENSES.txt\n  license_family: MIT\n  summary: \"J. Turney's C++ library providing compile-time contraction pattern analysis to determine optimal tensor operations\"\n\nextra:\n  feedstock-name: einsums\n  recipe-maintainers:\n    - loriab\n    - jturney\n",
+  "raw_meta_yaml": "{% set version = \"1.1.2\" %}\n{% set build_number = 0 %}\n\npackage:\n  name: einsums-split\n  version: {{ version }}\n\nsource:\n  url: https://github.com/Einsums/Einsums/archive/v{{ version }}.tar.gz\n  sha256: 73f43a6b10780e5cca7149c55c2fd5b03ce4269b56fdd2cc83e949a025bde8f7\n\nbuild:\n  number: {{ build_number }}\n  binary_relocation: true\n  skip: true  # [win]\n\noutputs:\n  - name: einsums\n    script: build-cxx.sh\n    build:\n      run_exports:\n        - {{ pin_subpackage('einsums', max_pin='x.x') }}\n\n    requirements:\n      build:\n        - {{ stdlib(\"c\") }}\n        - {{ compiler(\"c\") }}\n        - {{ compiler(\"cxx\") }}\n        - cmake\n        - ninja\n        - catch2\n      host:\n        - hdf5\n        - libblas\n        - liblapack\n        - llvm-openmp                            # [osx]\n        - libgomp                                # [linux]\n        - fftw\n        - fmt\n        - cpp-argparse\n        - spdlog\n        - zlib\n        - cpptrace\n      run:\n        - cpp-argparse\n\n    test:\n      commands:\n        # Verify library\n        - test -f $PREFIX/lib/libEinsums$SHLIB_EXT                             # [unix]\n        - test ! -f $PREFIX/lib/libEinsums.a                                   # [unix]\n        - test -f $PREFIX/lib/libEinsumsExperimental$SHLIB_EXT                 # [unix]\n        - test ! -f $PREFIX/lib/libEinsumsExperimental.a                       # [unix]\n        # Verify accessories\n        - test -f $PREFIX/include/Einsums/Tensor.hpp                           # [unix]\n        - test -f $PREFIX/include/Einsums/h5cpp/H5Pall.hpp                     # [unix]\n        - test -f $PREFIX/share/cmake/Einsums/EinsumsConfig.cmake              # [unix]\n        - test -f $PREFIX/share/cmake/Einsums/EinsumsTargets.cmake             # [unix]\n        # Inspect linkage\n        - ldd -v $PREFIX/lib/libEinsums$SHLIB_EXT                              # [linux]\n        - otool -L $PREFIX/lib/libEinsums$SHLIB_EXT                            # [osx]\n\n  - name: pyeinsums\n    script: build-py.sh\n    build:\n      ignore_run_exports_from:\n        - libblas\n        - liblapack\n        - fftw\n        - cpp-argparse\n        - zlib\n        - cpptrace\n      # skip: true                                                               # [py != 312]\n\n    requirements:\n      build:\n        - {{ stdlib(\"c\") }}                                                    # [unix]\n        - {{ compiler(\"c\") }}                                                  # [unix]\n        - {{ compiler(\"cxx\") }}                                                # [unix]\n        - cmake\n        - ninja\n        - catch2\n        - python                                                               # [build_platform != target_platform]\n        - cross-python_{{ target_platform }}                                   # [build_platform != target_platform]\n        - numpy                                                                # [build_platform != target_platform]\n        - pybind11                                                             # [build_platform != target_platform]\n      host:\n        - python\n        - pybind11\n        - pybind11-abi\n        - numpy\n        - llvm-openmp                                                          # [osx]\n        - libgomp                                                              # [linux]\n        # to rebuild the c++ lib\n        - hdf5\n        - libblas\n        - liblapack\n        - fftw\n        - fmt\n        - cpp-argparse\n        - spdlog\n        - zlib\n        - cpptrace\n        - {{ pin_subpackage('einsums', exact=True) }}\n      run:\n        - {{ pin_subpackage('einsums', exact=True) }}\n        - python\n        - {{ pin_compatible('numpy') }}\n\n    test:\n      requires:\n        - pytest-xdist\n        - scipy\n      imports:\n        - einsums\n      commands:\n        # Verify module\n        - test -f $SP_DIR/einsums/core*.so                                     # [unix]\n        - if not exist %SP_DIR%\\\\einsums\\\\core*.pyd exit 1                     # [win]\n        # Verify accessories\n        # Inspect linkage\n        - ldd -v $SP_DIR/einsums/core*.so                                      # [linux and build_platform == target_platform]\n        - otool -L $SP_DIR/einsums/core*.so                                    # [osx]\n        # Actually test\n        - pytest -v -rws --color yes --durations 10 -n auto -k \"not 1000\" $SP_DIR/einsums    # [unix]\n        - pytest -v -rws --color yes --durations 10 -n auto -k \"not 1000\" %SP_DIR%\\\\einsums  # [win]\n\nabout:\n  home: https://github.com/Einsums/Einsums\n  dev_url: https://github.com/Einsums/Einsums\n  doc_url: https://einsums.github.io/Einsums\n  license: MIT AND BSD-3-Clause\n  license_url: https://opensource.org/license/mit/\n  license_file:\n    - LICENSE.txt\n    - THIRD-PARTY-LICENSES.txt\n  license_family: MIT\n  summary: \"J. Turney's C++ library providing compile-time contraction pattern analysis to determine optimal tensor operations\"\n\nextra:\n  feedstock-name: einsums\n  recipe-maintainers:\n    - loriab\n    - jturney\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -591,6 +985,7 @@
       "cpp-argparse",
       "cpptrace",
       "cxx_compiler_stub",
+      "einsums",
       "fftw",
       "fmt",
       "hdf5",
@@ -599,6 +994,10 @@
       "liblapack",
       "llvm-openmp",
       "ninja",
+      "numpy",
+      "pybind11",
+      "pybind11-abi",
+      "python",
       "spdlog",
       "zlib"
     ]
@@ -624,6 +1023,7 @@
         "cpptrace",
         "ctng-compilers",
         "cxx_compiler_stub",
+        "einsums",
         "fftw",
         "fmt",
         "hdf5",
@@ -631,7 +1031,11 @@
         "libgomp",
         "liblapack",
         "llvm-openmp",
+        "numpy",
         "openmp",
+        "pybind11",
+        "pybind11-abi",
+        "python",
         "spdlog",
         "zlib"
       ]
@@ -644,12 +1048,18 @@
         "cpp-argparse",
         "ctng-compilers",
         "cxx_compiler_stub",
-        "openmp"
+        "einsums",
+        "numpy",
+        "openmp",
+        "python"
       ]
     },
     "test": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "pytest-xdist",
+        "scipy"
+      ]
     }
   },
   "strong_exports": false,
@@ -660,7 +1070,7 @@
         "c_compiler_stub",
         "c_stdlib_stub",
         "catch2",
-        "cmake 3.29.*",
+        "cmake",
         "cxx_compiler_stub",
         "ninja"
       ]
@@ -670,6 +1080,7 @@
       "elements": [
         "cpp-argparse",
         "cpptrace",
+        "einsums",
         "fftw",
         "fmt",
         "hdf5",
@@ -677,6 +1088,10 @@
         "libgomp",
         "liblapack",
         "llvm-openmp",
+        "numpy",
+        "pybind11",
+        "pybind11-abi",
+        "python",
         "spdlog",
         "zlib"
       ]
@@ -684,16 +1099,22 @@
     "run": {
       "__set__": true,
       "elements": [
-        "cpp-argparse"
+        "cpp-argparse",
+        "einsums",
+        "numpy",
+        "python"
       ]
     },
     "test": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "pytest-xdist",
+        "scipy"
+      ]
     }
   },
-  "url": "https://github.com/Einsums/Einsums/archive/v1.1.1.tar.gz",
-  "version": "1.1.1",
+  "url": "https://github.com/Einsums/Einsums/archive/v1.1.2.tar.gz",
+  "version": "1.1.2",
   "version_pr_info": {
     "__lazy_json__": "version_pr_info/einsums.json"
   }
