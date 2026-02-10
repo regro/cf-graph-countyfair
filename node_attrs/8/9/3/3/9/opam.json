@@ -22,10 +22,10 @@
       "linux_aarch64": "default",
       "linux_ppc64le": "default"
     },
-    "test": "native_and_emulated"
+    "test": "all"
   },
-  "feedstock_hash": "2fca35f38643de02052c4db29433fee115155750",
-  "feedstock_hash_ts": 1769097329,
+  "feedstock_hash": "76b65973afe363b225f0677caddc7fb84745cf21",
+  "feedstock_hash_ts": 1770735392,
   "feedstock_name": "opam",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -35,11 +35,11 @@
       "home": "https://github.com/ocaml/opam",
       "license": "LGPL-2.1-only",
       "license_family": "LGPL-2.1-only",
-      "license_file": "LICENSE",
+      "license_file": "opam/LICENSE",
       "summary": "Objective Caml (OCaml) is an implementation of the ML language."
     },
     "build": {
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "recipe-maintainers": [
@@ -64,17 +64,27 @@
             "grep",
             "make",
             "sed",
+            "ocaml-cppo",
+            "ocaml-dune",
+            "ocaml-menhir",
             "binutils",
             "curl",
             "git",
-            "ocaml >=5.3.0",
+            "ocaml >=5.3.0 *_12",
             "file",
+            "unzip",
             "zstd"
           ],
-          "host": [
-            "zstd"
-          ],
-          "run": []
+          "host": [],
+          "run": [
+            "c-compiler",
+            "curl",
+            "git",
+            "make",
+            "rsync",
+            "unzip",
+            "bubblewrap"
+          ]
         },
         "tests": [
           {
@@ -84,23 +94,66 @@
                 "opam-installer"
               ],
               "files": [
-                "share/man/man1/opam*"
-              ]
+                "share/man/man1/opam*",
+                "etc/conda/activate.d/opam-activate.sh",
+                "etc/conda/deactivate.d/opam-deactivate.sh",
+                "share/opam/conda/.opam-switch/{environment,lock,switch-config}",
+                "share/opam/{config,config.lock,lock}",
+                "share/opam/opam-init/complete.{sh,zsh}",
+                "share/opam/opam-init/hooks/sandbox.{sh,sh.hash}",
+                "share/opam/opam-init/init.{cmd,csh,fish,ps1,sh,zsh}",
+                "share/opam/opam-init/variables.{cmd,csh,fish,ps1,sh}",
+                "share/opam/repo/{default/repo,lock,repos-config}",
+                "etc/conda/test-files/*"
+              ],
+              "strict": true
             }
           },
           {
-            "requirements": {
-              "run": [
-                "grep"
+            "files": {
+              "recipe": [
+                "testing/test-opam-arch.sh"
               ]
             },
-            "script": "opam --version | grep ${{ version }}\n"
+            "requirements": {
+              "run": [
+                "binutils"
+              ]
+            },
+            "script": {
+              "content": "bash testing/test-opam-arch.sh",
+              "interpreter": "bash"
+            }
           },
           {
-            "script": "export OPAMROOT=./opam_test\nmkdir -p opam_test\nopam init --bare --no-setup --bypass-checks\nopam config list\nopam switch create test --empty\neval $(opam env --switch=test)\nopam list --installed\nopam switch list\nopam switch remove test --yes\nrm -rf opam_test\n"
+            "files": {
+              "recipe": [
+                "testing/test-opam-version.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "python >=3.9",
+                "ocaml"
+              ]
+            },
+            "script": "python testing/test-opam-version.py\n"
           },
           {
-            "package_contents": {}
+            "files": {
+              "recipe": [
+                "testing/test-opam-functional.py",
+                "testing/test-opam-activation.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "python >=3.9",
+                "ocaml",
+                "ocaml-dune"
+              ]
+            },
+            "script": "python testing/test-opam-functional.py\npython testing/test-opam-activation.py\n"
           }
         ],
         "version": "2.5.0"
@@ -122,15 +175,25 @@
         "grep",
         "make",
         "sed",
+        "ocaml-cppo",
+        "ocaml-dune",
+        "ocaml-menhir",
         "binutils",
         "curl",
         "git",
-        "ocaml >=5.3.0",
+        "ocaml >=5.3.0 *_12",
         "file",
+        "unzip",
         "zstd"
       ],
-      "host": [
-        "zstd"
+      "run": [
+        "c-compiler",
+        "curl",
+        "git",
+        "make",
+        "rsync",
+        "unzip",
+        "bubblewrap"
       ]
     },
     "schema_version": 1,
@@ -157,24 +220,37 @@
         "grep",
         "make",
         "ocaml",
+        "ocaml-cppo",
+        "ocaml-dune",
+        "ocaml-menhir",
         "sed",
+        "unzip",
         "zstd"
       ]
     },
     "host": {
       "__set__": true,
-      "elements": [
-        "zstd"
-      ]
+      "elements": []
     },
     "run": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "bubblewrap",
+        "c-compiler",
+        "curl",
+        "git",
+        "make",
+        "rsync",
+        "unzip"
+      ]
     },
     "test": {
       "__set__": true,
       "elements": [
-        "grep"
+        "binutils",
+        "ocaml",
+        "ocaml-dune",
+        "python"
       ]
     }
   },
@@ -185,11 +261,11 @@
       "home": "https://github.com/ocaml/opam",
       "license": "LGPL-2.1-only",
       "license_family": "LGPL-2.1-only",
-      "license_file": "LICENSE",
+      "license_file": "opam/LICENSE",
       "summary": "Objective Caml (OCaml) is an implementation of the ML language."
     },
     "build": {
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "recipe-maintainers": [
@@ -214,17 +290,27 @@
             "grep",
             "make",
             "sed",
+            "ocaml-cppo",
+            "ocaml-dune",
+            "ocaml-menhir",
             "binutils",
             "curl",
             "git",
-            "ocaml >=5.3.0",
+            "ocaml >=5.3.0 *_12",
             "file",
+            "unzip",
             "zstd"
           ],
-          "host": [
-            "zstd"
-          ],
-          "run": []
+          "host": [],
+          "run": [
+            "c-compiler",
+            "curl",
+            "git",
+            "make",
+            "rsync",
+            "unzip",
+            "bubblewrap"
+          ]
         },
         "tests": [
           {
@@ -234,23 +320,66 @@
                 "opam-installer"
               ],
               "files": [
-                "share/man/man1/opam*"
-              ]
+                "share/man/man1/opam*",
+                "etc/conda/activate.d/opam-activate.sh",
+                "etc/conda/deactivate.d/opam-deactivate.sh",
+                "share/opam/conda/.opam-switch/{environment,lock,switch-config}",
+                "share/opam/{config,config.lock,lock}",
+                "share/opam/opam-init/complete.{sh,zsh}",
+                "share/opam/opam-init/hooks/sandbox.{sh,sh.hash}",
+                "share/opam/opam-init/init.{cmd,csh,fish,ps1,sh,zsh}",
+                "share/opam/opam-init/variables.{cmd,csh,fish,ps1,sh}",
+                "share/opam/repo/{default/repo,lock,repos-config}",
+                "etc/conda/test-files/*"
+              ],
+              "strict": true
             }
           },
           {
-            "requirements": {
-              "run": [
-                "grep"
+            "files": {
+              "recipe": [
+                "testing/test-opam-arch.sh"
               ]
             },
-            "script": "opam --version | grep ${{ version }}\n"
+            "requirements": {
+              "run": [
+                "binutils"
+              ]
+            },
+            "script": {
+              "content": "bash testing/test-opam-arch.sh",
+              "interpreter": "bash"
+            }
           },
           {
-            "script": "export OPAMROOT=./opam_test\nmkdir -p opam_test\nopam init --bare --no-setup --bypass-checks\nopam config list\nopam switch create test --empty\neval $(opam env --switch=test)\nopam list --installed\nopam switch list\nopam switch remove test --yes\nrm -rf opam_test\n"
+            "files": {
+              "recipe": [
+                "testing/test-opam-version.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "python >=3.9",
+                "ocaml"
+              ]
+            },
+            "script": "python testing/test-opam-version.py\n"
           },
           {
-            "package_contents": {}
+            "files": {
+              "recipe": [
+                "testing/test-opam-functional.py",
+                "testing/test-opam-activation.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "python >=3.9",
+                "ocaml",
+                "ocaml-dune"
+              ]
+            },
+            "script": "python testing/test-opam-functional.py\npython testing/test-opam-activation.py\n"
           }
         ],
         "version": "2.5.0"
@@ -272,15 +401,25 @@
         "grep",
         "make",
         "sed",
+        "ocaml-cppo",
+        "ocaml-dune",
+        "ocaml-menhir",
         "binutils",
         "curl",
         "git",
-        "ocaml >=5.3.0",
+        "ocaml >=5.3.0 *_12",
         "file",
+        "unzip",
         "zstd"
       ],
-      "host": [
-        "zstd"
+      "run": [
+        "c-compiler",
+        "curl",
+        "git",
+        "make",
+        "rsync",
+        "unzip",
+        "bubblewrap"
       ]
     },
     "schema_version": 1,
@@ -307,24 +446,37 @@
         "grep",
         "make",
         "ocaml",
+        "ocaml-cppo",
+        "ocaml-dune",
+        "ocaml-menhir",
         "sed",
+        "unzip",
         "zstd"
       ]
     },
     "host": {
       "__set__": true,
-      "elements": [
-        "zstd"
-      ]
+      "elements": []
     },
     "run": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "bubblewrap",
+        "c-compiler",
+        "curl",
+        "git",
+        "make",
+        "rsync",
+        "unzip"
+      ]
     },
     "test": {
       "__set__": true,
       "elements": [
-        "grep"
+        "binutils",
+        "ocaml",
+        "ocaml-dune",
+        "python"
       ]
     }
   },
@@ -335,11 +487,11 @@
       "home": "https://github.com/ocaml/opam",
       "license": "LGPL-2.1-only",
       "license_family": "LGPL-2.1-only",
-      "license_file": "LICENSE",
+      "license_file": "opam/LICENSE",
       "summary": "Objective Caml (OCaml) is an implementation of the ML language."
     },
     "build": {
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "recipe-maintainers": [
@@ -364,17 +516,27 @@
             "grep",
             "make",
             "sed",
+            "ocaml-cppo",
+            "ocaml-dune",
+            "ocaml-menhir",
             "binutils",
             "curl",
             "git",
-            "ocaml >=5.3.0",
+            "ocaml >=5.3.0 *_12",
             "file",
+            "unzip",
             "zstd"
           ],
-          "host": [
-            "zstd"
-          ],
-          "run": []
+          "host": [],
+          "run": [
+            "c-compiler",
+            "curl",
+            "git",
+            "make",
+            "rsync",
+            "unzip",
+            "bubblewrap"
+          ]
         },
         "tests": [
           {
@@ -384,23 +546,66 @@
                 "opam-installer"
               ],
               "files": [
-                "share/man/man1/opam*"
-              ]
+                "share/man/man1/opam*",
+                "etc/conda/activate.d/opam-activate.sh",
+                "etc/conda/deactivate.d/opam-deactivate.sh",
+                "share/opam/conda/.opam-switch/{environment,lock,switch-config}",
+                "share/opam/{config,config.lock,lock}",
+                "share/opam/opam-init/complete.{sh,zsh}",
+                "share/opam/opam-init/hooks/sandbox.{sh,sh.hash}",
+                "share/opam/opam-init/init.{cmd,csh,fish,ps1,sh,zsh}",
+                "share/opam/opam-init/variables.{cmd,csh,fish,ps1,sh}",
+                "share/opam/repo/{default/repo,lock,repos-config}",
+                "etc/conda/test-files/*"
+              ],
+              "strict": true
             }
           },
           {
-            "requirements": {
-              "run": [
-                "grep"
+            "files": {
+              "recipe": [
+                "testing/test-opam-arch.sh"
               ]
             },
-            "script": "opam --version | grep ${{ version }}\n"
+            "requirements": {
+              "run": [
+                "binutils"
+              ]
+            },
+            "script": {
+              "content": "bash testing/test-opam-arch.sh",
+              "interpreter": "bash"
+            }
           },
           {
-            "script": "export OPAMROOT=./opam_test\nmkdir -p opam_test\nopam init --bare --no-setup --bypass-checks\nopam config list\nopam switch create test --empty\neval $(opam env --switch=test)\nopam list --installed\nopam switch list\nopam switch remove test --yes\nrm -rf opam_test\n"
+            "files": {
+              "recipe": [
+                "testing/test-opam-version.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "python >=3.9",
+                "ocaml"
+              ]
+            },
+            "script": "python testing/test-opam-version.py\n"
           },
           {
-            "package_contents": {}
+            "files": {
+              "recipe": [
+                "testing/test-opam-functional.py",
+                "testing/test-opam-activation.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "python >=3.9",
+                "ocaml",
+                "ocaml-dune"
+              ]
+            },
+            "script": "python testing/test-opam-functional.py\npython testing/test-opam-activation.py\n"
           }
         ],
         "version": "2.5.0"
@@ -422,15 +627,25 @@
         "grep",
         "make",
         "sed",
+        "ocaml-cppo",
+        "ocaml-dune",
+        "ocaml-menhir",
         "binutils",
         "curl",
         "git",
-        "ocaml >=5.3.0",
+        "ocaml >=5.3.0 *_12",
         "file",
+        "unzip",
         "zstd"
       ],
-      "host": [
-        "zstd"
+      "run": [
+        "c-compiler",
+        "curl",
+        "git",
+        "make",
+        "rsync",
+        "unzip",
+        "bubblewrap"
       ]
     },
     "schema_version": 1,
@@ -457,24 +672,37 @@
         "grep",
         "make",
         "ocaml",
+        "ocaml-cppo",
+        "ocaml-dune",
+        "ocaml-menhir",
         "sed",
+        "unzip",
         "zstd"
       ]
     },
     "host": {
       "__set__": true,
-      "elements": [
-        "zstd"
-      ]
+      "elements": []
     },
     "run": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "bubblewrap",
+        "c-compiler",
+        "curl",
+        "git",
+        "make",
+        "rsync",
+        "unzip"
+      ]
     },
     "test": {
       "__set__": true,
       "elements": [
-        "grep"
+        "binutils",
+        "ocaml",
+        "ocaml-dune",
+        "python"
       ]
     }
   },
@@ -485,11 +713,11 @@
       "home": "https://github.com/ocaml/opam",
       "license": "LGPL-2.1-only",
       "license_family": "LGPL-2.1-only",
-      "license_file": "LICENSE",
+      "license_file": "opam/LICENSE",
       "summary": "Objective Caml (OCaml) is an implementation of the ML language."
     },
     "build": {
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "recipe-maintainers": [
@@ -514,17 +742,27 @@
             "grep",
             "make",
             "sed",
+            "ocaml-cppo",
+            "ocaml-dune",
+            "ocaml-menhir",
             "binutils",
             "curl",
             "git",
-            "ocaml >=5.3.0",
+            "ocaml >=5.3.0 *_12",
             "file",
+            "unzip",
             "zstd"
           ],
-          "host": [
-            "zstd"
-          ],
-          "run": []
+          "host": [],
+          "run": [
+            "c-compiler",
+            "curl",
+            "git",
+            "make",
+            "rsync",
+            "unzip",
+            "bubblewrap"
+          ]
         },
         "tests": [
           {
@@ -534,23 +772,66 @@
                 "opam-installer"
               ],
               "files": [
-                "share/man/man1/opam*"
-              ]
+                "share/man/man1/opam*",
+                "etc/conda/activate.d/opam-activate.sh",
+                "etc/conda/deactivate.d/opam-deactivate.sh",
+                "share/opam/conda/.opam-switch/{environment,lock,switch-config}",
+                "share/opam/{config,config.lock,lock}",
+                "share/opam/opam-init/complete.{sh,zsh}",
+                "share/opam/opam-init/hooks/sandbox.{sh,sh.hash}",
+                "share/opam/opam-init/init.{cmd,csh,fish,ps1,sh,zsh}",
+                "share/opam/opam-init/variables.{cmd,csh,fish,ps1,sh}",
+                "share/opam/repo/{default/repo,lock,repos-config}",
+                "etc/conda/test-files/*"
+              ],
+              "strict": true
             }
           },
           {
-            "requirements": {
-              "run": [
-                "grep"
+            "files": {
+              "recipe": [
+                "testing/test-opam-arch.sh"
               ]
             },
-            "script": "opam --version | grep ${{ version }}\n"
+            "requirements": {
+              "run": [
+                "binutils"
+              ]
+            },
+            "script": {
+              "content": "bash testing/test-opam-arch.sh",
+              "interpreter": "bash"
+            }
           },
           {
-            "script": "export OPAMROOT=./opam_test\nmkdir -p opam_test\nopam init --bare --no-setup --bypass-checks\nopam config list\nopam switch create test --empty\neval $(opam env --switch=test)\nopam list --installed\nopam switch list\nopam switch remove test --yes\nrm -rf opam_test\n"
+            "files": {
+              "recipe": [
+                "testing/test-opam-version.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "python >=3.9",
+                "ocaml"
+              ]
+            },
+            "script": "python testing/test-opam-version.py\n"
           },
           {
-            "package_contents": {}
+            "files": {
+              "recipe": [
+                "testing/test-opam-functional.py",
+                "testing/test-opam-activation.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "python >=3.9",
+                "ocaml",
+                "ocaml-dune"
+              ]
+            },
+            "script": "python testing/test-opam-functional.py\npython testing/test-opam-activation.py\n"
           }
         ],
         "version": "2.5.0"
@@ -570,17 +851,27 @@
             "grep",
             "make",
             "sed",
+            "ocaml-cppo",
+            "ocaml-dune",
+            "ocaml-menhir",
             "binutils",
             "curl",
             "git",
-            "ocaml >=5.3.0",
+            "ocaml >=5.3.0 *_12",
             "file",
+            "unzip",
             "zstd"
           ],
-          "host": [
-            "zstd"
-          ],
-          "run": []
+          "host": [],
+          "run": [
+            "c-compiler",
+            "curl",
+            "git",
+            "make",
+            "rsync",
+            "unzip",
+            "bubblewrap"
+          ]
         },
         "tests": [
           {
@@ -590,23 +881,66 @@
                 "opam-installer"
               ],
               "files": [
-                "share/man/man1/opam*"
-              ]
+                "share/man/man1/opam*",
+                "etc/conda/activate.d/opam-activate.sh",
+                "etc/conda/deactivate.d/opam-deactivate.sh",
+                "share/opam/conda/.opam-switch/{environment,lock,switch-config}",
+                "share/opam/{config,config.lock,lock}",
+                "share/opam/opam-init/complete.{sh,zsh}",
+                "share/opam/opam-init/hooks/sandbox.{sh,sh.hash}",
+                "share/opam/opam-init/init.{cmd,csh,fish,ps1,sh,zsh}",
+                "share/opam/opam-init/variables.{cmd,csh,fish,ps1,sh}",
+                "share/opam/repo/{default/repo,lock,repos-config}",
+                "etc/conda/test-files/*"
+              ],
+              "strict": true
             }
           },
           {
-            "requirements": {
-              "run": [
-                "grep"
+            "files": {
+              "recipe": [
+                "testing/test-opam-arch.sh"
               ]
             },
-            "script": "opam --version | grep ${{ version }}\n"
+            "requirements": {
+              "run": [
+                "binutils"
+              ]
+            },
+            "script": {
+              "content": "bash testing/test-opam-arch.sh",
+              "interpreter": "bash"
+            }
           },
           {
-            "script": "export OPAMROOT=./opam_test\nmkdir -p opam_test\nopam init --bare --no-setup --bypass-checks\nopam config list\nopam switch create test --empty\neval $(opam env --switch=test)\nopam list --installed\nopam switch list\nopam switch remove test --yes\nrm -rf opam_test\n"
+            "files": {
+              "recipe": [
+                "testing/test-opam-version.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "python >=3.9",
+                "ocaml"
+              ]
+            },
+            "script": "python testing/test-opam-version.py\n"
           },
           {
-            "package_contents": {}
+            "files": {
+              "recipe": [
+                "testing/test-opam-functional.py",
+                "testing/test-opam-activation.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "python >=3.9",
+                "ocaml",
+                "ocaml-dune"
+              ]
+            },
+            "script": "python testing/test-opam-functional.py\npython testing/test-opam-activation.py\n"
           }
         ],
         "version": "2.5.0"
@@ -626,17 +960,27 @@
             "grep",
             "make",
             "sed",
+            "ocaml-cppo",
+            "ocaml-dune",
+            "ocaml-menhir",
             "binutils",
             "curl",
             "git",
-            "ocaml >=5.3.0",
+            "ocaml >=5.3.0 *_12",
             "file",
+            "unzip",
             "zstd"
           ],
-          "host": [
-            "zstd"
-          ],
-          "run": []
+          "host": [],
+          "run": [
+            "c-compiler",
+            "curl",
+            "git",
+            "make",
+            "rsync",
+            "unzip",
+            "bubblewrap"
+          ]
         },
         "tests": [
           {
@@ -646,23 +990,66 @@
                 "opam-installer"
               ],
               "files": [
-                "share/man/man1/opam*"
-              ]
+                "share/man/man1/opam*",
+                "etc/conda/activate.d/opam-activate.sh",
+                "etc/conda/deactivate.d/opam-deactivate.sh",
+                "share/opam/conda/.opam-switch/{environment,lock,switch-config}",
+                "share/opam/{config,config.lock,lock}",
+                "share/opam/opam-init/complete.{sh,zsh}",
+                "share/opam/opam-init/hooks/sandbox.{sh,sh.hash}",
+                "share/opam/opam-init/init.{cmd,csh,fish,ps1,sh,zsh}",
+                "share/opam/opam-init/variables.{cmd,csh,fish,ps1,sh}",
+                "share/opam/repo/{default/repo,lock,repos-config}",
+                "etc/conda/test-files/*"
+              ],
+              "strict": true
             }
           },
           {
-            "requirements": {
-              "run": [
-                "grep"
+            "files": {
+              "recipe": [
+                "testing/test-opam-arch.sh"
               ]
             },
-            "script": "opam --version | grep ${{ version }}\n"
+            "requirements": {
+              "run": [
+                "binutils"
+              ]
+            },
+            "script": {
+              "content": "bash testing/test-opam-arch.sh",
+              "interpreter": "bash"
+            }
           },
           {
-            "script": "export OPAMROOT=./opam_test\nmkdir -p opam_test\nopam init --bare --no-setup --bypass-checks\nopam config list\nopam switch create test --empty\neval $(opam env --switch=test)\nopam list --installed\nopam switch list\nopam switch remove test --yes\nrm -rf opam_test\n"
+            "files": {
+              "recipe": [
+                "testing/test-opam-version.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "python >=3.9",
+                "ocaml"
+              ]
+            },
+            "script": "python testing/test-opam-version.py\n"
           },
           {
-            "package_contents": {}
+            "files": {
+              "recipe": [
+                "testing/test-opam-functional.py",
+                "testing/test-opam-activation.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "python >=3.9",
+                "ocaml",
+                "ocaml-dune"
+              ]
+            },
+            "script": "python testing/test-opam-functional.py\npython testing/test-opam-activation.py\n"
           }
         ],
         "version": "2.5.0"
@@ -682,17 +1069,27 @@
             "grep",
             "make",
             "sed",
+            "ocaml-cppo",
+            "ocaml-dune",
+            "ocaml-menhir",
             "binutils",
             "curl",
             "git",
-            "ocaml >=5.3.0",
+            "ocaml >=5.3.0 *_12",
             "file",
+            "unzip",
             "zstd"
           ],
-          "host": [
-            "zstd"
-          ],
-          "run": []
+          "host": [],
+          "run": [
+            "c-compiler",
+            "curl",
+            "git",
+            "make",
+            "rsync",
+            "unzip",
+            "bubblewrap"
+          ]
         },
         "tests": [
           {
@@ -702,23 +1099,66 @@
                 "opam-installer"
               ],
               "files": [
-                "share/man/man1/opam*"
-              ]
+                "share/man/man1/opam*",
+                "etc/conda/activate.d/opam-activate.sh",
+                "etc/conda/deactivate.d/opam-deactivate.sh",
+                "share/opam/conda/.opam-switch/{environment,lock,switch-config}",
+                "share/opam/{config,config.lock,lock}",
+                "share/opam/opam-init/complete.{sh,zsh}",
+                "share/opam/opam-init/hooks/sandbox.{sh,sh.hash}",
+                "share/opam/opam-init/init.{cmd,csh,fish,ps1,sh,zsh}",
+                "share/opam/opam-init/variables.{cmd,csh,fish,ps1,sh}",
+                "share/opam/repo/{default/repo,lock,repos-config}",
+                "etc/conda/test-files/*"
+              ],
+              "strict": true
             }
           },
           {
-            "requirements": {
-              "run": [
-                "grep"
+            "files": {
+              "recipe": [
+                "testing/test-opam-arch.sh"
               ]
             },
-            "script": "opam --version | grep ${{ version }}\n"
+            "requirements": {
+              "run": [
+                "binutils"
+              ]
+            },
+            "script": {
+              "content": "bash testing/test-opam-arch.sh",
+              "interpreter": "bash"
+            }
           },
           {
-            "script": "export OPAMROOT=./opam_test\nmkdir -p opam_test\nopam init --bare --no-setup --bypass-checks\nopam config list\nopam switch create test --empty\neval $(opam env --switch=test)\nopam list --installed\nopam switch list\nopam switch remove test --yes\nrm -rf opam_test\n"
+            "files": {
+              "recipe": [
+                "testing/test-opam-version.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "python >=3.9",
+                "ocaml"
+              ]
+            },
+            "script": "python testing/test-opam-version.py\n"
           },
           {
-            "package_contents": {}
+            "files": {
+              "recipe": [
+                "testing/test-opam-functional.py",
+                "testing/test-opam-activation.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "python >=3.9",
+                "ocaml",
+                "ocaml-dune"
+              ]
+            },
+            "script": "python testing/test-opam-functional.py\npython testing/test-opam-activation.py\n"
           }
         ],
         "version": "2.5.0"
@@ -738,17 +1178,27 @@
             "grep",
             "make",
             "sed",
+            "ocaml-cppo",
+            "ocaml-dune",
+            "ocaml-menhir",
             "binutils",
             "curl",
             "git",
-            "ocaml >=5.3.0",
+            "ocaml >=5.3.0 *_12",
             "file",
+            "unzip",
             "zstd"
           ],
-          "host": [
-            "zstd"
-          ],
-          "run": []
+          "host": [],
+          "run": [
+            "c-compiler",
+            "curl",
+            "git",
+            "make",
+            "rsync",
+            "unzip",
+            "bubblewrap"
+          ]
         },
         "tests": [
           {
@@ -758,23 +1208,66 @@
                 "opam-installer"
               ],
               "files": [
-                "share/man/man1/opam*"
-              ]
+                "share/man/man1/opam*",
+                "etc/conda/activate.d/opam-activate.sh",
+                "etc/conda/deactivate.d/opam-deactivate.sh",
+                "share/opam/conda/.opam-switch/{environment,lock,switch-config}",
+                "share/opam/{config,config.lock,lock}",
+                "share/opam/opam-init/complete.{sh,zsh}",
+                "share/opam/opam-init/hooks/sandbox.{sh,sh.hash}",
+                "share/opam/opam-init/init.{cmd,csh,fish,ps1,sh,zsh}",
+                "share/opam/opam-init/variables.{cmd,csh,fish,ps1,sh}",
+                "share/opam/repo/{default/repo,lock,repos-config}",
+                "etc/conda/test-files/*"
+              ],
+              "strict": true
             }
           },
           {
-            "requirements": {
-              "run": [
-                "grep"
+            "files": {
+              "recipe": [
+                "testing/test-opam-arch.sh"
               ]
             },
-            "script": "opam --version | grep ${{ version }}\n"
+            "requirements": {
+              "run": [
+                "binutils"
+              ]
+            },
+            "script": {
+              "content": "bash testing/test-opam-arch.sh",
+              "interpreter": "bash"
+            }
           },
           {
-            "script": "export OPAMROOT=./opam_test\nmkdir -p opam_test\nopam init --bare --no-setup --bypass-checks\nopam config list\nopam switch create test --empty\neval $(opam env --switch=test)\nopam list --installed\nopam switch list\nopam switch remove test --yes\nrm -rf opam_test\n"
+            "files": {
+              "recipe": [
+                "testing/test-opam-version.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "python >=3.9",
+                "ocaml"
+              ]
+            },
+            "script": "python testing/test-opam-version.py\n"
           },
           {
-            "package_contents": {}
+            "files": {
+              "recipe": [
+                "testing/test-opam-functional.py",
+                "testing/test-opam-activation.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "python >=3.9",
+                "ocaml",
+                "ocaml-dune"
+              ]
+            },
+            "script": "python testing/test-opam-functional.py\npython testing/test-opam-activation.py\n"
           }
         ],
         "version": "2.5.0"
@@ -794,17 +1287,27 @@
             "grep",
             "make",
             "sed",
+            "ocaml-cppo",
+            "ocaml-dune",
+            "ocaml-menhir",
             "binutils",
             "curl",
             "git",
-            "ocaml >=5.3.0",
+            "ocaml >=5.3.0 *_12",
             "file",
+            "unzip",
             "zstd"
           ],
-          "host": [
-            "zstd"
-          ],
-          "run": []
+          "host": [],
+          "run": [
+            "c-compiler",
+            "curl",
+            "git",
+            "make",
+            "rsync",
+            "unzip",
+            "bubblewrap"
+          ]
         },
         "tests": [
           {
@@ -814,23 +1317,66 @@
                 "opam-installer"
               ],
               "files": [
-                "share/man/man1/opam*"
-              ]
+                "share/man/man1/opam*",
+                "etc/conda/activate.d/opam-activate.sh",
+                "etc/conda/deactivate.d/opam-deactivate.sh",
+                "share/opam/conda/.opam-switch/{environment,lock,switch-config}",
+                "share/opam/{config,config.lock,lock}",
+                "share/opam/opam-init/complete.{sh,zsh}",
+                "share/opam/opam-init/hooks/sandbox.{sh,sh.hash}",
+                "share/opam/opam-init/init.{cmd,csh,fish,ps1,sh,zsh}",
+                "share/opam/opam-init/variables.{cmd,csh,fish,ps1,sh}",
+                "share/opam/repo/{default/repo,lock,repos-config}",
+                "etc/conda/test-files/*"
+              ],
+              "strict": true
             }
           },
           {
-            "requirements": {
-              "run": [
-                "grep"
+            "files": {
+              "recipe": [
+                "testing/test-opam-arch.sh"
               ]
             },
-            "script": "opam --version | grep ${{ version }}\n"
+            "requirements": {
+              "run": [
+                "binutils"
+              ]
+            },
+            "script": {
+              "content": "bash testing/test-opam-arch.sh",
+              "interpreter": "bash"
+            }
           },
           {
-            "script": "export OPAMROOT=./opam_test\nmkdir -p opam_test\nopam init --bare --no-setup --bypass-checks\nopam config list\nopam switch create test --empty\neval $(opam env --switch=test)\nopam list --installed\nopam switch list\nopam switch remove test --yes\nrm -rf opam_test\n"
+            "files": {
+              "recipe": [
+                "testing/test-opam-version.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "python >=3.9",
+                "ocaml"
+              ]
+            },
+            "script": "python testing/test-opam-version.py\n"
           },
           {
-            "package_contents": {}
+            "files": {
+              "recipe": [
+                "testing/test-opam-functional.py",
+                "testing/test-opam-activation.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "python >=3.9",
+                "ocaml",
+                "ocaml-dune"
+              ]
+            },
+            "script": "python testing/test-opam-functional.py\npython testing/test-opam-activation.py\n"
           }
         ],
         "version": "2.5.0"
@@ -852,15 +1398,25 @@
         "grep",
         "make",
         "sed",
+        "ocaml-cppo",
+        "ocaml-dune",
+        "ocaml-menhir",
         "binutils",
         "curl",
         "git",
-        "ocaml >=5.3.0",
+        "ocaml >=5.3.0 *_12",
         "file",
+        "unzip",
         "zstd"
       ],
-      "host": [
-        "zstd"
+      "run": [
+        "c-compiler",
+        "curl",
+        "git",
+        "make",
+        "rsync",
+        "unzip",
+        "bubblewrap"
       ]
     },
     "schema_version": 1,
@@ -877,11 +1433,11 @@
       "home": "https://github.com/ocaml/opam",
       "license": "LGPL-2.1-only",
       "license_family": "LGPL-2.1-only",
-      "license_file": "LICENSE",
+      "license_file": "opam/LICENSE",
       "summary": "Objective Caml (OCaml) is an implementation of the ML language."
     },
     "build": {
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "recipe-maintainers": [
@@ -906,17 +1462,27 @@
             "grep",
             "make",
             "sed",
+            "ocaml-cppo",
+            "ocaml-dune",
+            "ocaml-menhir",
             "binutils",
             "curl",
             "git",
-            "ocaml >=5.3.0",
+            "ocaml >=5.3.0 *_12",
             "file",
+            "unzip",
             "zstd"
           ],
-          "host": [
-            "zstd"
-          ],
-          "run": []
+          "host": [],
+          "run": [
+            "c-compiler",
+            "curl",
+            "git",
+            "make",
+            "rsync",
+            "unzip",
+            "bubblewrap"
+          ]
         },
         "tests": [
           {
@@ -926,23 +1492,66 @@
                 "opam-installer"
               ],
               "files": [
-                "share/man/man1/opam*"
-              ]
+                "share/man/man1/opam*",
+                "etc/conda/activate.d/opam-activate.sh",
+                "etc/conda/deactivate.d/opam-deactivate.sh",
+                "share/opam/conda/.opam-switch/{environment,lock,switch-config}",
+                "share/opam/{config,config.lock,lock}",
+                "share/opam/opam-init/complete.{sh,zsh}",
+                "share/opam/opam-init/hooks/sandbox.{sh,sh.hash}",
+                "share/opam/opam-init/init.{cmd,csh,fish,ps1,sh,zsh}",
+                "share/opam/opam-init/variables.{cmd,csh,fish,ps1,sh}",
+                "share/opam/repo/{default/repo,lock,repos-config}",
+                "etc/conda/test-files/*"
+              ],
+              "strict": true
             }
           },
           {
-            "requirements": {
-              "run": [
-                "grep"
+            "files": {
+              "recipe": [
+                "testing/test-opam-arch.sh"
               ]
             },
-            "script": "opam --version | grep ${{ version }}\n"
+            "requirements": {
+              "run": [
+                "binutils"
+              ]
+            },
+            "script": {
+              "content": "bash testing/test-opam-arch.sh",
+              "interpreter": "bash"
+            }
           },
           {
-            "script": "export OPAMROOT=./opam_test\nmkdir -p opam_test\nopam init --bare --no-setup --bypass-checks\nopam config list\nopam switch create test --empty\neval $(opam env --switch=test)\nopam list --installed\nopam switch list\nopam switch remove test --yes\nrm -rf opam_test\n"
+            "files": {
+              "recipe": [
+                "testing/test-opam-version.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "python >=3.9",
+                "ocaml"
+              ]
+            },
+            "script": "python testing/test-opam-version.py\n"
           },
           {
-            "package_contents": {}
+            "files": {
+              "recipe": [
+                "testing/test-opam-functional.py",
+                "testing/test-opam-activation.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "python >=3.9",
+                "ocaml",
+                "ocaml-dune"
+              ]
+            },
+            "script": "python testing/test-opam-functional.py\npython testing/test-opam-activation.py\n"
           }
         ],
         "version": "2.5.0"
@@ -964,15 +1573,25 @@
         "grep",
         "make",
         "sed",
+        "ocaml-cppo",
+        "ocaml-dune",
+        "ocaml-menhir",
         "binutils",
         "curl",
         "git",
-        "ocaml >=5.3.0",
+        "ocaml >=5.3.0 *_12",
         "file",
+        "unzip",
         "zstd"
       ],
-      "host": [
-        "zstd"
+      "run": [
+        "c-compiler",
+        "curl",
+        "git",
+        "make",
+        "rsync",
+        "unzip",
+        "bubblewrap"
       ]
     },
     "schema_version": 1,
@@ -999,24 +1618,37 @@
         "grep",
         "make",
         "ocaml",
+        "ocaml-cppo",
+        "ocaml-dune",
+        "ocaml-menhir",
         "sed",
+        "unzip",
         "zstd"
       ]
     },
     "host": {
       "__set__": true,
-      "elements": [
-        "zstd"
-      ]
+      "elements": []
     },
     "run": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "bubblewrap",
+        "c-compiler",
+        "curl",
+        "git",
+        "make",
+        "rsync",
+        "unzip"
+      ]
     },
     "test": {
       "__set__": true,
       "elements": [
-        "grep"
+        "binutils",
+        "ocaml",
+        "ocaml-dune",
+        "python"
       ]
     }
   },
@@ -1027,11 +1659,11 @@
       "home": "https://github.com/ocaml/opam",
       "license": "LGPL-2.1-only",
       "license_family": "LGPL-2.1-only",
-      "license_file": "LICENSE",
+      "license_file": "opam/LICENSE",
       "summary": "Objective Caml (OCaml) is an implementation of the ML language."
     },
     "build": {
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "recipe-maintainers": [
@@ -1056,17 +1688,27 @@
             "grep",
             "make",
             "sed",
+            "ocaml-cppo",
+            "ocaml-dune",
+            "ocaml-menhir",
             "binutils",
             "curl",
             "git",
-            "ocaml >=5.3.0",
+            "ocaml >=5.3.0 *_12",
             "file",
+            "unzip",
             "zstd"
           ],
-          "host": [
-            "zstd"
-          ],
-          "run": []
+          "host": [],
+          "run": [
+            "c-compiler",
+            "curl",
+            "git",
+            "make",
+            "rsync",
+            "unzip",
+            "bubblewrap"
+          ]
         },
         "tests": [
           {
@@ -1076,23 +1718,66 @@
                 "opam-installer"
               ],
               "files": [
-                "share/man/man1/opam*"
-              ]
+                "share/man/man1/opam*",
+                "etc/conda/activate.d/opam-activate.sh",
+                "etc/conda/deactivate.d/opam-deactivate.sh",
+                "share/opam/conda/.opam-switch/{environment,lock,switch-config}",
+                "share/opam/{config,config.lock,lock}",
+                "share/opam/opam-init/complete.{sh,zsh}",
+                "share/opam/opam-init/hooks/sandbox.{sh,sh.hash}",
+                "share/opam/opam-init/init.{cmd,csh,fish,ps1,sh,zsh}",
+                "share/opam/opam-init/variables.{cmd,csh,fish,ps1,sh}",
+                "share/opam/repo/{default/repo,lock,repos-config}",
+                "etc/conda/test-files/*"
+              ],
+              "strict": true
             }
           },
           {
-            "requirements": {
-              "run": [
-                "grep"
+            "files": {
+              "recipe": [
+                "testing/test-opam-arch.sh"
               ]
             },
-            "script": "opam --version | grep ${{ version }}\n"
+            "requirements": {
+              "run": [
+                "binutils"
+              ]
+            },
+            "script": {
+              "content": "bash testing/test-opam-arch.sh",
+              "interpreter": "bash"
+            }
           },
           {
-            "script": "export OPAMROOT=./opam_test\nmkdir -p opam_test\nopam init --bare --no-setup --bypass-checks\nopam config list\nopam switch create test --empty\neval $(opam env --switch=test)\nopam list --installed\nopam switch list\nopam switch remove test --yes\nrm -rf opam_test\n"
+            "files": {
+              "recipe": [
+                "testing/test-opam-version.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "python >=3.9",
+                "ocaml"
+              ]
+            },
+            "script": "python testing/test-opam-version.py\n"
           },
           {
-            "package_contents": {}
+            "files": {
+              "recipe": [
+                "testing/test-opam-functional.py",
+                "testing/test-opam-activation.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "python >=3.9",
+                "ocaml",
+                "ocaml-dune"
+              ]
+            },
+            "script": "python testing/test-opam-functional.py\npython testing/test-opam-activation.py\n"
           }
         ],
         "version": "2.5.0"
@@ -1114,15 +1799,25 @@
         "grep",
         "make",
         "sed",
+        "ocaml-cppo",
+        "ocaml-dune",
+        "ocaml-menhir",
         "binutils",
         "curl",
         "git",
-        "ocaml >=5.3.0",
+        "ocaml >=5.3.0 *_12",
         "file",
+        "unzip",
         "zstd"
       ],
-      "host": [
-        "zstd"
+      "run": [
+        "c-compiler",
+        "curl",
+        "git",
+        "make",
+        "rsync",
+        "unzip",
+        "bubblewrap"
       ]
     },
     "schema_version": 1,
@@ -1149,24 +1844,37 @@
         "grep",
         "make",
         "ocaml",
+        "ocaml-cppo",
+        "ocaml-dune",
+        "ocaml-menhir",
         "sed",
+        "unzip",
         "zstd"
       ]
     },
     "host": {
       "__set__": true,
-      "elements": [
-        "zstd"
-      ]
+      "elements": []
     },
     "run": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "bubblewrap",
+        "c-compiler",
+        "curl",
+        "git",
+        "make",
+        "rsync",
+        "unzip"
+      ]
     },
     "test": {
       "__set__": true,
       "elements": [
-        "grep"
+        "binutils",
+        "ocaml",
+        "ocaml-dune",
+        "python"
       ]
     }
   },
@@ -1188,13 +1896,15 @@
   "pr_info": {
     "__lazy_json__": "pr_info/opam.json"
   },
-  "raw_meta_yaml": "context:\n  name: ocaml\n  version: 2.5.0\n  library: ${{ \"Library/\" if not unix }}\n  m2: ${{ \"m2-\" if not unix }}\n\npackage:\n  name: opam\n  version: ${{ version }}\n\nsource:\n  - url: https://github.com/ocaml/opam/releases/download/${{ version }}/opam-full-${{ version }}.tar.gz\n    sha256: 25fb98f962c4227c1261e142afc68a416778e6e819600bd5ee3ec4a18ae1e238\n\nbuild:\n  number: 0\n\nrequirements:\n  build:\n    - ${{ compiler('c') }}\n    - ${{ compiler('cxx') }}\n    - ${{ stdlib('c') }}\n    - ${{ m2 }}bash >=5.2\n    - ${{ m2 }}bzip2\n    - ${{ m2 }}findutils\n    - ${{ m2 }}gawk\n    - ${{ m2 }}grep\n    - ${{ m2 }}make\n    - ${{ m2 }}sed\n    - binutils\n    - curl\n    - git\n    - ocaml >=5.3.0\n    - if: unix\n      then:\n        # OCaml compiler has zstd paths embedded from its build environment.\n        # We need zstd in build env so those paths resolve correctly.\n        - file\n        - zstd\n      else:\n        - ${{ m2 }}coreutils\n        - ${{ m2 }}diffutils\n        - ${{ m2 }}which\n    - if: osx\n      then:\n        - lld\n        - llvm-tools\n  host:\n    - zstd\n    # We need to 2-phase as these do not exist yet for arm64 and non-unix\n    # We add opam bare for all archs, then later we update below\n    # - ocamlbuild\n    # - ocaml-findlib\n\ntests:\n  - package_contents:\n      bin:\n        - opam\n        - opam-installer\n      files:\n        - if: build_platform == target_platform\n          then:\n            - ${{ library }}share/man/man1/opam*\n\n  - script:\n      - if: build_platform == target_platform\n        then: |\n            opam --version | grep ${{ version }}\n        else: |\n            echo \"OCaml 5.x GC segfaults under QEMU\"\n    requirements:\n      run:\n        - ${{ m2 }}grep\n\n  # Functional tests - exercise core opam functionality to catch build issues\n  # (broken linking, missing libraries, OCaml runtime problems)\n  # Unix: bash. Windows: powershell (avoids WSL/MSYS2 PATH issues).\n  # Cross-compile: skipped (QEMU + OCaml 5.x GC incompatibility).\n  - script:\n      - if: unix and build_platform == target_platform\n        then: |\n          export OPAMROOT=./opam_test\n          mkdir -p opam_test\n          opam init --bare --no-setup --bypass-checks\n          opam config list\n          opam switch create test --empty\n          eval $(opam env --switch=test)\n          opam list --installed\n          opam switch list\n          opam switch remove test --yes\n          rm -rf opam_test\n      - if: unix and build_platform != target_platform\n        then: |\n          echo \"Skipping functional tests (cross-compile: QEMU + OCaml 5.x GC issue)\"\n\n  - script:\n      - if: win\n        then:\n          interpreter: powershell\n          content: |\n            $env:OPAMROOT = \"./opam_test\"\n            New-Item -ItemType Directory -Force -Path opam_test\n            opam init --bare --no-setup --bypass-checks\n            opam config list\n            opam switch create test --empty\n            opam list --installed\n            opam switch list\n            opam switch remove test --yes\n            Remove-Item -Recurse -Force opam_test\n\nabout:\n  homepage: https://github.com/ocaml/opam\n  license: LGPL-2.1-only\n  license_family: LGPL\n  license_file: LICENSE\n  summary: Objective Caml (OCaml) is an implementation of the ML language.\n  description: |\n    opam is a source-based package manager. It supports multiple simultaneous compiler\n    installations, flexible package constraints, and a Git-friendly development workflow.\n  repository: https://github.com/ocaml/opam\n\nextra:\n  recipe-maintainers:\n    - dslarm\n    - fasiha\n    - MementoRC\n",
+  "raw_meta_yaml": "context:\n  build_number: 1\n  name: opam\n  version: 2.5.0\n\n  library: ${{ \"Library/\" if not unix }}\n  m2: ${{ \"m2-\" if not unix }}\n  sh: ${{ \"sh\" if unix else \"bat\" }}\n\nrecipe:\n  name: opam-packages\n  version: ${{ version }}\n\nsource:\n  - url: https://github.com/ocaml/${{ name }}/releases/download/${{ version }}/${{ name }}-full-${{ version }}.tar.gz\n    sha256: 25fb98f962c4227c1261e142afc68a416778e6e819600bd5ee3ec4a18ae1e238\n    target_directory: opam\n\nbuild:\n  number: ${{ build_number }}\n  dynamic_linking:\n    missing_dso_allowlist:\n      - if: not unix\n        then:\n          - C:/Windows/system32/SHLWAPI.dll\n          - C:/Windows/system32/VERSION.dll\n\noutputs:\n  - package:\n      name: ${{ name }}\n      version: ${{ version }}\n    requirements:\n      build:\n        - if: unix\n          then:\n            - ${{ compiler(\"c\") }}\n            - ${{ compiler(\"cxx\") }}\n            - ${{ stdlib(\"c\") }}\n          else:\n            - ${{ compiler(\"m2w64_c\") }}\n            - ${{ compiler(\"m2w64_cxx\") }}\n            - ${{ stdlib(\"m2w64_c\") }}\n        - ${{ m2 }}bash >=5.2\n        - ${{ m2 }}bzip2\n        - ${{ m2 }}findutils\n        - ${{ m2 }}gawk\n        - ${{ m2 }}grep\n        - ${{ m2 }}make\n        - ${{ m2 }}sed\n        - ocaml-cppo\n        - ocaml-dune\n        - ocaml-menhir\n        - binutils\n        - curl\n        - git\n        - ocaml >=5.3.0 *_12\n        - if: build_platform != target_platform\n          then:\n            - python >=3.9\n        - if: unix\n          then:\n            # OCaml compiler has zstd paths embedded from its build environment.\n            # We need zstd in build env so those paths resolve correctly.\n            - file\n            - unzip\n            - zstd\n          else:\n            - ${{ m2 }}coreutils\n            - ${{ m2 }}diffutils\n            - ${{ m2 }}which\n        - if: osx\n          then:\n            - lld\n            - llvm-tools\n      host:\n        - if: aarch64 or ppc64le\n          then:\n            - zstd\n      run:\n        - c-compiler\n        - curl\n        - git\n        - if: unix\n          then:\n            - make\n            - rsync\n            - unzip\n        - if: linux\n          then:\n            - bubblewrap\n          # Once we have ocaml 5.4.0_1\n          # - ocaml-compiler\n    tests:\n      # Package contents validation (using brace expansion for conciseness)\n      - package_contents:\n          strict: true\n          bin:\n            - opam\n            - opam-installer\n          files:\n            - ${{ library }}share/man/man1/opam*\n            - etc/conda/activate.d/opam-activate.${{ sh }}\n            - etc/conda/deactivate.d/opam-deactivate.${{ sh }}\n            - ${{ library }}share/opam/conda/.opam-switch/{environment,lock,switch-config}\n            - ${{ library }}share/opam/{config,config.lock,lock}\n            - ${{ library }}share/opam/opam-init/complete.{sh,zsh}\n            - ${{ library }}share/opam/opam-init/hooks/sandbox.{sh,sh.hash}\n            - ${{ library }}share/opam/opam-init/init.{cmd,csh,fish,ps1,sh,zsh}\n            - ${{ library }}share/opam/opam-init/variables.{cmd,csh,fish,ps1,sh}\n            - ${{ library }}share/opam/repo/{default/repo,lock,repos-config}\n            - etc/conda/test-files/*\n\n      # Architecture verification - Unix only (uses otool/readelf)\n      - if: unix\n        then:\n          script: bash testing/test-opam-arch.sh\n          files:\n            recipe:\n              - testing/test-opam-arch.sh\n          requirements:\n            run:\n              - if: linux\n                then:\n                  - binutils\n\n      # Version check - native builds OR Linux cross-compile (QEMU/binfmt available)\n      # macOS cross-compile: can't run ARM64 binaries, skip this test\n      - if: build_platform == target_platform or linux\n        then:\n          script: |\n            python testing/test-opam-version.py\n          files:\n            recipe:\n              - testing/test-opam-version.py\n          requirements:\n            run:\n              - python >=3.9\n              - ocaml\n\n      # Functional tests - native builds OR Linux cross-compile\n      # These run opam commands; Linux uses QEMU, macOS cross can't run ARM64\n      - if: build_platform == target_platform or linux\n        then:\n          script: |\n            python testing/test-opam-functional.py\n            python testing/test-opam-activation.py\n          files:\n            recipe:\n              - testing/test-opam-functional.py\n              - testing/test-opam-activation.py\n          requirements:\n            run:\n              - python >=3.9\n              - ocaml\n              - ocaml-dune\n\nabout:\n  homepage: https://github.com/ocaml/opam\n  license: LGPL-2.1-only\n  license_family: LGPL\n  license_file: opam/LICENSE\n  summary: Objective Caml (OCaml) is an implementation of the ML language.\n  description: |\n    opam is a source-based package manager. It supports multiple simultaneous compiler\n    installations, flexible package constraints, and a Git-friendly development workflow.\n  repository: https://github.com/ocaml/opam\n\nextra:\n  recipe-maintainers:\n    - dslarm\n    - fasiha\n    - MementoRC\n",
   "req": {
     "__set__": true,
     "elements": [
       "bash",
       "binutils",
+      "bubblewrap",
       "bzip2",
+      "c-compiler",
       "c_compiler_stub",
       "c_stdlib_stub",
       "curl",
@@ -1206,7 +1916,12 @@
       "grep",
       "make",
       "ocaml",
+      "ocaml-cppo",
+      "ocaml-dune",
+      "ocaml-menhir",
+      "rsync",
       "sed",
+      "unzip",
       "zstd"
     ]
   },
@@ -1228,7 +1943,11 @@
         "grep",
         "make",
         "ocaml",
+        "ocaml-cppo",
+        "ocaml-dune",
+        "ocaml-menhir",
         "sed",
+        "unzip",
         "zstd"
       ]
     },
@@ -1237,22 +1956,31 @@
       "elements": [
         "c_compiler_stub",
         "c_stdlib_stub",
-        "cxx_compiler_stub",
-        "zstd"
+        "cxx_compiler_stub"
       ]
     },
     "run": {
       "__set__": true,
       "elements": [
+        "bubblewrap",
+        "c-compiler",
         "c_compiler_stub",
         "c_stdlib_stub",
-        "cxx_compiler_stub"
+        "curl",
+        "cxx_compiler_stub",
+        "git",
+        "make",
+        "rsync",
+        "unzip"
       ]
     },
     "test": {
       "__set__": true,
       "elements": [
-        "grep"
+        "binutils",
+        "ocaml",
+        "ocaml-dune",
+        "python"
       ]
     }
   },
@@ -1274,25 +2002,38 @@
         "git",
         "grep",
         "make",
-        "ocaml >=5.3.0",
+        "ocaml >=5.3.0 *_12",
+        "ocaml-cppo",
+        "ocaml-dune",
+        "ocaml-menhir",
         "sed",
+        "unzip",
         "zstd"
       ]
     },
     "host": {
       "__set__": true,
-      "elements": [
-        "zstd"
-      ]
+      "elements": []
     },
     "run": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "bubblewrap",
+        "c-compiler",
+        "curl",
+        "git",
+        "make",
+        "rsync",
+        "unzip"
+      ]
     },
     "test": {
       "__set__": true,
       "elements": [
-        "grep"
+        "binutils",
+        "ocaml",
+        "ocaml-dune",
+        "python >=3.9"
       ]
     }
   },
@@ -1308,11 +2049,11 @@
       "home": "https://github.com/ocaml/opam",
       "license": "LGPL-2.1-only",
       "license_family": "LGPL-2.1-only",
-      "license_file": "LICENSE",
+      "license_file": "opam/LICENSE",
       "summary": "Objective Caml (OCaml) is an implementation of the ML language."
     },
     "build": {
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "recipe-maintainers": [
@@ -1337,17 +2078,27 @@
             "grep",
             "make",
             "sed",
+            "ocaml-cppo",
+            "ocaml-dune",
+            "ocaml-menhir",
             "binutils",
             "curl",
             "git",
-            "ocaml >=5.3.0",
+            "ocaml >=5.3.0 *_12",
             "file",
+            "unzip",
             "zstd"
           ],
-          "host": [
-            "zstd"
-          ],
-          "run": []
+          "host": [],
+          "run": [
+            "c-compiler",
+            "curl",
+            "git",
+            "make",
+            "rsync",
+            "unzip",
+            "bubblewrap"
+          ]
         },
         "tests": [
           {
@@ -1357,23 +2108,66 @@
                 "opam-installer"
               ],
               "files": [
-                "share/man/man1/opam*"
-              ]
+                "share/man/man1/opam*",
+                "etc/conda/activate.d/opam-activate.sh",
+                "etc/conda/deactivate.d/opam-deactivate.sh",
+                "share/opam/conda/.opam-switch/{environment,lock,switch-config}",
+                "share/opam/{config,config.lock,lock}",
+                "share/opam/opam-init/complete.{sh,zsh}",
+                "share/opam/opam-init/hooks/sandbox.{sh,sh.hash}",
+                "share/opam/opam-init/init.{cmd,csh,fish,ps1,sh,zsh}",
+                "share/opam/opam-init/variables.{cmd,csh,fish,ps1,sh}",
+                "share/opam/repo/{default/repo,lock,repos-config}",
+                "etc/conda/test-files/*"
+              ],
+              "strict": true
             }
           },
           {
-            "requirements": {
-              "run": [
-                "grep"
+            "files": {
+              "recipe": [
+                "testing/test-opam-arch.sh"
               ]
             },
-            "script": "opam --version | grep ${{ version }}\n"
+            "requirements": {
+              "run": [
+                "binutils"
+              ]
+            },
+            "script": {
+              "content": "bash testing/test-opam-arch.sh",
+              "interpreter": "bash"
+            }
           },
           {
-            "script": "export OPAMROOT=./opam_test\nmkdir -p opam_test\nopam init --bare --no-setup --bypass-checks\nopam config list\nopam switch create test --empty\neval $(opam env --switch=test)\nopam list --installed\nopam switch list\nopam switch remove test --yes\nrm -rf opam_test\n"
+            "files": {
+              "recipe": [
+                "testing/test-opam-version.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "python >=3.9",
+                "ocaml"
+              ]
+            },
+            "script": "python testing/test-opam-version.py\n"
           },
           {
-            "package_contents": {}
+            "files": {
+              "recipe": [
+                "testing/test-opam-functional.py",
+                "testing/test-opam-activation.py"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "python >=3.9",
+                "ocaml",
+                "ocaml-dune"
+              ]
+            },
+            "script": "python testing/test-opam-functional.py\npython testing/test-opam-activation.py\n"
           }
         ],
         "version": "2.5.0"
@@ -1395,15 +2189,25 @@
         "grep",
         "make",
         "sed",
+        "ocaml-cppo",
+        "ocaml-dune",
+        "ocaml-menhir",
         "binutils",
         "curl",
         "git",
-        "ocaml >=5.3.0",
+        "ocaml >=5.3.0 *_12",
         "file",
+        "unzip",
         "zstd"
       ],
-      "host": [
-        "zstd"
+      "run": [
+        "c-compiler",
+        "curl",
+        "git",
+        "make",
+        "rsync",
+        "unzip",
+        "bubblewrap"
       ]
     },
     "schema_version": 1,
@@ -1430,24 +2234,37 @@
         "grep",
         "make",
         "ocaml",
+        "ocaml-cppo",
+        "ocaml-dune",
+        "ocaml-menhir",
         "sed",
+        "unzip",
         "zstd"
       ]
     },
     "host": {
       "__set__": true,
-      "elements": [
-        "zstd"
-      ]
+      "elements": []
     },
     "run": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "bubblewrap",
+        "c-compiler",
+        "curl",
+        "git",
+        "make",
+        "rsync",
+        "unzip"
+      ]
     },
     "test": {
       "__set__": true,
       "elements": [
-        "grep"
+        "binutils",
+        "ocaml",
+        "ocaml-dune",
+        "python"
       ]
     }
   }
