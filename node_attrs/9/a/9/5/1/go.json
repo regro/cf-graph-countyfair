@@ -32,8 +32,8 @@
     },
     "test": "native"
   },
-  "feedstock_hash": "4fa10f0f6cf939ee80d3da0b2a5a22ebc7048aca",
-  "feedstock_hash_ts": 1770769182,
+  "feedstock_hash": "efbe88f409f62e98556b7559bc7ba07eeba49219",
+  "feedstock_hash_ts": 1771027176,
   "feedstock_name": "go",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -48,7 +48,7 @@
       "summary": "The Go Programming Language (cgo)"
     },
     "build": {
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "feedstock-name": "go",
@@ -278,7 +278,7 @@
       "summary": "The Go Programming Language (cgo)"
     },
     "build": {
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "feedstock-name": "go",
@@ -504,7 +504,7 @@
       "summary": "The Go Programming Language (cgo)"
     },
     "build": {
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "feedstock-name": "go",
@@ -730,7 +730,7 @@
       "summary": "The Go Programming Language (cgo)"
     },
     "build": {
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "feedstock-name": "go",
@@ -1753,7 +1753,7 @@
       "summary": "The Go Programming Language (cgo)"
     },
     "build": {
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "feedstock-name": "go",
@@ -1988,7 +1988,7 @@
       "summary": "The Go Programming Language (cgo)"
     },
     "build": {
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "feedstock-name": "go",
@@ -2231,7 +2231,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/go.json"
   },
-  "raw_meta_yaml": "{% set name = \"go\" %}\n{% set version = \"1.26.0\" %}\n\npackage:\n  name: {{ name }}-{{ go_variant_str }}-split\n  version: {{ version }}\n\nsource:\n  - folder: go\n    url: https://dl.google.com/{{ name }}/go{{ version }}.src.tar.gz\n    sha256: c9132a8a1f6bd2aa4aad1d74b8231d95274950483a4950657ee6c56e6e817790\n    patches:\n      # Please see patches/README.md for more details\n      - patches/0001-Fix-cgo_fortran-test-setup-for-conda.patch\n      - patches/0002-Add-CC-C-CPP-LD-FLAGS-to-script_test-extraEnvKeys.patch\n      - patches/0003-Inherit-CGO_-environment-variables.patch\n      - patches/0004-Add-conda-aware-default-values-for-GOPATH-and-GOBIN.patch\n      - patches/0005-cmd-link-internal-ld-disable-testWindowsBuildmodeCSh.patch\n      - patches/0006-Revert-cmd-link-enable-internal-linker-in-more-cases.patch\n      - patches/0007-Mark-ftree-as-a-safe-compiler-flag.patch\n  # Update this with a release from https://go.dev/dl/\n  - folder: go-bootstrap\n    url: https://go.dev/dl/go{{ version }}.linux-amd64.tar.gz  # [build_platform == \"linux-64\"]\n    sha256: aac1b08a0fb0c4e0a7c1555beb7b59180b05dfc5a3d62e40e9de90cd42f88235  # [build_platform == \"linux-64\"]\n\n    url: https://go.dev/dl/go{{ version }}.windows-amd64.zip  # [win64]\n    sha256: 9bbe0fc64236b2b51f6255c05c4232532b8ecc0e6d2e00950bd3021d8a4d07d4  # [win64]\n\n    # url: https://go.dev/dl/go{{ version }}.darwin-arm64.tar.gz  # [osx and arm64]\n    # sha256: 49e394ab92bc6fa3df3d27298ddf3e4491f99477bee9dd4934525a526f3a391c  # [osx and arm64]\n\n    url: https://go.dev/dl/go{{ version }}.darwin-amd64.tar.gz  # [osx]\n    sha256: 1ca28b7703cbea05a65b2a1d92d6b308610ef92f8824578a0874f2e60c9d5a22  # [osx]\n\nbuild:\n  number: 0\n  skip: true  # [linux and s390x]\n\noutputs:\n  - name: go-{{ go_variant_str }}\n    build:\n      binary_relocation: false\n      detect_binary_files_with_prefix: false\n      force_ignore_keys:   # [win]\n        - c_compiler        # [win]\n        - cxx_compiler      # [win]\n        - fortran_compiler  # [win]\n      # test data links to these DSOs\n      missing_dso_whitelist:\n        - $RPATH/libc.so.6             # [linux and not cgo]\n        - /usr/lib/libSystem.B.dylib   # [osx]\n        - $SYSROOT\\System32\\winmm.dll  # [win]\n    requirements:\n      run:\n        - {{ pin_subpackage(name, exact=true) }}\n        - {{ compiler('c') }}  # [unix and cgo]\n        - {{ compiler('m2w64_c') }}  # [win and cgo]\n    test:\n      commands:\n        - go help\n\n  - name: go\n    script: {{ go_variant_str }}/build.sh  # [unix]\n    script: {{ go_variant_str }}/build.bat  # [win]\n    build:\n      binary_relocation: false\n      detect_binary_files_with_prefix: false\n      run_exports:   # [unix and cgo]\n        strong:   # [unix and cgo]\n          - __glibc >={{ c_stdlib_version }}  # [linux and cgo]\n          - __osx >=12                        # [osx and cgo]\n    requirements:\n      build:\n        - {{ compiler('c') }}        # [unix and cgo]\n        - {{ stdlib(\"c\") }}          # [unix and cgo]\n        - {{ compiler('cxx') }}      # [unix and cgo]\n        - {{ compiler('fortran') }}  # [unix and cgo]\n\n        - {{ compiler('m2w64_c') }}        # [win and cgo]\n        - {{ stdlib(\"m2w64_c\") }}          # [win and cgo]\n        - {{ compiler('m2w64_cxx') }}      # [win and cgo]\n        - {{ compiler('m2w64_fortran') }}  # [win and cgo]\n      run:\n        - _go_select =={{ go_variant_ver }}={{ go_variant_str }}\n      run_constrained:\n        # TODO: Move to run section once conda/conda#9845 is fixed\n\n        - {{ pin_compatible(compiler('c')) }}        # [unix and cgo]\n        - {{ pin_compatible(compiler('cxx')) }}      # [unix and cgo]\n        - {{ pin_compatible(compiler('fortran')) }}  # [unix and cgo]\n\n        - {{ pin_compatible(compiler('m2w64_c')) }}        # [win and cgo]\n        - {{ pin_compatible(compiler('m2w64_cxx')) }}      # [win and cgo]\n        - {{ pin_compatible(compiler('m2w64_fortran')) }}  # [win and cgo]\n    test:\n      requires:\n        - {{ compiler('c') }}        # [unix and cgo]\n        - {{ compiler('m2w64_c') }}  # [win and cgo]\n        - git  # [unix]\n        - binutils  # [osx]\n        - perl\n      files:\n        - {{ go_variant_str }}\n      commands:\n        - chmod +x {{ go_variant_str }}/test.sh   # [unix]\n        - ./{{ go_variant_str }}/test.sh   # [unix]\n        - {{ go_variant_str }}/test.bat  # [win]\n        - test \"$GOTOOLCHAIN\" = \"local\"   # [unix]\n        - if not \"%GOTOOLCHAIN%\"==\"local\" exit /b 1  # [win]\n    about:\n      home: https://go.dev/\n      license: BSD-3-Clause\n      license_family: BSD\n      license_file: go/LICENSE\n      summary: The Go Programming Language\n\nabout:\n  home: https://go.dev/\n  license: BSD-3-Clause\n  license_family: BSD\n  license_file: go/LICENSE\n  summary: The Go Programming Language ({{ go_variant_str }})\n  description: |\n    Go is expressive, concise, clean, and efficient. Its concurrency mechanisms\n    make it easy to write programs that get the most out of multicore and\n    networked machines, while its novel type system enables flexible and\n    modular program construction. Go compiles quickly to machine code yet has\n    the convenience of garbage collection and the power of run-time reflection.\n    It's a fast, statically typed, compiled language that feels like a\n    dynamically typed, interpreted language.\n  doc_url: https://go.dev/doc\n  dev_url: https://github.com/golang/\n\nextra:\n  feedstock-name: go\n  recipe-maintainers:\n    - nehaljwani\n    - scopatz\n    - sodre\n    - stuarteberg\n    - xhochy\n    - hmaarrfk\n",
+  "raw_meta_yaml": "{% set name = \"go\" %}\n{% set version = \"1.26.0\" %}\n\npackage:\n  name: {{ name }}-{{ go_variant_str }}-split\n  version: {{ version }}\n\nsource:\n  - folder: go\n    url: https://dl.google.com/{{ name }}/go{{ version }}.src.tar.gz\n    sha256: c9132a8a1f6bd2aa4aad1d74b8231d95274950483a4950657ee6c56e6e817790\n    patches:\n      # Please see patches/README.md for more details\n      - patches/0001-Fix-cgo_fortran-test-setup-for-conda.patch\n      - patches/0002-Add-CC-C-CPP-LD-FLAGS-to-script_test-extraEnvKeys.patch\n      - patches/0003-Inherit-CGO_-environment-variables.patch\n      - patches/0004-Add-conda-aware-default-values-for-GOPATH-and-GOBIN.patch\n      - patches/0005-cmd-link-internal-ld-disable-testWindowsBuildmodeCSh.patch\n      - patches/0006-Revert-cmd-link-enable-internal-linker-in-more-cases.patch\n      - patches/0007-Mark-ftree-as-a-safe-compiler-flag.patch\n  # Update this with a release from https://go.dev/dl/\n  - folder: go-bootstrap\n    url: https://go.dev/dl/go{{ version }}.linux-amd64.tar.gz  # [build_platform == \"linux-64\"]\n    sha256: aac1b08a0fb0c4e0a7c1555beb7b59180b05dfc5a3d62e40e9de90cd42f88235  # [build_platform == \"linux-64\"]\n\n    url: https://go.dev/dl/go{{ version }}.windows-amd64.zip  # [win64]\n    sha256: 9bbe0fc64236b2b51f6255c05c4232532b8ecc0e6d2e00950bd3021d8a4d07d4  # [win64]\n\n    # url: https://go.dev/dl/go{{ version }}.darwin-arm64.tar.gz  # [osx and arm64]\n    # sha256: 49e394ab92bc6fa3df3d27298ddf3e4491f99477bee9dd4934525a526f3a391c  # [osx and arm64]\n\n    url: https://go.dev/dl/go{{ version }}.darwin-amd64.tar.gz  # [osx]\n    sha256: 1ca28b7703cbea05a65b2a1d92d6b308610ef92f8824578a0874f2e60c9d5a22  # [osx]\n\nbuild:\n  number: 1\n  skip: true  # [linux and s390x]\n\noutputs:\n  - name: go-{{ go_variant_str }}\n    build:\n      binary_relocation: false\n      detect_binary_files_with_prefix: false\n      force_ignore_keys:   # [win]\n        - c_compiler        # [win]\n        - cxx_compiler      # [win]\n        - fortran_compiler  # [win]\n      # test data links to these DSOs\n      missing_dso_whitelist:\n        - $RPATH/libc.so.6             # [linux and not cgo]\n        - /usr/lib/libSystem.B.dylib   # [osx]\n        - $SYSROOT\\System32\\winmm.dll  # [win]\n    requirements:\n      run:\n        - {{ pin_subpackage(name, exact=true) }}\n        - {{ compiler('c') }}  # [unix and cgo]\n        - {{ compiler('m2w64_c') }}  # [win and cgo]\n    test:\n      commands:\n        - go help\n\n  - name: go\n    script: {{ go_variant_str }}/build.sh  # [unix]\n    script: {{ go_variant_str }}/build.bat  # [win]\n    build:\n      binary_relocation: false\n      detect_binary_files_with_prefix: false\n      run_exports:   # [unix and cgo]\n        strong:   # [unix and cgo]\n          - __glibc >={{ c_stdlib_version }}  # [linux and cgo]\n          - __osx >=12                        # [osx and cgo]\n    requirements:\n      build:\n        - {{ compiler('c') }}        # [unix and cgo]\n        - {{ stdlib(\"c\") }}          # [unix and cgo]\n        - {{ compiler('cxx') }}      # [unix and cgo]\n        - {{ compiler('fortran') }}  # [unix and cgo]\n\n        - {{ compiler('m2w64_c') }}        # [win and cgo]\n        - {{ stdlib(\"m2w64_c\") }}          # [win and cgo]\n        - {{ compiler('m2w64_cxx') }}      # [win and cgo]\n        - {{ compiler('m2w64_fortran') }}  # [win and cgo]\n      run:\n        - _go_select =={{ go_variant_ver }}={{ go_variant_str }}\n      run_constrained:\n        # TODO: Move to run section once conda/conda#9845 is fixed\n\n        - {{ pin_compatible(compiler('c')) }}        # [unix and cgo]\n        - {{ pin_compatible(compiler('cxx')) }}      # [unix and cgo]\n        - {{ pin_compatible(compiler('fortran')) }}  # [unix and cgo]\n\n        - {{ pin_compatible(compiler('m2w64_c')) }}        # [win and cgo]\n        - {{ pin_compatible(compiler('m2w64_cxx')) }}      # [win and cgo]\n        - {{ pin_compatible(compiler('m2w64_fortran')) }}  # [win and cgo]\n    test:\n      requires:\n        - {{ compiler('c') }}        # [unix and cgo]\n        - {{ compiler('m2w64_c') }}  # [win and cgo]\n        - git  # [unix]\n        - binutils  # [osx]\n        - perl\n      files:\n        - {{ go_variant_str }}\n      commands:\n        - chmod +x {{ go_variant_str }}/test.sh   # [unix]\n        - ./{{ go_variant_str }}/test.sh   # [unix]\n        - {{ go_variant_str }}/test.bat  # [win]\n        - test \"$GOTOOLCHAIN\" = \"local\"   # [unix]\n        - if not \"%GOTOOLCHAIN%\"==\"local\" exit /b 1  # [win]\n    about:\n      home: https://go.dev/\n      license: BSD-3-Clause\n      license_family: BSD\n      license_file: go/LICENSE\n      summary: The Go Programming Language\n\nabout:\n  home: https://go.dev/\n  license: BSD-3-Clause\n  license_family: BSD\n  license_file: go/LICENSE\n  summary: The Go Programming Language ({{ go_variant_str }})\n  description: |\n    Go is expressive, concise, clean, and efficient. Its concurrency mechanisms\n    make it easy to write programs that get the most out of multicore and\n    networked machines, while its novel type system enables flexible and\n    modular program construction. Go compiles quickly to machine code yet has\n    the convenience of garbage collection and the power of run-time reflection.\n    It's a fast, statically typed, compiled language that feels like a\n    dynamically typed, interpreted language.\n  doc_url: https://go.dev/doc\n  dev_url: https://github.com/golang/\n\nextra:\n  feedstock-name: go\n  recipe-maintainers:\n    - nehaljwani\n    - scopatz\n    - sodre\n    - stuarteberg\n    - xhochy\n    - hmaarrfk\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -2352,7 +2352,7 @@
       "summary": "The Go Programming Language (cgo)"
     },
     "build": {
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "feedstock-name": "go",
