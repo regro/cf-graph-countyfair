@@ -1,7 +1,7 @@
 {
   "archived": false,
   "branch": "main",
-  "ci_support_linux_64_python3.10.____cpython.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\nnumpy:\n- '2'\npin_run_as_build:\n  python:\n    min_pin: x.x\n    max_pin: x.x\npython:\n- 3.10.* *_cpython\nrust_compiler:\n- rust\ntarget_platform:\n- linux-64\nzip_keys:\n- - python\n  - channel_sources\n",
+  "ci_support_linux_64_is_python_mintruepython3.10.____cpython.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\nis_abi3:\n- true\nis_python_min:\n- true\nopenblas:\n- 0.3.*\npin_run_as_build:\n  python:\n    min_pin: x.x\n    max_pin: x.x\npython:\n- 3.10.* *_cpython\npython_min:\n- '3.10'\nrust_compiler:\n- rust\ntarget_platform:\n- linux-64\nzip_keys:\n- - python\n  - is_python_min\n",
   "conda-forge.yml": {
     "conda_build": {
       "error_overlinking": true
@@ -12,13 +12,13 @@
       "tooling_branch_name": "main"
     }
   },
-  "feedstock_hash": "1719e755240453240b4c2cb5cb24e18fa826669a",
-  "feedstock_hash_ts": 1759339452,
+  "feedstock_hash": "e81f7c650a8ba2384487464c2f8173524c271a68",
+  "feedstock_hash_ts": 1771285064,
   "feedstock_name": "evalica",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
     "about": {
-      "description": "Evalica is a Python library that transforms pairwise comparisons\ninto ranked lists of items. It offers convenient high-performant\nRust implementations of the corresponding methods via PyO3,\nand additionally provides naïve Python code for most of them.\n",
+      "description": "Evalica is an evaluation toolkit for statistical analysis,\ncombining fast Rust implementations with Python APIs for\nranking, reliability, and uncertainty estimation.\n",
       "home": "https://github.com/dustalov/evalica",
       "license": "Apache-2.0",
       "license_file": [
@@ -31,10 +31,15 @@
       "entry_points": [
         "evalica = evalica.__main__:main"
       ],
-      "number": "1",
+      "ignore_run_exports": [
+        "python"
+      ],
+      "number": "0",
+      "python_version_independent": true,
       "script": [
         "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml",
-        "PYTHON -m pip install . -vv --no-deps --no-build-isolation"
+        "export PKG_CONFIG_PATH=\"${PREFIX}/lib/pkgconfig${PKG_CONFIG_PATH:+:${PKG_CONFIG_PATH}}\"",
+        "MATURIN_PEP517_ARGS=\"--features python,openblas-src\" PYTHON -m pip install . -vv --no-deps --no-build-isolation"
       ]
     },
     "extra": {
@@ -44,42 +49,50 @@
     },
     "package": {
       "name": "evalica",
-      "version": "0.3.2"
+      "version": "0.4.0.post1"
     },
     "requirements": {
       "build": [
         "c_compiler_stub",
         "rust_compiler_stub",
         "c_stdlib_stub",
-        "cargo-bundle-licenses"
+        "cargo-bundle-licenses",
+        "pkg-config"
       ],
       "host": [
+        "libopenblas",
+        "openblas",
         "maturin",
-        "numpy",
-        "pandas",
         "pip",
+        "python-abi3",
         "python"
       ],
       "run": [
+        "libopenblas",
+        "openblas",
+        "python",
         "pandas",
-        "python"
+        "scipy"
       ]
     },
     "schema_version": 0,
     "source": {
-      "sha256": "44de2a2c4b742ca4a82c9fa032dec0ce6167e78e159a8c07dbb4268cf7e857b5",
-      "url": "https://pypi.org/packages/source/e/evalica/evalica-0.3.2.tar.gz"
+      "sha256": "4ec1e857ffde448e582794e06d3336a46e93aa3fe64aec8ebbc7eadb53a66807",
+      "url": "https://pypi.org/packages/source/e/evalica/evalica-0.4.0.post1.tar.gz"
     },
     "test": {
       "commands": [
         "pip check",
-        "evalica --help"
+        "evalica --help",
+        "python -c \"import evalica, sys; print('BLAS:', blas := evalica._brzo.HAS_BLAS); sys.exit(int(not blas))\"",
+        "abi3audit $SP_DIR/evalica/_brzo.abi3.so -s -v --assume-minimum-abi3 3.10"
       ],
       "imports": [
         "evalica"
       ],
       "requires": [
-        "pip"
+        "pip",
+        "abi3audit"
       ]
     }
   },
@@ -90,36 +103,42 @@
         "c_compiler_stub",
         "c_stdlib_stub",
         "cargo-bundle-licenses",
+        "pkg-config",
         "rust_compiler_stub"
       ]
     },
     "host": {
       "__set__": true,
       "elements": [
+        "libopenblas",
         "maturin",
-        "numpy",
-        "pandas",
+        "openblas",
         "pip",
-        "python"
+        "python",
+        "python-abi3"
       ]
     },
     "run": {
       "__set__": true,
       "elements": [
+        "libopenblas",
+        "openblas",
         "pandas",
-        "python"
+        "python",
+        "scipy"
       ]
     },
     "test": {
       "__set__": true,
       "elements": [
+        "abi3audit",
         "pip"
       ]
     }
   },
   "meta_yaml": {
     "about": {
-      "description": "Evalica is a Python library that transforms pairwise comparisons\ninto ranked lists of items. It offers convenient high-performant\nRust implementations of the corresponding methods via PyO3,\nand additionally provides naïve Python code for most of them.\n",
+      "description": "Evalica is an evaluation toolkit for statistical analysis,\ncombining fast Rust implementations with Python APIs for\nranking, reliability, and uncertainty estimation.\n",
       "home": "https://github.com/dustalov/evalica",
       "license": "Apache-2.0",
       "license_file": [
@@ -132,10 +151,17 @@
       "entry_points": [
         "evalica = evalica.__main__:main"
       ],
-      "number": "1",
+      "ignore_run_exports": [
+        "python"
+      ],
+      "number": "0",
+      "python_version_independent": true,
       "script": [
         "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml",
-        "PYTHON -m pip install . -vv --no-deps --no-build-isolation"
+        "export PKG_CONFIG_PATH=\"${PREFIX}/lib/pkgconfig${PKG_CONFIG_PATH:+:${PKG_CONFIG_PATH}}\"",
+        "MATURIN_PEP517_ARGS=\"--features python,openblas-src\" PYTHON -m pip install . -vv --no-deps --no-build-isolation",
+        "set \"PKG_CONFIG_PATH=%PREFIX%\\Library\\lib\\pkgconfig\"",
+        "set \"MATURIN_PEP517_ARGS=--features python,openblas-src\" && PYTHON -m pip install . -vv --no-deps --no-build-isolation"
       ]
     },
     "extra": {
@@ -145,49 +171,58 @@
     },
     "package": {
       "name": "evalica",
-      "version": "0.3.2"
+      "version": "0.4.0.post1"
     },
     "requirements": {
       "build": [
         "c_compiler_stub",
         "rust_compiler_stub",
         "c_stdlib_stub",
-        "cargo-bundle-licenses"
+        "cargo-bundle-licenses",
+        "pkg-config"
       ],
       "host": [
+        "libopenblas",
+        "openblas",
         "maturin",
-        "numpy",
-        "pandas",
         "pip",
+        "python-abi3",
         "python"
       ],
       "run": [
+        "libopenblas",
+        "openblas",
+        "python",
         "pandas",
-        "python"
+        "scipy"
       ]
     },
     "schema_version": 0,
     "source": {
-      "sha256": "44de2a2c4b742ca4a82c9fa032dec0ce6167e78e159a8c07dbb4268cf7e857b5",
-      "url": "https://pypi.org/packages/source/e/evalica/evalica-0.3.2.tar.gz"
+      "sha256": "4ec1e857ffde448e582794e06d3336a46e93aa3fe64aec8ebbc7eadb53a66807",
+      "url": "https://pypi.org/packages/source/e/evalica/evalica-0.4.0.post1.tar.gz"
     },
     "test": {
       "commands": [
         "pip check",
-        "evalica --help"
+        "evalica --help",
+        "python -c \"import evalica, sys; print('BLAS:', blas := evalica._brzo.HAS_BLAS); sys.exit(int(not blas))\"",
+        "abi3audit $SP_DIR/evalica/_brzo.abi3.so -s -v --assume-minimum-abi3 3.10",
+        "abi3audit %SP_DIR%\\evalica\\_brzo.pyd -s -v --assume-minimum-abi3 3.10"
       ],
       "imports": [
         "evalica"
       ],
       "requires": [
-        "pip"
+        "pip",
+        "abi3audit"
       ]
     }
   },
   "name": "evalica",
   "osx_64_meta_yaml": {
     "about": {
-      "description": "Evalica is a Python library that transforms pairwise comparisons\ninto ranked lists of items. It offers convenient high-performant\nRust implementations of the corresponding methods via PyO3,\nand additionally provides naïve Python code for most of them.\n",
+      "description": "Evalica is an evaluation toolkit for statistical analysis,\ncombining fast Rust implementations with Python APIs for\nranking, reliability, and uncertainty estimation.\n",
       "home": "https://github.com/dustalov/evalica",
       "license": "Apache-2.0",
       "license_file": [
@@ -200,10 +235,15 @@
       "entry_points": [
         "evalica = evalica.__main__:main"
       ],
-      "number": "1",
+      "ignore_run_exports": [
+        "python"
+      ],
+      "number": "0",
+      "python_version_independent": true,
       "script": [
         "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml",
-        "PYTHON -m pip install . -vv --no-deps --no-build-isolation"
+        "export PKG_CONFIG_PATH=\"${PREFIX}/lib/pkgconfig${PKG_CONFIG_PATH:+:${PKG_CONFIG_PATH}}\"",
+        "MATURIN_PEP517_ARGS=\"--features python,openblas-src\" PYTHON -m pip install . -vv --no-deps --no-build-isolation"
       ]
     },
     "extra": {
@@ -213,42 +253,50 @@
     },
     "package": {
       "name": "evalica",
-      "version": "0.3.2"
+      "version": "0.4.0.post1"
     },
     "requirements": {
       "build": [
         "c_compiler_stub",
         "rust_compiler_stub",
         "c_stdlib_stub",
-        "cargo-bundle-licenses"
+        "cargo-bundle-licenses",
+        "pkg-config"
       ],
       "host": [
+        "libopenblas",
+        "openblas",
         "maturin",
-        "numpy",
-        "pandas",
         "pip",
+        "python-abi3",
         "python"
       ],
       "run": [
+        "libopenblas",
+        "openblas",
+        "python",
         "pandas",
-        "python"
+        "scipy"
       ]
     },
     "schema_version": 0,
     "source": {
-      "sha256": "44de2a2c4b742ca4a82c9fa032dec0ce6167e78e159a8c07dbb4268cf7e857b5",
-      "url": "https://pypi.org/packages/source/e/evalica/evalica-0.3.2.tar.gz"
+      "sha256": "4ec1e857ffde448e582794e06d3336a46e93aa3fe64aec8ebbc7eadb53a66807",
+      "url": "https://pypi.org/packages/source/e/evalica/evalica-0.4.0.post1.tar.gz"
     },
     "test": {
       "commands": [
         "pip check",
-        "evalica --help"
+        "evalica --help",
+        "python -c \"import evalica, sys; print('BLAS:', blas := evalica._brzo.HAS_BLAS); sys.exit(int(not blas))\"",
+        "abi3audit $SP_DIR/evalica/_brzo.abi3.so -s -v --assume-minimum-abi3 3.10"
       ],
       "imports": [
         "evalica"
       ],
       "requires": [
-        "pip"
+        "pip",
+        "abi3audit"
       ]
     }
   },
@@ -259,29 +307,35 @@
         "c_compiler_stub",
         "c_stdlib_stub",
         "cargo-bundle-licenses",
+        "pkg-config",
         "rust_compiler_stub"
       ]
     },
     "host": {
       "__set__": true,
       "elements": [
+        "libopenblas",
         "maturin",
-        "numpy",
-        "pandas",
+        "openblas",
         "pip",
-        "python"
+        "python",
+        "python-abi3"
       ]
     },
     "run": {
       "__set__": true,
       "elements": [
+        "libopenblas",
+        "openblas",
         "pandas",
-        "python"
+        "python",
+        "scipy"
       ]
     },
     "test": {
       "__set__": true,
       "elements": [
+        "abi3audit",
         "pip"
       ]
     }
@@ -301,19 +355,23 @@
   "pr_info": {
     "__lazy_json__": "pr_info/evalica.json"
   },
-  "raw_meta_yaml": "{% set name = \"evalica\" %}\n{% set version = \"0.3.2\" %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/evalica-{{ version }}.tar.gz\n  sha256: 44de2a2c4b742ca4a82c9fa032dec0ce6167e78e159a8c07dbb4268cf7e857b5\n\nbuild:\n  entry_points:\n    - evalica = evalica.__main__:main\n  script:\n    - cargo-bundle-licenses --format yaml --output THIRDPARTY.yml\n    - {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation\n  number: 1\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ compiler('rust') }}\n    - {{ stdlib(\"c\") }}\n    - cargo-bundle-licenses\n  host:\n    - maturin\n    - numpy\n    - pandas\n    - pip\n    - python\n  run:\n    - pandas\n    - python\n\ntest:\n  imports:\n    - evalica\n  commands:\n    - pip check\n    - evalica --help\n  requires:\n    - pip\n\nabout:\n  home: https://github.com/dustalov/evalica\n  summary: Evalica, your favourite evaluation toolkit.\n  description: |\n    Evalica is a Python library that transforms pairwise comparisons\n    into ranked lists of items. It offers convenient high-performant\n    Rust implementations of the corresponding methods via PyO3,\n    and additionally provides naïve Python code for most of them.\n  license: Apache-2.0\n  license_file:\n    - LICENSE\n    - THIRDPARTY.yml\n\nextra:\n  recipe-maintainers:\n    - dustalov\n",
+  "raw_meta_yaml": "{% set name = \"evalica\" %}\n{% set version = \"0.4.0.post1\" %}\n{% set sha256 = \"4ec1e857ffde448e582794e06d3336a46e93aa3fe64aec8ebbc7eadb53a66807\" %}\n\npackage:\n  name: {{ name | lower }}\n  version: {{ version }}\n\nsource:\n  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/evalica-{{ version }}.tar.gz\n  sha256: {{ sha256 }}\n\nbuild:\n  number: 0\n  ignore_run_exports:\n    - python\n  entry_points:\n    - evalica = evalica.__main__:main\n  script:\n    - cargo-bundle-licenses --format yaml --output THIRDPARTY.yml\n    - export PKG_CONFIG_PATH=\"${PREFIX}/lib/pkgconfig${PKG_CONFIG_PATH:+:${PKG_CONFIG_PATH}}\"  # [unix]\n    - set \"PKG_CONFIG_PATH=%PREFIX%\\Library\\lib\\pkgconfig\"  # [win]\n    - MATURIN_PEP517_ARGS=\"--features python,openblas-src\" {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation  # [unix]\n    - set \"MATURIN_PEP517_ARGS=--features python,openblas-src\" && {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation  # [win]\n  python_version_independent: true  # [is_abi3]\n  skip: true  # [is_abi3 and not is_python_min]\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ compiler('rust') }}\n    - {{ stdlib('c') }}\n    - cargo-bundle-licenses\n    - pkg-config\n  host:\n    - libopenblas\n    - openblas\n    - maturin\n    - pip\n    - python-abi3  # [is_abi3]\n    - python\n  run:\n    - libopenblas\n    - openblas\n    - python\n    - pandas\n    - scipy\n\ntest:\n  imports:\n    - evalica\n  commands:\n    - pip check\n    - evalica --help\n    - python -c \"import evalica, sys; print('BLAS:', blas := evalica._brzo.HAS_BLAS); sys.exit(int(not blas))\"\n    - abi3audit $SP_DIR/evalica/_brzo.abi3.so -s -v --assume-minimum-abi3 {{ python_min }}  # [unix and is_abi3]\n    - abi3audit %SP_DIR%\\evalica\\_brzo.pyd -s -v --assume-minimum-abi3 {{ python_min }}  # [win and is_abi3]\n  requires:\n    - pip\n    - abi3audit  # [is_abi3]\n\nabout:\n  home: https://github.com/dustalov/evalica\n  summary: Evalica, your favourite evaluation toolkit.\n  description: |\n    Evalica is an evaluation toolkit for statistical analysis,\n    combining fast Rust implementations with Python APIs for\n    ranking, reliability, and uncertainty estimation.\n  license: Apache-2.0\n  license_file:\n    - LICENSE\n    - THIRDPARTY.yml\n\nextra:\n  recipe-maintainers:\n    - dustalov\n",
   "req": {
     "__set__": true,
     "elements": [
       "c_compiler_stub",
       "c_stdlib_stub",
       "cargo-bundle-licenses",
+      "libopenblas",
       "maturin",
-      "numpy",
+      "openblas",
       "pandas",
       "pip",
+      "pkg-config",
       "python",
-      "rust_compiler_stub"
+      "python-abi3",
+      "rust_compiler_stub",
+      "scipy"
     ]
   },
   "requirements": {
@@ -323,6 +381,7 @@
         "c_compiler_stub",
         "c_stdlib_stub",
         "cargo-bundle-licenses",
+        "pkg-config",
         "rust_compiler_stub"
       ]
     },
@@ -331,11 +390,12 @@
       "elements": [
         "c_compiler_stub",
         "c_stdlib_stub",
+        "libopenblas",
         "maturin",
-        "numpy",
-        "pandas",
+        "openblas",
         "pip",
-        "python"
+        "python",
+        "python-abi3"
       ]
     },
     "run": {
@@ -343,13 +403,17 @@
       "elements": [
         "c_compiler_stub",
         "c_stdlib_stub",
+        "libopenblas",
+        "openblas",
         "pandas",
-        "python"
+        "python",
+        "scipy"
       ]
     },
     "test": {
       "__set__": true,
       "elements": [
+        "abi3audit",
         "pip"
       ]
     }
@@ -362,41 +426,47 @@
         "c_compiler_stub",
         "c_stdlib_stub",
         "cargo-bundle-licenses",
+        "pkg-config",
         "rust_compiler_stub"
       ]
     },
     "host": {
       "__set__": true,
       "elements": [
+        "libopenblas",
         "maturin",
-        "numpy",
-        "pandas",
+        "openblas",
         "pip",
-        "python"
+        "python",
+        "python-abi3"
       ]
     },
     "run": {
       "__set__": true,
       "elements": [
+        "libopenblas",
+        "openblas",
         "pandas",
-        "python"
+        "python",
+        "scipy"
       ]
     },
     "test": {
       "__set__": true,
       "elements": [
+        "abi3audit",
         "pip"
       ]
     }
   },
-  "url": "https://pypi.org/packages/source/e/evalica/evalica-0.3.2.tar.gz",
-  "version": "0.3.2",
+  "url": "https://pypi.org/packages/source/e/evalica/evalica-0.4.0.post1.tar.gz",
+  "version": "0.4.0.post1",
   "version_pr_info": {
     "__lazy_json__": "version_pr_info/evalica.json"
   },
   "win_64_meta_yaml": {
     "about": {
-      "description": "Evalica is a Python library that transforms pairwise comparisons\ninto ranked lists of items. It offers convenient high-performant\nRust implementations of the corresponding methods via PyO3,\nand additionally provides naïve Python code for most of them.\n",
+      "description": "Evalica is an evaluation toolkit for statistical analysis,\ncombining fast Rust implementations with Python APIs for\nranking, reliability, and uncertainty estimation.\n",
       "home": "https://github.com/dustalov/evalica",
       "license": "Apache-2.0",
       "license_file": [
@@ -409,10 +479,15 @@
       "entry_points": [
         "evalica = evalica.__main__:main"
       ],
-      "number": "1",
+      "ignore_run_exports": [
+        "python"
+      ],
+      "number": "0",
+      "python_version_independent": true,
       "script": [
         "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml",
-        "PYTHON -m pip install . -vv --no-deps --no-build-isolation"
+        "set \"PKG_CONFIG_PATH=%PREFIX%\\Library\\lib\\pkgconfig\"",
+        "set \"MATURIN_PEP517_ARGS=--features python,openblas-src\" && PYTHON -m pip install . -vv --no-deps --no-build-isolation"
       ]
     },
     "extra": {
@@ -422,42 +497,50 @@
     },
     "package": {
       "name": "evalica",
-      "version": "0.3.2"
+      "version": "0.4.0.post1"
     },
     "requirements": {
       "build": [
         "c_compiler_stub",
         "rust_compiler_stub",
         "c_stdlib_stub",
-        "cargo-bundle-licenses"
+        "cargo-bundle-licenses",
+        "pkg-config"
       ],
       "host": [
+        "libopenblas",
+        "openblas",
         "maturin",
-        "numpy",
-        "pandas",
         "pip",
+        "python-abi3",
         "python"
       ],
       "run": [
+        "libopenblas",
+        "openblas",
+        "python",
         "pandas",
-        "python"
+        "scipy"
       ]
     },
     "schema_version": 0,
     "source": {
-      "sha256": "44de2a2c4b742ca4a82c9fa032dec0ce6167e78e159a8c07dbb4268cf7e857b5",
-      "url": "https://pypi.org/packages/source/e/evalica/evalica-0.3.2.tar.gz"
+      "sha256": "4ec1e857ffde448e582794e06d3336a46e93aa3fe64aec8ebbc7eadb53a66807",
+      "url": "https://pypi.org/packages/source/e/evalica/evalica-0.4.0.post1.tar.gz"
     },
     "test": {
       "commands": [
         "pip check",
-        "evalica --help"
+        "evalica --help",
+        "python -c \"import evalica, sys; print('BLAS:', blas := evalica._brzo.HAS_BLAS); sys.exit(int(not blas))\"",
+        "abi3audit %SP_DIR%\\evalica\\_brzo.pyd -s -v --assume-minimum-abi3 3.10"
       ],
       "imports": [
         "evalica"
       ],
       "requires": [
-        "pip"
+        "pip",
+        "abi3audit"
       ]
     }
   },
@@ -468,29 +551,35 @@
         "c_compiler_stub",
         "c_stdlib_stub",
         "cargo-bundle-licenses",
+        "pkg-config",
         "rust_compiler_stub"
       ]
     },
     "host": {
       "__set__": true,
       "elements": [
+        "libopenblas",
         "maturin",
-        "numpy",
-        "pandas",
+        "openblas",
         "pip",
-        "python"
+        "python",
+        "python-abi3"
       ]
     },
     "run": {
       "__set__": true,
       "elements": [
+        "libopenblas",
+        "openblas",
         "pandas",
-        "python"
+        "python",
+        "scipy"
       ]
     },
     "test": {
       "__set__": true,
       "elements": [
+        "abi3audit",
         "pip"
       ]
     }
