@@ -1,7 +1,7 @@
 {
   "archived": false,
   "branch": "main",
-  "ci_support_linux_64_root_base6.32.10.yaml": "c_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\ncdt_name:\n- conda\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ncxx_compiler:\n- gxx\ncxx_compiler_version:\n- '13'\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\nroot_base:\n- 6.32.10\ntarget_platform:\n- linux-64\n",
+  "ci_support_linux_64_root_base6.36.8root_cxx_standard20.yaml": "c_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ncxx_compiler:\n- gxx\ncxx_compiler_version:\n- '14'\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\nroot_base:\n- 6.36.8\nroot_cxx_standard:\n- '20'\ntarget_platform:\n- linux-64\nzip_keys:\n- - root_base\n  - root_cxx_standard\n",
   "conda-forge.yml": {
     "conda_build": {
       "error_overlinking": true
@@ -12,10 +12,15 @@
     "github": {
       "branch_name": "main",
       "tooling_branch_name": "main"
+    },
+    "provider": {
+      "linux_aarch64": "default",
+      "linux_ppc64le": "default",
+      "osx_arm64": "azure"
     }
   },
-  "feedstock_hash": "1481b97a5de2df74f0446000094f8c22ee9b23dd",
-  "feedstock_hash_ts": 1746496263,
+  "feedstock_hash": "04d2e24bc2efeec4566b0e5d3a01bf68bd4fed2f",
+  "feedstock_hash_ts": 1771428275,
   "feedstock_name": "delphes",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -30,10 +35,15 @@
       "summary": "A framework for fast simulation of a generic collider experiment"
     },
     "build": {
-      "number": "5",
+      "number": "0",
+      "run_exports": {
+        "weak": [
+          "delphes"
+        ]
+      },
       "script": [
         "grep -r -l \"external/\" examples/ | xargs sed -i 's|external/||g'",
-        "CXXFLAGS=\"${CXXFLAGS}\" cmake ${CMAKE_ARGS} -DCMAKE_INSTALL_PREFIX=$PREFIX -DPYTHIA8_DATA=$(pythia8-config --datadir) -S . -B build",
+        "CXXFLAGS=\"${CXXFLAGS}\" cmake ${CMAKE_ARGS} -DPYTHIA8_DATA=$(pythia8-config --datadir) -S . -B build",
         "cmake build -LH",
         "cmake --build build --clean-first --parallel=\"${CPU_COUNT}\"",
         "cmake --install build"
@@ -48,7 +58,12 @@
     },
     "outputs": [
       {
-        "build": null,
+        "build": {
+          "strong": [],
+          "weak": [
+            "delphes"
+          ]
+        },
         "name": "delphes",
         "requirements": {
           "build": [
@@ -61,6 +76,7 @@
           ],
           "host": [
             "root_base",
+            "root_cxx_standard",
             "pythia8"
           ],
           "run": []
@@ -69,7 +85,6 @@
           {
             "requirements": {
               "run": [
-                "cxx_compiler_stub",
                 "root_base",
                 "pythia8",
                 "gzip",
@@ -96,10 +111,15 @@
             ]
           }
         ],
-        "version": "3.5.0"
+        "version": "3.5.1"
       },
       {
-        "build": null,
+        "build": {
+          "strong": [],
+          "weak": [
+            "delphes"
+          ]
+        },
         "name": "delphes",
         "requirements": {
           "build": [
@@ -112,6 +132,7 @@
           ],
           "host": [
             "root_base",
+            "root_cxx_standard",
             "pythia8"
           ],
           "run": []
@@ -120,7 +141,6 @@
           {
             "requirements": {
               "run": [
-                "cxx_compiler_stub",
                 "root_base",
                 "pythia8",
                 "gzip",
@@ -147,12 +167,68 @@
             ]
           }
         ],
-        "version": "3.5.0"
+        "version": "3.5.1"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "delphes"
+          ]
+        },
+        "name": "delphes",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "grep",
+            "sed"
+          ],
+          "host": [
+            "root_base",
+            "root_cxx_standard",
+            "pythia8"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "root_base",
+                "pythia8",
+                "gzip",
+                "curl",
+                "grep",
+                "sed"
+              ]
+            },
+            "script": [
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC2",
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC3",
+              "test -f \"${PREFIX}\"/bin/DelphesLHEF",
+              "test -f \"${PREFIX}\"/bin/DelphesPythia8",
+              "test -f \"${PREFIX}\"/bin/DelphesROOT",
+              "test -f \"${PREFIX}\"/bin/DelphesSTDHEP",
+              "curl -LO http://cp3.irmp.ucl.ac.be/downloads/z_ee.hep.gz",
+              "gunzip z_ee.hep.gz",
+              "DelphesSTDHEP \"${PREFIX}\"/cards/delphes_card_CMS.tcl delphes_output.root z_ee.hep",
+              "root -l -b -q \"${PREFIX}\"/examples/Example1.C'(\"delphes_output.root\")' &> /dev/null",
+              "root -l -b -q \"${PREFIX}\"/examples/Example2.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example3.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example4.C'(\"delphes_output.root\", \"plots.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example5.C'(\"delphes_output.root\")' &> /dev/null"
+            ]
+          }
+        ],
+        "version": "3.5.1"
       }
     ],
     "package": {
       "name": "delphes",
-      "version": "3.5.0"
+      "version": "3.5.1"
     },
     "requirements": {
       "build": [
@@ -165,18 +241,17 @@
       ],
       "host": [
         "root_base",
+        "root_cxx_standard",
         "pythia8"
       ]
     },
     "schema_version": 1,
     "source": {
       "patches": [
-        "Delphes-ClosestPair2D-fwdDeclaration.patch",
-        "remove_binary_function.patch",
-        "use-range-of-supported-cmake.patch"
+        "add-missing-algorithm-include.patch"
       ],
-      "sha256": "30a2536e0c8f47d633ecf3b4d51ec9924af54538e492470ad47b4ed34342f063",
-      "url": "https://github.com/delphes/delphes/archive/refs/tags/3.5.0.tar.gz"
+      "sha256": "b60d26d2ee2c84b58fbf2cf397fabd0ef3e89d3a0546d843c4ada82cc802d787",
+      "url": "https://github.com/delphes/delphes/archive/refs/tags/3.5.1.tar.gz"
     }
   },
   "linux_64_requirements": {
@@ -195,7 +270,8 @@
       "__set__": true,
       "elements": [
         "pythia8",
-        "root_base"
+        "root_base",
+        "root_cxx_standard"
       ]
     },
     "run": {
@@ -206,7 +282,540 @@
       "__set__": true,
       "elements": [
         "curl",
+        "grep",
+        "gzip",
+        "pythia8",
+        "root_base",
+        "sed"
+      ]
+    }
+  },
+  "linux_aarch64_meta_yaml": {
+    "about": {
+      "description": "Delphes is a C++ framework, performing a fast multipurpose detector\nresponse simulation. The simulation includes a tracking system, embedded\ninto a magnetic field, calorimeters and a muon system. The framework is\ninterfaced to standard file formats (e.g. Les Houches Event File or HepMC)\nand outputs observables such as isolated leptons, missing transverse energy\nand collection of jets which can be used for dedicated analyses.\nThe simulation of the detector response takes into account the effect of\nmagnetic field, the granularity of the calorimeters and sub-detector resolutions.\nVisualisation of the final state particles is also built-in using the\ncorresponding ROOT library.",
+      "dev_url": "https://github.com/delphes/delphes",
+      "doc_url": "https://cp3.irmp.ucl.ac.be/projects/delphes",
+      "home": "https://github.com/delphes/delphes",
+      "license": "GPL-3.0-or-later",
+      "license_family": "GPL-3.0-or-later",
+      "license_file": "COPYING",
+      "summary": "A framework for fast simulation of a generic collider experiment"
+    },
+    "build": {
+      "number": "0",
+      "run_exports": {
+        "weak": [
+          "delphes"
+        ]
+      },
+      "script": [
+        "grep -r -l \"external/\" examples/ | xargs sed -i 's|external/||g'",
+        "CXXFLAGS=\"${CXXFLAGS}\" cmake ${CMAKE_ARGS} -DPYTHIA8_DATA=$(pythia8-config --datadir) -S . -B build",
+        "cmake build -LH",
+        "cmake --build build --clean-first --parallel=\"${CPU_COUNT}\"",
+        "cmake --install build"
+      ]
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "pavel-demin",
+        "matthewfeickert",
+        "kratsg"
+      ]
+    },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "delphes"
+          ]
+        },
+        "name": "delphes",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "grep",
+            "sed"
+          ],
+          "host": [
+            "root_base",
+            "root_cxx_standard",
+            "pythia8"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "root_base",
+                "pythia8",
+                "gzip",
+                "curl",
+                "grep",
+                "sed"
+              ]
+            },
+            "script": [
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC2",
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC3",
+              "test -f \"${PREFIX}\"/bin/DelphesLHEF",
+              "test -f \"${PREFIX}\"/bin/DelphesPythia8",
+              "test -f \"${PREFIX}\"/bin/DelphesROOT",
+              "test -f \"${PREFIX}\"/bin/DelphesSTDHEP",
+              "curl -LO http://cp3.irmp.ucl.ac.be/downloads/z_ee.hep.gz",
+              "gunzip z_ee.hep.gz",
+              "DelphesSTDHEP \"${PREFIX}\"/cards/delphes_card_CMS.tcl delphes_output.root z_ee.hep",
+              "root -l -b -q \"${PREFIX}\"/examples/Example1.C'(\"delphes_output.root\")' &> /dev/null",
+              "root -l -b -q \"${PREFIX}\"/examples/Example2.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example3.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example4.C'(\"delphes_output.root\", \"plots.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example5.C'(\"delphes_output.root\")' &> /dev/null"
+            ]
+          }
+        ],
+        "version": "3.5.1"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "delphes"
+          ]
+        },
+        "name": "delphes",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "grep",
+            "sed"
+          ],
+          "host": [
+            "root_base",
+            "root_cxx_standard",
+            "pythia8"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "root_base",
+                "pythia8",
+                "gzip",
+                "curl",
+                "grep",
+                "sed"
+              ]
+            },
+            "script": [
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC2",
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC3",
+              "test -f \"${PREFIX}\"/bin/DelphesLHEF",
+              "test -f \"${PREFIX}\"/bin/DelphesPythia8",
+              "test -f \"${PREFIX}\"/bin/DelphesROOT",
+              "test -f \"${PREFIX}\"/bin/DelphesSTDHEP",
+              "curl -LO http://cp3.irmp.ucl.ac.be/downloads/z_ee.hep.gz",
+              "gunzip z_ee.hep.gz",
+              "DelphesSTDHEP \"${PREFIX}\"/cards/delphes_card_CMS.tcl delphes_output.root z_ee.hep",
+              "root -l -b -q \"${PREFIX}\"/examples/Example1.C'(\"delphes_output.root\")' &> /dev/null",
+              "root -l -b -q \"${PREFIX}\"/examples/Example2.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example3.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example4.C'(\"delphes_output.root\", \"plots.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example5.C'(\"delphes_output.root\")' &> /dev/null"
+            ]
+          }
+        ],
+        "version": "3.5.1"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "delphes"
+          ]
+        },
+        "name": "delphes",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "grep",
+            "sed"
+          ],
+          "host": [
+            "root_base",
+            "root_cxx_standard",
+            "pythia8"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "root_base",
+                "pythia8",
+                "gzip",
+                "curl",
+                "grep",
+                "sed"
+              ]
+            },
+            "script": [
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC2",
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC3",
+              "test -f \"${PREFIX}\"/bin/DelphesLHEF",
+              "test -f \"${PREFIX}\"/bin/DelphesPythia8",
+              "test -f \"${PREFIX}\"/bin/DelphesROOT",
+              "test -f \"${PREFIX}\"/bin/DelphesSTDHEP",
+              "curl -LO http://cp3.irmp.ucl.ac.be/downloads/z_ee.hep.gz",
+              "gunzip z_ee.hep.gz",
+              "DelphesSTDHEP \"${PREFIX}\"/cards/delphes_card_CMS.tcl delphes_output.root z_ee.hep",
+              "root -l -b -q \"${PREFIX}\"/examples/Example1.C'(\"delphes_output.root\")' &> /dev/null",
+              "root -l -b -q \"${PREFIX}\"/examples/Example2.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example3.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example4.C'(\"delphes_output.root\", \"plots.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example5.C'(\"delphes_output.root\")' &> /dev/null"
+            ]
+          }
+        ],
+        "version": "3.5.1"
+      }
+    ],
+    "package": {
+      "name": "delphes",
+      "version": "3.5.1"
+    },
+    "requirements": {
+      "build": [
         "cxx_compiler_stub",
+        "c_stdlib_stub",
+        "cmake",
+        "make",
+        "grep",
+        "sed"
+      ],
+      "host": [
+        "root_base",
+        "root_cxx_standard",
+        "pythia8"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "patches": [
+        "add-missing-algorithm-include.patch"
+      ],
+      "sha256": "b60d26d2ee2c84b58fbf2cf397fabd0ef3e89d3a0546d843c4ada82cc802d787",
+      "url": "https://github.com/delphes/delphes/archive/refs/tags/3.5.1.tar.gz"
+    }
+  },
+  "linux_aarch64_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "cmake",
+        "cxx_compiler_stub",
+        "grep",
+        "make",
+        "sed"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "pythia8",
+        "root_base",
+        "root_cxx_standard"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": []
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "curl",
+        "grep",
+        "gzip",
+        "pythia8",
+        "root_base",
+        "sed"
+      ]
+    }
+  },
+  "linux_ppc64le_meta_yaml": {
+    "about": {
+      "description": "Delphes is a C++ framework, performing a fast multipurpose detector\nresponse simulation. The simulation includes a tracking system, embedded\ninto a magnetic field, calorimeters and a muon system. The framework is\ninterfaced to standard file formats (e.g. Les Houches Event File or HepMC)\nand outputs observables such as isolated leptons, missing transverse energy\nand collection of jets which can be used for dedicated analyses.\nThe simulation of the detector response takes into account the effect of\nmagnetic field, the granularity of the calorimeters and sub-detector resolutions.\nVisualisation of the final state particles is also built-in using the\ncorresponding ROOT library.",
+      "dev_url": "https://github.com/delphes/delphes",
+      "doc_url": "https://cp3.irmp.ucl.ac.be/projects/delphes",
+      "home": "https://github.com/delphes/delphes",
+      "license": "GPL-3.0-or-later",
+      "license_family": "GPL-3.0-or-later",
+      "license_file": "COPYING",
+      "summary": "A framework for fast simulation of a generic collider experiment"
+    },
+    "build": {
+      "number": "0",
+      "run_exports": {
+        "weak": [
+          "delphes"
+        ]
+      },
+      "script": [
+        "grep -r -l \"external/\" examples/ | xargs sed -i 's|external/||g'",
+        "CXXFLAGS=\"${CXXFLAGS}\" cmake ${CMAKE_ARGS} -DPYTHIA8_DATA=$(pythia8-config --datadir) -S . -B build",
+        "cmake build -LH",
+        "cmake --build build --clean-first --parallel=\"${CPU_COUNT}\"",
+        "cmake --install build"
+      ]
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "pavel-demin",
+        "matthewfeickert",
+        "kratsg"
+      ]
+    },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "delphes"
+          ]
+        },
+        "name": "delphes",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "grep",
+            "sed"
+          ],
+          "host": [
+            "root_base",
+            "root_cxx_standard",
+            "pythia8"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "root_base",
+                "pythia8",
+                "gzip",
+                "curl",
+                "grep",
+                "sed"
+              ]
+            },
+            "script": [
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC2",
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC3",
+              "test -f \"${PREFIX}\"/bin/DelphesLHEF",
+              "test -f \"${PREFIX}\"/bin/DelphesPythia8",
+              "test -f \"${PREFIX}\"/bin/DelphesROOT",
+              "test -f \"${PREFIX}\"/bin/DelphesSTDHEP",
+              "curl -LO http://cp3.irmp.ucl.ac.be/downloads/z_ee.hep.gz",
+              "gunzip z_ee.hep.gz",
+              "DelphesSTDHEP \"${PREFIX}\"/cards/delphes_card_CMS.tcl delphes_output.root z_ee.hep",
+              "root -l -b -q \"${PREFIX}\"/examples/Example1.C'(\"delphes_output.root\")' &> /dev/null",
+              "root -l -b -q \"${PREFIX}\"/examples/Example2.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example3.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example4.C'(\"delphes_output.root\", \"plots.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example5.C'(\"delphes_output.root\")' &> /dev/null"
+            ]
+          }
+        ],
+        "version": "3.5.1"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "delphes"
+          ]
+        },
+        "name": "delphes",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "grep",
+            "sed"
+          ],
+          "host": [
+            "root_base",
+            "root_cxx_standard",
+            "pythia8"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "root_base",
+                "pythia8",
+                "gzip",
+                "curl",
+                "grep",
+                "sed"
+              ]
+            },
+            "script": [
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC2",
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC3",
+              "test -f \"${PREFIX}\"/bin/DelphesLHEF",
+              "test -f \"${PREFIX}\"/bin/DelphesPythia8",
+              "test -f \"${PREFIX}\"/bin/DelphesROOT",
+              "test -f \"${PREFIX}\"/bin/DelphesSTDHEP",
+              "curl -LO http://cp3.irmp.ucl.ac.be/downloads/z_ee.hep.gz",
+              "gunzip z_ee.hep.gz",
+              "DelphesSTDHEP \"${PREFIX}\"/cards/delphes_card_CMS.tcl delphes_output.root z_ee.hep",
+              "root -l -b -q \"${PREFIX}\"/examples/Example1.C'(\"delphes_output.root\")' &> /dev/null",
+              "root -l -b -q \"${PREFIX}\"/examples/Example2.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example3.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example4.C'(\"delphes_output.root\", \"plots.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example5.C'(\"delphes_output.root\")' &> /dev/null"
+            ]
+          }
+        ],
+        "version": "3.5.1"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "delphes"
+          ]
+        },
+        "name": "delphes",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "grep",
+            "sed"
+          ],
+          "host": [
+            "root_base",
+            "root_cxx_standard",
+            "pythia8"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "root_base",
+                "pythia8",
+                "gzip",
+                "curl",
+                "grep",
+                "sed"
+              ]
+            },
+            "script": [
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC2",
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC3",
+              "test -f \"${PREFIX}\"/bin/DelphesLHEF",
+              "test -f \"${PREFIX}\"/bin/DelphesPythia8",
+              "test -f \"${PREFIX}\"/bin/DelphesROOT",
+              "test -f \"${PREFIX}\"/bin/DelphesSTDHEP",
+              "curl -LO http://cp3.irmp.ucl.ac.be/downloads/z_ee.hep.gz",
+              "gunzip z_ee.hep.gz",
+              "DelphesSTDHEP \"${PREFIX}\"/cards/delphes_card_CMS.tcl delphes_output.root z_ee.hep",
+              "root -l -b -q \"${PREFIX}\"/examples/Example1.C'(\"delphes_output.root\")' &> /dev/null",
+              "root -l -b -q \"${PREFIX}\"/examples/Example2.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example3.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example4.C'(\"delphes_output.root\", \"plots.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example5.C'(\"delphes_output.root\")' &> /dev/null"
+            ]
+          }
+        ],
+        "version": "3.5.1"
+      }
+    ],
+    "package": {
+      "name": "delphes",
+      "version": "3.5.1"
+    },
+    "requirements": {
+      "build": [
+        "cxx_compiler_stub",
+        "c_stdlib_stub",
+        "cmake",
+        "make",
+        "grep",
+        "sed"
+      ],
+      "host": [
+        "root_base",
+        "root_cxx_standard",
+        "pythia8"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "patches": [
+        "add-missing-algorithm-include.patch"
+      ],
+      "sha256": "b60d26d2ee2c84b58fbf2cf397fabd0ef3e89d3a0546d843c4ada82cc802d787",
+      "url": "https://github.com/delphes/delphes/archive/refs/tags/3.5.1.tar.gz"
+    }
+  },
+  "linux_ppc64le_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "cmake",
+        "cxx_compiler_stub",
+        "grep",
+        "make",
+        "sed"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "pythia8",
+        "root_base",
+        "root_cxx_standard"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": []
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "curl",
         "grep",
         "gzip",
         "pythia8",
@@ -227,10 +836,15 @@
       "summary": "A framework for fast simulation of a generic collider experiment"
     },
     "build": {
-      "number": "5",
+      "number": "0",
+      "run_exports": {
+        "weak": [
+          "delphes"
+        ]
+      },
       "script": [
         "grep -r -l \"external/\" examples/ | xargs sed -i 's|external/||g'",
-        "CXXFLAGS=\"${CXXFLAGS}\" cmake ${CMAKE_ARGS} -DCMAKE_INSTALL_PREFIX=$PREFIX -DPYTHIA8_DATA=$(pythia8-config --datadir) -S . -B build",
+        "CXXFLAGS=\"${CXXFLAGS}\" cmake ${CMAKE_ARGS} -DPYTHIA8_DATA=$(pythia8-config --datadir) -S . -B build",
         "cmake build -LH",
         "cmake --build build --clean-first --parallel=\"${CPU_COUNT}\"",
         "cmake --install build"
@@ -245,7 +859,12 @@
     },
     "outputs": [
       {
-        "build": null,
+        "build": {
+          "strong": [],
+          "weak": [
+            "delphes"
+          ]
+        },
         "name": "delphes",
         "requirements": {
           "build": [
@@ -258,6 +877,7 @@
           ],
           "host": [
             "root_base",
+            "root_cxx_standard",
             "pythia8"
           ],
           "run": []
@@ -266,7 +886,6 @@
           {
             "requirements": {
               "run": [
-                "cxx_compiler_stub",
                 "root_base",
                 "pythia8",
                 "gzip",
@@ -293,10 +912,15 @@
             ]
           }
         ],
-        "version": "3.5.0"
+        "version": "3.5.1"
       },
       {
-        "build": null,
+        "build": {
+          "strong": [],
+          "weak": [
+            "delphes"
+          ]
+        },
         "name": "delphes",
         "requirements": {
           "build": [
@@ -309,6 +933,7 @@
           ],
           "host": [
             "root_base",
+            "root_cxx_standard",
             "pythia8"
           ],
           "run": []
@@ -317,7 +942,6 @@
           {
             "requirements": {
               "run": [
-                "cxx_compiler_stub",
                 "root_base",
                 "pythia8",
                 "gzip",
@@ -344,10 +968,15 @@
             ]
           }
         ],
-        "version": "3.5.0"
+        "version": "3.5.1"
       },
       {
-        "build": null,
+        "build": {
+          "strong": [],
+          "weak": [
+            "delphes"
+          ]
+        },
         "name": "delphes",
         "requirements": {
           "build": [
@@ -360,6 +989,7 @@
           ],
           "host": [
             "root_base",
+            "root_cxx_standard",
             "pythia8"
           ],
           "run": []
@@ -368,7 +998,6 @@
           {
             "requirements": {
               "run": [
-                "cxx_compiler_stub",
                 "root_base",
                 "pythia8",
                 "gzip",
@@ -395,10 +1024,15 @@
             ]
           }
         ],
-        "version": "3.5.0"
+        "version": "3.5.1"
       },
       {
-        "build": null,
+        "build": {
+          "strong": [],
+          "weak": [
+            "delphes"
+          ]
+        },
         "name": "delphes",
         "requirements": {
           "build": [
@@ -411,6 +1045,7 @@
           ],
           "host": [
             "root_base",
+            "root_cxx_standard",
             "pythia8"
           ],
           "run": []
@@ -419,7 +1054,6 @@
           {
             "requirements": {
               "run": [
-                "cxx_compiler_stub",
                 "root_base",
                 "pythia8",
                 "gzip",
@@ -446,12 +1080,628 @@
             ]
           }
         ],
-        "version": "3.5.0"
+        "version": "3.5.1"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "delphes"
+          ]
+        },
+        "name": "delphes",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "grep",
+            "sed"
+          ],
+          "host": [
+            "root_base",
+            "root_cxx_standard",
+            "pythia8"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "root_base",
+                "pythia8",
+                "gzip",
+                "curl",
+                "grep",
+                "sed"
+              ]
+            },
+            "script": [
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC2",
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC3",
+              "test -f \"${PREFIX}\"/bin/DelphesLHEF",
+              "test -f \"${PREFIX}\"/bin/DelphesPythia8",
+              "test -f \"${PREFIX}\"/bin/DelphesROOT",
+              "test -f \"${PREFIX}\"/bin/DelphesSTDHEP",
+              "curl -LO http://cp3.irmp.ucl.ac.be/downloads/z_ee.hep.gz",
+              "gunzip z_ee.hep.gz",
+              "DelphesSTDHEP \"${PREFIX}\"/cards/delphes_card_CMS.tcl delphes_output.root z_ee.hep",
+              "root -l -b -q \"${PREFIX}\"/examples/Example1.C'(\"delphes_output.root\")' &> /dev/null",
+              "root -l -b -q \"${PREFIX}\"/examples/Example2.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example3.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example4.C'(\"delphes_output.root\", \"plots.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example5.C'(\"delphes_output.root\")' &> /dev/null"
+            ]
+          }
+        ],
+        "version": "3.5.1"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "delphes"
+          ]
+        },
+        "name": "delphes",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "grep",
+            "sed"
+          ],
+          "host": [
+            "root_base",
+            "root_cxx_standard",
+            "pythia8"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "root_base",
+                "pythia8",
+                "gzip",
+                "curl",
+                "grep",
+                "sed"
+              ]
+            },
+            "script": [
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC2",
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC3",
+              "test -f \"${PREFIX}\"/bin/DelphesLHEF",
+              "test -f \"${PREFIX}\"/bin/DelphesPythia8",
+              "test -f \"${PREFIX}\"/bin/DelphesROOT",
+              "test -f \"${PREFIX}\"/bin/DelphesSTDHEP",
+              "curl -LO http://cp3.irmp.ucl.ac.be/downloads/z_ee.hep.gz",
+              "gunzip z_ee.hep.gz",
+              "DelphesSTDHEP \"${PREFIX}\"/cards/delphes_card_CMS.tcl delphes_output.root z_ee.hep",
+              "root -l -b -q \"${PREFIX}\"/examples/Example1.C'(\"delphes_output.root\")' &> /dev/null",
+              "root -l -b -q \"${PREFIX}\"/examples/Example2.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example3.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example4.C'(\"delphes_output.root\", \"plots.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example5.C'(\"delphes_output.root\")' &> /dev/null"
+            ]
+          }
+        ],
+        "version": "3.5.1"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "delphes"
+          ]
+        },
+        "name": "delphes",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "grep",
+            "sed"
+          ],
+          "host": [
+            "root_base",
+            "root_cxx_standard",
+            "pythia8"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "root_base",
+                "pythia8",
+                "gzip",
+                "curl",
+                "grep",
+                "sed"
+              ]
+            },
+            "script": [
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC2",
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC3",
+              "test -f \"${PREFIX}\"/bin/DelphesLHEF",
+              "test -f \"${PREFIX}\"/bin/DelphesPythia8",
+              "test -f \"${PREFIX}\"/bin/DelphesROOT",
+              "test -f \"${PREFIX}\"/bin/DelphesSTDHEP",
+              "curl -LO http://cp3.irmp.ucl.ac.be/downloads/z_ee.hep.gz",
+              "gunzip z_ee.hep.gz",
+              "DelphesSTDHEP \"${PREFIX}\"/cards/delphes_card_CMS.tcl delphes_output.root z_ee.hep",
+              "root -l -b -q \"${PREFIX}\"/examples/Example1.C'(\"delphes_output.root\")' &> /dev/null",
+              "root -l -b -q \"${PREFIX}\"/examples/Example2.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example3.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example4.C'(\"delphes_output.root\", \"plots.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example5.C'(\"delphes_output.root\")' &> /dev/null"
+            ]
+          }
+        ],
+        "version": "3.5.1"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "delphes"
+          ]
+        },
+        "name": "delphes",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "grep",
+            "sed"
+          ],
+          "host": [
+            "root_base",
+            "root_cxx_standard",
+            "pythia8"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "root_base",
+                "pythia8",
+                "gzip",
+                "curl",
+                "grep",
+                "sed"
+              ]
+            },
+            "script": [
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC2",
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC3",
+              "test -f \"${PREFIX}\"/bin/DelphesLHEF",
+              "test -f \"${PREFIX}\"/bin/DelphesPythia8",
+              "test -f \"${PREFIX}\"/bin/DelphesROOT",
+              "test -f \"${PREFIX}\"/bin/DelphesSTDHEP",
+              "curl -LO http://cp3.irmp.ucl.ac.be/downloads/z_ee.hep.gz",
+              "gunzip z_ee.hep.gz",
+              "DelphesSTDHEP \"${PREFIX}\"/cards/delphes_card_CMS.tcl delphes_output.root z_ee.hep",
+              "root -l -b -q \"${PREFIX}\"/examples/Example1.C'(\"delphes_output.root\")' &> /dev/null",
+              "root -l -b -q \"${PREFIX}\"/examples/Example2.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example3.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example4.C'(\"delphes_output.root\", \"plots.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example5.C'(\"delphes_output.root\")' &> /dev/null"
+            ]
+          }
+        ],
+        "version": "3.5.1"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "delphes"
+          ]
+        },
+        "name": "delphes",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "grep",
+            "sed"
+          ],
+          "host": [
+            "root_base",
+            "root_cxx_standard",
+            "pythia8"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "root_base",
+                "pythia8",
+                "gzip",
+                "curl",
+                "grep",
+                "sed"
+              ]
+            },
+            "script": [
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC2",
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC3",
+              "test -f \"${PREFIX}\"/bin/DelphesLHEF",
+              "test -f \"${PREFIX}\"/bin/DelphesPythia8",
+              "test -f \"${PREFIX}\"/bin/DelphesROOT",
+              "test -f \"${PREFIX}\"/bin/DelphesSTDHEP",
+              "curl -LO http://cp3.irmp.ucl.ac.be/downloads/z_ee.hep.gz",
+              "gunzip z_ee.hep.gz",
+              "DelphesSTDHEP \"${PREFIX}\"/cards/delphes_card_CMS.tcl delphes_output.root z_ee.hep",
+              "root -l -b -q \"${PREFIX}\"/examples/Example1.C'(\"delphes_output.root\")' &> /dev/null",
+              "root -l -b -q \"${PREFIX}\"/examples/Example2.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example3.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example4.C'(\"delphes_output.root\", \"plots.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example5.C'(\"delphes_output.root\")' &> /dev/null"
+            ]
+          }
+        ],
+        "version": "3.5.1"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "delphes"
+          ]
+        },
+        "name": "delphes",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "grep",
+            "sed"
+          ],
+          "host": [
+            "root_base",
+            "root_cxx_standard",
+            "pythia8"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "root_base",
+                "pythia8",
+                "gzip",
+                "curl",
+                "grep",
+                "sed"
+              ]
+            },
+            "script": [
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC2",
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC3",
+              "test -f \"${PREFIX}\"/bin/DelphesLHEF",
+              "test -f \"${PREFIX}\"/bin/DelphesPythia8",
+              "test -f \"${PREFIX}\"/bin/DelphesROOT",
+              "test -f \"${PREFIX}\"/bin/DelphesSTDHEP",
+              "curl -LO http://cp3.irmp.ucl.ac.be/downloads/z_ee.hep.gz",
+              "gunzip z_ee.hep.gz",
+              "DelphesSTDHEP \"${PREFIX}\"/cards/delphes_card_CMS.tcl delphes_output.root z_ee.hep",
+              "root -l -b -q \"${PREFIX}\"/examples/Example1.C'(\"delphes_output.root\")' &> /dev/null",
+              "root -l -b -q \"${PREFIX}\"/examples/Example2.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example3.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example4.C'(\"delphes_output.root\", \"plots.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example5.C'(\"delphes_output.root\")' &> /dev/null"
+            ]
+          }
+        ],
+        "version": "3.5.1"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "delphes"
+          ]
+        },
+        "name": "delphes",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "grep",
+            "sed"
+          ],
+          "host": [
+            "root_base",
+            "root_cxx_standard",
+            "pythia8"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "root_base",
+                "pythia8",
+                "gzip",
+                "curl",
+                "grep",
+                "sed"
+              ]
+            },
+            "script": [
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC2",
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC3",
+              "test -f \"${PREFIX}\"/bin/DelphesLHEF",
+              "test -f \"${PREFIX}\"/bin/DelphesPythia8",
+              "test -f \"${PREFIX}\"/bin/DelphesROOT",
+              "test -f \"${PREFIX}\"/bin/DelphesSTDHEP",
+              "curl -LO http://cp3.irmp.ucl.ac.be/downloads/z_ee.hep.gz",
+              "gunzip z_ee.hep.gz",
+              "DelphesSTDHEP \"${PREFIX}\"/cards/delphes_card_CMS.tcl delphes_output.root z_ee.hep",
+              "root -l -b -q \"${PREFIX}\"/examples/Example1.C'(\"delphes_output.root\")' &> /dev/null",
+              "root -l -b -q \"${PREFIX}\"/examples/Example2.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example3.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example4.C'(\"delphes_output.root\", \"plots.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example5.C'(\"delphes_output.root\")' &> /dev/null"
+            ]
+          }
+        ],
+        "version": "3.5.1"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "delphes"
+          ]
+        },
+        "name": "delphes",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "grep",
+            "sed"
+          ],
+          "host": [
+            "root_base",
+            "root_cxx_standard",
+            "pythia8"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "root_base",
+                "pythia8",
+                "gzip",
+                "curl",
+                "grep",
+                "sed"
+              ]
+            },
+            "script": [
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC2",
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC3",
+              "test -f \"${PREFIX}\"/bin/DelphesLHEF",
+              "test -f \"${PREFIX}\"/bin/DelphesPythia8",
+              "test -f \"${PREFIX}\"/bin/DelphesROOT",
+              "test -f \"${PREFIX}\"/bin/DelphesSTDHEP",
+              "curl -LO http://cp3.irmp.ucl.ac.be/downloads/z_ee.hep.gz",
+              "gunzip z_ee.hep.gz",
+              "DelphesSTDHEP \"${PREFIX}\"/cards/delphes_card_CMS.tcl delphes_output.root z_ee.hep",
+              "root -l -b -q \"${PREFIX}\"/examples/Example1.C'(\"delphes_output.root\")' &> /dev/null",
+              "root -l -b -q \"${PREFIX}\"/examples/Example2.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example3.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example4.C'(\"delphes_output.root\", \"plots.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example5.C'(\"delphes_output.root\")' &> /dev/null"
+            ]
+          }
+        ],
+        "version": "3.5.1"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "delphes"
+          ]
+        },
+        "name": "delphes",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "grep",
+            "sed"
+          ],
+          "host": [
+            "root_base",
+            "root_cxx_standard",
+            "pythia8"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "root_base",
+                "pythia8",
+                "gzip",
+                "curl",
+                "grep",
+                "sed"
+              ]
+            },
+            "script": [
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC2",
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC3",
+              "test -f \"${PREFIX}\"/bin/DelphesLHEF",
+              "test -f \"${PREFIX}\"/bin/DelphesPythia8",
+              "test -f \"${PREFIX}\"/bin/DelphesROOT",
+              "test -f \"${PREFIX}\"/bin/DelphesSTDHEP",
+              "curl -LO http://cp3.irmp.ucl.ac.be/downloads/z_ee.hep.gz",
+              "gunzip z_ee.hep.gz",
+              "DelphesSTDHEP \"${PREFIX}\"/cards/delphes_card_CMS.tcl delphes_output.root z_ee.hep",
+              "root -l -b -q \"${PREFIX}\"/examples/Example1.C'(\"delphes_output.root\")' &> /dev/null",
+              "root -l -b -q \"${PREFIX}\"/examples/Example2.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example3.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example4.C'(\"delphes_output.root\", \"plots.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example5.C'(\"delphes_output.root\")' &> /dev/null"
+            ]
+          }
+        ],
+        "version": "3.5.1"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "delphes"
+          ]
+        },
+        "name": "delphes",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "grep",
+            "sed"
+          ],
+          "host": [
+            "root_base",
+            "root_cxx_standard",
+            "pythia8"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "root_base",
+                "pythia8",
+                "gzip",
+                "curl",
+                "grep",
+                "sed"
+              ]
+            },
+            "script": [
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC2",
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC3",
+              "test -f \"${PREFIX}\"/bin/DelphesLHEF",
+              "test -f \"${PREFIX}\"/bin/DelphesPythia8",
+              "test -f \"${PREFIX}\"/bin/DelphesROOT",
+              "test -f \"${PREFIX}\"/bin/DelphesSTDHEP",
+              "curl -LO http://cp3.irmp.ucl.ac.be/downloads/z_ee.hep.gz",
+              "gunzip z_ee.hep.gz",
+              "DelphesSTDHEP \"${PREFIX}\"/cards/delphes_card_CMS.tcl delphes_output.root z_ee.hep",
+              "root -l -b -q \"${PREFIX}\"/examples/Example1.C'(\"delphes_output.root\")' &> /dev/null",
+              "root -l -b -q \"${PREFIX}\"/examples/Example2.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example3.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example4.C'(\"delphes_output.root\", \"plots.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example5.C'(\"delphes_output.root\")' &> /dev/null"
+            ]
+          }
+        ],
+        "version": "3.5.1"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "delphes"
+          ]
+        },
+        "name": "delphes",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "grep",
+            "sed"
+          ],
+          "host": [
+            "root_base",
+            "root_cxx_standard",
+            "pythia8"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "root_base",
+                "pythia8",
+                "gzip",
+                "curl",
+                "grep",
+                "sed"
+              ]
+            },
+            "script": [
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC2",
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC3",
+              "test -f \"${PREFIX}\"/bin/DelphesLHEF",
+              "test -f \"${PREFIX}\"/bin/DelphesPythia8",
+              "test -f \"${PREFIX}\"/bin/DelphesROOT",
+              "test -f \"${PREFIX}\"/bin/DelphesSTDHEP",
+              "curl -LO http://cp3.irmp.ucl.ac.be/downloads/z_ee.hep.gz",
+              "gunzip z_ee.hep.gz",
+              "DelphesSTDHEP \"${PREFIX}\"/cards/delphes_card_CMS.tcl delphes_output.root z_ee.hep",
+              "root -l -b -q \"${PREFIX}\"/examples/Example1.C'(\"delphes_output.root\")' &> /dev/null",
+              "root -l -b -q \"${PREFIX}\"/examples/Example2.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example3.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example4.C'(\"delphes_output.root\", \"plots.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example5.C'(\"delphes_output.root\")' &> /dev/null"
+            ]
+          }
+        ],
+        "version": "3.5.1"
       }
     ],
     "package": {
       "name": "delphes",
-      "version": "3.5.0"
+      "version": "3.5.1"
     },
     "requirements": {
       "build": [
@@ -464,18 +1714,17 @@
       ],
       "host": [
         "root_base",
+        "root_cxx_standard",
         "pythia8"
       ]
     },
     "schema_version": 1,
     "source": {
       "patches": [
-        "Delphes-ClosestPair2D-fwdDeclaration.patch",
-        "remove_binary_function.patch",
-        "use-range-of-supported-cmake.patch"
+        "add-missing-algorithm-include.patch"
       ],
-      "sha256": "30a2536e0c8f47d633ecf3b4d51ec9924af54538e492470ad47b4ed34342f063",
-      "url": "https://github.com/delphes/delphes/archive/refs/tags/3.5.0.tar.gz"
+      "sha256": "b60d26d2ee2c84b58fbf2cf397fabd0ef3e89d3a0546d843c4ada82cc802d787",
+      "url": "https://github.com/delphes/delphes/archive/refs/tags/3.5.1.tar.gz"
     }
   },
   "name": "delphes",
@@ -491,10 +1740,15 @@
       "summary": "A framework for fast simulation of a generic collider experiment"
     },
     "build": {
-      "number": "5",
+      "number": "0",
+      "run_exports": {
+        "weak": [
+          "delphes"
+        ]
+      },
       "script": [
         "grep -r -l \"external/\" examples/ | xargs sed -i 's|external/||g'",
-        "CXXFLAGS=\"${CXXFLAGS}\" cmake ${CMAKE_ARGS} -DCMAKE_INSTALL_PREFIX=$PREFIX -DPYTHIA8_DATA=$(pythia8-config --datadir) -S . -B build",
+        "CXXFLAGS=\"${CXXFLAGS}\" cmake ${CMAKE_ARGS} -DPYTHIA8_DATA=$(pythia8-config --datadir) -S . -B build",
         "cmake build -LH",
         "cmake --build build --clean-first --parallel=\"${CPU_COUNT}\"",
         "cmake --install build"
@@ -509,7 +1763,12 @@
     },
     "outputs": [
       {
-        "build": null,
+        "build": {
+          "strong": [],
+          "weak": [
+            "delphes"
+          ]
+        },
         "name": "delphes",
         "requirements": {
           "build": [
@@ -522,6 +1781,7 @@
           ],
           "host": [
             "root_base",
+            "root_cxx_standard",
             "pythia8"
           ],
           "run": []
@@ -530,7 +1790,6 @@
           {
             "requirements": {
               "run": [
-                "cxx_compiler_stub",
                 "root_base",
                 "pythia8",
                 "gzip",
@@ -557,10 +1816,15 @@
             ]
           }
         ],
-        "version": "3.5.0"
+        "version": "3.5.1"
       },
       {
-        "build": null,
+        "build": {
+          "strong": [],
+          "weak": [
+            "delphes"
+          ]
+        },
         "name": "delphes",
         "requirements": {
           "build": [
@@ -573,6 +1837,7 @@
           ],
           "host": [
             "root_base",
+            "root_cxx_standard",
             "pythia8"
           ],
           "run": []
@@ -581,7 +1846,6 @@
           {
             "requirements": {
               "run": [
-                "cxx_compiler_stub",
                 "root_base",
                 "pythia8",
                 "gzip",
@@ -608,12 +1872,68 @@
             ]
           }
         ],
-        "version": "3.5.0"
+        "version": "3.5.1"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "delphes"
+          ]
+        },
+        "name": "delphes",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "grep",
+            "sed"
+          ],
+          "host": [
+            "root_base",
+            "root_cxx_standard",
+            "pythia8"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "root_base",
+                "pythia8",
+                "gzip",
+                "curl",
+                "grep",
+                "sed"
+              ]
+            },
+            "script": [
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC2",
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC3",
+              "test -f \"${PREFIX}\"/bin/DelphesLHEF",
+              "test -f \"${PREFIX}\"/bin/DelphesPythia8",
+              "test -f \"${PREFIX}\"/bin/DelphesROOT",
+              "test -f \"${PREFIX}\"/bin/DelphesSTDHEP",
+              "curl -LO http://cp3.irmp.ucl.ac.be/downloads/z_ee.hep.gz",
+              "gunzip z_ee.hep.gz",
+              "DelphesSTDHEP \"${PREFIX}\"/cards/delphes_card_CMS.tcl delphes_output.root z_ee.hep",
+              "root -l -b -q \"${PREFIX}\"/examples/Example1.C'(\"delphes_output.root\")' &> /dev/null",
+              "root -l -b -q \"${PREFIX}\"/examples/Example2.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example3.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example4.C'(\"delphes_output.root\", \"plots.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example5.C'(\"delphes_output.root\")' &> /dev/null"
+            ]
+          }
+        ],
+        "version": "3.5.1"
       }
     ],
     "package": {
       "name": "delphes",
-      "version": "3.5.0"
+      "version": "3.5.1"
     },
     "requirements": {
       "build": [
@@ -626,18 +1946,17 @@
       ],
       "host": [
         "root_base",
+        "root_cxx_standard",
         "pythia8"
       ]
     },
     "schema_version": 1,
     "source": {
       "patches": [
-        "Delphes-ClosestPair2D-fwdDeclaration.patch",
-        "remove_binary_function.patch",
-        "use-range-of-supported-cmake.patch"
+        "add-missing-algorithm-include.patch"
       ],
-      "sha256": "30a2536e0c8f47d633ecf3b4d51ec9924af54538e492470ad47b4ed34342f063",
-      "url": "https://github.com/delphes/delphes/archive/refs/tags/3.5.0.tar.gz"
+      "sha256": "b60d26d2ee2c84b58fbf2cf397fabd0ef3e89d3a0546d843c4ada82cc802d787",
+      "url": "https://github.com/delphes/delphes/archive/refs/tags/3.5.1.tar.gz"
     }
   },
   "osx_64_requirements": {
@@ -656,7 +1975,8 @@
       "__set__": true,
       "elements": [
         "pythia8",
-        "root_base"
+        "root_base",
+        "root_cxx_standard"
       ]
     },
     "run": {
@@ -667,7 +1987,273 @@
       "__set__": true,
       "elements": [
         "curl",
+        "grep",
+        "gzip",
+        "pythia8",
+        "root_base",
+        "sed"
+      ]
+    }
+  },
+  "osx_arm64_meta_yaml": {
+    "about": {
+      "description": "Delphes is a C++ framework, performing a fast multipurpose detector\nresponse simulation. The simulation includes a tracking system, embedded\ninto a magnetic field, calorimeters and a muon system. The framework is\ninterfaced to standard file formats (e.g. Les Houches Event File or HepMC)\nand outputs observables such as isolated leptons, missing transverse energy\nand collection of jets which can be used for dedicated analyses.\nThe simulation of the detector response takes into account the effect of\nmagnetic field, the granularity of the calorimeters and sub-detector resolutions.\nVisualisation of the final state particles is also built-in using the\ncorresponding ROOT library.",
+      "dev_url": "https://github.com/delphes/delphes",
+      "doc_url": "https://cp3.irmp.ucl.ac.be/projects/delphes",
+      "home": "https://github.com/delphes/delphes",
+      "license": "GPL-3.0-or-later",
+      "license_family": "GPL-3.0-or-later",
+      "license_file": "COPYING",
+      "summary": "A framework for fast simulation of a generic collider experiment"
+    },
+    "build": {
+      "number": "0",
+      "run_exports": {
+        "weak": [
+          "delphes"
+        ]
+      },
+      "script": [
+        "grep -r -l \"external/\" examples/ | xargs sed -i 's|external/||g'",
+        "CXXFLAGS=\"${CXXFLAGS}\" cmake ${CMAKE_ARGS} -DPYTHIA8_DATA=$(pythia8-config --datadir) -S . -B build",
+        "cmake build -LH",
+        "cmake --build build --clean-first --parallel=\"${CPU_COUNT}\"",
+        "cmake --install build"
+      ]
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "pavel-demin",
+        "matthewfeickert",
+        "kratsg"
+      ]
+    },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "delphes"
+          ]
+        },
+        "name": "delphes",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "grep",
+            "sed"
+          ],
+          "host": [
+            "root_base",
+            "root_cxx_standard",
+            "pythia8"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "root_base",
+                "pythia8",
+                "gzip",
+                "curl",
+                "grep",
+                "sed"
+              ]
+            },
+            "script": [
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC2",
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC3",
+              "test -f \"${PREFIX}\"/bin/DelphesLHEF",
+              "test -f \"${PREFIX}\"/bin/DelphesPythia8",
+              "test -f \"${PREFIX}\"/bin/DelphesROOT",
+              "test -f \"${PREFIX}\"/bin/DelphesSTDHEP",
+              "curl -LO http://cp3.irmp.ucl.ac.be/downloads/z_ee.hep.gz",
+              "gunzip z_ee.hep.gz",
+              "DelphesSTDHEP \"${PREFIX}\"/cards/delphes_card_CMS.tcl delphes_output.root z_ee.hep",
+              "root -l -b -q \"${PREFIX}\"/examples/Example1.C'(\"delphes_output.root\")' &> /dev/null",
+              "root -l -b -q \"${PREFIX}\"/examples/Example2.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example3.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example4.C'(\"delphes_output.root\", \"plots.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example5.C'(\"delphes_output.root\")' &> /dev/null"
+            ]
+          }
+        ],
+        "version": "3.5.1"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "delphes"
+          ]
+        },
+        "name": "delphes",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "grep",
+            "sed"
+          ],
+          "host": [
+            "root_base",
+            "root_cxx_standard",
+            "pythia8"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "root_base",
+                "pythia8",
+                "gzip",
+                "curl",
+                "grep",
+                "sed"
+              ]
+            },
+            "script": [
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC2",
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC3",
+              "test -f \"${PREFIX}\"/bin/DelphesLHEF",
+              "test -f \"${PREFIX}\"/bin/DelphesPythia8",
+              "test -f \"${PREFIX}\"/bin/DelphesROOT",
+              "test -f \"${PREFIX}\"/bin/DelphesSTDHEP",
+              "curl -LO http://cp3.irmp.ucl.ac.be/downloads/z_ee.hep.gz",
+              "gunzip z_ee.hep.gz",
+              "DelphesSTDHEP \"${PREFIX}\"/cards/delphes_card_CMS.tcl delphes_output.root z_ee.hep",
+              "root -l -b -q \"${PREFIX}\"/examples/Example1.C'(\"delphes_output.root\")' &> /dev/null",
+              "root -l -b -q \"${PREFIX}\"/examples/Example2.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example3.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example4.C'(\"delphes_output.root\", \"plots.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example5.C'(\"delphes_output.root\")' &> /dev/null"
+            ]
+          }
+        ],
+        "version": "3.5.1"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "delphes"
+          ]
+        },
+        "name": "delphes",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make",
+            "grep",
+            "sed"
+          ],
+          "host": [
+            "root_base",
+            "root_cxx_standard",
+            "pythia8"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "requirements": {
+              "run": [
+                "root_base",
+                "pythia8",
+                "gzip",
+                "curl",
+                "grep",
+                "sed"
+              ]
+            },
+            "script": [
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC2",
+              "test -f \"${PREFIX}\"/bin/DelphesHepMC3",
+              "test -f \"${PREFIX}\"/bin/DelphesLHEF",
+              "test -f \"${PREFIX}\"/bin/DelphesPythia8",
+              "test -f \"${PREFIX}\"/bin/DelphesROOT",
+              "test -f \"${PREFIX}\"/bin/DelphesSTDHEP",
+              "curl -LO http://cp3.irmp.ucl.ac.be/downloads/z_ee.hep.gz",
+              "gunzip z_ee.hep.gz",
+              "DelphesSTDHEP \"${PREFIX}\"/cards/delphes_card_CMS.tcl delphes_output.root z_ee.hep",
+              "root -l -b -q \"${PREFIX}\"/examples/Example1.C'(\"delphes_output.root\")' &> /dev/null",
+              "root -l -b -q \"${PREFIX}\"/examples/Example2.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example3.C'(\"delphes_output.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example4.C'(\"delphes_output.root\", \"plots.root\")'",
+              "root -l -b -q \"${PREFIX}\"/examples/Example5.C'(\"delphes_output.root\")' &> /dev/null"
+            ]
+          }
+        ],
+        "version": "3.5.1"
+      }
+    ],
+    "package": {
+      "name": "delphes",
+      "version": "3.5.1"
+    },
+    "requirements": {
+      "build": [
         "cxx_compiler_stub",
+        "c_stdlib_stub",
+        "cmake",
+        "make",
+        "grep",
+        "sed"
+      ],
+      "host": [
+        "root_base",
+        "root_cxx_standard",
+        "pythia8"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "patches": [
+        "add-missing-algorithm-include.patch"
+      ],
+      "sha256": "b60d26d2ee2c84b58fbf2cf397fabd0ef3e89d3a0546d843c4ada82cc802d787",
+      "url": "https://github.com/delphes/delphes/archive/refs/tags/3.5.1.tar.gz"
+    }
+  },
+  "osx_arm64_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "cmake",
+        "cxx_compiler_stub",
+        "grep",
+        "make",
+        "sed"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "pythia8",
+        "root_base",
+        "root_cxx_standard"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": []
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "curl",
         "grep",
         "gzip",
         "pythia8",
@@ -685,12 +2271,15 @@
   "parsing_error": false,
   "platforms": [
     "linux_64",
-    "osx_64"
+    "linux_aarch64",
+    "linux_ppc64le",
+    "osx_64",
+    "osx_arm64"
   ],
   "pr_info": {
     "__lazy_json__": "pr_info/delphes.json"
   },
-  "raw_meta_yaml": "context:\n  name: \"delphes\"\n  version: \"3.5.0\"\n\npackage:\n  name: ${{ name }}\n  version: ${{ version }}\n\nsource:\n  url: https://github.com/delphes/${{ name }}/archive/refs/tags/${{ version }}.tar.gz\n  sha256: 30a2536e0c8f47d633ecf3b4d51ec9924af54538e492470ad47b4ed34342f063\n  patches:\n    # Fixes builds for macOS\n    # c.f. https://github.com/delphes/delphes/pull/128\n    - Delphes-ClosestPair2D-fwdDeclaration.patch\n    # c.f. https://github.com/delphes/delphes/commit/64de5a479b94beba357e73c926cdc6ee9114ceec\n    - remove_binary_function.patch\n    # c.f. https://github.com/delphes/delphes/pull/154\n    - use-range-of-supported-cmake.patch\n\nbuild:\n  number: 5\n  skip:\n    - win\n  script:\n    # Make the examples location independent by removing the 'external/' prefix\n    # in includes to instead use the installed versions\n    - grep -r -l \"external/\" examples/ | xargs sed -i 's|external/||g'\n    - CXXFLAGS=\"${CXXFLAGS}\" cmake ${CMAKE_ARGS} -DCMAKE_INSTALL_PREFIX=$PREFIX -DPYTHIA8_DATA=$(pythia8-config --datadir) -S . -B build\n    - cmake build -LH\n    - cmake --build build --clean-first --parallel=\"${CPU_COUNT}\"\n    - cmake --install build\n\nrequirements:\n  build:\n    - ${{ compiler('cxx') }}\n    - ${{ stdlib('c') }}\n    - cmake\n    - make\n    - grep\n    - sed\n  host:\n    - root_base\n    - pythia8\n\ntests:\n  - script:\n      # Running the 'DelphesXXX --help' commands results in exit code 1,\n      # so check for existence instead.\n      - test -f \"${PREFIX}\"/bin/DelphesHepMC2\n      - test -f \"${PREFIX}\"/bin/DelphesHepMC3\n      - test -f \"${PREFIX}\"/bin/DelphesLHEF\n      - test -f \"${PREFIX}\"/bin/DelphesPythia8\n      - test -f \"${PREFIX}\"/bin/DelphesROOT\n      - test -f \"${PREFIX}\"/bin/DelphesSTDHEP\n\n      # N.B.: MUST be http not https (unfortunately)\n      - curl -LO http://cp3.irmp.ucl.ac.be/downloads/z_ee.hep.gz\n      - gunzip z_ee.hep.gz\n      - DelphesSTDHEP \"${PREFIX}\"/cards/delphes_card_CMS.tcl delphes_output.root z_ee.hep\n\n      - # avoid lots of output to stdout\n      - root -l -b -q \"${PREFIX}\"/examples/Example1.C'(\"delphes_output.root\")' &> /dev/null\n      - root -l -b -q \"${PREFIX}\"/examples/Example2.C'(\"delphes_output.root\")'\n      - root -l -b -q \"${PREFIX}\"/examples/Example3.C'(\"delphes_output.root\")'\n      - root -l -b -q \"${PREFIX}\"/examples/Example4.C'(\"delphes_output.root\", \"plots.root\")'\n      - root -l -b -q \"${PREFIX}\"/examples/Example5.C'(\"delphes_output.root\")' &> /dev/null\n      # FIXME: Example6.C is failing in CI but not locally\n      # - root -l -b -q $PREFIX/examples/Example6.C'(\"delphes_output.root\")'\n\n    requirements:\n      run:\n        - ${{ compiler('cxx') }}\n        - root_base\n        - pythia8\n        - gzip\n        - curl\n        - grep\n        - sed\n\nabout:\n  summary: 'A framework for fast simulation of a generic collider experiment'\n  description: |\n    Delphes is a C++ framework, performing a fast multipurpose detector\n    response simulation. The simulation includes a tracking system, embedded\n    into a magnetic field, calorimeters and a muon system. The framework is\n    interfaced to standard file formats (e.g. Les Houches Event File or HepMC)\n    and outputs observables such as isolated leptons, missing transverse energy\n    and collection of jets which can be used for dedicated analyses.\n    The simulation of the detector response takes into account the effect of\n    magnetic field, the granularity of the calorimeters and sub-detector resolutions.\n    Visualisation of the final state particles is also built-in using the\n    corresponding ROOT library.\n  license: GPL-3.0-or-later\n  license_file: COPYING\n  homepage: https://github.com/delphes/delphes\n  documentation: https://cp3.irmp.ucl.ac.be/projects/delphes\n  repository: https://github.com/delphes/delphes\n\nextra:\n  recipe-maintainers:\n    - pavel-demin\n    - matthewfeickert\n    - kratsg\n",
+  "raw_meta_yaml": "context:\n  name: \"delphes\"\n  version: \"3.5.1\"\n\npackage:\n  name: ${{ name }}\n  version: ${{ version }}\n\nsource:\n  url: https://github.com/delphes/${{ name }}/archive/refs/tags/${{ version }}.tar.gz\n  sha256: b60d26d2ee2c84b58fbf2cf397fabd0ef3e89d3a0546d843c4ada82cc802d787\n  patches:\n    # std::prev_permutation needs <algorithm>, not transitively included on osx\n    - add-missing-algorithm-include.patch\n\nbuild:\n  number: 0\n  skip:\n    - win\n  script:\n    # Make the examples location independent by removing the 'external/' prefix\n    # in includes to instead use the installed versions\n    - grep -r -l \"external/\" examples/ | xargs sed -i 's|external/||g'\n    - CXXFLAGS=\"${CXXFLAGS}\" cmake ${CMAKE_ARGS} -DPYTHIA8_DATA=$(pythia8-config --datadir) -S . -B build\n    - cmake build -LH\n    - cmake --build build --clean-first --parallel=\"${CPU_COUNT}\"\n    - cmake --install build\n\nrequirements:\n  build:\n    - ${{ compiler('cxx') }}\n    - ${{ stdlib('c') }}\n    - cmake\n    - make\n    - grep\n    - sed\n  host:\n    - root_base\n    - root_cxx_standard\n    - pythia8\n  run_exports:\n    - ${{ pin_subpackage(\"delphes\", upper_bound=\"x.x.x\") }}\n\ntests:\n  - script:\n      # Running the 'DelphesXXX --help' commands results in exit code 1,\n      # so check for existence instead.\n      - test -f \"${PREFIX}\"/bin/DelphesHepMC2\n      - test -f \"${PREFIX}\"/bin/DelphesHepMC3\n      - test -f \"${PREFIX}\"/bin/DelphesLHEF\n      - test -f \"${PREFIX}\"/bin/DelphesPythia8\n      - test -f \"${PREFIX}\"/bin/DelphesROOT\n      - test -f \"${PREFIX}\"/bin/DelphesSTDHEP\n\n      # N.B.: MUST be http not https (unfortunately)\n      - curl -LO http://cp3.irmp.ucl.ac.be/downloads/z_ee.hep.gz\n      - gunzip z_ee.hep.gz\n      - DelphesSTDHEP \"${PREFIX}\"/cards/delphes_card_CMS.tcl delphes_output.root z_ee.hep\n\n      - \n        # avoid lots of output to stdout\n      - root -l -b -q \"${PREFIX}\"/examples/Example1.C'(\"delphes_output.root\")' &> /dev/null\n      - root -l -b -q \"${PREFIX}\"/examples/Example2.C'(\"delphes_output.root\")'\n      - root -l -b -q \"${PREFIX}\"/examples/Example3.C'(\"delphes_output.root\")'\n      - root -l -b -q \"${PREFIX}\"/examples/Example4.C'(\"delphes_output.root\", \"plots.root\")'\n      - root -l -b -q \"${PREFIX}\"/examples/Example5.C'(\"delphes_output.root\")' &> /dev/null\n      # FIXME: Example6.C is failing in CI but not locally\n      # - root -l -b -q $PREFIX/examples/Example6.C'(\"delphes_output.root\")'\n\n    requirements:\n      run:\n        - root_base\n        - pythia8\n        - gzip\n        - curl\n        - grep\n        - sed\n\nabout:\n  summary: 'A framework for fast simulation of a generic collider experiment'\n  description: |\n    Delphes is a C++ framework, performing a fast multipurpose detector\n    response simulation. The simulation includes a tracking system, embedded\n    into a magnetic field, calorimeters and a muon system. The framework is\n    interfaced to standard file formats (e.g. Les Houches Event File or HepMC)\n    and outputs observables such as isolated leptons, missing transverse energy\n    and collection of jets which can be used for dedicated analyses.\n    The simulation of the detector response takes into account the effect of\n    magnetic field, the granularity of the calorimeters and sub-detector resolutions.\n    Visualisation of the final state particles is also built-in using the\n    corresponding ROOT library.\n  license: GPL-3.0-or-later\n  license_file: COPYING\n  homepage: https://github.com/delphes/delphes\n  documentation: https://cp3.irmp.ucl.ac.be/projects/delphes\n  repository: https://github.com/delphes/delphes\n\nextra:\n  recipe-maintainers:\n    - pavel-demin\n    - matthewfeickert\n    - kratsg\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -701,6 +2290,7 @@
       "make",
       "pythia8",
       "root_base",
+      "root_cxx_standard",
       "sed"
     ]
   },
@@ -722,7 +2312,8 @@
         "c_stdlib_stub",
         "cxx_compiler_stub",
         "pythia8",
-        "root_base"
+        "root_base",
+        "root_cxx_standard"
       ]
     },
     "run": {
@@ -736,7 +2327,6 @@
       "__set__": true,
       "elements": [
         "curl",
-        "cxx_compiler_stub",
         "grep",
         "gzip",
         "pythia8",
@@ -762,7 +2352,8 @@
       "__set__": true,
       "elements": [
         "pythia8",
-        "root_base"
+        "root_base",
+        "root_cxx_standard"
       ]
     },
     "run": {
@@ -773,7 +2364,6 @@
       "__set__": true,
       "elements": [
         "curl",
-        "cxx_compiler_stub",
         "grep",
         "gzip",
         "pythia8",
@@ -782,8 +2372,8 @@
       ]
     }
   },
-  "url": "https://github.com/delphes/delphes/archive/refs/tags/3.5.0.tar.gz",
-  "version": "3.5.0",
+  "url": "https://github.com/delphes/delphes/archive/refs/tags/3.5.1.tar.gz",
+  "version": "3.5.1",
   "version_pr_info": {
     "__lazy_json__": "version_pr_info/delphes.json"
   }
