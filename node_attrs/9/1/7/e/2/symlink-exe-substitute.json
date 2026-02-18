@@ -12,8 +12,8 @@
       "tooling_branch_name": "main"
     }
   },
-  "feedstock_hash": "0b58ecdc4a21956bd741fdb280a829b76b022f76",
-  "feedstock_hash_ts": 1771408659,
+  "feedstock_hash": "4ef3ecaaef30aec2f55f3316efba7f1f52830b1d",
+  "feedstock_hash_ts": 1771437838,
   "feedstock_name": "symlink-exe-substitute",
   "meta_yaml": {
     "about": {
@@ -31,12 +31,13 @@
       "summary": "Build .exe launchers under %PREFIX%/Scripts as symlink substitutes."
     },
     "build": {
-      "number": "1"
+      "number": "2"
     },
     "extra": {
       "recipe-maintainers": [
         "mbargull",
-        "h-vetinari"
+        "h-vetinari",
+        "isuruf"
       ]
     },
     "outputs": [
@@ -79,7 +80,7 @@
             "m2-bash",
             "m2-coreutils",
             "m2-sed",
-            "vs_win-64"
+            "c_compiler_stub"
           ]
         },
         "script": "bld-build.bat",
@@ -125,7 +126,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/symlink-exe-substitute.json"
   },
-  "raw_meta_yaml": "package:\n  name: symlink-exe-substitute\n  version: 1.0\n\nbuild:\n  number: 1\n  skip: true  # [not win]\n\noutputs:\n\n  - name: symlink-exe-runtime\n    requirements:\n      build:\n        - {{ stdlib(\"c\") }}\n        - {{ compiler(\"c\") }}\n      host:\n      run:\n    test:\n      commands:\n        - if not exist %PREFIX%\\vcruntime*.dll exit 1\n        - if not exist %PREFIX%\\api-ms-win-crt-*.dll exit 1\n    about:\n      home: http://github.com/conda-forge/symlink-exe-substitute-feedstock\n      summary: Runtimes needed for .exe files built by symlink-exe-build.\n      description: |\n        This is an empty, only-dependency-providing package (meta-package).\n        The executable launchers built by symlink-exe-build are dynamically\n        linked to the C runtime provided by the \"strong\" \"run_exports\" from the\n        \"compiler('c')\" packages. As of now, conda-build does not offer\n        transitive \"run_exports\" and as such this package helps to provide them.\n      license: BSD-3-Clause\n\n  - name: symlink-exe-build\n    script: bld-build.bat\n    build:\n      run_exports:\n        strong:\n          - {{ pin_subpackage(\"symlink-exe-runtime\") }}\n    requirements:\n      build:\n      host:\n      run:\n        # To make things less painful (i.e., not having to deal with CMD and\n        # other Windows idiosyncracies) for me (@mbargull), I opted to use a\n        # POSIX shell script to create an easy-to-use wrapper around calling\n        # the compiler. m2-bash is used to run the script, m2-coreutils is used\n        # for realpath, etc. and m2-sed for sed itself.\n        - m2-bash\n        - m2-coreutils\n        - m2-sed\n        - vs_win-64\n    test:\n      requires:\n        # Some random packages that have exe files not under %PREFIX%\\Scripts.\n        - zstd\n        - m2w64-xz\n      commands:\n        - if exist \"%PREFIX%\\Scripts\\xz.exe\" exit 1\n        - if exist \"%PREFIX%\\Scripts\\zstd.exe\" exit 1\n        - if exist \"%PREFIX%\\Scripts\\xzcat.exe\" exit 1\n        - if not exist \"%PREFIX%\\Scripts\\\" md \"%PREFIX%\\Scripts\"\n        - >\n          call build-symlink-exe\n          \"%PREFIX%\\Library\\mingw-w64\\bin\\xz.exe\"\n          \"%PREFIX%\\Library\\bin\\zstd.exe\"\n          \"%PREFIX%\\Library\\mingw-w64\\bin\\xzcat.exe\"\n          \"%PREFIX%\\Scripts\"\n        - dir \"%PREFIX%\\Scripts\\xz.exe\"\n        - dir \"%PREFIX%\\Scripts\\zstd.exe\"\n        - dir \"%PREFIX%\\Scripts\\xzcat.exe\"\n        - '\"%PREFIX%\\Scripts\\xz.exe\" --version || findstr \"/C:XZ Utils\"'\n        - '\"%PREFIX%\\Scripts\\zstd.exe\" --version || findstr \"/C:zstd\"'\n        - '\"%PREFIX%\\Scripts\\xzcat.exe\" --version || findstr \"/C:XZ Utils\"'\n\nabout:\n  home: http://github.com/conda-forge/symlink-exe-substitute-feedstock\n  dev_url: http://github.com/conda-forge/symlink-exe-substitute-feedstock\n  summary: Build .exe launchers under %PREFIX%/Scripts as symlink substitutes.\n  description: |\n    Compile small .exe launchers to be placed under, e.g., %PREFIX%/Scripts.\n    These launch target executables relative to their path inside the prefix\n    and as such work as alternative to symbolic links (symlinks) to binaries.\n    Use this package as a build dependency to workaround the fact that by\n    default creating symlinks is not available to non-admin users on Windows.\n    Usage is similar to `ln TARGET... DIRECTORY` on Unixes, e.g., run\n    `call build-symlink-exe \"%PREFIX%\\some\\dir\\your.exe\" \"%PREFIX%\\Scripts\"`\n  license: BSD-3-Clause AND (MIT OR PSF-2.0 OR ZPL-2.1)\n  license_file:\n    - LICENSE.txt\n    - LICENSE-conda-forge.txt\n    - LICENSE-conda-recipes.txt\n    - LICENSE-setuptools-new.txt\n    - LICENSE-setuptools-old.txt\n\nextra:\n  recipe-maintainers:\n    - mbargull\n    - h-vetinari\n",
+  "raw_meta_yaml": "package:\n  name: symlink-exe-substitute\n  version: 1.0\n\nbuild:\n  number: 2\n  skip: true  # [not win]\n\noutputs:\n\n  - name: symlink-exe-runtime\n    requirements:\n      build:\n        - {{ stdlib(\"c\") }}\n        - {{ compiler(\"c\") }}\n      host:\n      run:\n    test:\n      commands:\n        - if not exist %PREFIX%\\vcruntime*.dll exit 1\n        - if not exist %PREFIX%\\api-ms-win-crt-*.dll exit 1\n    about:\n      home: http://github.com/conda-forge/symlink-exe-substitute-feedstock\n      summary: Runtimes needed for .exe files built by symlink-exe-build.\n      description: |\n        This is an empty, only-dependency-providing package (meta-package).\n        The executable launchers built by symlink-exe-build are dynamically\n        linked to the C runtime provided by the \"strong\" \"run_exports\" from the\n        \"compiler('c')\" packages. As of now, conda-build does not offer\n        transitive \"run_exports\" and as such this package helps to provide them.\n      license: BSD-3-Clause\n\n  - name: symlink-exe-build\n    script: bld-build.bat\n    build:\n      run_exports:\n        strong:\n          - {{ pin_subpackage(\"symlink-exe-runtime\") }}\n    requirements:\n      build:\n      host:\n      run:\n        # To make things less painful (i.e., not having to deal with CMD and\n        # other Windows idiosyncracies) for me (@mbargull), I opted to use a\n        # POSIX shell script to create an easy-to-use wrapper around calling\n        # the compiler. m2-bash is used to run the script, m2-coreutils is used\n        # for realpath, etc. and m2-sed for sed itself.\n        - m2-bash\n        - m2-coreutils\n        - m2-sed\n        - {{ compiler(\"c\") }}\n    test:\n      requires:\n        # Some random packages that have exe files not under %PREFIX%\\Scripts.\n        - zstd\n        - m2w64-xz\n      commands:\n        - if exist \"%PREFIX%\\Scripts\\xz.exe\" exit 1\n        - if exist \"%PREFIX%\\Scripts\\zstd.exe\" exit 1\n        - if exist \"%PREFIX%\\Scripts\\xzcat.exe\" exit 1\n        - if not exist \"%PREFIX%\\Scripts\\\" md \"%PREFIX%\\Scripts\"\n        - >\n          call build-symlink-exe\n          \"%PREFIX%\\Library\\mingw-w64\\bin\\xz.exe\"\n          \"%PREFIX%\\Library\\bin\\zstd.exe\"\n          \"%PREFIX%\\Library\\mingw-w64\\bin\\xzcat.exe\"\n          \"%PREFIX%\\Scripts\"\n        - dir \"%PREFIX%\\Scripts\\xz.exe\"\n        - dir \"%PREFIX%\\Scripts\\zstd.exe\"\n        - dir \"%PREFIX%\\Scripts\\xzcat.exe\"\n        - '\"%PREFIX%\\Scripts\\xz.exe\" --version || findstr \"/C:XZ Utils\"'\n        - '\"%PREFIX%\\Scripts\\zstd.exe\" --version || findstr \"/C:zstd\"'\n        - '\"%PREFIX%\\Scripts\\xzcat.exe\" --version || findstr \"/C:XZ Utils\"'\n\nabout:\n  home: http://github.com/conda-forge/symlink-exe-substitute-feedstock\n  dev_url: http://github.com/conda-forge/symlink-exe-substitute-feedstock\n  summary: Build .exe launchers under %PREFIX%/Scripts as symlink substitutes.\n  description: |\n    Compile small .exe launchers to be placed under, e.g., %PREFIX%/Scripts.\n    These launch target executables relative to their path inside the prefix\n    and as such work as alternative to symbolic links (symlinks) to binaries.\n    Use this package as a build dependency to workaround the fact that by\n    default creating symlinks is not available to non-admin users on Windows.\n    Usage is similar to `ln TARGET... DIRECTORY` on Unixes, e.g., run\n    `call build-symlink-exe \"%PREFIX%\\some\\dir\\your.exe\" \"%PREFIX%\\Scripts\"`\n  license: BSD-3-Clause AND (MIT OR PSF-2.0 OR ZPL-2.1)\n  license_file:\n    - LICENSE.txt\n    - LICENSE-conda-forge.txt\n    - LICENSE-conda-recipes.txt\n    - LICENSE-setuptools-new.txt\n    - LICENSE-setuptools-old.txt\n\nextra:\n  recipe-maintainers:\n    - mbargull\n    - h-vetinari\n    - isuruf\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -133,8 +134,7 @@
       "c_stdlib_stub",
       "m2-bash",
       "m2-coreutils",
-      "m2-sed",
-      "vs_win-64"
+      "m2-sed"
     ]
   },
   "requirements": {
@@ -149,8 +149,7 @@
       "__set__": true,
       "elements": [
         "c_compiler_stub",
-        "c_stdlib_stub",
-        "vc"
+        "c_stdlib_stub"
       ]
     },
     "run": {
@@ -160,9 +159,7 @@
         "c_stdlib_stub",
         "m2-bash",
         "m2-coreutils",
-        "m2-sed",
-        "vc",
-        "vs_win-64"
+        "m2-sed"
       ]
     },
     "test": {
@@ -189,10 +186,10 @@
     "run": {
       "__set__": true,
       "elements": [
+        "c_compiler_stub",
         "m2-bash",
         "m2-coreutils",
-        "m2-sed",
-        "vs_win-64"
+        "m2-sed"
       ]
     },
     "test": {
@@ -223,12 +220,13 @@
       "summary": "Build .exe launchers under %PREFIX%/Scripts as symlink substitutes."
     },
     "build": {
-      "number": "1"
+      "number": "2"
     },
     "extra": {
       "recipe-maintainers": [
         "mbargull",
-        "h-vetinari"
+        "h-vetinari",
+        "isuruf"
       ]
     },
     "outputs": [
@@ -271,7 +269,7 @@
             "m2-bash",
             "m2-coreutils",
             "m2-sed",
-            "vs_win-64"
+            "c_compiler_stub"
           ]
         },
         "script": "bld-build.bat",
@@ -317,10 +315,10 @@
     "run": {
       "__set__": true,
       "elements": [
+        "c_compiler_stub",
         "m2-bash",
         "m2-coreutils",
-        "m2-sed",
-        "vs_win-64"
+        "m2-sed"
       ]
     },
     "test": {
