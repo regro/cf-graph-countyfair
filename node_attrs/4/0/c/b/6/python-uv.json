@@ -18,8 +18,8 @@
       "tooling_branch_name": "main"
     }
   },
-  "feedstock_hash": "4270f482fb4df61aa11fc37219a3458ff5568dbd",
-  "feedstock_hash_ts": 1771301708,
+  "feedstock_hash": "a577581188fb8f2bbbb78fd14adc5616305eb921",
+  "feedstock_hash_ts": 1771423218,
   "feedstock_name": "python-uv",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -55,7 +55,7 @@
           ],
           "run": [
             "python >=3.10",
-            "uv 0.10.3.*"
+            "uv 0.10.4.*"
           ]
         },
         "tests": [
@@ -85,12 +85,12 @@
             ]
           }
         ],
-        "version": "0.10.3"
+        "version": "0.10.4"
       }
     ],
     "package": {
       "name": "python-uv",
-      "version": "0.10.3"
+      "version": "0.10.4"
     },
     "requirements": {
       "host": [
@@ -100,7 +100,7 @@
       ],
       "run": [
         "python >=3.10",
-        "uv 0.10.3.*"
+        "uv 0.10.4.*"
       ]
     },
     "schema_version": 1,
@@ -109,8 +109,8 @@
         "0000-no-rust.patch",
         "0001-use-conda-forge-bin.patch"
       ],
-      "sha256": "56e15a90bf81a484e501f6ebc890024a47cb808800e18ecbc81f7d7668ff8b55",
-      "url": "https://pypi.org/packages/source/u/uv/uv-0.10.3.tar.gz"
+      "sha256": "b9ecf9f9145b95ddd6627b106e2e74f4204393b41bea2488079872699c03612e",
+      "url": "https://pypi.org/packages/source/u/uv/uv-0.10.4.tar.gz"
     }
   },
   "linux_64_requirements": {
@@ -175,7 +175,7 @@
           ],
           "run": [
             "python >=3.10",
-            "uv 0.10.3.*"
+            "uv 0.10.4.*"
           ]
         },
         "tests": [
@@ -205,12 +205,12 @@
             ]
           }
         ],
-        "version": "0.10.3"
+        "version": "0.10.4"
       }
     ],
     "package": {
       "name": "python-uv",
-      "version": "0.10.3"
+      "version": "0.10.4"
     },
     "requirements": {
       "host": [
@@ -220,7 +220,7 @@
       ],
       "run": [
         "python >=3.10",
-        "uv 0.10.3.*"
+        "uv 0.10.4.*"
       ]
     },
     "schema_version": 1,
@@ -229,8 +229,8 @@
         "0000-no-rust.patch",
         "0001-use-conda-forge-bin.patch"
       ],
-      "sha256": "56e15a90bf81a484e501f6ebc890024a47cb808800e18ecbc81f7d7668ff8b55",
-      "url": "https://pypi.org/packages/source/u/uv/uv-0.10.3.tar.gz"
+      "sha256": "b9ecf9f9145b95ddd6627b106e2e74f4204393b41bea2488079872699c03612e",
+      "url": "https://pypi.org/packages/source/u/uv/uv-0.10.4.tar.gz"
     }
   },
   "name": "python-uv",
@@ -247,7 +247,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/python-uv.json"
   },
-  "raw_meta_yaml": "# yaml-language-server: $schema=https://raw.githubusercontent.com/prefix-dev/recipe-format/main/schema.json\n#\n# for the actual `uv` CLI tool (which does not require or link against `python`), see:\n# - https://github.com/conda-forge/uv-feedstock\n#\n# _this_ package provides the `site-packages` content of the upstream PyPI package to:\n# - appease `pip check` for downstreams which (presently) might use `uv`\n#   programatically as a `run` dependency\n# - eventually to provide a PEP517 backend as a `host` dependency, which _does_ require python\n#\n# for more context, see:\n# - https://github.com/conda-forge/uv-feedstock/issues/42\n#\nschema_version: 1\n\ncontext:\n  version: \"0.10.3\"\n\npackage:\n  name: python-uv\n  version: ${{ version }}\n\nsource:\n  url: https://pypi.org/packages/source/u/uv/uv-${{ version }}.tar.gz\n  sha256: 56e15a90bf81a484e501f6ebc890024a47cb808800e18ecbc81f7d7668ff8b55\n  patches:\n    # replaces `maturin` with `setuptools`\n    #\n    #   this avoids\n    #   - populating `(Library/)bin`\n    #   - forcing {os x arch x python} builds\n    #   and enables\n    #   - the `uv` CLI (which can install its _own_ python) to be installed separately\n    #\n    - 0000-no-rust.patch\n    # provide binary path in `sys.prefix`\n    #\n    #   this replaces machinery which doesn't work with conda-forge packaging on osx/win\n    #   with a `sys.prefix`-relative path to the `uv` CLI provided by conda-forge/uv-feedstock\n    #\n    - 0001-use-conda-forge-bin.patch\n\nbuild:\n  number: 0\n  noarch: python\n  script:\n    - ${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation --disable-pip-version-check\n\nrequirements:\n  host:\n    - pip\n    - python ${{ python_min }}.*\n    - setuptools\n  run:\n    - python >=${{ python_min }}\n    - uv ${{ version }}.*\n\ntests:\n  - python:\n      imports:\n        - uv\n        - uv._find_uv\n      pip_check: true\n      python_version:\n        - ${{ python_min }}.*\n        - 3.13.*\n  - requirements:\n      run:\n        - python ${{ python_min }}.*\n        - mypy\n    script:\n      - python -c \"import uv; print(uv.find_uv_bin())\"\n      - uv --version\n      - python -m uv --version\n      # TODO: restore after https://github.com/astral-sh/uv/pull/15177\n      # - mypy -p uv\n\nabout:\n  summary: An extremely fast Python package and project manager, written in Rust. (with python)\n  license: Apache-2.0 OR MIT\n  license_file:\n    - LICENSE-APACHE\n    - LICENSE-MIT\n  homepage: https://pypi.org/project/uv\n  repository: https://github.com/astral-sh/uv\n\nextra:\n  recipe-maintainers:\n    - bollwyvl\n    - conda-forge/uv\n",
+  "raw_meta_yaml": "# yaml-language-server: $schema=https://raw.githubusercontent.com/prefix-dev/recipe-format/main/schema.json\n#\n# for the actual `uv` CLI tool (which does not require or link against `python`), see:\n# - https://github.com/conda-forge/uv-feedstock\n#\n# _this_ package provides the `site-packages` content of the upstream PyPI package to:\n# - appease `pip check` for downstreams which (presently) might use `uv`\n#   programatically as a `run` dependency\n# - eventually to provide a PEP517 backend as a `host` dependency, which _does_ require python\n#\n# for more context, see:\n# - https://github.com/conda-forge/uv-feedstock/issues/42\n#\nschema_version: 1\n\ncontext:\n  version: \"0.10.4\"\n\npackage:\n  name: python-uv\n  version: ${{ version }}\n\nsource:\n  url: https://pypi.org/packages/source/u/uv/uv-${{ version }}.tar.gz\n  sha256: b9ecf9f9145b95ddd6627b106e2e74f4204393b41bea2488079872699c03612e\n  patches:\n    # replaces `maturin` with `setuptools`\n    #\n    #   this avoids\n    #   - populating `(Library/)bin`\n    #   - forcing {os x arch x python} builds\n    #   and enables\n    #   - the `uv` CLI (which can install its _own_ python) to be installed separately\n    #\n    - 0000-no-rust.patch\n    # provide binary path in `sys.prefix`\n    #\n    #   this replaces machinery which doesn't work with conda-forge packaging on osx/win\n    #   with a `sys.prefix`-relative path to the `uv` CLI provided by conda-forge/uv-feedstock\n    #\n    - 0001-use-conda-forge-bin.patch\n\nbuild:\n  number: 0\n  noarch: python\n  script:\n    - ${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation --disable-pip-version-check\n\nrequirements:\n  host:\n    - pip\n    - python ${{ python_min }}.*\n    - setuptools\n  run:\n    - python >=${{ python_min }}\n    - uv ${{ version }}.*\n\ntests:\n  - python:\n      imports:\n        - uv\n        - uv._find_uv\n      pip_check: true\n      python_version:\n        - ${{ python_min }}.*\n        - 3.13.*\n  - requirements:\n      run:\n        - python ${{ python_min }}.*\n        - mypy\n    script:\n      - python -c \"import uv; print(uv.find_uv_bin())\"\n      - uv --version\n      - python -m uv --version\n      # TODO: restore after https://github.com/astral-sh/uv/pull/15177\n      # - mypy -p uv\n\nabout:\n  summary: An extremely fast Python package and project manager, written in Rust. (with python)\n  license: Apache-2.0 OR MIT\n  license_file:\n    - LICENSE-APACHE\n    - LICENSE-MIT\n  homepage: https://pypi.org/project/uv\n  repository: https://github.com/astral-sh/uv\n\nextra:\n  recipe-maintainers:\n    - bollwyvl\n    - conda-forge/uv\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -304,7 +304,7 @@
       "__set__": true,
       "elements": [
         "python >=3.10",
-        "uv 0.10.3.*"
+        "uv 0.10.4.*"
       ]
     },
     "test": {
@@ -316,8 +316,8 @@
       ]
     }
   },
-  "url": "https://pypi.org/packages/source/u/uv/uv-0.10.3.tar.gz",
-  "version": "0.10.3",
+  "url": "https://pypi.org/packages/source/u/uv/uv-0.10.4.tar.gz",
+  "version": "0.10.4",
   "version_pr_info": {
     "__lazy_json__": "version_pr_info/python-uv.json"
   }
