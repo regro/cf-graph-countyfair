@@ -1,7 +1,7 @@
 {
   "archived": false,
   "branch": "main",
-  "ci_support_linux_64_.yaml": "c_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ncxx_compiler:\n- gxx\ncxx_compiler_version:\n- '14'\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\ntarget_platform:\n- linux-64\n",
+  "ci_support_linux_64_.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ncxx_compiler:\n- gxx\ncxx_compiler_version:\n- '14'\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\neigen_abi_profile:\n- '100'\n- '70'\n- '80'\neigen_max_align_bytes:\n- '16'\n- '64'\n- '32'\ntarget_platform:\n- linux-64\nzip_keys:\n- - c_compiler_version\n  - cxx_compiler_version\n- - eigen_abi_profile\n  - eigen_max_align_bytes\n",
   "conda-forge.yml": {
     "build_platform": {
       "osx_arm64": "osx_64"
@@ -22,8 +22,8 @@
     },
     "test": "native_and_emulated"
   },
-  "feedstock_hash": "c39d8171e340d536906ecdb5d010fe49883ef99f",
-  "feedstock_hash_ts": 1759819716,
+  "feedstock_hash": "a04ced7dc9796dba6c4097c82a17085f02989e03",
+  "feedstock_hash_ts": 1771590474,
   "feedstock_name": "eigen",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -36,7 +36,7 @@
     },
     "build": {
       "number": "1",
-      "script": "build.sh"
+      "script": "build_eigen.sh"
     },
     "extra": {
       "recipe-maintainers": [
@@ -79,10 +79,184 @@
             ]
           },
           {
-            "script": "test -d ${PREFIX}/include/eigen3"
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "test -d ${PREFIX}/include/eigen3",
+              "cmake-package-check Eigen3 --targets Eigen3::Eigen"
+            ]
           }
         ],
         "version": "3.4.0"
+      },
+      {
+        "build": null,
+        "name": "eigen-abi",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "echo \"This is a metapackage, no test is necessary.\""
+          }
+        ],
+        "version": "3.4.0.100"
+      },
+      {
+        "build": null,
+        "name": "eigen-abi",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "echo \"This is a metapackage, no test is necessary.\""
+          }
+        ],
+        "version": "3.4.0.70"
+      },
+      {
+        "build": null,
+        "name": "eigen-abi",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "echo \"This is a metapackage, no test is necessary.\""
+          }
+        ],
+        "version": "3.4.0.80"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "eigen-abi"
+          ]
+        },
+        "name": "eigen-abi-devel",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "eigen",
+            "eigen-abi"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "test_abi/test_abi.cc",
+                "test_abi/CMakeLists.txt"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "cmake",
+                "ninja",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "cmake -GNinja -Stest_abi -Bbuild_test_abi -DEXPECTED_EIGEN_MAX_ALIGN_BYTES=${{ eigen_max_align_bytes }}",
+              "cmake --build build_test_abi"
+            ]
+          }
+        ],
+        "version": "3.4.0.100"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "eigen-abi"
+          ]
+        },
+        "name": "eigen-abi-devel",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "eigen",
+            "eigen-abi",
+            "x86_64-microarch-level 4.*"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "test_abi/test_abi.cc",
+                "test_abi/CMakeLists.txt"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "cmake",
+                "ninja",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "cmake -GNinja -Stest_abi -Bbuild_test_abi -DEXPECTED_EIGEN_MAX_ALIGN_BYTES=${{ eigen_max_align_bytes }}",
+              "cmake --build build_test_abi"
+            ]
+          }
+        ],
+        "version": "3.4.0.70"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "eigen-abi"
+          ]
+        },
+        "name": "eigen-abi-devel",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "eigen",
+            "eigen-abi",
+            "x86_64-microarch-level 3.*"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "test_abi/test_abi.cc",
+                "test_abi/CMakeLists.txt"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "cmake",
+                "ninja",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "cmake -GNinja -Stest_abi -Bbuild_test_abi -DEXPECTED_EIGEN_MAX_ALIGN_BYTES=${{ eigen_max_align_bytes }}",
+              "cmake --build build_test_abi"
+            ]
+          }
+        ],
+        "version": "3.4.0.80"
       }
     ],
     "package": {
@@ -119,12 +293,20 @@
     },
     "run": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "eigen",
+        "eigen-abi",
+        "x86_64-microarch-level"
+      ]
     },
     "test": {
       "__set__": true,
       "elements": [
-        "cxx_compiler_stub"
+        "c_compiler_stub",
+        "cmake",
+        "cmake-package-check",
+        "cxx_compiler_stub",
+        "ninja"
       ]
     }
   },
@@ -138,7 +320,7 @@
     },
     "build": {
       "number": "1",
-      "script": "build.sh"
+      "script": "build_eigen.sh"
     },
     "extra": {
       "recipe-maintainers": [
@@ -181,10 +363,74 @@
             ]
           },
           {
-            "script": "test -d ${PREFIX}/include/eigen3"
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "test -d ${PREFIX}/include/eigen3",
+              "cmake-package-check Eigen3 --targets Eigen3::Eigen"
+            ]
           }
         ],
         "version": "3.4.0"
+      },
+      {
+        "build": null,
+        "name": "eigen-abi",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "echo \"This is a metapackage, no test is necessary.\""
+          }
+        ],
+        "version": "3.4.0.100"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "eigen-abi"
+          ]
+        },
+        "name": "eigen-abi-devel",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "eigen",
+            "eigen-abi"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "test_abi/test_abi.cc",
+                "test_abi/CMakeLists.txt"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "cmake",
+                "ninja",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "cmake -GNinja -Stest_abi -Bbuild_test_abi -DEXPECTED_EIGEN_MAX_ALIGN_BYTES=${{ eigen_max_align_bytes }}",
+              "cmake --build build_test_abi"
+            ]
+          }
+        ],
+        "version": "3.4.0.100"
       }
     ],
     "package": {
@@ -221,12 +467,19 @@
     },
     "run": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "eigen",
+        "eigen-abi"
+      ]
     },
     "test": {
       "__set__": true,
       "elements": [
-        "cxx_compiler_stub"
+        "c_compiler_stub",
+        "cmake",
+        "cmake-package-check",
+        "cxx_compiler_stub",
+        "ninja"
       ]
     }
   },
@@ -240,7 +493,7 @@
     },
     "build": {
       "number": "1",
-      "script": "build.sh"
+      "script": "build_eigen.sh"
     },
     "extra": {
       "recipe-maintainers": [
@@ -283,10 +536,74 @@
             ]
           },
           {
-            "script": "test -d ${PREFIX}/include/eigen3"
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "test -d ${PREFIX}/include/eigen3",
+              "cmake-package-check Eigen3 --targets Eigen3::Eigen"
+            ]
           }
         ],
         "version": "3.4.0"
+      },
+      {
+        "build": null,
+        "name": "eigen-abi",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "echo \"This is a metapackage, no test is necessary.\""
+          }
+        ],
+        "version": "3.4.0.100"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "eigen-abi"
+          ]
+        },
+        "name": "eigen-abi-devel",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "eigen",
+            "eigen-abi"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "test_abi/test_abi.cc",
+                "test_abi/CMakeLists.txt"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "cmake",
+                "ninja",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "cmake -GNinja -Stest_abi -Bbuild_test_abi -DEXPECTED_EIGEN_MAX_ALIGN_BYTES=${{ eigen_max_align_bytes }}",
+              "cmake --build build_test_abi"
+            ]
+          }
+        ],
+        "version": "3.4.0.100"
       }
     ],
     "package": {
@@ -323,12 +640,19 @@
     },
     "run": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "eigen",
+        "eigen-abi"
+      ]
     },
     "test": {
       "__set__": true,
       "elements": [
-        "cxx_compiler_stub"
+        "c_compiler_stub",
+        "cmake",
+        "cmake-package-check",
+        "cxx_compiler_stub",
+        "ninja"
       ]
     }
   },
@@ -342,7 +666,7 @@
     },
     "build": {
       "number": "1",
-      "script": "build.sh"
+      "script": "build_eigen.sh"
     },
     "extra": {
       "recipe-maintainers": [
@@ -385,10 +709,184 @@
             ]
           },
           {
-            "script": "test -d ${PREFIX}/include/eigen3"
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "test -d ${PREFIX}/include/eigen3",
+              "cmake-package-check Eigen3 --targets Eigen3::Eigen"
+            ]
           }
         ],
         "version": "3.4.0"
+      },
+      {
+        "build": null,
+        "name": "eigen-abi",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "echo \"This is a metapackage, no test is necessary.\""
+          }
+        ],
+        "version": "3.4.0.100"
+      },
+      {
+        "build": null,
+        "name": "eigen-abi",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "echo \"This is a metapackage, no test is necessary.\""
+          }
+        ],
+        "version": "3.4.0.70"
+      },
+      {
+        "build": null,
+        "name": "eigen-abi",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "echo \"This is a metapackage, no test is necessary.\""
+          }
+        ],
+        "version": "3.4.0.80"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "eigen-abi"
+          ]
+        },
+        "name": "eigen-abi-devel",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "eigen",
+            "eigen-abi"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "test_abi/test_abi.cc",
+                "test_abi/CMakeLists.txt"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "cmake",
+                "ninja",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "cmake -GNinja -Stest_abi -Bbuild_test_abi -DEXPECTED_EIGEN_MAX_ALIGN_BYTES=${{ eigen_max_align_bytes }}",
+              "cmake --build build_test_abi"
+            ]
+          }
+        ],
+        "version": "3.4.0.100"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "eigen-abi"
+          ]
+        },
+        "name": "eigen-abi-devel",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "eigen",
+            "eigen-abi",
+            "x86_64-microarch-level 4.*"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "test_abi/test_abi.cc",
+                "test_abi/CMakeLists.txt"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "cmake",
+                "ninja",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "cmake -GNinja -Stest_abi -Bbuild_test_abi -DEXPECTED_EIGEN_MAX_ALIGN_BYTES=${{ eigen_max_align_bytes }}",
+              "cmake --build build_test_abi"
+            ]
+          }
+        ],
+        "version": "3.4.0.70"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "eigen-abi"
+          ]
+        },
+        "name": "eigen-abi-devel",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "eigen",
+            "eigen-abi",
+            "x86_64-microarch-level 3.*"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "test_abi/test_abi.cc",
+                "test_abi/CMakeLists.txt"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "cmake",
+                "ninja",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "cmake -GNinja -Stest_abi -Bbuild_test_abi -DEXPECTED_EIGEN_MAX_ALIGN_BYTES=${{ eigen_max_align_bytes }}",
+              "cmake --build build_test_abi"
+            ]
+          }
+        ],
+        "version": "3.4.0.80"
       },
       {
         "build": null,
@@ -421,10 +919,74 @@
             ]
           },
           {
-            "script": "test -d ${PREFIX}/include/eigen3"
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "test -d ${PREFIX}/include/eigen3",
+              "cmake-package-check Eigen3 --targets Eigen3::Eigen"
+            ]
           }
         ],
         "version": "3.4.0"
+      },
+      {
+        "build": null,
+        "name": "eigen-abi",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "echo \"This is a metapackage, no test is necessary.\""
+          }
+        ],
+        "version": "3.4.0.100"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "eigen-abi"
+          ]
+        },
+        "name": "eigen-abi-devel",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "eigen",
+            "eigen-abi"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "test_abi/test_abi.cc",
+                "test_abi/CMakeLists.txt"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "cmake",
+                "ninja",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "cmake -GNinja -Stest_abi -Bbuild_test_abi -DEXPECTED_EIGEN_MAX_ALIGN_BYTES=${{ eigen_max_align_bytes }}",
+              "cmake --build build_test_abi"
+            ]
+          }
+        ],
+        "version": "3.4.0.100"
       },
       {
         "build": null,
@@ -457,10 +1019,74 @@
             ]
           },
           {
-            "script": "test -d ${PREFIX}/include/eigen3"
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "test -d ${PREFIX}/include/eigen3",
+              "cmake-package-check Eigen3 --targets Eigen3::Eigen"
+            ]
           }
         ],
         "version": "3.4.0"
+      },
+      {
+        "build": null,
+        "name": "eigen-abi",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "echo \"This is a metapackage, no test is necessary.\""
+          }
+        ],
+        "version": "3.4.0.100"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "eigen-abi"
+          ]
+        },
+        "name": "eigen-abi-devel",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "eigen",
+            "eigen-abi"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "test_abi/test_abi.cc",
+                "test_abi/CMakeLists.txt"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "cmake",
+                "ninja",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "cmake -GNinja -Stest_abi -Bbuild_test_abi -DEXPECTED_EIGEN_MAX_ALIGN_BYTES=${{ eigen_max_align_bytes }}",
+              "cmake --build build_test_abi"
+            ]
+          }
+        ],
+        "version": "3.4.0.100"
       },
       {
         "build": null,
@@ -493,10 +1119,184 @@
             ]
           },
           {
-            "script": "test -d ${PREFIX}/include/eigen3"
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "test -d ${PREFIX}/include/eigen3",
+              "cmake-package-check Eigen3 --targets Eigen3::Eigen"
+            ]
           }
         ],
         "version": "3.4.0"
+      },
+      {
+        "build": null,
+        "name": "eigen-abi",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "echo \"This is a metapackage, no test is necessary.\""
+          }
+        ],
+        "version": "3.4.0.100"
+      },
+      {
+        "build": null,
+        "name": "eigen-abi",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "echo \"This is a metapackage, no test is necessary.\""
+          }
+        ],
+        "version": "3.4.0.70"
+      },
+      {
+        "build": null,
+        "name": "eigen-abi",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "echo \"This is a metapackage, no test is necessary.\""
+          }
+        ],
+        "version": "3.4.0.80"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "eigen-abi"
+          ]
+        },
+        "name": "eigen-abi-devel",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "eigen",
+            "eigen-abi"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "test_abi/test_abi.cc",
+                "test_abi/CMakeLists.txt"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "cmake",
+                "ninja",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "cmake -GNinja -Stest_abi -Bbuild_test_abi -DEXPECTED_EIGEN_MAX_ALIGN_BYTES=${{ eigen_max_align_bytes }}",
+              "cmake --build build_test_abi"
+            ]
+          }
+        ],
+        "version": "3.4.0.100"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "eigen-abi"
+          ]
+        },
+        "name": "eigen-abi-devel",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "eigen",
+            "eigen-abi",
+            "x86_64-microarch-level 4.*"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "test_abi/test_abi.cc",
+                "test_abi/CMakeLists.txt"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "cmake",
+                "ninja",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "cmake -GNinja -Stest_abi -Bbuild_test_abi -DEXPECTED_EIGEN_MAX_ALIGN_BYTES=${{ eigen_max_align_bytes }}",
+              "cmake --build build_test_abi"
+            ]
+          }
+        ],
+        "version": "3.4.0.70"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "eigen-abi"
+          ]
+        },
+        "name": "eigen-abi-devel",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "eigen",
+            "eigen-abi",
+            "x86_64-microarch-level 3.*"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "test_abi/test_abi.cc",
+                "test_abi/CMakeLists.txt"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "cmake",
+                "ninja",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "cmake -GNinja -Stest_abi -Bbuild_test_abi -DEXPECTED_EIGEN_MAX_ALIGN_BYTES=${{ eigen_max_align_bytes }}",
+              "cmake --build build_test_abi"
+            ]
+          }
+        ],
+        "version": "3.4.0.80"
       },
       {
         "build": null,
@@ -529,10 +1329,74 @@
             ]
           },
           {
-            "script": "test -d ${PREFIX}/include/eigen3"
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "test -d ${PREFIX}/include/eigen3",
+              "cmake-package-check Eigen3 --targets Eigen3::Eigen"
+            ]
           }
         ],
         "version": "3.4.0"
+      },
+      {
+        "build": null,
+        "name": "eigen-abi",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "echo \"This is a metapackage, no test is necessary.\""
+          }
+        ],
+        "version": "3.4.0.100"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "eigen-abi"
+          ]
+        },
+        "name": "eigen-abi-devel",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "eigen",
+            "eigen-abi"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "test_abi/test_abi.cc",
+                "test_abi/CMakeLists.txt"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "cmake",
+                "ninja",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "cmake -GNinja -Stest_abi -Bbuild_test_abi -DEXPECTED_EIGEN_MAX_ALIGN_BYTES=${{ eigen_max_align_bytes }}",
+              "cmake --build build_test_abi"
+            ]
+          }
+        ],
+        "version": "3.4.0.100"
       },
       {
         "build": null,
@@ -565,10 +1429,74 @@
             ]
           },
           {
-            "script": "test -d ${PREFIX}/include/eigen3"
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "test -d ${PREFIX}/include/eigen3",
+              "cmake-package-check Eigen3 --targets Eigen3::Eigen"
+            ]
           }
         ],
         "version": "3.4.0"
+      },
+      {
+        "build": null,
+        "name": "eigen-abi",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "echo \"This is a metapackage, no test is necessary.\""
+          }
+        ],
+        "version": "3.4.0.100"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "eigen-abi"
+          ]
+        },
+        "name": "eigen-abi-devel",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "eigen",
+            "eigen-abi"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "test_abi/test_abi.cc",
+                "test_abi/CMakeLists.txt"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "cmake",
+                "ninja",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "cmake -GNinja -Stest_abi -Bbuild_test_abi -DEXPECTED_EIGEN_MAX_ALIGN_BYTES=${{ eigen_max_align_bytes }}",
+              "cmake --build build_test_abi"
+            ]
+          }
+        ],
+        "version": "3.4.0.100"
       }
     ],
     "package": {
@@ -600,7 +1528,7 @@
     },
     "build": {
       "number": "1",
-      "script": "build.sh"
+      "script": "build_eigen.sh"
     },
     "extra": {
       "recipe-maintainers": [
@@ -643,10 +1571,184 @@
             ]
           },
           {
-            "script": "test -d ${PREFIX}/include/eigen3"
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "test -d ${PREFIX}/include/eigen3",
+              "cmake-package-check Eigen3 --targets Eigen3::Eigen"
+            ]
           }
         ],
         "version": "3.4.0"
+      },
+      {
+        "build": null,
+        "name": "eigen-abi",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "echo \"This is a metapackage, no test is necessary.\""
+          }
+        ],
+        "version": "3.4.0.100"
+      },
+      {
+        "build": null,
+        "name": "eigen-abi",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "echo \"This is a metapackage, no test is necessary.\""
+          }
+        ],
+        "version": "3.4.0.70"
+      },
+      {
+        "build": null,
+        "name": "eigen-abi",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "echo \"This is a metapackage, no test is necessary.\""
+          }
+        ],
+        "version": "3.4.0.80"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "eigen-abi"
+          ]
+        },
+        "name": "eigen-abi-devel",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "eigen",
+            "eigen-abi"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "test_abi/test_abi.cc",
+                "test_abi/CMakeLists.txt"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "cmake",
+                "ninja",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "cmake -GNinja -Stest_abi -Bbuild_test_abi -DEXPECTED_EIGEN_MAX_ALIGN_BYTES=${{ eigen_max_align_bytes }}",
+              "cmake --build build_test_abi"
+            ]
+          }
+        ],
+        "version": "3.4.0.100"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "eigen-abi"
+          ]
+        },
+        "name": "eigen-abi-devel",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "eigen",
+            "eigen-abi",
+            "x86_64-microarch-level 4.*"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "test_abi/test_abi.cc",
+                "test_abi/CMakeLists.txt"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "cmake",
+                "ninja",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "cmake -GNinja -Stest_abi -Bbuild_test_abi -DEXPECTED_EIGEN_MAX_ALIGN_BYTES=${{ eigen_max_align_bytes }}",
+              "cmake --build build_test_abi"
+            ]
+          }
+        ],
+        "version": "3.4.0.70"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "eigen-abi"
+          ]
+        },
+        "name": "eigen-abi-devel",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "eigen",
+            "eigen-abi",
+            "x86_64-microarch-level 3.*"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "test_abi/test_abi.cc",
+                "test_abi/CMakeLists.txt"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "cmake",
+                "ninja",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "cmake -GNinja -Stest_abi -Bbuild_test_abi -DEXPECTED_EIGEN_MAX_ALIGN_BYTES=${{ eigen_max_align_bytes }}",
+              "cmake --build build_test_abi"
+            ]
+          }
+        ],
+        "version": "3.4.0.80"
       }
     ],
     "package": {
@@ -683,12 +1785,20 @@
     },
     "run": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "eigen",
+        "eigen-abi",
+        "x86_64-microarch-level"
+      ]
     },
     "test": {
       "__set__": true,
       "elements": [
-        "cxx_compiler_stub"
+        "c_compiler_stub",
+        "cmake",
+        "cmake-package-check",
+        "cxx_compiler_stub",
+        "ninja"
       ]
     }
   },
@@ -702,7 +1812,7 @@
     },
     "build": {
       "number": "1",
-      "script": "build.sh"
+      "script": "build_eigen.sh"
     },
     "extra": {
       "recipe-maintainers": [
@@ -745,10 +1855,74 @@
             ]
           },
           {
-            "script": "test -d ${PREFIX}/include/eigen3"
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "test -d ${PREFIX}/include/eigen3",
+              "cmake-package-check Eigen3 --targets Eigen3::Eigen"
+            ]
           }
         ],
         "version": "3.4.0"
+      },
+      {
+        "build": null,
+        "name": "eigen-abi",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "echo \"This is a metapackage, no test is necessary.\""
+          }
+        ],
+        "version": "3.4.0.100"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "eigen-abi"
+          ]
+        },
+        "name": "eigen-abi-devel",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "eigen",
+            "eigen-abi"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "test_abi/test_abi.cc",
+                "test_abi/CMakeLists.txt"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "cmake",
+                "ninja",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "cmake -GNinja -Stest_abi -Bbuild_test_abi -DEXPECTED_EIGEN_MAX_ALIGN_BYTES=${{ eigen_max_align_bytes }}",
+              "cmake --build build_test_abi"
+            ]
+          }
+        ],
+        "version": "3.4.0.100"
       }
     ],
     "package": {
@@ -785,19 +1959,28 @@
     },
     "run": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "eigen",
+        "eigen-abi"
+      ]
     },
     "test": {
       "__set__": true,
       "elements": [
-        "cxx_compiler_stub"
+        "c_compiler_stub",
+        "cmake",
+        "cmake-package-check",
+        "cxx_compiler_stub",
+        "ninja"
       ]
     }
   },
   "outputs_names": {
     "__set__": true,
     "elements": [
-      "eigen"
+      "eigen",
+      "eigen-abi",
+      "eigen-abi-devel"
     ]
   },
   "parsing_error": false,
@@ -812,14 +1995,17 @@
   "pr_info": {
     "__lazy_json__": "pr_info/eigen.json"
   },
-  "raw_meta_yaml": "schema_version: 1\n\ncontext:\n  version: 3.4.0\n\npackage:\n  name: eigen\n  version: ${{ version }}\n\nsource:\n  - url: https://gitlab.com/libeigen/eigen/-/archive/${{ version }}/eigen-${{ version }}.tar.gz\n    sha256: 8586084f71f9bde545ee7fa6d00288b264a2b7ac3607b974e54d13e7162c1c72\n\nbuild:\n  number: 1\n  script:\n    - if: unix\n      then: build.sh\n    - if: win\n      then: build.bat\n\nrequirements:\n  build:\n    - cmake\n    - ${{ compiler('cxx') }}\n    - ${{ stdlib('c') }}\n    - ninja\n\ntests:\n  - files:\n      recipe:\n        - test.cc\n    requirements:\n      build:\n        - ${{ compiler('cxx') }}\n    script:\n      - if: unix\n        then:\n          - ${CXX} -I${PREFIX}/include -o test test.cc\n          - ./test\n      - if: win\n        then:\n          - \"%CXX% -I%PREFIX%\\\\Library\\\\include -o test.exe test.cc\"\n          - test.exe\n  - script:\n      - if: unix\n        then:\n          - test -d ${PREFIX}/include/eigen3\n      - if: win\n        then:\n          - if not exist %PREFIX%\\\\Library\\\\include\\\\eigen3 exit 1\n          - if not exist %PREFIX%\\\\Library\\\\share\\\\pkgconfig\\\\eigen3.pc exit 1\n\nabout:\n  homepage: http://eigen.tuxfamily.org/\n  license: MPL-2.0\n  license_file: COPYING.MPL2\n  summary: C++ template library for linear algebra\n\nextra:\n  recipe-maintainers:\n    - traversaro\n    - jakirkham\n    - patricksnape\n    - jschueller\n    - seanyen\n",
+  "raw_meta_yaml": "schema_version: 1\n\ncontext:\n  version: 3.4.0\n\nrecipe:\n  name: eigen-split\n  version: ${{ version }}\n\nsource:\n  - url: https://gitlab.com/libeigen/eigen/-/archive/${{ version }}/eigen-${{ version }}.tar.gz\n    sha256: 8586084f71f9bde545ee7fa6d00288b264a2b7ac3607b974e54d13e7162c1c72\n\nbuild:\n  number: 1\n\noutputs:\n  - package:\n      name: eigen\n      version: ${{ version }}\n    build:\n      script:\n        - if: unix\n          then: build_eigen.sh\n        - if: win\n          then: build_eigen.bat\n\n    requirements:\n      build:\n        - cmake\n        - ${{ compiler('cxx') }}\n        - ${{ stdlib('c') }}\n        - ninja\n    tests:\n      - files:\n          recipe:\n            - test.cc\n        requirements:\n          build:\n            - ${{ compiler('cxx') }}\n        script:\n          - if: unix\n            then:\n              - ${CXX} -I${PREFIX}/include -o test test.cc\n              - ./test\n          - if: win\n            then:\n              - \"%CXX% -I%PREFIX%\\\\Library\\\\include -o test.exe test.cc\"\n              - test.exe\n      - script:\n          - if: unix\n            then:\n              - test -d ${PREFIX}/include/eigen3\n          - if: win\n            then:\n              - if not exist %PREFIX%\\\\Library\\\\include\\\\eigen3 exit 1\n              - if not exist %PREFIX%\\\\Library\\\\share\\\\pkgconfig\\\\eigen3.pc exit 1\n          - cmake-package-check Eigen3 --targets Eigen3::Eigen\n        requirements:\n          run:\n            - cmake-package-check\n            - ${{ compiler('c') }}\n            - ${{ compiler('cxx') }}\n\n  # The eigen-abi and eigen-abi-devel logic is discussed in detail recipe/README.md\n  - package:\n      name: eigen-abi-devel\n      # The version of eigen-abi is composed by the eigen version, and the eigen_abi_profile value\n      version: ${{ version }}.${{ eigen_abi_profile }}\n    requirements:\n      run_exports:\n        - ${{ pin_subpackage('eigen-abi', upper_bound='x.x.x.x') }}\n      run_constraints:\n        - if: x86_64 and eigen_max_align_bytes == \"16\"\n          then:\n            - x86_64-microarch-level >=1,<3\n      run:\n        - ${{ pin_subpackage('eigen', upper_bound='x.x.x') }}\n        - ${{ pin_subpackage('eigen-abi', upper_bound='x.x.x.x') }}\n        - if: x86_64 and eigen_max_align_bytes == \"32\"\n          then: x86_64-microarch-level 3.*\n        - if: x86_64 and eigen_max_align_bytes == \"64\"\n          then: x86_64-microarch-level 4.*\n    tests:\n      - files:\n          recipe:\n            - test_abi/test_abi.cc\n            - test_abi/CMakeLists.txt\n        script:\n          - cmake -GNinja -Stest_abi -Bbuild_test_abi -DEXPECTED_EIGEN_MAX_ALIGN_BYTES=${{ eigen_max_align_bytes }}\n          - cmake --build build_test_abi\n        requirements:\n          run:\n            - cmake\n            - ninja\n            - ${{ compiler('cxx') }}\n\n  - package:\n      name: eigen-abi\n      # The version of eigen-abi is composed by the eigen version, and eigen_abi_profile value\n      version: ${{ version }}.${{ eigen_abi_profile }}\n    tests:\n      - script:\n          - echo \"This is a metapackage, no test is necessary.\"\n\n\nabout:\n  homepage: http://eigen.tuxfamily.org/\n  license: MPL-2.0\n  license_file: COPYING.MPL2\n  summary: C++ template library for linear algebra\n\nextra:\n  recipe-maintainers:\n    - traversaro\n    - jakirkham\n    - patricksnape\n    - jschueller\n    - seanyen\n",
   "req": {
     "__set__": true,
     "elements": [
       "c_stdlib_stub",
       "cmake",
       "cxx_compiler_stub",
-      "ninja"
+      "eigen",
+      "eigen-abi",
+      "ninja",
+      "x86_64-microarch-level"
     ]
   },
   "requirements": {
@@ -835,21 +2021,32 @@
     "host": {
       "__set__": true,
       "elements": [
+        "c_compiler_stub",
         "c_stdlib_stub",
-        "cxx_compiler_stub"
+        "cxx_compiler_stub",
+        "microarch-level"
       ]
     },
     "run": {
       "__set__": true,
       "elements": [
+        "c_compiler_stub",
         "c_stdlib_stub",
-        "cxx_compiler_stub"
+        "cxx_compiler_stub",
+        "eigen",
+        "eigen-abi",
+        "microarch-level",
+        "x86_64-microarch-level"
       ]
     },
     "test": {
       "__set__": true,
       "elements": [
-        "cxx_compiler_stub"
+        "c_compiler_stub",
+        "cmake",
+        "cmake-package-check",
+        "cxx_compiler_stub",
+        "ninja"
       ]
     }
   },
@@ -870,12 +2067,21 @@
     },
     "run": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "eigen",
+        "eigen-abi",
+        "x86_64-microarch-level 3.*",
+        "x86_64-microarch-level 4.*"
+      ]
     },
     "test": {
       "__set__": true,
       "elements": [
-        "cxx_compiler_stub"
+        "c_compiler_stub",
+        "cmake",
+        "cmake-package-check",
+        "cxx_compiler_stub",
+        "ninja"
       ]
     }
   },
@@ -894,7 +2100,7 @@
     },
     "build": {
       "number": "1",
-      "script": "build.sh"
+      "script": "build_eigen.sh"
     },
     "extra": {
       "recipe-maintainers": [
@@ -937,10 +2143,74 @@
             ]
           },
           {
-            "script": "test -d ${PREFIX}/include/eigen3"
+            "requirements": {
+              "run": [
+                "cmake-package-check",
+                "c_compiler_stub",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "test -d ${PREFIX}/include/eigen3",
+              "cmake-package-check Eigen3 --targets Eigen3::Eigen"
+            ]
           }
         ],
         "version": "3.4.0"
+      },
+      {
+        "build": null,
+        "name": "eigen-abi",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "echo \"This is a metapackage, no test is necessary.\""
+          }
+        ],
+        "version": "3.4.0.100"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "eigen-abi"
+          ]
+        },
+        "name": "eigen-abi-devel",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "eigen",
+            "eigen-abi"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "test_abi/test_abi.cc",
+                "test_abi/CMakeLists.txt"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "cmake",
+                "ninja",
+                "cxx_compiler_stub"
+              ]
+            },
+            "script": [
+              "cmake -GNinja -Stest_abi -Bbuild_test_abi -DEXPECTED_EIGEN_MAX_ALIGN_BYTES=${{ eigen_max_align_bytes }}",
+              "cmake --build build_test_abi"
+            ]
+          }
+        ],
+        "version": "3.4.0.100"
       }
     ],
     "package": {
@@ -977,12 +2247,19 @@
     },
     "run": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "eigen",
+        "eigen-abi"
+      ]
     },
     "test": {
       "__set__": true,
       "elements": [
-        "cxx_compiler_stub"
+        "c_compiler_stub",
+        "cmake",
+        "cmake-package-check",
+        "cxx_compiler_stub",
+        "ninja"
       ]
     }
   }
