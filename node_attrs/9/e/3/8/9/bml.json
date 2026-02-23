@@ -1,7 +1,7 @@
 {
   "archived": false,
   "branch": "main",
-  "ci_support_linux_64_mpimpich.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '12'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.12'\ncdt_name:\n- cos6\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ncxx_compiler:\n- gxx\ncxx_compiler_version:\n- '12'\ndocker_image:\n- quay.io/condaforge/linux-anvil-cos7-x86_64\nfortran_compiler:\n- gfortran\nfortran_compiler_version:\n- '12'\nlibblas:\n- 3.9 *netlib\nliblapack:\n- 3.9 *netlib\nmpi:\n- mpich\nmpich:\n- '4'\nopenmpi:\n- '5'\ntarget_platform:\n- linux-64\nzip_keys:\n- - c_compiler_version\n  - cxx_compiler_version\n  - fortran_compiler_version\n- - c_stdlib_version\n  - cdt_name\n",
+  "ci_support_linux_64_mpimpich.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ncxx_compiler:\n- gxx\ncxx_compiler_version:\n- '14'\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\nfortran_compiler:\n- gfortran\nfortran_compiler_version:\n- '14'\nlibblas:\n- 3.9.* *netlib\nliblapack:\n- 3.9.* *netlib\nmpi:\n- mpich\nmpich:\n- '5'\nopenmpi:\n- '5'\ntarget_platform:\n- linux-64\nzip_keys:\n- - c_compiler_version\n  - cxx_compiler_version\n  - fortran_compiler_version\n",
   "conda-forge.yml": {
     "conda_build": {
       "pkg_format": "2"
@@ -12,8 +12,8 @@
       "tooling_branch_name": "main"
     }
   },
-  "feedstock_hash": "f6dc5979e5c1ebf41535d540c3bdfcc85b4ed352",
-  "feedstock_hash_ts": 1730845578,
+  "feedstock_hash": "884f2da812595640869fc51d01a4a89e6f7f7de0",
+  "feedstock_hash_ts": 1771827261,
   "feedstock_name": "bml",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -28,7 +28,7 @@
       "summary": "The Basic Matrix Library (bml)"
     },
     "build": {
-      "number": "1",
+      "number": "2",
       "run_exports": [
         "bml * mpi_mpich_*",
         "bml * mpi_openmpi_*"
@@ -43,7 +43,7 @@
         "BML_TESTING=yes",
         "EXTRA_FFLAGS=-ffree-line-length-none"
       ],
-      "string": "mpi_openmpi_h1234567_1"
+      "string": "mpi_openmpi_h1234567_2"
     },
     "extra": {
       "recipe-maintainers": [
@@ -142,7 +142,7 @@
       "summary": "The Basic Matrix Library (bml)"
     },
     "build": {
-      "number": "1",
+      "number": "2",
       "run_exports": [
         "bml * mpi_mpich_*",
         "bml * mpi_openmpi_*"
@@ -157,7 +157,7 @@
         "BML_TESTING=yes",
         "EXTRA_FFLAGS=-ffree-line-length-none"
       ],
-      "string": "mpi_openmpi_h1234567_1"
+      "string": "mpi_openmpi_h1234567_2"
     },
     "extra": {
       "recipe-maintainers": [
@@ -222,7 +222,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/bml.json"
   },
-  "raw_meta_yaml": "{% set name = \"bml\" %}\n{% set version = \"2.4.0\" %}\n{% set build = 1 %}\n{% set mpi = mpi or \"nompi\" %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://github.com/lanl/{{ name }}/archive/v{{ version }}.tar.gz\n  sha256: 338474ec7f6c5351eb7092791082063d4284e8e961824b9850516fffcc2b0605\n\n{% if mpi == \"nompi\" %}\n{% set build = build + 100 %}\n{% endif %}\nbuild:\n  number: {{ build }}\n  skip: true  # [win or osx]\n\n  script: bash ${RECIPE_DIR}/build-cf.sh\n  script_env:\n    - CMAKE_BUILD_TYPE=Release\n    - BUILD_SHARED_LIBS=yes\n    - BML_OPENMP=yes\n    - BML_MPI=yes  # [mpi != \"nompi\"]\n    - BML_COMPLEX=yes\n    - BML_TESTING=yes\n    - EXTRA_FFLAGS=-ffree-line-length-none\n\n  {% if mpi != \"nompi\" %}\n  {% set mpi_prefix = \"mpi_\" + mpi %}\n  {% else %}\n  {% set mpi_prefix = \"nompi\" %}\n  {% endif %}\n  string: {{ mpi_prefix }}_h{{ PKG_HASH }}_{{ build }}\n\n  {% if mpi != \"nompi\" %}\n  run_exports:\n    - {{ name }} * {{ mpi_prefix }}_*\n  {% endif %}\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ stdlib(\"c\") }}\n    - {{ compiler('cxx') }}\n    - {{ compiler('fortran') }}\n    - cmake\n    - make\n    - llvm-openmp  # [osx]\n    - libgomp  # [linux]\n  host:\n    - {{ mpi }}  # [mpi != \"nompi\"]\n    - libblas\n    - liblapack\n  run:\n    - {{ mpi }}  # [mpi != \"nompi\"]\n\ntest:\n  requires:\n    - pkg-config\n  commands:\n    - pkg-config {{ name }} --exact-version {{ version }}\n    - test -f $PREFIX/include/bml.h\n    - test -f $PREFIX/include/bml.mod\n    - test -f $PREFIX/lib/libbml${SHLIB_EXT}\n    - test -f $PREFIX/lib/libbml_fortran${SHLIB_EXT}\n\nabout:\n  home: https://basic-matrix-library.readthedocs.io/\n  license: BSD-3-Clause\n  license_file:\n    - LICENSE.md\n  summary: The Basic Matrix Library (bml)\n  description: |\n    The basic matrix library (bml) is a collection of various matrix data formats\n    (for dense and sparse) and their associated algorithms for basic matrix operations.\n    Application programming interfaces (API) are available for both C and Fortran.\n    The current status of this library allows us to use two different formats\n    for representing matrix data. Currently these formats are dense, ELLPACK-R,\n    ELLBLOCK, ELLSORT, and CSR.\n  dev_url: https://github.com/lanl/bml\n\nextra:\n  recipe-maintainers:\n    - awvwgk\n    - nicolasbock\n",
+  "raw_meta_yaml": "{% set name = \"bml\" %}\n{% set version = \"2.4.0\" %}\n{% set build = 2 %}\n{% set mpi = mpi or \"nompi\" %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://github.com/lanl/{{ name }}/archive/v{{ version }}.tar.gz\n  sha256: 338474ec7f6c5351eb7092791082063d4284e8e961824b9850516fffcc2b0605\n\n{% if mpi == \"nompi\" %}\n{% set build = build + 100 %}\n{% endif %}\nbuild:\n  number: {{ build }}\n  skip: true  # [win or osx]\n\n  script: bash ${RECIPE_DIR}/build-cf.sh\n  script_env:\n    - CMAKE_BUILD_TYPE=Release\n    - BUILD_SHARED_LIBS=yes\n    - BML_OPENMP=yes\n    - BML_MPI=yes  # [mpi != \"nompi\"]\n    - BML_COMPLEX=yes\n    - BML_TESTING=yes\n    - EXTRA_FFLAGS=-ffree-line-length-none\n\n  {% if mpi != \"nompi\" %}\n  {% set mpi_prefix = \"mpi_\" + mpi %}\n  {% else %}\n  {% set mpi_prefix = \"nompi\" %}\n  {% endif %}\n  string: {{ mpi_prefix }}_h{{ PKG_HASH }}_{{ build }}\n\n  {% if mpi != \"nompi\" %}\n  run_exports:\n    - {{ name }} * {{ mpi_prefix }}_*\n  {% endif %}\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ stdlib(\"c\") }}\n    - {{ compiler('cxx') }}\n    - {{ compiler('fortran') }}\n    - cmake\n    - make\n    - llvm-openmp  # [osx]\n    - libgomp  # [linux]\n  host:\n    - {{ mpi }}  # [mpi != \"nompi\"]\n    - libblas\n    - liblapack\n  run:\n    - {{ mpi }}  # [mpi != \"nompi\"]\n\ntest:\n  requires:\n    - pkg-config\n  commands:\n    - pkg-config {{ name }} --exact-version {{ version }}\n    - test -f $PREFIX/include/bml.h\n    - test -f $PREFIX/include/bml.mod\n    - test -f $PREFIX/lib/libbml${SHLIB_EXT}\n    - test -f $PREFIX/lib/libbml_fortran${SHLIB_EXT}\n\nabout:\n  home: https://basic-matrix-library.readthedocs.io/\n  license: BSD-3-Clause\n  license_file:\n    - LICENSE.md\n  summary: The Basic Matrix Library (bml)\n  description: |\n    The basic matrix library (bml) is a collection of various matrix data formats\n    (for dense and sparse) and their associated algorithms for basic matrix operations.\n    Application programming interfaces (API) are available for both C and Fortran.\n    The current status of this library allows us to use two different formats\n    for representing matrix data. Currently these formats are dense, ELLPACK-R,\n    ELLBLOCK, ELLSORT, and CSR.\n  dev_url: https://github.com/lanl/bml\n\nextra:\n  recipe-maintainers:\n    - awvwgk\n    - nicolasbock\n",
   "req": {
     "__set__": true,
     "elements": [
