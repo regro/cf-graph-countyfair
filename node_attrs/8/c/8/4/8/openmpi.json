@@ -1,6 +1,7 @@
 {
   "archived": false,
   "branch": "main",
+  "ci_support_linux_64_channel_targetsconda-forge_maincuda_compiler_version12.9mpi_typeconda.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ncuda_compiler:\n- cuda-nvcc\ncuda_compiler_version:\n- '12.9'\ncuda_compiler_version_min:\n- '12.9'\ncxx_compiler:\n- gxx\ncxx_compiler_version:\n- '14'\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\nfortran_compiler:\n- gfortran\nfortran_compiler_version:\n- '14'\nlibevent:\n- 2.1.12\nlibfabric:\n- '1.19'\nlibhwloc:\n- 2.12.2\nlibpmix_devel:\n- '5'\nmpi_type:\n- conda\ntarget_platform:\n- linux-64\nucc:\n- '1'\nucx:\n- '1.20'\nzip_keys:\n- - c_compiler_version\n  - cxx_compiler_version\n  - fortran_compiler_version\n  - c_stdlib_version\n  - cuda_compiler_version\n- - mpi_type\n  - channel_targets\nzlib:\n- '1'\n",
   "conda-forge.yml": {
     "azure": {
       "settings_linux": {
@@ -16,6 +17,7 @@
     "conda_build": {
       "pkg_format": "2"
     },
+    "conda_build_tool": "rattler-build",
     "conda_forge_output_validation": true,
     "github": {
       "branch_name": "main",
@@ -28,24 +30,29 @@
     },
     "test": "native_and_emulated"
   },
+  "feedstock_hash": "2d4dcfd7ee094ef80701e6f1ae8beed614fa1453",
+  "feedstock_hash_ts": 1768621119,
   "feedstock_name": "openmpi",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
     "about": {
-      "description": "The Open MPI Project is an open source Message Passing Interface\nimplementation that is developed and maintained by a consortium of academic,\nresearch, and industry partners.\n",
+      "description": "The Open MPI Project is an open source Message Passing Interface\nimplementation that is developed and maintained by a consortium of academic,\nresearch, and industry partners.",
       "dev_url": "https://github.com/open-mpi/ompi",
       "doc_url": "https://www.open-mpi.org/doc/",
       "home": "https://www.open-mpi.org/",
       "license": "BSD-3-Clause",
-      "license_family": "BSD",
+      "license_family": "BSD-3-Clause",
       "license_file": "LICENSE",
       "summary": "An open source Message Passing Interface implementation."
     },
     "build": {
-      "force_use_keys": [
-        "cuda_compiler_version_min"
-      ],
-      "number": "4"
+      "number": "111",
+      "run_exports": {
+        "weak": [
+          "openmpi"
+        ]
+      },
+      "script": "build-mpi"
     },
     "extra": {
       "recipe-maintainers": [
@@ -63,10 +70,8 @@
     "outputs": [
       {
         "build": {
-          "ignore_run_exports_from": [
-            "cuda_compiler_stub"
-          ],
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "openmpi"
           ]
         },
@@ -79,168 +84,185 @@
             "fortran_compiler_stub",
             "c_stdlib_stub",
             "pkg-config",
-            "make"
+            "make",
+            "shellcheck"
           ],
           "host": [
             "libevent",
             "libfabric-devel 1.19.*",
             "libhwloc",
-            "libnl",
             "libpmix-devel",
             "zlib",
+            "libnl",
             "ucc",
             "ucx",
-            "cuda-version 12.9"
+            "cuda-version 12.9.*"
           ],
           "run": [
-            "mpi 1.0 openmpi"
-          ],
-          "run_constrained": [
-            "__cuda  >= 12.0",
-            "cuda-version  >= 12.0",
-            "libprrte ==0.0.0"
+            "mpi 1.0.* openmpi"
           ]
         },
-        "script": "build-mpi.sh",
-        "test": {
-          "commands": [
-            "test ! -d $PREFIX/share/doc/openmpi",
-            "test ! -f $PREFIX/share/man/man3/MPI_Init.3"
-          ],
-          "files": [
-            "tests/helloworld.sh"
-          ],
-          "requires": [
-            "patchelf"
-          ],
-          "script": "run_test.sh"
-        }
+        "tests": [
+          {
+            "package_contents": {
+              "files": {
+                "not_exists": [
+                  "share/doc/openmpi",
+                  "share/man/man3/MPI_Init.3"
+                ]
+              }
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.sh"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "patchelf"
+              ]
+            },
+            "script": {
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "5.0.8"
       },
       {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
-        "name": "openmpi-mpicc",
-        "requirements": {
-          "build": [
-            "c_stdlib_stub"
-          ],
-          "run": [
-            "openmpi",
-            "c_compiler_stub"
-          ]
-        },
-        "test": {
-          "files": [
-            "tests/helloworld.c"
-          ],
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
-        "name": "openmpi-mpicxx",
-        "requirements": {
-          "build": [
-            "c_stdlib_stub"
-          ],
-          "run": [
-            "openmpi",
-            "cxx_compiler_stub"
-          ]
-        },
-        "test": {
-          "files": [
-            "tests/helloworld.cxx"
-          ],
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
+        "build": null,
         "name": "openmpi-mpifort",
         "requirements": {
           "build": [
             "c_stdlib_stub"
           ],
+          "host": [],
           "run": [
             "openmpi",
             "fortran_compiler_stub"
           ]
         },
-        "test": {
-          "files": [
-            "tests/helloworld.f",
-            "tests/helloworld.f90"
-          ],
-          "script": "run_test.sh"
-        }
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.f",
+                "tests/helloworld.f90"
+              ]
+            },
+            "script": {
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "5.0.8"
       },
       {
-        "build": {
-          "ignore_run_exports_from": [
-            "cuda_compiler_stub"
-          ],
-          "string": "external_h1234567_4",
-          "track_features": [
-            "openmpi_external"
-          ]
-        },
-        "name": "openmpi",
+        "build": null,
+        "name": "openmpi-mpicxx",
         "requirements": {
           "build": [
-            "c_compiler_stub",
-            "cxx_compiler_stub",
-            "cuda_compiler_stub",
-            "fortran_compiler_stub",
-            "c_stdlib_stub",
-            "pkg-config",
-            "make"
+            "c_stdlib_stub"
           ],
-          "host": [
-            "libevent",
-            "libfabric-devel 1.19.*",
-            "libhwloc",
-            "libnl",
-            "libpmix-devel",
-            "zlib",
-            "ucc",
-            "ucx",
-            "cuda-version 12.9"
-          ],
+          "host": [],
           "run": [
-            "mpi 1.0 openmpi"
-          ],
-          "run_constrained": [
-            "__cuda  >= 12.0",
-            "cuda-version  >= 12.0",
-            "libprrte ==0.0.0"
+            "openmpi",
+            "cxx_compiler_stub"
           ]
         },
-        "test": {
-          "commands": [
-            "echo \"It works!\""
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.cxx"
+              ]
+            },
+            "script": {
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "5.0.8"
+      },
+      {
+        "build": null,
+        "name": "openmpi-mpicc",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": [
+            "openmpi",
+            "c_compiler_stub"
           ]
-        }
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.c"
+              ]
+            },
+            "script": {
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "5.0.8"
+      },
+      {
+        "build": null,
+        "name": "openmpi",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "mpi 1.0.* openmpi"
+          ]
+        },
+        "tests": [
+          {
+            "script": "echo 'ok'"
+          }
+        ],
+        "version": "5.0.8"
       }
     ],
     "package": {
-      "name": "openmpi-mpi",
+      "name": "openmpi",
       "version": "5.0.8"
     },
-    "schema_version": 0,
+    "requirements": {
+      "build": [
+        "c_compiler_stub",
+        "cxx_compiler_stub",
+        "cuda_compiler_stub",
+        "fortran_compiler_stub",
+        "c_stdlib_stub",
+        "pkg-config",
+        "make",
+        "shellcheck"
+      ],
+      "host": [
+        "libevent",
+        "libfabric-devel 1.19.*",
+        "libhwloc",
+        "libpmix-devel",
+        "zlib",
+        "libnl",
+        "ucc",
+        "ucx",
+        "cuda-version 12.9.*"
+      ],
+      "run": [
+        "mpi 1.0.* openmpi"
+      ]
+    },
+    "schema_version": 1,
     "source": {
-      "fn": "openmpi-5.0.8.tar.bz2",
       "sha256": "53131e1a57e7270f645707f8b0b65ba56048f5b5ac3f68faabed3eb0d710e449",
       "url": "https://www.open-mpi.org/software/ompi/v5.0/downloads/openmpi-5.0.8.tar.bz2"
     }
@@ -255,7 +277,8 @@
         "cxx_compiler_stub",
         "fortran_compiler_stub",
         "make",
-        "pkg-config"
+        "pkg-config",
+        "shellcheck"
       ]
     },
     "host": {
@@ -291,20 +314,23 @@
   },
   "linux_aarch64_meta_yaml": {
     "about": {
-      "description": "The Open MPI Project is an open source Message Passing Interface\nimplementation that is developed and maintained by a consortium of academic,\nresearch, and industry partners.\n",
+      "description": "The Open MPI Project is an open source Message Passing Interface\nimplementation that is developed and maintained by a consortium of academic,\nresearch, and industry partners.",
       "dev_url": "https://github.com/open-mpi/ompi",
       "doc_url": "https://www.open-mpi.org/doc/",
       "home": "https://www.open-mpi.org/",
       "license": "BSD-3-Clause",
-      "license_family": "BSD",
+      "license_family": "BSD-3-Clause",
       "license_file": "LICENSE",
       "summary": "An open source Message Passing Interface implementation."
     },
     "build": {
-      "force_use_keys": [
-        "cuda_compiler_version_min"
-      ],
-      "number": "4"
+      "number": "111",
+      "run_exports": {
+        "weak": [
+          "openmpi"
+        ]
+      },
+      "script": "build-mpi"
     },
     "extra": {
       "recipe-maintainers": [
@@ -322,10 +348,8 @@
     "outputs": [
       {
         "build": {
-          "ignore_run_exports_from": [
-            "cuda_compiler_stub"
-          ],
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "openmpi"
           ]
         },
@@ -338,168 +362,185 @@
             "fortran_compiler_stub",
             "c_stdlib_stub",
             "pkg-config",
-            "make"
+            "make",
+            "shellcheck"
           ],
           "host": [
             "libevent",
             "libfabric-devel 1.19.*",
             "libhwloc",
-            "libnl",
             "libpmix-devel",
             "zlib",
+            "libnl",
             "ucc",
             "ucx",
-            "cuda-version 12.9"
+            "cuda-version 12.9.*"
           ],
           "run": [
-            "mpi 1.0 openmpi"
-          ],
-          "run_constrained": [
-            "__cuda  >= 12.0",
-            "cuda-version  >= 12.0",
-            "libprrte ==0.0.0"
+            "mpi 1.0.* openmpi"
           ]
         },
-        "script": "build-mpi.sh",
-        "test": {
-          "commands": [
-            "test ! -d $PREFIX/share/doc/openmpi",
-            "test ! -f $PREFIX/share/man/man3/MPI_Init.3"
-          ],
-          "files": [
-            "tests/helloworld.sh"
-          ],
-          "requires": [
-            "patchelf"
-          ],
-          "script": "run_test.sh"
-        }
+        "tests": [
+          {
+            "package_contents": {
+              "files": {
+                "not_exists": [
+                  "share/doc/openmpi",
+                  "share/man/man3/MPI_Init.3"
+                ]
+              }
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.sh"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "patchelf"
+              ]
+            },
+            "script": {
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "5.0.8"
       },
       {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
-        "name": "openmpi-mpicc",
-        "requirements": {
-          "build": [
-            "c_stdlib_stub"
-          ],
-          "run": [
-            "openmpi",
-            "c_compiler_stub"
-          ]
-        },
-        "test": {
-          "files": [
-            "tests/helloworld.c"
-          ],
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
-        "name": "openmpi-mpicxx",
-        "requirements": {
-          "build": [
-            "c_stdlib_stub"
-          ],
-          "run": [
-            "openmpi",
-            "cxx_compiler_stub"
-          ]
-        },
-        "test": {
-          "files": [
-            "tests/helloworld.cxx"
-          ],
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
+        "build": null,
         "name": "openmpi-mpifort",
         "requirements": {
           "build": [
             "c_stdlib_stub"
           ],
+          "host": [],
           "run": [
             "openmpi",
             "fortran_compiler_stub"
           ]
         },
-        "test": {
-          "files": [
-            "tests/helloworld.f",
-            "tests/helloworld.f90"
-          ],
-          "script": "run_test.sh"
-        }
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.f",
+                "tests/helloworld.f90"
+              ]
+            },
+            "script": {
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "5.0.8"
       },
       {
-        "build": {
-          "ignore_run_exports_from": [
-            "cuda_compiler_stub"
-          ],
-          "string": "external_h1234567_4",
-          "track_features": [
-            "openmpi_external"
-          ]
-        },
-        "name": "openmpi",
+        "build": null,
+        "name": "openmpi-mpicxx",
         "requirements": {
           "build": [
-            "c_compiler_stub",
-            "cxx_compiler_stub",
-            "cuda_compiler_stub",
-            "fortran_compiler_stub",
-            "c_stdlib_stub",
-            "pkg-config",
-            "make"
+            "c_stdlib_stub"
           ],
-          "host": [
-            "libevent",
-            "libfabric-devel 1.19.*",
-            "libhwloc",
-            "libnl",
-            "libpmix-devel",
-            "zlib",
-            "ucc",
-            "ucx",
-            "cuda-version 12.9"
-          ],
+          "host": [],
           "run": [
-            "mpi 1.0 openmpi"
-          ],
-          "run_constrained": [
-            "__cuda  >= 12.0",
-            "cuda-version  >= 12.0",
-            "libprrte ==0.0.0"
+            "openmpi",
+            "cxx_compiler_stub"
           ]
         },
-        "test": {
-          "commands": [
-            "echo \"It works!\""
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.cxx"
+              ]
+            },
+            "script": {
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "5.0.8"
+      },
+      {
+        "build": null,
+        "name": "openmpi-mpicc",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": [
+            "openmpi",
+            "c_compiler_stub"
           ]
-        }
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.c"
+              ]
+            },
+            "script": {
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "5.0.8"
+      },
+      {
+        "build": null,
+        "name": "openmpi",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "mpi 1.0.* openmpi"
+          ]
+        },
+        "tests": [
+          {
+            "script": "echo 'ok'"
+          }
+        ],
+        "version": "5.0.8"
       }
     ],
     "package": {
-      "name": "openmpi-mpi",
+      "name": "openmpi",
       "version": "5.0.8"
     },
-    "schema_version": 0,
+    "requirements": {
+      "build": [
+        "c_compiler_stub",
+        "cxx_compiler_stub",
+        "cuda_compiler_stub",
+        "fortran_compiler_stub",
+        "c_stdlib_stub",
+        "pkg-config",
+        "make",
+        "shellcheck"
+      ],
+      "host": [
+        "libevent",
+        "libfabric-devel 1.19.*",
+        "libhwloc",
+        "libpmix-devel",
+        "zlib",
+        "libnl",
+        "ucc",
+        "ucx",
+        "cuda-version 12.9.*"
+      ],
+      "run": [
+        "mpi 1.0.* openmpi"
+      ]
+    },
+    "schema_version": 1,
     "source": {
-      "fn": "openmpi-5.0.8.tar.bz2",
       "sha256": "53131e1a57e7270f645707f8b0b65ba56048f5b5ac3f68faabed3eb0d710e449",
       "url": "https://www.open-mpi.org/software/ompi/v5.0/downloads/openmpi-5.0.8.tar.bz2"
     }
@@ -514,7 +555,8 @@
         "cxx_compiler_stub",
         "fortran_compiler_stub",
         "make",
-        "pkg-config"
+        "pkg-config",
+        "shellcheck"
       ]
     },
     "host": {
@@ -550,20 +592,23 @@
   },
   "linux_ppc64le_meta_yaml": {
     "about": {
-      "description": "The Open MPI Project is an open source Message Passing Interface\nimplementation that is developed and maintained by a consortium of academic,\nresearch, and industry partners.\n",
+      "description": "The Open MPI Project is an open source Message Passing Interface\nimplementation that is developed and maintained by a consortium of academic,\nresearch, and industry partners.",
       "dev_url": "https://github.com/open-mpi/ompi",
       "doc_url": "https://www.open-mpi.org/doc/",
       "home": "https://www.open-mpi.org/",
       "license": "BSD-3-Clause",
-      "license_family": "BSD",
+      "license_family": "BSD-3-Clause",
       "license_file": "LICENSE",
       "summary": "An open source Message Passing Interface implementation."
     },
     "build": {
-      "force_use_keys": [
-        "cuda_compiler_version_min"
-      ],
-      "number": "4"
+      "number": "111",
+      "run_exports": {
+        "weak": [
+          "openmpi"
+        ]
+      },
+      "script": "build-mpi"
     },
     "extra": {
       "recipe-maintainers": [
@@ -581,10 +626,8 @@
     "outputs": [
       {
         "build": {
-          "ignore_run_exports_from": [
-            "cuda_compiler_stub"
-          ],
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "openmpi"
           ]
         },
@@ -593,168 +636,185 @@
           "build": [
             "c_compiler_stub",
             "cxx_compiler_stub",
-            "cuda_compiler_stub",
             "fortran_compiler_stub",
             "c_stdlib_stub",
             "pkg-config",
-            "make"
+            "make",
+            "shellcheck"
           ],
           "host": [
             "libevent",
             "libfabric-devel 1.19.*",
             "libhwloc",
-            "libnl",
             "libpmix-devel",
             "zlib",
-            "cuda-version 12.4"
+            "libnl",
+            "ucc",
+            "ucx"
           ],
           "run": [
-            "mpi 1.0 openmpi"
-          ],
-          "run_constrained": [
-            "__cuda  >= 12.0",
-            "cuda-version  >= 12.0",
-            "libprrte ==0.0.0"
+            "mpi 1.0.* openmpi"
           ]
         },
-        "script": "build-mpi.sh",
-        "test": {
-          "commands": [
-            "test ! -d $PREFIX/share/doc/openmpi",
-            "test ! -f $PREFIX/share/man/man3/MPI_Init.3"
-          ],
-          "files": [
-            "tests/helloworld.sh"
-          ],
-          "requires": [
-            "patchelf"
-          ],
-          "script": "run_test.sh"
-        }
+        "tests": [
+          {
+            "package_contents": {
+              "files": {
+                "not_exists": [
+                  "share/doc/openmpi",
+                  "share/man/man3/MPI_Init.3"
+                ]
+              }
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.sh"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "patchelf"
+              ]
+            },
+            "script": {
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "5.0.8"
       },
       {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
-        "name": "openmpi-mpicc",
-        "requirements": {
-          "build": [
-            "c_stdlib_stub"
-          ],
-          "run": [
-            "openmpi",
-            "c_compiler_stub"
-          ]
-        },
-        "test": {
-          "files": [
-            "tests/helloworld.c"
-          ],
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
-        "name": "openmpi-mpicxx",
-        "requirements": {
-          "build": [
-            "c_stdlib_stub"
-          ],
-          "run": [
-            "openmpi",
-            "cxx_compiler_stub"
-          ]
-        },
-        "test": {
-          "files": [
-            "tests/helloworld.cxx"
-          ],
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
+        "build": null,
         "name": "openmpi-mpifort",
         "requirements": {
           "build": [
             "c_stdlib_stub"
           ],
+          "host": [],
           "run": [
             "openmpi",
             "fortran_compiler_stub"
           ]
         },
-        "test": {
-          "files": [
-            "tests/helloworld.f",
-            "tests/helloworld.f90"
-          ],
-          "script": "run_test.sh"
-        }
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.f",
+                "tests/helloworld.f90"
+              ]
+            },
+            "script": {
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "5.0.8"
       },
       {
-        "build": {
-          "ignore_run_exports_from": [
-            "cuda_compiler_stub"
-          ],
-          "string": "external_h1234567_4",
-          "track_features": [
-            "openmpi_external"
-          ]
-        },
-        "name": "openmpi",
+        "build": null,
+        "name": "openmpi-mpicxx",
         "requirements": {
           "build": [
-            "c_compiler_stub",
-            "cxx_compiler_stub",
-            "cuda_compiler_stub",
-            "fortran_compiler_stub",
-            "c_stdlib_stub",
-            "pkg-config",
-            "make"
+            "c_stdlib_stub"
           ],
-          "host": [
-            "libevent",
-            "libfabric-devel 1.19.*",
-            "libhwloc",
-            "libnl",
-            "libpmix-devel",
-            "zlib",
-            "cuda-version 12.4"
-          ],
+          "host": [],
           "run": [
-            "mpi 1.0 openmpi"
-          ],
-          "run_constrained": [
-            "__cuda  >= 12.0",
-            "cuda-version  >= 12.0",
-            "libprrte ==0.0.0"
+            "openmpi",
+            "cxx_compiler_stub"
           ]
         },
-        "test": {
-          "commands": [
-            "echo \"It works!\""
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.cxx"
+              ]
+            },
+            "script": {
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "5.0.8"
+      },
+      {
+        "build": null,
+        "name": "openmpi-mpicc",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": [
+            "openmpi",
+            "c_compiler_stub"
           ]
-        }
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.c"
+              ]
+            },
+            "script": {
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "5.0.8"
+      },
+      {
+        "build": null,
+        "name": "openmpi",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "mpi 1.0.* openmpi"
+          ]
+        },
+        "tests": [
+          {
+            "script": "echo 'ok'"
+          }
+        ],
+        "version": "5.0.8"
       }
     ],
     "package": {
-      "name": "openmpi-mpi",
+      "name": "openmpi",
       "version": "5.0.8"
     },
-    "schema_version": 0,
+    "requirements": {
+      "build": [
+        "c_compiler_stub",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "c_stdlib_stub",
+        "pkg-config",
+        "make",
+        "shellcheck"
+      ],
+      "host": [
+        "libevent",
+        "libfabric-devel 1.19.*",
+        "libhwloc",
+        "libpmix-devel",
+        "zlib",
+        "libnl",
+        "ucc",
+        "ucx"
+      ],
+      "run": [
+        "mpi 1.0.* openmpi"
+      ]
+    },
+    "schema_version": 1,
     "source": {
-      "fn": "openmpi-5.0.8.tar.bz2",
       "sha256": "53131e1a57e7270f645707f8b0b65ba56048f5b5ac3f68faabed3eb0d710e449",
       "url": "https://www.open-mpi.org/software/ompi/v5.0/downloads/openmpi-5.0.8.tar.bz2"
     }
@@ -765,22 +825,23 @@
       "elements": [
         "c_compiler_stub",
         "c_stdlib_stub",
-        "cuda_compiler_stub",
         "cxx_compiler_stub",
         "fortran_compiler_stub",
         "make",
-        "pkg-config"
+        "pkg-config",
+        "shellcheck"
       ]
     },
     "host": {
       "__set__": true,
       "elements": [
-        "cuda-version",
         "libevent",
         "libfabric-devel",
         "libhwloc",
         "libnl",
         "libpmix-devel",
+        "ucc",
+        "ucx",
         "zlib"
       ]
     },
@@ -803,18 +864,23 @@
   },
   "meta_yaml": {
     "about": {
-      "description": "The Open MPI Project is an open source Message Passing Interface\nimplementation that is developed and maintained by a consortium of academic,\nresearch, and industry partners.\n",
+      "description": "The Open MPI Project is an open source Message Passing Interface\nimplementation that is developed and maintained by a consortium of academic,\nresearch, and industry partners.",
       "dev_url": "https://github.com/open-mpi/ompi",
       "doc_url": "https://www.open-mpi.org/doc/",
       "home": "https://www.open-mpi.org/",
       "license": "BSD-3-Clause",
-      "license_family": "BSD",
+      "license_family": "BSD-3-Clause",
       "license_file": "LICENSE",
       "summary": "An open source Message Passing Interface implementation."
     },
     "build": {
-      "force_use_keys": null,
-      "number": "104"
+      "number": "111",
+      "run_exports": {
+        "weak": [
+          "openmpi"
+        ]
+      },
+      "script": "build-mpi"
     },
     "extra": {
       "recipe-maintainers": [
@@ -832,10 +898,8 @@
     "outputs": [
       {
         "build": {
-          "ignore_run_exports_from": [
-            "cuda_compiler_stub"
-          ],
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "openmpi"
           ]
         },
@@ -848,121 +912,157 @@
             "fortran_compiler_stub",
             "c_stdlib_stub",
             "pkg-config",
-            "make"
+            "make",
+            "shellcheck"
           ],
           "host": [
             "libevent",
             "libfabric-devel 1.19.*",
             "libhwloc",
-            "libnl",
             "libpmix-devel",
             "zlib",
+            "libnl",
             "ucc",
             "ucx",
-            "cuda-version 12.9"
+            "cuda-version 12.9.*"
           ],
           "run": [
-            "mpi 1.0 openmpi"
-          ],
-          "run_constrained": [
-            "__cuda  >= 12.0",
-            "cuda-version  >= 12.0",
-            "libprrte ==0.0.0"
+            "mpi 1.0.* openmpi"
           ]
         },
-        "script": "build-mpi.sh",
-        "test": {
-          "commands": [
-            "test ! -d $PREFIX/share/doc/openmpi",
-            "test ! -f $PREFIX/share/man/man3/MPI_Init.3"
-          ],
-          "files": [
-            "tests/helloworld.sh"
-          ],
-          "requires": [
-            "patchelf"
-          ],
-          "script": "run_test.sh"
-        }
+        "tests": [
+          {
+            "package_contents": {
+              "files": {
+                "not_exists": [
+                  "share/doc/openmpi",
+                  "share/man/man3/MPI_Init.3"
+                ]
+              }
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.sh"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "patchelf"
+              ]
+            },
+            "script": {
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "5.0.8"
       },
       {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
-        "name": "openmpi-mpicc",
-        "requirements": {
-          "build": [
-            "c_stdlib_stub"
-          ],
-          "run": [
-            "openmpi",
-            "c_compiler_stub"
-          ]
-        },
-        "test": {
-          "files": [
-            "tests/helloworld.c"
-          ],
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
-        "name": "openmpi-mpicxx",
-        "requirements": {
-          "build": [
-            "c_stdlib_stub"
-          ],
-          "run": [
-            "openmpi",
-            "cxx_compiler_stub"
-          ]
-        },
-        "test": {
-          "files": [
-            "tests/helloworld.cxx"
-          ],
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
+        "build": null,
         "name": "openmpi-mpifort",
         "requirements": {
           "build": [
             "c_stdlib_stub"
           ],
+          "host": [],
           "run": [
             "openmpi",
             "fortran_compiler_stub"
           ]
         },
-        "test": {
-          "files": [
-            "tests/helloworld.f",
-            "tests/helloworld.f90"
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.f",
+                "tests/helloworld.f90"
+              ]
+            },
+            "script": {
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "5.0.8"
+      },
+      {
+        "build": null,
+        "name": "openmpi-mpicxx",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub"
           ],
-          "script": "run_test.sh"
-        }
+          "host": [],
+          "run": [
+            "openmpi",
+            "cxx_compiler_stub"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.cxx"
+              ]
+            },
+            "script": {
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "5.0.8"
+      },
+      {
+        "build": null,
+        "name": "openmpi-mpicc",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": [
+            "openmpi",
+            "c_compiler_stub"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.c"
+              ]
+            },
+            "script": {
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "5.0.8"
+      },
+      {
+        "build": null,
+        "name": "openmpi",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "mpi 1.0.* openmpi"
+          ]
+        },
+        "tests": [
+          {
+            "script": "echo 'ok'"
+          }
+        ],
+        "version": "5.0.8"
       },
       {
         "build": {
-          "ignore_run_exports_from": [
-            "cuda_compiler_stub"
-          ],
-          "string": "external_h1234567_4",
-          "track_features": [
-            "openmpi_external"
+          "strong": [],
+          "weak": [
+            "openmpi"
           ]
         },
         "name": "openmpi",
@@ -974,40 +1074,156 @@
             "fortran_compiler_stub",
             "c_stdlib_stub",
             "pkg-config",
-            "make"
+            "make",
+            "shellcheck"
           ],
           "host": [
             "libevent",
             "libfabric-devel 1.19.*",
             "libhwloc",
-            "libnl",
             "libpmix-devel",
             "zlib",
+            "libnl",
             "ucc",
             "ucx",
-            "cuda-version 12.9"
+            "cuda-version 12.9.*"
           ],
           "run": [
-            "mpi 1.0 openmpi"
-          ],
-          "run_constrained": [
-            "__cuda  >= 12.0",
-            "cuda-version  >= 12.0",
-            "libprrte ==0.0.0"
+            "mpi 1.0.* openmpi"
           ]
         },
-        "test": {
-          "commands": [
-            "echo \"It works!\""
+        "tests": [
+          {
+            "package_contents": {
+              "files": {
+                "not_exists": [
+                  "share/doc/openmpi",
+                  "share/man/man3/MPI_Init.3"
+                ]
+              }
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.sh"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "patchelf"
+              ]
+            },
+            "script": {
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "5.0.8"
+      },
+      {
+        "build": null,
+        "name": "openmpi-mpifort",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": [
+            "openmpi",
+            "fortran_compiler_stub"
           ]
-        }
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.f",
+                "tests/helloworld.f90"
+              ]
+            },
+            "script": {
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "5.0.8"
+      },
+      {
+        "build": null,
+        "name": "openmpi-mpicxx",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": [
+            "openmpi",
+            "cxx_compiler_stub"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.cxx"
+              ]
+            },
+            "script": {
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "5.0.8"
+      },
+      {
+        "build": null,
+        "name": "openmpi-mpicc",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": [
+            "openmpi",
+            "c_compiler_stub"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.c"
+              ]
+            },
+            "script": {
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "5.0.8"
+      },
+      {
+        "build": null,
+        "name": "openmpi",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "mpi 1.0.* openmpi"
+          ]
+        },
+        "tests": [
+          {
+            "script": "echo 'ok'"
+          }
+        ],
+        "version": "5.0.8"
       },
       {
         "build": {
-          "ignore_run_exports_from": [
-            "cuda_compiler_stub"
-          ],
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "openmpi"
           ]
         },
@@ -1016,125 +1232,159 @@
           "build": [
             "c_compiler_stub",
             "cxx_compiler_stub",
-            "cuda_compiler_stub",
             "fortran_compiler_stub",
             "c_stdlib_stub",
             "pkg-config",
-            "make"
+            "make",
+            "shellcheck"
           ],
           "host": [
             "libevent",
             "libfabric-devel 1.19.*",
             "libhwloc",
-            "libnl",
             "libpmix-devel",
             "zlib",
+            "libnl",
             "ucc",
-            "ucx",
-            "cuda-version 12.9"
+            "ucx"
           ],
           "run": [
-            "mpi 1.0 openmpi"
-          ],
-          "run_constrained": [
-            "__cuda  >= 12.0",
-            "cuda-version  >= 12.0",
-            "libprrte ==0.0.0"
+            "mpi 1.0.* openmpi"
           ]
         },
-        "script": "build-mpi.sh",
-        "test": {
-          "commands": [
-            "test ! -d $PREFIX/share/doc/openmpi",
-            "test ! -f $PREFIX/share/man/man3/MPI_Init.3"
-          ],
-          "files": [
-            "tests/helloworld.sh"
-          ],
-          "requires": [
-            "patchelf"
-          ],
-          "script": "run_test.sh"
-        }
+        "tests": [
+          {
+            "package_contents": {
+              "files": {
+                "not_exists": [
+                  "share/doc/openmpi",
+                  "share/man/man3/MPI_Init.3"
+                ]
+              }
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.sh"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "patchelf"
+              ]
+            },
+            "script": {
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "5.0.8"
       },
       {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
-        "name": "openmpi-mpicc",
-        "requirements": {
-          "build": [
-            "c_stdlib_stub"
-          ],
-          "run": [
-            "openmpi",
-            "c_compiler_stub"
-          ]
-        },
-        "test": {
-          "files": [
-            "tests/helloworld.c"
-          ],
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
-        "name": "openmpi-mpicxx",
-        "requirements": {
-          "build": [
-            "c_stdlib_stub"
-          ],
-          "run": [
-            "openmpi",
-            "cxx_compiler_stub"
-          ]
-        },
-        "test": {
-          "files": [
-            "tests/helloworld.cxx"
-          ],
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
+        "build": null,
         "name": "openmpi-mpifort",
         "requirements": {
           "build": [
             "c_stdlib_stub"
           ],
+          "host": [],
           "run": [
             "openmpi",
             "fortran_compiler_stub"
           ]
         },
-        "test": {
-          "files": [
-            "tests/helloworld.f",
-            "tests/helloworld.f90"
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.f",
+                "tests/helloworld.f90"
+              ]
+            },
+            "script": {
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "5.0.8"
+      },
+      {
+        "build": null,
+        "name": "openmpi-mpicxx",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub"
           ],
-          "script": "run_test.sh"
-        }
+          "host": [],
+          "run": [
+            "openmpi",
+            "cxx_compiler_stub"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.cxx"
+              ]
+            },
+            "script": {
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "5.0.8"
+      },
+      {
+        "build": null,
+        "name": "openmpi-mpicc",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": [
+            "openmpi",
+            "c_compiler_stub"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.c"
+              ]
+            },
+            "script": {
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "5.0.8"
+      },
+      {
+        "build": null,
+        "name": "openmpi",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "mpi 1.0.* openmpi"
+          ]
+        },
+        "tests": [
+          {
+            "script": "echo 'ok'"
+          }
+        ],
+        "version": "5.0.8"
       },
       {
         "build": {
-          "ignore_run_exports_from": [
-            "cuda_compiler_stub"
-          ],
-          "string": "external_h1234567_4",
-          "track_features": [
-            "openmpi_external"
+          "strong": [],
+          "weak": [
+            "openmpi"
           ]
         },
         "name": "openmpi",
@@ -1142,44 +1392,141 @@
           "build": [
             "c_compiler_stub",
             "cxx_compiler_stub",
-            "cuda_compiler_stub",
             "fortran_compiler_stub",
             "c_stdlib_stub",
             "pkg-config",
-            "make"
+            "make",
+            "shellcheck"
           ],
           "host": [
             "libevent",
             "libfabric-devel 1.19.*",
             "libhwloc",
-            "libnl",
             "libpmix-devel",
             "zlib",
+            "libnl",
             "ucc",
-            "ucx",
-            "cuda-version 12.9"
+            "ucx"
           ],
           "run": [
-            "mpi 1.0 openmpi"
-          ],
-          "run_constrained": [
-            "__cuda  >= 12.0",
-            "cuda-version  >= 12.0",
-            "libprrte ==0.0.0"
+            "mpi 1.0.* openmpi"
           ]
         },
-        "test": {
-          "commands": [
-            "echo \"It works!\""
+        "tests": [
+          {
+            "package_contents": {
+              "files": {
+                "not_exists": [
+                  "share/doc/openmpi",
+                  "share/man/man3/MPI_Init.3"
+                ]
+              }
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.sh"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "patchelf"
+              ]
+            },
+            "script": {
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "5.0.8"
+      },
+      {
+        "build": null,
+        "name": "openmpi-mpifort",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": [
+            "openmpi",
+            "fortran_compiler_stub"
           ]
-        }
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.f",
+                "tests/helloworld.f90"
+              ]
+            },
+            "script": {
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "5.0.8"
+      },
+      {
+        "build": null,
+        "name": "openmpi-mpicxx",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": [
+            "openmpi",
+            "cxx_compiler_stub"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.cxx"
+              ]
+            },
+            "script": {
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "5.0.8"
+      },
+      {
+        "build": null,
+        "name": "openmpi-mpicc",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": [
+            "openmpi",
+            "c_compiler_stub"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.c"
+              ]
+            },
+            "script": {
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "5.0.8"
       },
       {
         "build": {
-          "ignore_run_exports_from": [
-            "cuda_compiler_stub"
-          ],
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "openmpi"
           ]
         },
@@ -1188,415 +1535,194 @@
           "build": [
             "c_compiler_stub",
             "cxx_compiler_stub",
-            "cuda_compiler_stub",
             "fortran_compiler_stub",
             "c_stdlib_stub",
             "pkg-config",
-            "make"
+            "make",
+            "shellcheck"
           ],
           "host": [
             "libevent",
             "libfabric-devel 1.19.*",
             "libhwloc",
-            "libnl",
             "libpmix-devel",
             "zlib",
-            "cuda-version 12.4"
-          ],
-          "run": [
-            "mpi 1.0 openmpi"
-          ],
-          "run_constrained": [
-            "__cuda  >= 12.0",
-            "cuda-version  >= 12.0",
-            "libprrte ==0.0.0"
-          ]
-        },
-        "script": "build-mpi.sh",
-        "test": {
-          "commands": [
-            "test ! -d $PREFIX/share/doc/openmpi",
-            "test ! -f $PREFIX/share/man/man3/MPI_Init.3"
-          ],
-          "files": [
-            "tests/helloworld.sh"
-          ],
-          "requires": [
-            "patchelf"
-          ],
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
-        "name": "openmpi-mpicc",
-        "requirements": {
-          "build": [
-            "c_stdlib_stub"
-          ],
-          "run": [
-            "openmpi",
-            "c_compiler_stub"
-          ]
-        },
-        "test": {
-          "files": [
-            "tests/helloworld.c"
-          ],
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
-        "name": "openmpi-mpicxx",
-        "requirements": {
-          "build": [
-            "c_stdlib_stub"
-          ],
-          "run": [
-            "openmpi",
-            "cxx_compiler_stub"
-          ]
-        },
-        "test": {
-          "files": [
-            "tests/helloworld.cxx"
-          ],
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
-        "name": "openmpi-mpifort",
-        "requirements": {
-          "build": [
-            "c_stdlib_stub"
-          ],
-          "run": [
-            "openmpi",
-            "fortran_compiler_stub"
-          ]
-        },
-        "test": {
-          "files": [
-            "tests/helloworld.f",
-            "tests/helloworld.f90"
-          ],
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "ignore_run_exports_from": [
-            "cuda_compiler_stub"
-          ],
-          "string": "external_h1234567_4",
-          "track_features": [
-            "openmpi_external"
-          ]
-        },
-        "name": "openmpi",
-        "requirements": {
-          "build": [
-            "c_compiler_stub",
-            "cxx_compiler_stub",
-            "cuda_compiler_stub",
-            "fortran_compiler_stub",
-            "c_stdlib_stub",
-            "pkg-config",
-            "make"
-          ],
-          "host": [
-            "libevent",
-            "libfabric-devel 1.19.*",
-            "libhwloc",
             "libnl",
-            "libpmix-devel",
-            "zlib",
-            "cuda-version 12.4"
+            "ucc",
+            "ucx"
           ],
           "run": [
-            "mpi 1.0 openmpi"
-          ],
-          "run_constrained": [
-            "__cuda  >= 12.0",
-            "cuda-version  >= 12.0",
-            "libprrte ==0.0.0"
+            "mpi 1.0.* openmpi"
           ]
         },
-        "test": {
-          "commands": [
-            "echo \"It works!\""
-          ]
-        }
+        "tests": [
+          {
+            "package_contents": {
+              "files": {
+                "not_exists": [
+                  "share/doc/openmpi",
+                  "share/man/man3/MPI_Init.3"
+                ]
+              }
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.sh"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "patchelf"
+              ]
+            },
+            "script": {
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "5.0.8"
       },
       {
-        "build": {
-          "ignore_run_exports_from": null,
-          "run_exports": [
-            "openmpi"
-          ]
-        },
-        "name": "openmpi",
-        "requirements": {
-          "build": [
-            "c_compiler_stub",
-            "cxx_compiler_stub",
-            "fortran_compiler_stub",
-            "c_stdlib_stub",
-            "pkg-config",
-            "make"
-          ],
-          "host": [
-            "libevent",
-            "libfabric-devel 1.19.*",
-            "libhwloc",
-            "libpmix-devel",
-            "zlib"
-          ],
-          "run": [
-            "mpi 1.0 openmpi"
-          ],
-          "run_constrained": [
-            "libprrte ==0.0.0"
-          ]
-        },
-        "script": "build-mpi.sh",
-        "test": {
-          "commands": [
-            "test ! -d $PREFIX/share/doc/openmpi",
-            "test ! -f $PREFIX/share/man/man3/MPI_Init.3"
-          ],
-          "files": [
-            "tests/helloworld.sh"
-          ],
-          "requires": null,
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
-        "name": "openmpi-mpicc",
-        "requirements": {
-          "build": [
-            "c_stdlib_stub"
-          ],
-          "run": [
-            "openmpi",
-            "c_compiler_stub"
-          ]
-        },
-        "test": {
-          "files": [
-            "tests/helloworld.c"
-          ],
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
-        "name": "openmpi-mpicxx",
-        "requirements": {
-          "build": [
-            "c_stdlib_stub"
-          ],
-          "run": [
-            "openmpi",
-            "cxx_compiler_stub"
-          ]
-        },
-        "test": {
-          "files": [
-            "tests/helloworld.cxx"
-          ],
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
+        "build": null,
         "name": "openmpi-mpifort",
         "requirements": {
           "build": [
             "c_stdlib_stub"
           ],
+          "host": [],
           "run": [
             "openmpi",
             "fortran_compiler_stub"
           ]
         },
-        "test": {
-          "files": [
-            "tests/helloworld.f",
-            "tests/helloworld.f90"
-          ],
-          "script": "run_test.sh"
-        }
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.f",
+                "tests/helloworld.f90"
+              ]
+            },
+            "script": {
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "5.0.8"
       },
       {
-        "build": {
-          "ignore_run_exports_from": null,
-          "run_exports": [
-            "openmpi"
-          ]
-        },
-        "name": "openmpi",
-        "requirements": {
-          "build": [
-            "c_compiler_stub",
-            "cxx_compiler_stub",
-            "fortran_compiler_stub",
-            "c_stdlib_stub",
-            "pkg-config",
-            "make"
-          ],
-          "host": [
-            "libevent",
-            "libfabric-devel 1.19.*",
-            "libhwloc",
-            "libpmix-devel",
-            "zlib"
-          ],
-          "run": [
-            "mpi 1.0 openmpi"
-          ],
-          "run_constrained": [
-            "libprrte ==0.0.0"
-          ]
-        },
-        "script": "build-mpi.sh",
-        "test": {
-          "commands": [
-            "test ! -d $PREFIX/share/doc/openmpi",
-            "test ! -f $PREFIX/share/man/man3/MPI_Init.3"
-          ],
-          "files": [
-            "tests/helloworld.sh"
-          ],
-          "requires": null,
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
-        "name": "openmpi-mpicc",
-        "requirements": {
-          "build": [
-            "c_stdlib_stub"
-          ],
-          "run": [
-            "openmpi",
-            "c_compiler_stub"
-          ]
-        },
-        "test": {
-          "files": [
-            "tests/helloworld.c"
-          ],
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
+        "build": null,
         "name": "openmpi-mpicxx",
         "requirements": {
           "build": [
             "c_stdlib_stub"
           ],
+          "host": [],
           "run": [
             "openmpi",
             "cxx_compiler_stub"
           ]
         },
-        "test": {
-          "files": [
-            "tests/helloworld.cxx"
-          ],
-          "script": "run_test.sh"
-        }
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.cxx"
+              ]
+            },
+            "script": {
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "5.0.8"
       },
       {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
-        "name": "openmpi-mpifort",
+        "build": null,
+        "name": "openmpi-mpicc",
         "requirements": {
           "build": [
             "c_stdlib_stub"
           ],
+          "host": [],
           "run": [
             "openmpi",
-            "fortran_compiler_stub"
+            "c_compiler_stub"
           ]
         },
-        "test": {
-          "files": [
-            "tests/helloworld.f",
-            "tests/helloworld.f90"
-          ],
-          "script": "run_test.sh"
-        }
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.c"
+              ]
+            },
+            "script": {
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "5.0.8"
       }
     ],
     "package": {
-      "name": "openmpi-mpi",
+      "name": "openmpi",
       "version": "5.0.8"
     },
-    "schema_version": 0,
+    "requirements": {
+      "build": [
+        "c_compiler_stub",
+        "cxx_compiler_stub",
+        "cuda_compiler_stub",
+        "fortran_compiler_stub",
+        "c_stdlib_stub",
+        "pkg-config",
+        "make",
+        "shellcheck"
+      ],
+      "host": [
+        "libevent",
+        "libfabric-devel 1.19.*",
+        "libhwloc",
+        "libpmix-devel",
+        "zlib",
+        "libnl",
+        "ucc",
+        "ucx",
+        "cuda-version 12.9.*"
+      ],
+      "run": [
+        "mpi 1.0.* openmpi"
+      ]
+    },
+    "schema_version": 1,
     "source": {
-      "fn": "openmpi-5.0.8.tar.bz2",
       "sha256": "53131e1a57e7270f645707f8b0b65ba56048f5b5ac3f68faabed3eb0d710e449",
       "url": "https://www.open-mpi.org/software/ompi/v5.0/downloads/openmpi-5.0.8.tar.bz2"
     }
   },
-  "name": "openmpi-mpi",
+  "name": "openmpi",
   "osx_64_meta_yaml": {
     "about": {
-      "description": "The Open MPI Project is an open source Message Passing Interface\nimplementation that is developed and maintained by a consortium of academic,\nresearch, and industry partners.\n",
+      "description": "The Open MPI Project is an open source Message Passing Interface\nimplementation that is developed and maintained by a consortium of academic,\nresearch, and industry partners.",
       "dev_url": "https://github.com/open-mpi/ompi",
       "doc_url": "https://www.open-mpi.org/doc/",
       "home": "https://www.open-mpi.org/",
       "license": "BSD-3-Clause",
-      "license_family": "BSD",
+      "license_family": "BSD-3-Clause",
       "license_file": "LICENSE",
       "summary": "An open source Message Passing Interface implementation."
     },
     "build": {
-      "force_use_keys": null,
-      "number": "104"
+      "number": "111",
+      "run_exports": {
+        "weak": [
+          "openmpi"
+        ]
+      },
+      "script": "build-mpi"
     },
     "extra": {
       "recipe-maintainers": [
@@ -1614,8 +1740,8 @@
     "outputs": [
       {
         "build": {
-          "ignore_run_exports_from": null,
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "openmpi"
           ]
         },
@@ -1627,113 +1753,165 @@
             "fortran_compiler_stub",
             "c_stdlib_stub",
             "pkg-config",
-            "make"
+            "make",
+            "shellcheck"
           ],
           "host": [
             "libevent",
             "libfabric-devel 1.19.*",
             "libhwloc",
             "libpmix-devel",
-            "zlib"
+            "zlib",
+            "libnl",
+            "ucc",
+            "ucx"
           ],
           "run": [
-            "mpi 1.0 openmpi"
-          ],
-          "run_constrained": [
-            "libprrte ==0.0.0"
+            "mpi 1.0.* openmpi"
           ]
         },
-        "script": "build-mpi.sh",
-        "test": {
-          "commands": [
-            "test ! -d $PREFIX/share/doc/openmpi",
-            "test ! -f $PREFIX/share/man/man3/MPI_Init.3"
-          ],
-          "files": [
-            "tests/helloworld.sh"
-          ],
-          "requires": null,
-          "script": "run_test.sh"
-        }
+        "tests": [
+          {
+            "package_contents": {
+              "files": {
+                "not_exists": [
+                  "share/doc/openmpi",
+                  "share/man/man3/MPI_Init.3"
+                ]
+              }
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.sh"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "patchelf"
+              ]
+            },
+            "script": {
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "5.0.8"
       },
       {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
-        "name": "openmpi-mpicc",
-        "requirements": {
-          "build": [
-            "c_stdlib_stub"
-          ],
-          "run": [
-            "openmpi",
-            "c_compiler_stub"
-          ]
-        },
-        "test": {
-          "files": [
-            "tests/helloworld.c"
-          ],
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
-        "name": "openmpi-mpicxx",
-        "requirements": {
-          "build": [
-            "c_stdlib_stub"
-          ],
-          "run": [
-            "openmpi",
-            "cxx_compiler_stub"
-          ]
-        },
-        "test": {
-          "files": [
-            "tests/helloworld.cxx"
-          ],
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
+        "build": null,
         "name": "openmpi-mpifort",
         "requirements": {
           "build": [
             "c_stdlib_stub"
           ],
+          "host": [],
           "run": [
             "openmpi",
             "fortran_compiler_stub"
           ]
         },
-        "test": {
-          "files": [
-            "tests/helloworld.f",
-            "tests/helloworld.f90"
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.f",
+                "tests/helloworld.f90"
+              ]
+            },
+            "script": {
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "5.0.8"
+      },
+      {
+        "build": null,
+        "name": "openmpi-mpicxx",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub"
           ],
-          "script": "run_test.sh"
-        }
+          "host": [],
+          "run": [
+            "openmpi",
+            "cxx_compiler_stub"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.cxx"
+              ]
+            },
+            "script": {
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "5.0.8"
+      },
+      {
+        "build": null,
+        "name": "openmpi-mpicc",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": [
+            "openmpi",
+            "c_compiler_stub"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.c"
+              ]
+            },
+            "script": {
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "5.0.8"
       }
     ],
     "package": {
-      "name": "openmpi-mpi",
+      "name": "openmpi",
       "version": "5.0.8"
     },
-    "schema_version": 0,
+    "requirements": {
+      "build": [
+        "c_compiler_stub",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "c_stdlib_stub",
+        "pkg-config",
+        "make",
+        "shellcheck"
+      ],
+      "host": [
+        "libevent",
+        "libfabric-devel 1.19.*",
+        "libhwloc",
+        "libpmix-devel",
+        "zlib",
+        "libnl",
+        "ucc",
+        "ucx"
+      ],
+      "run": [
+        "mpi 1.0.* openmpi"
+      ]
+    },
+    "schema_version": 1,
     "source": {
-      "fn": "openmpi-5.0.8.tar.bz2",
       "sha256": "53131e1a57e7270f645707f8b0b65ba56048f5b5ac3f68faabed3eb0d710e449",
       "url": "https://www.open-mpi.org/software/ompi/v5.0/downloads/openmpi-5.0.8.tar.bz2"
     }
@@ -1747,7 +1925,8 @@
         "cxx_compiler_stub",
         "fortran_compiler_stub",
         "make",
-        "pkg-config"
+        "pkg-config",
+        "shellcheck"
       ]
     },
     "host": {
@@ -1756,7 +1935,10 @@
         "libevent",
         "libfabric-devel",
         "libhwloc",
+        "libnl",
         "libpmix-devel",
+        "ucc",
+        "ucx",
         "zlib"
       ]
     },
@@ -1772,23 +1954,30 @@
     },
     "test": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "patchelf"
+      ]
     }
   },
   "osx_arm64_meta_yaml": {
     "about": {
-      "description": "The Open MPI Project is an open source Message Passing Interface\nimplementation that is developed and maintained by a consortium of academic,\nresearch, and industry partners.\n",
+      "description": "The Open MPI Project is an open source Message Passing Interface\nimplementation that is developed and maintained by a consortium of academic,\nresearch, and industry partners.",
       "dev_url": "https://github.com/open-mpi/ompi",
       "doc_url": "https://www.open-mpi.org/doc/",
       "home": "https://www.open-mpi.org/",
       "license": "BSD-3-Clause",
-      "license_family": "BSD",
+      "license_family": "BSD-3-Clause",
       "license_file": "LICENSE",
       "summary": "An open source Message Passing Interface implementation."
     },
     "build": {
-      "force_use_keys": null,
-      "number": "104"
+      "number": "111",
+      "run_exports": {
+        "weak": [
+          "openmpi"
+        ]
+      },
+      "script": "build-mpi"
     },
     "extra": {
       "recipe-maintainers": [
@@ -1806,8 +1995,8 @@
     "outputs": [
       {
         "build": {
-          "ignore_run_exports_from": null,
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "openmpi"
           ]
         },
@@ -1819,113 +2008,165 @@
             "fortran_compiler_stub",
             "c_stdlib_stub",
             "pkg-config",
-            "make"
+            "make",
+            "shellcheck"
           ],
           "host": [
             "libevent",
             "libfabric-devel 1.19.*",
             "libhwloc",
             "libpmix-devel",
-            "zlib"
+            "zlib",
+            "libnl",
+            "ucc",
+            "ucx"
           ],
           "run": [
-            "mpi 1.0 openmpi"
-          ],
-          "run_constrained": [
-            "libprrte ==0.0.0"
+            "mpi 1.0.* openmpi"
           ]
         },
-        "script": "build-mpi.sh",
-        "test": {
-          "commands": [
-            "test ! -d $PREFIX/share/doc/openmpi",
-            "test ! -f $PREFIX/share/man/man3/MPI_Init.3"
-          ],
-          "files": [
-            "tests/helloworld.sh"
-          ],
-          "requires": null,
-          "script": "run_test.sh"
-        }
+        "tests": [
+          {
+            "package_contents": {
+              "files": {
+                "not_exists": [
+                  "share/doc/openmpi",
+                  "share/man/man3/MPI_Init.3"
+                ]
+              }
+            }
+          },
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.sh"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "patchelf"
+              ]
+            },
+            "script": {
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "5.0.8"
       },
       {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
-        "name": "openmpi-mpicc",
-        "requirements": {
-          "build": [
-            "c_stdlib_stub"
-          ],
-          "run": [
-            "openmpi",
-            "c_compiler_stub"
-          ]
-        },
-        "test": {
-          "files": [
-            "tests/helloworld.c"
-          ],
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
-        "name": "openmpi-mpicxx",
-        "requirements": {
-          "build": [
-            "c_stdlib_stub"
-          ],
-          "run": [
-            "openmpi",
-            "cxx_compiler_stub"
-          ]
-        },
-        "test": {
-          "files": [
-            "tests/helloworld.cxx"
-          ],
-          "script": "run_test.sh"
-        }
-      },
-      {
-        "build": {
-          "script": [
-            "echo 'ok'"
-          ]
-        },
+        "build": null,
         "name": "openmpi-mpifort",
         "requirements": {
           "build": [
             "c_stdlib_stub"
           ],
+          "host": [],
           "run": [
             "openmpi",
             "fortran_compiler_stub"
           ]
         },
-        "test": {
-          "files": [
-            "tests/helloworld.f",
-            "tests/helloworld.f90"
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.f",
+                "tests/helloworld.f90"
+              ]
+            },
+            "script": {
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "5.0.8"
+      },
+      {
+        "build": null,
+        "name": "openmpi-mpicxx",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub"
           ],
-          "script": "run_test.sh"
-        }
+          "host": [],
+          "run": [
+            "openmpi",
+            "cxx_compiler_stub"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.cxx"
+              ]
+            },
+            "script": {
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "5.0.8"
+      },
+      {
+        "build": null,
+        "name": "openmpi-mpicc",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub"
+          ],
+          "host": [],
+          "run": [
+            "openmpi",
+            "c_compiler_stub"
+          ]
+        },
+        "tests": [
+          {
+            "files": {
+              "recipe": [
+                "tests/helloworld.c"
+              ]
+            },
+            "script": {
+              "file": "run_test"
+            }
+          }
+        ],
+        "version": "5.0.8"
       }
     ],
     "package": {
-      "name": "openmpi-mpi",
+      "name": "openmpi",
       "version": "5.0.8"
     },
-    "schema_version": 0,
+    "requirements": {
+      "build": [
+        "c_compiler_stub",
+        "cxx_compiler_stub",
+        "fortran_compiler_stub",
+        "c_stdlib_stub",
+        "pkg-config",
+        "make",
+        "shellcheck"
+      ],
+      "host": [
+        "libevent",
+        "libfabric-devel 1.19.*",
+        "libhwloc",
+        "libpmix-devel",
+        "zlib",
+        "libnl",
+        "ucc",
+        "ucx"
+      ],
+      "run": [
+        "mpi 1.0.* openmpi"
+      ]
+    },
+    "schema_version": 1,
     "source": {
-      "fn": "openmpi-5.0.8.tar.bz2",
       "sha256": "53131e1a57e7270f645707f8b0b65ba56048f5b5ac3f68faabed3eb0d710e449",
       "url": "https://www.open-mpi.org/software/ompi/v5.0/downloads/openmpi-5.0.8.tar.bz2"
     }
@@ -1939,7 +2180,8 @@
         "cxx_compiler_stub",
         "fortran_compiler_stub",
         "make",
-        "pkg-config"
+        "pkg-config",
+        "shellcheck"
       ]
     },
     "host": {
@@ -1948,7 +2190,10 @@
         "libevent",
         "libfabric-devel",
         "libhwloc",
+        "libnl",
         "libpmix-devel",
+        "ucc",
+        "ucx",
         "zlib"
       ]
     },
@@ -1964,7 +2209,9 @@
     },
     "test": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "patchelf"
+      ]
     }
   },
   "outputs_names": {
@@ -1976,7 +2223,7 @@
       "openmpi-mpifort"
     ]
   },
-  "parsing_error": "feedstock parsing error: Error running 'conda-forge-tick-container parse-feedstock --existing-feedstock-node-attrs - --log-level info --mark-not-archived' in container - error CalledProcessError raised:\n1, ['rattler-build', 'build', '--render-only', '--variant-config', '/tmp/tmpmwhu87tz/openmpi-feedstock-main/.ci_support/linux_64_channel_targetsconda-forge_maincuda_compiler_version12.9mpi_typeconda.yaml'], '', '\n ╭─ Finding outputs from recipe\n │ Loading variant config file: \"/tmp/tmpmwhu87tz/openmpi-feedstock-main/.ci_support/linux_64_channel_targetsconda-forge_maincuda_compiler_version12.9mpi_typeco\n │ nda.yaml\"\n │\n ╰─────────────────── (took 0 seconds)\nError:   × Failed to parse recipe\n\nError: \n  × failed to parse match spec: invalid package name 'c')': 'c')' is not a\n  │ valid package name. Package names can only contain 0-9, a-z, A-Z, -, _,\n  │ or .\n     ╭─[../.tmp8oFHfO/recipe.yaml:128:11]\n 127 │         - ${{ pin_subpackage('openmpi', exact=True) }}\n 128 │         - c') | replace(' =', '>=_compiler_stub\n     ·           ──────────────────┬──────────────────\n     ·                             ╰── error parsing `c') | replace(' =', '>=_compiler_stub` as a match spec\n 129 │     tests:\n     ╰────\n\n'\nTraceback (most recent call last):\n  File \"/home/runner/work/cf-scripts/cf-scripts/cf-scripts/conda_forge_tick/make_graph.py\", line 115, in try_load_feedstock\n    data = load_feedstock(name, attrs.data, mark_not_archived=mark_not_archived)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/runner/work/cf-scripts/cf-scripts/cf-scripts/conda_forge_tick/feedstock_parser.py\", line 818, in load_feedstock\n    return load_feedstock_containerized(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/runner/work/cf-scripts/cf-scripts/cf-scripts/conda_forge_tick/feedstock_parser.py\", line 765, in load_feedstock_containerized\n    data = run_container_operation(\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/runner/micromamba/envs/cf-scripts/lib/python3.12/site-packages/conda_forge_feedstock_ops/container_utils.py\", line 231, in run_container_operation\n    raise ContainerRuntimeError(\nconda_forge_feedstock_ops.container_utils.ContainerRuntimeError: Error running 'conda-forge-tick-container parse-feedstock --existing-feedstock-node-attrs - --log-level info --mark-not-archived' in container - error CalledProcessError raised:\n1, ['rattler-build', 'build', '--render-only', '--variant-config', '/tmp/tmpmwhu87tz/openmpi-feedstock-main/.ci_support/linux_64_channel_targetsconda-forge_maincuda_compiler_version12.9mpi_typeconda.yaml'], '', '\n ╭─ Finding outputs from recipe\n │ Loading variant config file: \"/tmp/tmpmwhu87tz/openmpi-feedstock-main/.ci_support/linux_64_channel_targetsconda-forge_maincuda_compiler_version12.9mpi_typeco\n │ nda.yaml\"\n │\n ╰─────────────────── (took 0 seconds)\nError:   × Failed to parse recipe\n\nError: \n  × failed to parse match spec: invalid package name 'c')': 'c')' is not a\n  │ valid package name. Package names can only contain 0-9, a-z, A-Z, -, _,\n  │ or .\n     ╭─[../.tmp8oFHfO/recipe.yaml:128:11]\n 127 │         - ${{ pin_subpackage('openmpi', exact=True) }}\n 128 │         - c') | replace(' =', '>=_compiler_stub\n     ·           ──────────────────┬──────────────────\n     ·                             ╰── error parsing `c') | replace(' =', '>=_compiler_stub` as a match spec\n 129 │     tests:\n     ╰────\n\n'\n",
+  "parsing_error": false,
   "platforms": [
     "linux_64",
     "linux_aarch64",
@@ -1987,7 +2234,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/openmpi.json"
   },
-  "raw_meta_yaml": "{% set version = \"5.0.8\" %}\n{% set major = version.rpartition('.')[0] %}\n{% set cuda_major = (cuda_compiler_version|default(\"11.8\")).rpartition('.')[0] %}\n{% set build = 4 %}\n\n# give conda package a higher build number\n{% if mpi_type == 'conda' %}\n{% set build = build + 100 %}\n{% endif %}\n\npackage:\n  # must not match any outputs for requirements to be handled correctly\n  name: openmpi-mpi\n  version: {{ version }}\n\nsource:\n  fn: openmpi-{{ version }}.tar.bz2\n  url: https://www.open-mpi.org/software/ompi/v{{ major }}/downloads/openmpi-{{ version }}.tar.bz2\n  sha256: 53131e1a57e7270f645707f8b0b65ba56048f5b5ac3f68faabed3eb0d710e449\n\nbuild:\n  number: {{ build }}\n  skip: true  # [win or (linux and cuda_compiler_version != cuda_compiler_version_min)]\n  force_use_keys:\n    # var only being used in skip doesn't appear to end up in used_vars\n    - cuda_compiler_version_min  # [linux]\n\noutputs:\n  - name: openmpi\n    {% if mpi_type == 'conda' %}\n    script: build-mpi.sh\n    {% endif %}\n    build:\n      {% if mpi_type == 'conda' %}\n      run_exports:\n        - {{ pin_subpackage('openmpi', min_pin='x.x.x', max_pin='x') }}\n      {% else %}\n      string: {{ mpi_type }}_h{{ PKG_HASH }}_{{ build }}\n      track_features:\n        - openmpi_{{ mpi_type }}\n      {% endif %}\n      ignore_run_exports_from:\n        - {{ compiler('cuda') }}   # [cuda_compiler_version != \"None\"]\n    requirements:\n      build:\n        - {{ compiler('c') }}\n        - {{ compiler('cxx') }}\n        - {{ compiler('cuda') }}     # [cuda_compiler_version != \"None\"]\n        - {{ compiler('fortran') }}\n        - {{ stdlib('c') }}\n        - pkg-config\n        - make\n      host:\n        - libevent\n        - libfabric-devel {{ libfabric }}.*\n        - libhwloc\n        - libnl  # [linux]\n        - libpmix-devel\n        - zlib\n        - ucc  # [linux and not ppc64le]\n        - ucx  # [linux and not ppc64le]\n        - cuda-version {{ cuda_compiler_version }}  # [cuda_compiler_version != \"None\"]\n      run:\n        - mpi 1.0 openmpi\n      run_constrained:\n        # Open MPI only uses CUDA Driver APIs, set the minimal driver version\n        - __cuda  >= {{ cuda_major ~ \".0\" }}  # [cuda_compiler_version != \"None\"]\n        # Ensure a consistent CUDA environment\n        - cuda-version  >= {{ cuda_major ~ \".0\" }}  # [cuda_compiler_version != \"None\"]\n        # conflict with prrte\n        # openmpi (starting with 6)\n        # bundles its own fork of prrte\n        - libprrte ==0.0.0\n    test:\n      {% if mpi_type == 'conda' %}\n      script: run_test.sh\n      requires:\n        - patchelf  # [linux]\n      files:\n        - tests/helloworld.sh\n      {% endif %}\n      commands:\n      {% if mpi_type == 'conda' %}\n        - test ! -d $PREFIX/share/doc/openmpi\n        - test ! -f $PREFIX/share/man/man3/MPI_Init.3\n      {% else %}\n        - echo \"It works!\"\n      {% endif %}\n\n  {% if mpi_type == 'conda' %}\n  - name: openmpi-mpicc\n    build:\n      script:\n        - echo 'ok'\n    requirements:\n      build:\n        - {{ stdlib('c') }}\n      run:\n        - {{ pin_subpackage('openmpi', exact=True) }}\n        # host C compilers work fine (better) on mac\n        - {{ compiler('c') | replace(' ', '>=', 1) }}\n    test:\n      script: run_test.sh\n      files:\n        - tests/helloworld.c\n\n  - name: openmpi-mpicxx\n    build:\n      script:\n        - echo 'ok'\n    requirements:\n      build:\n        - {{ stdlib('c') }}\n      run:\n        - {{ pin_subpackage('openmpi', exact=True) }}\n        # host C compilers work fine (better) on mac\n        - {{ compiler('cxx') | replace(' ', '>=', 1) }}\n    test:\n      script: run_test.sh\n      files:\n        - tests/helloworld.cxx\n\n  - name: openmpi-mpifort\n    build:\n      script:\n        - echo 'ok'\n    requirements:\n      build:\n        - {{ stdlib('c') }}\n      run:\n        - {{ pin_subpackage('openmpi', exact=True) }}\n        - {{ compiler('fortran') | replace(' ', '>=', 1) }}\n    test:\n      script: run_test.sh\n      files:\n        - tests/helloworld.f\n        - tests/helloworld.f90\n  {% endif %}\n\nabout:\n  home: https://www.open-mpi.org/\n  license: BSD-3-Clause\n  license_family: BSD\n  license_file: LICENSE\n  summary: An open source Message Passing Interface implementation.\n  description: |\n    The Open MPI Project is an open source Message Passing Interface\n    implementation that is developed and maintained by a consortium of academic,\n    research, and industry partners.\n  doc_url: https://www.open-mpi.org/doc/\n  dev_url: https://github.com/open-mpi/ompi\n\nextra:\n  recipe-maintainers:\n    - astrofrog\n    - bekozi\n    - dalcinl\n    - leofang\n    - minrk\n    - msarahan\n    - ocefpaf\n    - beckermr\n    - j34ni\n",
+  "raw_meta_yaml": "schema_version: 1\n\ncontext:\n  version: 5.0.8\n  build: 111\n  mpi_type: ${{ mpi_type | default('conda') }}\n  major_minor: ${{ (version | split('.'))[:2] | join('.') }}\n  cuda_compiler_version: ${{ cuda_compiler_version | default('None') }}\n  with_cuda: ${{ 'true' if cuda_compiler_version != 'None' else '' }}\n  cuda_major: >-\n    ${{\n      cuda_compiler_version | split('.') | first\n      if with_cuda\n      else \"0\"\n    }}\n  string_prefix: ${{ 'external_' if mpi_type == 'external' else '' }}\n\nrecipe:\n  name: openmpi\n  version: ${{ version }}\n\nsource:\n  url: https://www.open-mpi.org/software/ompi/v${{ major_minor }}/downloads/openmpi-${{ version }}.tar.bz2\n  sha256: 53131e1a57e7270f645707f8b0b65ba56048f5b5ac3f68faabed3eb0d710e449\n  \nbuild:\n  number: ${{ build }}\n  # this needs to be duplicated into output skips\n  # until https://github.com/prefix-dev/rattler-build/issues/1918 is fixed\n  skip: win or (linux and cuda_compiler_version != cuda_compiler_version_min)\n\noutputs:\n  - package:\n      name: openmpi\n    build:\n      script: build-mpi\n      string: ${{ string_prefix }}h${{ hash }}_${{ build }}\n      \n    requirements:\n      run_exports:\n        - if: mpi_type != 'external'\n          then: ${{ pin_subpackage('openmpi', lower_bound='x.x.x', upper_bound='x') }}\n      build:\n        - if: mpi_type != 'external'\n          then:\n            - ${{ compiler('c') }}\n            - ${{ compiler('cxx') }}\n            - if: with_cuda\n              then:\n                - ${{ compiler('cuda') }}\n            - ${{ compiler('fortran') }}\n            - ${{ stdlib('c') }}\n            - pkg-config\n            - make\n            - shellcheck\n      host:\n        - if: mpi_type != 'external'\n          then:\n            - libevent\n            - libfabric-devel ${{ libfabric }}.*\n            - libhwloc\n            - libpmix-devel\n            - zlib\n            - if: linux\n              then:\n                - libnl\n            - if: linux and not ppc64le\n              then:\n                - ucc\n                - ucx\n            - if: with_cuda\n              then:\n                - cuda-version ${{ cuda_compiler_version }}.*\n      run:\n        - mpi 1.0.* openmpi\n      run_constraints:\n        - if: mpi_type != 'external'\n          then:  \n            # Open MPI only uses CUDA Driver APIs, set the minimal driver version\n            - if: with_cuda\n              then:\n                - __cuda  >= ${{ cuda_major ~ \".0\" }}\n                # Ensure a consistent CUDA environment\n                - cuda-version  >= ${{ cuda_major ~ \".0\" }}\n            # conflict with prrte\n            # openmpi (starting with 6)\n            # bundles its own fork of prrte\n            - libprrte ==0.0.0\n      ignore_run_exports:\n        from_package:\n          - if: with_cuda\n            then:\n              - ${{ compiler(\"cuda\") | split | first }}\n    tests:\n      - if: mpi_type == 'external'\n        then:\n          - script:\n              - echo 'ok'\n      - if: mpi_type == 'conda'\n        then:\n          - package_contents:\n              files:\n                not_exists:\n                  - share/doc/openmpi\n                  - share/man/man3/MPI_Init.3\n          - script:\n              file: run_test\n            requirements:\n              run:\n                - if: linux\n                  then:\n                    - patchelf\n            files:\n              recipe:\n                - tests/helloworld.sh\n  \n  - package:\n      name: openmpi-mpicc\n    build:\n      skip: mpi_type == 'external' or win or (linux and cuda_compiler_version != cuda_compiler_version_min)\n      script:\n        - echo 'ok'\n    requirements:\n      build:\n        - ${{ stdlib('c') }}\n      run:\n        - ${{ pin_subpackage('openmpi', exact=True) }}\n        - ${{ compiler('c') | replace(' =', '>=') }}\n    tests:\n      - if: mpi_type == 'conda'\n        then:\n          - script:\n              file: run_test\n            files:\n              recipe:\n                - tests/helloworld.c\n\n  - package:\n      name: openmpi-mpicxx\n    build:\n      skip: mpi_type == 'external' or win or (linux and cuda_compiler_version != cuda_compiler_version_min)\n      script:\n        - echo 'ok'\n    requirements:\n      build:\n        - ${{ stdlib('c') }}\n      run:\n        - ${{ pin_subpackage('openmpi', exact=True) }}\n        - ${{ compiler('cxx') | replace(' =', '>=') }}\n    tests:\n      - if: mpi_type == 'conda'\n        then:\n          - script:\n              file: run_test\n            files:\n              recipe:\n                - tests/helloworld.cxx\n\n  - package:\n      name: openmpi-mpifort\n    build:\n      skip: mpi_type == 'external' or win or (linux and cuda_compiler_version != cuda_compiler_version_min)\n      script:\n        - echo 'ok'\n    requirements:\n      build:\n        - ${{ stdlib('c') }}\n      run:\n        - ${{ pin_subpackage('openmpi', exact=True) }}\n        - ${{ compiler('fortran') | replace(' =', '>=') }}\n    tests:\n      - if: mpi_type == 'conda'\n        then:\n          - script:\n              file: run_test\n            files:\n              recipe:\n                - tests/helloworld.f\n                - tests/helloworld.f90\n\nabout:\n  homepage: https://www.open-mpi.org/\n  license: BSD-3-Clause\n  license_family: BSD\n  license_file: LICENSE\n  summary: An open source Message Passing Interface implementation.\n  description: |\n    The Open MPI Project is an open source Message Passing Interface\n    implementation that is developed and maintained by a consortium of academic,\n    research, and industry partners.\n  documentation: https://www.open-mpi.org/doc/\n  repository: https://github.com/open-mpi/ompi\n\nextra:\n  recipe-maintainers:\n    - astrofrog\n    - bekozi\n    - dalcinl\n    - leofang\n    - minrk\n    - msarahan\n    - ocefpaf\n    - beckermr\n    - j34ni\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -2006,6 +2253,7 @@
       "mpi",
       "openmpi",
       "pkg-config",
+      "shellcheck",
       "ucc",
       "ucx",
       "zlib"
@@ -2021,7 +2269,8 @@
         "cxx_compiler_stub",
         "fortran_compiler_stub",
         "make",
-        "pkg-config"
+        "pkg-config",
+        "shellcheck"
       ]
     },
     "host": {
@@ -2073,14 +2322,14 @@
         "cxx_compiler_stub",
         "fortran_compiler_stub",
         "make",
-        "pkg-config"
+        "pkg-config",
+        "shellcheck"
       ]
     },
     "host": {
       "__set__": true,
       "elements": [
-        "cuda-version 12.4",
-        "cuda-version 12.9",
+        "cuda-version 12.9.*",
         "libevent",
         "libfabric-devel 1.19.*",
         "libhwloc",
@@ -2097,7 +2346,7 @@
         "c_compiler_stub",
         "cxx_compiler_stub",
         "fortran_compiler_stub",
-        "mpi 1.0 openmpi",
+        "mpi 1.0.* openmpi",
         "openmpi"
       ]
     },
