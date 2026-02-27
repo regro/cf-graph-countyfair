@@ -4,13 +4,16 @@
   "ci_support_linux_64_.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ncxx_compiler:\n- gxx\ncxx_compiler_version:\n- '14'\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\nicu:\n- '75'\ntarget_platform:\n- linux-64\nzip_keys:\n- - c_compiler_version\n  - cxx_compiler_version\n",
   "conda-forge.yml": {
     "build_platform": {
+      "linux_aarch64": "linux_64",
       "linux_ppc64le": "linux_64",
-      "osx_arm64": "osx_64"
+      "osx_arm64": "osx_64",
+      "win_arm64": "win_64"
     },
     "conda_build": {
       "pkg_format": "2"
     },
     "conda_forge_output_validation": true,
+    "conda_install_tool": "pixi",
     "github": {
       "branch_name": "main",
       "tooling_branch_name": "main"
@@ -21,8 +24,8 @@
     },
     "test": "native_and_emulated"
   },
-  "feedstock_hash": "4b6e9004479f8edfcb82e886c67ff00f74ad266f",
-  "feedstock_hash_ts": 1767969397,
+  "feedstock_hash": "dd7de5dd55a85a4699232db0d6298fac347b5dbe",
+  "feedstock_hash_ts": 1772208079,
   "feedstock_name": "icu",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -372,8 +375,11 @@
         "c_stdlib_stub",
         "cxx_compiler_stub",
         "make",
+        "python 3.11",
         "m2-base",
-        "m2-make"
+        "m2-make",
+        "m2-sed",
+        "m2-coreutils"
       ],
       "host": [],
       "run": []
@@ -425,6 +431,19 @@
       {
         "patches": [
           "mach-port-t.patch"
+        ],
+        "sha256": "3e99687b5c435d4b209630e2d2ebb79906c984685e78635078b672e03c89df35",
+        "url": "https://github.com/unicode-org/icu/releases/download/release-78.2/icu4c-78.2-sources.tgz"
+      },
+      {
+        "folder": "source/data",
+        "sha256": "582968cf174c9498b2046b4f4e7f786def5f18222bd8d98432d7a29399c38c70",
+        "url": "https://github.com/unicode-org/icu/releases/download/release-78.2/icu4c-78.2-data.zip"
+      },
+      {
+        "patches": [
+          "icu4c-4_9_1-mingw-w64-mkdir-compatibility.patch",
+          "icu-config.patch"
         ],
         "sha256": "3e99687b5c435d4b209630e2d2ebb79906c984685e78635078b672e03c89df35",
         "url": "https://github.com/unicode-org/icu/releases/download/release-78.2/icu4c-78.2-sources.tgz"
@@ -708,12 +727,13 @@
     "linux_ppc64le",
     "osx_64",
     "osx_arm64",
-    "win_64"
+    "win_64",
+    "win_arm64"
   ],
   "pr_info": {
     "__lazy_json__": "pr_info/icu.json"
   },
-  "raw_meta_yaml": "{% set version = \"78.2\" %}\n\npackage:\n  name: icu\n  version: {{ version }}\n\nsource:\n  - url: https://github.com/unicode-org/icu/releases/download/release-{{ version }}/icu4c-{{ version }}-sources.tgz\n    sha256: 3e99687b5c435d4b209630e2d2ebb79906c984685e78635078b672e03c89df35\n    patches:\n      # Include an extra header when using mingw.\n      - icu4c-4_9_1-mingw-w64-mkdir-compatibility.patch  # [win]\n      # Omit lib prefix on libraries.\n      - icu-config.patch  # [win]\n      - mach-port-t.patch  # [osx]\n\n  - url: https://github.com/unicode-org/icu/releases/download/release-{{ version }}/icu4c-{{ version }}-data.zip\n    sha256: 582968cf174c9498b2046b4f4e7f786def5f18222bd8d98432d7a29399c38c70\n    folder: source/data\n\nbuild:\n  number: 0\n  run_exports:\n    # icu changes their file extension with each major rev.  Default pin OK.\n    - {{ pin_subpackage('icu') }}\n\nrequirements:\n  build:\n    - m2-base  # [win]\n    - m2-make  # [win]\n    - libtool  # [unix]\n    - {{ compiler('c') }}\n    - {{ stdlib(\"c\") }}\n    - {{ compiler('cxx') }}\n    - make     # [unix]\n  host:\n  run:\n\ntest:\n  files:\n    # From http://source.icu-project.org/repos/icu/data/trunk/charset/data/ucm/gb-18030-2000.ucm\n    - gb-18030-2000.ucm\n    # From ICU's data folder.\n    - de.txt\n  commands:\n    # Libraries\n    {% set libs = [\n       \"libicudata\",\n       \"libicui18n\",\n       \"libicuio\",\n       \"libicutest\",\n       \"libicutu\",\n       \"libicuuc\"\n     ] %}\n    {% for each_lib in libs %}\n    # https://github.com/conda-forge/icu-feedstock/issues/40\n    - test ! -f $PREFIX/lib/{{ each_lib }}.a  # [not win]\n    - test -f $PREFIX/lib/{{ each_lib }}.{{ version }}.dylib   # [osx]\n    - test -f $PREFIX/lib/{{ each_lib }}.so.{{ version }}  # [linux]\n    {% endfor %}\n\n    # CLI tests\n    - genbrk --help\n    - gencfu --help\n    - gencnval --help\n    - gendict --help\n    - icuinfo --help\n    - icu-config --help  # [not win]\n    - makeconv gb-18030-2000.ucm\n\nabout:\n  home: https://icu.unicode.org\n  license: MIT\n  license_file: LICENSE\n  summary: International Components for Unicode.\n  dev_url: https://github.com/unicode-org/icu\n  doc_url: https://unicode-org.github.io/icu-docs/apidoc/released/icu4c/\n\nextra:\n  recipe-maintainers:\n    - ccordoba12\n    - jakirkham\n    - msarahan\n    - ocefpaf\n    - xhochy\n",
+  "raw_meta_yaml": "{% set version = \"78.2\" %}\n\npackage:\n  name: icu\n  version: {{ version }}\n\nsource:\n  - url: https://github.com/unicode-org/icu/releases/download/release-{{ version }}/icu4c-{{ version }}-sources.tgz\n    sha256: 3e99687b5c435d4b209630e2d2ebb79906c984685e78635078b672e03c89df35\n    patches:\n      # Include an extra header when using mingw.\n      - icu4c-4_9_1-mingw-w64-mkdir-compatibility.patch  # [win]\n      # Omit lib prefix on libraries.\n      - icu-config.patch  # [win]\n      - mach-port-t.patch  # [osx]\n\n  - url: https://github.com/unicode-org/icu/releases/download/release-{{ version }}/icu4c-{{ version }}-data.zip\n    sha256: 582968cf174c9498b2046b4f4e7f786def5f18222bd8d98432d7a29399c38c70\n    folder: source/data\n\nbuild:\n  number: 0\n  run_exports:\n    # icu changes their file extension with each major rev.  Default pin OK.\n    - {{ pin_subpackage('icu') }}\n\nrequirements:\n  build:\n    - python 3.11   # [win]\n    - m2-base       # [win]\n    - m2-make       # [win]\n    - m2-sed        # [win]\n    - m2-coreutils  # [win]\n    - libtool  # [unix]\n    - {{ compiler('c') }}\n    - {{ stdlib(\"c\") }}\n    - {{ compiler('cxx') }}\n    - make     # [unix]\n  host:\n  run:\n\ntest:\n  files:\n    # From http://source.icu-project.org/repos/icu/data/trunk/charset/data/ucm/gb-18030-2000.ucm\n    - gb-18030-2000.ucm\n    # From ICU's data folder.\n    - de.txt\n  commands:\n    # Libraries\n    {% set libs = [\n       \"libicudata\",\n       \"libicui18n\",\n       \"libicuio\",\n       \"libicutest\",\n       \"libicutu\",\n       \"libicuuc\"\n     ] %}\n    {% for each_lib in libs %}\n    # https://github.com/conda-forge/icu-feedstock/issues/40\n    - test ! -f $PREFIX/lib/{{ each_lib }}.a  # [not win]\n    - test -f $PREFIX/lib/{{ each_lib }}.{{ version }}.dylib   # [osx]\n    - test -f $PREFIX/lib/{{ each_lib }}.so.{{ version }}  # [linux]\n    {% endfor %}\n\n    # CLI tests\n    - genbrk --help\n    - gencfu --help\n    - gencnval --help\n    - gendict --help\n    - icuinfo --help\n    - icu-config --help  # [not win]\n    - makeconv gb-18030-2000.ucm\n\nabout:\n  home: https://icu.unicode.org\n  license: MIT\n  license_file: LICENSE\n  summary: International Components for Unicode.\n  dev_url: https://github.com/unicode-org/icu\n  doc_url: https://unicode-org.github.io/icu-docs/apidoc/released/icu4c/\n\nextra:\n  recipe-maintainers:\n    - ccordoba12\n    - jakirkham\n    - msarahan\n    - ocefpaf\n    - xhochy\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -722,8 +742,11 @@
       "cxx_compiler_stub",
       "libtool",
       "m2-base",
+      "m2-coreutils",
       "m2-make",
-      "make"
+      "m2-sed",
+      "make",
+      "python"
     ]
   },
   "requirements": {
@@ -735,8 +758,11 @@
         "cxx_compiler_stub",
         "libtool",
         "m2-base",
+        "m2-coreutils",
         "m2-make",
-        "make"
+        "m2-sed",
+        "make",
+        "python"
       ]
     },
     "host": {
@@ -770,8 +796,11 @@
         "cxx_compiler_stub",
         "libtool",
         "m2-base",
+        "m2-coreutils",
         "m2-make",
-        "make"
+        "m2-sed",
+        "make",
+        "python 3.11"
       ]
     },
     "host": {
@@ -822,8 +851,11 @@
     },
     "requirements": {
       "build": [
+        "python 3.11",
         "m2-base",
         "m2-make",
+        "m2-sed",
+        "m2-coreutils",
         "c_compiler_stub",
         "c_stdlib_stub",
         "cxx_compiler_stub"
@@ -870,7 +902,110 @@
         "c_stdlib_stub",
         "cxx_compiler_stub",
         "m2-base",
-        "m2-make"
+        "m2-coreutils",
+        "m2-make",
+        "m2-sed",
+        "python"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": []
+    },
+    "run": {
+      "__set__": true,
+      "elements": []
+    },
+    "test": {
+      "__set__": true,
+      "elements": []
+    }
+  },
+  "win_arm64_meta_yaml": {
+    "about": {
+      "dev_url": "https://github.com/unicode-org/icu",
+      "doc_url": "https://unicode-org.github.io/icu-docs/apidoc/released/icu4c/",
+      "home": "https://icu.unicode.org",
+      "license": "MIT",
+      "license_file": "LICENSE",
+      "summary": "International Components for Unicode."
+    },
+    "build": {
+      "number": "0",
+      "run_exports": [
+        "icu"
+      ]
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "ccordoba12",
+        "jakirkham",
+        "msarahan",
+        "ocefpaf",
+        "xhochy"
+      ]
+    },
+    "package": {
+      "name": "icu",
+      "version": "78.2"
+    },
+    "requirements": {
+      "build": [
+        "python 3.11",
+        "m2-base",
+        "m2-make",
+        "m2-sed",
+        "m2-coreutils",
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "cxx_compiler_stub"
+      ],
+      "host": [],
+      "run": []
+    },
+    "schema_version": 0,
+    "source": [
+      {
+        "patches": [
+          "icu4c-4_9_1-mingw-w64-mkdir-compatibility.patch",
+          "icu-config.patch"
+        ],
+        "sha256": "3e99687b5c435d4b209630e2d2ebb79906c984685e78635078b672e03c89df35",
+        "url": "https://github.com/unicode-org/icu/releases/download/release-78.2/icu4c-78.2-sources.tgz"
+      },
+      {
+        "folder": "source/data",
+        "sha256": "582968cf174c9498b2046b4f4e7f786def5f18222bd8d98432d7a29399c38c70",
+        "url": "https://github.com/unicode-org/icu/releases/download/release-78.2/icu4c-78.2-data.zip"
+      }
+    ],
+    "test": {
+      "commands": [
+        "genbrk --help",
+        "gencfu --help",
+        "gencnval --help",
+        "gendict --help",
+        "icuinfo --help",
+        "makeconv gb-18030-2000.ucm"
+      ],
+      "files": [
+        "gb-18030-2000.ucm",
+        "de.txt"
+      ]
+    }
+  },
+  "win_arm64_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "cxx_compiler_stub",
+        "m2-base",
+        "m2-coreutils",
+        "m2-make",
+        "m2-sed",
+        "python"
       ]
     },
     "host": {
