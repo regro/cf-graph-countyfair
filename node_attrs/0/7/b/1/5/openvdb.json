@@ -54,8 +54,8 @@
           "cmake --build . --target install --config Release"
         ],
         "env": {
-          "OUTPUT_CMAKE_ARGS": "-DOPENVDB_BUILD_CORE=ON -DOPENVDB_CORE_SHARED=ON -DOPENVDB_CORE_STATIC=OFF -DOPENVDB_INSTALL_CMAKE_MODULES=ON -DOPENVDB_BUILD_PYTHON_MODULE=ON -DUSE_NUMPY=ON",
-          "SHARED_CMAKE_ARGS": "-Wno-dev -DOPENVDB_BUILD_CORE=OFF -DOPENVDB_BUILD_BINARIES=OFF -DOPENVDB_INSTALL_CMAKE_MODULES=OFF -DNANOVDB_BUILD_TOOLS=OFF -DUSE_EXPLICIT_INSTANTIATION=OFF"
+          "OUTPUT_CMAKE_ARGS": "-DOPENVDB_BUILD_CORE=ON -DOPENVDB_CORE_SHARED=ON -DOPENVDB_CORE_STATIC=OFF -DOPENVDB_INSTALL_CMAKE_MODULES=ON -DOPENVDB_BUILD_PYTHON_MODULE=ON -DUSE_NUMPY=ON\n",
+          "SHARED_CMAKE_ARGS": "-Wno-dev -DOPENVDB_BUILD_CORE=OFF -DOPENVDB_BUILD_BINARIES=OFF -DOPENVDB_INSTALL_CMAKE_MODULES=OFF -DNANOVDB_BUILD_TOOLS=OFF -DUSE_EXPLICIT_INSTANTIATION=OFF\n"
         }
       }
     },
@@ -125,6 +125,83 @@
       },
       {
         "build": null,
+        "name": "openvdb-tools",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
+          }
+        ],
+        "version": "13.0.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "nanovdb"
+          ]
+        },
+        "name": "nanovdb",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "libboost-devel",
+            "nanobind",
+            "python",
+            "tbb-devel",
+            "tsl_robin_map",
+            "zlib",
+            "openvdb"
+          ],
+          "run": [
+            "python"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "nanovdb"
+              ]
+            }
+          },
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
         "name": "nanovdb-dev",
         "requirements": {
           "build": [],
@@ -139,118 +216,34 @@
         "version": "32.9.0"
       },
       {
-        "build": {
-          "strong": [],
-          "weak": [
-            "openvdb"
-          ]
-        },
-        "name": "openvdb",
+        "build": null,
+        "name": "nanovdb-tools",
         "requirements": {
           "build": [
             "cxx_compiler_stub",
             "c_stdlib_stub",
             "cmake",
-            "pkg-config",
-            "jemalloc",
             "make"
           ],
           "host": [
-            "blosc",
             "libboost-devel",
-            "nanobind",
-            "numpy >=1.23.0",
-            "python",
             "tbb-devel",
-            "zlib"
+            "zlib",
+            "openvdb",
+            "nanovdb"
           ],
-          "run": [
-            "python",
-            "numpy"
-          ]
+          "run": []
         },
         "tests": [
           {
-            "python": {
-              "imports": [
-                "openvdb"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "numpy"
-              ]
-            },
-            "script": "python -c \"import openvdb; import numpy; grid = openvdb.FloatGrid(); grid.copyFromArray(numpy.random.rand(200, 200, 200))\"\n"
-          },
-          {
             "script": [
-              "test -f ${PREFIX}/include/openvdb/openvdb.h",
-              "test -f ${PREFIX}/lib/cmake/OpenVDB/FindOpenVDB.cmake",
-              "test -f ${PREFIX}/lib/libopenvdb${SHLIB_EXT}"
+              "nanovdb_convert --help",
+              "nanovdb_print --help",
+              "nanovdb_validate --help"
             ]
           }
         ],
-        "version": "13.0.0"
-      },
-      {
-        "build": {
-          "strong": [],
-          "weak": [
-            "openvdb"
-          ]
-        },
-        "name": "openvdb",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "pkg-config",
-            "jemalloc",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "nanobind",
-            "numpy >=1.23.0",
-            "python",
-            "tbb-devel",
-            "zlib"
-          ],
-          "run": [
-            "python",
-            "numpy"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "openvdb"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "numpy"
-              ]
-            },
-            "script": "python -c \"import openvdb; import numpy; grid = openvdb.FloatGrid(); grid.copyFromArray(numpy.random.rand(200, 200, 200))\"\n"
-          },
-          {
-            "script": [
-              "test -f ${PREFIX}/include/openvdb/openvdb.h",
-              "test -f ${PREFIX}/lib/cmake/OpenVDB/FindOpenVDB.cmake",
-              "test -f ${PREFIX}/lib/libopenvdb${SHLIB_EXT}"
-            ]
-          }
-        ],
-        "version": "13.0.0"
+        "version": "32.9.0"
       },
       {
         "build": {
@@ -310,13 +303,8 @@
         "version": "13.0.0"
       },
       {
-        "build": {
-          "strong": [],
-          "weak": [
-            "nanovdb"
-          ]
-        },
-        "name": "nanovdb",
+        "build": null,
+        "name": "openvdb-tools",
         "requirements": {
           "build": [
             "cxx_compiler_stub",
@@ -325,115 +313,29 @@
             "make"
           ],
           "host": [
+            "blosc",
             "libboost-devel",
-            "nanobind",
-            "python",
+            "glfw",
             "tbb-devel",
-            "tsl_robin_map",
             "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
             "openvdb"
           ],
-          "run": [
-            "python"
-          ]
+          "run": []
         },
         "tests": [
           {
-            "python": {
-              "imports": [
-                "nanovdb"
-              ]
-            }
-          },
-          {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
           }
         ],
-        "version": "32.9.0"
-      },
-      {
-        "build": {
-          "strong": [],
-          "weak": [
-            "nanovdb"
-          ]
-        },
-        "name": "nanovdb",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "libboost-devel",
-            "nanobind",
-            "python",
-            "tbb-devel",
-            "tsl_robin_map",
-            "zlib",
-            "openvdb"
-          ],
-          "run": [
-            "python"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "nanovdb"
-              ]
-            }
-          },
-          {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
-          }
-        ],
-        "version": "32.9.0"
-      },
-      {
-        "build": {
-          "strong": [],
-          "weak": [
-            "nanovdb"
-          ]
-        },
-        "name": "nanovdb",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "libboost-devel",
-            "nanobind",
-            "python",
-            "tbb-devel",
-            "tsl_robin_map",
-            "zlib",
-            "openvdb"
-          ],
-          "run": [
-            "python"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "nanovdb"
-              ]
-            }
-          },
-          {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
-          }
-        ],
-        "version": "32.9.0"
+        "version": "13.0.0"
       },
       {
         "build": {
@@ -479,6 +381,21 @@
       },
       {
         "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
         "name": "nanovdb-tools",
         "requirements": {
           "build": [
@@ -506,6 +423,63 @@
           }
         ],
         "version": "32.9.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "openvdb"
+          ]
+        },
+        "name": "openvdb",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "pkg-config",
+            "jemalloc",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "nanobind",
+            "numpy >=1.23.0",
+            "python",
+            "tbb-devel",
+            "zlib"
+          ],
+          "run": [
+            "python",
+            "numpy"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "openvdb"
+              ]
+            }
+          },
+          {
+            "requirements": {
+              "run": [
+                "numpy"
+              ]
+            },
+            "script": "python -c \"import openvdb; import numpy; grid = openvdb.FloatGrid(); grid.copyFromArray(numpy.random.rand(200, 200, 200))\"\n"
+          },
+          {
+            "script": [
+              "test -f ${PREFIX}/include/openvdb/openvdb.h",
+              "test -f ${PREFIX}/lib/cmake/OpenVDB/FindOpenVDB.cmake",
+              "test -f ${PREFIX}/lib/libopenvdb${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "13.0.0"
       },
       {
         "build": null,
@@ -543,6 +517,63 @@
         "version": "13.0.0"
       },
       {
+        "build": {
+          "strong": [],
+          "weak": [
+            "nanovdb"
+          ]
+        },
+        "name": "nanovdb",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "libboost-devel",
+            "nanobind",
+            "python",
+            "tbb-devel",
+            "tsl_robin_map",
+            "zlib",
+            "openvdb"
+          ],
+          "run": [
+            "python"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "nanovdb"
+              ]
+            }
+          },
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
         "build": null,
         "name": "nanovdb-tools",
         "requirements": {
@@ -571,6 +602,63 @@
           }
         ],
         "version": "32.9.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "openvdb"
+          ]
+        },
+        "name": "openvdb",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "pkg-config",
+            "jemalloc",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "nanobind",
+            "numpy >=1.23.0",
+            "python",
+            "tbb-devel",
+            "zlib"
+          ],
+          "run": [
+            "python",
+            "numpy"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "openvdb"
+              ]
+            }
+          },
+          {
+            "requirements": {
+              "run": [
+                "numpy"
+              ]
+            },
+            "script": "python -c \"import openvdb; import numpy; grid = openvdb.FloatGrid(); grid.copyFromArray(numpy.random.rand(200, 200, 200))\"\n"
+          },
+          {
+            "script": [
+              "test -f ${PREFIX}/include/openvdb/openvdb.h",
+              "test -f ${PREFIX}/lib/cmake/OpenVDB/FindOpenVDB.cmake",
+              "test -f ${PREFIX}/lib/libopenvdb${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "13.0.0"
       },
       {
         "build": null,
@@ -608,6 +696,63 @@
         "version": "13.0.0"
       },
       {
+        "build": {
+          "strong": [],
+          "weak": [
+            "nanovdb"
+          ]
+        },
+        "name": "nanovdb",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "libboost-devel",
+            "nanobind",
+            "python",
+            "tbb-devel",
+            "tsl_robin_map",
+            "zlib",
+            "openvdb"
+          ],
+          "run": [
+            "python"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "nanovdb"
+              ]
+            }
+          },
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
         "build": null,
         "name": "nanovdb-tools",
         "requirements": {
@@ -636,106 +781,6 @@
           }
         ],
         "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
-      },
-      {
-        "build": null,
-        "name": "nanovdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "libboost-devel",
-            "tbb-devel",
-            "zlib",
-            "openvdb",
-            "nanovdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "nanovdb_convert --help",
-              "nanovdb_print --help",
-              "nanovdb_validate --help"
-            ]
-          }
-        ],
-        "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
       }
     ],
     "package": {
@@ -847,8 +892,8 @@
           "cmake --build . --target install --config Release"
         ],
         "env": {
-          "OUTPUT_CMAKE_ARGS": "-DOPENVDB_BUILD_CORE=ON -DOPENVDB_CORE_SHARED=ON -DOPENVDB_CORE_STATIC=OFF -DOPENVDB_INSTALL_CMAKE_MODULES=ON -DOPENVDB_BUILD_PYTHON_MODULE=ON -DUSE_NUMPY=ON",
-          "SHARED_CMAKE_ARGS": "-Wno-dev -DOPENVDB_BUILD_CORE=OFF -DOPENVDB_BUILD_BINARIES=OFF -DOPENVDB_INSTALL_CMAKE_MODULES=OFF -DNANOVDB_BUILD_TOOLS=OFF -DUSE_EXPLICIT_INSTANTIATION=OFF"
+          "OUTPUT_CMAKE_ARGS": "-DOPENVDB_BUILD_CORE=ON -DOPENVDB_CORE_SHARED=ON -DOPENVDB_CORE_STATIC=OFF -DOPENVDB_INSTALL_CMAKE_MODULES=ON -DOPENVDB_BUILD_PYTHON_MODULE=ON -DUSE_NUMPY=ON\n",
+          "SHARED_CMAKE_ARGS": "-Wno-dev -DOPENVDB_BUILD_CORE=OFF -DOPENVDB_BUILD_BINARIES=OFF -DOPENVDB_INSTALL_CMAKE_MODULES=OFF -DNANOVDB_BUILD_TOOLS=OFF -DUSE_EXPLICIT_INSTANTIATION=OFF\n"
         }
       }
     },
@@ -918,18 +963,38 @@
       },
       {
         "build": null,
-        "name": "nanovdb-dev",
+        "name": "openvdb-tools",
         "requirements": {
-          "build": [],
-          "host": [],
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
           "run": []
         },
         "tests": [
           {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
           }
         ],
-        "version": "32.9.0"
+        "version": "13.0.0"
       },
       {
         "build": {
@@ -975,6 +1040,21 @@
       },
       {
         "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
         "name": "nanovdb-tools",
         "requirements": {
           "build": [
@@ -1002,41 +1082,6 @@
           }
         ],
         "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
       },
       {
         "build": {
@@ -1097,18 +1142,38 @@
       },
       {
         "build": null,
-        "name": "nanovdb-dev",
+        "name": "openvdb-tools",
         "requirements": {
-          "build": [],
-          "host": [],
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
           "run": []
         },
         "tests": [
           {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
           }
         ],
-        "version": "32.9.0"
+        "version": "13.0.0"
       },
       {
         "build": {
@@ -1154,6 +1219,21 @@
       },
       {
         "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
         "name": "nanovdb-tools",
         "requirements": {
           "build": [
@@ -1181,41 +1261,6 @@
           }
         ],
         "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
       },
       {
         "build": {
@@ -1276,18 +1321,38 @@
       },
       {
         "build": null,
-        "name": "nanovdb-dev",
+        "name": "openvdb-tools",
         "requirements": {
-          "build": [],
-          "host": [],
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
           "run": []
         },
         "tests": [
           {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
           }
         ],
-        "version": "32.9.0"
+        "version": "13.0.0"
       },
       {
         "build": {
@@ -1333,6 +1398,21 @@
       },
       {
         "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
         "name": "nanovdb-tools",
         "requirements": {
           "build": [
@@ -1360,41 +1440,6 @@
           }
         ],
         "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
       },
       {
         "build": {
@@ -1455,18 +1500,38 @@
       },
       {
         "build": null,
-        "name": "nanovdb-dev",
+        "name": "openvdb-tools",
         "requirements": {
-          "build": [],
-          "host": [],
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
           "run": []
         },
         "tests": [
           {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
           }
         ],
-        "version": "32.9.0"
+        "version": "13.0.0"
       },
       {
         "build": {
@@ -1512,6 +1577,21 @@
       },
       {
         "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
         "name": "nanovdb-tools",
         "requirements": {
           "build": [
@@ -1539,41 +1619,6 @@
           }
         ],
         "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
       }
     ],
     "package": {
@@ -1685,8 +1730,8 @@
           "cmake --build . --target install --config Release"
         ],
         "env": {
-          "OUTPUT_CMAKE_ARGS": "-DOPENVDB_BUILD_CORE=ON -DOPENVDB_CORE_SHARED=ON -DOPENVDB_CORE_STATIC=OFF -DOPENVDB_INSTALL_CMAKE_MODULES=ON -DOPENVDB_BUILD_PYTHON_MODULE=ON -DUSE_NUMPY=ON",
-          "SHARED_CMAKE_ARGS": "-Wno-dev -DOPENVDB_BUILD_CORE=OFF -DOPENVDB_BUILD_BINARIES=OFF -DOPENVDB_INSTALL_CMAKE_MODULES=OFF -DNANOVDB_BUILD_TOOLS=OFF -DUSE_EXPLICIT_INSTANTIATION=OFF"
+          "OUTPUT_CMAKE_ARGS": "-DOPENVDB_BUILD_CORE=ON -DOPENVDB_CORE_SHARED=ON -DOPENVDB_CORE_STATIC=OFF -DOPENVDB_INSTALL_CMAKE_MODULES=ON -DOPENVDB_BUILD_PYTHON_MODULE=ON -DUSE_NUMPY=ON\n",
+          "SHARED_CMAKE_ARGS": "-Wno-dev -DOPENVDB_BUILD_CORE=OFF -DOPENVDB_BUILD_BINARIES=OFF -DOPENVDB_INSTALL_CMAKE_MODULES=OFF -DNANOVDB_BUILD_TOOLS=OFF -DUSE_EXPLICIT_INSTANTIATION=OFF\n"
         }
       }
     },
@@ -1756,18 +1801,38 @@
       },
       {
         "build": null,
-        "name": "nanovdb-dev",
+        "name": "openvdb-tools",
         "requirements": {
-          "build": [],
-          "host": [],
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
           "run": []
         },
         "tests": [
           {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
           }
         ],
-        "version": "32.9.0"
+        "version": "13.0.0"
       },
       {
         "build": {
@@ -1813,6 +1878,21 @@
       },
       {
         "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
         "name": "nanovdb-tools",
         "requirements": {
           "build": [
@@ -1840,41 +1920,6 @@
           }
         ],
         "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
       },
       {
         "build": {
@@ -1935,18 +1980,38 @@
       },
       {
         "build": null,
-        "name": "nanovdb-dev",
+        "name": "openvdb-tools",
         "requirements": {
-          "build": [],
-          "host": [],
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
           "run": []
         },
         "tests": [
           {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
           }
         ],
-        "version": "32.9.0"
+        "version": "13.0.0"
       },
       {
         "build": {
@@ -1992,6 +2057,21 @@
       },
       {
         "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
         "name": "nanovdb-tools",
         "requirements": {
           "build": [
@@ -2019,41 +2099,6 @@
           }
         ],
         "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
       },
       {
         "build": {
@@ -2114,18 +2159,38 @@
       },
       {
         "build": null,
-        "name": "nanovdb-dev",
+        "name": "openvdb-tools",
         "requirements": {
-          "build": [],
-          "host": [],
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
           "run": []
         },
         "tests": [
           {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
           }
         ],
-        "version": "32.9.0"
+        "version": "13.0.0"
       },
       {
         "build": {
@@ -2171,6 +2236,21 @@
       },
       {
         "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
         "name": "nanovdb-tools",
         "requirements": {
           "build": [
@@ -2198,41 +2278,6 @@
           }
         ],
         "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
       },
       {
         "build": {
@@ -2293,18 +2338,38 @@
       },
       {
         "build": null,
-        "name": "nanovdb-dev",
+        "name": "openvdb-tools",
         "requirements": {
-          "build": [],
-          "host": [],
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
           "run": []
         },
         "tests": [
           {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
           }
         ],
-        "version": "32.9.0"
+        "version": "13.0.0"
       },
       {
         "build": {
@@ -2350,6 +2415,21 @@
       },
       {
         "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
         "name": "nanovdb-tools",
         "requirements": {
           "build": [
@@ -2377,41 +2457,6 @@
           }
         ],
         "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
       }
     ],
     "package": {
@@ -2523,8 +2568,8 @@
           "cmake --build . --target install --config Release"
         ],
         "env": {
-          "OUTPUT_CMAKE_ARGS": "-DOPENVDB_BUILD_CORE=ON -DOPENVDB_CORE_SHARED=ON -DOPENVDB_CORE_STATIC=OFF -DOPENVDB_INSTALL_CMAKE_MODULES=ON -DOPENVDB_BUILD_PYTHON_MODULE=ON -DUSE_NUMPY=ON",
-          "SHARED_CMAKE_ARGS": "-Wno-dev -DOPENVDB_BUILD_CORE=OFF -DOPENVDB_BUILD_BINARIES=OFF -DOPENVDB_INSTALL_CMAKE_MODULES=OFF -DNANOVDB_BUILD_TOOLS=OFF -DUSE_EXPLICIT_INSTANTIATION=OFF"
+          "OUTPUT_CMAKE_ARGS": "-DOPENVDB_BUILD_CORE=ON -DOPENVDB_CORE_SHARED=ON -DOPENVDB_CORE_STATIC=OFF -DOPENVDB_INSTALL_CMAKE_MODULES=ON -DOPENVDB_BUILD_PYTHON_MODULE=ON -DUSE_NUMPY=ON\n",
+          "SHARED_CMAKE_ARGS": "-Wno-dev -DOPENVDB_BUILD_CORE=OFF -DOPENVDB_BUILD_BINARIES=OFF -DOPENVDB_INSTALL_CMAKE_MODULES=OFF -DNANOVDB_BUILD_TOOLS=OFF -DUSE_EXPLICIT_INSTANTIATION=OFF\n"
         }
       }
     },
@@ -2594,185 +2639,34 @@
       },
       {
         "build": null,
-        "name": "nanovdb-dev",
+        "name": "openvdb-tools",
         "requirements": {
-          "build": [],
-          "host": [],
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
           "run": []
         },
         "tests": [
           {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
-          }
-        ],
-        "version": "32.9.0"
-      },
-      {
-        "build": {
-          "strong": [],
-          "weak": [
-            "openvdb"
-          ]
-        },
-        "name": "openvdb",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "pkg-config",
-            "jemalloc",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "nanobind",
-            "numpy >=1.23.0",
-            "python",
-            "tbb-devel",
-            "zlib"
-          ],
-          "run": [
-            "python",
-            "numpy"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "openvdb"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "numpy"
-              ]
-            },
-            "script": "python -c \"import openvdb; import numpy; grid = openvdb.FloatGrid(); grid.copyFromArray(numpy.random.rand(200, 200, 200))\"\n"
-          },
-          {
             "script": [
-              "test -f ${PREFIX}/include/openvdb/openvdb.h",
-              "test -f ${PREFIX}/lib/cmake/OpenVDB/FindOpenVDB.cmake",
-              "test -f ${PREFIX}/lib/libopenvdb${SHLIB_EXT}"
-            ]
-          }
-        ],
-        "version": "13.0.0"
-      },
-      {
-        "build": {
-          "strong": [],
-          "weak": [
-            "openvdb"
-          ]
-        },
-        "name": "openvdb",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "pkg-config",
-            "jemalloc",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "nanobind",
-            "numpy >=1.23.0",
-            "python",
-            "tbb-devel",
-            "zlib"
-          ],
-          "run": [
-            "python",
-            "numpy"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "openvdb"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "numpy"
-              ]
-            },
-            "script": "python -c \"import openvdb; import numpy; grid = openvdb.FloatGrid(); grid.copyFromArray(numpy.random.rand(200, 200, 200))\"\n"
-          },
-          {
-            "script": [
-              "test -f ${PREFIX}/include/openvdb/openvdb.h",
-              "test -f ${PREFIX}/lib/cmake/OpenVDB/FindOpenVDB.cmake",
-              "test -f ${PREFIX}/lib/libopenvdb${SHLIB_EXT}"
-            ]
-          }
-        ],
-        "version": "13.0.0"
-      },
-      {
-        "build": {
-          "strong": [],
-          "weak": [
-            "openvdb"
-          ]
-        },
-        "name": "openvdb",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "pkg-config",
-            "jemalloc",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "nanobind",
-            "numpy >=1.23.0",
-            "python",
-            "tbb-devel",
-            "zlib"
-          ],
-          "run": [
-            "python",
-            "numpy"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "openvdb"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "numpy"
-              ]
-            },
-            "script": "python -c \"import openvdb; import numpy; grid = openvdb.FloatGrid(); grid.copyFromArray(numpy.random.rand(200, 200, 200))\"\n"
-          },
-          {
-            "script": [
-              "test -f ${PREFIX}/include/openvdb/openvdb.h",
-              "test -f ${PREFIX}/lib/cmake/OpenVDB/FindOpenVDB.cmake",
-              "test -f ${PREFIX}/lib/libopenvdb${SHLIB_EXT}"
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
             ]
           }
         ],
@@ -2819,449 +2713,6 @@
           }
         ],
         "version": "32.9.0"
-      },
-      {
-        "build": {
-          "strong": [],
-          "weak": [
-            "nanovdb"
-          ]
-        },
-        "name": "nanovdb",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "libboost-devel",
-            "nanobind",
-            "python",
-            "tbb-devel",
-            "tsl_robin_map",
-            "zlib",
-            "openvdb"
-          ],
-          "run": [
-            "python"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "nanovdb"
-              ]
-            }
-          },
-          {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
-          }
-        ],
-        "version": "32.9.0"
-      },
-      {
-        "build": {
-          "strong": [],
-          "weak": [
-            "nanovdb"
-          ]
-        },
-        "name": "nanovdb",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "libboost-devel",
-            "nanobind",
-            "python",
-            "tbb-devel",
-            "tsl_robin_map",
-            "zlib",
-            "openvdb"
-          ],
-          "run": [
-            "python"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "nanovdb"
-              ]
-            }
-          },
-          {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
-          }
-        ],
-        "version": "32.9.0"
-      },
-      {
-        "build": {
-          "strong": [],
-          "weak": [
-            "nanovdb"
-          ]
-        },
-        "name": "nanovdb",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "libboost-devel",
-            "nanobind",
-            "python",
-            "tbb-devel",
-            "tsl_robin_map",
-            "zlib",
-            "openvdb"
-          ],
-          "run": [
-            "python"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "nanovdb"
-              ]
-            }
-          },
-          {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
-          }
-        ],
-        "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "nanovdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "libboost-devel",
-            "tbb-devel",
-            "zlib",
-            "openvdb",
-            "nanovdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "nanovdb_convert --help",
-              "nanovdb_print --help",
-              "nanovdb_validate --help"
-            ]
-          }
-        ],
-        "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
-      },
-      {
-        "build": null,
-        "name": "nanovdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "libboost-devel",
-            "tbb-devel",
-            "zlib",
-            "openvdb",
-            "nanovdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "nanovdb_convert --help",
-              "nanovdb_print --help",
-              "nanovdb_validate --help"
-            ]
-          }
-        ],
-        "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
-      },
-      {
-        "build": null,
-        "name": "nanovdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "libboost-devel",
-            "tbb-devel",
-            "zlib",
-            "openvdb",
-            "nanovdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "nanovdb_convert --help",
-              "nanovdb_print --help",
-              "nanovdb_validate --help"
-            ]
-          }
-        ],
-        "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
-      },
-      {
-        "build": null,
-        "name": "nanovdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "libboost-devel",
-            "tbb-devel",
-            "zlib",
-            "openvdb",
-            "nanovdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "nanovdb_convert --help",
-              "nanovdb_print --help",
-              "nanovdb_validate --help"
-            ]
-          }
-        ],
-        "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
-      },
-      {
-        "build": {
-          "strong": [],
-          "weak": [
-            "openvdb"
-          ]
-        },
-        "name": "openvdb",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "pkg-config",
-            "jemalloc",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "nanobind",
-            "numpy >=1.23.0",
-            "python",
-            "tbb-devel",
-            "zlib"
-          ],
-          "run": [
-            "python",
-            "numpy"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "openvdb"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "numpy"
-              ]
-            },
-            "script": "python -c \"import openvdb; import numpy; grid = openvdb.FloatGrid(); grid.copyFromArray(numpy.random.rand(200, 200, 200))\"\n"
-          },
-          {
-            "script": [
-              "test -f ${PREFIX}/include/openvdb/openvdb.h",
-              "test -f ${PREFIX}/lib/cmake/OpenVDB/FindOpenVDB.cmake",
-              "test -f ${PREFIX}/lib/libopenvdb${SHLIB_EXT}"
-            ]
-          }
-        ],
-        "version": "13.0.0"
       },
       {
         "build": null,
@@ -3279,48 +2730,6 @@
         "version": "32.9.0"
       },
       {
-        "build": {
-          "strong": [],
-          "weak": [
-            "nanovdb"
-          ]
-        },
-        "name": "nanovdb",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "libboost-devel",
-            "nanobind",
-            "python",
-            "tbb-devel",
-            "tsl_robin_map",
-            "zlib",
-            "openvdb"
-          ],
-          "run": [
-            "python"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "nanovdb"
-              ]
-            }
-          },
-          {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
-          }
-        ],
-        "version": "32.9.0"
-      },
-      {
         "build": null,
         "name": "nanovdb-tools",
         "requirements": {
@@ -3349,41 +2758,6 @@
           }
         ],
         "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
       },
       {
         "build": {
@@ -3444,18 +2818,38 @@
       },
       {
         "build": null,
-        "name": "nanovdb-dev",
+        "name": "openvdb-tools",
         "requirements": {
-          "build": [],
-          "host": [],
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
           "run": []
         },
         "tests": [
           {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
           }
         ],
-        "version": "32.9.0"
+        "version": "13.0.0"
       },
       {
         "build": {
@@ -3501,6 +2895,21 @@
       },
       {
         "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
         "name": "nanovdb-tools",
         "requirements": {
           "build": [
@@ -3528,41 +2937,6 @@
           }
         ],
         "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
       },
       {
         "build": {
@@ -3623,18 +2997,38 @@
       },
       {
         "build": null,
-        "name": "nanovdb-dev",
+        "name": "openvdb-tools",
         "requirements": {
-          "build": [],
-          "host": [],
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
           "run": []
         },
         "tests": [
           {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
           }
         ],
-        "version": "32.9.0"
+        "version": "13.0.0"
       },
       {
         "build": {
@@ -3680,6 +3074,21 @@
       },
       {
         "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
         "name": "nanovdb-tools",
         "requirements": {
           "build": [
@@ -3707,41 +3116,6 @@
           }
         ],
         "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
       },
       {
         "build": {
@@ -3802,18 +3176,38 @@
       },
       {
         "build": null,
-        "name": "nanovdb-dev",
+        "name": "openvdb-tools",
         "requirements": {
-          "build": [],
-          "host": [],
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
           "run": []
         },
         "tests": [
           {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
           }
         ],
-        "version": "32.9.0"
+        "version": "13.0.0"
       },
       {
         "build": {
@@ -3859,6 +3253,21 @@
       },
       {
         "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
         "name": "nanovdb-tools",
         "requirements": {
           "build": [
@@ -3886,41 +3295,6 @@
           }
         ],
         "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
       },
       {
         "build": {
@@ -3981,18 +3355,38 @@
       },
       {
         "build": null,
-        "name": "nanovdb-dev",
+        "name": "openvdb-tools",
         "requirements": {
-          "build": [],
-          "host": [],
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
           "run": []
         },
         "tests": [
           {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
           }
         ],
-        "version": "32.9.0"
+        "version": "13.0.0"
       },
       {
         "build": {
@@ -4038,6 +3432,21 @@
       },
       {
         "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
         "name": "nanovdb-tools",
         "requirements": {
           "build": [
@@ -4065,41 +3474,6 @@
           }
         ],
         "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
       },
       {
         "build": {
@@ -4160,18 +3534,38 @@
       },
       {
         "build": null,
-        "name": "nanovdb-dev",
+        "name": "openvdb-tools",
         "requirements": {
-          "build": [],
-          "host": [],
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
           "run": []
         },
         "tests": [
           {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
           }
         ],
-        "version": "32.9.0"
+        "version": "13.0.0"
       },
       {
         "build": {
@@ -4217,6 +3611,21 @@
       },
       {
         "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
         "name": "nanovdb-tools",
         "requirements": {
           "build": [
@@ -4244,41 +3653,6 @@
           }
         ],
         "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
       },
       {
         "build": {
@@ -4339,18 +3713,38 @@
       },
       {
         "build": null,
-        "name": "nanovdb-dev",
+        "name": "openvdb-tools",
         "requirements": {
-          "build": [],
-          "host": [],
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
           "run": []
         },
         "tests": [
           {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
           }
         ],
-        "version": "32.9.0"
+        "version": "13.0.0"
       },
       {
         "build": {
@@ -4396,6 +3790,21 @@
       },
       {
         "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
         "name": "nanovdb-tools",
         "requirements": {
           "build": [
@@ -4423,41 +3832,6 @@
           }
         ],
         "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
       },
       {
         "build": {
@@ -4518,18 +3892,38 @@
       },
       {
         "build": null,
-        "name": "nanovdb-dev",
+        "name": "openvdb-tools",
         "requirements": {
-          "build": [],
-          "host": [],
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
           "run": []
         },
         "tests": [
           {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
           }
         ],
-        "version": "32.9.0"
+        "version": "13.0.0"
       },
       {
         "build": {
@@ -4575,6 +3969,21 @@
       },
       {
         "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
         "name": "nanovdb-tools",
         "requirements": {
           "build": [
@@ -4602,41 +4011,6 @@
           }
         ],
         "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
       },
       {
         "build": {
@@ -4697,18 +4071,38 @@
       },
       {
         "build": null,
-        "name": "nanovdb-dev",
+        "name": "openvdb-tools",
         "requirements": {
-          "build": [],
-          "host": [],
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
           "run": []
         },
         "tests": [
           {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
           }
         ],
-        "version": "32.9.0"
+        "version": "13.0.0"
       },
       {
         "build": {
@@ -4754,6 +4148,21 @@
       },
       {
         "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
         "name": "nanovdb-tools",
         "requirements": {
           "build": [
@@ -4781,41 +4190,6 @@
           }
         ],
         "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
       },
       {
         "build": {
@@ -4876,18 +4250,38 @@
       },
       {
         "build": null,
-        "name": "nanovdb-dev",
+        "name": "openvdb-tools",
         "requirements": {
-          "build": [],
-          "host": [],
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
           "run": []
         },
         "tests": [
           {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
           }
         ],
-        "version": "32.9.0"
+        "version": "13.0.0"
       },
       {
         "build": {
@@ -4933,6 +4327,21 @@
       },
       {
         "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
         "name": "nanovdb-tools",
         "requirements": {
           "build": [
@@ -4960,41 +4369,6 @@
           }
         ],
         "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
       },
       {
         "build": {
@@ -5055,18 +4429,38 @@
       },
       {
         "build": null,
-        "name": "nanovdb-dev",
+        "name": "openvdb-tools",
         "requirements": {
-          "build": [],
-          "host": [],
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
           "run": []
         },
         "tests": [
           {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
           }
         ],
-        "version": "32.9.0"
+        "version": "13.0.0"
       },
       {
         "build": {
@@ -5112,6 +4506,21 @@
       },
       {
         "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
         "name": "nanovdb-tools",
         "requirements": {
           "build": [
@@ -5139,41 +4548,6 @@
           }
         ],
         "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
       },
       {
         "build": {
@@ -5234,18 +4608,38 @@
       },
       {
         "build": null,
-        "name": "nanovdb-dev",
+        "name": "openvdb-tools",
         "requirements": {
-          "build": [],
-          "host": [],
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
           "run": []
         },
         "tests": [
           {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
           }
         ],
-        "version": "32.9.0"
+        "version": "13.0.0"
       },
       {
         "build": {
@@ -5291,6 +4685,21 @@
       },
       {
         "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
         "name": "nanovdb-tools",
         "requirements": {
           "build": [
@@ -5318,41 +4727,6 @@
           }
         ],
         "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
       },
       {
         "build": {
@@ -5413,18 +4787,38 @@
       },
       {
         "build": null,
-        "name": "nanovdb-dev",
+        "name": "openvdb-tools",
         "requirements": {
-          "build": [],
-          "host": [],
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
           "run": []
         },
         "tests": [
           {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
           }
         ],
-        "version": "32.9.0"
+        "version": "13.0.0"
       },
       {
         "build": {
@@ -5470,6 +4864,21 @@
       },
       {
         "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
         "name": "nanovdb-tools",
         "requirements": {
           "build": [
@@ -5497,41 +4906,6 @@
           }
         ],
         "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
       },
       {
         "build": {
@@ -5592,18 +4966,38 @@
       },
       {
         "build": null,
-        "name": "nanovdb-dev",
+        "name": "openvdb-tools",
         "requirements": {
-          "build": [],
-          "host": [],
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
           "run": []
         },
         "tests": [
           {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
           }
         ],
-        "version": "32.9.0"
+        "version": "13.0.0"
       },
       {
         "build": {
@@ -5649,6 +5043,21 @@
       },
       {
         "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
         "name": "nanovdb-tools",
         "requirements": {
           "build": [
@@ -5676,41 +5085,6 @@
           }
         ],
         "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
       },
       {
         "build": {
@@ -5771,18 +5145,38 @@
       },
       {
         "build": null,
-        "name": "nanovdb-dev",
+        "name": "openvdb-tools",
         "requirements": {
-          "build": [],
-          "host": [],
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
           "run": []
         },
         "tests": [
           {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
           }
         ],
-        "version": "32.9.0"
+        "version": "13.0.0"
       },
       {
         "build": {
@@ -5828,6 +5222,21 @@
       },
       {
         "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
         "name": "nanovdb-tools",
         "requirements": {
           "build": [
@@ -5855,41 +5264,6 @@
           }
         ],
         "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
       },
       {
         "build": {
@@ -5950,18 +5324,38 @@
       },
       {
         "build": null,
-        "name": "nanovdb-dev",
+        "name": "openvdb-tools",
         "requirements": {
-          "build": [],
-          "host": [],
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
           "run": []
         },
         "tests": [
           {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
           }
         ],
-        "version": "32.9.0"
+        "version": "13.0.0"
       },
       {
         "build": {
@@ -6007,6 +5401,21 @@
       },
       {
         "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
         "name": "nanovdb-tools",
         "requirements": {
           "build": [
@@ -6034,41 +5443,6 @@
           }
         ],
         "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
       },
       {
         "build": {
@@ -6129,18 +5503,38 @@
       },
       {
         "build": null,
-        "name": "nanovdb-dev",
+        "name": "openvdb-tools",
         "requirements": {
-          "build": [],
-          "host": [],
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
           "run": []
         },
         "tests": [
           {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
           }
         ],
-        "version": "32.9.0"
+        "version": "13.0.0"
       },
       {
         "build": {
@@ -6186,6 +5580,21 @@
       },
       {
         "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
         "name": "nanovdb-tools",
         "requirements": {
           "build": [
@@ -6213,41 +5622,6 @@
           }
         ],
         "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
       },
       {
         "build": {
@@ -6308,18 +5682,38 @@
       },
       {
         "build": null,
-        "name": "nanovdb-dev",
+        "name": "openvdb-tools",
         "requirements": {
-          "build": [],
-          "host": [],
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
           "run": []
         },
         "tests": [
           {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
           }
         ],
-        "version": "32.9.0"
+        "version": "13.0.0"
       },
       {
         "build": {
@@ -6365,6 +5759,21 @@
       },
       {
         "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
         "name": "nanovdb-tools",
         "requirements": {
           "build": [
@@ -6392,41 +5801,6 @@
           }
         ],
         "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
       },
       {
         "build": {
@@ -6487,18 +5861,38 @@
       },
       {
         "build": null,
-        "name": "nanovdb-dev",
+        "name": "openvdb-tools",
         "requirements": {
-          "build": [],
-          "host": [],
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
           "run": []
         },
         "tests": [
           {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
           }
         ],
-        "version": "32.9.0"
+        "version": "13.0.0"
       },
       {
         "build": {
@@ -6544,6 +5938,21 @@
       },
       {
         "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
         "name": "nanovdb-tools",
         "requirements": {
           "build": [
@@ -6571,41 +5980,6 @@
           }
         ],
         "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
       },
       {
         "build": {
@@ -6666,18 +6040,38 @@
       },
       {
         "build": null,
-        "name": "nanovdb-dev",
+        "name": "openvdb-tools",
         "requirements": {
-          "build": [],
-          "host": [],
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
           "run": []
         },
         "tests": [
           {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
           }
         ],
-        "version": "32.9.0"
+        "version": "13.0.0"
       },
       {
         "build": {
@@ -6723,6 +6117,21 @@
       },
       {
         "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
         "name": "nanovdb-tools",
         "requirements": {
           "build": [
@@ -6750,6 +6159,63 @@
           }
         ],
         "version": "32.9.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "openvdb"
+          ]
+        },
+        "name": "openvdb",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "pkg-config",
+            "jemalloc",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "nanobind",
+            "numpy >=1.23.0",
+            "python",
+            "tbb-devel",
+            "zlib"
+          ],
+          "run": [
+            "python",
+            "numpy"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "openvdb"
+              ]
+            }
+          },
+          {
+            "requirements": {
+              "run": [
+                "numpy"
+              ]
+            },
+            "script": "python -c \"import openvdb; import numpy; grid = openvdb.FloatGrid(); grid.copyFromArray(numpy.random.rand(200, 200, 200))\"\n"
+          },
+          {
+            "script": [
+              "test -f ${PREFIX}/include/openvdb/openvdb.h",
+              "test -f ${PREFIX}/lib/cmake/OpenVDB/FindOpenVDB.cmake",
+              "test -f ${PREFIX}/lib/libopenvdb${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "13.0.0"
       },
       {
         "build": null,
@@ -6785,6 +6251,630 @@
           }
         ],
         "version": "13.0.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "nanovdb"
+          ]
+        },
+        "name": "nanovdb",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "libboost-devel",
+            "nanobind",
+            "python",
+            "tbb-devel",
+            "tsl_robin_map",
+            "zlib",
+            "openvdb"
+          ],
+          "run": [
+            "python"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "nanovdb"
+              ]
+            }
+          },
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
+        "name": "nanovdb-tools",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "libboost-devel",
+            "tbb-devel",
+            "zlib",
+            "openvdb",
+            "nanovdb"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "nanovdb_convert --help",
+              "nanovdb_print --help",
+              "nanovdb_validate --help"
+            ]
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "openvdb"
+          ]
+        },
+        "name": "openvdb",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "pkg-config",
+            "jemalloc",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "nanobind",
+            "numpy >=1.23.0",
+            "python",
+            "tbb-devel",
+            "zlib"
+          ],
+          "run": [
+            "python",
+            "numpy"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "openvdb"
+              ]
+            }
+          },
+          {
+            "requirements": {
+              "run": [
+                "numpy"
+              ]
+            },
+            "script": "python -c \"import openvdb; import numpy; grid = openvdb.FloatGrid(); grid.copyFromArray(numpy.random.rand(200, 200, 200))\"\n"
+          },
+          {
+            "script": [
+              "test -f ${PREFIX}/include/openvdb/openvdb.h",
+              "test -f ${PREFIX}/lib/cmake/OpenVDB/FindOpenVDB.cmake",
+              "test -f ${PREFIX}/lib/libopenvdb${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "13.0.0"
+      },
+      {
+        "build": null,
+        "name": "openvdb-tools",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
+          }
+        ],
+        "version": "13.0.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "nanovdb"
+          ]
+        },
+        "name": "nanovdb",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "libboost-devel",
+            "nanobind",
+            "python",
+            "tbb-devel",
+            "tsl_robin_map",
+            "zlib",
+            "openvdb"
+          ],
+          "run": [
+            "python"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "nanovdb"
+              ]
+            }
+          },
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
+        "name": "nanovdb-tools",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "libboost-devel",
+            "tbb-devel",
+            "zlib",
+            "openvdb",
+            "nanovdb"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "nanovdb_convert --help",
+              "nanovdb_print --help",
+              "nanovdb_validate --help"
+            ]
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "openvdb"
+          ]
+        },
+        "name": "openvdb",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "pkg-config",
+            "jemalloc",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "nanobind",
+            "numpy >=1.23.0",
+            "python",
+            "tbb-devel",
+            "zlib"
+          ],
+          "run": [
+            "python",
+            "numpy"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "openvdb"
+              ]
+            }
+          },
+          {
+            "requirements": {
+              "run": [
+                "numpy"
+              ]
+            },
+            "script": "python -c \"import openvdb; import numpy; grid = openvdb.FloatGrid(); grid.copyFromArray(numpy.random.rand(200, 200, 200))\"\n"
+          },
+          {
+            "script": [
+              "test -f ${PREFIX}/include/openvdb/openvdb.h",
+              "test -f ${PREFIX}/lib/cmake/OpenVDB/FindOpenVDB.cmake",
+              "test -f ${PREFIX}/lib/libopenvdb${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "13.0.0"
+      },
+      {
+        "build": null,
+        "name": "openvdb-tools",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
+          }
+        ],
+        "version": "13.0.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "nanovdb"
+          ]
+        },
+        "name": "nanovdb",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "libboost-devel",
+            "nanobind",
+            "python",
+            "tbb-devel",
+            "tsl_robin_map",
+            "zlib",
+            "openvdb"
+          ],
+          "run": [
+            "python"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "nanovdb"
+              ]
+            }
+          },
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
+        "name": "nanovdb-tools",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "libboost-devel",
+            "tbb-devel",
+            "zlib",
+            "openvdb",
+            "nanovdb"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "nanovdb_convert --help",
+              "nanovdb_print --help",
+              "nanovdb_validate --help"
+            ]
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "openvdb"
+          ]
+        },
+        "name": "openvdb",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "pkg-config",
+            "jemalloc",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "nanobind",
+            "numpy >=1.23.0",
+            "python",
+            "tbb-devel",
+            "zlib"
+          ],
+          "run": [
+            "python",
+            "numpy"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "openvdb"
+              ]
+            }
+          },
+          {
+            "requirements": {
+              "run": [
+                "numpy"
+              ]
+            },
+            "script": "python -c \"import openvdb; import numpy; grid = openvdb.FloatGrid(); grid.copyFromArray(numpy.random.rand(200, 200, 200))\"\n"
+          },
+          {
+            "script": [
+              "test -f ${PREFIX}/include/openvdb/openvdb.h",
+              "test -f ${PREFIX}/lib/cmake/OpenVDB/FindOpenVDB.cmake",
+              "test -f ${PREFIX}/lib/libopenvdb${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "13.0.0"
+      },
+      {
+        "build": null,
+        "name": "openvdb-tools",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
+          }
+        ],
+        "version": "13.0.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "nanovdb"
+          ]
+        },
+        "name": "nanovdb",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "libboost-devel",
+            "nanobind",
+            "python",
+            "tbb-devel",
+            "tsl_robin_map",
+            "zlib",
+            "openvdb"
+          ],
+          "run": [
+            "python"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "nanovdb"
+              ]
+            }
+          },
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
+        "name": "nanovdb-tools",
+        "requirements": {
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "libboost-devel",
+            "tbb-devel",
+            "zlib",
+            "openvdb",
+            "nanovdb"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "nanovdb_convert --help",
+              "nanovdb_print --help",
+              "nanovdb_validate --help"
+            ]
+          }
+        ],
+        "version": "32.9.0"
       }
     ],
     "package": {
@@ -6851,8 +6941,8 @@
           "cmake --build . --target install --config Release"
         ],
         "env": {
-          "OUTPUT_CMAKE_ARGS": "-DOPENVDB_BUILD_CORE=ON -DOPENVDB_CORE_SHARED=ON -DOPENVDB_CORE_STATIC=OFF -DOPENVDB_INSTALL_CMAKE_MODULES=ON -DOPENVDB_BUILD_PYTHON_MODULE=ON -DUSE_NUMPY=ON",
-          "SHARED_CMAKE_ARGS": "-Wno-dev -DOPENVDB_BUILD_CORE=OFF -DOPENVDB_BUILD_BINARIES=OFF -DOPENVDB_INSTALL_CMAKE_MODULES=OFF -DNANOVDB_BUILD_TOOLS=OFF -DUSE_EXPLICIT_INSTANTIATION=OFF"
+          "OUTPUT_CMAKE_ARGS": "-DOPENVDB_BUILD_CORE=ON -DOPENVDB_CORE_SHARED=ON -DOPENVDB_CORE_STATIC=OFF -DOPENVDB_INSTALL_CMAKE_MODULES=ON -DOPENVDB_BUILD_PYTHON_MODULE=ON -DUSE_NUMPY=ON\n",
+          "SHARED_CMAKE_ARGS": "-Wno-dev -DOPENVDB_BUILD_CORE=OFF -DOPENVDB_BUILD_BINARIES=OFF -DOPENVDB_INSTALL_CMAKE_MODULES=OFF -DNANOVDB_BUILD_TOOLS=OFF -DUSE_EXPLICIT_INSTANTIATION=OFF\n"
         }
       }
     },
@@ -6922,18 +7012,38 @@
       },
       {
         "build": null,
-        "name": "nanovdb-dev",
+        "name": "openvdb-tools",
         "requirements": {
-          "build": [],
-          "host": [],
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
           "run": []
         },
         "tests": [
           {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
           }
         ],
-        "version": "32.9.0"
+        "version": "13.0.0"
       },
       {
         "build": {
@@ -6979,6 +7089,21 @@
       },
       {
         "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
         "name": "nanovdb-tools",
         "requirements": {
           "build": [
@@ -7006,41 +7131,6 @@
           }
         ],
         "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
       },
       {
         "build": {
@@ -7101,18 +7191,38 @@
       },
       {
         "build": null,
-        "name": "nanovdb-dev",
+        "name": "openvdb-tools",
         "requirements": {
-          "build": [],
-          "host": [],
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
           "run": []
         },
         "tests": [
           {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
           }
         ],
-        "version": "32.9.0"
+        "version": "13.0.0"
       },
       {
         "build": {
@@ -7158,6 +7268,21 @@
       },
       {
         "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
         "name": "nanovdb-tools",
         "requirements": {
           "build": [
@@ -7185,41 +7310,6 @@
           }
         ],
         "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
       },
       {
         "build": {
@@ -7280,18 +7370,38 @@
       },
       {
         "build": null,
-        "name": "nanovdb-dev",
+        "name": "openvdb-tools",
         "requirements": {
-          "build": [],
-          "host": [],
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
           "run": []
         },
         "tests": [
           {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
           }
         ],
-        "version": "32.9.0"
+        "version": "13.0.0"
       },
       {
         "build": {
@@ -7337,6 +7447,21 @@
       },
       {
         "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
         "name": "nanovdb-tools",
         "requirements": {
           "build": [
@@ -7364,41 +7489,6 @@
           }
         ],
         "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
       },
       {
         "build": {
@@ -7459,18 +7549,38 @@
       },
       {
         "build": null,
-        "name": "nanovdb-dev",
+        "name": "openvdb-tools",
         "requirements": {
-          "build": [],
-          "host": [],
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
           "run": []
         },
         "tests": [
           {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
           }
         ],
-        "version": "32.9.0"
+        "version": "13.0.0"
       },
       {
         "build": {
@@ -7516,6 +7626,21 @@
       },
       {
         "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
         "name": "nanovdb-tools",
         "requirements": {
           "build": [
@@ -7543,41 +7668,6 @@
           }
         ],
         "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
       }
     ],
     "package": {
@@ -7689,8 +7779,8 @@
           "cmake --build . --target install --config Release"
         ],
         "env": {
-          "OUTPUT_CMAKE_ARGS": "-DOPENVDB_BUILD_CORE=ON -DOPENVDB_CORE_SHARED=ON -DOPENVDB_CORE_STATIC=OFF -DOPENVDB_INSTALL_CMAKE_MODULES=ON -DOPENVDB_BUILD_PYTHON_MODULE=ON -DUSE_NUMPY=ON",
-          "SHARED_CMAKE_ARGS": "-Wno-dev -DOPENVDB_BUILD_CORE=OFF -DOPENVDB_BUILD_BINARIES=OFF -DOPENVDB_INSTALL_CMAKE_MODULES=OFF -DNANOVDB_BUILD_TOOLS=OFF -DUSE_EXPLICIT_INSTANTIATION=OFF"
+          "OUTPUT_CMAKE_ARGS": "-DOPENVDB_BUILD_CORE=ON -DOPENVDB_CORE_SHARED=ON -DOPENVDB_CORE_STATIC=OFF -DOPENVDB_INSTALL_CMAKE_MODULES=ON -DOPENVDB_BUILD_PYTHON_MODULE=ON -DUSE_NUMPY=ON\n",
+          "SHARED_CMAKE_ARGS": "-Wno-dev -DOPENVDB_BUILD_CORE=OFF -DOPENVDB_BUILD_BINARIES=OFF -DOPENVDB_INSTALL_CMAKE_MODULES=OFF -DNANOVDB_BUILD_TOOLS=OFF -DUSE_EXPLICIT_INSTANTIATION=OFF\n"
         }
       }
     },
@@ -7760,18 +7850,38 @@
       },
       {
         "build": null,
-        "name": "nanovdb-dev",
+        "name": "openvdb-tools",
         "requirements": {
-          "build": [],
-          "host": [],
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
           "run": []
         },
         "tests": [
           {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
           }
         ],
-        "version": "32.9.0"
+        "version": "13.0.0"
       },
       {
         "build": {
@@ -7817,6 +7927,21 @@
       },
       {
         "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
         "name": "nanovdb-tools",
         "requirements": {
           "build": [
@@ -7844,41 +7969,6 @@
           }
         ],
         "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
       },
       {
         "build": {
@@ -7939,18 +8029,38 @@
       },
       {
         "build": null,
-        "name": "nanovdb-dev",
+        "name": "openvdb-tools",
         "requirements": {
-          "build": [],
-          "host": [],
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
           "run": []
         },
         "tests": [
           {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
           }
         ],
-        "version": "32.9.0"
+        "version": "13.0.0"
       },
       {
         "build": {
@@ -7996,6 +8106,21 @@
       },
       {
         "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
         "name": "nanovdb-tools",
         "requirements": {
           "build": [
@@ -8023,41 +8148,6 @@
           }
         ],
         "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
       },
       {
         "build": {
@@ -8118,18 +8208,38 @@
       },
       {
         "build": null,
-        "name": "nanovdb-dev",
+        "name": "openvdb-tools",
         "requirements": {
-          "build": [],
-          "host": [],
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
           "run": []
         },
         "tests": [
           {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
           }
         ],
-        "version": "32.9.0"
+        "version": "13.0.0"
       },
       {
         "build": {
@@ -8175,6 +8285,21 @@
       },
       {
         "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
         "name": "nanovdb-tools",
         "requirements": {
           "build": [
@@ -8202,41 +8327,6 @@
           }
         ],
         "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
       },
       {
         "build": {
@@ -8297,18 +8387,38 @@
       },
       {
         "build": null,
-        "name": "nanovdb-dev",
+        "name": "openvdb-tools",
         "requirements": {
-          "build": [],
-          "host": [],
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
           "run": []
         },
         "tests": [
           {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
           }
         ],
-        "version": "32.9.0"
+        "version": "13.0.0"
       },
       {
         "build": {
@@ -8354,6 +8464,21 @@
       },
       {
         "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
         "name": "nanovdb-tools",
         "requirements": {
           "build": [
@@ -8381,41 +8506,6 @@
           }
         ],
         "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
       }
     ],
     "package": {
@@ -8676,8 +8766,8 @@
           "cmake --build . --target install --config Release"
         ],
         "env": {
-          "OUTPUT_CMAKE_ARGS": "-DOPENVDB_BUILD_CORE=ON -DOPENVDB_CORE_SHARED=ON -DOPENVDB_CORE_STATIC=OFF -DOPENVDB_INSTALL_CMAKE_MODULES=ON -DOPENVDB_BUILD_PYTHON_MODULE=ON -DUSE_NUMPY=ON",
-          "SHARED_CMAKE_ARGS": "-Wno-dev -DOPENVDB_BUILD_CORE=OFF -DOPENVDB_BUILD_BINARIES=OFF -DOPENVDB_INSTALL_CMAKE_MODULES=OFF -DNANOVDB_BUILD_TOOLS=OFF -DUSE_EXPLICIT_INSTANTIATION=OFF"
+          "OUTPUT_CMAKE_ARGS": "-DOPENVDB_BUILD_CORE=ON -DOPENVDB_CORE_SHARED=ON -DOPENVDB_CORE_STATIC=OFF -DOPENVDB_INSTALL_CMAKE_MODULES=ON -DOPENVDB_BUILD_PYTHON_MODULE=ON -DUSE_NUMPY=ON\n",
+          "SHARED_CMAKE_ARGS": "-Wno-dev -DOPENVDB_BUILD_CORE=OFF -DOPENVDB_BUILD_BINARIES=OFF -DOPENVDB_INSTALL_CMAKE_MODULES=OFF -DNANOVDB_BUILD_TOOLS=OFF -DUSE_EXPLICIT_INSTANTIATION=OFF\n"
         }
       }
     },
@@ -8747,18 +8837,38 @@
       },
       {
         "build": null,
-        "name": "nanovdb-dev",
+        "name": "openvdb-tools",
         "requirements": {
-          "build": [],
-          "host": [],
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
           "run": []
         },
         "tests": [
           {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
           }
         ],
-        "version": "32.9.0"
+        "version": "13.0.0"
       },
       {
         "build": {
@@ -8804,6 +8914,21 @@
       },
       {
         "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
         "name": "nanovdb-tools",
         "requirements": {
           "build": [
@@ -8831,41 +8956,6 @@
           }
         ],
         "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
       },
       {
         "build": {
@@ -8926,18 +9016,38 @@
       },
       {
         "build": null,
-        "name": "nanovdb-dev",
+        "name": "openvdb-tools",
         "requirements": {
-          "build": [],
-          "host": [],
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
           "run": []
         },
         "tests": [
           {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
           }
         ],
-        "version": "32.9.0"
+        "version": "13.0.0"
       },
       {
         "build": {
@@ -8983,6 +9093,21 @@
       },
       {
         "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
         "name": "nanovdb-tools",
         "requirements": {
           "build": [
@@ -9010,41 +9135,6 @@
           }
         ],
         "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
       },
       {
         "build": {
@@ -9105,18 +9195,38 @@
       },
       {
         "build": null,
-        "name": "nanovdb-dev",
+        "name": "openvdb-tools",
         "requirements": {
-          "build": [],
-          "host": [],
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
           "run": []
         },
         "tests": [
           {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
           }
         ],
-        "version": "32.9.0"
+        "version": "13.0.0"
       },
       {
         "build": {
@@ -9162,6 +9272,21 @@
       },
       {
         "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
         "name": "nanovdb-tools",
         "requirements": {
           "build": [
@@ -9189,41 +9314,6 @@
           }
         ],
         "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
       },
       {
         "build": {
@@ -9284,18 +9374,38 @@
       },
       {
         "build": null,
-        "name": "nanovdb-dev",
+        "name": "openvdb-tools",
         "requirements": {
-          "build": [],
-          "host": [],
+          "build": [
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "cmake",
+            "make"
+          ],
+          "host": [
+            "blosc",
+            "libboost-devel",
+            "glfw",
+            "tbb-devel",
+            "zlib",
+            "libgl-devel",
+            "libglu",
+            "jemalloc",
+            "openvdb"
+          ],
           "run": []
         },
         "tests": [
           {
-            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+            "script": [
+              "vdb_print --help",
+              "vdb_lod --help",
+              "vdb_render --help",
+              "vdb_tool --help"
+            ]
           }
         ],
-        "version": "32.9.0"
+        "version": "13.0.0"
       },
       {
         "build": {
@@ -9341,6 +9451,21 @@
       },
       {
         "build": null,
+        "name": "nanovdb-dev",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": "test -f ${PREFIX}/include/nanovdb/NanoVDB.h"
+          }
+        ],
+        "version": "32.9.0"
+      },
+      {
+        "build": null,
         "name": "nanovdb-tools",
         "requirements": {
           "build": [
@@ -9368,41 +9493,6 @@
           }
         ],
         "version": "32.9.0"
-      },
-      {
-        "build": null,
-        "name": "openvdb-tools",
-        "requirements": {
-          "build": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "cmake",
-            "make"
-          ],
-          "host": [
-            "blosc",
-            "libboost-devel",
-            "glfw",
-            "tbb-devel",
-            "zlib",
-            "libgl-devel",
-            "libglu",
-            "jemalloc",
-            "openvdb"
-          ],
-          "run": []
-        },
-        "tests": [
-          {
-            "script": [
-              "vdb_print --help",
-              "vdb_lod --help",
-              "vdb_render --help",
-              "vdb_tool --help"
-            ]
-          }
-        ],
-        "version": "13.0.0"
       }
     ],
     "package": {
