@@ -1,8 +1,11 @@
 {
   "archived": false,
   "branch": "main",
-  "ci_support_linux_64_.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '13'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\ncdt_name:\n- conda\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\ntarget_platform:\n- linux-64\n",
+  "ci_support_linux_64_.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\ntarget_platform:\n- linux-64\n",
   "conda-forge.yml": {
+    "build_platform": {
+      "osx_arm64": "osx_64"
+    },
     "conda_build": {
       "pkg_format": "2"
     },
@@ -14,10 +17,11 @@
     "provider": {
       "linux_aarch64": "default",
       "linux_ppc64le": "default"
-    }
+    },
+    "test": "native_and_emulated"
   },
-  "feedstock_hash": "2ec178e289272e9bb922444d7486b3c86db6d546",
-  "feedstock_hash_ts": 1749573494,
+  "feedstock_hash": "459cb3a0b2a43e61bef23e9009cd37b7df145f98",
+  "feedstock_hash_ts": 1772779535,
   "feedstock_name": "numactl",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -121,6 +125,7 @@
         "grep",
         "libtool",
         "sed",
+        "gnuconfig",
         "c_compiler_stub",
         "c_stdlib_stub",
         "make"
@@ -142,6 +147,7 @@
         "c_compiler_stub",
         "c_stdlib_stub",
         "coreutils",
+        "gnuconfig",
         "grep",
         "libtool",
         "make",
@@ -264,6 +270,7 @@
         "grep",
         "libtool",
         "sed",
+        "gnuconfig",
         "c_compiler_stub",
         "c_stdlib_stub",
         "make"
@@ -287,6 +294,7 @@
         "c_compiler_stub",
         "c_stdlib_stub",
         "coreutils",
+        "gnuconfig",
         "grep",
         "libtool",
         "make",
@@ -409,6 +417,7 @@
         "grep",
         "libtool",
         "sed",
+        "gnuconfig",
         "c_compiler_stub",
         "c_stdlib_stub",
         "make"
@@ -433,6 +442,7 @@
         "c_compiler_stub",
         "c_stdlib_stub",
         "coreutils",
+        "gnuconfig",
         "grep",
         "libtool",
         "make",
@@ -685,6 +695,7 @@
         "grep",
         "libtool",
         "sed",
+        "gnuconfig",
         "c_compiler_stub",
         "c_stdlib_stub",
         "make"
@@ -717,7 +728,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/numactl.json"
   },
-  "raw_meta_yaml": "{% set version = \"2.0.18\" %}\n\npackage:\n  name: libnuma-split\n  version: {{ version }}\n\nsource:\n  url: https://github.com/numactl/numactl/releases/download/v{{ version }}/numactl-{{ version }}.tar.gz\n  sha256: b4fc0956317680579992d7815bc43d0538960dc73aa1dd8ca7e3806e30bc1274\n  patches:\n    # jakirkham found that these tests failed of aarch and ppc64le\n    # https://github.com/conda-forge/numactl-feedstock/pull/1#issuecomment-1425000697\n    # https://github.com/numactl/numactl/issues/163\n    # https://github.com/numactl/numactl/issues/164\n    - skip_failing_tests.patch  # [aarch64 or ppc64le]\n    - fix_ppc64le_set_mempolicy_home_node.patch  # [ppc64le]\n\nbuild:\n  number: 3\n  skip: true  # [not linux]\n\nrequirements:\n  build:\n    - automake\n    - autoconf\n    - coreutils\n    - grep\n    - libtool\n    - sed\n    - {{ compiler('c') }}\n    - {{ stdlib('c') }}\n    - make\n\noutputs:\n  - name: libnuma\n    script: install-libnuma.sh\n    build:\n      run_exports:\n        - {{ pin_subpackage('libnuma', max_pin='x') }}\n    requirements:\n      build:\n        - automake\n        - autoconf\n        - coreutils\n        - grep\n        - libtool\n        - sed\n        - {{ compiler('c') }}\n        - {{ stdlib('c') }}\n        - make\n    test:\n      commands:\n        - test -f $PREFIX/lib/libnuma.so\n        - test ! -f $PREFIX/lib/libnuma.a\n        - test -f $PREFIX/lib/pkgconfig/numa.pc\n\n  - name: numactl\n    build:\n      run_exports:\n        - {{ pin_subpackage('libnuma', max_pin='x') }}\n    script: install-numactl.sh\n    requirements:\n      build:\n        - automake\n        - autoconf\n        - coreutils\n        - grep\n        - libtool\n        - sed\n        - {{ compiler('c') }}\n        - {{ stdlib('c') }}\n        - make\n      host:\n        - libnuma\n      run:\n        - {{ pin_subpackage('libnuma', exact=True) }}\n    test:\n      commands:\n        - numactl --show  # [not aarch64 and not ppc64le]\n    about:\n      license: GPL-2.0-only\n      license_file: LICENSE.GPL2\n\nabout:\n  home: https://github.com/numactl/numactl\n  summary: NUMA support for Linux\n  description: |\n    Simple NUMA policy support. It consists of a numactl program to run other\n    programs with a specific NUMA policy and a libnuma shared library\n    (\"NUMA API\") to set NUMA policy in applications.\n  license: LGPL-2.1-only\n  license_file: LICENSE.LGPL2.1\n  dev_url: https://github.com/numactl/numactl\n  doc_url: https://linux.die.net/man/8/numactl\n\nextra:\n  feedstock-name: numactl\n  recipe-maintainers:\n    - kkraus14\n    - chrisburr\n    - zklaus\n",
+  "raw_meta_yaml": "{% set version = \"2.0.18\" %}\n\npackage:\n  name: libnuma-split\n  version: {{ version }}\n\nsource:\n  url: https://github.com/numactl/numactl/releases/download/v{{ version }}/numactl-{{ version }}.tar.gz\n  sha256: b4fc0956317680579992d7815bc43d0538960dc73aa1dd8ca7e3806e30bc1274\n  patches:\n    # jakirkham found that these tests failed of aarch and ppc64le\n    # https://github.com/conda-forge/numactl-feedstock/pull/1#issuecomment-1425000697\n    # https://github.com/numactl/numactl/issues/163\n    # https://github.com/numactl/numactl/issues/164\n    - skip_failing_tests.patch  # [aarch64 or ppc64le]\n    - fix_ppc64le_set_mempolicy_home_node.patch  # [ppc64le]\n\nbuild:\n  number: 3\n  skip: true  # [not linux]\n\nrequirements:\n  build:\n    - automake\n    - autoconf\n    - coreutils\n    - grep\n    - libtool\n    - sed\n    - gnuconfig  # [unix]\n    - {{ compiler('c') }}\n    - {{ stdlib('c') }}\n    - make\n\noutputs:\n  - name: libnuma\n    script: install-libnuma.sh\n    build:\n      run_exports:\n        - {{ pin_subpackage('libnuma', max_pin='x') }}\n    requirements:\n      build:\n        - automake\n        - autoconf\n        - coreutils\n        - grep\n        - libtool\n        - sed\n        - {{ compiler('c') }}\n        - {{ stdlib('c') }}\n        - make\n    test:\n      commands:\n        - test -f $PREFIX/lib/libnuma.so\n        - test ! -f $PREFIX/lib/libnuma.a\n        - test -f $PREFIX/lib/pkgconfig/numa.pc\n\n  - name: numactl\n    build:\n      run_exports:\n        - {{ pin_subpackage('libnuma', max_pin='x') }}\n    script: install-numactl.sh\n    requirements:\n      build:\n        - automake\n        - autoconf\n        - coreutils\n        - grep\n        - libtool\n        - sed\n        - {{ compiler('c') }}\n        - {{ stdlib('c') }}\n        - make\n      host:\n        - libnuma\n      run:\n        - {{ pin_subpackage('libnuma', exact=True) }}\n    test:\n      commands:\n        - numactl --show  # [not aarch64 and not ppc64le]\n    about:\n      license: GPL-2.0-only\n      license_file: LICENSE.GPL2\n\nabout:\n  home: https://github.com/numactl/numactl\n  summary: NUMA support for Linux\n  description: |\n    Simple NUMA policy support. It consists of a numactl program to run other\n    programs with a specific NUMA policy and a libnuma shared library\n    (\"NUMA API\") to set NUMA policy in applications.\n  license: LGPL-2.1-only\n  license_file: LICENSE.LGPL2.1\n  dev_url: https://github.com/numactl/numactl\n  doc_url: https://linux.die.net/man/8/numactl\n\nextra:\n  feedstock-name: numactl\n  recipe-maintainers:\n    - kkraus14\n    - chrisburr\n    - zklaus\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -726,6 +737,7 @@
       "c_compiler_stub",
       "c_stdlib_stub",
       "coreutils",
+      "gnuconfig",
       "grep",
       "libnuma",
       "libtool",
@@ -742,6 +754,7 @@
         "c_compiler_stub",
         "c_stdlib_stub",
         "coreutils",
+        "gnuconfig",
         "grep",
         "libtool",
         "make",
@@ -779,6 +792,7 @@
         "c_compiler_stub",
         "c_stdlib_stub",
         "coreutils",
+        "gnuconfig",
         "grep",
         "libtool",
         "make",
