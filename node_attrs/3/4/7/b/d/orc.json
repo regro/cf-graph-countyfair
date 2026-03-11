@@ -1,7 +1,7 @@
 {
   "archived": false,
   "branch": "main",
-  "ci_support_linux_64_.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ncxx_compiler:\n- gxx\ncxx_compiler_version:\n- '14'\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\nlibprotobuf:\n- 6.33.5\nlz4_c:\n- '1.10'\norc:\n- 2.2.2\nsnappy:\n- '1.2'\ntarget_platform:\n- linux-64\nzip_keys:\n- - c_compiler_version\n  - cxx_compiler_version\nzlib:\n- '1'\nzstd:\n- '1.5'\n",
+  "ci_support_linux_64_.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ncxx_compiler:\n- gxx\ncxx_compiler_version:\n- '14'\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\nlibabseil:\n- '20260107'\nlibprotobuf:\n- 6.33.5\nlz4_c:\n- '1.10'\nsnappy:\n- '1.2'\ntarget_platform:\n- linux-64\nzip_keys:\n- - c_compiler_version\n  - cxx_compiler_version\nzlib:\n- '1'\nzstd:\n- '1.5'\n",
   "conda-forge.yml": {
     "build_platform": {
       "linux_aarch64": "linux_64",
@@ -11,7 +11,9 @@
     "conda_build": {
       "pkg_format": "2"
     },
+    "conda_build_tool": "rattler-build",
     "conda_forge_output_validation": true,
+    "conda_install_tool": "pixi",
     "github": {
       "branch_name": "main",
       "tooling_branch_name": "main"
@@ -22,8 +24,8 @@
     },
     "test": "native_and_emulated"
   },
-  "feedstock_hash": "2cddd715bad26c2a8ba10855865a1b9239410914",
-  "feedstock_hash_ts": 1770452072,
+  "feedstock_hash": "8145686dd1bc6b1e5f53ffc7388e84e91d4996e2",
+  "feedstock_hash_ts": 1773230111,
   "feedstock_name": "orc",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -31,26 +33,71 @@
       "dev_url": "https://github.com/apache/orc",
       "home": "http://github.com/apache/orc",
       "license": "Apache-2.0",
-      "license_family": "Apache",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "C++ libraries for Apache ORC"
     },
     "build": {
-      "number": "1",
-      "run_exports": [
-        "orc"
-      ]
+      "number": "0",
+      "run_exports": {
+        "weak": [
+          "orc"
+        ]
+      }
     },
     "extra": {
       "recipe-maintainers": [
         "wesm",
         "xhochy",
-        "nehaljwani"
+        "nehaljwani",
+        "h-vetinari"
       ]
     },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "orc"
+          ]
+        },
+        "name": "orc",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "ninja",
+            "libprotobuf",
+            "cmake"
+          ],
+          "host": [
+            "zlib",
+            "snappy",
+            "libabseil",
+            "libprotobuf",
+            "lz4-c",
+            "zstd"
+          ],
+          "run": [
+            "tzdata"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f $PREFIX/lib/liborc${SHLIB_EXT}",
+              "test -f $PREFIX/include/orc/Common.hh",
+              "test ! -f $PREFIX/lib/liborc.a"
+            ]
+          }
+        ],
+        "version": "2.3.0"
+      }
+    ],
     "package": {
       "name": "orc",
-      "version": "2.2.2"
+      "version": "2.3.0"
     },
     "requirements": {
       "build": [
@@ -64,6 +111,7 @@
       "host": [
         "zlib",
         "snappy",
+        "libabseil",
         "libprotobuf",
         "lz4-c",
         "zstd"
@@ -72,21 +120,15 @@
         "tzdata"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "patches": [
         "patches/0001-Don-t-force-orc-to-be-a-static-library-let-end-user-.patch",
-        "patches/0002-Allow-user-to-override-path-to-protoc.patch"
+        "patches/0002-Allow-user-to-override-path-to-protoc.patch",
+        "patches/0003-Link-to-abseil-libraries.patch"
       ],
-      "sha256": "ff952b23f0a7078153ce56ef1f3fa47fefa2bbcb17a2cf305cc36fad6b0a6316",
-      "url": "https://github.com/apache/orc/archive/refs/tags/v2.2.2.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "test -f $PREFIX/lib/liborc.so",
-        "test ! -f $PREFIX/lib/liborc.a",
-        "test -f $PREFIX/include/orc/Common.hh"
-      ]
+      "sha256": "d38b871c3989304d79c28c291bc80819b4585d7cea88d16243f74842a7e2a953",
+      "url": "https://github.com/apache/orc/archive/refs/tags/v2.3.0.tar.gz"
     }
   },
   "linux_64_requirements": {
@@ -104,6 +146,7 @@
     "host": {
       "__set__": true,
       "elements": [
+        "libabseil",
         "libprotobuf",
         "lz4-c",
         "snappy",
@@ -127,26 +170,71 @@
       "dev_url": "https://github.com/apache/orc",
       "home": "http://github.com/apache/orc",
       "license": "Apache-2.0",
-      "license_family": "Apache",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "C++ libraries for Apache ORC"
     },
     "build": {
-      "number": "1",
-      "run_exports": [
-        "orc"
-      ]
+      "number": "0",
+      "run_exports": {
+        "weak": [
+          "orc"
+        ]
+      }
     },
     "extra": {
       "recipe-maintainers": [
         "wesm",
         "xhochy",
-        "nehaljwani"
+        "nehaljwani",
+        "h-vetinari"
       ]
     },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "orc"
+          ]
+        },
+        "name": "orc",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "ninja",
+            "libprotobuf",
+            "cmake"
+          ],
+          "host": [
+            "zlib",
+            "snappy",
+            "libabseil",
+            "libprotobuf",
+            "lz4-c",
+            "zstd"
+          ],
+          "run": [
+            "tzdata"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f $PREFIX/lib/liborc${SHLIB_EXT}",
+              "test -f $PREFIX/include/orc/Common.hh",
+              "test ! -f $PREFIX/lib/liborc.a"
+            ]
+          }
+        ],
+        "version": "2.3.0"
+      }
+    ],
     "package": {
       "name": "orc",
-      "version": "2.2.2"
+      "version": "2.3.0"
     },
     "requirements": {
       "build": [
@@ -160,6 +248,7 @@
       "host": [
         "zlib",
         "snappy",
+        "libabseil",
         "libprotobuf",
         "lz4-c",
         "zstd"
@@ -168,21 +257,15 @@
         "tzdata"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "patches": [
         "patches/0001-Don-t-force-orc-to-be-a-static-library-let-end-user-.patch",
-        "patches/0002-Allow-user-to-override-path-to-protoc.patch"
+        "patches/0002-Allow-user-to-override-path-to-protoc.patch",
+        "patches/0003-Link-to-abseil-libraries.patch"
       ],
-      "sha256": "ff952b23f0a7078153ce56ef1f3fa47fefa2bbcb17a2cf305cc36fad6b0a6316",
-      "url": "https://github.com/apache/orc/archive/refs/tags/v2.2.2.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "test -f $PREFIX/lib/liborc.so",
-        "test ! -f $PREFIX/lib/liborc.a",
-        "test -f $PREFIX/include/orc/Common.hh"
-      ]
+      "sha256": "d38b871c3989304d79c28c291bc80819b4585d7cea88d16243f74842a7e2a953",
+      "url": "https://github.com/apache/orc/archive/refs/tags/v2.3.0.tar.gz"
     }
   },
   "linux_aarch64_requirements": {
@@ -200,6 +283,7 @@
     "host": {
       "__set__": true,
       "elements": [
+        "libabseil",
         "libprotobuf",
         "lz4-c",
         "snappy",
@@ -223,26 +307,71 @@
       "dev_url": "https://github.com/apache/orc",
       "home": "http://github.com/apache/orc",
       "license": "Apache-2.0",
-      "license_family": "Apache",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "C++ libraries for Apache ORC"
     },
     "build": {
-      "number": "1",
-      "run_exports": [
-        "orc"
-      ]
+      "number": "0",
+      "run_exports": {
+        "weak": [
+          "orc"
+        ]
+      }
     },
     "extra": {
       "recipe-maintainers": [
         "wesm",
         "xhochy",
-        "nehaljwani"
+        "nehaljwani",
+        "h-vetinari"
       ]
     },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "orc"
+          ]
+        },
+        "name": "orc",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "ninja",
+            "libprotobuf",
+            "cmake"
+          ],
+          "host": [
+            "zlib",
+            "snappy",
+            "libabseil",
+            "libprotobuf",
+            "lz4-c",
+            "zstd"
+          ],
+          "run": [
+            "tzdata"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f $PREFIX/lib/liborc${SHLIB_EXT}",
+              "test -f $PREFIX/include/orc/Common.hh",
+              "test ! -f $PREFIX/lib/liborc.a"
+            ]
+          }
+        ],
+        "version": "2.3.0"
+      }
+    ],
     "package": {
       "name": "orc",
-      "version": "2.2.2"
+      "version": "2.3.0"
     },
     "requirements": {
       "build": [
@@ -256,6 +385,7 @@
       "host": [
         "zlib",
         "snappy",
+        "libabseil",
         "libprotobuf",
         "lz4-c",
         "zstd"
@@ -264,21 +394,15 @@
         "tzdata"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "patches": [
         "patches/0001-Don-t-force-orc-to-be-a-static-library-let-end-user-.patch",
-        "patches/0002-Allow-user-to-override-path-to-protoc.patch"
+        "patches/0002-Allow-user-to-override-path-to-protoc.patch",
+        "patches/0003-Link-to-abseil-libraries.patch"
       ],
-      "sha256": "ff952b23f0a7078153ce56ef1f3fa47fefa2bbcb17a2cf305cc36fad6b0a6316",
-      "url": "https://github.com/apache/orc/archive/refs/tags/v2.2.2.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "test -f $PREFIX/lib/liborc.so",
-        "test ! -f $PREFIX/lib/liborc.a",
-        "test -f $PREFIX/include/orc/Common.hh"
-      ]
+      "sha256": "d38b871c3989304d79c28c291bc80819b4585d7cea88d16243f74842a7e2a953",
+      "url": "https://github.com/apache/orc/archive/refs/tags/v2.3.0.tar.gz"
     }
   },
   "linux_ppc64le_requirements": {
@@ -296,6 +420,7 @@
     "host": {
       "__set__": true,
       "elements": [
+        "libabseil",
         "libprotobuf",
         "lz4-c",
         "snappy",
@@ -319,26 +444,271 @@
       "dev_url": "https://github.com/apache/orc",
       "home": "http://github.com/apache/orc",
       "license": "Apache-2.0",
-      "license_family": "Apache",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "C++ libraries for Apache ORC"
     },
     "build": {
-      "number": "1",
-      "run_exports": [
-        "orc"
-      ]
+      "number": "0",
+      "run_exports": {
+        "weak": [
+          "orc"
+        ]
+      }
     },
     "extra": {
       "recipe-maintainers": [
         "wesm",
         "xhochy",
-        "nehaljwani"
+        "nehaljwani",
+        "h-vetinari"
       ]
     },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "orc"
+          ]
+        },
+        "name": "orc",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "ninja",
+            "libprotobuf",
+            "cmake"
+          ],
+          "host": [
+            "zlib",
+            "snappy",
+            "libabseil",
+            "libprotobuf",
+            "lz4-c",
+            "zstd"
+          ],
+          "run": [
+            "tzdata"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f $PREFIX/lib/liborc${SHLIB_EXT}",
+              "test -f $PREFIX/include/orc/Common.hh",
+              "test ! -f $PREFIX/lib/liborc.a"
+            ]
+          }
+        ],
+        "version": "2.3.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "orc"
+          ]
+        },
+        "name": "orc",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "ninja",
+            "libprotobuf",
+            "cmake"
+          ],
+          "host": [
+            "zlib",
+            "snappy",
+            "libabseil",
+            "libprotobuf",
+            "lz4-c",
+            "zstd"
+          ],
+          "run": [
+            "tzdata"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f $PREFIX/lib/liborc${SHLIB_EXT}",
+              "test -f $PREFIX/include/orc/Common.hh",
+              "test ! -f $PREFIX/lib/liborc.a"
+            ]
+          }
+        ],
+        "version": "2.3.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "orc"
+          ]
+        },
+        "name": "orc",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "ninja",
+            "libprotobuf",
+            "cmake"
+          ],
+          "host": [
+            "zlib",
+            "snappy",
+            "libabseil",
+            "libprotobuf",
+            "lz4-c",
+            "zstd"
+          ],
+          "run": [
+            "tzdata"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f $PREFIX/lib/liborc${SHLIB_EXT}",
+              "test -f $PREFIX/include/orc/Common.hh",
+              "test ! -f $PREFIX/lib/liborc.a"
+            ]
+          }
+        ],
+        "version": "2.3.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "orc"
+          ]
+        },
+        "name": "orc",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "ninja",
+            "libprotobuf",
+            "cmake"
+          ],
+          "host": [
+            "zlib",
+            "snappy",
+            "libabseil",
+            "libprotobuf",
+            "lz4-c",
+            "zstd"
+          ],
+          "run": [
+            "tzdata"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f $PREFIX/lib/liborc${SHLIB_EXT}",
+              "test -f $PREFIX/include/orc/Common.hh",
+              "test ! -f $PREFIX/lib/liborc.a"
+            ]
+          }
+        ],
+        "version": "2.3.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "orc"
+          ]
+        },
+        "name": "orc",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "ninja",
+            "libprotobuf",
+            "cmake"
+          ],
+          "host": [
+            "zlib",
+            "snappy",
+            "libabseil",
+            "libprotobuf",
+            "lz4-c",
+            "zstd"
+          ],
+          "run": [
+            "tzdata"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f $PREFIX/lib/liborc${SHLIB_EXT}",
+              "test -f $PREFIX/include/orc/Common.hh",
+              "test ! -f $PREFIX/lib/liborc.a"
+            ]
+          }
+        ],
+        "version": "2.3.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "orc"
+          ]
+        },
+        "name": "orc",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "ninja",
+            "libprotobuf",
+            "cmake"
+          ],
+          "host": [
+            "zlib",
+            "snappy",
+            "libabseil",
+            "libprotobuf",
+            "lz4-c",
+            "zstd"
+          ],
+          "run": [
+            "tzdata"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f $PREFIX/lib/liborc${SHLIB_EXT}",
+              "test -f $PREFIX/include/orc/Common.hh",
+              "test ! -f $PREFIX/lib/liborc.a"
+            ]
+          }
+        ],
+        "version": "2.3.0"
+      }
+    ],
     "package": {
       "name": "orc",
-      "version": "2.2.2"
+      "version": "2.3.0"
     },
     "requirements": {
       "build": [
@@ -352,6 +722,7 @@
       "host": [
         "zlib",
         "snappy",
+        "libabseil",
         "libprotobuf",
         "lz4-c",
         "zstd"
@@ -360,25 +731,15 @@
         "tzdata"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "patches": [
         "patches/0001-Don-t-force-orc-to-be-a-static-library-let-end-user-.patch",
-        "patches/0002-Allow-user-to-override-path-to-protoc.patch"
+        "patches/0002-Allow-user-to-override-path-to-protoc.patch",
+        "patches/0003-Link-to-abseil-libraries.patch"
       ],
-      "sha256": "ff952b23f0a7078153ce56ef1f3fa47fefa2bbcb17a2cf305cc36fad6b0a6316",
-      "url": "https://github.com/apache/orc/archive/refs/tags/v2.2.2.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "test -f $PREFIX/lib/liborc.so",
-        "test ! -f $PREFIX/lib/liborc.a",
-        "test -f $PREFIX/include/orc/Common.hh",
-        "test -f $PREFIX/lib/liborc.dylib",
-        "if not exist %LIBRARY_BIN%\\orc.dll exit 1",
-        "if not exist %LIBRARY_LIB%\\orc.lib exit 1",
-        "if not exist %LIBRARY_INC%\\orc\\Common.hh exit 1"
-      ]
+      "sha256": "d38b871c3989304d79c28c291bc80819b4585d7cea88d16243f74842a7e2a953",
+      "url": "https://github.com/apache/orc/archive/refs/tags/v2.3.0.tar.gz"
     }
   },
   "name": "orc",
@@ -387,26 +748,71 @@
       "dev_url": "https://github.com/apache/orc",
       "home": "http://github.com/apache/orc",
       "license": "Apache-2.0",
-      "license_family": "Apache",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "C++ libraries for Apache ORC"
     },
     "build": {
-      "number": "1",
-      "run_exports": [
-        "orc"
-      ]
+      "number": "0",
+      "run_exports": {
+        "weak": [
+          "orc"
+        ]
+      }
     },
     "extra": {
       "recipe-maintainers": [
         "wesm",
         "xhochy",
-        "nehaljwani"
+        "nehaljwani",
+        "h-vetinari"
       ]
     },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "orc"
+          ]
+        },
+        "name": "orc",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "ninja",
+            "libprotobuf",
+            "cmake"
+          ],
+          "host": [
+            "zlib",
+            "snappy",
+            "libabseil",
+            "libprotobuf",
+            "lz4-c",
+            "zstd"
+          ],
+          "run": [
+            "tzdata"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f $PREFIX/lib/liborc${SHLIB_EXT}",
+              "test -f $PREFIX/include/orc/Common.hh",
+              "test ! -f $PREFIX/lib/liborc.a"
+            ]
+          }
+        ],
+        "version": "2.3.0"
+      }
+    ],
     "package": {
       "name": "orc",
-      "version": "2.2.2"
+      "version": "2.3.0"
     },
     "requirements": {
       "build": [
@@ -420,6 +826,7 @@
       "host": [
         "zlib",
         "snappy",
+        "libabseil",
         "libprotobuf",
         "lz4-c",
         "zstd"
@@ -428,21 +835,15 @@
         "tzdata"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "patches": [
         "patches/0001-Don-t-force-orc-to-be-a-static-library-let-end-user-.patch",
-        "patches/0002-Allow-user-to-override-path-to-protoc.patch"
+        "patches/0002-Allow-user-to-override-path-to-protoc.patch",
+        "patches/0003-Link-to-abseil-libraries.patch"
       ],
-      "sha256": "ff952b23f0a7078153ce56ef1f3fa47fefa2bbcb17a2cf305cc36fad6b0a6316",
-      "url": "https://github.com/apache/orc/archive/refs/tags/v2.2.2.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "test -f $PREFIX/lib/liborc.dylib",
-        "test ! -f $PREFIX/lib/liborc.a",
-        "test -f $PREFIX/include/orc/Common.hh"
-      ]
+      "sha256": "d38b871c3989304d79c28c291bc80819b4585d7cea88d16243f74842a7e2a953",
+      "url": "https://github.com/apache/orc/archive/refs/tags/v2.3.0.tar.gz"
     }
   },
   "osx_64_requirements": {
@@ -460,6 +861,7 @@
     "host": {
       "__set__": true,
       "elements": [
+        "libabseil",
         "libprotobuf",
         "lz4-c",
         "snappy",
@@ -483,26 +885,71 @@
       "dev_url": "https://github.com/apache/orc",
       "home": "http://github.com/apache/orc",
       "license": "Apache-2.0",
-      "license_family": "Apache",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "C++ libraries for Apache ORC"
     },
     "build": {
-      "number": "1",
-      "run_exports": [
-        "orc"
-      ]
+      "number": "0",
+      "run_exports": {
+        "weak": [
+          "orc"
+        ]
+      }
     },
     "extra": {
       "recipe-maintainers": [
         "wesm",
         "xhochy",
-        "nehaljwani"
+        "nehaljwani",
+        "h-vetinari"
       ]
     },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "orc"
+          ]
+        },
+        "name": "orc",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "ninja",
+            "libprotobuf",
+            "cmake"
+          ],
+          "host": [
+            "zlib",
+            "snappy",
+            "libabseil",
+            "libprotobuf",
+            "lz4-c",
+            "zstd"
+          ],
+          "run": [
+            "tzdata"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f $PREFIX/lib/liborc${SHLIB_EXT}",
+              "test -f $PREFIX/include/orc/Common.hh",
+              "test ! -f $PREFIX/lib/liborc.a"
+            ]
+          }
+        ],
+        "version": "2.3.0"
+      }
+    ],
     "package": {
       "name": "orc",
-      "version": "2.2.2"
+      "version": "2.3.0"
     },
     "requirements": {
       "build": [
@@ -516,6 +963,7 @@
       "host": [
         "zlib",
         "snappy",
+        "libabseil",
         "libprotobuf",
         "lz4-c",
         "zstd"
@@ -524,21 +972,15 @@
         "tzdata"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "patches": [
         "patches/0001-Don-t-force-orc-to-be-a-static-library-let-end-user-.patch",
-        "patches/0002-Allow-user-to-override-path-to-protoc.patch"
+        "patches/0002-Allow-user-to-override-path-to-protoc.patch",
+        "patches/0003-Link-to-abseil-libraries.patch"
       ],
-      "sha256": "ff952b23f0a7078153ce56ef1f3fa47fefa2bbcb17a2cf305cc36fad6b0a6316",
-      "url": "https://github.com/apache/orc/archive/refs/tags/v2.2.2.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "test -f $PREFIX/lib/liborc.dylib",
-        "test ! -f $PREFIX/lib/liborc.a",
-        "test -f $PREFIX/include/orc/Common.hh"
-      ]
+      "sha256": "d38b871c3989304d79c28c291bc80819b4585d7cea88d16243f74842a7e2a953",
+      "url": "https://github.com/apache/orc/archive/refs/tags/v2.3.0.tar.gz"
     }
   },
   "osx_arm64_requirements": {
@@ -556,6 +998,7 @@
     "host": {
       "__set__": true,
       "elements": [
+        "libabseil",
         "libprotobuf",
         "lz4-c",
         "snappy",
@@ -592,7 +1035,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/orc.json"
   },
-  "raw_meta_yaml": "{% set version = \"2.2.2\" %}\n\npackage:\n  name: orc\n  version: {{ version }}\n\nsource:\n  url: https://github.com/apache/orc/archive/refs/tags/v{{ version }}.tar.gz\n  sha256: ff952b23f0a7078153ce56ef1f3fa47fefa2bbcb17a2cf305cc36fad6b0a6316\n  patches:\n    - patches/0001-Don-t-force-orc-to-be-a-static-library-let-end-user-.patch\n    - patches/0002-Allow-user-to-override-path-to-protoc.patch\n\nbuild:\n  number: 1\n  run_exports:\n    - {{ pin_subpackage(\"orc\", max_pin=\"x.x.x\") }}\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ stdlib(\"c\") }}\n    - {{ compiler('cxx') }}\n    - ninja       # [unix]\n    # `protoc` is also used for building\n    - libprotobuf\n    - cmake\n  host:\n    - zlib\n    - snappy\n    - libprotobuf\n    - lz4-c\n    - zstd\n  run:\n    # orc >=2.0.1 will prefer $CONDA_PREFIX/share/zoneinfo for tzdb\n    - tzdata\n\ntest:\n  commands:\n    # shared libraries\n    - test -f $PREFIX/lib/liborc.so              # [linux]\n    - test -f $PREFIX/lib/liborc.dylib           # [osx]\n    - if not exist %LIBRARY_BIN%\\orc.dll exit 1  # [win]\n    # import library for the DLL\n    - if not exist %LIBRARY_LIB%\\orc.lib exit 1  # [win]\n\n    # absence of static libraries\n    - test ! -f $PREFIX/lib/liborc.a             # [not win]\n\n    # headers\n    - test -f $PREFIX/include/orc/Common.hh            # [unix]\n    - if not exist %LIBRARY_INC%\\orc\\Common.hh exit 1  # [win]\n\nabout:\n  home: http://github.com/apache/orc\n  license: Apache-2.0\n  license_family: Apache\n  license_file: LICENSE\n  summary: C++ libraries for Apache ORC\n  dev_url: https://github.com/apache/orc\n\nextra:\n  recipe-maintainers:\n    - wesm\n    - xhochy\n    - nehaljwani\n",
+  "raw_meta_yaml": "schema_version: 1\n\ncontext:\n  version: \"2.3.0\"\n\npackage:\n  name: orc\n  version: ${{ version }}\n\nsource:\n  url: https://github.com/apache/orc/archive/refs/tags/v${{ version }}.tar.gz\n  sha256: d38b871c3989304d79c28c291bc80819b4585d7cea88d16243f74842a7e2a953\n  patches:\n    - patches/0001-Don-t-force-orc-to-be-a-static-library-let-end-user-.patch\n    - patches/0002-Allow-user-to-override-path-to-protoc.patch\n    - patches/0003-Link-to-abseil-libraries.patch\n\nbuild:\n  number: 0\n\nrequirements:\n  build:\n    - ${{ compiler('c') }}\n    - ${{ stdlib(\"c\") }}\n    - ${{ compiler('cxx') }}\n    - if: unix\n      then: ninja\n    # `protoc` is also used for building\n    - libprotobuf\n    - cmake\n  host:\n    - zlib\n    - snappy\n    - libabseil\n    - libprotobuf\n    - lz4-c\n    - zstd\n  run:\n    # orc >=2.0.1 will prefer $CONDA_PREFIX/share/zoneinfo for tzdb\n    - tzdata\n  run_exports:\n    - ${{ pin_subpackage(\"orc\", upper_bound=\"x.x.x\") }}\n\ntests:\n  - script:\n      - if: unix\n        then: \n          - test -f $PREFIX/lib/liborc${SHLIB_EXT}\n          - test -f $PREFIX/include/orc/Common.hh\n          - test ! -f $PREFIX/lib/liborc.a\n      - if: win\n        then: \n          - if not exist %LIBRARY_BIN%\\orc.dll exit 1\n          - if not exist %LIBRARY_LIB%\\orc.lib exit 1\n          - if not exist %LIBRARY_INC%\\orc\\Common.hh exit 1\n\nabout:\n  license: Apache-2.0\n  license_file: LICENSE\n  summary: C++ libraries for Apache ORC\n  homepage: http://github.com/apache/orc\n  repository: https://github.com/apache/orc\n\nextra:\n  recipe-maintainers:\n    - wesm\n    - xhochy\n    - nehaljwani\n    - h-vetinari\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -600,6 +1043,7 @@
       "c_stdlib_stub",
       "cmake",
       "cxx_compiler_stub",
+      "libabseil",
       "libprotobuf",
       "lz4-c",
       "ninja",
@@ -627,6 +1071,7 @@
         "c_compiler_stub",
         "c_stdlib_stub",
         "cxx_compiler_stub",
+        "libabseil",
         "libprotobuf",
         "lz4-c",
         "snappy",
@@ -664,6 +1109,7 @@
     "host": {
       "__set__": true,
       "elements": [
+        "libabseil",
         "libprotobuf",
         "lz4-c",
         "snappy",
@@ -682,8 +1128,8 @@
       "elements": []
     }
   },
-  "url": "https://github.com/apache/orc/archive/refs/tags/v2.2.2.tar.gz",
-  "version": "2.2.2",
+  "url": "https://github.com/apache/orc/archive/refs/tags/v2.3.0.tar.gz",
+  "version": "2.3.0",
   "version_pr_info": {
     "__lazy_json__": "version_pr_info/orc.json"
   },
@@ -692,38 +1138,85 @@
       "dev_url": "https://github.com/apache/orc",
       "home": "http://github.com/apache/orc",
       "license": "Apache-2.0",
-      "license_family": "Apache",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "C++ libraries for Apache ORC"
     },
     "build": {
-      "number": "1",
-      "run_exports": [
-        "orc"
-      ]
+      "number": "0",
+      "run_exports": {
+        "weak": [
+          "orc"
+        ]
+      }
     },
     "extra": {
       "recipe-maintainers": [
         "wesm",
         "xhochy",
-        "nehaljwani"
+        "nehaljwani",
+        "h-vetinari"
       ]
     },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "orc"
+          ]
+        },
+        "name": "orc",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "cxx_compiler_stub",
+            "ninja",
+            "libprotobuf",
+            "cmake"
+          ],
+          "host": [
+            "zlib",
+            "snappy",
+            "libabseil",
+            "libprotobuf",
+            "lz4-c",
+            "zstd"
+          ],
+          "run": [
+            "tzdata"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "test -f $PREFIX/lib/liborc${SHLIB_EXT}",
+              "test -f $PREFIX/include/orc/Common.hh",
+              "test ! -f $PREFIX/lib/liborc.a"
+            ]
+          }
+        ],
+        "version": "2.3.0"
+      }
+    ],
     "package": {
       "name": "orc",
-      "version": "2.2.2"
+      "version": "2.3.0"
     },
     "requirements": {
       "build": [
         "c_compiler_stub",
         "c_stdlib_stub",
         "cxx_compiler_stub",
+        "ninja",
         "libprotobuf",
         "cmake"
       ],
       "host": [
         "zlib",
         "snappy",
+        "libabseil",
         "libprotobuf",
         "lz4-c",
         "zstd"
@@ -732,21 +1225,15 @@
         "tzdata"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "patches": [
         "patches/0001-Don-t-force-orc-to-be-a-static-library-let-end-user-.patch",
-        "patches/0002-Allow-user-to-override-path-to-protoc.patch"
+        "patches/0002-Allow-user-to-override-path-to-protoc.patch",
+        "patches/0003-Link-to-abseil-libraries.patch"
       ],
-      "sha256": "ff952b23f0a7078153ce56ef1f3fa47fefa2bbcb17a2cf305cc36fad6b0a6316",
-      "url": "https://github.com/apache/orc/archive/refs/tags/v2.2.2.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "if not exist %LIBRARY_BIN%\\orc.dll exit 1",
-        "if not exist %LIBRARY_LIB%\\orc.lib exit 1",
-        "if not exist %LIBRARY_INC%\\orc\\Common.hh exit 1"
-      ]
+      "sha256": "d38b871c3989304d79c28c291bc80819b4585d7cea88d16243f74842a7e2a953",
+      "url": "https://github.com/apache/orc/archive/refs/tags/v2.3.0.tar.gz"
     }
   },
   "win_64_requirements": {
@@ -757,12 +1244,14 @@
         "c_stdlib_stub",
         "cmake",
         "cxx_compiler_stub",
-        "libprotobuf"
+        "libprotobuf",
+        "ninja"
       ]
     },
     "host": {
       "__set__": true,
       "elements": [
+        "libabseil",
         "libprotobuf",
         "lz4-c",
         "snappy",
