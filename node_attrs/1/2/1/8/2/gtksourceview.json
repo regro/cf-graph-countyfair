@@ -1,8 +1,11 @@
 {
   "archived": false,
   "branch": "main",
-  "ci_support_linux_64_.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\nexpat:\n- '2'\nfontconfig:\n- '2'\nglib:\n- '2'\nlibxml2_devel:\n- '2.15'\npango:\n- '1'\ntarget_platform:\n- linux-64\nzlib:\n- '1'\n",
+  "ci_support_linux_64_.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\nexpat:\n- '2'\nfontconfig:\n- '2'\nfreetype:\n- '2'\nglib:\n- '2'\nlibxml2_devel:\n- '2.15'\npango:\n- '1'\ntarget_platform:\n- linux-64\nzlib:\n- '1'\n",
   "conda-forge.yml": {
+    "build_platform": {
+      "osx_arm64": "osx_64"
+    },
     "conda_build": {
       "error_overlinking": true
     },
@@ -11,10 +14,11 @@
     "github": {
       "branch_name": "main",
       "tooling_branch_name": "main"
-    }
+    },
+    "test": "native_and_emulated"
   },
-  "feedstock_hash": "ed792eeb22b82a3ad9b443f1325205c8b864418a",
-  "feedstock_hash_ts": 1768920617,
+  "feedstock_hash": "9c1443bd4420a611b9b53dedf1f4009867ca2b29",
+  "feedstock_hash_ts": 1773264744,
   "feedstock_name": "gtksourceview",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -30,7 +34,12 @@
     },
     "build": {
       "number": "1",
-      "script": "meson setup ${MESON_ARGS} \\\n    --prefix=$PREFIX \\\n    --default-library=shared \\\n    --wrap-mode=nofallback \\\n    -Dintrospection=enabled \\\n    -Ddocumentation=false \\\n    -Dvapi=false \\\n    builddir\nninja -v -C builddir -j ${CPU_COUNT}\nninja -C builddir install -j ${CPU_COUNT}\n"
+      "run_exports": {
+        "weak": [
+          "gtksourceview"
+        ]
+      },
+      "script": "if [[ \"${CONDA_BUILD_CROSS_COMPILATION:-0}\" == \"1\" ]]; then\n  for tool in glib-mkenums glib-genmarshal; do\n      cp -f ${BUILD_PREFIX}/bin/${tool} ${PREFIX}/bin/${tool}\n  done\n  echo '#!/bin/bash' > ${PREFIX}/bin/glib-compile-resources\n  echo \"exec ${BUILD_PREFIX}/bin/glib-compile-resources \\\"\\$@\\\"\" >> ${PREFIX}/bin/glib-compile-resources\n  chmod +x ${PREFIX}/bin/glib-compile-resources\n  echo '#!/bin/bash' > ${PREFIX}/bin/gtk4-update-icon-cache\n  echo 'exit 0' >> ${PREFIX}/bin/gtk4-update-icon-cache\n  chmod +x ${PREFIX}/bin/gtk4-update-icon-cache\nfi\nmeson setup ${MESON_ARGS} \\\n    --prefix=$PREFIX \\\n    --default-library=shared \\\n    --wrap-mode=nofallback \\\n    -Dintrospection=${{ \"enabled\" if build_platform == target_platform else \"disabled\" }} \\\n    -Ddocumentation=false \\\n    -Dvapi=false \\\n    builddir\nninja -v -C builddir -j ${CPU_COUNT}\nninja -C builddir install -j ${CPU_COUNT}\n"
     },
     "extra": {
       "recipe-maintainers": [
@@ -41,7 +50,12 @@
     },
     "outputs": [
       {
-        "build": null,
+        "build": {
+          "strong": [],
+          "weak": [
+            "gtksourceview"
+          ]
+        },
         "name": "gtksourceview",
         "requirements": {
           "build": [
@@ -50,11 +64,13 @@
             "meson",
             "ninja",
             "pkg-config",
-            "gobject-introspection"
+            "gobject-introspection",
+            "glib"
           ],
           "host": [
             "expat",
             "fontconfig",
+            "freetype",
             "fribidi",
             "glib",
             "gobject-introspection",
@@ -63,7 +79,13 @@
             "zlib",
             "pango"
           ],
-          "run": []
+          "run": [
+            "libgraphene",
+            "cairo",
+            "gdk-pixbuf",
+            "libintl",
+            "pcre2"
+          ]
         },
         "tests": [
           {
@@ -91,11 +113,13 @@
         "meson",
         "ninja",
         "pkg-config",
-        "gobject-introspection"
+        "gobject-introspection",
+        "glib"
       ],
       "host": [
         "expat",
         "fontconfig",
+        "freetype",
         "fribidi",
         "glib",
         "gobject-introspection",
@@ -103,6 +127,13 @@
         "libxml2-devel",
         "zlib",
         "pango"
+      ],
+      "run": [
+        "libgraphene",
+        "cairo",
+        "gdk-pixbuf",
+        "libintl",
+        "pcre2"
       ]
     },
     "schema_version": 1,
@@ -117,6 +148,7 @@
       "elements": [
         "c_compiler_stub",
         "c_stdlib_stub",
+        "glib",
         "gobject-introspection",
         "meson",
         "ninja",
@@ -128,6 +160,7 @@
       "elements": [
         "expat",
         "fontconfig",
+        "freetype",
         "fribidi",
         "glib",
         "gobject-introspection",
@@ -139,7 +172,13 @@
     },
     "run": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "cairo",
+        "gdk-pixbuf",
+        "libgraphene",
+        "libintl",
+        "pcre2"
+      ]
     },
     "test": {
       "__set__": true,
@@ -159,7 +198,12 @@
     },
     "build": {
       "number": "1",
-      "script": "meson setup ${MESON_ARGS} \\\n    --prefix=$PREFIX \\\n    --default-library=shared \\\n    --wrap-mode=nofallback \\\n    -Dintrospection=enabled \\\n    -Ddocumentation=false \\\n    -Dvapi=false \\\n    builddir\nninja -v -C builddir -j ${CPU_COUNT}\nninja -C builddir install -j ${CPU_COUNT}\n"
+      "run_exports": {
+        "weak": [
+          "gtksourceview"
+        ]
+      },
+      "script": "if [[ \"${CONDA_BUILD_CROSS_COMPILATION:-0}\" == \"1\" ]]; then\n  for tool in glib-mkenums glib-genmarshal; do\n      cp -f ${BUILD_PREFIX}/bin/${tool} ${PREFIX}/bin/${tool}\n  done\n  echo '#!/bin/bash' > ${PREFIX}/bin/glib-compile-resources\n  echo \"exec ${BUILD_PREFIX}/bin/glib-compile-resources \\\"\\$@\\\"\" >> ${PREFIX}/bin/glib-compile-resources\n  chmod +x ${PREFIX}/bin/glib-compile-resources\n  echo '#!/bin/bash' > ${PREFIX}/bin/gtk4-update-icon-cache\n  echo 'exit 0' >> ${PREFIX}/bin/gtk4-update-icon-cache\n  chmod +x ${PREFIX}/bin/gtk4-update-icon-cache\nfi\nmeson setup ${MESON_ARGS} \\\n    --prefix=$PREFIX \\\n    --default-library=shared \\\n    --wrap-mode=nofallback \\\n    -Dintrospection=${{ \"enabled\" if build_platform == target_platform else \"disabled\" }} \\\n    -Ddocumentation=false \\\n    -Dvapi=false \\\n    builddir\nninja -v -C builddir -j ${CPU_COUNT}\nninja -C builddir install -j ${CPU_COUNT}\n"
     },
     "extra": {
       "recipe-maintainers": [
@@ -170,7 +214,12 @@
     },
     "outputs": [
       {
-        "build": null,
+        "build": {
+          "strong": [],
+          "weak": [
+            "gtksourceview"
+          ]
+        },
         "name": "gtksourceview",
         "requirements": {
           "build": [
@@ -179,11 +228,13 @@
             "meson",
             "ninja",
             "pkg-config",
-            "gobject-introspection"
+            "gobject-introspection",
+            "glib"
           ],
           "host": [
             "expat",
             "fontconfig",
+            "freetype",
             "fribidi",
             "glib",
             "gobject-introspection",
@@ -192,7 +243,13 @@
             "zlib",
             "pango"
           ],
-          "run": []
+          "run": [
+            "libgraphene",
+            "cairo",
+            "gdk-pixbuf",
+            "libintl",
+            "pcre2"
+          ]
         },
         "tests": [
           {
@@ -209,7 +266,12 @@
         "version": "5.18.0"
       },
       {
-        "build": null,
+        "build": {
+          "strong": [],
+          "weak": [
+            "gtksourceview"
+          ]
+        },
         "name": "gtksourceview",
         "requirements": {
           "build": [
@@ -218,11 +280,13 @@
             "meson",
             "ninja",
             "pkg-config",
-            "gobject-introspection"
+            "gobject-introspection",
+            "glib"
           ],
           "host": [
             "expat",
             "fontconfig",
+            "freetype",
             "fribidi",
             "glib",
             "gobject-introspection",
@@ -231,7 +295,13 @@
             "zlib",
             "pango"
           ],
-          "run": []
+          "run": [
+            "libgraphene",
+            "cairo",
+            "gdk-pixbuf",
+            "libintl",
+            "pcre2"
+          ]
         },
         "tests": [
           {
@@ -248,7 +318,12 @@
         "version": "5.18.0"
       },
       {
-        "build": null,
+        "build": {
+          "strong": [],
+          "weak": [
+            "gtksourceview"
+          ]
+        },
         "name": "gtksourceview",
         "requirements": {
           "build": [
@@ -257,11 +332,13 @@
             "meson",
             "ninja",
             "pkg-config",
-            "gobject-introspection"
+            "gobject-introspection",
+            "glib"
           ],
           "host": [
             "expat",
             "fontconfig",
+            "freetype",
             "fribidi",
             "glib",
             "gobject-introspection",
@@ -270,7 +347,65 @@
             "zlib",
             "pango"
           ],
-          "run": []
+          "run": [
+            "libgraphene",
+            "cairo",
+            "gdk-pixbuf",
+            "libintl",
+            "pcre2"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/pkgconfig/gtksourceview-5.pc"
+              ],
+              "lib": [
+                "gtksourceview-5"
+              ]
+            }
+          }
+        ],
+        "version": "5.18.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "gtksourceview"
+          ]
+        },
+        "name": "gtksourceview",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "meson",
+            "ninja",
+            "pkg-config",
+            "gobject-introspection",
+            "glib"
+          ],
+          "host": [
+            "expat",
+            "fontconfig",
+            "freetype",
+            "fribidi",
+            "glib",
+            "gobject-introspection",
+            "gtk4",
+            "libxml2-devel",
+            "zlib",
+            "pango"
+          ],
+          "run": [
+            "libgraphene",
+            "cairo",
+            "gdk-pixbuf",
+            "libintl",
+            "pcre2"
+          ]
         },
         "tests": [
           {
@@ -298,11 +433,13 @@
         "meson",
         "ninja",
         "pkg-config",
-        "gobject-introspection"
+        "gobject-introspection",
+        "glib"
       ],
       "host": [
         "expat",
         "fontconfig",
+        "freetype",
         "fribidi",
         "glib",
         "gobject-introspection",
@@ -310,6 +447,13 @@
         "libxml2-devel",
         "zlib",
         "pango"
+      ],
+      "run": [
+        "libgraphene",
+        "cairo",
+        "gdk-pixbuf",
+        "libintl",
+        "pcre2"
       ]
     },
     "schema_version": 1,
@@ -332,7 +476,12 @@
     },
     "build": {
       "number": "1",
-      "script": "meson setup ${MESON_ARGS} \\\n    --prefix=$PREFIX \\\n    --default-library=shared \\\n    --wrap-mode=nofallback \\\n    -Dintrospection=enabled \\\n    -Ddocumentation=false \\\n    -Dvapi=false \\\n    builddir\nninja -v -C builddir -j ${CPU_COUNT}\nninja -C builddir install -j ${CPU_COUNT}\n"
+      "run_exports": {
+        "weak": [
+          "gtksourceview"
+        ]
+      },
+      "script": "if [[ \"${CONDA_BUILD_CROSS_COMPILATION:-0}\" == \"1\" ]]; then\n  for tool in glib-mkenums glib-genmarshal; do\n      cp -f ${BUILD_PREFIX}/bin/${tool} ${PREFIX}/bin/${tool}\n  done\n  echo '#!/bin/bash' > ${PREFIX}/bin/glib-compile-resources\n  echo \"exec ${BUILD_PREFIX}/bin/glib-compile-resources \\\"\\$@\\\"\" >> ${PREFIX}/bin/glib-compile-resources\n  chmod +x ${PREFIX}/bin/glib-compile-resources\n  echo '#!/bin/bash' > ${PREFIX}/bin/gtk4-update-icon-cache\n  echo 'exit 0' >> ${PREFIX}/bin/gtk4-update-icon-cache\n  chmod +x ${PREFIX}/bin/gtk4-update-icon-cache\nfi\nmeson setup ${MESON_ARGS} \\\n    --prefix=$PREFIX \\\n    --default-library=shared \\\n    --wrap-mode=nofallback \\\n    -Dintrospection=${{ \"enabled\" if build_platform == target_platform else \"disabled\" }} \\\n    -Ddocumentation=false \\\n    -Dvapi=false \\\n    builddir\nninja -v -C builddir -j ${CPU_COUNT}\nninja -C builddir install -j ${CPU_COUNT}\n"
     },
     "extra": {
       "recipe-maintainers": [
@@ -343,7 +492,12 @@
     },
     "outputs": [
       {
-        "build": null,
+        "build": {
+          "strong": [],
+          "weak": [
+            "gtksourceview"
+          ]
+        },
         "name": "gtksourceview",
         "requirements": {
           "build": [
@@ -352,11 +506,13 @@
             "meson",
             "ninja",
             "pkg-config",
-            "gobject-introspection"
+            "gobject-introspection",
+            "glib"
           ],
           "host": [
             "expat",
             "fontconfig",
+            "freetype",
             "fribidi",
             "glib",
             "gobject-introspection",
@@ -365,7 +521,13 @@
             "zlib",
             "pango"
           ],
-          "run": []
+          "run": [
+            "libgraphene",
+            "cairo",
+            "gdk-pixbuf",
+            "libintl",
+            "pcre2"
+          ]
         },
         "tests": [
           {
@@ -393,11 +555,13 @@
         "meson",
         "ninja",
         "pkg-config",
-        "gobject-introspection"
+        "gobject-introspection",
+        "glib"
       ],
       "host": [
         "expat",
         "fontconfig",
+        "freetype",
         "fribidi",
         "glib",
         "gobject-introspection",
@@ -405,6 +569,13 @@
         "libxml2-devel",
         "zlib",
         "pango"
+      ],
+      "run": [
+        "libgraphene",
+        "cairo",
+        "gdk-pixbuf",
+        "libintl",
+        "pcre2"
       ]
     },
     "schema_version": 1,
@@ -419,6 +590,7 @@
       "elements": [
         "c_compiler_stub",
         "c_stdlib_stub",
+        "glib",
         "gobject-introspection",
         "meson",
         "ninja",
@@ -430,6 +602,7 @@
       "elements": [
         "expat",
         "fontconfig",
+        "freetype",
         "fribidi",
         "glib",
         "gobject-introspection",
@@ -441,7 +614,177 @@
     },
     "run": {
       "__set__": true,
+      "elements": [
+        "cairo",
+        "gdk-pixbuf",
+        "libgraphene",
+        "libintl",
+        "pcre2"
+      ]
+    },
+    "test": {
+      "__set__": true,
       "elements": []
+    }
+  },
+  "osx_arm64_meta_yaml": {
+    "about": {
+      "description": "GtkSourceView is a GNOME library that extends GtkTextView, the standard GTK\nwidget for multiline text editing. GtkSourceView adds support for syntax\nhighlighting, file loading and saving, search and replace, code completion,\nsnippets, Vim emulation, printing, displaying line numbers, and other features\ntypical of a source code editor.",
+      "dev_url": "https://gitlab.gnome.org/GNOME/gtksourceview",
+      "doc_url": "https://gnome.pages.gitlab.gnome.org/gtksourceview/gtksourceview5/",
+      "home": "https://gitlab.gnome.org/GNOME/gtksourceview",
+      "license": "LGPL-2.0-or-later",
+      "license_family": "LGPL-2.0-or-later",
+      "license_file": "COPYING",
+      "summary": "A GNOME library that extends GtkTextView"
+    },
+    "build": {
+      "number": "1",
+      "run_exports": {
+        "weak": [
+          "gtksourceview"
+        ]
+      },
+      "script": "if [[ \"${CONDA_BUILD_CROSS_COMPILATION:-0}\" == \"1\" ]]; then\n  for tool in glib-mkenums glib-genmarshal; do\n      cp -f ${BUILD_PREFIX}/bin/${tool} ${PREFIX}/bin/${tool}\n  done\n  echo '#!/bin/bash' > ${PREFIX}/bin/glib-compile-resources\n  echo \"exec ${BUILD_PREFIX}/bin/glib-compile-resources \\\"\\$@\\\"\" >> ${PREFIX}/bin/glib-compile-resources\n  chmod +x ${PREFIX}/bin/glib-compile-resources\n  echo '#!/bin/bash' > ${PREFIX}/bin/gtk4-update-icon-cache\n  echo 'exit 0' >> ${PREFIX}/bin/gtk4-update-icon-cache\n  chmod +x ${PREFIX}/bin/gtk4-update-icon-cache\nfi\nmeson setup ${MESON_ARGS} \\\n    --prefix=$PREFIX \\\n    --default-library=shared \\\n    --wrap-mode=nofallback \\\n    -Dintrospection=${{ \"enabled\" if build_platform == target_platform else \"disabled\" }} \\\n    -Ddocumentation=false \\\n    -Dvapi=false \\\n    builddir\nninja -v -C builddir -j ${CPU_COUNT}\nninja -C builddir install -j ${CPU_COUNT}\n"
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "danyeaw",
+        "pkgw",
+        "ryanvolz"
+      ]
+    },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "gtksourceview"
+          ]
+        },
+        "name": "gtksourceview",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "meson",
+            "ninja",
+            "pkg-config",
+            "gobject-introspection",
+            "glib"
+          ],
+          "host": [
+            "expat",
+            "fontconfig",
+            "freetype",
+            "fribidi",
+            "glib",
+            "gobject-introspection",
+            "gtk4",
+            "libxml2-devel",
+            "zlib",
+            "pango"
+          ],
+          "run": [
+            "libgraphene",
+            "cairo",
+            "gdk-pixbuf",
+            "libintl",
+            "pcre2"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/pkgconfig/gtksourceview-5.pc"
+              ],
+              "lib": [
+                "gtksourceview-5"
+              ]
+            }
+          }
+        ],
+        "version": "5.18.0"
+      }
+    ],
+    "package": {
+      "name": "gtksourceview",
+      "version": "5.18.0"
+    },
+    "requirements": {
+      "build": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "meson",
+        "ninja",
+        "pkg-config",
+        "gobject-introspection",
+        "glib"
+      ],
+      "host": [
+        "expat",
+        "fontconfig",
+        "freetype",
+        "fribidi",
+        "glib",
+        "gobject-introspection",
+        "gtk4",
+        "libxml2-devel",
+        "zlib",
+        "pango"
+      ],
+      "run": [
+        "libgraphene",
+        "cairo",
+        "gdk-pixbuf",
+        "libintl",
+        "pcre2"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "sha256": "051a78fe38f793328047e5bcd6d855c6425c0b480c20d9432179e356742c6ac0",
+      "url": "https://download.gnome.org/sources/gtksourceview/5.18/gtksourceview-5.18.0.tar.xz"
+    }
+  },
+  "osx_arm64_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "glib",
+        "gobject-introspection",
+        "meson",
+        "ninja",
+        "pkg-config"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "expat",
+        "fontconfig",
+        "freetype",
+        "fribidi",
+        "glib",
+        "gobject-introspection",
+        "gtk4",
+        "libxml2-devel",
+        "pango",
+        "zlib"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "cairo",
+        "gdk-pixbuf",
+        "libgraphene",
+        "libintl",
+        "pcre2"
+      ]
     },
     "test": {
       "__set__": true,
@@ -458,27 +801,34 @@
   "platforms": [
     "linux_64",
     "osx_64",
+    "osx_arm64",
     "win_64"
   ],
   "pr_info": {
     "__lazy_json__": "pr_info/gtksourceview.json"
   },
-  "raw_meta_yaml": "# yaml-language-server: $schema=https://raw.githubusercontent.com/prefix-dev/recipe-format/main/schema.json\nschema_version: 1\ncontext:\n  name: gtksourceview\n  version: 5.18.0\n  version_majmin: ${{ (version | split('.'))[:2] | join('.') }}\npackage:\n  name: ${{ name|lower }}\n  version: ${{ version }}\nsource:\n  url: \"https://download.gnome.org/sources/${{ name }}/${{ version_majmin }}/${{ name }}-${{ version }}.tar.xz\"\n  sha256: 051a78fe38f793328047e5bcd6d855c6425c0b480c20d9432179e356742c6ac0\nbuild:\n  number: 1\n  script:\n    - if: win\n      then: |\n        meson setup %MESON_ARGS% ^\n          --prefix=%LIBRARY_PREFIX% ^\n          --default-library=shared ^\n          --wrap-mode=nofallback ^\n          --buildtype=release ^\n          -Dintrospection=enabled ^\n          -Ddocumentation=false ^\n          -Dvapi=false ^\n          builddir\n        ninja -v -C builddir -j %CPU_COUNT%\n        ninja -C builddir install -j %CPU_COUNT%\n    - if: osx\n      then: |\n        # Define _DARWIN_C_SOURCE to expose POSIX.1-2008 functions like strnlen\n        export CFLAGS=\"${CFLAGS} -D_DARWIN_C_SOURCE\"\n    - if: unix\n      then: |\n        meson setup ${MESON_ARGS} \\\n            --prefix=$PREFIX \\\n            --default-library=shared \\\n            --wrap-mode=nofallback \\\n            -Dintrospection=enabled \\\n            -Ddocumentation=false \\\n            -Dvapi=false \\\n            builddir\n        ninja -v -C builddir -j ${CPU_COUNT}\n        ninja -C builddir install -j ${CPU_COUNT}\n  files:\n    exclude:\n      - '**/gschemas.compiled'\n      - '**/icon-theme.cache'\n      - '**/loaders.cache'\nrequirements:\n  build:\n    - ${{ compiler('c') }}\n    - ${{ stdlib('c') }}\n    - meson\n    - ninja\n    - pkg-config\n    - gobject-introspection\n  host:\n    - expat\n    - fontconfig\n    - fribidi\n    - glib\n    - gobject-introspection\n    - gtk4\n    - libxml2-devel\n    - zlib\n    - if: unix\n      then: pango\n  ignore_run_exports:\n    by_name:\n      - libexpat\n      - adwaita-icon-theme\n      - libzlib\ntests:\n  - package_contents:\n      files:\n        - if: unix\n          then:\n            - lib/pkgconfig/gtksourceview-5.pc\n        - if: win\n          then:\n            - Library/lib/pkgconfig/gtksourceview-5.pc\n            - Library/lib/gtksourceview-5.lib\n      lib:\n        - if: unix\n          then: gtksourceview-5\nabout:\n  homepage: https://gitlab.gnome.org/GNOME/gtksourceview\n  summary: A GNOME library that extends GtkTextView\n  description: |\n    GtkSourceView is a GNOME library that extends GtkTextView, the standard GTK\n    widget for multiline text editing. GtkSourceView adds support for syntax\n    highlighting, file loading and saving, search and replace, code completion,\n    snippets, Vim emulation, printing, displaying line numbers, and other features\n    typical of a source code editor.\n  license: LGPL-2.0-or-later\n  license_file: COPYING\n  documentation: https://gnome.pages.gitlab.gnome.org/gtksourceview/gtksourceview5/\n  repository: https://gitlab.gnome.org/GNOME/gtksourceview\nextra:\n  recipe-maintainers:\n    - danyeaw\n    - pkgw\n    - ryanvolz\n",
+  "raw_meta_yaml": "# yaml-language-server: $schema=https://raw.githubusercontent.com/prefix-dev/recipe-format/main/schema.json\nschema_version: 1\ncontext:\n  name: gtksourceview\n  version: 5.18.0\n  version_majmin: ${{ (version | split('.'))[:2] | join('.') }}\npackage:\n  name: ${{ name|lower }}\n  version: ${{ version }}\nsource:\n  url: \"https://download.gnome.org/sources/${{ name }}/${{ version_majmin }}/${{ name }}-${{ version }}.tar.xz\"\n  sha256: 051a78fe38f793328047e5bcd6d855c6425c0b480c20d9432179e356742c6ac0\nbuild:\n  number: 1\n  script:\n    - if: win\n      then: |\n        meson setup %MESON_ARGS% ^\n          --prefix=%LIBRARY_PREFIX% ^\n          --default-library=shared ^\n          --wrap-mode=nofallback ^\n          --buildtype=release ^\n          -Dintrospection=enabled ^\n          -Ddocumentation=false ^\n          -Dvapi=false ^\n          builddir\n        ninja -v -C builddir -j %CPU_COUNT%\n        ninja -C builddir install -j %CPU_COUNT%\n    - if: osx\n      then: |\n        # Define _DARWIN_C_SOURCE to expose POSIX.1-2008 functions like strnlen\n        export CFLAGS=\"${CFLAGS} -D_DARWIN_C_SOURCE\"\n    - if: unix\n      then: |\n        if [[ \"${CONDA_BUILD_CROSS_COMPILATION:-0}\" == \"1\" ]]; then\n          for tool in glib-mkenums glib-genmarshal; do\n              cp -f ${BUILD_PREFIX}/bin/${tool} ${PREFIX}/bin/${tool}\n          done\n          echo '#!/bin/bash' > ${PREFIX}/bin/glib-compile-resources\n          echo \"exec ${BUILD_PREFIX}/bin/glib-compile-resources \\\"\\$@\\\"\" >> ${PREFIX}/bin/glib-compile-resources\n          chmod +x ${PREFIX}/bin/glib-compile-resources\n          echo '#!/bin/bash' > ${PREFIX}/bin/gtk4-update-icon-cache\n          echo 'exit 0' >> ${PREFIX}/bin/gtk4-update-icon-cache\n          chmod +x ${PREFIX}/bin/gtk4-update-icon-cache\n        fi\n        meson setup ${MESON_ARGS} \\\n            --prefix=$PREFIX \\\n            --default-library=shared \\\n            --wrap-mode=nofallback \\\n            -Dintrospection=${{ \"enabled\" if build_platform == target_platform else \"disabled\" }} \\\n            -Ddocumentation=false \\\n            -Dvapi=false \\\n            builddir\n        ninja -v -C builddir -j ${CPU_COUNT}\n        ninja -C builddir install -j ${CPU_COUNT}\n  files:\n    exclude:\n      - '**/gschemas.compiled'\n      - '**/icon-theme.cache'\n      - '**/loaders.cache'\nrequirements:\n  build:\n    - ${{ compiler('c') }}\n    - ${{ stdlib('c') }}\n    - meson\n    - ninja\n    - pkg-config\n    - gobject-introspection\n    - glib\n  host:\n    - expat\n    - fontconfig\n    - freetype\n    - fribidi\n    - glib\n    - gobject-introspection\n    - gtk4\n    - libxml2-devel\n    - zlib\n    - if: unix\n      then: pango\n  run:\n    - libgraphene\n    - cairo\n    - gdk-pixbuf\n    - libintl\n    - pcre2\n  run_exports:\n    - ${{ pin_subpackage('gtksourceview', upper_bound='x.x') }}\n  ignore_run_exports:\n    by_name:\n      - libexpat\n      - adwaita-icon-theme\n      - libzlib\n      - libfreetype6\ntests:\n  - package_contents:\n      files:\n        - if: unix\n          then:\n            - lib/pkgconfig/gtksourceview-5.pc\n        - if: win\n          then:\n            - Library/lib/pkgconfig/gtksourceview-5.pc\n            - Library/lib/gtksourceview-5.lib\n      lib:\n        - if: unix\n          then: gtksourceview-5\nabout:\n  homepage: https://gitlab.gnome.org/GNOME/gtksourceview\n  summary: A GNOME library that extends GtkTextView\n  description: |\n    GtkSourceView is a GNOME library that extends GtkTextView, the standard GTK\n    widget for multiline text editing. GtkSourceView adds support for syntax\n    highlighting, file loading and saving, search and replace, code completion,\n    snippets, Vim emulation, printing, displaying line numbers, and other features\n    typical of a source code editor.\n  license: LGPL-2.0-or-later\n  license_file: COPYING\n  documentation: https://gnome.pages.gitlab.gnome.org/gtksourceview/gtksourceview5/\n  repository: https://gitlab.gnome.org/GNOME/gtksourceview\nextra:\n  recipe-maintainers:\n    - danyeaw\n    - pkgw\n    - ryanvolz\n",
   "req": {
     "__set__": true,
     "elements": [
       "c_compiler_stub",
       "c_stdlib_stub",
+      "cairo",
       "expat",
       "fontconfig",
+      "freetype",
       "fribidi",
+      "gdk-pixbuf",
       "glib",
       "gobject-introspection",
       "gtk4",
+      "libgraphene",
+      "libintl",
       "libxml2-devel",
       "meson",
       "ninja",
       "pango",
+      "pcre2",
       "pkg-config",
       "zlib"
     ]
@@ -489,6 +839,7 @@
       "elements": [
         "c_compiler_stub",
         "c_stdlib_stub",
+        "glib",
         "gobject-introspection",
         "meson",
         "ninja",
@@ -502,6 +853,7 @@
         "c_stdlib_stub",
         "expat",
         "fontconfig",
+        "freetype",
         "fribidi",
         "glib",
         "gobject-introspection",
@@ -515,7 +867,12 @@
       "__set__": true,
       "elements": [
         "c_compiler_stub",
-        "c_stdlib_stub"
+        "c_stdlib_stub",
+        "cairo",
+        "gdk-pixbuf",
+        "libgraphene",
+        "libintl",
+        "pcre2"
       ]
     },
     "test": {
@@ -530,6 +887,7 @@
       "elements": [
         "c_compiler_stub",
         "c_stdlib_stub",
+        "glib",
         "gobject-introspection",
         "meson",
         "ninja",
@@ -541,6 +899,7 @@
       "elements": [
         "expat",
         "fontconfig",
+        "freetype",
         "fribidi",
         "glib",
         "gobject-introspection",
@@ -552,7 +911,13 @@
     },
     "run": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "cairo",
+        "gdk-pixbuf",
+        "libgraphene",
+        "libintl",
+        "pcre2"
+      ]
     },
     "test": {
       "__set__": true,
@@ -577,7 +942,12 @@
     },
     "build": {
       "number": "1",
-      "script": "meson setup ${MESON_ARGS} \\\n    --prefix=$PREFIX \\\n    --default-library=shared \\\n    --wrap-mode=nofallback \\\n    -Dintrospection=enabled \\\n    -Ddocumentation=false \\\n    -Dvapi=false \\\n    builddir\nninja -v -C builddir -j ${CPU_COUNT}\nninja -C builddir install -j ${CPU_COUNT}\n"
+      "run_exports": {
+        "weak": [
+          "gtksourceview"
+        ]
+      },
+      "script": "if [[ \"${CONDA_BUILD_CROSS_COMPILATION:-0}\" == \"1\" ]]; then\n  for tool in glib-mkenums glib-genmarshal; do\n      cp -f ${BUILD_PREFIX}/bin/${tool} ${PREFIX}/bin/${tool}\n  done\n  echo '#!/bin/bash' > ${PREFIX}/bin/glib-compile-resources\n  echo \"exec ${BUILD_PREFIX}/bin/glib-compile-resources \\\"\\$@\\\"\" >> ${PREFIX}/bin/glib-compile-resources\n  chmod +x ${PREFIX}/bin/glib-compile-resources\n  echo '#!/bin/bash' > ${PREFIX}/bin/gtk4-update-icon-cache\n  echo 'exit 0' >> ${PREFIX}/bin/gtk4-update-icon-cache\n  chmod +x ${PREFIX}/bin/gtk4-update-icon-cache\nfi\nmeson setup ${MESON_ARGS} \\\n    --prefix=$PREFIX \\\n    --default-library=shared \\\n    --wrap-mode=nofallback \\\n    -Dintrospection=${{ \"enabled\" if build_platform == target_platform else \"disabled\" }} \\\n    -Ddocumentation=false \\\n    -Dvapi=false \\\n    builddir\nninja -v -C builddir -j ${CPU_COUNT}\nninja -C builddir install -j ${CPU_COUNT}\n"
     },
     "extra": {
       "recipe-maintainers": [
@@ -588,7 +958,12 @@
     },
     "outputs": [
       {
-        "build": null,
+        "build": {
+          "strong": [],
+          "weak": [
+            "gtksourceview"
+          ]
+        },
         "name": "gtksourceview",
         "requirements": {
           "build": [
@@ -597,11 +972,13 @@
             "meson",
             "ninja",
             "pkg-config",
-            "gobject-introspection"
+            "gobject-introspection",
+            "glib"
           ],
           "host": [
             "expat",
             "fontconfig",
+            "freetype",
             "fribidi",
             "glib",
             "gobject-introspection",
@@ -610,7 +987,13 @@
             "zlib",
             "pango"
           ],
-          "run": []
+          "run": [
+            "libgraphene",
+            "cairo",
+            "gdk-pixbuf",
+            "libintl",
+            "pcre2"
+          ]
         },
         "tests": [
           {
@@ -638,11 +1021,13 @@
         "meson",
         "ninja",
         "pkg-config",
-        "gobject-introspection"
+        "gobject-introspection",
+        "glib"
       ],
       "host": [
         "expat",
         "fontconfig",
+        "freetype",
         "fribidi",
         "glib",
         "gobject-introspection",
@@ -650,6 +1035,13 @@
         "libxml2-devel",
         "zlib",
         "pango"
+      ],
+      "run": [
+        "libgraphene",
+        "cairo",
+        "gdk-pixbuf",
+        "libintl",
+        "pcre2"
       ]
     },
     "schema_version": 1,
@@ -664,6 +1056,7 @@
       "elements": [
         "c_compiler_stub",
         "c_stdlib_stub",
+        "glib",
         "gobject-introspection",
         "meson",
         "ninja",
@@ -675,6 +1068,7 @@
       "elements": [
         "expat",
         "fontconfig",
+        "freetype",
         "fribidi",
         "glib",
         "gobject-introspection",
@@ -686,7 +1080,13 @@
     },
     "run": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "cairo",
+        "gdk-pixbuf",
+        "libgraphene",
+        "libintl",
+        "pcre2"
+      ]
     },
     "test": {
       "__set__": true,
