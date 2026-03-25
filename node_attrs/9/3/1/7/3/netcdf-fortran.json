@@ -1,7 +1,7 @@
 {
   "archived": false,
   "branch": "main",
-  "ci_support_linux_64_mpimpich.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\nfortran_compiler:\n- gfortran\nfortran_compiler_version:\n- '14'\nhdf5:\n- 1.14.6\nlibnetcdf:\n- 4.10.0\nmpi:\n- mpich\nmpich:\n- '4'\nopenmpi:\n- '5'\ntarget_platform:\n- linux-64\nzip_keys:\n- - c_compiler_version\n  - fortran_compiler_version\n",
+  "ci_support_linux_64_hdf51.14.6mpimpich.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\nfortran_compiler:\n- gfortran\nfortran_compiler_version:\n- '14'\nhdf5:\n- 1.14.6\nlibnetcdf:\n- 4.10.0\nmpi:\n- mpich\nmpich:\n- '4'\nopenmpi:\n- '5'\ntarget_platform:\n- linux-64\nzip_keys:\n- - c_compiler_version\n  - fortran_compiler_version\nzlib:\n- '1'\n",
   "conda-forge.yml": {
     "build_platform": {
       "linux_aarch64": "linux_64",
@@ -11,7 +11,9 @@
     "conda_build": {
       "pkg_format": "2"
     },
+    "conda_build_tool": "rattler-build",
     "conda_forge_output_validation": true,
+    "conda_install_tool": "pixi",
     "github": {
       "branch_name": "main",
       "tooling_branch_name": "main"
@@ -22,25 +24,29 @@
     },
     "test": "native_and_emulated"
   },
-  "feedstock_hash": "9855ae7e5c8015397139d33faf2494df6bcc4415",
-  "feedstock_hash_ts": 1773687120,
+  "feedstock_hash": "4f3f3e1f0a1968691319cc31bd389f6df0ee440e",
+  "feedstock_hash_ts": 1774444273,
   "feedstock_name": "netcdf-fortran",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
     "about": {
+      "dev_url": "https://github.com/Unidata/netcdf-fortran",
       "home": "https://github.com/Unidata/netcdf-fortran",
       "license": "NetCDF",
+      "license_family": "NetCDF",
       "license_file": "COPYRIGHT",
       "summary": "Unidata NetCDF Fortran Library"
     },
     "build": {
-      "number": "3",
-      "run_exports": [
-        "netcdf-fortran mpi_mpich_*",
-        "netcdf-fortran",
-        "netcdf-fortran mpi_openmpi_*"
-      ],
-      "string": "mpi_openmpi_h1234567_3"
+      "number": "4",
+      "run_exports": {
+        "weak": [
+          "netcdf-fortran",
+          "netcdf-fortran * mpi_mpich_*",
+          "netcdf-fortran * mpi_openmpi_*"
+        ]
+      },
+      "script": "build.sh"
     },
     "extra": {
       "recipe-maintainers": [
@@ -50,6 +56,296 @@
         "zklaus"
       ]
     },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_mpich_*"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * mpi_mpich_*",
+            "hdf5",
+            "hdf5 * mpi_mpich_*",
+            "zlib",
+            "mpich"
+          ],
+          "run": [
+            "libnetcdf * mpi_mpich_*",
+            "hdf5 * mpi_mpich_*",
+            "mpich"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * nompi_*",
+            "hdf5",
+            "hdf5 * nompi_*",
+            "zlib"
+          ],
+          "run": [
+            "libnetcdf * nompi_*",
+            "hdf5 * nompi_*"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_openmpi_*"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * mpi_openmpi_*",
+            "hdf5",
+            "hdf5 * mpi_openmpi_*",
+            "zlib",
+            "openmpi"
+          ],
+          "run": [
+            "libnetcdf * mpi_openmpi_*",
+            "hdf5 * mpi_openmpi_*",
+            "openmpi"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_mpich_*"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * mpi_mpich_*",
+            "hdf5",
+            "hdf5 * mpi_mpich_*",
+            "zlib",
+            "mpich"
+          ],
+          "run": [
+            "libnetcdf * mpi_mpich_*",
+            "hdf5 * mpi_mpich_*",
+            "mpich"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * nompi_*",
+            "hdf5",
+            "hdf5 * nompi_*",
+            "zlib"
+          ],
+          "run": [
+            "libnetcdf * nompi_*",
+            "hdf5 * nompi_*"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_openmpi_*"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * mpi_openmpi_*",
+            "hdf5",
+            "hdf5 * mpi_openmpi_*",
+            "zlib",
+            "openmpi"
+          ],
+          "run": [
+            "libnetcdf * mpi_openmpi_*",
+            "hdf5 * mpi_openmpi_*",
+            "openmpi"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      }
+    ],
     "package": {
       "name": "netcdf-fortran",
       "version": "4.6.2"
@@ -69,6 +365,7 @@
         "libnetcdf * mpi_mpich_*",
         "hdf5",
         "hdf5 * mpi_mpich_*",
+        "zlib",
         "mpich",
         "libnetcdf * nompi_*",
         "hdf5 * nompi_*",
@@ -87,7 +384,7 @@
         "openmpi"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "patches": [
         "0001-no-clang.patch",
@@ -96,16 +393,6 @@
       ],
       "sha256": "44cc7b5626b0b054a8503b8fe7c1b0ac4e0a79a69dad792c212454906a9224ca",
       "url": "https://github.com/Unidata/netcdf-fortran/archive/v4.6.2.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "nf-config --version",
-        "test -f $(nf-config --fc)",
-        "test -f $PREFIX/lib/libnetcdff${SHLIB_EXT}"
-      ],
-      "requires": [
-        "fortran_compiler_stub"
-      ]
     }
   },
   "linux_64_requirements": {
@@ -127,7 +414,8 @@
         "hdf5",
         "libnetcdf",
         "mpich",
-        "openmpi"
+        "openmpi",
+        "zlib"
       ]
     },
     "run": {
@@ -148,19 +436,23 @@
   },
   "linux_aarch64_meta_yaml": {
     "about": {
+      "dev_url": "https://github.com/Unidata/netcdf-fortran",
       "home": "https://github.com/Unidata/netcdf-fortran",
       "license": "NetCDF",
+      "license_family": "NetCDF",
       "license_file": "COPYRIGHT",
       "summary": "Unidata NetCDF Fortran Library"
     },
     "build": {
-      "number": "3",
-      "run_exports": [
-        "netcdf-fortran mpi_mpich_*",
-        "netcdf-fortran",
-        "netcdf-fortran mpi_openmpi_*"
-      ],
-      "string": "mpi_openmpi_h1234567_3"
+      "number": "4",
+      "run_exports": {
+        "weak": [
+          "netcdf-fortran",
+          "netcdf-fortran * mpi_mpich_*",
+          "netcdf-fortran * mpi_openmpi_*"
+        ]
+      },
+      "script": "build.sh"
     },
     "extra": {
       "recipe-maintainers": [
@@ -170,6 +462,296 @@
         "zklaus"
       ]
     },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_mpich_*"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * mpi_mpich_*",
+            "hdf5",
+            "hdf5 * mpi_mpich_*",
+            "zlib",
+            "mpich"
+          ],
+          "run": [
+            "libnetcdf * mpi_mpich_*",
+            "hdf5 * mpi_mpich_*",
+            "mpich"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * nompi_*",
+            "hdf5",
+            "hdf5 * nompi_*",
+            "zlib"
+          ],
+          "run": [
+            "libnetcdf * nompi_*",
+            "hdf5 * nompi_*"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_openmpi_*"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * mpi_openmpi_*",
+            "hdf5",
+            "hdf5 * mpi_openmpi_*",
+            "zlib",
+            "openmpi"
+          ],
+          "run": [
+            "libnetcdf * mpi_openmpi_*",
+            "hdf5 * mpi_openmpi_*",
+            "openmpi"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_mpich_*"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * mpi_mpich_*",
+            "hdf5",
+            "hdf5 * mpi_mpich_*",
+            "zlib",
+            "mpich"
+          ],
+          "run": [
+            "libnetcdf * mpi_mpich_*",
+            "hdf5 * mpi_mpich_*",
+            "mpich"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * nompi_*",
+            "hdf5",
+            "hdf5 * nompi_*",
+            "zlib"
+          ],
+          "run": [
+            "libnetcdf * nompi_*",
+            "hdf5 * nompi_*"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_openmpi_*"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * mpi_openmpi_*",
+            "hdf5",
+            "hdf5 * mpi_openmpi_*",
+            "zlib",
+            "openmpi"
+          ],
+          "run": [
+            "libnetcdf * mpi_openmpi_*",
+            "hdf5 * mpi_openmpi_*",
+            "openmpi"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      }
+    ],
     "package": {
       "name": "netcdf-fortran",
       "version": "4.6.2"
@@ -189,6 +771,7 @@
         "libnetcdf * mpi_mpich_*",
         "hdf5",
         "hdf5 * mpi_mpich_*",
+        "zlib",
         "mpich",
         "libnetcdf * nompi_*",
         "hdf5 * nompi_*",
@@ -207,7 +790,7 @@
         "openmpi"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "patches": [
         "0001-no-clang.patch",
@@ -216,16 +799,6 @@
       ],
       "sha256": "44cc7b5626b0b054a8503b8fe7c1b0ac4e0a79a69dad792c212454906a9224ca",
       "url": "https://github.com/Unidata/netcdf-fortran/archive/v4.6.2.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "nf-config --version",
-        "test -f $(nf-config --fc)",
-        "test -f $PREFIX/lib/libnetcdff${SHLIB_EXT}"
-      ],
-      "requires": [
-        "fortran_compiler_stub"
-      ]
     }
   },
   "linux_aarch64_requirements": {
@@ -247,7 +820,8 @@
         "hdf5",
         "libnetcdf",
         "mpich",
-        "openmpi"
+        "openmpi",
+        "zlib"
       ]
     },
     "run": {
@@ -268,19 +842,23 @@
   },
   "linux_ppc64le_meta_yaml": {
     "about": {
+      "dev_url": "https://github.com/Unidata/netcdf-fortran",
       "home": "https://github.com/Unidata/netcdf-fortran",
       "license": "NetCDF",
+      "license_family": "NetCDF",
       "license_file": "COPYRIGHT",
       "summary": "Unidata NetCDF Fortran Library"
     },
     "build": {
-      "number": "3",
-      "run_exports": [
-        "netcdf-fortran mpi_mpich_*",
-        "netcdf-fortran",
-        "netcdf-fortran mpi_openmpi_*"
-      ],
-      "string": "mpi_openmpi_h1234567_3"
+      "number": "4",
+      "run_exports": {
+        "weak": [
+          "netcdf-fortran",
+          "netcdf-fortran * mpi_mpich_*",
+          "netcdf-fortran * mpi_openmpi_*"
+        ]
+      },
+      "script": "build.sh"
     },
     "extra": {
       "recipe-maintainers": [
@@ -290,6 +868,296 @@
         "zklaus"
       ]
     },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_mpich_*"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * mpi_mpich_*",
+            "hdf5",
+            "hdf5 * mpi_mpich_*",
+            "zlib",
+            "mpich"
+          ],
+          "run": [
+            "libnetcdf * mpi_mpich_*",
+            "hdf5 * mpi_mpich_*",
+            "mpich"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * nompi_*",
+            "hdf5",
+            "hdf5 * nompi_*",
+            "zlib"
+          ],
+          "run": [
+            "libnetcdf * nompi_*",
+            "hdf5 * nompi_*"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_openmpi_*"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * mpi_openmpi_*",
+            "hdf5",
+            "hdf5 * mpi_openmpi_*",
+            "zlib",
+            "openmpi"
+          ],
+          "run": [
+            "libnetcdf * mpi_openmpi_*",
+            "hdf5 * mpi_openmpi_*",
+            "openmpi"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_mpich_*"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * mpi_mpich_*",
+            "hdf5",
+            "hdf5 * mpi_mpich_*",
+            "zlib",
+            "mpich"
+          ],
+          "run": [
+            "libnetcdf * mpi_mpich_*",
+            "hdf5 * mpi_mpich_*",
+            "mpich"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * nompi_*",
+            "hdf5",
+            "hdf5 * nompi_*",
+            "zlib"
+          ],
+          "run": [
+            "libnetcdf * nompi_*",
+            "hdf5 * nompi_*"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_openmpi_*"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * mpi_openmpi_*",
+            "hdf5",
+            "hdf5 * mpi_openmpi_*",
+            "zlib",
+            "openmpi"
+          ],
+          "run": [
+            "libnetcdf * mpi_openmpi_*",
+            "hdf5 * mpi_openmpi_*",
+            "openmpi"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      }
+    ],
     "package": {
       "name": "netcdf-fortran",
       "version": "4.6.2"
@@ -309,6 +1177,7 @@
         "libnetcdf * mpi_mpich_*",
         "hdf5",
         "hdf5 * mpi_mpich_*",
+        "zlib",
         "mpich",
         "libnetcdf * nompi_*",
         "hdf5 * nompi_*",
@@ -327,7 +1196,7 @@
         "openmpi"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "patches": [
         "0001-no-clang.patch",
@@ -336,16 +1205,6 @@
       ],
       "sha256": "44cc7b5626b0b054a8503b8fe7c1b0ac4e0a79a69dad792c212454906a9224ca",
       "url": "https://github.com/Unidata/netcdf-fortran/archive/v4.6.2.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "nf-config --version",
-        "test -f $(nf-config --fc)",
-        "test -f $PREFIX/lib/libnetcdff${SHLIB_EXT}"
-      ],
-      "requires": [
-        "fortran_compiler_stub"
-      ]
     }
   },
   "linux_ppc64le_requirements": {
@@ -367,7 +1226,8 @@
         "hdf5",
         "libnetcdf",
         "mpich",
-        "openmpi"
+        "openmpi",
+        "zlib"
       ]
     },
     "run": {
@@ -388,20 +1248,23 @@
   },
   "meta_yaml": {
     "about": {
+      "dev_url": "https://github.com/Unidata/netcdf-fortran",
       "home": "https://github.com/Unidata/netcdf-fortran",
       "license": "NetCDF",
+      "license_family": "NetCDF",
       "license_file": "COPYRIGHT",
       "summary": "Unidata NetCDF Fortran Library"
     },
     "build": {
-      "merge_build_host": true,
-      "number": "103",
-      "run_exports": [
-        "netcdf-fortran mpi_mpich_*",
-        "netcdf-fortran",
-        "netcdf-fortran mpi_openmpi_*"
-      ],
-      "string": "nompi_h1234567_103"
+      "number": "104",
+      "run_exports": {
+        "weak": [
+          "netcdf-fortran",
+          "netcdf-fortran * mpi_mpich_*",
+          "netcdf-fortran * mpi_openmpi_*"
+        ]
+      },
+      "script": "build.sh"
     },
     "extra": {
       "recipe-maintainers": [
@@ -411,97 +1274,1540 @@
         "zklaus"
       ]
     },
-    "package": {
-      "name": "netcdf-fortran",
-      "version": "4.6.2"
-    },
-    "requirements": {
-      "build": [
-        "cmake",
-        "pkg-config",
-        "c_compiler_stub",
-        "c_stdlib_stub",
-        "fortran_compiler_stub",
-        "m4",
-        "make",
-        "m2w64_c_compiler_stub",
-        "m2w64_c_stdlib_stub",
-        "m2w64_fortran_compiler_stub",
-        "ninja"
-      ],
-      "host": [
-        "libnetcdf",
-        "libnetcdf * mpi_mpich_*",
-        "hdf5",
-        "hdf5 * mpi_mpich_*",
-        "mpich",
-        "libnetcdf * nompi_*",
-        "hdf5 * nompi_*",
-        "libnetcdf * mpi_openmpi_*",
-        "hdf5 * mpi_openmpi_*",
-        "openmpi"
-      ],
-      "run": [
-        "libnetcdf * mpi_mpich_*",
-        "hdf5 * mpi_mpich_*",
-        "mpich",
-        "libnetcdf * nompi_*",
-        "hdf5 * nompi_*",
-        "libnetcdf * mpi_openmpi_*",
-        "hdf5 * mpi_openmpi_*",
-        "openmpi"
-      ]
-    },
-    "schema_version": 0,
-    "source": {
-      "patches": [
-        "0001-no-clang.patch",
-        "0002-manpage-quoting.patch",
-        "0003-make-v2compat-cachable.patch",
-        "0004-szip.patch"
-      ],
-      "sha256": "44cc7b5626b0b054a8503b8fe7c1b0ac4e0a79a69dad792c212454906a9224ca",
-      "url": "https://github.com/Unidata/netcdf-fortran/archive/v4.6.2.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "nf-config --version",
-        "test -f $(nf-config --fc)",
-        "test -f $PREFIX/lib/libnetcdff${SHLIB_EXT}",
-        "if not exist %LIBRARY_LIB%/libnetcdff.dll.a exit 1",
-        "if not exist %LIBRARY_LIB%/libnetcdff.lib exit 1"
-      ],
-      "requires": [
-        "fortran_compiler_stub",
-        "m2w64_fortran_compiler_stub"
-      ]
-    }
-  },
-  "name": "netcdf-fortran",
-  "osx_64_meta_yaml": {
-    "about": {
-      "home": "https://github.com/Unidata/netcdf-fortran",
-      "license": "NetCDF",
-      "license_file": "COPYRIGHT",
-      "summary": "Unidata NetCDF Fortran Library"
-    },
-    "build": {
-      "number": "3",
-      "run_exports": [
-        "netcdf-fortran mpi_mpich_*",
-        "netcdf-fortran",
-        "netcdf-fortran mpi_openmpi_*"
-      ],
-      "string": "mpi_openmpi_h1234567_3"
-    },
-    "extra": {
-      "recipe-maintainers": [
-        "ocefpaf",
-        "bekozi",
-        "xylar",
-        "zklaus"
-      ]
-    },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_mpich_*"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * mpi_mpich_*",
+            "hdf5",
+            "hdf5 * mpi_mpich_*",
+            "zlib",
+            "mpich"
+          ],
+          "run": [
+            "libnetcdf * mpi_mpich_*",
+            "hdf5 * mpi_mpich_*",
+            "mpich"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * nompi_*",
+            "hdf5",
+            "hdf5 * nompi_*",
+            "zlib"
+          ],
+          "run": [
+            "libnetcdf * nompi_*",
+            "hdf5 * nompi_*"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_openmpi_*"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * mpi_openmpi_*",
+            "hdf5",
+            "hdf5 * mpi_openmpi_*",
+            "zlib",
+            "openmpi"
+          ],
+          "run": [
+            "libnetcdf * mpi_openmpi_*",
+            "hdf5 * mpi_openmpi_*",
+            "openmpi"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_mpich_*"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * mpi_mpich_*",
+            "hdf5",
+            "hdf5 * mpi_mpich_*",
+            "zlib",
+            "mpich"
+          ],
+          "run": [
+            "libnetcdf * mpi_mpich_*",
+            "hdf5 * mpi_mpich_*",
+            "mpich"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * nompi_*",
+            "hdf5",
+            "hdf5 * nompi_*",
+            "zlib"
+          ],
+          "run": [
+            "libnetcdf * nompi_*",
+            "hdf5 * nompi_*"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_openmpi_*"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * mpi_openmpi_*",
+            "hdf5",
+            "hdf5 * mpi_openmpi_*",
+            "zlib",
+            "openmpi"
+          ],
+          "run": [
+            "libnetcdf * mpi_openmpi_*",
+            "hdf5 * mpi_openmpi_*",
+            "openmpi"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_mpich_*"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * mpi_mpich_*",
+            "hdf5",
+            "hdf5 * mpi_mpich_*",
+            "zlib",
+            "mpich"
+          ],
+          "run": [
+            "libnetcdf * mpi_mpich_*",
+            "hdf5 * mpi_mpich_*",
+            "mpich"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * nompi_*",
+            "hdf5",
+            "hdf5 * nompi_*",
+            "zlib"
+          ],
+          "run": [
+            "libnetcdf * nompi_*",
+            "hdf5 * nompi_*"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_openmpi_*"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * mpi_openmpi_*",
+            "hdf5",
+            "hdf5 * mpi_openmpi_*",
+            "zlib",
+            "openmpi"
+          ],
+          "run": [
+            "libnetcdf * mpi_openmpi_*",
+            "hdf5 * mpi_openmpi_*",
+            "openmpi"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_mpich_*"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * mpi_mpich_*",
+            "hdf5",
+            "hdf5 * mpi_mpich_*",
+            "zlib",
+            "mpich"
+          ],
+          "run": [
+            "libnetcdf * mpi_mpich_*",
+            "hdf5 * mpi_mpich_*",
+            "mpich"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * nompi_*",
+            "hdf5",
+            "hdf5 * nompi_*",
+            "zlib"
+          ],
+          "run": [
+            "libnetcdf * nompi_*",
+            "hdf5 * nompi_*"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_openmpi_*"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * mpi_openmpi_*",
+            "hdf5",
+            "hdf5 * mpi_openmpi_*",
+            "zlib",
+            "openmpi"
+          ],
+          "run": [
+            "libnetcdf * mpi_openmpi_*",
+            "hdf5 * mpi_openmpi_*",
+            "openmpi"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_mpich_*"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * mpi_mpich_*",
+            "hdf5",
+            "hdf5 * mpi_mpich_*",
+            "zlib",
+            "mpich"
+          ],
+          "run": [
+            "libnetcdf * mpi_mpich_*",
+            "hdf5 * mpi_mpich_*",
+            "mpich"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * nompi_*",
+            "hdf5",
+            "hdf5 * nompi_*",
+            "zlib"
+          ],
+          "run": [
+            "libnetcdf * nompi_*",
+            "hdf5 * nompi_*"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_openmpi_*"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * mpi_openmpi_*",
+            "hdf5",
+            "hdf5 * mpi_openmpi_*",
+            "zlib",
+            "openmpi"
+          ],
+          "run": [
+            "libnetcdf * mpi_openmpi_*",
+            "hdf5 * mpi_openmpi_*",
+            "openmpi"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_mpich_*"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * mpi_mpich_*",
+            "hdf5",
+            "hdf5 * mpi_mpich_*",
+            "zlib",
+            "mpich"
+          ],
+          "run": [
+            "libnetcdf * mpi_mpich_*",
+            "hdf5 * mpi_mpich_*",
+            "mpich"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * nompi_*",
+            "hdf5",
+            "hdf5 * nompi_*",
+            "zlib"
+          ],
+          "run": [
+            "libnetcdf * nompi_*",
+            "hdf5 * nompi_*"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_openmpi_*"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * mpi_openmpi_*",
+            "hdf5",
+            "hdf5 * mpi_openmpi_*",
+            "zlib",
+            "openmpi"
+          ],
+          "run": [
+            "libnetcdf * mpi_openmpi_*",
+            "hdf5 * mpi_openmpi_*",
+            "openmpi"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_mpich_*"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * mpi_mpich_*",
+            "hdf5",
+            "hdf5 * mpi_mpich_*",
+            "zlib",
+            "mpich"
+          ],
+          "run": [
+            "libnetcdf * mpi_mpich_*",
+            "hdf5 * mpi_mpich_*",
+            "mpich"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * nompi_*",
+            "hdf5",
+            "hdf5 * nompi_*",
+            "zlib"
+          ],
+          "run": [
+            "libnetcdf * nompi_*",
+            "hdf5 * nompi_*"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_openmpi_*"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * mpi_openmpi_*",
+            "hdf5",
+            "hdf5 * mpi_openmpi_*",
+            "zlib",
+            "openmpi"
+          ],
+          "run": [
+            "libnetcdf * mpi_openmpi_*",
+            "hdf5 * mpi_openmpi_*",
+            "openmpi"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_mpich_*"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * mpi_mpich_*",
+            "hdf5",
+            "hdf5 * mpi_mpich_*",
+            "zlib",
+            "mpich"
+          ],
+          "run": [
+            "libnetcdf * mpi_mpich_*",
+            "hdf5 * mpi_mpich_*",
+            "mpich"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * nompi_*",
+            "hdf5",
+            "hdf5 * nompi_*",
+            "zlib"
+          ],
+          "run": [
+            "libnetcdf * nompi_*",
+            "hdf5 * nompi_*"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_openmpi_*"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * mpi_openmpi_*",
+            "hdf5",
+            "hdf5 * mpi_openmpi_*",
+            "zlib",
+            "openmpi"
+          ],
+          "run": [
+            "libnetcdf * mpi_openmpi_*",
+            "hdf5 * mpi_openmpi_*",
+            "openmpi"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_mpich_*"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * mpi_mpich_*",
+            "hdf5",
+            "hdf5 * mpi_mpich_*",
+            "zlib",
+            "mpich"
+          ],
+          "run": [
+            "libnetcdf * mpi_mpich_*",
+            "hdf5 * mpi_mpich_*",
+            "mpich"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * nompi_*",
+            "hdf5",
+            "hdf5 * nompi_*",
+            "zlib"
+          ],
+          "run": [
+            "libnetcdf * nompi_*",
+            "hdf5 * nompi_*"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_openmpi_*"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * mpi_openmpi_*",
+            "hdf5",
+            "hdf5 * mpi_openmpi_*",
+            "zlib",
+            "openmpi"
+          ],
+          "run": [
+            "libnetcdf * mpi_openmpi_*",
+            "hdf5 * mpi_openmpi_*",
+            "openmpi"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_mpich_*"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * mpi_mpich_*",
+            "hdf5",
+            "hdf5 * mpi_mpich_*",
+            "zlib",
+            "mpich"
+          ],
+          "run": [
+            "libnetcdf * mpi_mpich_*",
+            "hdf5 * mpi_mpich_*",
+            "mpich"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * nompi_*",
+            "hdf5",
+            "hdf5 * nompi_*",
+            "zlib"
+          ],
+          "run": [
+            "libnetcdf * nompi_*",
+            "hdf5 * nompi_*"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_openmpi_*"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * mpi_openmpi_*",
+            "hdf5",
+            "hdf5 * mpi_openmpi_*",
+            "zlib",
+            "openmpi"
+          ],
+          "run": [
+            "libnetcdf * mpi_openmpi_*",
+            "hdf5 * mpi_openmpi_*",
+            "openmpi"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * nompi_*",
+            "hdf5",
+            "hdf5 * nompi_*",
+            "zlib"
+          ],
+          "run": [
+            "libnetcdf * nompi_*",
+            "hdf5 * nompi_*"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * nompi_*",
+            "hdf5",
+            "hdf5 * nompi_*",
+            "zlib"
+          ],
+          "run": [
+            "libnetcdf * nompi_*",
+            "hdf5 * nompi_*"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      }
+    ],
     "package": {
       "name": "netcdf-fortran",
       "version": "4.6.2"
@@ -521,6 +2827,7 @@
         "libnetcdf * mpi_mpich_*",
         "hdf5",
         "hdf5 * mpi_mpich_*",
+        "zlib",
         "mpich",
         "libnetcdf * nompi_*",
         "hdf5 * nompi_*",
@@ -539,7 +2846,7 @@
         "openmpi"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "patches": [
         "0001-no-clang.patch",
@@ -548,16 +2855,374 @@
       ],
       "sha256": "44cc7b5626b0b054a8503b8fe7c1b0ac4e0a79a69dad792c212454906a9224ca",
       "url": "https://github.com/Unidata/netcdf-fortran/archive/v4.6.2.tar.gz"
+    }
+  },
+  "name": "netcdf-fortran",
+  "osx_64_meta_yaml": {
+    "about": {
+      "dev_url": "https://github.com/Unidata/netcdf-fortran",
+      "home": "https://github.com/Unidata/netcdf-fortran",
+      "license": "NetCDF",
+      "license_family": "NetCDF",
+      "license_file": "COPYRIGHT",
+      "summary": "Unidata NetCDF Fortran Library"
     },
-    "test": {
-      "commands": [
-        "nf-config --version",
-        "test -f $(nf-config --fc)",
-        "test -f $PREFIX/lib/libnetcdff${SHLIB_EXT}"
-      ],
-      "requires": [
-        "fortran_compiler_stub"
+    "build": {
+      "number": "4",
+      "run_exports": {
+        "weak": [
+          "netcdf-fortran",
+          "netcdf-fortran * mpi_mpich_*",
+          "netcdf-fortran * mpi_openmpi_*"
+        ]
+      },
+      "script": "build.sh"
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "ocefpaf",
+        "bekozi",
+        "xylar",
+        "zklaus"
       ]
+    },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_mpich_*"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * mpi_mpich_*",
+            "hdf5",
+            "hdf5 * mpi_mpich_*",
+            "zlib",
+            "mpich"
+          ],
+          "run": [
+            "libnetcdf * mpi_mpich_*",
+            "hdf5 * mpi_mpich_*",
+            "mpich"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * nompi_*",
+            "hdf5",
+            "hdf5 * nompi_*",
+            "zlib"
+          ],
+          "run": [
+            "libnetcdf * nompi_*",
+            "hdf5 * nompi_*"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_openmpi_*"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * mpi_openmpi_*",
+            "hdf5",
+            "hdf5 * mpi_openmpi_*",
+            "zlib",
+            "openmpi"
+          ],
+          "run": [
+            "libnetcdf * mpi_openmpi_*",
+            "hdf5 * mpi_openmpi_*",
+            "openmpi"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_mpich_*"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * mpi_mpich_*",
+            "hdf5",
+            "hdf5 * mpi_mpich_*",
+            "zlib",
+            "mpich"
+          ],
+          "run": [
+            "libnetcdf * mpi_mpich_*",
+            "hdf5 * mpi_mpich_*",
+            "mpich"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * nompi_*",
+            "hdf5",
+            "hdf5 * nompi_*",
+            "zlib"
+          ],
+          "run": [
+            "libnetcdf * nompi_*",
+            "hdf5 * nompi_*"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_openmpi_*"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * mpi_openmpi_*",
+            "hdf5",
+            "hdf5 * mpi_openmpi_*",
+            "zlib",
+            "openmpi"
+          ],
+          "run": [
+            "libnetcdf * mpi_openmpi_*",
+            "hdf5 * mpi_openmpi_*",
+            "openmpi"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      }
+    ],
+    "package": {
+      "name": "netcdf-fortran",
+      "version": "4.6.2"
+    },
+    "requirements": {
+      "build": [
+        "cmake",
+        "pkg-config",
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "fortran_compiler_stub",
+        "m4",
+        "make"
+      ],
+      "host": [
+        "libnetcdf",
+        "libnetcdf * mpi_mpich_*",
+        "hdf5",
+        "hdf5 * mpi_mpich_*",
+        "zlib",
+        "mpich",
+        "libnetcdf * nompi_*",
+        "hdf5 * nompi_*",
+        "libnetcdf * mpi_openmpi_*",
+        "hdf5 * mpi_openmpi_*",
+        "openmpi"
+      ],
+      "run": [
+        "libnetcdf * mpi_mpich_*",
+        "hdf5 * mpi_mpich_*",
+        "mpich",
+        "libnetcdf * nompi_*",
+        "hdf5 * nompi_*",
+        "libnetcdf * mpi_openmpi_*",
+        "hdf5 * mpi_openmpi_*",
+        "openmpi"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "patches": [
+        "0001-no-clang.patch",
+        "0002-manpage-quoting.patch",
+        "0003-make-v2compat-cachable.patch"
+      ],
+      "sha256": "44cc7b5626b0b054a8503b8fe7c1b0ac4e0a79a69dad792c212454906a9224ca",
+      "url": "https://github.com/Unidata/netcdf-fortran/archive/v4.6.2.tar.gz"
     }
   },
   "osx_64_requirements": {
@@ -579,7 +3244,8 @@
         "hdf5",
         "libnetcdf",
         "mpich",
-        "openmpi"
+        "openmpi",
+        "zlib"
       ]
     },
     "run": {
@@ -600,19 +3266,23 @@
   },
   "osx_arm64_meta_yaml": {
     "about": {
+      "dev_url": "https://github.com/Unidata/netcdf-fortran",
       "home": "https://github.com/Unidata/netcdf-fortran",
       "license": "NetCDF",
+      "license_family": "NetCDF",
       "license_file": "COPYRIGHT",
       "summary": "Unidata NetCDF Fortran Library"
     },
     "build": {
-      "number": "3",
-      "run_exports": [
-        "netcdf-fortran mpi_mpich_*",
-        "netcdf-fortran",
-        "netcdf-fortran mpi_openmpi_*"
-      ],
-      "string": "mpi_openmpi_h1234567_3"
+      "number": "4",
+      "run_exports": {
+        "weak": [
+          "netcdf-fortran",
+          "netcdf-fortran * mpi_mpich_*",
+          "netcdf-fortran * mpi_openmpi_*"
+        ]
+      },
+      "script": "build.sh"
     },
     "extra": {
       "recipe-maintainers": [
@@ -622,6 +3292,296 @@
         "zklaus"
       ]
     },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_mpich_*"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * mpi_mpich_*",
+            "hdf5",
+            "hdf5 * mpi_mpich_*",
+            "zlib",
+            "mpich"
+          ],
+          "run": [
+            "libnetcdf * mpi_mpich_*",
+            "hdf5 * mpi_mpich_*",
+            "mpich"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * nompi_*",
+            "hdf5",
+            "hdf5 * nompi_*",
+            "zlib"
+          ],
+          "run": [
+            "libnetcdf * nompi_*",
+            "hdf5 * nompi_*"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_openmpi_*"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * mpi_openmpi_*",
+            "hdf5",
+            "hdf5 * mpi_openmpi_*",
+            "zlib",
+            "openmpi"
+          ],
+          "run": [
+            "libnetcdf * mpi_openmpi_*",
+            "hdf5 * mpi_openmpi_*",
+            "openmpi"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_mpich_*"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * mpi_mpich_*",
+            "hdf5",
+            "hdf5 * mpi_mpich_*",
+            "zlib",
+            "mpich"
+          ],
+          "run": [
+            "libnetcdf * mpi_mpich_*",
+            "hdf5 * mpi_mpich_*",
+            "mpich"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * nompi_*",
+            "hdf5",
+            "hdf5 * nompi_*",
+            "zlib"
+          ],
+          "run": [
+            "libnetcdf * nompi_*",
+            "hdf5 * nompi_*"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran",
+            "netcdf-fortran * mpi_openmpi_*"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * mpi_openmpi_*",
+            "hdf5",
+            "hdf5 * mpi_openmpi_*",
+            "zlib",
+            "openmpi"
+          ],
+          "run": [
+            "libnetcdf * mpi_openmpi_*",
+            "hdf5 * mpi_openmpi_*",
+            "openmpi"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      }
+    ],
     "package": {
       "name": "netcdf-fortran",
       "version": "4.6.2"
@@ -641,6 +3601,7 @@
         "libnetcdf * mpi_mpich_*",
         "hdf5",
         "hdf5 * mpi_mpich_*",
+        "zlib",
         "mpich",
         "libnetcdf * nompi_*",
         "hdf5 * nompi_*",
@@ -659,7 +3620,7 @@
         "openmpi"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "patches": [
         "0001-no-clang.patch",
@@ -668,16 +3629,6 @@
       ],
       "sha256": "44cc7b5626b0b054a8503b8fe7c1b0ac4e0a79a69dad792c212454906a9224ca",
       "url": "https://github.com/Unidata/netcdf-fortran/archive/v4.6.2.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "nf-config --version",
-        "test -f $(nf-config --fc)",
-        "test -f $PREFIX/lib/libnetcdff${SHLIB_EXT}"
-      ],
-      "requires": [
-        "fortran_compiler_stub"
-      ]
     }
   },
   "osx_arm64_requirements": {
@@ -699,7 +3650,8 @@
         "hdf5",
         "libnetcdf",
         "mpich",
-        "openmpi"
+        "openmpi",
+        "zlib"
       ]
     },
     "run": {
@@ -736,7 +3688,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/netcdf-fortran.json"
   },
-  "raw_meta_yaml": "{% set version = \"4.6.2\" %}\n{% set build = 3 %}\n\n# recipe-lint fails if mpi is undefined\n{% set mpi = mpi or 'nompi' %}\n{% if mpi == \"nompi\" %}\n# prioritize nompi via build number\n{% set build = build + 100 %}\n{% endif %}\n\npackage:\n  name: netcdf-fortran\n  version: {{ version }}\n\nsource:\n  url: https://github.com/Unidata/netcdf-fortran/archive/v{{ version }}.tar.gz\n  sha256: 44cc7b5626b0b054a8503b8fe7c1b0ac4e0a79a69dad792c212454906a9224ca\n  patches:\n    - 0001-no-clang.patch\n    - 0002-manpage-quoting.patch\n    - 0003-make-v2compat-cachable.patch\n    - 0004-szip.patch  # [win]\n\nbuild:\n  number: {{ build }}\n  merge_build_host: true  # [win]\n\n  # add build string so packages can depend on\n  # mpi or nompi variants explicitly:\n  # `netcdf-fortran * mpi_mpich_*` for mpich\n  # `netcdf-fortran * mpi_*` for any mpi\n  # `netcdf-fortran * nompi_*` for no mpi\n\n  {% if mpi != 'nompi' %}\n  {% set mpi_prefix = \"mpi_\" + mpi %}\n  {% else %}\n  {% set mpi_prefix = \"nompi\" %}\n  {% endif %}\n  string: {{ mpi_prefix }}_h{{ PKG_HASH }}_{{ build }}\n\n  {% if mpi != 'nompi' %}\n  {% set build_pin = mpi_prefix + '_*' %}\n  {% else %}\n  {% set build_pin = '' %}\n  {% endif %}\n\n  run_exports:\n    # https://abi-laboratory.pro/index.php?view=timeline&l=netcdf-fortran\n    - {{ pin_subpackage('netcdf-fortran', max_pin='x.x') }} {{ build_pin }}\n\nrequirements:\n  build:\n    # General\n    - cmake\n    - pkg-config\n    - {{ mpi }}  # [mpi == 'openmpi' and build_platform != target_platform]\n    # Unix\n    - {{ compiler('c') }}  # [unix]\n    - {{ stdlib('c') }}  # [unix]\n    - {{ compiler('fortran') }}  # [unix]\n    - m4  # [unix]\n    - make  # [unix]\n    # Win\n    - {{ compiler('m2w64_c') }}  # [win]\n    - {{ stdlib('m2w64_c') }}  # [win]\n    - {{ compiler('m2w64_fortran') }}  # [win]\n    - ninja  # [win]\n  host:\n    # need to list hdf5 and libnetcdf twice to get version pinning from conda_build_config\n    # and build pinning from {{ mpi_prefix }}\n    - libnetcdf\n    - libnetcdf * {{ mpi_prefix }}_*\n    - hdf5\n    - hdf5 * {{ mpi_prefix }}_*\n    - {{ mpi }}  # [mpi != 'nompi']\n  run:\n    - libnetcdf * {{ mpi_prefix }}_*\n    - hdf5 * {{ mpi_prefix }}_*\n    - {{ mpi }}  # [mpi != 'nompi']\n\ntest:\n  requires:\n    - {{ compiler('fortran') }}  # [not win]\n    - {{ compiler('m2w64_fortran') }}  # [win]\n  commands:\n    - nf-config --version  # [not win]\n    - test -f $(nf-config --fc)  # [not win]\n    - test -f $PREFIX/lib/libnetcdff${SHLIB_EXT}  # [not win]\n    # MinGW style import lib (.dll.a); check can be removed if we\n    # switch to flang or similar, or if we decide to only ship .lib\n    - if not exist %LIBRARY_LIB%/libnetcdff.dll.a exit 1  # [win]\n    - if not exist %LIBRARY_LIB%/libnetcdff.lib exit 1  # [win]\n\nabout:\n  home: https://github.com/Unidata/netcdf-fortran\n  license: NetCDF\n  license_file: COPYRIGHT\n  summary: Unidata NetCDF Fortran Library\n\nextra:\n  recipe-maintainers:\n    - ocefpaf\n    - bekozi\n    - xylar\n    - zklaus\n",
+  "raw_meta_yaml": "schema_version: 1\n\ncontext:\n  name: netcdf-fortran\n  version: \"4.6.2\"\n  build: 4\n  # recipe-lint fails if mpi is undefined\n  mpi: ${{ mpi or \"nompi\" }}\n  # prioritize nompi via build number\n  build_number: ${{ build + 100 if mpi == \"nompi\" else build }}\n  mpi_prefix: ${{ \"mpi_\" + mpi if mpi != \"nompi\" else \"nompi\" }}\n\npackage:\n  name: ${{ name }}\n  version: ${{ version }}\n\nsource:\n  url: https://github.com/Unidata/netcdf-fortran/archive/v${{ version }}.tar.gz\n  sha256: 44cc7b5626b0b054a8503b8fe7c1b0ac4e0a79a69dad792c212454906a9224ca\n  patches:\n    - 0001-no-clang.patch\n    - 0002-manpage-quoting.patch\n    - 0003-make-v2compat-cachable.patch\n    - if: win\n      then: 0004-szip.patch\n\nbuild:\n  number: ${{ build_number }}\n  script:\n    - if: win\n      then: build.bat\n    - if: unix\n      then: build.sh\n\n  # add build string so packages can depend on\n  # mpi or nompi variants explicitly:\n  # `netcdf-fortran * mpi_mpich_*` for mpich\n  # `netcdf-fortran * mpi_*` for any mpi\n  # `netcdf-fortran * nompi_*` for no mpi\n  string: ${{ mpi_prefix }}_h${{ hash }}_${{ build_number }}\n\nrequirements:\n  build:\n    # General\n    - cmake\n    - pkg-config\n    - if: mpi == \"openmpi\" and build_platform != target_platform\n      then: ${{ mpi }}\n    # Unix\n    - if: unix\n      then:\n        - ${{ compiler('c') }}\n        - ${{ stdlib(\"c\") }}\n        - ${{ compiler('fortran') }}\n        - m4\n        - make\n    # Win\n    - if: win\n      then:\n        - ${{ compiler('m2w64_c') }}\n        - ${{ stdlib(\"m2w64_c\") }}\n        - ${{ compiler('m2w64_fortran') }}\n        - ninja\n  host:\n    # need to list hdf5 and libnetcdf twice to get version pinning from\n    # conda_build_config and build pinning from ${{ mpi_prefix }}\n    - libnetcdf\n    - libnetcdf * ${{ mpi_prefix }}_*\n    - hdf5\n    - hdf5 * ${{ mpi_prefix }}_*\n    - zlib\n    - if: mpi != \"nompi\"\n      then: ${{ mpi }}\n  run:\n    - libnetcdf * ${{ mpi_prefix }}_*\n    - hdf5 * ${{ mpi_prefix }}_*\n    - if: mpi != \"nompi\"\n      then: ${{ mpi }}\n  run_exports:\n    # https://abi-laboratory.pro/index.php?view=timeline&l=netcdf-fortran\n    - ${{ pin_subpackage(name, upper_bound=\"x.x\") }}\n    - if: mpi != \"nompi\"\n      then: ${{ name }} * ${{ mpi_prefix }}_*\n\ntests:\n  - requirements:\n      build:\n        - if: not win\n          then:\n            - ${{ compiler('fortran') }}\n        - if: win\n          then:\n            - ${{ compiler('m2w64_fortran') }}\n    script:\n      - if: not win\n        then:\n          - nf-config --version\n          - command -v \"$(basename \"$(nf-config --fc)\")\"\n          - test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}\n      - if: win\n        then:\n          - if not exist %PREFIX%\\Library\\bin\\libnetcdff.dll exit 1\n          - if not exist %PREFIX%\\Library\\lib\\libnetcdff.lib exit 1\n\nabout:\n  homepage: https://github.com/Unidata/netcdf-fortran\n  license: NetCDF\n  license_file: COPYRIGHT\n  summary: Unidata NetCDF Fortran Library\n  repository: https://github.com/Unidata/netcdf-fortran\n\nextra:\n  recipe-maintainers:\n    - ocefpaf\n    - bekozi\n    - xylar\n    - zklaus\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -746,15 +3698,12 @@
       "fortran_compiler_stub",
       "hdf5",
       "libnetcdf",
-      "m2w64_c_compiler_stub",
-      "m2w64_c_stdlib_stub",
-      "m2w64_fortran_compiler_stub",
       "m4",
       "make",
       "mpich",
-      "ninja",
       "openmpi",
-      "pkg-config"
+      "pkg-config",
+      "zlib"
     ]
   },
   "requirements": {
@@ -765,12 +3714,8 @@
         "c_stdlib_stub",
         "cmake",
         "fortran_compiler_stub",
-        "m2w64_c_compiler_stub",
-        "m2w64_c_stdlib_stub",
-        "m2w64_fortran_compiler_stub",
         "m4",
         "make",
-        "ninja",
         "pkg-config"
       ]
     },
@@ -783,7 +3728,8 @@
         "hdf5",
         "libnetcdf",
         "mpich",
-        "openmpi"
+        "openmpi",
+        "zlib"
       ]
     },
     "run": {
@@ -801,8 +3747,7 @@
     "test": {
       "__set__": true,
       "elements": [
-        "fortran_compiler_stub",
-        "m2w64_fortran_compiler_stub"
+        "fortran_compiler_stub"
       ]
     }
   },
@@ -815,12 +3760,8 @@
         "c_stdlib_stub",
         "cmake",
         "fortran_compiler_stub",
-        "m2w64_c_compiler_stub",
-        "m2w64_c_stdlib_stub",
-        "m2w64_fortran_compiler_stub",
         "m4",
         "make",
-        "ninja",
         "pkg-config"
       ]
     },
@@ -836,7 +3777,8 @@
         "libnetcdf * mpi_openmpi_*",
         "libnetcdf * nompi_*",
         "mpich",
-        "openmpi"
+        "openmpi",
+        "zlib"
       ]
     },
     "run": {
@@ -855,8 +3797,7 @@
     "test": {
       "__set__": true,
       "elements": [
-        "fortran_compiler_stub",
-        "m2w64_fortran_compiler_stub"
+        "fortran_compiler_stub"
       ]
     }
   },
@@ -867,18 +3808,21 @@
   },
   "win_64_meta_yaml": {
     "about": {
+      "dev_url": "https://github.com/Unidata/netcdf-fortran",
       "home": "https://github.com/Unidata/netcdf-fortran",
       "license": "NetCDF",
+      "license_family": "NetCDF",
       "license_file": "COPYRIGHT",
       "summary": "Unidata NetCDF Fortran Library"
     },
     "build": {
-      "merge_build_host": true,
-      "number": "103",
-      "run_exports": [
-        "netcdf-fortran"
-      ],
-      "string": "nompi_h1234567_103"
+      "number": "104",
+      "run_exports": {
+        "weak": [
+          "netcdf-fortran"
+        ]
+      },
+      "script": "build.sh"
     },
     "extra": {
       "recipe-maintainers": [
@@ -888,6 +3832,100 @@
         "zklaus"
       ]
     },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * nompi_*",
+            "hdf5",
+            "hdf5 * nompi_*",
+            "zlib"
+          ],
+          "run": [
+            "libnetcdf * nompi_*",
+            "hdf5 * nompi_*"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "netcdf-fortran"
+          ]
+        },
+        "name": "netcdf-fortran",
+        "requirements": {
+          "build": [
+            "cmake",
+            "pkg-config",
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "fortran_compiler_stub",
+            "m4",
+            "make"
+          ],
+          "host": [
+            "libnetcdf",
+            "libnetcdf * nompi_*",
+            "hdf5",
+            "hdf5 * nompi_*",
+            "zlib"
+          ],
+          "run": [
+            "libnetcdf * nompi_*",
+            "hdf5 * nompi_*"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "fortran_compiler_stub"
+              ]
+            },
+            "script": [
+              "nf-config --version",
+              "command -v \"$(basename \"$(nf-config --fc)\")\"",
+              "test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}"
+            ]
+          }
+        ],
+        "version": "4.6.2"
+      }
+    ],
     "package": {
       "name": "netcdf-fortran",
       "version": "4.6.2"
@@ -896,52 +3934,45 @@
       "build": [
         "cmake",
         "pkg-config",
-        "m2w64_c_compiler_stub",
-        "m2w64_c_stdlib_stub",
-        "m2w64_fortran_compiler_stub",
-        "ninja"
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "fortran_compiler_stub",
+        "m4",
+        "make"
       ],
       "host": [
         "libnetcdf",
         "libnetcdf * nompi_*",
         "hdf5",
-        "hdf5 * nompi_*"
+        "hdf5 * nompi_*",
+        "zlib"
       ],
       "run": [
         "libnetcdf * nompi_*",
         "hdf5 * nompi_*"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "patches": [
         "0001-no-clang.patch",
         "0002-manpage-quoting.patch",
-        "0003-make-v2compat-cachable.patch",
-        "0004-szip.patch"
+        "0003-make-v2compat-cachable.patch"
       ],
       "sha256": "44cc7b5626b0b054a8503b8fe7c1b0ac4e0a79a69dad792c212454906a9224ca",
       "url": "https://github.com/Unidata/netcdf-fortran/archive/v4.6.2.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "if not exist %LIBRARY_LIB%/libnetcdff.dll.a exit 1",
-        "if not exist %LIBRARY_LIB%/libnetcdff.lib exit 1"
-      ],
-      "requires": [
-        "m2w64_fortran_compiler_stub"
-      ]
     }
   },
   "win_64_requirements": {
     "build": {
       "__set__": true,
       "elements": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
         "cmake",
-        "m2w64_c_compiler_stub",
-        "m2w64_c_stdlib_stub",
-        "m2w64_fortran_compiler_stub",
-        "ninja",
+        "fortran_compiler_stub",
+        "m4",
+        "make",
         "pkg-config"
       ]
     },
@@ -949,7 +3980,8 @@
       "__set__": true,
       "elements": [
         "hdf5",
-        "libnetcdf"
+        "libnetcdf",
+        "zlib"
       ]
     },
     "run": {
@@ -962,7 +3994,7 @@
     "test": {
       "__set__": true,
       "elements": [
-        "m2w64_fortran_compiler_stub"
+        "fortran_compiler_stub"
       ]
     }
   }
