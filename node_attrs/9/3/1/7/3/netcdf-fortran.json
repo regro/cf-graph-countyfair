@@ -1,7 +1,7 @@
 {
   "archived": false,
   "branch": "main",
-  "ci_support_linux_64_hdf51.14.6mpimpich.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\nfortran_compiler:\n- gfortran\nfortran_compiler_version:\n- '14'\nhdf5:\n- 1.14.6\nlibnetcdf:\n- 4.10.0\nmpi:\n- mpich\nmpich:\n- '4'\nopenmpi:\n- '5'\ntarget_platform:\n- linux-64\nzip_keys:\n- - c_compiler_version\n  - fortran_compiler_version\nzlib:\n- '1'\n",
+  "ci_support_linux_64_hdf51.14.6mpimpich.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\nfortran_compiler:\n- gfortran\nfortran_compiler_version:\n- '14'\nhdf5:\n- 1.14.6\nlibnetcdf:\n- 4.10.0\nmpi:\n- mpich\nmpich:\n- '5'\nopenmpi:\n- '5'\ntarget_platform:\n- linux-64\nzip_keys:\n- - c_compiler_version\n  - fortran_compiler_version\nzlib:\n- '1'\n",
   "conda-forge.yml": {
     "build_platform": {
       "linux_aarch64": "linux_64",
@@ -24,8 +24,8 @@
     },
     "test": "native_and_emulated"
   },
-  "feedstock_hash": "4f3f3e1f0a1968691319cc31bd389f6df0ee440e",
-  "feedstock_hash_ts": 1774444273,
+  "feedstock_hash": "112726fb8668bd744d5550d2aa45f9d6fb569a66",
+  "feedstock_hash_ts": 1774640108,
   "feedstock_name": "netcdf-fortran",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -38,7 +38,7 @@
       "summary": "Unidata NetCDF Fortran Library"
     },
     "build": {
-      "number": "4",
+      "number": "5",
       "run_exports": {
         "weak": [
           "netcdf-fortran",
@@ -444,7 +444,7 @@
       "summary": "Unidata NetCDF Fortran Library"
     },
     "build": {
-      "number": "4",
+      "number": "5",
       "run_exports": {
         "weak": [
           "netcdf-fortran",
@@ -850,7 +850,7 @@
       "summary": "Unidata NetCDF Fortran Library"
     },
     "build": {
-      "number": "4",
+      "number": "5",
       "run_exports": {
         "weak": [
           "netcdf-fortran",
@@ -1256,7 +1256,7 @@
       "summary": "Unidata NetCDF Fortran Library"
     },
     "build": {
-      "number": "104",
+      "number": "105",
       "run_exports": {
         "weak": [
           "netcdf-fortran",
@@ -2868,7 +2868,7 @@
       "summary": "Unidata NetCDF Fortran Library"
     },
     "build": {
-      "number": "4",
+      "number": "5",
       "run_exports": {
         "weak": [
           "netcdf-fortran",
@@ -3274,7 +3274,7 @@
       "summary": "Unidata NetCDF Fortran Library"
     },
     "build": {
-      "number": "4",
+      "number": "5",
       "run_exports": {
         "weak": [
           "netcdf-fortran",
@@ -3688,7 +3688,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/netcdf-fortran.json"
   },
-  "raw_meta_yaml": "schema_version: 1\n\ncontext:\n  name: netcdf-fortran\n  version: \"4.6.2\"\n  build: 4\n  # recipe-lint fails if mpi is undefined\n  mpi: ${{ mpi or \"nompi\" }}\n  # prioritize nompi via build number\n  build_number: ${{ build + 100 if mpi == \"nompi\" else build }}\n  mpi_prefix: ${{ \"mpi_\" + mpi if mpi != \"nompi\" else \"nompi\" }}\n\npackage:\n  name: ${{ name }}\n  version: ${{ version }}\n\nsource:\n  url: https://github.com/Unidata/netcdf-fortran/archive/v${{ version }}.tar.gz\n  sha256: 44cc7b5626b0b054a8503b8fe7c1b0ac4e0a79a69dad792c212454906a9224ca\n  patches:\n    - 0001-no-clang.patch\n    - 0002-manpage-quoting.patch\n    - 0003-make-v2compat-cachable.patch\n    - if: win\n      then: 0004-szip.patch\n\nbuild:\n  number: ${{ build_number }}\n  script:\n    - if: win\n      then: build.bat\n    - if: unix\n      then: build.sh\n\n  # add build string so packages can depend on\n  # mpi or nompi variants explicitly:\n  # `netcdf-fortran * mpi_mpich_*` for mpich\n  # `netcdf-fortran * mpi_*` for any mpi\n  # `netcdf-fortran * nompi_*` for no mpi\n  string: ${{ mpi_prefix }}_h${{ hash }}_${{ build_number }}\n\nrequirements:\n  build:\n    # General\n    - cmake\n    - pkg-config\n    - if: mpi == \"openmpi\" and build_platform != target_platform\n      then: ${{ mpi }}\n    # Unix\n    - if: unix\n      then:\n        - ${{ compiler('c') }}\n        - ${{ stdlib(\"c\") }}\n        - ${{ compiler('fortran') }}\n        - m4\n        - make\n    # Win\n    - if: win\n      then:\n        - ${{ compiler('m2w64_c') }}\n        - ${{ stdlib(\"m2w64_c\") }}\n        - ${{ compiler('m2w64_fortran') }}\n        - ninja\n  host:\n    # need to list hdf5 and libnetcdf twice to get version pinning from\n    # conda_build_config and build pinning from ${{ mpi_prefix }}\n    - libnetcdf\n    - libnetcdf * ${{ mpi_prefix }}_*\n    - hdf5\n    - hdf5 * ${{ mpi_prefix }}_*\n    - zlib\n    - if: mpi != \"nompi\"\n      then: ${{ mpi }}\n  run:\n    - libnetcdf * ${{ mpi_prefix }}_*\n    - hdf5 * ${{ mpi_prefix }}_*\n    - if: mpi != \"nompi\"\n      then: ${{ mpi }}\n  run_exports:\n    # https://abi-laboratory.pro/index.php?view=timeline&l=netcdf-fortran\n    - ${{ pin_subpackage(name, upper_bound=\"x.x\") }}\n    - if: mpi != \"nompi\"\n      then: ${{ name }} * ${{ mpi_prefix }}_*\n\ntests:\n  - requirements:\n      build:\n        - if: not win\n          then:\n            - ${{ compiler('fortran') }}\n        - if: win\n          then:\n            - ${{ compiler('m2w64_fortran') }}\n    script:\n      - if: not win\n        then:\n          - nf-config --version\n          - command -v \"$(basename \"$(nf-config --fc)\")\"\n          - test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}\n      - if: win\n        then:\n          - if not exist %PREFIX%\\Library\\bin\\libnetcdff.dll exit 1\n          - if not exist %PREFIX%\\Library\\lib\\libnetcdff.lib exit 1\n\nabout:\n  homepage: https://github.com/Unidata/netcdf-fortran\n  license: NetCDF\n  license_file: COPYRIGHT\n  summary: Unidata NetCDF Fortran Library\n  repository: https://github.com/Unidata/netcdf-fortran\n\nextra:\n  recipe-maintainers:\n    - ocefpaf\n    - bekozi\n    - xylar\n    - zklaus\n",
+  "raw_meta_yaml": "schema_version: 1\n\ncontext:\n  name: netcdf-fortran\n  version: \"4.6.2\"\n  build: 5\n  # recipe-lint fails if mpi is undefined\n  mpi: ${{ mpi or \"nompi\" }}\n  # prioritize nompi via build number\n  build_number: ${{ build + 100 if mpi == \"nompi\" else build }}\n  mpi_prefix: ${{ \"mpi_\" + mpi if mpi != \"nompi\" else \"nompi\" }}\n\npackage:\n  name: ${{ name }}\n  version: ${{ version }}\n\nsource:\n  url: https://github.com/Unidata/netcdf-fortran/archive/v${{ version }}.tar.gz\n  sha256: 44cc7b5626b0b054a8503b8fe7c1b0ac4e0a79a69dad792c212454906a9224ca\n  patches:\n    - 0001-no-clang.patch\n    - 0002-manpage-quoting.patch\n    - 0003-make-v2compat-cachable.patch\n    - if: win\n      then: 0004-szip.patch\n\nbuild:\n  number: ${{ build_number }}\n  script:\n    - if: win\n      then: build.bat\n    - if: unix\n      then: build.sh\n\n  # add build string so packages can depend on\n  # mpi or nompi variants explicitly:\n  # `netcdf-fortran * mpi_mpich_*` for mpich\n  # `netcdf-fortran * mpi_*` for any mpi\n  # `netcdf-fortran * nompi_*` for no mpi\n  string: ${{ mpi_prefix }}_h${{ hash }}_${{ build_number }}\n\nrequirements:\n  build:\n    # General\n    - cmake\n    - pkg-config\n    - if: mpi == \"openmpi\" and build_platform != target_platform\n      then: ${{ mpi }}\n    # Unix\n    - if: unix\n      then:\n        - ${{ compiler('c') }}\n        - ${{ stdlib(\"c\") }}\n        - ${{ compiler('fortran') }}\n        - m4\n        - make\n    # Win\n    - if: win\n      then:\n        - ${{ compiler('m2w64_c') }}\n        - ${{ stdlib(\"m2w64_c\") }}\n        - ${{ compiler('m2w64_fortran') }}\n        - ninja\n  host:\n    # need to list hdf5 and libnetcdf twice to get version pinning from\n    # conda_build_config and build pinning from ${{ mpi_prefix }}\n    - libnetcdf\n    - libnetcdf * ${{ mpi_prefix }}_*\n    - hdf5\n    - hdf5 * ${{ mpi_prefix }}_*\n    - zlib\n    - if: mpi != \"nompi\"\n      then: ${{ mpi }}\n  run:\n    - libnetcdf * ${{ mpi_prefix }}_*\n    - hdf5 * ${{ mpi_prefix }}_*\n    - if: mpi != \"nompi\"\n      then: ${{ mpi }}\n  run_exports:\n    # https://abi-laboratory.pro/index.php?view=timeline&l=netcdf-fortran\n    - ${{ pin_subpackage(name, upper_bound=\"x.x\") }}\n    - if: mpi != \"nompi\"\n      then: ${{ name }} * ${{ mpi_prefix }}_*\n\ntests:\n  - requirements:\n      build:\n        - if: not win\n          then:\n            - ${{ compiler('fortran') }}\n          else:\n            - ${{ compiler('m2w64_fortran') }}\n    script:\n      - if: not win\n        then:\n          - nf-config --version\n          - command -v \"$(basename \"$(nf-config --fc)\")\"\n          - test -f ${PREFIX}/lib/libnetcdff${SHLIB_EXT}\n        else:\n          - if not exist %PREFIX%\\Library\\bin\\libnetcdff.dll exit 1\n          - if not exist %PREFIX%\\Library\\lib\\libnetcdff.lib exit 1\nabout:\n  homepage: https://github.com/Unidata/netcdf-fortran\n  license: NetCDF\n  license_file: COPYRIGHT\n  summary: Unidata NetCDF Fortran Library\n  repository: https://github.com/Unidata/netcdf-fortran\n\nextra:\n  recipe-maintainers:\n    - ocefpaf\n    - bekozi\n    - xylar\n    - zklaus\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -3816,7 +3816,7 @@
       "summary": "Unidata NetCDF Fortran Library"
     },
     "build": {
-      "number": "104",
+      "number": "105",
       "run_exports": {
         "weak": [
           "netcdf-fortran"
