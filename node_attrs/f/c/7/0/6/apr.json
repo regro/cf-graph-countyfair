@@ -1,17 +1,15 @@
 {
   "archived": false,
   "branch": "main",
-  "ci_support_linux_64_.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '12'\ncdt_name:\n- cos6\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ndocker_image:\n- quay.io/condaforge/linux-anvil-cos7-x86_64\nexpat:\n- '2'\ntarget_platform:\n- linux-64\n",
+  "ci_support_linux_64_.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\nexpat:\n- '2'\ntarget_platform:\n- linux-64\n",
   "conda-forge.yml": {
     "azure": {
       "upload_packages": true
     },
-    "build_platform": {
-      "osx_arm64": "osx_64"
-    },
     "conda_build": {
       "pkg_format": "2"
     },
+    "conda_build_tool": "rattler-build",
     "conda_forge_output_validation": true,
     "github": {
       "branch_name": "main",
@@ -19,28 +17,33 @@
     },
     "provider": {
       "linux_aarch64": "default",
-      "linux_ppc64le": "default"
+      "osx_arm64": "default"
     },
     "test": "native_and_emulated"
   },
-  "feedstock_hash": "8f9e601ca7d8c4e9cbd292d89e3fe7eab7642150",
-  "feedstock_hash_ts": 1773752014,
+  "feedstock_hash": "acf721868dc9d5c72ad3ba6be1511c342f85e309",
+  "feedstock_hash_ts": 1774616926,
   "feedstock_name": "apr",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
     "about": {
-      "description": "Apache Portable Run-time libraries have been designed to provide a common\ninterface to low level routines across any platform.The original goal of APR\nwas to combine all code in Apache to one common code base.\n",
-      "dev_url": "https://svn.apache.org/viewvc/apr",
-      "doc_source_url": "https://github.com/apache/apr/tree/trunk/docs",
+      "description": "Apache Portable Run-time libraries have been designed to provide a common\ninterface to low level routines across any platform. The original goal of APR\nwas to combine all code in Apache to one common code base.",
+      "dev_url": "https://github.com/apache/apr",
       "doc_url": "https://apr.apache.org/docs/apr/1.6/index.html",
       "home": "http://apr.apache.org/",
       "license": "Apache-2.0",
-      "license_family": "Apache",
-      "license_file": "apr/LICENSE",
+      "license_family": "Apache-2.0",
+      "license_file": "LICENSE",
       "summary": "Maintains a consistent API with predictable behaviour"
     },
     "build": {
-      "number": "6"
+      "number": "0",
+      "run_exports": {
+        "weak": [
+          "libapr"
+        ]
+      },
+      "script": "install_libapr"
     },
     "extra": {
       "recipe-maintainers": [
@@ -55,7 +58,8 @@
     "outputs": [
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libapr"
           ]
         },
@@ -63,27 +67,70 @@
         "requirements": {
           "build": [
             "c_compiler_stub",
+            "c_stdlib_stub",
             "make",
-            "libtool",
-            "autoconf <2.70",
-            "automake",
-            "gettext"
+            "libtool"
           ],
-          "host": []
+          "host": [
+            "libxcrypt"
+          ],
+          "run": []
         },
-        "script": "install_libapr.sh",
-        "test": {
-          "commands": [
-            "apr-1-config --help",
-            "test -f ${PREFIX}/include/apr-1/apr.h",
-            "test -f ${PREFIX}/lib/libapr-1${SHLIB_EXT}"
-          ]
-        },
-        "version": "1.7.0"
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "**/apr.h"
+              ],
+              "lib": [
+                "libapr-1"
+              ]
+            }
+          },
+          {
+            "script": "apr-1-config --help"
+          }
+        ],
+        "version": "1.7.6"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
+            "libapriconv"
+          ]
+        },
+        "name": "libapriconv",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "make",
+            "libtool"
+          ],
+          "host": [
+            "libapr"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "**/apr_iconv.h"
+              ],
+              "lib": [
+                "libapriconv-1"
+              ]
+            }
+          }
+        ],
+        "version": "1.2.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
             "libaprutil"
           ]
         },
@@ -91,6 +138,7 @@
         "requirements": {
           "build": [
             "c_compiler_stub",
+            "c_stdlib_stub",
             "make",
             "libtool"
           ],
@@ -99,92 +147,73 @@
             "libapr",
             "libapriconv",
             "libxcrypt"
-          ]
+          ],
+          "run": []
         },
-        "script": "install_libaprutil.sh",
-        "test": {
-          "commands": [
-            "apu-1-config --help",
-            "test -f ${PREFIX}/include/apr-1/apu.h",
-            "test -f ${PREFIX}/lib/libaprutil-1${SHLIB_EXT}"
-          ]
-        },
-        "version": "1.6.1"
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "**/apu.h"
+              ],
+              "lib": [
+                "libaprutil-1"
+              ]
+            }
+          },
+          {
+            "script": "apu-1-config --help"
+          }
+        ],
+        "version": "1.6.3"
       },
       {
-        "build": {
-          "run_exports": [
+        "build": null,
+        "name": "apr",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "libapr",
+            "libaprutil",
             "libapriconv"
           ]
         },
-        "name": "libapriconv",
-        "requirements": {
-          "build": [
-            "c_compiler_stub",
-            "make",
-            "libtool"
-          ],
-          "host": [
-            "libapr"
-          ]
-        },
-        "script": "install_libapriconv.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/lib/libapriconv-1${SHLIB_EXT}"
-          ]
-        },
-        "version": "1.2.2"
+        "tests": [
+          {
+            "script": "echo \"apr meta-package\""
+          }
+        ],
+        "version": "1.7.6"
       }
     ],
     "package": {
-      "name": "apr",
-      "version": "1.7.0"
+      "name": "libapr",
+      "version": "1.7.6"
     },
     "requirements": {
       "build": [
         "c_compiler_stub",
-        "libtool",
-        "make"
+        "c_stdlib_stub",
+        "make",
+        "libtool"
       ],
-      "host": [],
-      "run": [
-        "libapr",
-        "libaprutil",
-        "libapriconv"
+      "host": [
+        "libxcrypt"
       ]
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "folder": "apr",
-        "patches": [
-          "patches/osx-libapr-darwin20-hints.patch",
-          "patches/cross-compile-apr-866e1df.patch"
-        ],
-        "sha256": "48e9dbf45ae3fdc7b491259ffb6ccf7d63049ffacbc1c0977cced095e4c2d5a2",
-        "url": "https://archive.apache.org/dist/apr/apr-1.7.0.tar.gz"
-      },
-      {
-        "folder": "apr-util",
-        "sha256": "b65e40713da57d004123b6319828be7f1273fbc6490e145874ee1177e112c459",
-        "url": "https://archive.apache.org/dist/apr/apr-util-1.6.1.tar.gz"
-      },
-      {
-        "folder": "apr-iconv",
-        "sha256": "ce94c7722ede927ce1e5a368675ace17d96d60ff9b8918df216ee5c1298c6a5e",
-        "url": "https://archive.apache.org/dist/apr/apr-iconv-1.2.2.tar.gz"
-      }
-    ]
+    "schema_version": 1,
+    "source": {
+      "sha256": "6a10e7f7430510600af25fabf466e1df61aaae910bf1dc5d10c44a4433ccc81d",
+      "url": "https://archive.apache.org/dist/apr/apr-1.7.6.tar.gz"
+    }
   },
   "linux_64_requirements": {
     "build": {
       "__set__": true,
       "elements": [
-        "autoconf",
-        "automake",
         "c_compiler_stub",
-        "gettext",
+        "c_stdlib_stub",
         "libtool",
         "make"
       ]
@@ -213,18 +242,23 @@
   },
   "linux_aarch64_meta_yaml": {
     "about": {
-      "description": "Apache Portable Run-time libraries have been designed to provide a common\ninterface to low level routines across any platform.The original goal of APR\nwas to combine all code in Apache to one common code base.\n",
-      "dev_url": "https://svn.apache.org/viewvc/apr",
-      "doc_source_url": "https://github.com/apache/apr/tree/trunk/docs",
+      "description": "Apache Portable Run-time libraries have been designed to provide a common\ninterface to low level routines across any platform. The original goal of APR\nwas to combine all code in Apache to one common code base.",
+      "dev_url": "https://github.com/apache/apr",
       "doc_url": "https://apr.apache.org/docs/apr/1.6/index.html",
       "home": "http://apr.apache.org/",
       "license": "Apache-2.0",
-      "license_family": "Apache",
-      "license_file": "apr/LICENSE",
+      "license_family": "Apache-2.0",
+      "license_file": "LICENSE",
       "summary": "Maintains a consistent API with predictable behaviour"
     },
     "build": {
-      "number": "6"
+      "number": "0",
+      "run_exports": {
+        "weak": [
+          "libapr"
+        ]
+      },
+      "script": "install_libapr"
     },
     "extra": {
       "recipe-maintainers": [
@@ -239,7 +273,8 @@
     "outputs": [
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libapr"
           ]
         },
@@ -247,27 +282,70 @@
         "requirements": {
           "build": [
             "c_compiler_stub",
+            "c_stdlib_stub",
             "make",
-            "libtool",
-            "autoconf <2.70",
-            "automake",
-            "gettext"
+            "libtool"
           ],
-          "host": []
+          "host": [
+            "libxcrypt"
+          ],
+          "run": []
         },
-        "script": "install_libapr.sh",
-        "test": {
-          "commands": [
-            "apr-1-config --help",
-            "test -f ${PREFIX}/include/apr-1/apr.h",
-            "test -f ${PREFIX}/lib/libapr-1${SHLIB_EXT}"
-          ]
-        },
-        "version": "1.7.0"
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "**/apr.h"
+              ],
+              "lib": [
+                "libapr-1"
+              ]
+            }
+          },
+          {
+            "script": "apr-1-config --help"
+          }
+        ],
+        "version": "1.7.6"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
+            "libapriconv"
+          ]
+        },
+        "name": "libapriconv",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "make",
+            "libtool"
+          ],
+          "host": [
+            "libapr"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "**/apr_iconv.h"
+              ],
+              "lib": [
+                "libapriconv-1"
+              ]
+            }
+          }
+        ],
+        "version": "1.2.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
             "libaprutil"
           ]
         },
@@ -275,6 +353,7 @@
         "requirements": {
           "build": [
             "c_compiler_stub",
+            "c_stdlib_stub",
             "make",
             "libtool"
           ],
@@ -283,276 +362,73 @@
             "libapr",
             "libapriconv",
             "libxcrypt"
-          ]
+          ],
+          "run": []
         },
-        "script": "install_libaprutil.sh",
-        "test": {
-          "commands": [
-            "apu-1-config --help",
-            "test -f ${PREFIX}/include/apr-1/apu.h",
-            "test -f ${PREFIX}/lib/libaprutil-1${SHLIB_EXT}"
-          ]
-        },
-        "version": "1.6.1"
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "**/apu.h"
+              ],
+              "lib": [
+                "libaprutil-1"
+              ]
+            }
+          },
+          {
+            "script": "apu-1-config --help"
+          }
+        ],
+        "version": "1.6.3"
       },
       {
-        "build": {
-          "run_exports": [
+        "build": null,
+        "name": "apr",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "libapr",
+            "libaprutil",
             "libapriconv"
           ]
         },
-        "name": "libapriconv",
-        "requirements": {
-          "build": [
-            "c_compiler_stub",
-            "make",
-            "libtool"
-          ],
-          "host": [
-            "libapr"
-          ]
-        },
-        "script": "install_libapriconv.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/lib/libapriconv-1${SHLIB_EXT}"
-          ]
-        },
-        "version": "1.2.2"
+        "tests": [
+          {
+            "script": "echo \"apr meta-package\""
+          }
+        ],
+        "version": "1.7.6"
       }
     ],
     "package": {
-      "name": "apr",
-      "version": "1.7.0"
+      "name": "libapr",
+      "version": "1.7.6"
     },
     "requirements": {
       "build": [
         "c_compiler_stub",
-        "libtool",
-        "make"
+        "c_stdlib_stub",
+        "make",
+        "libtool"
       ],
-      "host": [],
-      "run": [
-        "libapr",
-        "libaprutil",
-        "libapriconv"
+      "host": [
+        "libxcrypt"
       ]
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "folder": "apr",
-        "patches": [
-          "patches/osx-libapr-darwin20-hints.patch",
-          "patches/cross-compile-apr-866e1df.patch"
-        ],
-        "sha256": "48e9dbf45ae3fdc7b491259ffb6ccf7d63049ffacbc1c0977cced095e4c2d5a2",
-        "url": "https://archive.apache.org/dist/apr/apr-1.7.0.tar.gz"
-      },
-      {
-        "folder": "apr-util",
-        "sha256": "b65e40713da57d004123b6319828be7f1273fbc6490e145874ee1177e112c459",
-        "url": "https://archive.apache.org/dist/apr/apr-util-1.6.1.tar.gz"
-      },
-      {
-        "folder": "apr-iconv",
-        "sha256": "ce94c7722ede927ce1e5a368675ace17d96d60ff9b8918df216ee5c1298c6a5e",
-        "url": "https://archive.apache.org/dist/apr/apr-iconv-1.2.2.tar.gz"
-      }
-    ]
+    "schema_version": 1,
+    "source": {
+      "sha256": "6a10e7f7430510600af25fabf466e1df61aaae910bf1dc5d10c44a4433ccc81d",
+      "url": "https://archive.apache.org/dist/apr/apr-1.7.6.tar.gz"
+    }
   },
   "linux_aarch64_requirements": {
     "build": {
       "__set__": true,
       "elements": [
-        "autoconf",
-        "automake",
         "c_compiler_stub",
-        "gettext",
-        "libtool",
-        "make"
-      ]
-    },
-    "host": {
-      "__set__": true,
-      "elements": [
-        "expat",
-        "libapr",
-        "libapriconv",
-        "libxcrypt"
-      ]
-    },
-    "run": {
-      "__set__": true,
-      "elements": [
-        "libapr",
-        "libapriconv",
-        "libaprutil"
-      ]
-    },
-    "test": {
-      "__set__": true,
-      "elements": []
-    }
-  },
-  "linux_ppc64le_meta_yaml": {
-    "about": {
-      "description": "Apache Portable Run-time libraries have been designed to provide a common\ninterface to low level routines across any platform.The original goal of APR\nwas to combine all code in Apache to one common code base.\n",
-      "dev_url": "https://svn.apache.org/viewvc/apr",
-      "doc_source_url": "https://github.com/apache/apr/tree/trunk/docs",
-      "doc_url": "https://apr.apache.org/docs/apr/1.6/index.html",
-      "home": "http://apr.apache.org/",
-      "license": "Apache-2.0",
-      "license_family": "Apache",
-      "license_file": "apr/LICENSE",
-      "summary": "Maintains a consistent API with predictable behaviour"
-    },
-    "build": {
-      "number": "6"
-    },
-    "extra": {
-      "recipe-maintainers": [
-        "jakirkham",
-        "mingwandroid",
-        "nehaljwani",
-        "seanyen",
-        "erykoff",
-        "mwittgen"
-      ]
-    },
-    "outputs": [
-      {
-        "build": {
-          "run_exports": [
-            "libapr"
-          ]
-        },
-        "name": "libapr",
-        "requirements": {
-          "build": [
-            "c_compiler_stub",
-            "make",
-            "libtool",
-            "autoconf <2.70",
-            "automake",
-            "gettext"
-          ],
-          "host": []
-        },
-        "script": "install_libapr.sh",
-        "test": {
-          "commands": [
-            "apr-1-config --help",
-            "test -f ${PREFIX}/include/apr-1/apr.h",
-            "test -f ${PREFIX}/lib/libapr-1${SHLIB_EXT}"
-          ]
-        },
-        "version": "1.7.0"
-      },
-      {
-        "build": {
-          "run_exports": [
-            "libaprutil"
-          ]
-        },
-        "name": "libaprutil",
-        "requirements": {
-          "build": [
-            "c_compiler_stub",
-            "make",
-            "libtool"
-          ],
-          "host": [
-            "expat",
-            "libapr",
-            "libapriconv",
-            "libxcrypt"
-          ]
-        },
-        "script": "install_libaprutil.sh",
-        "test": {
-          "commands": [
-            "apu-1-config --help",
-            "test -f ${PREFIX}/include/apr-1/apu.h",
-            "test -f ${PREFIX}/lib/libaprutil-1${SHLIB_EXT}"
-          ]
-        },
-        "version": "1.6.1"
-      },
-      {
-        "build": {
-          "run_exports": [
-            "libapriconv"
-          ]
-        },
-        "name": "libapriconv",
-        "requirements": {
-          "build": [
-            "c_compiler_stub",
-            "make",
-            "libtool"
-          ],
-          "host": [
-            "libapr"
-          ]
-        },
-        "script": "install_libapriconv.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/lib/libapriconv-1${SHLIB_EXT}"
-          ]
-        },
-        "version": "1.2.2"
-      }
-    ],
-    "package": {
-      "name": "apr",
-      "version": "1.7.0"
-    },
-    "requirements": {
-      "build": [
-        "c_compiler_stub",
-        "libtool",
-        "make"
-      ],
-      "host": [],
-      "run": [
-        "libapr",
-        "libaprutil",
-        "libapriconv"
-      ]
-    },
-    "schema_version": 0,
-    "source": [
-      {
-        "folder": "apr",
-        "patches": [
-          "patches/osx-libapr-darwin20-hints.patch",
-          "patches/cross-compile-apr-866e1df.patch"
-        ],
-        "sha256": "48e9dbf45ae3fdc7b491259ffb6ccf7d63049ffacbc1c0977cced095e4c2d5a2",
-        "url": "https://archive.apache.org/dist/apr/apr-1.7.0.tar.gz"
-      },
-      {
-        "folder": "apr-util",
-        "sha256": "b65e40713da57d004123b6319828be7f1273fbc6490e145874ee1177e112c459",
-        "url": "https://archive.apache.org/dist/apr/apr-util-1.6.1.tar.gz"
-      },
-      {
-        "folder": "apr-iconv",
-        "sha256": "ce94c7722ede927ce1e5a368675ace17d96d60ff9b8918df216ee5c1298c6a5e",
-        "url": "https://archive.apache.org/dist/apr/apr-iconv-1.2.2.tar.gz"
-      }
-    ]
-  },
-  "linux_ppc64le_requirements": {
-    "build": {
-      "__set__": true,
-      "elements": [
-        "autoconf",
-        "automake",
-        "c_compiler_stub",
-        "gettext",
+        "c_stdlib_stub",
         "libtool",
         "make"
       ]
@@ -581,21 +457,23 @@
   },
   "meta_yaml": {
     "about": {
-      "description": "Apache Portable Run-time libraries have been designed to provide a common\ninterface to low level routines across any platform.The original goal of APR\nwas to combine all code in Apache to one common code base.\n",
-      "dev_url": "https://svn.apache.org/viewvc/apr",
-      "doc_source_url": "https://github.com/apache/apr/tree/trunk/docs",
+      "description": "Apache Portable Run-time libraries have been designed to provide a common\ninterface to low level routines across any platform. The original goal of APR\nwas to combine all code in Apache to one common code base.",
+      "dev_url": "https://github.com/apache/apr",
       "doc_url": "https://apr.apache.org/docs/apr/1.6/index.html",
       "home": "http://apr.apache.org/",
       "license": "Apache-2.0",
-      "license_family": "Apache",
-      "license_file": "apr/LICENSE",
+      "license_family": "Apache-2.0",
+      "license_file": "LICENSE",
       "summary": "Maintains a consistent API with predictable behaviour"
     },
     "build": {
-      "ignore_run_exports": [
-        "expat"
-      ],
-      "number": "6"
+      "number": "0",
+      "run_exports": {
+        "weak": [
+          "libapr"
+        ]
+      },
+      "script": "install_libapr"
     },
     "extra": {
       "recipe-maintainers": [
@@ -610,7 +488,8 @@
     "outputs": [
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libapr"
           ]
         },
@@ -618,27 +497,70 @@
         "requirements": {
           "build": [
             "c_compiler_stub",
+            "c_stdlib_stub",
             "make",
-            "libtool",
-            "autoconf <2.70",
-            "automake",
-            "gettext"
+            "libtool"
           ],
-          "host": []
+          "host": [
+            "libxcrypt"
+          ],
+          "run": []
         },
-        "script": "install_libapr.sh",
-        "test": {
-          "commands": [
-            "apr-1-config --help",
-            "test -f ${PREFIX}/include/apr-1/apr.h",
-            "test -f ${PREFIX}/lib/libapr-1${SHLIB_EXT}"
-          ]
-        },
-        "version": "1.7.0"
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "**/apr.h"
+              ],
+              "lib": [
+                "libapr-1"
+              ]
+            }
+          },
+          {
+            "script": "apr-1-config --help"
+          }
+        ],
+        "version": "1.7.6"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
+            "libapriconv"
+          ]
+        },
+        "name": "libapriconv",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "make",
+            "libtool"
+          ],
+          "host": [
+            "libapr"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "**/apr_iconv.h"
+              ],
+              "lib": [
+                "libapriconv-1"
+              ]
+            }
+          }
+        ],
+        "version": "1.2.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
             "libaprutil"
           ]
         },
@@ -646,6 +568,7 @@
         "requirements": {
           "build": [
             "c_compiler_stub",
+            "c_stdlib_stub",
             "make",
             "libtool"
           ],
@@ -654,46 +577,49 @@
             "libapr",
             "libapriconv",
             "libxcrypt"
-          ]
+          ],
+          "run": []
         },
-        "script": "install_libaprutil.sh",
-        "test": {
-          "commands": [
-            "apu-1-config --help",
-            "test -f ${PREFIX}/include/apr-1/apu.h",
-            "test -f ${PREFIX}/lib/libaprutil-1${SHLIB_EXT}"
-          ]
-        },
-        "version": "1.6.1"
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "**/apu.h"
+              ],
+              "lib": [
+                "libaprutil-1"
+              ]
+            }
+          },
+          {
+            "script": "apu-1-config --help"
+          }
+        ],
+        "version": "1.6.3"
       },
       {
-        "build": {
-          "run_exports": [
+        "build": null,
+        "name": "apr",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "libapr",
+            "libaprutil",
             "libapriconv"
           ]
         },
-        "name": "libapriconv",
-        "requirements": {
-          "build": [
-            "c_compiler_stub",
-            "make",
-            "libtool"
-          ],
-          "host": [
-            "libapr"
-          ]
-        },
-        "script": "install_libapriconv.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/lib/libapriconv-1${SHLIB_EXT}"
-          ]
-        },
-        "version": "1.2.2"
+        "tests": [
+          {
+            "script": "echo \"apr meta-package\""
+          }
+        ],
+        "version": "1.7.6"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libapr"
           ]
         },
@@ -701,27 +627,70 @@
         "requirements": {
           "build": [
             "c_compiler_stub",
+            "c_stdlib_stub",
             "make",
-            "libtool",
-            "autoconf <2.70",
-            "automake",
-            "gettext"
+            "libtool"
           ],
-          "host": []
+          "host": [
+            "libxcrypt"
+          ],
+          "run": []
         },
-        "script": "install_libapr.sh",
-        "test": {
-          "commands": [
-            "apr-1-config --help",
-            "test -f ${PREFIX}/include/apr-1/apr.h",
-            "test -f ${PREFIX}/lib/libapr-1${SHLIB_EXT}"
-          ]
-        },
-        "version": "1.7.0"
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "**/apr.h"
+              ],
+              "lib": [
+                "libapr-1"
+              ]
+            }
+          },
+          {
+            "script": "apr-1-config --help"
+          }
+        ],
+        "version": "1.7.6"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
+            "libapriconv"
+          ]
+        },
+        "name": "libapriconv",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "make",
+            "libtool"
+          ],
+          "host": [
+            "libapr"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "**/apr_iconv.h"
+              ],
+              "lib": [
+                "libapriconv-1"
+              ]
+            }
+          }
+        ],
+        "version": "1.2.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
             "libaprutil"
           ]
         },
@@ -729,6 +698,7 @@
         "requirements": {
           "build": [
             "c_compiler_stub",
+            "c_stdlib_stub",
             "make",
             "libtool"
           ],
@@ -737,46 +707,49 @@
             "libapr",
             "libapriconv",
             "libxcrypt"
-          ]
+          ],
+          "run": []
         },
-        "script": "install_libaprutil.sh",
-        "test": {
-          "commands": [
-            "apu-1-config --help",
-            "test -f ${PREFIX}/include/apr-1/apu.h",
-            "test -f ${PREFIX}/lib/libaprutil-1${SHLIB_EXT}"
-          ]
-        },
-        "version": "1.6.1"
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "**/apu.h"
+              ],
+              "lib": [
+                "libaprutil-1"
+              ]
+            }
+          },
+          {
+            "script": "apu-1-config --help"
+          }
+        ],
+        "version": "1.6.3"
       },
       {
-        "build": {
-          "run_exports": [
+        "build": null,
+        "name": "apr",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "libapr",
+            "libaprutil",
             "libapriconv"
           ]
         },
-        "name": "libapriconv",
-        "requirements": {
-          "build": [
-            "c_compiler_stub",
-            "make",
-            "libtool"
-          ],
-          "host": [
-            "libapr"
-          ]
-        },
-        "script": "install_libapriconv.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/lib/libapriconv-1${SHLIB_EXT}"
-          ]
-        },
-        "version": "1.2.2"
+        "tests": [
+          {
+            "script": "echo \"apr meta-package\""
+          }
+        ],
+        "version": "1.7.6"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libapr"
           ]
         },
@@ -784,27 +757,70 @@
         "requirements": {
           "build": [
             "c_compiler_stub",
+            "c_stdlib_stub",
             "make",
-            "libtool",
-            "autoconf <2.70",
-            "automake",
-            "gettext"
+            "libtool"
           ],
-          "host": []
+          "host": [
+            "libxcrypt"
+          ],
+          "run": []
         },
-        "script": "install_libapr.sh",
-        "test": {
-          "commands": [
-            "apr-1-config --help",
-            "test -f ${PREFIX}/include/apr-1/apr.h",
-            "test -f ${PREFIX}/lib/libapr-1${SHLIB_EXT}"
-          ]
-        },
-        "version": "1.7.0"
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "**/apr.h"
+              ],
+              "lib": [
+                "libapr-1"
+              ]
+            }
+          },
+          {
+            "script": "apr-1-config --help"
+          }
+        ],
+        "version": "1.7.6"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
+            "libapriconv"
+          ]
+        },
+        "name": "libapriconv",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "make",
+            "libtool"
+          ],
+          "host": [
+            "libapr"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "**/apr_iconv.h"
+              ],
+              "lib": [
+                "libapriconv-1"
+              ]
+            }
+          }
+        ],
+        "version": "1.2.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
             "libaprutil"
           ]
         },
@@ -812,6 +828,7 @@
         "requirements": {
           "build": [
             "c_compiler_stub",
+            "c_stdlib_stub",
             "make",
             "libtool"
           ],
@@ -820,46 +837,49 @@
             "libapr",
             "libapriconv",
             "libxcrypt"
-          ]
+          ],
+          "run": []
         },
-        "script": "install_libaprutil.sh",
-        "test": {
-          "commands": [
-            "apu-1-config --help",
-            "test -f ${PREFIX}/include/apr-1/apu.h",
-            "test -f ${PREFIX}/lib/libaprutil-1${SHLIB_EXT}"
-          ]
-        },
-        "version": "1.6.1"
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "**/apu.h"
+              ],
+              "lib": [
+                "libaprutil-1"
+              ]
+            }
+          },
+          {
+            "script": "apu-1-config --help"
+          }
+        ],
+        "version": "1.6.3"
       },
       {
-        "build": {
-          "run_exports": [
+        "build": null,
+        "name": "apr",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "libapr",
+            "libaprutil",
             "libapriconv"
           ]
         },
-        "name": "libapriconv",
-        "requirements": {
-          "build": [
-            "c_compiler_stub",
-            "make",
-            "libtool"
-          ],
-          "host": [
-            "libapr"
-          ]
-        },
-        "script": "install_libapriconv.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/lib/libapriconv-1${SHLIB_EXT}"
-          ]
-        },
-        "version": "1.2.2"
+        "tests": [
+          {
+            "script": "echo \"apr meta-package\""
+          }
+        ],
+        "version": "1.7.6"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libapr"
           ]
         },
@@ -867,56 +887,36 @@
         "requirements": {
           "build": [
             "c_compiler_stub",
-            "make",
-            "libtool",
-            "autoconf <2.70",
-            "automake",
-            "gettext"
-          ],
-          "host": []
-        },
-        "script": "install_libapr.sh",
-        "test": {
-          "commands": [
-            "apr-1-config --help",
-            "test -f ${PREFIX}/include/apr-1/apr.h",
-            "test -f ${PREFIX}/lib/libapr-1${SHLIB_EXT}"
-          ]
-        },
-        "version": "1.7.0"
-      },
-      {
-        "build": {
-          "run_exports": [
-            "libaprutil"
-          ]
-        },
-        "name": "libaprutil",
-        "requirements": {
-          "build": [
-            "c_compiler_stub",
+            "c_stdlib_stub",
             "make",
             "libtool"
           ],
           "host": [
-            "expat",
-            "libapr",
-            "libapriconv"
-          ]
+            "libxcrypt"
+          ],
+          "run": []
         },
-        "script": "install_libaprutil.sh",
-        "test": {
-          "commands": [
-            "apu-1-config --help",
-            "test -f ${PREFIX}/include/apr-1/apu.h",
-            "test -f ${PREFIX}/lib/libaprutil-1${SHLIB_EXT}"
-          ]
-        },
-        "version": "1.6.1"
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "**/apr.h"
+              ],
+              "lib": [
+                "libapr-1"
+              ]
+            }
+          },
+          {
+            "script": "apr-1-config --help"
+          }
+        ],
+        "version": "1.7.6"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libapriconv"
           ]
         },
@@ -924,24 +924,92 @@
         "requirements": {
           "build": [
             "c_compiler_stub",
+            "c_stdlib_stub",
             "make",
             "libtool"
           ],
           "host": [
             "libapr"
-          ]
+          ],
+          "run": []
         },
-        "script": "install_libapriconv.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/lib/libapriconv-1${SHLIB_EXT}"
-          ]
-        },
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "**/apr_iconv.h"
+              ],
+              "lib": [
+                "libapriconv-1"
+              ]
+            }
+          }
+        ],
         "version": "1.2.2"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
+            "libaprutil"
+          ]
+        },
+        "name": "libaprutil",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "make",
+            "libtool"
+          ],
+          "host": [
+            "expat",
+            "libapr",
+            "libapriconv",
+            "libxcrypt"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "**/apu.h"
+              ],
+              "lib": [
+                "libaprutil-1"
+              ]
+            }
+          },
+          {
+            "script": "apu-1-config --help"
+          }
+        ],
+        "version": "1.6.3"
+      },
+      {
+        "build": null,
+        "name": "apr",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "libapr",
+            "libaprutil",
+            "libapriconv"
+          ]
+        },
+        "tests": [
+          {
+            "script": "echo \"apr meta-package\""
+          }
+        ],
+        "version": "1.7.6"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
             "libapr"
           ]
         },
@@ -949,56 +1017,36 @@
         "requirements": {
           "build": [
             "c_compiler_stub",
-            "make",
-            "libtool",
-            "autoconf <2.70",
-            "automake",
-            "gettext"
-          ],
-          "host": []
-        },
-        "script": "install_libapr.sh",
-        "test": {
-          "commands": [
-            "apr-1-config --help",
-            "test -f ${PREFIX}/include/apr-1/apr.h",
-            "test -f ${PREFIX}/lib/libapr-1${SHLIB_EXT}"
-          ]
-        },
-        "version": "1.7.0"
-      },
-      {
-        "build": {
-          "run_exports": [
-            "libaprutil"
-          ]
-        },
-        "name": "libaprutil",
-        "requirements": {
-          "build": [
-            "c_compiler_stub",
+            "c_stdlib_stub",
             "make",
             "libtool"
           ],
           "host": [
-            "expat",
-            "libapr",
-            "libapriconv"
-          ]
+            "libxcrypt"
+          ],
+          "run": []
         },
-        "script": "install_libaprutil.sh",
-        "test": {
-          "commands": [
-            "apu-1-config --help",
-            "test -f ${PREFIX}/include/apr-1/apu.h",
-            "test -f ${PREFIX}/lib/libaprutil-1${SHLIB_EXT}"
-          ]
-        },
-        "version": "1.6.1"
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "**/apr.h"
+              ],
+              "lib": [
+                "libapr-1"
+              ]
+            }
+          },
+          {
+            "script": "apr-1-config --help"
+          }
+        ],
+        "version": "1.7.6"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libapriconv"
           ]
         },
@@ -1006,49 +1054,33 @@
         "requirements": {
           "build": [
             "c_compiler_stub",
+            "c_stdlib_stub",
             "make",
             "libtool"
           ],
           "host": [
             "libapr"
-          ]
+          ],
+          "run": []
         },
-        "script": "install_libapriconv.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/lib/libapriconv-1${SHLIB_EXT}"
-          ]
-        },
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "**/apr_iconv.h"
+              ],
+              "lib": [
+                "libapriconv-1"
+              ]
+            }
+          }
+        ],
         "version": "1.2.2"
       },
       {
         "build": {
-          "run_exports": [
-            "libapr"
-          ]
-        },
-        "name": "libapr",
-        "requirements": {
-          "build": [
-            "c_compiler_stub",
-            "cmake",
-            "ninja"
-          ],
-          "host": []
-        },
-        "script": "install_libapr.bat",
-        "test": {
-          "commands": [
-            "if not exist %LIBRARY_INC%\\\\apr.h             exit 1",
-            "if not exist %LIBRARY_BIN%\\\\libapr-1.dll      exit 1",
-            "if not exist %LIBRARY_LIB%\\\\libapr-1.lib      exit 1"
-          ]
-        },
-        "version": "1.7.0"
-      },
-      {
-        "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libaprutil"
           ]
         },
@@ -1056,211 +1088,96 @@
         "requirements": {
           "build": [
             "c_compiler_stub",
-            "cmake",
-            "ninja"
+            "c_stdlib_stub",
+            "make",
+            "libtool"
           ],
           "host": [
             "expat",
             "libapr",
-            "libapriconv"
-          ]
+            "libapriconv",
+            "libxcrypt"
+          ],
+          "run": []
         },
-        "script": "install_libaprutil.bat",
-        "test": {
-          "commands": [
-            "if not exist %LIBRARY_INC%\\\\apu.h             exit 1",
-            "if not exist %LIBRARY_BIN%\\\\libaprutil-1.dll  exit 1",
-            "if not exist %LIBRARY_LIB%\\\\libaprutil-1.lib  exit 1"
-          ]
-        },
-        "version": "1.6.1"
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "**/apu.h"
+              ],
+              "lib": [
+                "libaprutil-1"
+              ]
+            }
+          },
+          {
+            "script": "apu-1-config --help"
+          }
+        ],
+        "version": "1.6.3"
       },
       {
-        "build": {
-          "run_exports": [
+        "build": null,
+        "name": "apr",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "libapr",
+            "libaprutil",
             "libapriconv"
           ]
         },
-        "name": "libapriconv",
-        "requirements": {
-          "build": [
-            "c_compiler_stub",
-            "cmake",
-            "ninja"
-          ],
-          "host": [
-            "libapr"
-          ]
-        },
-        "script": "install_libapriconv.bat",
-        "test": {
-          "commands": [
-            "if not exist %LIBRARY_INC%\\\\apr_iconv.h       exit 1",
-            "if not exist %LIBRARY_BIN%\\\\libapriconv-1.dll exit 1",
-            "if not exist %LIBRARY_LIB%\\\\libapriconv-1.lib exit 1",
-            "if not exist %LIBRARY_BIN%\\\\iconv\\\\utf-8.so   exit 1"
-          ]
-        },
-        "version": "1.2.2"
+        "tests": [
+          {
+            "script": "echo \"apr meta-package\""
+          }
+        ],
+        "version": "1.7.6"
       }
     ],
     "package": {
-      "name": "apr",
-      "version": "1.7.0"
+      "name": "libapr",
+      "version": "1.7.6"
     },
     "requirements": {
       "build": [
         "c_compiler_stub",
-        "libtool",
+        "c_stdlib_stub",
         "make",
-        "cmake",
-        "ninja"
+        "libtool"
       ],
       "host": [
-        "expat"
-      ],
-      "run": [
-        "libapr",
-        "libaprutil",
-        "libapriconv"
+        "libxcrypt"
       ]
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "folder": "apr",
-        "patches": [
-          "patches/osx-libapr-darwin20-hints.patch",
-          "patches/cross-compile-apr-866e1df.patch"
-        ],
-        "sha256": "48e9dbf45ae3fdc7b491259ffb6ccf7d63049ffacbc1c0977cced095e4c2d5a2",
-        "url": "https://archive.apache.org/dist/apr/apr-1.7.0.tar.gz"
-      },
-      {
-        "folder": "apr-util",
-        "sha256": "b65e40713da57d004123b6319828be7f1273fbc6490e145874ee1177e112c459",
-        "url": "https://archive.apache.org/dist/apr/apr-util-1.6.1.tar.gz"
-      },
-      {
-        "folder": "apr-iconv",
-        "sha256": "ce94c7722ede927ce1e5a368675ace17d96d60ff9b8918df216ee5c1298c6a5e",
-        "url": "https://archive.apache.org/dist/apr/apr-iconv-1.2.2.tar.gz"
-      },
-      {
-        "folder": "apr",
-        "patches": [
-          "patches/osx-libapr-darwin20-hints.patch",
-          "patches/cross-compile-apr-866e1df.patch"
-        ],
-        "sha256": "48e9dbf45ae3fdc7b491259ffb6ccf7d63049ffacbc1c0977cced095e4c2d5a2",
-        "url": "https://archive.apache.org/dist/apr/apr-1.7.0.tar.gz"
-      },
-      {
-        "folder": "apr-util",
-        "sha256": "b65e40713da57d004123b6319828be7f1273fbc6490e145874ee1177e112c459",
-        "url": "https://archive.apache.org/dist/apr/apr-util-1.6.1.tar.gz"
-      },
-      {
-        "folder": "apr-iconv",
-        "sha256": "ce94c7722ede927ce1e5a368675ace17d96d60ff9b8918df216ee5c1298c6a5e",
-        "url": "https://archive.apache.org/dist/apr/apr-iconv-1.2.2.tar.gz"
-      },
-      {
-        "folder": "apr",
-        "patches": [
-          "patches/osx-libapr-darwin20-hints.patch",
-          "patches/cross-compile-apr-866e1df.patch"
-        ],
-        "sha256": "48e9dbf45ae3fdc7b491259ffb6ccf7d63049ffacbc1c0977cced095e4c2d5a2",
-        "url": "https://archive.apache.org/dist/apr/apr-1.7.0.tar.gz"
-      },
-      {
-        "folder": "apr-util",
-        "sha256": "b65e40713da57d004123b6319828be7f1273fbc6490e145874ee1177e112c459",
-        "url": "https://archive.apache.org/dist/apr/apr-util-1.6.1.tar.gz"
-      },
-      {
-        "folder": "apr-iconv",
-        "sha256": "ce94c7722ede927ce1e5a368675ace17d96d60ff9b8918df216ee5c1298c6a5e",
-        "url": "https://archive.apache.org/dist/apr/apr-iconv-1.2.2.tar.gz"
-      },
-      {
-        "folder": "apr",
-        "patches": [
-          "patches/osx-libapr-darwin20-hints.patch",
-          "patches/cross-compile-apr-866e1df.patch"
-        ],
-        "sha256": "48e9dbf45ae3fdc7b491259ffb6ccf7d63049ffacbc1c0977cced095e4c2d5a2",
-        "url": "https://archive.apache.org/dist/apr/apr-1.7.0.tar.gz"
-      },
-      {
-        "folder": "apr-util",
-        "sha256": "b65e40713da57d004123b6319828be7f1273fbc6490e145874ee1177e112c459",
-        "url": "https://archive.apache.org/dist/apr/apr-util-1.6.1.tar.gz"
-      },
-      {
-        "folder": "apr-iconv",
-        "sha256": "ce94c7722ede927ce1e5a368675ace17d96d60ff9b8918df216ee5c1298c6a5e",
-        "url": "https://archive.apache.org/dist/apr/apr-iconv-1.2.2.tar.gz"
-      },
-      {
-        "folder": "apr",
-        "patches": [
-          "patches/osx-libapr-darwin20-hints.patch",
-          "patches/cross-compile-apr-866e1df.patch"
-        ],
-        "sha256": "48e9dbf45ae3fdc7b491259ffb6ccf7d63049ffacbc1c0977cced095e4c2d5a2",
-        "url": "https://archive.apache.org/dist/apr/apr-1.7.0.tar.gz"
-      },
-      {
-        "folder": "apr-util",
-        "sha256": "b65e40713da57d004123b6319828be7f1273fbc6490e145874ee1177e112c459",
-        "url": "https://archive.apache.org/dist/apr/apr-util-1.6.1.tar.gz"
-      },
-      {
-        "folder": "apr-iconv",
-        "sha256": "ce94c7722ede927ce1e5a368675ace17d96d60ff9b8918df216ee5c1298c6a5e",
-        "url": "https://archive.apache.org/dist/apr/apr-iconv-1.2.2.tar.gz"
-      },
-      {
-        "folder": "apr",
-        "patches": [
-          "patches/osx-libapr-darwin20-hints.patch",
-          "patches/cross-compile-apr-866e1df.patch"
-        ],
-        "sha256": "48e9dbf45ae3fdc7b491259ffb6ccf7d63049ffacbc1c0977cced095e4c2d5a2",
-        "url": "https://archive.apache.org/dist/apr/apr-1.7.0.tar.gz"
-      },
-      {
-        "folder": "apr-util",
-        "sha256": "b65e40713da57d004123b6319828be7f1273fbc6490e145874ee1177e112c459",
-        "url": "https://archive.apache.org/dist/apr/apr-util-1.6.1.tar.gz"
-      },
-      {
-        "folder": "apr-iconv",
-        "sha256": "ce94c7722ede927ce1e5a368675ace17d96d60ff9b8918df216ee5c1298c6a5e",
-        "url": "https://archive.apache.org/dist/apr/apr-iconv-1.2.2.tar.gz"
-      },
-      {
-        "path": "cmake/"
-      }
-    ]
+    "schema_version": 1,
+    "source": {
+      "sha256": "6a10e7f7430510600af25fabf466e1df61aaae910bf1dc5d10c44a4433ccc81d",
+      "url": "https://archive.apache.org/dist/apr/apr-1.7.6.tar.gz"
+    }
   },
-  "name": "apr",
+  "name": "libapr",
   "osx_64_meta_yaml": {
     "about": {
-      "description": "Apache Portable Run-time libraries have been designed to provide a common\ninterface to low level routines across any platform.The original goal of APR\nwas to combine all code in Apache to one common code base.\n",
-      "dev_url": "https://svn.apache.org/viewvc/apr",
-      "doc_source_url": "https://github.com/apache/apr/tree/trunk/docs",
+      "description": "Apache Portable Run-time libraries have been designed to provide a common\ninterface to low level routines across any platform. The original goal of APR\nwas to combine all code in Apache to one common code base.",
+      "dev_url": "https://github.com/apache/apr",
       "doc_url": "https://apr.apache.org/docs/apr/1.6/index.html",
       "home": "http://apr.apache.org/",
       "license": "Apache-2.0",
-      "license_family": "Apache",
-      "license_file": "apr/LICENSE",
+      "license_family": "Apache-2.0",
+      "license_file": "LICENSE",
       "summary": "Maintains a consistent API with predictable behaviour"
     },
     "build": {
-      "number": "6"
+      "number": "0",
+      "run_exports": {
+        "weak": [
+          "libapr"
+        ]
+      },
+      "script": "install_libapr"
     },
     "extra": {
       "recipe-maintainers": [
@@ -1275,7 +1192,8 @@
     "outputs": [
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libapr"
           ]
         },
@@ -1283,56 +1201,36 @@
         "requirements": {
           "build": [
             "c_compiler_stub",
-            "make",
-            "libtool",
-            "autoconf <2.70",
-            "automake",
-            "gettext"
-          ],
-          "host": []
-        },
-        "script": "install_libapr.sh",
-        "test": {
-          "commands": [
-            "apr-1-config --help",
-            "test -f ${PREFIX}/include/apr-1/apr.h",
-            "test -f ${PREFIX}/lib/libapr-1${SHLIB_EXT}"
-          ]
-        },
-        "version": "1.7.0"
-      },
-      {
-        "build": {
-          "run_exports": [
-            "libaprutil"
-          ]
-        },
-        "name": "libaprutil",
-        "requirements": {
-          "build": [
-            "c_compiler_stub",
+            "c_stdlib_stub",
             "make",
             "libtool"
           ],
           "host": [
-            "expat",
-            "libapr",
-            "libapriconv"
-          ]
+            "libxcrypt"
+          ],
+          "run": []
         },
-        "script": "install_libaprutil.sh",
-        "test": {
-          "commands": [
-            "apu-1-config --help",
-            "test -f ${PREFIX}/include/apr-1/apu.h",
-            "test -f ${PREFIX}/lib/libaprutil-1${SHLIB_EXT}"
-          ]
-        },
-        "version": "1.6.1"
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "**/apr.h"
+              ],
+              "lib": [
+                "libapr-1"
+              ]
+            }
+          },
+          {
+            "script": "apr-1-config --help"
+          }
+        ],
+        "version": "1.7.6"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libapriconv"
           ]
         },
@@ -1340,70 +1238,116 @@
         "requirements": {
           "build": [
             "c_compiler_stub",
+            "c_stdlib_stub",
             "make",
             "libtool"
           ],
           "host": [
             "libapr"
-          ]
+          ],
+          "run": []
         },
-        "script": "install_libapriconv.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/lib/libapriconv-1${SHLIB_EXT}"
-          ]
-        },
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "**/apr_iconv.h"
+              ],
+              "lib": [
+                "libapriconv-1"
+              ]
+            }
+          }
+        ],
         "version": "1.2.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "libaprutil"
+          ]
+        },
+        "name": "libaprutil",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "make",
+            "libtool"
+          ],
+          "host": [
+            "expat",
+            "libapr",
+            "libapriconv",
+            "libxcrypt"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "**/apu.h"
+              ],
+              "lib": [
+                "libaprutil-1"
+              ]
+            }
+          },
+          {
+            "script": "apu-1-config --help"
+          }
+        ],
+        "version": "1.6.3"
+      },
+      {
+        "build": null,
+        "name": "apr",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "libapr",
+            "libaprutil",
+            "libapriconv"
+          ]
+        },
+        "tests": [
+          {
+            "script": "echo \"apr meta-package\""
+          }
+        ],
+        "version": "1.7.6"
       }
     ],
     "package": {
-      "name": "apr",
-      "version": "1.7.0"
+      "name": "libapr",
+      "version": "1.7.6"
     },
     "requirements": {
       "build": [
         "c_compiler_stub",
-        "libtool",
-        "make"
+        "c_stdlib_stub",
+        "make",
+        "libtool"
       ],
-      "host": [],
-      "run": [
-        "libapr",
-        "libaprutil",
-        "libapriconv"
+      "host": [
+        "libxcrypt"
       ]
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "folder": "apr",
-        "patches": [
-          "patches/osx-libapr-darwin20-hints.patch",
-          "patches/cross-compile-apr-866e1df.patch"
-        ],
-        "sha256": "48e9dbf45ae3fdc7b491259ffb6ccf7d63049ffacbc1c0977cced095e4c2d5a2",
-        "url": "https://archive.apache.org/dist/apr/apr-1.7.0.tar.gz"
-      },
-      {
-        "folder": "apr-util",
-        "sha256": "b65e40713da57d004123b6319828be7f1273fbc6490e145874ee1177e112c459",
-        "url": "https://archive.apache.org/dist/apr/apr-util-1.6.1.tar.gz"
-      },
-      {
-        "folder": "apr-iconv",
-        "sha256": "ce94c7722ede927ce1e5a368675ace17d96d60ff9b8918df216ee5c1298c6a5e",
-        "url": "https://archive.apache.org/dist/apr/apr-iconv-1.2.2.tar.gz"
-      }
-    ]
+    "schema_version": 1,
+    "source": {
+      "sha256": "6a10e7f7430510600af25fabf466e1df61aaae910bf1dc5d10c44a4433ccc81d",
+      "url": "https://archive.apache.org/dist/apr/apr-1.7.6.tar.gz"
+    }
   },
   "osx_64_requirements": {
     "build": {
       "__set__": true,
       "elements": [
-        "autoconf",
-        "automake",
         "c_compiler_stub",
-        "gettext",
+        "c_stdlib_stub",
         "libtool",
         "make"
       ]
@@ -1413,7 +1357,8 @@
       "elements": [
         "expat",
         "libapr",
-        "libapriconv"
+        "libapriconv",
+        "libxcrypt"
       ]
     },
     "run": {
@@ -1431,18 +1376,23 @@
   },
   "osx_arm64_meta_yaml": {
     "about": {
-      "description": "Apache Portable Run-time libraries have been designed to provide a common\ninterface to low level routines across any platform.The original goal of APR\nwas to combine all code in Apache to one common code base.\n",
-      "dev_url": "https://svn.apache.org/viewvc/apr",
-      "doc_source_url": "https://github.com/apache/apr/tree/trunk/docs",
+      "description": "Apache Portable Run-time libraries have been designed to provide a common\ninterface to low level routines across any platform. The original goal of APR\nwas to combine all code in Apache to one common code base.",
+      "dev_url": "https://github.com/apache/apr",
       "doc_url": "https://apr.apache.org/docs/apr/1.6/index.html",
       "home": "http://apr.apache.org/",
       "license": "Apache-2.0",
-      "license_family": "Apache",
-      "license_file": "apr/LICENSE",
+      "license_family": "Apache-2.0",
+      "license_file": "LICENSE",
       "summary": "Maintains a consistent API with predictable behaviour"
     },
     "build": {
-      "number": "6"
+      "number": "0",
+      "run_exports": {
+        "weak": [
+          "libapr"
+        ]
+      },
+      "script": "install_libapr"
     },
     "extra": {
       "recipe-maintainers": [
@@ -1457,7 +1407,8 @@
     "outputs": [
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libapr"
           ]
         },
@@ -1465,56 +1416,36 @@
         "requirements": {
           "build": [
             "c_compiler_stub",
-            "make",
-            "libtool",
-            "autoconf <2.70",
-            "automake",
-            "gettext"
-          ],
-          "host": []
-        },
-        "script": "install_libapr.sh",
-        "test": {
-          "commands": [
-            "apr-1-config --help",
-            "test -f ${PREFIX}/include/apr-1/apr.h",
-            "test -f ${PREFIX}/lib/libapr-1${SHLIB_EXT}"
-          ]
-        },
-        "version": "1.7.0"
-      },
-      {
-        "build": {
-          "run_exports": [
-            "libaprutil"
-          ]
-        },
-        "name": "libaprutil",
-        "requirements": {
-          "build": [
-            "c_compiler_stub",
+            "c_stdlib_stub",
             "make",
             "libtool"
           ],
           "host": [
-            "expat",
-            "libapr",
-            "libapriconv"
-          ]
+            "libxcrypt"
+          ],
+          "run": []
         },
-        "script": "install_libaprutil.sh",
-        "test": {
-          "commands": [
-            "apu-1-config --help",
-            "test -f ${PREFIX}/include/apr-1/apu.h",
-            "test -f ${PREFIX}/lib/libaprutil-1${SHLIB_EXT}"
-          ]
-        },
-        "version": "1.6.1"
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "**/apr.h"
+              ],
+              "lib": [
+                "libapr-1"
+              ]
+            }
+          },
+          {
+            "script": "apr-1-config --help"
+          }
+        ],
+        "version": "1.7.6"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libapriconv"
           ]
         },
@@ -1522,70 +1453,116 @@
         "requirements": {
           "build": [
             "c_compiler_stub",
+            "c_stdlib_stub",
             "make",
             "libtool"
           ],
           "host": [
             "libapr"
-          ]
+          ],
+          "run": []
         },
-        "script": "install_libapriconv.sh",
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/lib/libapriconv-1${SHLIB_EXT}"
-          ]
-        },
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "**/apr_iconv.h"
+              ],
+              "lib": [
+                "libapriconv-1"
+              ]
+            }
+          }
+        ],
         "version": "1.2.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "libaprutil"
+          ]
+        },
+        "name": "libaprutil",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "make",
+            "libtool"
+          ],
+          "host": [
+            "expat",
+            "libapr",
+            "libapriconv",
+            "libxcrypt"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "**/apu.h"
+              ],
+              "lib": [
+                "libaprutil-1"
+              ]
+            }
+          },
+          {
+            "script": "apu-1-config --help"
+          }
+        ],
+        "version": "1.6.3"
+      },
+      {
+        "build": null,
+        "name": "apr",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "libapr",
+            "libaprutil",
+            "libapriconv"
+          ]
+        },
+        "tests": [
+          {
+            "script": "echo \"apr meta-package\""
+          }
+        ],
+        "version": "1.7.6"
       }
     ],
     "package": {
-      "name": "apr",
-      "version": "1.7.0"
+      "name": "libapr",
+      "version": "1.7.6"
     },
     "requirements": {
       "build": [
         "c_compiler_stub",
-        "libtool",
-        "make"
+        "c_stdlib_stub",
+        "make",
+        "libtool"
       ],
-      "host": [],
-      "run": [
-        "libapr",
-        "libaprutil",
-        "libapriconv"
+      "host": [
+        "libxcrypt"
       ]
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "folder": "apr",
-        "patches": [
-          "patches/osx-libapr-darwin20-hints.patch",
-          "patches/cross-compile-apr-866e1df.patch"
-        ],
-        "sha256": "48e9dbf45ae3fdc7b491259ffb6ccf7d63049ffacbc1c0977cced095e4c2d5a2",
-        "url": "https://archive.apache.org/dist/apr/apr-1.7.0.tar.gz"
-      },
-      {
-        "folder": "apr-util",
-        "sha256": "b65e40713da57d004123b6319828be7f1273fbc6490e145874ee1177e112c459",
-        "url": "https://archive.apache.org/dist/apr/apr-util-1.6.1.tar.gz"
-      },
-      {
-        "folder": "apr-iconv",
-        "sha256": "ce94c7722ede927ce1e5a368675ace17d96d60ff9b8918df216ee5c1298c6a5e",
-        "url": "https://archive.apache.org/dist/apr/apr-iconv-1.2.2.tar.gz"
-      }
-    ]
+    "schema_version": 1,
+    "source": {
+      "sha256": "6a10e7f7430510600af25fabf466e1df61aaae910bf1dc5d10c44a4433ccc81d",
+      "url": "https://archive.apache.org/dist/apr/apr-1.7.6.tar.gz"
+    }
   },
   "osx_arm64_requirements": {
     "build": {
       "__set__": true,
       "elements": [
-        "autoconf",
-        "automake",
         "c_compiler_stub",
-        "gettext",
+        "c_stdlib_stub",
         "libtool",
         "make"
       ]
@@ -1595,7 +1572,8 @@
       "elements": [
         "expat",
         "libapr",
-        "libapriconv"
+        "libapriconv",
+        "libxcrypt"
       ]
     },
     "run": {
@@ -1624,7 +1602,6 @@
   "platforms": [
     "linux_64",
     "linux_aarch64",
-    "linux_ppc64le",
     "osx_64",
     "osx_arm64",
     "win_64"
@@ -1632,43 +1609,36 @@
   "pr_info": {
     "__lazy_json__": "pr_info/apr.json"
   },
-  "raw_meta_yaml": "{% set apr_ver = \"1.7.0\" %}\n{% set apu_ver = \"1.6.1\" %}\n{% set api_ver = \"1.2.2\" %}\n{% set mirror = \"https://archive.apache.org/dist\" %}\n\npackage:\n  name: apr\n  version: {{ apr_ver }}\n\nsource:\n  - url: {{ mirror }}/apr/apr-{{ apr_ver }}.tar.gz\n    folder: apr\n    sha256: 48e9dbf45ae3fdc7b491259ffb6ccf7d63049ffacbc1c0977cced095e4c2d5a2\n    patches:\n      - patches/osx-libapr-darwin20-hints.patch\n      # backport of commit 866e1df from upstream\n      - patches/cross-compile-apr-866e1df.patch\n      - patches/cross-compile-osx-arm64-strerror.patch  # [osx and build_platform != target_platform]\n  - url: {{ mirror }}/apr/apr-util-{{ apu_ver }}.tar.gz\n    folder: apr-util\n    sha256: b65e40713da57d004123b6319828be7f1273fbc6490e145874ee1177e112c459\n  - url: {{ mirror }}/apr/apr-iconv-{{ api_ver }}.tar.gz\n    folder: apr-iconv\n    sha256: ce94c7722ede927ce1e5a368675ace17d96d60ff9b8918df216ee5c1298c6a5e\n  - path: cmake/  # [win]\n\nbuild:\n  number: 6\n  ignore_run_exports:                                           # [win]\n    - expat                                                     # [win]\n  skip: true  # [win and vc<14]\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - cmake                                                     # [win]\n    - ninja                                                     # [win]\n    - libtool  # [not win]\n    - make  # [unix]\n  host:\n    - expat                                                     # [win]\n    - {{ compiler('c') }}  # [build_platform != target_platform]\n  run:\n    - libapr\n    - libaprutil\n    - libapriconv\n\noutputs:\n  - name: libapr\n    version: {{ apr_ver }}\n    build:\n      run_exports:\n        # https://abi-laboratory.pro/tracker/timeline/apr/\n        # This is only on the basis of libapr.so\n        - {{ pin_subpackage('libapr', max_pin='x') }}\n    requirements:\n      build:\n        - {{ compiler('c') }}\n        - make                                                  # [unix]\n        - cmake                                                 # [win]\n        - ninja                                                 # [win]\n        - libtool  # [not win]\n        - autoconf <2.70  # [unix]\n        - automake  # [unix]\n        - gettext  # [unix]\n      host:\n    script: install_libapr.sh                                   # [unix]\n    script: install_libapr.bat                                  # [win]\n    test:\n      commands:\n        - apr-1-config --help                                   # [unix]\n\n        - if not exist %LIBRARY_INC%\\\\apr.h             exit 1  # [win]\n        - if not exist %LIBRARY_BIN%\\\\libapr-1.dll      exit 1  # [win]\n        - if not exist %LIBRARY_LIB%\\\\libapr-1.lib      exit 1  # [win]\n\n        - test -f ${PREFIX}/include/apr-1/apr.h                 # [unix]\n        - test -f ${PREFIX}/lib/libapr-1${SHLIB_EXT}            # [unix]\n\n  - name: libaprutil\n    version: {{ apu_ver }}\n    build:\n      run_exports:\n        - {{ pin_subpackage('libaprutil', max_pin='x') }}\n    requirements:\n      build:\n        - {{ compiler('c') }}\n        - make                                                  # [unix]\n        - cmake                                                 # [win]\n        - ninja                                                 # [win]\n        - libtool  # [not win]\n      host:\n        - expat\n        - libapr\n        - libapriconv\n        - libxcrypt  # [linux]\n    script: install_libaprutil.sh                               # [unix]\n    script: install_libaprutil.bat                              # [win]\n    test:\n      commands:\n        - apu-1-config --help                                   # [unix]\n\n        - if not exist %LIBRARY_INC%\\\\apu.h             exit 1  # [win]\n        - if not exist %LIBRARY_BIN%\\\\libaprutil-1.dll  exit 1  # [win]\n        - if not exist %LIBRARY_LIB%\\\\libaprutil-1.lib  exit 1  # [win]\n\n        - test -f ${PREFIX}/include/apr-1/apu.h                 # [unix]\n        - test -f ${PREFIX}/lib/libaprutil-1${SHLIB_EXT}        # [unix]\n\n  - name: libapriconv\n    version: {{ api_ver }}\n    build:\n      run_exports:\n        - {{ pin_subpackage('libapriconv', max_pin='x') }}\n    requirements:\n      build:\n        - {{ compiler('c') }}\n        - make                                                  # [unix]\n        - cmake                                                 # [win]\n        - ninja                                                 # [win]\n        - libtool  # [not win]\n      host:\n        - libapr\n    script: install_libapriconv.sh                              # [unix]\n    script: install_libapriconv.bat                             # [win]\n    test:\n      commands:\n        - if not exist %LIBRARY_INC%\\\\apr_iconv.h       exit 1  # [win]\n        - if not exist %LIBRARY_BIN%\\\\libapriconv-1.dll exit 1  # [win]\n        - if not exist %LIBRARY_LIB%\\\\libapriconv-1.lib exit 1  # [win]\n        - if not exist %LIBRARY_BIN%\\\\iconv\\\\utf-8.so   exit 1  # [win]\n        - test -f ${PREFIX}/lib/libapriconv-1${SHLIB_EXT}       # [unix]\n\nabout:\n  home: http://apr.apache.org/\n  license: Apache-2.0\n  license_family: Apache\n  license_file: apr/LICENSE\n  summary: Maintains a consistent API with predictable behaviour\n  description: |\n    Apache Portable Run-time libraries have been designed to provide a common\n    interface to low level routines across any platform.The original goal of APR\n    was to combine all code in Apache to one common code base.\n  doc_url: https://apr.apache.org/docs/apr/1.6/index.html\n  dev_url: https://svn.apache.org/viewvc/apr\n  doc_source_url: https://github.com/apache/apr/tree/trunk/docs\n\nextra:\n  recipe-maintainers:\n    - jakirkham\n    - mingwandroid\n    - nehaljwani\n    - seanyen\n    - erykoff\n    - mwittgen\n",
+  "raw_meta_yaml": "context:\n  apr_ver: \"1.7.6\"\n  apu_ver: \"1.6.3\"\n  api_ver: \"1.2.2\"\n  mirror: https://archive.apache.org/dist\n\nrecipe:\n  name: apr-split\n  version: ${{ apr_ver }}\n\nbuild:\n  number: 0\n\noutputs:\n  - package:\n      name: libapr\n      version: ${{ apr_ver }}\n    source:\n      url: ${{ mirror }}/apr/apr-${{ apr_ver }}.tar.gz\n      sha256: 6a10e7f7430510600af25fabf466e1df61aaae910bf1dc5d10c44a4433ccc81d\n    build:\n      script: install_libapr\n    requirements:\n      build:\n        - ${{ compiler('c') }}\n        - ${{ stdlib('c') }}\n        - if: unix\n          then:\n            - make\n            - libtool\n        - if: win\n          then:\n            - cmake\n            - ninja\n      host:\n        - if: linux\n          then:\n            - libxcrypt\n      run_exports:\n        # https://abi-laboratory.pro/tracker/timeline/apr/\n        # This is only on the basis of libapr.so\n        - ${{ pin_subpackage('libapr', upper_bound='x') }}\n\n    tests:\n      - package_contents:\n          include:\n            - \"**/apr.h\"\n          lib:\n            - libapr-1\n      - if: unix\n        then:\n          script:\n            - apr-1-config --help\n\n  - package:\n      name: libapriconv\n      version: ${{ api_ver }}\n    source:\n      - url: ${{ mirror }}/apr/apr-iconv-${{ api_ver }}.tar.gz\n        sha256: ce94c7722ede927ce1e5a368675ace17d96d60ff9b8918df216ee5c1298c6a5e\n      - if: win\n        then:\n          - path: cmake/apr-iconv\n    build:\n      # apr-iconv version unchanged, keep incrementing build number\n      number: 7\n      script: install_libapriconv\n    requirements:\n      build:\n        - ${{ compiler('c') }}\n        - ${{ stdlib('c') }}\n        - if: unix\n          then:\n            - make\n            - libtool\n        - if: win\n          then:\n            - cmake\n            - ninja\n      host:\n        - ${{ pin_subpackage('libapr', exact=True) }}\n      run_exports:\n        - ${{ pin_subpackage('libapriconv', upper_bound='x') }}\n\n    tests:\n      - package_contents:\n          include:\n            - \"**/apr_iconv.h\"\n          lib:\n            - libapriconv-1\n\n  - package:\n      name: libaprutil\n      version: ${{ apu_ver }}\n    source:\n      url: ${{ mirror }}/apr/apr-util-${{ apu_ver }}.tar.gz\n      sha256: 2b74d8932703826862ca305b094eef2983c27b39d5c9414442e9976a9acf1983\n    build:\n      script: install_libaprutil\n    requirements:\n      build:\n        - ${{ compiler('c') }}\n        - ${{ stdlib('c') }}\n        - if: unix\n          then:\n            - make\n            - libtool\n        - if: win\n          then:\n            - cmake\n            - ninja\n      host:\n        - expat\n        - ${{ pin_subpackage('libapr', exact=True) }}\n        - ${{ pin_subpackage('libapriconv', exact=True) }}\n        - if: linux\n          then:\n            - libxcrypt\n      run_exports:\n        - ${{ pin_subpackage('libaprutil', upper_bound='x') }}\n\n    tests:\n      - package_contents:\n          include:\n            - \"**/apu.h\"\n          lib:\n            - libaprutil-1\n\n      - if: unix\n        then:\n          script:\n            - apu-1-config --help\n\n  - package:\n      name: apr\n      version: ${{ apr_ver }}\n    requirements:\n      run:\n        - ${{ pin_subpackage('libapr', exact=True) }}\n        - ${{ pin_subpackage('libaprutil', exact=True) }}\n        - ${{ pin_subpackage('libapriconv', exact=True) }}\n    tests:\n      - script:\n          - echo \"apr meta-package\"\n    about:\n      license_file: []\n\nabout:\n  homepage: http://apr.apache.org/\n  license: Apache-2.0\n  license_file: LICENSE\n  summary: Maintains a consistent API with predictable behaviour\n  description: |\n    Apache Portable Run-time libraries have been designed to provide a common\n    interface to low level routines across any platform. The original goal of APR\n    was to combine all code in Apache to one common code base.\n  documentation: https://apr.apache.org/docs/apr/1.6/index.html\n  repository: https://github.com/apache/apr\n\nextra:\n  recipe-maintainers:\n    - jakirkham\n    - mingwandroid\n    - nehaljwani\n    - seanyen\n    - erykoff\n    - mwittgen\n",
   "req": {
     "__set__": true,
     "elements": [
-      "autoconf",
-      "automake",
       "c_compiler_stub",
-      "cmake",
+      "c_stdlib_stub",
       "expat",
-      "gettext",
       "libapr",
       "libapriconv",
       "libaprutil",
       "libtool",
       "libxcrypt",
-      "make",
-      "ninja"
+      "make"
     ]
   },
   "requirements": {
     "build": {
       "__set__": true,
       "elements": [
-        "autoconf",
-        "automake",
         "c_compiler_stub",
-        "cmake",
-        "gettext",
+        "c_stdlib_stub",
         "libtool",
-        "make",
-        "ninja"
+        "make"
       ]
     },
     "host": {
       "__set__": true,
       "elements": [
         "c_compiler_stub",
+        "c_stdlib_stub",
         "expat",
         "libapr",
         "libapriconv",
@@ -1679,6 +1649,7 @@
       "__set__": true,
       "elements": [
         "c_compiler_stub",
+        "c_stdlib_stub",
         "libapr",
         "libapriconv",
         "libaprutil"
@@ -1694,14 +1665,10 @@
     "build": {
       "__set__": true,
       "elements": [
-        "autoconf <2.70",
-        "automake",
         "c_compiler_stub",
-        "cmake",
-        "gettext",
+        "c_stdlib_stub",
         "libtool",
-        "make",
-        "ninja"
+        "make"
       ]
     },
     "host": {
@@ -1726,28 +1693,30 @@
       "elements": []
     }
   },
-  "url": "https://archive.apache.org/dist/apr/apr-1.7.0.tar.gz",
-  "version": "1.7.0",
+  "url": "https://archive.apache.org/dist/apr/apr-1.7.6.tar.gz",
+  "version": "1.7.6",
   "version_pr_info": {
     "__lazy_json__": "version_pr_info/apr.json"
   },
   "win_64_meta_yaml": {
     "about": {
-      "description": "Apache Portable Run-time libraries have been designed to provide a common\ninterface to low level routines across any platform.The original goal of APR\nwas to combine all code in Apache to one common code base.\n",
-      "dev_url": "https://svn.apache.org/viewvc/apr",
-      "doc_source_url": "https://github.com/apache/apr/tree/trunk/docs",
+      "description": "Apache Portable Run-time libraries have been designed to provide a common\ninterface to low level routines across any platform. The original goal of APR\nwas to combine all code in Apache to one common code base.",
+      "dev_url": "https://github.com/apache/apr",
       "doc_url": "https://apr.apache.org/docs/apr/1.6/index.html",
       "home": "http://apr.apache.org/",
       "license": "Apache-2.0",
-      "license_family": "Apache",
-      "license_file": "apr/LICENSE",
+      "license_family": "Apache-2.0",
+      "license_file": "LICENSE",
       "summary": "Maintains a consistent API with predictable behaviour"
     },
     "build": {
-      "ignore_run_exports": [
-        "expat"
-      ],
-      "number": "6"
+      "number": "0",
+      "run_exports": {
+        "weak": [
+          "libapr"
+        ]
+      },
+      "script": "install_libapr"
     },
     "extra": {
       "recipe-maintainers": [
@@ -1762,7 +1731,8 @@
     "outputs": [
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libapr"
           ]
         },
@@ -1770,53 +1740,36 @@
         "requirements": {
           "build": [
             "c_compiler_stub",
-            "cmake",
-            "ninja"
-          ],
-          "host": []
-        },
-        "script": "install_libapr.bat",
-        "test": {
-          "commands": [
-            "if not exist %LIBRARY_INC%\\\\apr.h             exit 1",
-            "if not exist %LIBRARY_BIN%\\\\libapr-1.dll      exit 1",
-            "if not exist %LIBRARY_LIB%\\\\libapr-1.lib      exit 1"
-          ]
-        },
-        "version": "1.7.0"
-      },
-      {
-        "build": {
-          "run_exports": [
-            "libaprutil"
-          ]
-        },
-        "name": "libaprutil",
-        "requirements": {
-          "build": [
-            "c_compiler_stub",
-            "cmake",
-            "ninja"
+            "c_stdlib_stub",
+            "make",
+            "libtool"
           ],
           "host": [
-            "expat",
-            "libapr",
-            "libapriconv"
-          ]
+            "libxcrypt"
+          ],
+          "run": []
         },
-        "script": "install_libaprutil.bat",
-        "test": {
-          "commands": [
-            "if not exist %LIBRARY_INC%\\\\apu.h             exit 1",
-            "if not exist %LIBRARY_BIN%\\\\libaprutil-1.dll  exit 1",
-            "if not exist %LIBRARY_LIB%\\\\libaprutil-1.lib  exit 1"
-          ]
-        },
-        "version": "1.6.1"
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "**/apr.h"
+              ],
+              "lib": [
+                "libapr-1"
+              ]
+            }
+          },
+          {
+            "script": "apr-1-config --help"
+          }
+        ],
+        "version": "1.7.6"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libapriconv"
           ]
         },
@@ -1824,77 +1777,118 @@
         "requirements": {
           "build": [
             "c_compiler_stub",
-            "cmake",
-            "ninja"
+            "c_stdlib_stub",
+            "make",
+            "libtool"
           ],
           "host": [
             "libapr"
-          ]
+          ],
+          "run": []
         },
-        "script": "install_libapriconv.bat",
-        "test": {
-          "commands": [
-            "if not exist %LIBRARY_INC%\\\\apr_iconv.h       exit 1",
-            "if not exist %LIBRARY_BIN%\\\\libapriconv-1.dll exit 1",
-            "if not exist %LIBRARY_LIB%\\\\libapriconv-1.lib exit 1",
-            "if not exist %LIBRARY_BIN%\\\\iconv\\\\utf-8.so   exit 1"
-          ]
-        },
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "**/apr_iconv.h"
+              ],
+              "lib": [
+                "libapriconv-1"
+              ]
+            }
+          }
+        ],
         "version": "1.2.2"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "libaprutil"
+          ]
+        },
+        "name": "libaprutil",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "make",
+            "libtool"
+          ],
+          "host": [
+            "expat",
+            "libapr",
+            "libapriconv",
+            "libxcrypt"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "include": [
+                "**/apu.h"
+              ],
+              "lib": [
+                "libaprutil-1"
+              ]
+            }
+          },
+          {
+            "script": "apu-1-config --help"
+          }
+        ],
+        "version": "1.6.3"
+      },
+      {
+        "build": null,
+        "name": "apr",
+        "requirements": {
+          "build": [],
+          "host": [],
+          "run": [
+            "libapr",
+            "libaprutil",
+            "libapriconv"
+          ]
+        },
+        "tests": [
+          {
+            "script": "echo \"apr meta-package\""
+          }
+        ],
+        "version": "1.7.6"
       }
     ],
     "package": {
-      "name": "apr",
-      "version": "1.7.0"
+      "name": "libapr",
+      "version": "1.7.6"
     },
     "requirements": {
       "build": [
         "c_compiler_stub",
-        "cmake",
-        "ninja"
+        "c_stdlib_stub",
+        "make",
+        "libtool"
       ],
       "host": [
-        "expat"
-      ],
-      "run": [
-        "libapr",
-        "libaprutil",
-        "libapriconv"
+        "libxcrypt"
       ]
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "folder": "apr",
-        "patches": [
-          "patches/osx-libapr-darwin20-hints.patch",
-          "patches/cross-compile-apr-866e1df.patch"
-        ],
-        "sha256": "48e9dbf45ae3fdc7b491259ffb6ccf7d63049ffacbc1c0977cced095e4c2d5a2",
-        "url": "https://archive.apache.org/dist/apr/apr-1.7.0.tar.gz"
-      },
-      {
-        "folder": "apr-util",
-        "sha256": "b65e40713da57d004123b6319828be7f1273fbc6490e145874ee1177e112c459",
-        "url": "https://archive.apache.org/dist/apr/apr-util-1.6.1.tar.gz"
-      },
-      {
-        "folder": "apr-iconv",
-        "sha256": "ce94c7722ede927ce1e5a368675ace17d96d60ff9b8918df216ee5c1298c6a5e",
-        "url": "https://archive.apache.org/dist/apr/apr-iconv-1.2.2.tar.gz"
-      },
-      {
-        "path": "cmake/"
-      }
-    ]
+    "schema_version": 1,
+    "source": {
+      "sha256": "6a10e7f7430510600af25fabf466e1df61aaae910bf1dc5d10c44a4433ccc81d",
+      "url": "https://archive.apache.org/dist/apr/apr-1.7.6.tar.gz"
+    }
   },
   "win_64_requirements": {
     "build": {
       "__set__": true,
       "elements": [
         "c_compiler_stub",
-        "cmake",
-        "ninja"
+        "c_stdlib_stub",
+        "libtool",
+        "make"
       ]
     },
     "host": {
@@ -1902,7 +1896,8 @@
       "elements": [
         "expat",
         "libapr",
-        "libapriconv"
+        "libapriconv",
+        "libxcrypt"
       ]
     },
     "run": {
