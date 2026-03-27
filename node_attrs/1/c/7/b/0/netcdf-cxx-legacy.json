@@ -1,7 +1,7 @@
 {
   "archived": false,
   "branch": "main",
-  "ci_support_linux_64_hdf51.14.6mpimpich.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ncxx_compiler:\n- gxx\ncxx_compiler_version:\n- '14'\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\nhdf5:\n- 1.14.6\nlibnetcdf:\n- 4.10.0\nmpi:\n- mpich\nmpich:\n- '4'\nopenmpi:\n- '5'\ntarget_platform:\n- linux-64\nzip_keys:\n- - c_compiler_version\n  - cxx_compiler_version\n",
+  "ci_support_linux_64_hdf51.14.6mpimpich.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ncxx_compiler:\n- gxx\ncxx_compiler_version:\n- '14'\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\nhdf5:\n- 1.14.6\nlibnetcdf:\n- 4.10.0\nmpi:\n- mpich\nmpich:\n- '5'\nopenmpi:\n- '5'\ntarget_platform:\n- linux-64\nzip_keys:\n- - c_compiler_version\n  - cxx_compiler_version\n",
   "conda-forge.yml": {
     "conda_build": {
       "pkg_format": "2"
@@ -14,8 +14,8 @@
       "tooling_branch_name": "main"
     }
   },
-  "feedstock_hash": "cd734e3f838047c77236c0f6216e1d8fb9c20fc3",
-  "feedstock_hash_ts": 1774391786,
+  "feedstock_hash": "7b56a142b7ff71bfb83ec947bd9b33d38b793e06",
+  "feedstock_hash_ts": 1774642266,
   "feedstock_name": "netcdf-cxx-legacy",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -27,7 +27,7 @@
       "summary": "Legacy Unidata NetCDF C++ Library"
     },
     "build": {
-      "number": "21",
+      "number": "22",
       "run_exports": {
         "weak": [
           "netcdf-cxx-legacy * mpi_mpich_*",
@@ -372,7 +372,7 @@
       "summary": "Legacy Unidata NetCDF C++ Library"
     },
     "build": {
-      "number": "21",
+      "number": "22",
       "run_exports": {
         "weak": [
           "netcdf-cxx-legacy * mpi_mpich_*",
@@ -920,7 +920,7 @@
       "summary": "Legacy Unidata NetCDF C++ Library"
     },
     "build": {
-      "number": "21",
+      "number": "22",
       "run_exports": {
         "weak": [
           "netcdf-cxx-legacy * mpi_mpich_*",
@@ -1270,7 +1270,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/netcdf-cxx-legacy.json"
   },
-  "raw_meta_yaml": "schema_version: 1\n\ncontext:\n  name: netcdf-cxx-legacy\n  version: \"4.2\"\n  build: 21\n  # recipe-lint fails if mpi is undefined\n  mpi: ${{ mpi or \"nompi\" }}\n  # prioritize nompi via build number\n  build_number: ${{ build + 100 if mpi == \"nompi\" else build }}\n  mpi_prefix: ${{ \"mpi_\" + mpi if mpi != \"nompi\" else \"nompi\" }}\n\npackage:\n  name: ${{ name }}\n  version: ${{ version }}\n\nsource:\n  url: https://downloads.unidata.ucar.edu/netcdf-cxx/${{ version }}/netcdf-cxx-${{ version }}.tar.gz\n  sha256: 95ed6ab49a0ee001255eac4e44aacb5ca4ea96ba850c08337a3e4c9a0872ccd1\n  patches:\n    # remove VERSION file that is problematic in OSX\n    - 0001-configure.patch\n    - 0002-remove-error-check-in-configure.patch\n\nbuild:\n  number: ${{ build_number }}\n  skip: win\n\n  # add build string so packages can depend on\n  # mpi or nompi variants explicitly:\n  # `netcdf-cxx-legacy * mpi_mpich_*` for mpich\n  # `netcdf-cxx-legacy * mpi_*` for any mpi\n  # `netcdf-cxx-legacy * nompi_*` for no mpi\n  string: ${{ mpi_prefix }}_h${{ hash }}_${{ build_number }}\n\nrequirements:\n  build:\n    - if: mpi != \"nompi\"\n      then: ${{ mpi }}\n    - ${{ compiler('c') }}\n    - ${{ stdlib(\"c\") }}\n    - ${{ compiler('cxx') }}\n    - make\n  host:\n    # need to list hdf5 and libnetcdf twice to get version pinning from\n    # conda_build_config and build pinning from ${{ mpi_prefix }}\n    - hdf5\n    - hdf5 * ${{ mpi_prefix }}_*\n    - libnetcdf\n    - libnetcdf * ${{ mpi_prefix }}_*\n    - if: mpi != \"nompi\"\n      then: ${{ mpi }}\n  run:\n    - hdf5 * ${{ mpi_prefix }}_*\n    - libnetcdf * ${{ mpi_prefix }}_*\n    - if: mpi != \"nompi\"\n      then: ${{ mpi }}\n    - if: mpi == \"openmpi\"\n      then: openssh\n  run_constraints:\n    - netcdf-cxx4 >=9999\n  run_exports:\n    - if: mpi != \"nompi\"\n      then:\n        - ${{ name }} * ${{ mpi_prefix }}_*\n\ntests:\n  - script:\n      - test -f ${PREFIX}/lib/libnetcdf_c++.a\n      - test -f ${PREFIX}/lib/libnetcdf_c++${SHLIB_EXT}\n      - test -f ${PREFIX}/include/ncvalues.h\n      - test -f ${PREFIX}/include/netcdfcpp.h\n      - test -f ${PREFIX}/include/netcdf.hh\n\nabout:\n  homepage: https://www.unidata.ucar.edu/downloads/netcdf/\n  license: NetCDF\n  license_file: COPYRIGHT\n  summary: Legacy Unidata NetCDF C++ Library\n\nextra:\n  recipe-maintainers:\n    - xylar\n",
+  "raw_meta_yaml": "schema_version: 1\n\ncontext:\n  name: netcdf-cxx-legacy\n  version: \"4.2\"\n  build: 22\n  # recipe-lint fails if mpi is undefined\n  mpi: ${{ mpi or \"nompi\" }}\n  # prioritize nompi via build number\n  build_number: ${{ build + 100 if mpi == \"nompi\" else build }}\n  mpi_prefix: ${{ \"mpi_\" + mpi if mpi != \"nompi\" else \"nompi\" }}\n\npackage:\n  name: ${{ name }}\n  version: ${{ version }}\n\nsource:\n  url: https://downloads.unidata.ucar.edu/netcdf-cxx/${{ version }}/netcdf-cxx-${{ version }}.tar.gz\n  sha256: 95ed6ab49a0ee001255eac4e44aacb5ca4ea96ba850c08337a3e4c9a0872ccd1\n  patches:\n    # remove VERSION file that is problematic in OSX\n    - 0001-configure.patch\n    - 0002-remove-error-check-in-configure.patch\n\nbuild:\n  number: ${{ build_number }}\n  skip: win\n\n  # add build string so packages can depend on\n  # mpi or nompi variants explicitly:\n  # `netcdf-cxx-legacy * mpi_mpich_*` for mpich\n  # `netcdf-cxx-legacy * mpi_*` for any mpi\n  # `netcdf-cxx-legacy * nompi_*` for no mpi\n  string: ${{ mpi_prefix }}_h${{ hash }}_${{ build_number }}\n\nrequirements:\n  build:\n    - if: mpi != \"nompi\"\n      then: ${{ mpi }}\n    - ${{ compiler('c') }}\n    - ${{ stdlib(\"c\") }}\n    - ${{ compiler('cxx') }}\n    - make\n  host:\n    # need to list hdf5 and libnetcdf twice to get version pinning from\n    # conda_build_config and build pinning from ${{ mpi_prefix }}\n    - hdf5\n    - hdf5 * ${{ mpi_prefix }}_*\n    - libnetcdf\n    - libnetcdf * ${{ mpi_prefix }}_*\n    - if: mpi != \"nompi\"\n      then: ${{ mpi }}\n  run:\n    - hdf5 * ${{ mpi_prefix }}_*\n    - libnetcdf * ${{ mpi_prefix }}_*\n    - if: mpi != \"nompi\"\n      then: ${{ mpi }}\n    - if: mpi == \"openmpi\"\n      then: openssh\n  run_constraints:\n    - netcdf-cxx4 >=9999\n  run_exports:\n    - if: mpi != \"nompi\"\n      then:\n        - ${{ name }} * ${{ mpi_prefix }}_*\n\ntests:\n  - script:\n      - test -f ${PREFIX}/lib/libnetcdf_c++.a\n      - test -f ${PREFIX}/lib/libnetcdf_c++${SHLIB_EXT}\n      - test -f ${PREFIX}/include/ncvalues.h\n      - test -f ${PREFIX}/include/netcdfcpp.h\n      - test -f ${PREFIX}/include/netcdf.hh\n\nabout:\n  homepage: https://www.unidata.ucar.edu/downloads/netcdf/\n  license: NetCDF\n  license_file: COPYRIGHT\n  summary: Legacy Unidata NetCDF C++ Library\n\nextra:\n  recipe-maintainers:\n    - xylar\n",
   "req": {
     "__set__": true,
     "elements": [
