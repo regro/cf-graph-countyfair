@@ -22,8 +22,8 @@
     },
     "test": "native_and_emulated"
   },
-  "feedstock_hash": "e287a44289a74d6034a3ab646bc06ad1b916a667",
-  "feedstock_hash_ts": 1774275807,
+  "feedstock_hash": "800670deca63955a003a78cece3a3ad12f07fdf6",
+  "feedstock_hash_ts": 1774833540,
   "feedstock_name": "gtk4",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -54,6 +54,7 @@
     },
     "extra": {
       "recipe-maintainers": [
+        "danyeaw",
         "ryanvolz",
         "pkgw",
         "tschoonj"
@@ -256,6 +257,7 @@
     },
     "extra": {
       "recipe-maintainers": [
+        "danyeaw",
         "ryanvolz",
         "pkgw",
         "tschoonj"
@@ -458,6 +460,7 @@
     },
     "extra": {
       "recipe-maintainers": [
+        "danyeaw",
         "ryanvolz",
         "pkgw",
         "tschoonj"
@@ -604,6 +607,7 @@
     },
     "extra": {
       "recipe-maintainers": [
+        "danyeaw",
         "ryanvolz",
         "pkgw",
         "tschoonj"
@@ -768,6 +772,7 @@
     },
     "extra": {
       "recipe-maintainers": [
+        "danyeaw",
         "ryanvolz",
         "pkgw",
         "tschoonj"
@@ -919,7 +924,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/gtk4.json"
   },
-  "raw_meta_yaml": "{% set name = \"gtk\" %}\n{% set version = \"4.22.1\" %}\n{% set version_majmin = '.'.join(version.split('.', 2)[:2]) %}\n\npackage:\n  name: gtk4  # note customization\n  version: {{ version }}\n\nsource:\n  url: https://download.gnome.org/sources/{{ name }}/{{ version_majmin }}/{{ name }}-{{ version }}.tar.xz\n  sha256: cd7b5a9c41127da6fb321c5a842ad73c62e6996f9ce3f1960ca509f6559d55fc\n  patches:\n    - patches/001-win32-fix-black-borders.patch\n\nbuild:\n  number: 1\n  run_exports:\n    - {{ pin_subpackage('gtk4', max_pin='x') }}\n    # gtk apps need at least a default icon set for fallback\n    - adwaita-icon-theme\n  missing_dso_whitelist:\n    - /usr/lib/libcups.2.dylib    # [osx]\n  ignore_run_exports:\n    # We need to pull in metapackages for these below to get devel files, but\n    # don't depend on these libraries directly:\n    - libexpat\n    - liblzma\n  ignore_run_exports_from:\n    - libxml2-devel\n\nrequirements:\n  build:\n    - meson\n    - ninja\n    - gobject-introspection\n    - packaging  # workaround: this is needed for glib's gdbus-codegen\n    - pkg-config\n    - {{ compiler('c') }}\n    - {{ stdlib(\"c\") }}\n    - {{ compiler(\"cxx\") }}\n    - libegl-devel  # [linux]\n    - cairo  # [build_platform != target_platform]\n    - expat  # [build_platform != target_platform]\n    - epoxy  # [build_platform != target_platform]\n    - freetype  # [build_platform != target_platform]\n    - gdk-pixbuf  # [build_platform != target_platform]\n    - gettext  # [build_platform != target_platform]\n    - glib  # [build_platform != target_platform]\n    - harfbuzz  # [build_platform != target_platform]\n    - libdrm  # [linux and (build_platform != target_platform)]\n    - libtiff  # [build_platform != target_platform]\n    - libpng  # [build_platform != target_platform]\n    - libjpeg-turbo  # [build_platform != target_platform]\n    - liblzma-devel  # [build_platform != target_platform]\n    - zlib  # [build_platform != target_platform]\n    - libgraphene  # [build_platform != target_platform]\n    - librsvg  # [build_platform != target_platform]\n    - libxml2-devel  # [build_platform != target_platform]\n    - pango  # [build_platform != target_platform]\n  host:\n    - cairo\n    - expat\n    - epoxy\n    - freetype\n    - gdk-pixbuf\n    - gettext  # [osx]\n    - glib\n    - harfbuzz\n    - libtiff\n    - libpng\n    - libjpeg-turbo\n    - liblzma-devel\n    - zlib\n    - libgraphene\n    - libcups  # [linux]\n    - libdrm  # [linux]\n    - libiconv  # [win]\n    - librsvg\n    - libxkbcommon  # [linux]\n    - libxml2-devel\n    - pango\n    - wayland  # [linux]\n    - wayland-protocols  # [linux]\n    - xorg-libice  # [linux]\n    - xorg-libsm  # [linux]\n    - xorg-libx11  # [linux]\n    - xorg-libxcomposite  # [linux]\n    - xorg-libxcursor  # [linux]\n    - xorg-libxdamage  # [linux]\n    - xorg-libxext  # [linux]\n    - xorg-libxi  # [linux]\n    - xorg-libxinerama  # [linux]\n    - xorg-libxfixes  # [linux]\n    - xorg-libxrandr  # [linux]\n    - xorg-libxrender  # [linux]\n    - xorg-libxtst  # [linux]\n    - xorg-xorgproto  # [linux]\n  run:\n    - hicolor-icon-theme\n    - pango\n    - libgraphene\n    - fribidi\n    - fontconfig\n    - {{ pin_compatible('libcups') }}  # [linux]\n    # The post-link script uses gio-querymodules from glib-tools\n    - glib-tools\n\ntest:\n  requires:\n    - pygobject\n  commands:\n    # check that the binaries can run\n    - gtk4-encode-symbolic-svg --help\n    - gtk4-launch --help  # [unix]\n    - gtk4-update-icon-cache --help\n    # other binaries require a display, check that they get installed\n    {% set cmds = [\"gtk4-builder-tool\", \"gtk4-query-settings\"] %}\n    {% for cmd in cmds %}\n    - command -v {{ cmd }}  # [unix]\n    - where {{ cmd }}  # [win]\n    {% endfor %}\n\n    # verify that (some) headers get installed\n    - test -f $PREFIX/include/gtk-4.0/gdk/gdk.h  # [unix]\n    - test -f $PREFIX/include/gtk-4.0/gsk/gsk.h  # [unix]\n    - test -f $PREFIX/include/gtk-4.0/gtk/gtk.h  # [unix]\n    - if not exist %PREFIX%\\\\Library\\\\include\\\\gtk-4.0\\\\gdk\\\\gdk.h exit 1  # [win]\n    - if not exist %PREFIX%\\\\Library\\\\include\\\\gtk-4.0\\\\gsk\\\\gsk.h exit 1  # [win]\n    - if not exist %PREFIX%\\\\Library\\\\include\\\\gtk-4.0\\\\gtk\\\\gtk.h exit 1  # [win]\n\n    # verify that pkgconfig files get installed\n    {% set pcs = [\"gtk4\"] %}\n    {% set pcs = pcs + [\"gtk4-unix-print\"] %}  # [unix]\n    {% set pcs = pcs + [\"gtk4-x11\"] %}  # [linux]\n    {% set pcs = pcs + [\"gtk4-macos\"] %}  # [osx]\n    {% set pcs = pcs + [\"gtk4-win32\"] %}  # [win]\n    {% for pc in pcs %}\n    - test -f $PREFIX/lib/pkgconfig/{{ pc }}.pc  # [unix]\n    - if not exist %PREFIX%\\\\Library\\\\lib\\\\pkgconfig\\\\{{ pc }}.pc exit 1  # [win]\n    {% endfor %}\n    # check gi typelibs\n    {% set gis = [\"Gdk-4.0\", \"Gsk-4.0\", \"Gtk-4.0\"] %}\n    {% for gi in gis %}\n    - test -f $PREFIX/lib/girepository-1.0/{{ gi }}.typelib    # [unix]\n    - if not exist %PREFIX%\\Library\\lib\\girepository-1.0\\{{ gi }}.typelib exit 1         # [win]\n    {% endfor %}\n\nabout:\n  home: http://www.gtk.org/\n  license: LGPL-2.0-or-later\n  license_family: LGPL\n  license_file: COPYING\n  summary: Version 4 of the Gtk+ graphical toolkit\n  description: |\n    GTK is a multi-platform toolkit for creating graphical user interfaces.\n    Offering a complete set of widgets, GTK is suitable for projects ranging\n    from small one-off projects to complete application suites.\n  doc_url: https://developer.gnome.org/gtk4/\n  dev_url: https://gitlab.gnome.org/GNOME/gtk\n\nextra:\n  recipe-maintainers:\n    - ryanvolz\n    - pkgw\n    - tschoonj\n",
+  "raw_meta_yaml": "{% set name = \"gtk\" %}\n{% set version = \"4.22.1\" %}\n{% set version_majmin = '.'.join(version.split('.', 2)[:2]) %}\n\npackage:\n  name: gtk4  # note customization\n  version: {{ version }}\n\nsource:\n  url: https://download.gnome.org/sources/{{ name }}/{{ version_majmin }}/{{ name }}-{{ version }}.tar.xz\n  sha256: cd7b5a9c41127da6fb321c5a842ad73c62e6996f9ce3f1960ca509f6559d55fc\n  patches:\n    - patches/001-win32-fix-black-borders.patch\n\nbuild:\n  number: 1\n  run_exports:\n    - {{ pin_subpackage('gtk4', max_pin='x') }}\n    # gtk apps need at least a default icon set for fallback\n    - adwaita-icon-theme\n  missing_dso_whitelist:\n    - /usr/lib/libcups.2.dylib    # [osx]\n  ignore_run_exports:\n    # We need to pull in metapackages for these below to get devel files, but\n    # don't depend on these libraries directly:\n    - libexpat\n    - liblzma\n  ignore_run_exports_from:\n    - libxml2-devel\n\nrequirements:\n  build:\n    - meson\n    - ninja\n    - gobject-introspection\n    - packaging  # workaround: this is needed for glib's gdbus-codegen\n    - pkg-config\n    - {{ compiler('c') }}\n    - {{ stdlib(\"c\") }}\n    - {{ compiler(\"cxx\") }}\n    - libegl-devel  # [linux]\n    - cairo  # [build_platform != target_platform]\n    - expat  # [build_platform != target_platform]\n    - epoxy  # [build_platform != target_platform]\n    - freetype  # [build_platform != target_platform]\n    - gdk-pixbuf  # [build_platform != target_platform]\n    - gettext  # [build_platform != target_platform]\n    - glib  # [build_platform != target_platform]\n    - harfbuzz  # [build_platform != target_platform]\n    - libdrm  # [linux and (build_platform != target_platform)]\n    - libtiff  # [build_platform != target_platform]\n    - libpng  # [build_platform != target_platform]\n    - libjpeg-turbo  # [build_platform != target_platform]\n    - liblzma-devel  # [build_platform != target_platform]\n    - zlib  # [build_platform != target_platform]\n    - libgraphene  # [build_platform != target_platform]\n    - librsvg  # [build_platform != target_platform]\n    - libxml2-devel  # [build_platform != target_platform]\n    - pango  # [build_platform != target_platform]\n  host:\n    - cairo\n    - expat\n    - epoxy\n    - freetype\n    - gdk-pixbuf\n    - gettext  # [osx]\n    - glib\n    - harfbuzz\n    - libtiff\n    - libpng\n    - libjpeg-turbo\n    - liblzma-devel\n    - zlib\n    - libgraphene\n    - libcups  # [linux]\n    - libdrm  # [linux]\n    - libiconv  # [win]\n    - librsvg\n    - libxkbcommon  # [linux]\n    - libxml2-devel\n    - pango\n    - wayland  # [linux]\n    - wayland-protocols  # [linux]\n    - xorg-libice  # [linux]\n    - xorg-libsm  # [linux]\n    - xorg-libx11  # [linux]\n    - xorg-libxcomposite  # [linux]\n    - xorg-libxcursor  # [linux]\n    - xorg-libxdamage  # [linux]\n    - xorg-libxext  # [linux]\n    - xorg-libxi  # [linux]\n    - xorg-libxinerama  # [linux]\n    - xorg-libxfixes  # [linux]\n    - xorg-libxrandr  # [linux]\n    - xorg-libxrender  # [linux]\n    - xorg-libxtst  # [linux]\n    - xorg-xorgproto  # [linux]\n  run:\n    - hicolor-icon-theme\n    - pango\n    - libgraphene\n    - fribidi\n    - fontconfig\n    - {{ pin_compatible('libcups') }}  # [linux]\n    # The post-link script uses gio-querymodules from glib-tools\n    - glib-tools\n\ntest:\n  requires:\n    - pygobject\n  commands:\n    # check that the binaries can run\n    - gtk4-encode-symbolic-svg --help\n    - gtk4-launch --help  # [unix]\n    - gtk4-update-icon-cache --help\n    # other binaries require a display, check that they get installed\n    {% set cmds = [\"gtk4-builder-tool\", \"gtk4-query-settings\"] %}\n    {% for cmd in cmds %}\n    - command -v {{ cmd }}  # [unix]\n    - where {{ cmd }}  # [win]\n    {% endfor %}\n\n    # verify that (some) headers get installed\n    - test -f $PREFIX/include/gtk-4.0/gdk/gdk.h  # [unix]\n    - test -f $PREFIX/include/gtk-4.0/gsk/gsk.h  # [unix]\n    - test -f $PREFIX/include/gtk-4.0/gtk/gtk.h  # [unix]\n    - if not exist %PREFIX%\\\\Library\\\\include\\\\gtk-4.0\\\\gdk\\\\gdk.h exit 1  # [win]\n    - if not exist %PREFIX%\\\\Library\\\\include\\\\gtk-4.0\\\\gsk\\\\gsk.h exit 1  # [win]\n    - if not exist %PREFIX%\\\\Library\\\\include\\\\gtk-4.0\\\\gtk\\\\gtk.h exit 1  # [win]\n\n    # verify that pkgconfig files get installed\n    {% set pcs = [\"gtk4\"] %}\n    {% set pcs = pcs + [\"gtk4-unix-print\"] %}  # [unix]\n    {% set pcs = pcs + [\"gtk4-x11\"] %}  # [linux]\n    {% set pcs = pcs + [\"gtk4-macos\"] %}  # [osx]\n    {% set pcs = pcs + [\"gtk4-win32\"] %}  # [win]\n    {% for pc in pcs %}\n    - test -f $PREFIX/lib/pkgconfig/{{ pc }}.pc  # [unix]\n    - if not exist %PREFIX%\\\\Library\\\\lib\\\\pkgconfig\\\\{{ pc }}.pc exit 1  # [win]\n    {% endfor %}\n    # check gi typelibs\n    {% set gis = [\"Gdk-4.0\", \"Gsk-4.0\", \"Gtk-4.0\"] %}\n    {% for gi in gis %}\n    - test -f $PREFIX/lib/girepository-1.0/{{ gi }}.typelib    # [unix]\n    - if not exist %PREFIX%\\Library\\lib\\girepository-1.0\\{{ gi }}.typelib exit 1         # [win]\n    {% endfor %}\n\nabout:\n  home: http://www.gtk.org/\n  license: LGPL-2.0-or-later\n  license_family: LGPL\n  license_file: COPYING\n  summary: Version 4 of the Gtk+ graphical toolkit\n  description: |\n    GTK is a multi-platform toolkit for creating graphical user interfaces.\n    Offering a complete set of widgets, GTK is suitable for projects ranging\n    from small one-off projects to complete application suites.\n  doc_url: https://developer.gnome.org/gtk4/\n  dev_url: https://gitlab.gnome.org/GNOME/gtk\n\nextra:\n  recipe-maintainers:\n    - danyeaw\n    - ryanvolz\n    - pkgw\n    - tschoonj\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -1167,6 +1172,7 @@
     },
     "extra": {
       "recipe-maintainers": [
+        "danyeaw",
         "ryanvolz",
         "pkgw",
         "tschoonj"
