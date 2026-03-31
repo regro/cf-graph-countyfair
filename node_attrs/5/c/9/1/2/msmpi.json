@@ -1,7 +1,7 @@
 {
   "archived": false,
   "branch": "main",
-  "ci_support_win_64_.yaml": "c_compiler:\n- vs2017\nchannel_sources:\n- conda-forge,defaults\nchannel_targets:\n- conda-forge main\ncxx_compiler:\n- vs2017\nm2w64_fortran_compiler:\n- m2w64-toolchain\ntarget_platform:\n- win-64\n",
+  "ci_support_win_64_.yaml": "c_compiler:\n- vs2022\nc_stdlib:\n- vs\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ncxx_compiler:\n- vs2022\nm2w64_fortran_compiler:\n- gfortran\nm2w64_fortran_compiler_version:\n- '14'\ntarget_platform:\n- win-64\n",
   "conda-forge.yml": {
     "conda_build": {
       "pkg_format": "2"
@@ -12,8 +12,8 @@
       "tooling_branch_name": "main"
     }
   },
-  "feedstock_hash": "938ec65cc945b148cd404490d08621f57cbb1028",
-  "feedstock_hash_ts": 1773683314,
+  "feedstock_hash": "7d2fefee375522cfe8e3330e26205f7af90b5586",
+  "feedstock_hash_ts": 1774967197,
   "feedstock_name": "msmpi",
   "hash_type": "sha256",
   "meta_yaml": {
@@ -27,7 +27,10 @@
       "summary": "Microsoft message-passing-interface (MS-MPI)"
     },
     "build": {
-      "number": "7"
+      "number": "8",
+      "run_exports": [
+        "msmpi"
+      ]
     },
     "extra": {
       "recipe-maintainers": [
@@ -41,9 +44,11 @@
     },
     "requirements": {
       "build": [
-        "cxx_compiler_stub",
         "c_compiler_stub",
-        "m2w64_fortran_compiler_stub"
+        "cxx_compiler_stub",
+        "c_stdlib_stub",
+        "m2w64_fortran_compiler_stub",
+        "gfortran"
       ],
       "run": [
         "mpi 1.0 msmpi"
@@ -101,12 +106,14 @@
   "pr_info": {
     "__lazy_json__": "pr_info/msmpi.json"
   },
-  "raw_meta_yaml": "{% set name = \"msmpi\" %}\n{% set version = \"10.1.1\" %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://github.com/microsoft/Microsoft-MPI/archive/v{{ version }}.tar.gz\n  sha256: 63c7da941fc4ffb05a0f97bd54a67968c71f63389a0d162d3182eabba1beab3d\n  patches:\n    - conda-build.patch\n\nbuild:\n  number: 7\n  skip: true  # [not win]\n\nrequirements:\n  build:\n    - {{ compiler('cxx') }}\n    - {{ compiler('c') }}\n    - {{ compiler('m2w64_fortran') }}\n  run:\n    - mpi 1.0 msmpi\n\ntest:\n  files:\n    - tests/*  # [win]\n  requires:\n    - {{ compiler('c') }}\n    # These deps are needed for the mpi4py tests\n    # - python\n    # - pip\n    # - cython\n    # - setuptools\n    # - git\n  commands:\n    # simple package integraty check\n    - if not exist %LIBRARY_BIN%\\\\mpiexec.exe exit 1  # [win]\n    - if not exist %LIBRARY_BIN%\\\\smpd.exe exit 1  # [win]\n    - if not exist %LIBRARY_BIN%\\\\msmpi.dll exit 1  # [win]\n    - if not exist %LIBRARY_INC%\\\\mpi.f90 exit 1  # [win]\n    - if not exist %LIBRARY_INC%\\\\mpi.h exit 1  # [win]\n    - if not exist %LIBRARY_LIB%\\\\msmpi.lib exit 1  # [win]\n    - if not exist %LIBRARY_LIB%\\\\mpifort.lib exit 1  # [win]\n    - if not %MSMPI_BIN% == %LIBRARY_BIN% exit 1  # [win]\n    - if not %MSMPI_INC% == %LIBRARY_INC% exit 1  # [win]\n    - if not %MSMPI_LIB64% == %LIBRARY_LIB% exit 1  # [win]\n\n    # check if binaries work ok\n    - where mpiexec.exe\n    - where smpd.exe\n    \n    - mpiexec.exe /help2\n    - mpiexec.exe /help3\n\n    # This works! Just comment out to save time...\n    ## test compiling + linking + execution\n    #- git clone https://github.com/mpi4py/mpi4py.git\n    #- cd mpi4py\n    #- pip install --no-build-isolation --no-deps -v .\n    #- cd ..\n    #- python -c \"from mpi4py import MPI; print(MPI.Get_library_version())\"\n    #- mpiexec -n 2 python -m mpi4py.bench helloworld\n    #- mpiexec -n 2 python -m mpi4py.bench ringtest\n\n    # check if MSMPI_VER is correctly patched\n    - cl.exe -I%LIBRARY_INC% tests\\\\get_mpi_ver.c /Fe\"%cd%\\get_mpi_ver.exe\"\n    - for /f \"tokens=* usebackq\" %%f in (`get_mpi_ver`) do (set \"mpi_ver=%%f\")\n    # TODO(leofang): we could compute this, yes, but don't bother as MS-MPI is not evolving...\n    - if not %mpi_ver% == 2561 exit 1  # [win]  # for MS-MPI v10.1.x\n\n    # check compiling & running simple C code\n    # TODO(leofang): add C++ & Fortran tests?\n    - cl.exe -I%LIBRARY_INC% tests\\\\helloworld.c /Fe\"%cd%\\helloworld.exe\" /link /LIBPATH:\"%LIBRARY_LIB%\" msmpi.lib\n    - mpiexec.exe -n 4 helloworld.exe\n\nabout:\n  home: https://docs.microsoft.com/en-us/message-passing-interface/microsoft-mpi\n  license: MIT\n  license_file: LICENSE.txt\n  summary: Microsoft message-passing-interface (MS-MPI)\n  description: |\n    Microsoft MPI (MS-MPI) is a Microsoft implementation of the Message Passing\n    Interface standard for developing and running parallel applications on the\n    Windows platform.\n  doc_url: https://docs.microsoft.com/en-us/message-passing-interface/microsoft-mpi\n  dev_url: https://github.com/microsoft/Microsoft-MPI\n\nextra:\n  recipe-maintainers:\n    - RyanMcCarthy-NOAA\n    - isuruf\n",
+  "raw_meta_yaml": "{% set name = \"msmpi\" %}\n{% set version = \"10.1.1\" %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://github.com/microsoft/Microsoft-MPI/archive/v{{ version }}.tar.gz\n  sha256: 63c7da941fc4ffb05a0f97bd54a67968c71f63389a0d162d3182eabba1beab3d\n  patches:\n    - conda-build.patch\n\nbuild:\n  number: 8\n  skip: true  # [not win]\n  run_exports:\n    - {{ pin_subpackage(\"msmpi\", max_pin=\"x.x\") }}\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ compiler('cxx') }}\n    - {{ stdlib('c') }}\n    - {{ compiler('m2w64_fortran') }}\n    - gfortran\n  run:\n    - mpi 1.0 msmpi\n\ntest:\n  files:\n    - tests/*  # [win]\n  requires:\n    - {{ compiler('c') }}\n    # These deps are needed for the mpi4py tests\n    # - python\n    # - pip\n    # - cython\n    # - setuptools\n    # - git\n  commands:\n    # simple package integraty check\n    - if not exist %LIBRARY_BIN%\\\\mpiexec.exe exit 1  # [win]\n    - if not exist %LIBRARY_BIN%\\\\smpd.exe exit 1  # [win]\n    - if not exist %LIBRARY_BIN%\\\\msmpi.dll exit 1  # [win]\n    - if not exist %LIBRARY_INC%\\\\mpi.f90 exit 1  # [win]\n    - if not exist %LIBRARY_INC%\\\\mpi.h exit 1  # [win]\n    - if not exist %LIBRARY_LIB%\\\\msmpi.lib exit 1  # [win]\n    - if not exist %LIBRARY_LIB%\\\\mpifort.lib exit 1  # [win]\n    - if not %MSMPI_BIN% == %LIBRARY_BIN% exit 1  # [win]\n    - if not %MSMPI_INC% == %LIBRARY_INC% exit 1  # [win]\n    - if not %MSMPI_LIB64% == %LIBRARY_LIB% exit 1  # [win]\n\n    # check if binaries work ok\n    - where mpiexec.exe\n    - where smpd.exe\n    \n    - mpiexec.exe /help2\n    - mpiexec.exe /help3\n\n    # This works! Just comment out to save time...\n    ## test compiling + linking + execution\n    #- git clone https://github.com/mpi4py/mpi4py.git\n    #- cd mpi4py\n    #- pip install --no-build-isolation --no-deps -v .\n    #- cd ..\n    #- python -c \"from mpi4py import MPI; print(MPI.Get_library_version())\"\n    #- mpiexec -n 2 python -m mpi4py.bench helloworld\n    #- mpiexec -n 2 python -m mpi4py.bench ringtest\n\n    # check if MSMPI_VER is correctly patched\n    - cl.exe -I%LIBRARY_INC% tests\\\\get_mpi_ver.c /Fe\"%cd%\\get_mpi_ver.exe\"\n    - for /f \"tokens=* usebackq\" %%f in (`get_mpi_ver`) do (set \"mpi_ver=%%f\")\n    # TODO(leofang): we could compute this, yes, but don't bother as MS-MPI is not evolving...\n    - if not %mpi_ver% == 2561 exit 1  # [win]  # for MS-MPI v10.1.x\n\n    # check compiling & running simple C code\n    # TODO(leofang): add C++ & Fortran tests?\n    - cl.exe -I%LIBRARY_INC% tests\\\\helloworld.c /Fe\"%cd%\\helloworld.exe\" /link /LIBPATH:\"%LIBRARY_LIB%\" msmpi.lib\n    - mpiexec.exe -n 4 helloworld.exe\n\nabout:\n  home: https://docs.microsoft.com/en-us/message-passing-interface/microsoft-mpi\n  license: MIT\n  license_file: LICENSE.txt\n  summary: Microsoft message-passing-interface (MS-MPI)\n  description: |\n    Microsoft MPI (MS-MPI) is a Microsoft implementation of the Message Passing\n    Interface standard for developing and running parallel applications on the\n    Windows platform.\n  doc_url: https://docs.microsoft.com/en-us/message-passing-interface/microsoft-mpi\n  dev_url: https://github.com/microsoft/Microsoft-MPI\n\nextra:\n  recipe-maintainers:\n    - RyanMcCarthy-NOAA\n    - isuruf\n",
   "req": {
     "__set__": true,
     "elements": [
       "c_compiler_stub",
+      "c_stdlib_stub",
       "cxx_compiler_stub",
+      "gfortran",
       "m2w64_fortran_compiler_stub",
       "mpi"
     ]
@@ -116,7 +123,9 @@
       "__set__": true,
       "elements": [
         "c_compiler_stub",
+        "c_stdlib_stub",
         "cxx_compiler_stub",
+        "gfortran",
         "m2w64_fortran_compiler_stub"
       ]
     },
@@ -124,14 +133,20 @@
       "__set__": true,
       "elements": [
         "c_compiler_stub",
-        "cxx_compiler_stub"
+        "c_stdlib_stub",
+        "ctng-compilers",
+        "cxx_compiler_stub",
+        "gfortran_osx-64"
       ]
     },
     "run": {
       "__set__": true,
       "elements": [
         "c_compiler_stub",
+        "c_stdlib_stub",
+        "ctng-compilers",
         "cxx_compiler_stub",
+        "gfortran_osx-64",
         "mpi"
       ]
     },
@@ -148,7 +163,9 @@
       "__set__": true,
       "elements": [
         "c_compiler_stub",
+        "c_stdlib_stub",
         "cxx_compiler_stub",
+        "gfortran",
         "m2w64_fortran_compiler_stub"
       ]
     },
@@ -185,7 +202,10 @@
       "summary": "Microsoft message-passing-interface (MS-MPI)"
     },
     "build": {
-      "number": "7"
+      "number": "8",
+      "run_exports": [
+        "msmpi"
+      ]
     },
     "extra": {
       "recipe-maintainers": [
@@ -199,9 +219,11 @@
     },
     "requirements": {
       "build": [
-        "cxx_compiler_stub",
         "c_compiler_stub",
-        "m2w64_fortran_compiler_stub"
+        "cxx_compiler_stub",
+        "c_stdlib_stub",
+        "m2w64_fortran_compiler_stub",
+        "gfortran"
       ],
       "run": [
         "mpi 1.0 msmpi"
@@ -250,7 +272,9 @@
       "__set__": true,
       "elements": [
         "c_compiler_stub",
+        "c_stdlib_stub",
         "cxx_compiler_stub",
+        "gfortran",
         "m2w64_fortran_compiler_stub"
       ]
     },
