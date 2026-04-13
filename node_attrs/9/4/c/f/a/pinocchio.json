@@ -28,8 +28,8 @@
     },
     "test": "native_and_emulated"
   },
-  "feedstock_hash": "2401f4ddae42465d15ee77082dd4b7655d8ce3e3",
-  "feedstock_hash_ts": 1774947439,
+  "feedstock_hash": "9a3c8f30bd0b6bccafb22bdbd4c4c2564e28e8f8",
+  "feedstock_hash_ts": 1776089500,
   "feedstock_name": "pinocchio",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -50,6 +50,7 @@
     "extra": {
       "feedstock-name": "pinocchio",
       "recipe-maintainers": [
+        "ManifoldFR",
         "nim65s",
         "fabinsch",
         "jorisv",
@@ -697,6 +698,7 @@
     "extra": {
       "feedstock-name": "pinocchio",
       "recipe-maintainers": [
+        "ManifoldFR",
         "nim65s",
         "fabinsch",
         "jorisv",
@@ -1344,6 +1346,7 @@
     "extra": {
       "feedstock-name": "pinocchio",
       "recipe-maintainers": [
+        "ManifoldFR",
         "nim65s",
         "fabinsch",
         "jorisv",
@@ -1991,6 +1994,7 @@
     "extra": {
       "feedstock-name": "pinocchio",
       "recipe-maintainers": [
+        "ManifoldFR",
         "nim65s",
         "fabinsch",
         "jorisv",
@@ -5385,6 +5389,7 @@
     "extra": {
       "feedstock-name": "pinocchio",
       "recipe-maintainers": [
+        "ManifoldFR",
         "nim65s",
         "fabinsch",
         "jorisv",
@@ -6032,6 +6037,7 @@
     "extra": {
       "feedstock-name": "pinocchio",
       "recipe-maintainers": [
+        "ManifoldFR",
         "nim65s",
         "fabinsch",
         "jorisv",
@@ -6681,7 +6687,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/pinocchio.json"
   },
-  "raw_meta_yaml": "{% set name = \"pinocchio\" %}\n{% set cppname = \"lib\" + name %}\n{% set pythonname = name + \"-python\" %}\n{% set version = \"3.9.0\" %}\n\npackage:\n  name: {{ name|lower }}-split\n  version: {{ version }}\n\nsource:\n  url: https://github.com/stack-of-tasks/{{ name }}/releases/download/v{{ version }}/{{ name }}-{{ version }}.tar.gz\n  sha256: 60553630d83de492bc0cf1126add2acc591c87f1bc8ea7f70693e7563fc103a3\n\nbuild:\n  number: 3\n  run_exports:\n    - {{ pin_subpackage(name, max_pin='x.x.x') }}\n\noutputs:\n  - name: {{ cppname }}\n    build:\n      run_exports:\n        - {{ pin_subpackage(cppname, max_pin='x.x.x') }}\n    script: build_pinocchio_cpp.sh  # [not win]\n    script: build_pinocchio_cpp.bat  # [win]\n    requirements:\n      build:\n        - {{ compiler('cxx') }}\n        - {{ stdlib(\"c\") }}\n        - cmake\n        - ninja\n        - libgomp       # [linux]\n        - llvm-openmp   # [osx]\n      host:\n        - eigen\n        - urdfdom\n        - hpp-fcl\n        - libboost-devel\n        - casadi\n        - qhull\n        - qhull-static  # [not win]\n        - console_bridge\n        - libsdformat14\n        - eigen-abi-devel\n      run:\n        - libboost-devel\n        - qhull-static  # [not win]\n      test:\n        requires:\n          - pkg-config\n        commands:\n          - pkg-config --modversion {{ name }}\n          - test -f $PREFIX/lib/lib{{ name }}_default${SHLIB_EXT}  # [unix]\n          - if not exist %PREFIX%\\Library\\bin\\{{ name }}_default.dll exit 1  # [win]\n  - name: {{ pythonname }}\n    script: build_pinocchio_python.sh  # [not win]\n    script: build_pinocchio_python.bat  # [win]\n    requirements:\n      build:\n        - python                                 # [build_platform != target_platform]\n        - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n        - numpy                                  # [build_platform != target_platform]\n        - {{ compiler('cxx') }}\n        - {{ stdlib(\"c\") }}\n        - clang  # [win]\n        - cmake\n        - ninja\n      host:\n        - eigen\n        - eigenpy\n        - hpp-fcl\n        - libboost-devel\n        - libboost-python-devel\n        - python\n        # On Windows, Numpy 2.0 don't allow to export the PY_ARRAY_UNIQUE_SYMBOL.\n        # This has been fixed in Numpy 2.1.\n        - numpy >=2.1      # [win and py>=310]\n        # Unfortunatly, Numpy 2.1 is not distributed with Python 3.9.\n        # We are forced to use Numpy 1 in this case.\n        - numpy >=1.19,<2  # [win and py<310]\n        - numpy            # [not win]\n        - casadi\n        - {{ pin_subpackage(cppname, exact=true) }}\n        - eigen-abi-devel\n      run:\n        - python\n        - numpy >=2.1      # [win and py>=310]\n        - {{ pin_compatible('numpy') }}  # [win and py<310]\n        - {{ pin_subpackage(cppname, exact=true) }}\n    test:\n      requires:\n        - pip\n      imports:\n        - pinocchio\n      commands:\n        - python -c \"import importlib.metadata as metadata; assert metadata.version('pin') == '{{ version }}'\"\n        - python -m pip show pin\n  - name: {{ name }}\n    build:\n      run_exports:\n        - {{ pin_subpackage(cppname, max_pin='x.x.x') }}\n    requirements:\n      host:\n        # Explicitely add a python requirement so that the hash changes between python version\n        - python\n      run:\n        - {{ pin_subpackage(cppname, exact=true) }}\n        - {{ pin_subpackage(pythonname, exact=true) }}\n    test:\n      requires:\n        - pkg-config\n      imports:\n        - pinocchio\n      commands:\n        - pkg-config --modversion {{ name }}\n        - test -f $PREFIX/lib/lib{{ name }}_default${SHLIB_EXT}  # [unix]\n        - if not exist %PREFIX%\\Library\\bin\\{{ name }}_default.dll exit 1  # [win]\n\nabout:\n  home: http://github.com/stack-of-tasks/pinocchio\n  license: BSD-2-Clause\n  license_family: BSD\n  license_file: LICENSE\n  summary: A fast and flexible implementation of Rigid Body Dynamics algorithms and their analytical derivatives\n  dev_url: https://github.com/stack-of-tasks/pinocchio\n\nextra:\n  feedstock-name: pinocchio\n  recipe-maintainers:\n    - nim65s\n    - fabinsch\n    - jorisv\n    - jcarpent\n    - wolfv\n    - ymontmarin\n",
+  "raw_meta_yaml": "{% set name = \"pinocchio\" %}\n{% set cppname = \"lib\" + name %}\n{% set pythonname = name + \"-python\" %}\n{% set version = \"3.9.0\" %}\n\npackage:\n  name: {{ name|lower }}-split\n  version: {{ version }}\n\nsource:\n  url: https://github.com/stack-of-tasks/{{ name }}/releases/download/v{{ version }}/{{ name }}-{{ version }}.tar.gz\n  sha256: 60553630d83de492bc0cf1126add2acc591c87f1bc8ea7f70693e7563fc103a3\n\nbuild:\n  number: 3\n  run_exports:\n    - {{ pin_subpackage(name, max_pin='x.x.x') }}\n\noutputs:\n  - name: {{ cppname }}\n    build:\n      run_exports:\n        - {{ pin_subpackage(cppname, max_pin='x.x.x') }}\n    script: build_pinocchio_cpp.sh  # [not win]\n    script: build_pinocchio_cpp.bat  # [win]\n    requirements:\n      build:\n        - {{ compiler('cxx') }}\n        - {{ stdlib(\"c\") }}\n        - cmake\n        - ninja\n        - libgomp       # [linux]\n        - llvm-openmp   # [osx]\n      host:\n        - eigen\n        - urdfdom\n        - hpp-fcl\n        - libboost-devel\n        - casadi\n        - qhull\n        - qhull-static  # [not win]\n        - console_bridge\n        - libsdformat14\n        - eigen-abi-devel\n      run:\n        - libboost-devel\n        - qhull-static  # [not win]\n      test:\n        requires:\n          - pkg-config\n        commands:\n          - pkg-config --modversion {{ name }}\n          - test -f $PREFIX/lib/lib{{ name }}_default${SHLIB_EXT}  # [unix]\n          - if not exist %PREFIX%\\Library\\bin\\{{ name }}_default.dll exit 1  # [win]\n  - name: {{ pythonname }}\n    script: build_pinocchio_python.sh  # [not win]\n    script: build_pinocchio_python.bat  # [win]\n    requirements:\n      build:\n        - python                                 # [build_platform != target_platform]\n        - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n        - numpy                                  # [build_platform != target_platform]\n        - {{ compiler('cxx') }}\n        - {{ stdlib(\"c\") }}\n        - clang  # [win]\n        - cmake\n        - ninja\n      host:\n        - eigen\n        - eigenpy\n        - hpp-fcl\n        - libboost-devel\n        - libboost-python-devel\n        - python\n        # On Windows, Numpy 2.0 don't allow to export the PY_ARRAY_UNIQUE_SYMBOL.\n        # This has been fixed in Numpy 2.1.\n        - numpy >=2.1      # [win and py>=310]\n        # Unfortunatly, Numpy 2.1 is not distributed with Python 3.9.\n        # We are forced to use Numpy 1 in this case.\n        - numpy >=1.19,<2  # [win and py<310]\n        - numpy            # [not win]\n        - casadi\n        - {{ pin_subpackage(cppname, exact=true) }}\n        - eigen-abi-devel\n      run:\n        - python\n        - numpy >=2.1      # [win and py>=310]\n        - {{ pin_compatible('numpy') }}  # [win and py<310]\n        - {{ pin_subpackage(cppname, exact=true) }}\n    test:\n      requires:\n        - pip\n      imports:\n        - pinocchio\n      commands:\n        - python -c \"import importlib.metadata as metadata; assert metadata.version('pin') == '{{ version }}'\"\n        - python -m pip show pin\n  - name: {{ name }}\n    build:\n      run_exports:\n        - {{ pin_subpackage(cppname, max_pin='x.x.x') }}\n    requirements:\n      host:\n        # Explicitely add a python requirement so that the hash changes between python version\n        - python\n      run:\n        - {{ pin_subpackage(cppname, exact=true) }}\n        - {{ pin_subpackage(pythonname, exact=true) }}\n    test:\n      requires:\n        - pkg-config\n      imports:\n        - pinocchio\n      commands:\n        - pkg-config --modversion {{ name }}\n        - test -f $PREFIX/lib/lib{{ name }}_default${SHLIB_EXT}  # [unix]\n        - if not exist %PREFIX%\\Library\\bin\\{{ name }}_default.dll exit 1  # [win]\n\nabout:\n  home: http://github.com/stack-of-tasks/pinocchio\n  license: BSD-2-Clause\n  license_family: BSD\n  license_file: LICENSE\n  summary: A fast and flexible implementation of Rigid Body Dynamics algorithms and their analytical derivatives\n  dev_url: https://github.com/stack-of-tasks/pinocchio\n\nextra:\n  feedstock-name: pinocchio\n  recipe-maintainers:\n    - ManifoldFR\n    - nim65s\n    - fabinsch\n    - jorisv\n    - jcarpent\n    - wolfv\n    - ymontmarin\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -6847,6 +6853,7 @@
     "extra": {
       "feedstock-name": "pinocchio",
       "recipe-maintainers": [
+        "ManifoldFR",
         "nim65s",
         "fabinsch",
         "jorisv",
