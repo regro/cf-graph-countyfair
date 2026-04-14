@@ -18,8 +18,8 @@
       "linux_aarch64": "default"
     }
   },
-  "feedstock_hash": "9294021b00afe7d276a05798fc257f191312d921",
-  "feedstock_hash_ts": 1773436514,
+  "feedstock_hash": "26021fe56f2c7e8869817e27991b5142611730f5",
+  "feedstock_hash_ts": 1776142491,
   "feedstock_name": "libcudla",
   "hash_type": "sha256",
   "linux_aarch64_meta_yaml": {
@@ -125,7 +125,7 @@
     ],
     "package": {
       "name": "libcudla-split",
-      "version": "13.2.51"
+      "version": "13.2.75"
     },
     "requirements": {
       "build": [
@@ -135,8 +135,8 @@
     },
     "schema_version": 0,
     "source": {
-      "sha256": "5118b776567bb246d42730b489ec4b7906abf87569f0fafb0ab97c7cbe635bf5",
-      "url": "https://developer.download.nvidia.com/compute/cuda/redist/libcudla/linux-sbsa/libcudla-linux-sbsa-13.2.51-archive.tar.xz"
+      "sha256": "99ba5a1d5f781e03b80d00208aa16c21e569f1db2f9b01b3c6b3b921c43610a5",
+      "url": "https://developer.download.nvidia.com/compute/cuda/redist/libcudla/linux-sbsa/libcudla-linux-sbsa-13.2.75-archive.tar.xz"
     }
   },
   "linux_aarch64_requirements": {
@@ -273,7 +273,7 @@
     ],
     "package": {
       "name": "libcudla-split",
-      "version": "13.2.51"
+      "version": "13.2.75"
     },
     "requirements": {
       "build": [
@@ -283,8 +283,8 @@
     },
     "schema_version": 0,
     "source": {
-      "sha256": "5118b776567bb246d42730b489ec4b7906abf87569f0fafb0ab97c7cbe635bf5",
-      "url": "https://developer.download.nvidia.com/compute/cuda/redist/libcudla/linux-sbsa/libcudla-linux-sbsa-13.2.51-archive.tar.xz"
+      "sha256": "99ba5a1d5f781e03b80d00208aa16c21e569f1db2f9b01b3c6b3b921c43610a5",
+      "url": "https://developer.download.nvidia.com/compute/cuda/redist/libcudla/linux-sbsa/libcudla-linux-sbsa-13.2.75-archive.tar.xz"
     }
   },
   "name": "libcudla-split",
@@ -302,7 +302,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/libcudla.json"
   },
-  "raw_meta_yaml": "{% set name = \"libcudla\" %}\n{% set version = \"13.2.51\" %}\n{% set libversion = \"1.0.0\" %}\n{% set abiversion = libversion.split('.')[0] %}\n{% set cuda_version = \"13.2\" %}\n{% set platform = \"linux-x86_64\" %}  # [linux64]\n{% set platform = \"linux-sbsa\" %}  # [aarch64]\n{% set target_name = \"x86_64-linux\" %}  # [linux64]\n{% set target_name = \"sbsa-linux\" %}  # [aarch64]\n{% set extension = \"tar.xz\" %}  # [not win]\n\npackage:\n  name: {{ name }}-split\n  version: {{ version }}\n\nsource:\n  url: https://developer.download.nvidia.com/compute/cuda/redist/{{ name }}/{{ platform }}/{{ name }}-{{ platform }}-{{ version }}-archive.{{ extension }}  # [aarch64]\n  sha256: 5118b776567bb246d42730b489ec4b7906abf87569f0fafb0ab97c7cbe635bf5  # [aarch64]\n\nbuild:\n  number: 1\n  skip: true  # [not aarch64]\n\nrequirements:\n  build:\n    - cf-nvidia-tools 1.*  # [linux]\n    - patchelf             # [linux]\n\noutputs:\n  - name: libcudla\n    build:\n      binary_relocation: false\n      missing_dso_whitelist:\n        - \"*libnvcudla.so*\"  # Does not come with libcudla. It is provided by Nvidia PDK for jetson\n    files:\n      - lib/libcudla.so.*                             # [linux]\n      - targets/{{ target_name }}/lib/libcudla*.so.*  # [linux]\n    requirements:\n      build:\n        - {{ compiler(\"c\") }}\n        - {{ compiler(\"cxx\") }}\n        - {{ stdlib(\"c\") }}\n      host:\n        - cuda-version {{ cuda_version }}\n      run:\n        - {{ pin_compatible(\"cuda-version\", max_pin=\"x.x\") }}\n    test:\n      requires:\n        - patchelf  # [linux]\n      files:\n        - test-rpath.sh\n      commands:\n        - test -L $PREFIX/lib/libcudla.so.{{ libversion }}                                  # [linux]\n        - test -L $PREFIX/lib/libcudla.so.{{ abiversion }}                                  # [linux]\n        - test -f $PREFIX/targets/{{ target_name }}/lib/libcudla.so.{{ libversion }}        # [linux]\n        - test -L $PREFIX/targets/{{ target_name }}/lib/libcudla.so.{{ abiversion }}        # [linux]\n        - bash test-rpath.sh                                                                # [linux]\n\n  - name: libcudla-dev\n    build:\n      run_exports:\n        - {{ pin_subpackage(\"libcudla\", max_pin=\"x\") }}\n    files:\n      - lib/libcudla.so         # [linux]\n      - lib/pkgconfig                                 # [linux]\n      - targets/{{ target_name }}/include             # [linux]\n      - targets/{{ target_name }}/lib/libcudla.so     # [linux]\n      - targets/{{ target_name }}/lib/stubs           # [linux]\n    requirements:\n      build:\n        - {{ compiler(\"c\") }}\n        - {{ compiler(\"cxx\") }}\n        - {{ stdlib(\"c\") }}\n      host:\n        - cuda-version {{ cuda_version }}\n      run:\n        - {{ pin_compatible(\"cuda-version\", max_pin=\"x.x\") }}\n        - {{ pin_subpackage(\"libcudla\", exact=True) }}\n    test:\n      commands:\n        - test -L $PREFIX/lib/libcudla.so                                                   # [linux]\n        - test -f $PREFIX/lib/pkgconfig/cudla*.pc                                           # [linux]\n        - test -f $PREFIX/targets/{{ target_name }}/include/cudla.h                         # [linux]\n        - test -f $PREFIX/targets/{{ target_name }}/include/cudlaExternalEtbl.hpp           # [linux]\n        - test -L $PREFIX/targets/{{ target_name }}/lib/libcudla.so                         # [linux]\n        - test -f $PREFIX/targets/{{ target_name }}/lib/stubs/libcudla.so                   # [linux]\n\nabout:\n  home: https://developer.nvidia.com/cuda-toolkit\n  license_file: LICENSE\n  license: LicenseRef-NVIDIA-End-User-License-Agreement\n  license_url: https://docs.nvidia.com/cuda/eula/index.html\n  summary: CUDA Deep Learning Accelerator(DLA)\n  description: |\n    cuDLA is an extension of the CUDA programming model to encompass DLA work as well.\n    It provides familiar CUDA programming model to work with DLA, reduces SW complexity\n    (without need for EGLStreams) to interoperate between DLA – GPU for your inference pipelines.\n  doc_url: https://docs.nvidia.com/cuda/index.html\n\nextra:\n  feedstock-name: libcudla\n  recipe-maintainers:\n    - conda-forge/cuda\n",
+  "raw_meta_yaml": "{% set name = \"libcudla\" %}\n{% set version = \"13.2.75\" %}\n{% set libversion = \"1.0.0\" %}\n{% set abiversion = libversion.split('.')[0] %}\n{% set cuda_version = \"13.2\" %}\n{% set platform = \"linux-x86_64\" %}  # [linux64]\n{% set platform = \"linux-sbsa\" %}  # [aarch64]\n{% set target_name = \"x86_64-linux\" %}  # [linux64]\n{% set target_name = \"sbsa-linux\" %}  # [aarch64]\n{% set extension = \"tar.xz\" %}  # [not win]\n\npackage:\n  name: {{ name }}-split\n  version: {{ version }}\n\nsource:\n  url: https://developer.download.nvidia.com/compute/cuda/redist/{{ name }}/{{ platform }}/{{ name }}-{{ platform }}-{{ version }}-archive.{{ extension }}  # [aarch64]\n  sha256: 99ba5a1d5f781e03b80d00208aa16c21e569f1db2f9b01b3c6b3b921c43610a5  # [aarch64]\n\nbuild:\n  number: 1\n  skip: true  # [not aarch64]\n\nrequirements:\n  build:\n    - cf-nvidia-tools 1.*  # [linux]\n    - patchelf             # [linux]\n\noutputs:\n  - name: libcudla\n    build:\n      binary_relocation: false\n      missing_dso_whitelist:\n        - \"*libnvcudla.so*\"  # Does not come with libcudla. It is provided by Nvidia PDK for jetson\n    files:\n      - lib/libcudla.so.*                             # [linux]\n      - targets/{{ target_name }}/lib/libcudla*.so.*  # [linux]\n    requirements:\n      build:\n        - {{ compiler(\"c\") }}\n        - {{ compiler(\"cxx\") }}\n        - {{ stdlib(\"c\") }}\n      host:\n        - cuda-version {{ cuda_version }}\n      run:\n        - {{ pin_compatible(\"cuda-version\", max_pin=\"x.x\") }}\n    test:\n      requires:\n        - patchelf  # [linux]\n      files:\n        - test-rpath.sh\n      commands:\n        - test -L $PREFIX/lib/libcudla.so.{{ libversion }}                                  # [linux]\n        - test -L $PREFIX/lib/libcudla.so.{{ abiversion }}                                  # [linux]\n        - test -f $PREFIX/targets/{{ target_name }}/lib/libcudla.so.{{ libversion }}        # [linux]\n        - test -L $PREFIX/targets/{{ target_name }}/lib/libcudla.so.{{ abiversion }}        # [linux]\n        - bash test-rpath.sh                                                                # [linux]\n\n  - name: libcudla-dev\n    build:\n      run_exports:\n        - {{ pin_subpackage(\"libcudla\", max_pin=\"x\") }}\n    files:\n      - lib/libcudla.so         # [linux]\n      - lib/pkgconfig                                 # [linux]\n      - targets/{{ target_name }}/include             # [linux]\n      - targets/{{ target_name }}/lib/libcudla.so     # [linux]\n      - targets/{{ target_name }}/lib/stubs           # [linux]\n    requirements:\n      build:\n        - {{ compiler(\"c\") }}\n        - {{ compiler(\"cxx\") }}\n        - {{ stdlib(\"c\") }}\n      host:\n        - cuda-version {{ cuda_version }}\n      run:\n        - {{ pin_compatible(\"cuda-version\", max_pin=\"x.x\") }}\n        - {{ pin_subpackage(\"libcudla\", exact=True) }}\n    test:\n      commands:\n        - test -L $PREFIX/lib/libcudla.so                                                   # [linux]\n        - test -f $PREFIX/lib/pkgconfig/cudla*.pc                                           # [linux]\n        - test -f $PREFIX/targets/{{ target_name }}/include/cudla.h                         # [linux]\n        - test -f $PREFIX/targets/{{ target_name }}/include/cudlaExternalEtbl.hpp           # [linux]\n        - test -L $PREFIX/targets/{{ target_name }}/lib/libcudla.so                         # [linux]\n        - test -f $PREFIX/targets/{{ target_name }}/lib/stubs/libcudla.so                   # [linux]\n\nabout:\n  home: https://developer.nvidia.com/cuda-toolkit\n  license_file: LICENSE\n  license: LicenseRef-NVIDIA-End-User-License-Agreement\n  license_url: https://docs.nvidia.com/cuda/eula/index.html\n  summary: CUDA Deep Learning Accelerator(DLA)\n  description: |\n    cuDLA is an extension of the CUDA programming model to encompass DLA work as well.\n    It provides familiar CUDA programming model to work with DLA, reduces SW complexity\n    (without need for EGLStreams) to interoperate between DLA – GPU for your inference pipelines.\n  doc_url: https://docs.nvidia.com/cuda/index.html\n\nextra:\n  feedstock-name: libcudla\n  recipe-maintainers:\n    - conda-forge/cuda\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -384,8 +384,8 @@
       ]
     }
   },
-  "url": "https://developer.download.nvidia.com/compute/cuda/redist/libcudla/linux-sbsa/libcudla-linux-sbsa-13.2.51-archive.tar.xz",
-  "version": "13.2.51",
+  "url": "https://developer.download.nvidia.com/compute/cuda/redist/libcudla/linux-sbsa/libcudla-linux-sbsa-13.2.75-archive.tar.xz",
+  "version": "13.2.75",
   "version_pr_info": {
     "__lazy_json__": "version_pr_info/libcudla.json"
   }
