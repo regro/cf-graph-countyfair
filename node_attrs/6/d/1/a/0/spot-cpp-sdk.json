@@ -1,7 +1,7 @@
 {
   "archived": false,
   "branch": "main",
-  "ci_support_linux_64_.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ncxx_compiler:\n- gxx\ncxx_compiler_version:\n- '14'\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\neigen_abi_devel:\n- 3.4.0\nlibabseil:\n- '20250512'\nlibgrpc:\n- '1.73'\nlibprotobuf:\n- 6.31.1\ntarget_platform:\n- linux-64\nzip_keys:\n- - c_compiler_version\n  - cxx_compiler_version\n",
+  "ci_support_linux_64_.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ncxx_compiler:\n- gxx\ncxx_compiler_version:\n- '14'\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\neigen_abi_devel:\n- 3.4.0\nlibabseil:\n- '20260107'\nlibgrpc:\n- '1.78'\nlibprotobuf:\n- 6.33.5\ntarget_platform:\n- linux-64\nzip_keys:\n- - c_compiler_version\n  - cxx_compiler_version\n",
   "conda-forge.yml": {
     "bot": {
       "inspection": "update-all"
@@ -25,8 +25,8 @@
       "osx_arm64": "default"
     }
   },
-  "feedstock_hash": "38ddccfca075459aa8ab2cd842d1645725140066",
-  "feedstock_hash_ts": 1775844599,
+  "feedstock_hash": "18945a2812e72f2a390e4b464e45a3cce16097d5",
+  "feedstock_hash_ts": 1776244451,
   "feedstock_name": "spot-cpp-sdk",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -39,7 +39,7 @@
       "summary": "Develop applications and payloads for Spot using the Boston Dynamics Spot C++ SDK."
     },
     "build": {
-      "number": "1",
+      "number": "2",
       "script": [
         "export CFLAGS=\"${CFLAGS} -Wno-deprecated-declarations\"",
         "export CXXFLAGS=\"${CXXFLAGS} -Wno-deprecated-declarations\"",
@@ -188,7 +188,7 @@
       "summary": "Develop applications and payloads for Spot using the Boston Dynamics Spot C++ SDK."
     },
     "build": {
-      "number": "1",
+      "number": "2",
       "script": [
         "export CFLAGS=\"${CFLAGS} -Wno-deprecated-declarations\"",
         "export CXXFLAGS=\"${CXXFLAGS} -Wno-deprecated-declarations\"",
@@ -337,7 +337,7 @@
       "summary": "Develop applications and payloads for Spot using the Boston Dynamics Spot C++ SDK."
     },
     "build": {
-      "number": "1",
+      "number": "2",
       "script": [
         "export CFLAGS=\"${CFLAGS} -Wno-deprecated-declarations\"",
         "export CXXFLAGS=\"${CXXFLAGS} -Wno-deprecated-declarations\"",
@@ -608,7 +608,7 @@
       "summary": "Develop applications and payloads for Spot using the Boston Dynamics Spot C++ SDK."
     },
     "build": {
-      "number": "1",
+      "number": "2",
       "script": [
         "export CFLAGS=\"${CFLAGS} -Wno-deprecated-declarations\"",
         "export CXXFLAGS=\"${CXXFLAGS} -Wno-deprecated-declarations\"",
@@ -757,7 +757,7 @@
       "summary": "Develop applications and payloads for Spot using the Boston Dynamics Spot C++ SDK."
     },
     "build": {
-      "number": "1",
+      "number": "2",
       "script": [
         "export CFLAGS=\"${CFLAGS} -Wno-deprecated-declarations\"",
         "export CXXFLAGS=\"${CXXFLAGS} -Wno-deprecated-declarations\"",
@@ -913,7 +913,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/spot-cpp-sdk.json"
   },
-  "raw_meta_yaml": "context:\n  name: spot-cpp-sdk\n  version: 5.1.4\n  build_number: 1\n\nrecipe:\n  name: ${{ name }}-split\n  version: ${{ version }}\n\nsource:\n  url: https://github.com/boston-dynamics/spot-cpp-sdk/archive/refs/tags/v${{ version }}.zip\n  sha256: a5aa0b1d3fc4b58282d8fd94e9b89cb561d245403a472208312527cc13a37776\n  patches:\n    - 01-fix-protobuf-stringview.patch\n    - 02-fix-proto-shared-linkage.osx.patch\n    - if: osx\n      then:\n        - 03-fix-grpc-deadline.osx.patch\n        - 04-fix-std-max.osx.patch\n\nbuild:\n  skip: win\n  number: ${{ build_number }}\n\noutputs:\n  - package:\n      name: spot-cpp-sdk\n    build:\n      script:\n        - if: unix\n          then:\n            # Suppress deprecated warnings.\n            - export CFLAGS=\"${CFLAGS} -Wno-deprecated-declarations\"\n            - export CXXFLAGS=\"${CXXFLAGS} -Wno-deprecated-declarations\"\n            # Configure C++ project.\n            - echo ${CMAKE_ARGS}\n            - cmake -S cpp/ -B build/\n              ${CMAKE_ARGS}\n              -DCMAKE_FIND_PACKAGE_PREFER_CONFIG=ON\n              -GNinja\n        - if: win\n          then:\n            # Configure C++ project.\n            - echo %CMAKE_ARGS%\n            - cmake -S cpp/ -B build/\n              ${CMAKE_ARGS}\n              -DCMAKE_FIND_PACKAGE_PREFER_CONFIG=ON\n              -DCMAKE_CXX_COMPILER_WORKS=ON\n              -DCMAKE_CXX_FLAGS=\"%CXXFLAGS% /DNOMINMAX /wd4267 /wd4996 /WX- /EHsc\"\n              -GNinja\n        # Build and install C++ project.\n        - cmake --build build/ --config Release\n        - cmake --install build/ --config Release\n    requirements:\n      build:\n        - ${{ stdlib('c') }}\n        - ${{ compiler('c') }}\n        - ${{ compiler('cxx') }}\n        - cmake\n        - ninja\n      host:\n        - cli11\n        - eigen-abi-devel\n        - libabseil\n        - libgrpc\n        - libprotobuf\n  # TODO: move to this package headers and cmake config files\n  - package:\n      name: spot-cpp-sdk-devel\n    requirements:\n      run:\n        - ${{ pin_subpackage(\"spot-cpp-sdk\", exact=True) }}\n        - cli11\n        - eigen\n    tests:\n      - script:\n          - cmake-package-check bosdyn --targets bosdyn_client bosdyn_client_static\n          - cmake-package-check bosdyn --targets bosdyn_api bosdyn_api_obj bosdyn_api_static\n          - cmake-package-check bosdyn --targets bosdyn_api bosdyn_choreography_protos_obj bosdyn_choreography_protos bosdyn_choreography_protos_static\n        requirements:\n          run:\n            - ${{ compiler('c') }}\n            - ${{ compiler('cxx') }}\n            - cmake-package-check\n\nabout:\n  homepage: https://github.com/boston-dynamics/spot-cpp-sdk\n  license: LicenseRef-BostonDynamics\n  license_file: LICENSE\n  repository: https://github.com/boston-dynamics/spot-cpp-sdk\n  summary: Develop applications and payloads for Spot using the Boston Dynamics Spot C++ SDK.\n\nextra:\n  feedstock-name: spot-cpp-sdk\n  recipe-maintainers:\n    - diegoferigo\n",
+  "raw_meta_yaml": "context:\n  name: spot-cpp-sdk\n  version: 5.1.4\n  build_number: 2\n\nrecipe:\n  name: ${{ name }}-split\n  version: ${{ version }}\n\nsource:\n  url: https://github.com/boston-dynamics/spot-cpp-sdk/archive/refs/tags/v${{ version }}.zip\n  sha256: a5aa0b1d3fc4b58282d8fd94e9b89cb561d245403a472208312527cc13a37776\n  patches:\n    - 01-fix-protobuf-stringview.patch\n    - 02-fix-proto-shared-linkage.osx.patch\n    - if: osx\n      then:\n        - 03-fix-grpc-deadline.osx.patch\n        - 04-fix-std-max.osx.patch\n\nbuild:\n  skip: win\n  number: ${{ build_number }}\n\noutputs:\n  - package:\n      name: spot-cpp-sdk\n    build:\n      script:\n        - if: unix\n          then:\n            # Suppress deprecated warnings.\n            - export CFLAGS=\"${CFLAGS} -Wno-deprecated-declarations\"\n            - export CXXFLAGS=\"${CXXFLAGS} -Wno-deprecated-declarations\"\n            # Configure C++ project.\n            - echo ${CMAKE_ARGS}\n            - cmake -S cpp/ -B build/ ${CMAKE_ARGS} -DCMAKE_FIND_PACKAGE_PREFER_CONFIG=ON -GNinja\n        - if: win\n          then:\n            # Configure C++ project.\n            - echo %CMAKE_ARGS%\n            - cmake -S cpp/ -B build/ ${CMAKE_ARGS} -DCMAKE_FIND_PACKAGE_PREFER_CONFIG=ON -DCMAKE_CXX_COMPILER_WORKS=ON -DCMAKE_CXX_FLAGS=\"%CXXFLAGS% /DNOMINMAX /wd4267 /wd4996 /WX- /EHsc\" -GNinja\n        # Build and install C++ project.\n        - cmake --build build/ --config Release\n        - cmake --install build/ --config Release\n    requirements:\n      build:\n        - ${{ stdlib('c') }}\n        - ${{ compiler('c') }}\n        - ${{ compiler('cxx') }}\n        - cmake\n        - ninja\n      host:\n        - cli11\n        - eigen-abi-devel\n        - libabseil\n        - libgrpc\n        - libprotobuf\n  # TODO: move to this package headers and cmake config files\n  - package:\n      name: spot-cpp-sdk-devel\n    requirements:\n      run:\n        - ${{ pin_subpackage(\"spot-cpp-sdk\", exact=True) }}\n        - cli11\n        - eigen\n    tests:\n      - script:\n          - cmake-package-check bosdyn --targets bosdyn_client bosdyn_client_static\n          - cmake-package-check bosdyn --targets bosdyn_api bosdyn_api_obj bosdyn_api_static\n          - cmake-package-check bosdyn --targets bosdyn_api bosdyn_choreography_protos_obj bosdyn_choreography_protos bosdyn_choreography_protos_static\n        requirements:\n          run:\n            - ${{ compiler('c') }}\n            - ${{ compiler('cxx') }}\n            - cmake-package-check\n\nabout:\n  homepage: https://github.com/boston-dynamics/spot-cpp-sdk\n  license: LicenseRef-BostonDynamics\n  license_file: LICENSE\n  repository: https://github.com/boston-dynamics/spot-cpp-sdk\n  summary: Develop applications and payloads for Spot using the Boston Dynamics Spot C++ SDK.\n\nextra:\n  feedstock-name: spot-cpp-sdk\n  recipe-maintainers:\n    - diegoferigo\n",
   "req": {
     "__set__": true,
     "elements": [
