@@ -1,0 +1,547 @@
+{
+  "archived": false,
+  "branch": "main",
+  "ci_support_linux_64_.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ncxx_compiler:\n- gxx\ncxx_compiler_version:\n- '14'\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\nlibffi:\n- '3.5'\nlibxml2_devel:\n- '2.14'\nrust_compiler:\n- rust\ntarget_platform:\n- linux-64\nzip_keys:\n- - c_compiler_version\n  - cxx_compiler_version\nzlib:\n- '1'\nzstd:\n- '1.5'\n",
+  "conda-forge.yml": {
+    "conda_build": {
+      "error_overlinking": true
+    },
+    "conda_build_tool": "rattler-build",
+    "conda_forge_output_validation": true,
+    "github": {
+      "branch_name": "main",
+      "tooling_branch_name": "main"
+    }
+  },
+  "feedstock_hash": "1d37ec66b6ddf2e53ba100ae2894dcba0062c0e4",
+  "feedstock_hash_ts": 1776683978,
+  "feedstock_name": "inko",
+  "hash_type": "sha256",
+  "linux_64_meta_yaml": {
+    "about": {
+      "description": "Inko is a language for building concurrent software with confidence.\nInko makes it easy to build concurrent software, without having to\nworry about unpredictable performance, unexpected runtime errors, or\nrace conditions.\n\nInko features deterministic automatic memory management, move\nsemantics, static typing, type-safe concurrency, efficient error\nhandling, and more. Inko source code is compiled to machine code\nusing LLVM.",
+      "dev_url": "https://github.com/inko-lang/inko",
+      "doc_url": "https://docs.inko-lang.org/",
+      "home": "https://inko-lang.org/",
+      "license": "MPL-2.0",
+      "license_family": "MPL-2.0",
+      "license_file": "LICENSE",
+      "summary": "A language for building concurrent software with confidence"
+    },
+    "build": {
+      "number": "0",
+      "script": {
+        "content": "$env.LLVM_SYS_180_PREFIX = $env.PREFIX\n\n# The patched Config::new() resolves INKO_STD / INKO_RT at runtime\n# from current_exe(); the compile-time env!() fallback still has to\n# resolve to something, so we bake placeholder-free literals that\n# rattler's prefix rewriter will leave alone.\n$env.INKO_STD = \"/nonexistent/inko/std\"\n$env.INKO_RT  = \"/nonexistent/inko/runtime\"\n\ncargo auditable build --release --locked\n\n# Conda-forge's Rust toolchain sets CARGO_BUILD_TARGET, so artifacts\n# land in target/<triple>/release/. Fall back to target/release/ for\n# native-only builds.\nlet triple = $env.CARGO_BUILD_TARGET? | default ''\nlet target_dir = if ($\"target/($triple)/release/inko\" | path exists) {\n  $\"target/($triple)/release\"\n} else {\n  \"target/release\"\n}\n\nlet install_rt  = $\"($env.PREFIX)/lib/inko/runtime\"\nmkdir $\"($env.PREFIX)/bin\"\nmkdir $install_rt\ncp $\"($target_dir)/inko\"      $\"($env.PREFIX)/bin/inko\"\ncp $\"($target_dir)/libinko.a\" $\"($install_rt)/libinko.a\"\n\n# The standard library ships as Inko source files; copy std/src\n# wholesale and rename it to std so the installed layout matches\n# lib/inko/std/... instead of lib/inko/src/....\ncp -r std/src $\"($env.PREFIX)/lib/inko/src\"\nmv $\"($env.PREFIX)/lib/inko/src\" $\"($env.PREFIX)/lib/inko/std\"\n\ncargo-bundle-licenses --format yaml --output THIRDPARTY.yml\n",
+        "env": {
+          "CARGO_PROFILE_RELEASE_STRIP": "symbols"
+        },
+        "interpreter": "nu"
+      }
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "tdejager"
+      ]
+    },
+    "outputs": [
+      {
+        "build": null,
+        "name": "inko",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "c_compiler_stub",
+            "cxx_compiler_stub",
+            "rust_compiler_stub",
+            "cargo-bundle-licenses",
+            "cargo-auditable",
+            "nushell"
+          ],
+          "host": [
+            "llvmdev 18.1.*",
+            "zlib",
+            "zstd",
+            "libxml2-devel",
+            "libffi"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "inko --help",
+              "inko --version",
+              "echo 'type async Main { fn async main { } }' > hello.inko",
+              "inko check hello.inko"
+            ]
+          },
+          {
+            "package_contents": {
+              "bin": [
+                "inko"
+              ],
+              "files": [
+                "lib/inko/runtime/libinko.a"
+              ]
+            }
+          }
+        ],
+        "version": "0.19.1"
+      }
+    ],
+    "package": {
+      "name": "inko",
+      "version": "0.19.1"
+    },
+    "requirements": {
+      "build": [
+        "c_stdlib_stub",
+        "c_compiler_stub",
+        "cxx_compiler_stub",
+        "rust_compiler_stub",
+        "cargo-bundle-licenses",
+        "cargo-auditable",
+        "nushell"
+      ],
+      "host": [
+        "llvmdev 18.1.*",
+        "zlib",
+        "zstd",
+        "libxml2-devel",
+        "libffi"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "patches": [
+        "patches/0001-locate-std-and-runtime-relative-to-executable.patch"
+      ],
+      "sha256": "53f5e7065c9ced78dc2dcbce0d04e4c77dd233dcc2ac38c91d5a35aa14637fc7",
+      "url": "https://github.com/inko-lang/inko/archive/refs/tags/v0.19.1.tar.gz"
+    }
+  },
+  "linux_64_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "cargo-auditable",
+        "cargo-bundle-licenses",
+        "cxx_compiler_stub",
+        "nushell",
+        "rust_compiler_stub"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "libffi",
+        "libxml2-devel",
+        "llvmdev",
+        "zlib",
+        "zstd"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": []
+    },
+    "test": {
+      "__set__": true,
+      "elements": []
+    }
+  },
+  "meta_yaml": {
+    "about": {
+      "description": "Inko is a language for building concurrent software with confidence.\nInko makes it easy to build concurrent software, without having to\nworry about unpredictable performance, unexpected runtime errors, or\nrace conditions.\n\nInko features deterministic automatic memory management, move\nsemantics, static typing, type-safe concurrency, efficient error\nhandling, and more. Inko source code is compiled to machine code\nusing LLVM.",
+      "dev_url": "https://github.com/inko-lang/inko",
+      "doc_url": "https://docs.inko-lang.org/",
+      "home": "https://inko-lang.org/",
+      "license": "MPL-2.0",
+      "license_family": "MPL-2.0",
+      "license_file": "LICENSE",
+      "summary": "A language for building concurrent software with confidence"
+    },
+    "build": {
+      "number": "0",
+      "script": {
+        "content": "$env.LLVM_SYS_180_PREFIX = $env.PREFIX\n\n# The patched Config::new() resolves INKO_STD / INKO_RT at runtime\n# from current_exe(); the compile-time env!() fallback still has to\n# resolve to something, so we bake placeholder-free literals that\n# rattler's prefix rewriter will leave alone.\n$env.INKO_STD = \"/nonexistent/inko/std\"\n$env.INKO_RT  = \"/nonexistent/inko/runtime\"\n\ncargo auditable build --release --locked\n\n# Conda-forge's Rust toolchain sets CARGO_BUILD_TARGET, so artifacts\n# land in target/<triple>/release/. Fall back to target/release/ for\n# native-only builds.\nlet triple = $env.CARGO_BUILD_TARGET? | default ''\nlet target_dir = if ($\"target/($triple)/release/inko\" | path exists) {\n  $\"target/($triple)/release\"\n} else {\n  \"target/release\"\n}\n\nlet install_rt  = $\"($env.PREFIX)/lib/inko/runtime\"\nmkdir $\"($env.PREFIX)/bin\"\nmkdir $install_rt\ncp $\"($target_dir)/inko\"      $\"($env.PREFIX)/bin/inko\"\ncp $\"($target_dir)/libinko.a\" $\"($install_rt)/libinko.a\"\n\n# The standard library ships as Inko source files; copy std/src\n# wholesale and rename it to std so the installed layout matches\n# lib/inko/std/... instead of lib/inko/src/....\ncp -r std/src $\"($env.PREFIX)/lib/inko/src\"\nmv $\"($env.PREFIX)/lib/inko/src\" $\"($env.PREFIX)/lib/inko/std\"\n\ncargo-bundle-licenses --format yaml --output THIRDPARTY.yml\n",
+        "env": {
+          "CARGO_PROFILE_RELEASE_STRIP": "symbols"
+        },
+        "interpreter": "nu"
+      }
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "tdejager"
+      ]
+    },
+    "outputs": [
+      {
+        "build": null,
+        "name": "inko",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "c_compiler_stub",
+            "cxx_compiler_stub",
+            "rust_compiler_stub",
+            "cargo-bundle-licenses",
+            "cargo-auditable",
+            "nushell"
+          ],
+          "host": [
+            "llvmdev 18.1.*",
+            "zlib",
+            "zstd",
+            "libxml2-devel",
+            "libffi"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "inko --help",
+              "inko --version",
+              "echo 'type async Main { fn async main { } }' > hello.inko",
+              "inko check hello.inko"
+            ]
+          },
+          {
+            "package_contents": {
+              "bin": [
+                "inko"
+              ],
+              "files": [
+                "lib/inko/runtime/libinko.a"
+              ]
+            }
+          }
+        ],
+        "version": "0.19.1"
+      },
+      {
+        "build": null,
+        "name": "inko",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "c_compiler_stub",
+            "cxx_compiler_stub",
+            "rust_compiler_stub",
+            "cargo-bundle-licenses",
+            "cargo-auditable",
+            "nushell"
+          ],
+          "host": [
+            "llvmdev 18.1.*",
+            "zlib",
+            "zstd",
+            "libxml2-devel",
+            "libffi"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "inko --help",
+              "inko --version",
+              "echo 'type async Main { fn async main { } }' > hello.inko",
+              "inko check hello.inko"
+            ]
+          },
+          {
+            "package_contents": {
+              "bin": [
+                "inko"
+              ],
+              "files": [
+                "lib/inko/runtime/libinko.a"
+              ]
+            }
+          }
+        ],
+        "version": "0.19.1"
+      }
+    ],
+    "package": {
+      "name": "inko",
+      "version": "0.19.1"
+    },
+    "requirements": {
+      "build": [
+        "c_stdlib_stub",
+        "c_compiler_stub",
+        "cxx_compiler_stub",
+        "rust_compiler_stub",
+        "cargo-bundle-licenses",
+        "cargo-auditable",
+        "nushell"
+      ],
+      "host": [
+        "llvmdev 18.1.*",
+        "zlib",
+        "zstd",
+        "libxml2-devel",
+        "libffi"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "patches": [
+        "patches/0001-locate-std-and-runtime-relative-to-executable.patch"
+      ],
+      "sha256": "53f5e7065c9ced78dc2dcbce0d04e4c77dd233dcc2ac38c91d5a35aa14637fc7",
+      "url": "https://github.com/inko-lang/inko/archive/refs/tags/v0.19.1.tar.gz"
+    }
+  },
+  "name": "inko",
+  "osx_64_meta_yaml": {
+    "about": {
+      "description": "Inko is a language for building concurrent software with confidence.\nInko makes it easy to build concurrent software, without having to\nworry about unpredictable performance, unexpected runtime errors, or\nrace conditions.\n\nInko features deterministic automatic memory management, move\nsemantics, static typing, type-safe concurrency, efficient error\nhandling, and more. Inko source code is compiled to machine code\nusing LLVM.",
+      "dev_url": "https://github.com/inko-lang/inko",
+      "doc_url": "https://docs.inko-lang.org/",
+      "home": "https://inko-lang.org/",
+      "license": "MPL-2.0",
+      "license_family": "MPL-2.0",
+      "license_file": "LICENSE",
+      "summary": "A language for building concurrent software with confidence"
+    },
+    "build": {
+      "number": "0",
+      "script": {
+        "content": "$env.LLVM_SYS_180_PREFIX = $env.PREFIX\n\n# The patched Config::new() resolves INKO_STD / INKO_RT at runtime\n# from current_exe(); the compile-time env!() fallback still has to\n# resolve to something, so we bake placeholder-free literals that\n# rattler's prefix rewriter will leave alone.\n$env.INKO_STD = \"/nonexistent/inko/std\"\n$env.INKO_RT  = \"/nonexistent/inko/runtime\"\n\ncargo auditable build --release --locked\n\n# Conda-forge's Rust toolchain sets CARGO_BUILD_TARGET, so artifacts\n# land in target/<triple>/release/. Fall back to target/release/ for\n# native-only builds.\nlet triple = $env.CARGO_BUILD_TARGET? | default ''\nlet target_dir = if ($\"target/($triple)/release/inko\" | path exists) {\n  $\"target/($triple)/release\"\n} else {\n  \"target/release\"\n}\n\nlet install_rt  = $\"($env.PREFIX)/lib/inko/runtime\"\nmkdir $\"($env.PREFIX)/bin\"\nmkdir $install_rt\ncp $\"($target_dir)/inko\"      $\"($env.PREFIX)/bin/inko\"\ncp $\"($target_dir)/libinko.a\" $\"($install_rt)/libinko.a\"\n\n# The standard library ships as Inko source files; copy std/src\n# wholesale and rename it to std so the installed layout matches\n# lib/inko/std/... instead of lib/inko/src/....\ncp -r std/src $\"($env.PREFIX)/lib/inko/src\"\nmv $\"($env.PREFIX)/lib/inko/src\" $\"($env.PREFIX)/lib/inko/std\"\n\ncargo-bundle-licenses --format yaml --output THIRDPARTY.yml\n",
+        "env": {
+          "CARGO_PROFILE_RELEASE_STRIP": "symbols"
+        },
+        "interpreter": "nu"
+      }
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "tdejager"
+      ]
+    },
+    "outputs": [
+      {
+        "build": null,
+        "name": "inko",
+        "requirements": {
+          "build": [
+            "c_stdlib_stub",
+            "c_compiler_stub",
+            "cxx_compiler_stub",
+            "rust_compiler_stub",
+            "cargo-bundle-licenses",
+            "cargo-auditable",
+            "nushell"
+          ],
+          "host": [
+            "llvmdev 18.1.*",
+            "zlib",
+            "zstd",
+            "libxml2-devel",
+            "libffi"
+          ],
+          "run": []
+        },
+        "tests": [
+          {
+            "script": [
+              "inko --help",
+              "inko --version",
+              "echo 'type async Main { fn async main { } }' > hello.inko",
+              "inko check hello.inko"
+            ]
+          },
+          {
+            "package_contents": {
+              "bin": [
+                "inko"
+              ],
+              "files": [
+                "lib/inko/runtime/libinko.a"
+              ]
+            }
+          }
+        ],
+        "version": "0.19.1"
+      }
+    ],
+    "package": {
+      "name": "inko",
+      "version": "0.19.1"
+    },
+    "requirements": {
+      "build": [
+        "c_stdlib_stub",
+        "c_compiler_stub",
+        "cxx_compiler_stub",
+        "rust_compiler_stub",
+        "cargo-bundle-licenses",
+        "cargo-auditable",
+        "nushell"
+      ],
+      "host": [
+        "llvmdev 18.1.*",
+        "zlib",
+        "zstd",
+        "libxml2-devel",
+        "libffi"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "patches": [
+        "patches/0001-locate-std-and-runtime-relative-to-executable.patch"
+      ],
+      "sha256": "53f5e7065c9ced78dc2dcbce0d04e4c77dd233dcc2ac38c91d5a35aa14637fc7",
+      "url": "https://github.com/inko-lang/inko/archive/refs/tags/v0.19.1.tar.gz"
+    }
+  },
+  "osx_64_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "cargo-auditable",
+        "cargo-bundle-licenses",
+        "cxx_compiler_stub",
+        "nushell",
+        "rust_compiler_stub"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "libffi",
+        "libxml2-devel",
+        "llvmdev",
+        "zlib",
+        "zstd"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": []
+    },
+    "test": {
+      "__set__": true,
+      "elements": []
+    }
+  },
+  "outputs_names": {
+    "__set__": true,
+    "elements": [
+      "inko"
+    ]
+  },
+  "parsing_error": false,
+  "platforms": [
+    "linux_64",
+    "osx_64"
+  ],
+  "pr_info": {
+    "__lazy_json__": "pr_info/inko.json"
+  },
+  "raw_meta_yaml": "context:\n  version: \"0.19.1\"\n\npackage:\n  name: inko\n  version: ${{ version }}\n\nsource:\n  url: https://github.com/inko-lang/inko/archive/refs/tags/v${{ version }}.tar.gz\n  sha256: 53f5e7065c9ced78dc2dcbce0d04e4c77dd233dcc2ac38c91d5a35aa14637fc7\n  patches:\n    - patches/0001-locate-std-and-runtime-relative-to-executable.patch\n\nbuild:\n  number: 0\n  skip: win\n  script:\n    interpreter: nu\n    env:\n      CARGO_PROFILE_RELEASE_STRIP: symbols\n    content: |\n      $env.LLVM_SYS_180_PREFIX = $env.PREFIX\n\n      # The patched Config::new() resolves INKO_STD / INKO_RT at runtime\n      # from current_exe(); the compile-time env!() fallback still has to\n      # resolve to something, so we bake placeholder-free literals that\n      # rattler's prefix rewriter will leave alone.\n      $env.INKO_STD = \"/nonexistent/inko/std\"\n      $env.INKO_RT  = \"/nonexistent/inko/runtime\"\n\n      cargo auditable build --release --locked\n\n      # Conda-forge's Rust toolchain sets CARGO_BUILD_TARGET, so artifacts\n      # land in target/<triple>/release/. Fall back to target/release/ for\n      # native-only builds.\n      let triple = $env.CARGO_BUILD_TARGET? | default ''\n      let target_dir = if ($\"target/($triple)/release/inko\" | path exists) {\n        $\"target/($triple)/release\"\n      } else {\n        \"target/release\"\n      }\n\n      let install_rt  = $\"($env.PREFIX)/lib/inko/runtime\"\n      mkdir $\"($env.PREFIX)/bin\"\n      mkdir $install_rt\n      cp $\"($target_dir)/inko\"      $\"($env.PREFIX)/bin/inko\"\n      cp $\"($target_dir)/libinko.a\" $\"($install_rt)/libinko.a\"\n\n      # The standard library ships as Inko source files; copy std/src\n      # wholesale and rename it to std so the installed layout matches\n      # lib/inko/std/... instead of lib/inko/src/....\n      cp -r std/src $\"($env.PREFIX)/lib/inko/src\"\n      mv $\"($env.PREFIX)/lib/inko/src\" $\"($env.PREFIX)/lib/inko/std\"\n\n      cargo-bundle-licenses --format yaml --output THIRDPARTY.yml\n\nrequirements:\n  build:\n    - ${{ stdlib('c') }}\n    - ${{ compiler('c') }}\n    - ${{ compiler('cxx') }}\n    - ${{ compiler('rust') }}\n    - cargo-bundle-licenses\n    - cargo-auditable\n    - nushell\n  host:\n    # inko's compiler crate hard-pins inkwell to its `llvm18-0` feature,\n    # which is generated against LLVM 18 headers and is not forward-\n    # compatible with later major versions. Bump this in lockstep with\n    # any upstream inkwell feature-flag bump.\n    - llvmdev 18.1.*\n    # `zlib` (not `libzlib`) provides the `libz.so` symlink and headers\n    # needed at link time. `libzlib` ships only the versioned runtime.\n    - zlib\n    - zstd\n    # libxml2-devel provides the unversioned `libxml2.so` / `libxml2.dylib`\n    # linker symlink and headers that llvm-sys needs — llvm-sys forwards\n    # `-lxml2` to the final link because llvmdev was built with LLVM's\n    # XML remark support. libxml2-devel pulls in libxml2-16 (the runtime)\n    # as a hard dependency.\n    - libxml2-devel\n    - libffi\n\ntests:\n  - script:\n      - inko --help\n      - inko --version\n      - echo 'type async Main { fn async main { } }' > hello.inko\n      - inko check hello.inko\n  - package_contents:\n      bin:\n        - inko\n      files:\n        - lib/inko/runtime/libinko.a\n\nabout:\n  homepage: https://inko-lang.org\n  summary: A language for building concurrent software with confidence\n  description: |\n    Inko is a language for building concurrent software with confidence.\n    Inko makes it easy to build concurrent software, without having to\n    worry about unpredictable performance, unexpected runtime errors, or\n    race conditions.\n\n    Inko features deterministic automatic memory management, move\n    semantics, static typing, type-safe concurrency, efficient error\n    handling, and more. Inko source code is compiled to machine code\n    using LLVM.\n  license: MPL-2.0\n  license_file:\n    - LICENSE\n    - THIRDPARTY.yml\n  documentation: https://docs.inko-lang.org\n  repository: https://github.com/inko-lang/inko\n\nextra:\n  recipe-maintainers:\n    - tdejager\n",
+  "req": {
+    "__set__": true,
+    "elements": [
+      "c_compiler_stub",
+      "c_stdlib_stub",
+      "cargo-auditable",
+      "cargo-bundle-licenses",
+      "cxx_compiler_stub",
+      "libffi",
+      "libxml2-devel",
+      "llvmdev",
+      "nushell",
+      "rust_compiler_stub",
+      "zlib",
+      "zstd"
+    ]
+  },
+  "requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "cargo-auditable",
+        "cargo-bundle-licenses",
+        "cxx_compiler_stub",
+        "nushell",
+        "rust_compiler_stub"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "cxx_compiler_stub",
+        "libffi",
+        "libxml2-devel",
+        "llvmdev",
+        "zlib",
+        "zstd"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "cxx_compiler_stub"
+      ]
+    },
+    "test": {
+      "__set__": true,
+      "elements": []
+    }
+  },
+  "strong_exports": false,
+  "total_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "cargo-auditable",
+        "cargo-bundle-licenses",
+        "cxx_compiler_stub",
+        "nushell",
+        "rust_compiler_stub"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "libffi",
+        "libxml2-devel",
+        "llvmdev 18.1.*",
+        "zlib",
+        "zstd"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": []
+    },
+    "test": {
+      "__set__": true,
+      "elements": []
+    }
+  },
+  "url": "https://github.com/inko-lang/inko/archive/refs/tags/v0.19.1.tar.gz",
+  "version": "0.19.1",
+  "version_pr_info": {
+    "__lazy_json__": "version_pr_info/inko.json"
+  }
+}
