@@ -1,51 +1,94 @@
 {
   "archived": false,
   "branch": "main",
-  "ci_support_linux_64_.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '13'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\ncdt_name:\n- cos7\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ndocker_image:\n- quay.io/condaforge/linux-anvil-cos7-x86_64\ngmp:\n- '6'\nmpfr:\n- '4'\nreadline:\n- '8'\ntarget_platform:\n- linux-64\nzip_keys:\n- - c_stdlib_version\n  - cdt_name\n",
+  "ci_support_linux_64_.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\ngmp:\n- '6'\nmpfr:\n- '4'\nreadline:\n- '8'\ntarget_platform:\n- linux-64\n",
   "conda-forge.yml": {
-    "build_platform": {
-      "osx_arm64": "osx_64"
-    },
     "conda_build": {
       "pkg_format": "2"
     },
+    "conda_build_tool": "rattler-build",
     "conda_forge_output_validation": true,
     "github": {
       "branch_name": "main",
       "tooling_branch_name": "main"
     },
     "provider": {
-      "linux_aarch64": "azure",
-      "linux_ppc64le": "azure"
-    },
-    "test": "native_and_emulated"
+      "linux_aarch64": "default",
+      "linux_ppc64le": "default",
+      "osx_arm64": "default"
+    }
   },
-  "feedstock_hash": "d1f594691fcf8dcff9a5762ad0c1c92386f084f6",
-  "feedstock_hash_ts": 1777022739,
+  "feedstock_hash": "2cf2010f38c34edc4335d4ee13654dae5ac34632",
+  "feedstock_hash_ts": 1777296959,
   "feedstock_name": "gawk",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
     "about": {
-      "description": "The GNU implementation of awk is called gawk; if you invoke it with the\nproper options or environment variables, it is fully compatible with the\nPOSIX1 specification of the awk language and with the Unix version of awk\nmaintained by Brian Kernighan. This means that all properly written awk\nprograms should work with gawk. So most of the time, we don’t distinguish\nbetween gawk and other awk implementations.\n",
-      "dev_url": "http://savannah.gnu.org/projects/gawk/",
+      "description": "The GNU implementation of awk is called gawk; if you invoke it with the\nproper options or environment variables, it is fully compatible with the\nPOSIX1 specification of the awk language and with the Unix version of awk\nmaintained by Brian Kernighan. This means that all properly written awk\nprograms should work with gawk. So most of the time, we don’t distinguish\nbetween gawk and other awk implementations.",
+      "dev_url": "http://savannah.gnu.org/projects/gawk",
       "doc_url": "https://www.gnu.org/software/gawk/manual/gawk.html",
-      "home": "https://www.gnu.org/software/gawk/",
+      "home": "https://www.gnu.org/software/gawk",
       "license": "GPL-3.0-or-later",
-      "license_family": "GPL",
+      "license_family": "GPL-3.0-or-later",
       "license_file": "COPYING",
-      "summary": "The awk utility interprets a special-purpose programming language that\nmakes it easy to handle simple data-reformatting jobs.\n"
+      "summary": "The awk utility interprets a special-purpose programming language that\nmakes it easy to handle simple data-reformatting jobs."
     },
     "build": {
-      "number": "0"
+      "number": "0",
+      "script": [
+        "bash ./bootstrap.sh",
+        "bash ./configure \\\n  --prefix=\"${PREFIX}\" \\\n  --with-mpfr=\"${PREFIX}\" \\\n  --with-readline=\"${PREFIX}\"",
+        "make -j${CPU_COUNT}",
+        "make install",
+        "make installcheck"
+      ]
     },
     "extra": {
       "recipe-maintainers": [
         "bollwyvl"
       ]
     },
+    "outputs": [
+      {
+        "build": null,
+        "name": "gawk",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "coreutils",
+            "gnuconfig",
+            "grep",
+            "make",
+            "sed"
+          ],
+          "host": [
+            "gettext",
+            "gmp",
+            "mpfr",
+            "readline"
+          ],
+          "run": [
+            "gmp",
+            "mpfr"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "gawk --version | grep -iE \"${{ version | replace(\".\", \"\\\\.\") }}\"",
+              "gawk --help",
+              "awk --version | grep -iE \"${{ version | replace(\".\", \"\\\\.\") }}\"",
+              "awk --help"
+            ]
+          }
+        ],
+        "version": "5.4.0"
+      }
+    ],
     "package": {
       "name": "gawk",
-      "version": "5.3.1"
+      "version": "5.4.0"
     },
     "requirements": {
       "build": [
@@ -68,27 +111,10 @@
         "mpfr"
       ]
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "patches": [
-          "0006-no-more-or-localenl.patch"
-        ],
-        "sha256": "fa41b3a85413af87fb5e3a7d9c8fa8d4a20728c67651185bb49c38a7f9382b1e",
-        "url": "https://ftp.gnu.org/gnu/gawk/gawk-5.3.1.tar.gz"
-      },
-      {
-        "sha256": "34fef05a25afdbe00edeffd1defa6d0578257651454fa2295d03db15b88358b3",
-        "url": "http://git.savannah.gnu.org/cgit/gawk.git/plain/bootstrap.sh?h=gawk-5.3.1"
-      }
-    ],
-    "test": {
-      "commands": [
-        "gawk --version",
-        "gawk --help",
-        "awk --version",
-        "awk --help"
-      ]
+    "schema_version": 1,
+    "source": {
+      "sha256": "df5756d50772212a8e3f26d903107ece3773c4037c6a9e0a59c2a0a8d7329f0d",
+      "url": "https://ftp.gnu.org/gnu/gawk/gawk-5.4.0.tar.gz"
     }
   },
   "linux_64_requirements": {
@@ -127,26 +153,71 @@
   },
   "linux_aarch64_meta_yaml": {
     "about": {
-      "description": "The GNU implementation of awk is called gawk; if you invoke it with the\nproper options or environment variables, it is fully compatible with the\nPOSIX1 specification of the awk language and with the Unix version of awk\nmaintained by Brian Kernighan. This means that all properly written awk\nprograms should work with gawk. So most of the time, we don’t distinguish\nbetween gawk and other awk implementations.\n",
-      "dev_url": "http://savannah.gnu.org/projects/gawk/",
+      "description": "The GNU implementation of awk is called gawk; if you invoke it with the\nproper options or environment variables, it is fully compatible with the\nPOSIX1 specification of the awk language and with the Unix version of awk\nmaintained by Brian Kernighan. This means that all properly written awk\nprograms should work with gawk. So most of the time, we don’t distinguish\nbetween gawk and other awk implementations.",
+      "dev_url": "http://savannah.gnu.org/projects/gawk",
       "doc_url": "https://www.gnu.org/software/gawk/manual/gawk.html",
-      "home": "https://www.gnu.org/software/gawk/",
+      "home": "https://www.gnu.org/software/gawk",
       "license": "GPL-3.0-or-later",
-      "license_family": "GPL",
+      "license_family": "GPL-3.0-or-later",
       "license_file": "COPYING",
-      "summary": "The awk utility interprets a special-purpose programming language that\nmakes it easy to handle simple data-reformatting jobs.\n"
+      "summary": "The awk utility interprets a special-purpose programming language that\nmakes it easy to handle simple data-reformatting jobs."
     },
     "build": {
-      "number": "0"
+      "number": "0",
+      "script": [
+        "bash ./bootstrap.sh",
+        "bash ./configure \\\n  --prefix=\"${PREFIX}\" \\\n  --with-mpfr=\"${PREFIX}\" \\\n  --with-readline=\"${PREFIX}\"",
+        "make -j${CPU_COUNT}",
+        "make install",
+        "make installcheck"
+      ]
     },
     "extra": {
       "recipe-maintainers": [
         "bollwyvl"
       ]
     },
+    "outputs": [
+      {
+        "build": null,
+        "name": "gawk",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "coreutils",
+            "gnuconfig",
+            "grep",
+            "make",
+            "sed"
+          ],
+          "host": [
+            "gettext",
+            "gmp",
+            "mpfr",
+            "readline"
+          ],
+          "run": [
+            "gmp",
+            "mpfr"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "gawk --version | grep -iE \"${{ version | replace(\".\", \"\\\\.\") }}\"",
+              "gawk --help",
+              "awk --version | grep -iE \"${{ version | replace(\".\", \"\\\\.\") }}\"",
+              "awk --help"
+            ]
+          }
+        ],
+        "version": "5.4.0"
+      }
+    ],
     "package": {
       "name": "gawk",
-      "version": "5.3.1"
+      "version": "5.4.0"
     },
     "requirements": {
       "build": [
@@ -169,27 +240,10 @@
         "mpfr"
       ]
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "patches": [
-          "0006-no-more-or-localenl.patch"
-        ],
-        "sha256": "fa41b3a85413af87fb5e3a7d9c8fa8d4a20728c67651185bb49c38a7f9382b1e",
-        "url": "https://ftp.gnu.org/gnu/gawk/gawk-5.3.1.tar.gz"
-      },
-      {
-        "sha256": "34fef05a25afdbe00edeffd1defa6d0578257651454fa2295d03db15b88358b3",
-        "url": "http://git.savannah.gnu.org/cgit/gawk.git/plain/bootstrap.sh?h=gawk-5.3.1"
-      }
-    ],
-    "test": {
-      "commands": [
-        "gawk --version",
-        "gawk --help",
-        "awk --version",
-        "awk --help"
-      ]
+    "schema_version": 1,
+    "source": {
+      "sha256": "df5756d50772212a8e3f26d903107ece3773c4037c6a9e0a59c2a0a8d7329f0d",
+      "url": "https://ftp.gnu.org/gnu/gawk/gawk-5.4.0.tar.gz"
     }
   },
   "linux_aarch64_requirements": {
@@ -228,26 +282,71 @@
   },
   "linux_ppc64le_meta_yaml": {
     "about": {
-      "description": "The GNU implementation of awk is called gawk; if you invoke it with the\nproper options or environment variables, it is fully compatible with the\nPOSIX1 specification of the awk language and with the Unix version of awk\nmaintained by Brian Kernighan. This means that all properly written awk\nprograms should work with gawk. So most of the time, we don’t distinguish\nbetween gawk and other awk implementations.\n",
-      "dev_url": "http://savannah.gnu.org/projects/gawk/",
+      "description": "The GNU implementation of awk is called gawk; if you invoke it with the\nproper options or environment variables, it is fully compatible with the\nPOSIX1 specification of the awk language and with the Unix version of awk\nmaintained by Brian Kernighan. This means that all properly written awk\nprograms should work with gawk. So most of the time, we don’t distinguish\nbetween gawk and other awk implementations.",
+      "dev_url": "http://savannah.gnu.org/projects/gawk",
       "doc_url": "https://www.gnu.org/software/gawk/manual/gawk.html",
-      "home": "https://www.gnu.org/software/gawk/",
+      "home": "https://www.gnu.org/software/gawk",
       "license": "GPL-3.0-or-later",
-      "license_family": "GPL",
+      "license_family": "GPL-3.0-or-later",
       "license_file": "COPYING",
-      "summary": "The awk utility interprets a special-purpose programming language that\nmakes it easy to handle simple data-reformatting jobs.\n"
+      "summary": "The awk utility interprets a special-purpose programming language that\nmakes it easy to handle simple data-reformatting jobs."
     },
     "build": {
-      "number": "0"
+      "number": "0",
+      "script": [
+        "bash ./bootstrap.sh",
+        "bash ./configure \\\n  --prefix=\"${PREFIX}\" \\\n  --with-mpfr=\"${PREFIX}\" \\\n  --with-readline=\"${PREFIX}\"",
+        "make -j${CPU_COUNT}",
+        "make install",
+        "make installcheck"
+      ]
     },
     "extra": {
       "recipe-maintainers": [
         "bollwyvl"
       ]
     },
+    "outputs": [
+      {
+        "build": null,
+        "name": "gawk",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "coreutils",
+            "gnuconfig",
+            "grep",
+            "make",
+            "sed"
+          ],
+          "host": [
+            "gettext",
+            "gmp",
+            "mpfr",
+            "readline"
+          ],
+          "run": [
+            "gmp",
+            "mpfr"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "gawk --version | grep -iE \"${{ version | replace(\".\", \"\\\\.\") }}\"",
+              "gawk --help",
+              "awk --version | grep -iE \"${{ version | replace(\".\", \"\\\\.\") }}\"",
+              "awk --help"
+            ]
+          }
+        ],
+        "version": "5.4.0"
+      }
+    ],
     "package": {
       "name": "gawk",
-      "version": "5.3.1"
+      "version": "5.4.0"
     },
     "requirements": {
       "build": [
@@ -270,27 +369,10 @@
         "mpfr"
       ]
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "patches": [
-          "0006-no-more-or-localenl.patch"
-        ],
-        "sha256": "fa41b3a85413af87fb5e3a7d9c8fa8d4a20728c67651185bb49c38a7f9382b1e",
-        "url": "https://ftp.gnu.org/gnu/gawk/gawk-5.3.1.tar.gz"
-      },
-      {
-        "sha256": "34fef05a25afdbe00edeffd1defa6d0578257651454fa2295d03db15b88358b3",
-        "url": "http://git.savannah.gnu.org/cgit/gawk.git/plain/bootstrap.sh?h=gawk-5.3.1"
-      }
-    ],
-    "test": {
-      "commands": [
-        "gawk --version",
-        "gawk --help",
-        "awk --version",
-        "awk --help"
-      ]
+    "schema_version": 1,
+    "source": {
+      "sha256": "df5756d50772212a8e3f26d903107ece3773c4037c6a9e0a59c2a0a8d7329f0d",
+      "url": "https://ftp.gnu.org/gnu/gawk/gawk-5.4.0.tar.gz"
     }
   },
   "linux_ppc64le_requirements": {
@@ -329,26 +411,215 @@
   },
   "meta_yaml": {
     "about": {
-      "description": "The GNU implementation of awk is called gawk; if you invoke it with the\nproper options or environment variables, it is fully compatible with the\nPOSIX1 specification of the awk language and with the Unix version of awk\nmaintained by Brian Kernighan. This means that all properly written awk\nprograms should work with gawk. So most of the time, we don’t distinguish\nbetween gawk and other awk implementations.\n",
-      "dev_url": "http://savannah.gnu.org/projects/gawk/",
+      "description": "The GNU implementation of awk is called gawk; if you invoke it with the\nproper options or environment variables, it is fully compatible with the\nPOSIX1 specification of the awk language and with the Unix version of awk\nmaintained by Brian Kernighan. This means that all properly written awk\nprograms should work with gawk. So most of the time, we don’t distinguish\nbetween gawk and other awk implementations.",
+      "dev_url": "http://savannah.gnu.org/projects/gawk",
       "doc_url": "https://www.gnu.org/software/gawk/manual/gawk.html",
-      "home": "https://www.gnu.org/software/gawk/",
+      "home": "https://www.gnu.org/software/gawk",
       "license": "GPL-3.0-or-later",
-      "license_family": "GPL",
+      "license_family": "GPL-3.0-or-later",
       "license_file": "COPYING",
-      "summary": "The awk utility interprets a special-purpose programming language that\nmakes it easy to handle simple data-reformatting jobs.\n"
+      "summary": "The awk utility interprets a special-purpose programming language that\nmakes it easy to handle simple data-reformatting jobs."
     },
     "build": {
-      "number": "0"
+      "number": "0",
+      "script": [
+        "bash ./bootstrap.sh",
+        "bash ./configure \\\n  --prefix=\"${PREFIX}\" \\\n  --with-mpfr=\"${PREFIX}\" \\\n  --with-readline=\"${PREFIX}\"",
+        "make -j${CPU_COUNT}",
+        "make install",
+        "make installcheck"
+      ]
     },
     "extra": {
       "recipe-maintainers": [
         "bollwyvl"
       ]
     },
+    "outputs": [
+      {
+        "build": null,
+        "name": "gawk",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "coreutils",
+            "gnuconfig",
+            "grep",
+            "make",
+            "sed"
+          ],
+          "host": [
+            "gettext",
+            "gmp",
+            "mpfr",
+            "readline"
+          ],
+          "run": [
+            "gmp",
+            "mpfr"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "gawk --version | grep -iE \"${{ version | replace(\".\", \"\\\\.\") }}\"",
+              "gawk --help",
+              "awk --version | grep -iE \"${{ version | replace(\".\", \"\\\\.\") }}\"",
+              "awk --help"
+            ]
+          }
+        ],
+        "version": "5.4.0"
+      },
+      {
+        "build": null,
+        "name": "gawk",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "coreutils",
+            "gnuconfig",
+            "grep",
+            "make",
+            "sed"
+          ],
+          "host": [
+            "gettext",
+            "gmp",
+            "mpfr",
+            "readline"
+          ],
+          "run": [
+            "gmp",
+            "mpfr"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "gawk --version | grep -iE \"${{ version | replace(\".\", \"\\\\.\") }}\"",
+              "gawk --help",
+              "awk --version | grep -iE \"${{ version | replace(\".\", \"\\\\.\") }}\"",
+              "awk --help"
+            ]
+          }
+        ],
+        "version": "5.4.0"
+      },
+      {
+        "build": null,
+        "name": "gawk",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "coreutils",
+            "gnuconfig",
+            "grep",
+            "make",
+            "sed"
+          ],
+          "host": [
+            "gettext",
+            "gmp",
+            "mpfr",
+            "readline"
+          ],
+          "run": [
+            "gmp",
+            "mpfr"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "gawk --version | grep -iE \"${{ version | replace(\".\", \"\\\\.\") }}\"",
+              "gawk --help",
+              "awk --version | grep -iE \"${{ version | replace(\".\", \"\\\\.\") }}\"",
+              "awk --help"
+            ]
+          }
+        ],
+        "version": "5.4.0"
+      },
+      {
+        "build": null,
+        "name": "gawk",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "coreutils",
+            "gnuconfig",
+            "grep",
+            "make",
+            "sed"
+          ],
+          "host": [
+            "gettext",
+            "gmp",
+            "mpfr",
+            "readline"
+          ],
+          "run": [
+            "gmp",
+            "mpfr"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "gawk --version | grep -iE \"${{ version | replace(\".\", \"\\\\.\") }}\"",
+              "gawk --help",
+              "awk --version | grep -iE \"${{ version | replace(\".\", \"\\\\.\") }}\"",
+              "awk --help"
+            ]
+          }
+        ],
+        "version": "5.4.0"
+      },
+      {
+        "build": null,
+        "name": "gawk",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "coreutils",
+            "gnuconfig",
+            "grep",
+            "make",
+            "sed"
+          ],
+          "host": [
+            "gettext",
+            "gmp",
+            "mpfr",
+            "readline"
+          ],
+          "run": [
+            "gmp",
+            "mpfr"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "gawk --version | grep -iE \"${{ version | replace(\".\", \"\\\\.\") }}\"",
+              "gawk --help",
+              "awk --version | grep -iE \"${{ version | replace(\".\", \"\\\\.\") }}\"",
+              "awk --help"
+            ]
+          }
+        ],
+        "version": "5.4.0"
+      }
+    ],
     "package": {
       "name": "gawk",
-      "version": "5.3.1"
+      "version": "5.4.0"
     },
     "requirements": {
       "build": [
@@ -371,98 +642,80 @@
         "mpfr"
       ]
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "patches": [
-          "0006-no-more-or-localenl.patch"
-        ],
-        "sha256": "fa41b3a85413af87fb5e3a7d9c8fa8d4a20728c67651185bb49c38a7f9382b1e",
-        "url": "https://ftp.gnu.org/gnu/gawk/gawk-5.3.1.tar.gz"
-      },
-      {
-        "sha256": "34fef05a25afdbe00edeffd1defa6d0578257651454fa2295d03db15b88358b3",
-        "url": "http://git.savannah.gnu.org/cgit/gawk.git/plain/bootstrap.sh?h=gawk-5.3.1"
-      },
-      {
-        "patches": [
-          "0006-no-more-or-localenl.patch"
-        ],
-        "sha256": "fa41b3a85413af87fb5e3a7d9c8fa8d4a20728c67651185bb49c38a7f9382b1e",
-        "url": "https://ftp.gnu.org/gnu/gawk/gawk-5.3.1.tar.gz"
-      },
-      {
-        "sha256": "34fef05a25afdbe00edeffd1defa6d0578257651454fa2295d03db15b88358b3",
-        "url": "http://git.savannah.gnu.org/cgit/gawk.git/plain/bootstrap.sh?h=gawk-5.3.1"
-      },
-      {
-        "patches": [
-          "0006-no-more-or-localenl.patch"
-        ],
-        "sha256": "fa41b3a85413af87fb5e3a7d9c8fa8d4a20728c67651185bb49c38a7f9382b1e",
-        "url": "https://ftp.gnu.org/gnu/gawk/gawk-5.3.1.tar.gz"
-      },
-      {
-        "sha256": "34fef05a25afdbe00edeffd1defa6d0578257651454fa2295d03db15b88358b3",
-        "url": "http://git.savannah.gnu.org/cgit/gawk.git/plain/bootstrap.sh?h=gawk-5.3.1"
-      },
-      {
-        "patches": [
-          "0006-no-more-or-localenl.patch",
-          "0007-osx-map-anonymous.patch"
-        ],
-        "sha256": "fa41b3a85413af87fb5e3a7d9c8fa8d4a20728c67651185bb49c38a7f9382b1e",
-        "url": "https://ftp.gnu.org/gnu/gawk/gawk-5.3.1.tar.gz"
-      },
-      {
-        "sha256": "34fef05a25afdbe00edeffd1defa6d0578257651454fa2295d03db15b88358b3",
-        "url": "http://git.savannah.gnu.org/cgit/gawk.git/plain/bootstrap.sh?h=gawk-5.3.1"
-      },
-      {
-        "patches": [
-          "0006-no-more-or-localenl.patch",
-          "0007-osx-map-anonymous.patch"
-        ],
-        "sha256": "fa41b3a85413af87fb5e3a7d9c8fa8d4a20728c67651185bb49c38a7f9382b1e",
-        "url": "https://ftp.gnu.org/gnu/gawk/gawk-5.3.1.tar.gz"
-      },
-      {
-        "sha256": "34fef05a25afdbe00edeffd1defa6d0578257651454fa2295d03db15b88358b3",
-        "url": "http://git.savannah.gnu.org/cgit/gawk.git/plain/bootstrap.sh?h=gawk-5.3.1"
-      }
-    ],
-    "test": {
-      "commands": [
-        "gawk --version",
-        "gawk --help",
-        "awk --version",
-        "awk --help"
-      ]
+    "schema_version": 1,
+    "source": {
+      "sha256": "df5756d50772212a8e3f26d903107ece3773c4037c6a9e0a59c2a0a8d7329f0d",
+      "url": "https://ftp.gnu.org/gnu/gawk/gawk-5.4.0.tar.gz"
     }
   },
   "name": "gawk",
   "osx_64_meta_yaml": {
     "about": {
-      "description": "The GNU implementation of awk is called gawk; if you invoke it with the\nproper options or environment variables, it is fully compatible with the\nPOSIX1 specification of the awk language and with the Unix version of awk\nmaintained by Brian Kernighan. This means that all properly written awk\nprograms should work with gawk. So most of the time, we don’t distinguish\nbetween gawk and other awk implementations.\n",
-      "dev_url": "http://savannah.gnu.org/projects/gawk/",
+      "description": "The GNU implementation of awk is called gawk; if you invoke it with the\nproper options or environment variables, it is fully compatible with the\nPOSIX1 specification of the awk language and with the Unix version of awk\nmaintained by Brian Kernighan. This means that all properly written awk\nprograms should work with gawk. So most of the time, we don’t distinguish\nbetween gawk and other awk implementations.",
+      "dev_url": "http://savannah.gnu.org/projects/gawk",
       "doc_url": "https://www.gnu.org/software/gawk/manual/gawk.html",
-      "home": "https://www.gnu.org/software/gawk/",
+      "home": "https://www.gnu.org/software/gawk",
       "license": "GPL-3.0-or-later",
-      "license_family": "GPL",
+      "license_family": "GPL-3.0-or-later",
       "license_file": "COPYING",
-      "summary": "The awk utility interprets a special-purpose programming language that\nmakes it easy to handle simple data-reformatting jobs.\n"
+      "summary": "The awk utility interprets a special-purpose programming language that\nmakes it easy to handle simple data-reformatting jobs."
     },
     "build": {
-      "number": "0"
+      "number": "0",
+      "script": [
+        "bash ./bootstrap.sh",
+        "bash ./configure \\\n  --prefix=\"${PREFIX}\" \\\n  --with-mpfr=\"${PREFIX}\" \\\n  --with-readline=\"${PREFIX}\"",
+        "make -j${CPU_COUNT}",
+        "make install",
+        "make installcheck"
+      ]
     },
     "extra": {
       "recipe-maintainers": [
         "bollwyvl"
       ]
     },
+    "outputs": [
+      {
+        "build": null,
+        "name": "gawk",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "coreutils",
+            "gnuconfig",
+            "grep",
+            "make",
+            "sed"
+          ],
+          "host": [
+            "gettext",
+            "gmp",
+            "mpfr",
+            "readline"
+          ],
+          "run": [
+            "gmp",
+            "mpfr"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "gawk --version | grep -iE \"${{ version | replace(\".\", \"\\\\.\") }}\"",
+              "gawk --help",
+              "awk --version | grep -iE \"${{ version | replace(\".\", \"\\\\.\") }}\"",
+              "awk --help"
+            ]
+          }
+        ],
+        "version": "5.4.0"
+      }
+    ],
     "package": {
       "name": "gawk",
-      "version": "5.3.1"
+      "version": "5.4.0"
     },
     "requirements": {
       "build": [
@@ -485,28 +738,10 @@
         "mpfr"
       ]
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "patches": [
-          "0006-no-more-or-localenl.patch",
-          "0007-osx-map-anonymous.patch"
-        ],
-        "sha256": "fa41b3a85413af87fb5e3a7d9c8fa8d4a20728c67651185bb49c38a7f9382b1e",
-        "url": "https://ftp.gnu.org/gnu/gawk/gawk-5.3.1.tar.gz"
-      },
-      {
-        "sha256": "34fef05a25afdbe00edeffd1defa6d0578257651454fa2295d03db15b88358b3",
-        "url": "http://git.savannah.gnu.org/cgit/gawk.git/plain/bootstrap.sh?h=gawk-5.3.1"
-      }
-    ],
-    "test": {
-      "commands": [
-        "gawk --version",
-        "gawk --help",
-        "awk --version",
-        "awk --help"
-      ]
+    "schema_version": 1,
+    "source": {
+      "sha256": "df5756d50772212a8e3f26d903107ece3773c4037c6a9e0a59c2a0a8d7329f0d",
+      "url": "https://ftp.gnu.org/gnu/gawk/gawk-5.4.0.tar.gz"
     }
   },
   "osx_64_requirements": {
@@ -545,26 +780,71 @@
   },
   "osx_arm64_meta_yaml": {
     "about": {
-      "description": "The GNU implementation of awk is called gawk; if you invoke it with the\nproper options or environment variables, it is fully compatible with the\nPOSIX1 specification of the awk language and with the Unix version of awk\nmaintained by Brian Kernighan. This means that all properly written awk\nprograms should work with gawk. So most of the time, we don’t distinguish\nbetween gawk and other awk implementations.\n",
-      "dev_url": "http://savannah.gnu.org/projects/gawk/",
+      "description": "The GNU implementation of awk is called gawk; if you invoke it with the\nproper options or environment variables, it is fully compatible with the\nPOSIX1 specification of the awk language and with the Unix version of awk\nmaintained by Brian Kernighan. This means that all properly written awk\nprograms should work with gawk. So most of the time, we don’t distinguish\nbetween gawk and other awk implementations.",
+      "dev_url": "http://savannah.gnu.org/projects/gawk",
       "doc_url": "https://www.gnu.org/software/gawk/manual/gawk.html",
-      "home": "https://www.gnu.org/software/gawk/",
+      "home": "https://www.gnu.org/software/gawk",
       "license": "GPL-3.0-or-later",
-      "license_family": "GPL",
+      "license_family": "GPL-3.0-or-later",
       "license_file": "COPYING",
-      "summary": "The awk utility interprets a special-purpose programming language that\nmakes it easy to handle simple data-reformatting jobs.\n"
+      "summary": "The awk utility interprets a special-purpose programming language that\nmakes it easy to handle simple data-reformatting jobs."
     },
     "build": {
-      "number": "0"
+      "number": "0",
+      "script": [
+        "bash ./bootstrap.sh",
+        "bash ./configure \\\n  --prefix=\"${PREFIX}\" \\\n  --with-mpfr=\"${PREFIX}\" \\\n  --with-readline=\"${PREFIX}\"",
+        "make -j${CPU_COUNT}",
+        "make install",
+        "make installcheck"
+      ]
     },
     "extra": {
       "recipe-maintainers": [
         "bollwyvl"
       ]
     },
+    "outputs": [
+      {
+        "build": null,
+        "name": "gawk",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "coreutils",
+            "gnuconfig",
+            "grep",
+            "make",
+            "sed"
+          ],
+          "host": [
+            "gettext",
+            "gmp",
+            "mpfr",
+            "readline"
+          ],
+          "run": [
+            "gmp",
+            "mpfr"
+          ]
+        },
+        "tests": [
+          {
+            "script": [
+              "gawk --version | grep -iE \"${{ version | replace(\".\", \"\\\\.\") }}\"",
+              "gawk --help",
+              "awk --version | grep -iE \"${{ version | replace(\".\", \"\\\\.\") }}\"",
+              "awk --help"
+            ]
+          }
+        ],
+        "version": "5.4.0"
+      }
+    ],
     "package": {
       "name": "gawk",
-      "version": "5.3.1"
+      "version": "5.4.0"
     },
     "requirements": {
       "build": [
@@ -587,28 +867,10 @@
         "mpfr"
       ]
     },
-    "schema_version": 0,
-    "source": [
-      {
-        "patches": [
-          "0006-no-more-or-localenl.patch",
-          "0007-osx-map-anonymous.patch"
-        ],
-        "sha256": "fa41b3a85413af87fb5e3a7d9c8fa8d4a20728c67651185bb49c38a7f9382b1e",
-        "url": "https://ftp.gnu.org/gnu/gawk/gawk-5.3.1.tar.gz"
-      },
-      {
-        "sha256": "34fef05a25afdbe00edeffd1defa6d0578257651454fa2295d03db15b88358b3",
-        "url": "http://git.savannah.gnu.org/cgit/gawk.git/plain/bootstrap.sh?h=gawk-5.3.1"
-      }
-    ],
-    "test": {
-      "commands": [
-        "gawk --version",
-        "gawk --help",
-        "awk --version",
-        "awk --help"
-      ]
+    "schema_version": 1,
+    "source": {
+      "sha256": "df5756d50772212a8e3f26d903107ece3773c4037c6a9e0a59c2a0a8d7329f0d",
+      "url": "https://ftp.gnu.org/gnu/gawk/gawk-5.4.0.tar.gz"
     }
   },
   "osx_arm64_requirements": {
@@ -662,7 +924,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/gawk.json"
   },
-  "raw_meta_yaml": "{% set version = \"5.3.1\" %}\n\npackage:\n  name: gawk\n  version: {{ version }}\n\nsource:\n  - url: https://ftp.gnu.org/gnu/gawk/gawk-{{ version }}.tar.gz\n    sha256: fa41b3a85413af87fb5e3a7d9c8fa8d4a20728c67651185bb49c38a7f9382b1e\n    patches:\n      - 0006-no-more-or-localenl.patch\n      - 0007-osx-map-anonymous.patch  # [osx]\n  - url: http://git.savannah.gnu.org/cgit/gawk.git/plain/bootstrap.sh?h=gawk-{{ version }}\n    sha256: 34fef05a25afdbe00edeffd1defa6d0578257651454fa2295d03db15b88358b3\n\nbuild:\n  number: 0\n  skip: true  # [win]\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ stdlib(\"c\") }}\n    - coreutils\n    - gnuconfig\n    - grep\n    - make\n    - sed\n  host:\n    - gettext\n    - gmp\n    - mpfr\n    - readline\n  run:\n    - gmp\n    - mpfr\n\ntest:\n  commands:\n    - gawk --version\n    - gawk --help\n    - awk --version\n    - awk --help\n\nabout:\n  home: https://www.gnu.org/software/gawk/\n  license: GPL-3.0-or-later\n  license_family: GPL\n  license_file: COPYING\n  summary: |\n    The awk utility interprets a special-purpose programming language that\n    makes it easy to handle simple data-reformatting jobs.\n  doc_url: https://www.gnu.org/software/gawk/manual/gawk.html\n  dev_url: http://savannah.gnu.org/projects/gawk/\n  description: |\n    The GNU implementation of awk is called gawk; if you invoke it with the\n    proper options or environment variables, it is fully compatible with the\n    POSIX1 specification of the awk language and with the Unix version of awk\n    maintained by Brian Kernighan. This means that all properly written awk\n    programs should work with gawk. So most of the time, we don’t distinguish\n    between gawk and other awk implementations.\n\nextra:\n  recipe-maintainers:\n    - bollwyvl\n",
+  "raw_meta_yaml": "# yaml-language-server: $schema=https://raw.githubusercontent.com/prefix-dev/recipe-format/main/schema.json\nschema_version: 1\n\ncontext:\n  version: \"5.4.0\"\n\npackage:\n  name: gawk\n  version: ${{ version }}\n\nsource:\n  - url: https://ftp.gnu.org/gnu/gawk/gawk-${{ version }}.tar.gz\n    sha256: df5756d50772212a8e3f26d903107ece3773c4037c6a9e0a59c2a0a8d7329f0d\n    patches:\n    - if: osx\n      then: 0007-osx-map-anonymous.patch\n  - file_name: bootstrap.sh\n    url: http://git.savannah.gnu.org/cgit/gawk.git/plain/bootstrap.sh?h=gawk-${{ version }}\n    sha256: 6c147b67f361a44fd3a0b9709de06868f46c21c7b9b592212f05f633dd21d820\n\nbuild:\n  number: 0\n  skip: not unix\n  script:\n    # just sets some timestamps\n    - bash ./bootstrap.sh\n    - |-\n      bash ./configure \\\n        --prefix=\"${PREFIX}\" \\\n        --with-mpfr=\"${PREFIX}\" \\\n        --with-readline=\"${PREFIX}\"\n    - make -j${CPU_COUNT}\n    # presently skipped due to (likely) docker locale issues\n    # - make check\n    - make install\n    - make installcheck\n\nrequirements:\n  build:\n    - ${{ compiler(\"c\") }}\n    - ${{ stdlib(\"c\") }}\n    - coreutils\n    - gnuconfig\n    - grep\n    - make\n    - sed\n  host:\n    - gettext\n    - gmp\n    - mpfr\n    - readline\n  run:\n    - gmp\n    - mpfr\n\ntests:\n  - script:\n      - gawk --version | grep -iE \"${{ version | replace(\".\", \"\\\\.\") }}\"\n      - gawk --help\n      - awk --version | grep -iE \"${{ version | replace(\".\", \"\\\\.\") }}\"\n      - awk --help\n\nabout:\n  license: GPL-3.0-or-later\n  license_file: COPYING\n  summary: |\n    The awk utility interprets a special-purpose programming language that\n    makes it easy to handle simple data-reformatting jobs.\n  description: |\n    The GNU implementation of awk is called gawk; if you invoke it with the\n    proper options or environment variables, it is fully compatible with the\n    POSIX1 specification of the awk language and with the Unix version of awk\n    maintained by Brian Kernighan. This means that all properly written awk\n    programs should work with gawk. So most of the time, we don’t distinguish\n    between gawk and other awk implementations.\n  homepage: https://www.gnu.org/software/gawk\n  repository: http://savannah.gnu.org/projects/gawk\n  documentation: https://www.gnu.org/software/gawk/manual/gawk.html\n\nextra:\n  recipe-maintainers:\n    - bollwyvl\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -752,8 +1014,8 @@
       "elements": []
     }
   },
-  "url": "https://ftp.gnu.org/gnu/gawk/gawk-5.3.1.tar.gz",
-  "version": "5.3.1",
+  "url": "https://ftp.gnu.org/gnu/gawk/gawk-5.4.0.tar.gz",
+  "version": "5.4.0",
   "version_pr_info": {
     "__lazy_json__": "version_pr_info/gawk.json"
   }
