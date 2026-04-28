@@ -20,8 +20,8 @@
     },
     "test": "native_and_emulated"
   },
-  "feedstock_hash": "8d77c8a729346ec8b4ee8f7a20d8cabe5dbd7e9a",
-  "feedstock_hash_ts": 1777312122,
+  "feedstock_hash": "8690ff0a2815059471937ecaa38266fe256a57f3",
+  "feedstock_hash_ts": 1777335344,
   "feedstock_name": "sedonadb",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -36,7 +36,7 @@
       "summary": "A single-node analytical database engine with geospatial as a first-class citizen"
     },
     "build": {
-      "number": "3",
+      "number": "4",
       "script": [
         "export PYO3_PYTHON=PYTHON",
         "cd python/sedonadb",
@@ -75,8 +75,7 @@
       ],
       "run": [
         "python",
-        "apache-sedona",
-        "geos"
+        "apache-sedona"
       ]
     },
     "schema_version": 0,
@@ -123,7 +122,6 @@
       "__set__": true,
       "elements": [
         "apache-sedona",
-        "geos",
         "python"
       ]
     },
@@ -146,7 +144,7 @@
       "summary": "A single-node analytical database engine with geospatial as a first-class citizen"
     },
     "build": {
-      "number": "3",
+      "number": "4",
       "script": [
         "export PYO3_PYTHON=PYTHON",
         "cd python/sedonadb",
@@ -185,8 +183,7 @@
       ],
       "run": [
         "python",
-        "apache-sedona",
-        "geos"
+        "apache-sedona"
       ]
     },
     "schema_version": 0,
@@ -233,7 +230,6 @@
       "__set__": true,
       "elements": [
         "apache-sedona",
-        "geos",
         "python"
       ]
     },
@@ -256,7 +252,7 @@
       "summary": "A single-node analytical database engine with geospatial as a first-class citizen"
     },
     "build": {
-      "number": "3",
+      "number": "4",
       "script": [
         "export PYO3_PYTHON=PYTHON",
         "cd python/sedonadb",
@@ -298,8 +294,7 @@
       ],
       "run": [
         "python",
-        "apache-sedona",
-        "geos"
+        "apache-sedona"
       ]
     },
     "schema_version": 0,
@@ -333,7 +328,7 @@
       "summary": "A single-node analytical database engine with geospatial as a first-class citizen"
     },
     "build": {
-      "number": "3",
+      "number": "4",
       "script": [
         "export PYO3_PYTHON=PYTHON",
         "cd python/sedonadb",
@@ -372,8 +367,7 @@
       ],
       "run": [
         "python",
-        "apache-sedona",
-        "geos"
+        "apache-sedona"
       ]
     },
     "schema_version": 0,
@@ -420,7 +414,6 @@
       "__set__": true,
       "elements": [
         "apache-sedona",
-        "geos",
         "python"
       ]
     },
@@ -443,7 +436,7 @@
       "summary": "A single-node analytical database engine with geospatial as a first-class citizen"
     },
     "build": {
-      "number": "3",
+      "number": "4",
       "script": [
         "export PYO3_PYTHON=PYTHON",
         "cd python/sedonadb",
@@ -482,8 +475,7 @@
       ],
       "run": [
         "python",
-        "apache-sedona",
-        "geos"
+        "apache-sedona"
       ]
     },
     "schema_version": 0,
@@ -530,7 +522,6 @@
       "__set__": true,
       "elements": [
         "apache-sedona",
-        "geos",
         "python"
       ]
     },
@@ -558,7 +549,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/sedonadb.json"
   },
-  "raw_meta_yaml": "{% set version = \"0.3.0\" %}\n{% set name = \"sedonadb\" %}\n\npackage:\n  name: {{ name }}\n  version: {{ version }}\n\nsource:\n  url: https://github.com/apache/sedona-db/archive/apache-sedona-db-{{ version }}.tar.gz\n  sha256: 808a38f955dc1dc1c68793a2a6c707abf6299d5f2371ff7dd7b4a3c267e67333\n\nbuild:\n  number: 3\n  script:\n    # Windows workaround for upstream geos pkg-config flag'-lstdc++' flag, which breaks MSVC\n    # Consider moving this to bld.bat\n    - python -c \"import os, pathlib; [f.write_text(f.read_text().replace('-lstdc++', '')) for f in pathlib.Path(os.environ['LIBRARY_PREFIX']).joinpath('lib', 'pkgconfig').glob('*.pc')]\"  # [win]\n\n    # Configure PyO3 to use the host Python environment\n    - export PYO3_PYTHON={{ PYTHON }}  # [not win]\n    - set \"PYO3_PYTHON={{ PYTHON }}\"   # [win]\n\n    # Generate Rust license inventory\n    - cd python/sedonadb\n    - cargo-bundle-licenses --format yaml --output THIRDPARTY.yml\n    - mv THIRDPARTY.yml ../../         # [not win]\n    - move THIRDPARTY.yml ..\\..        # [win]\n\n    # Build, skipping auditwheel to rely on shared libs\n    - maturin build --release --skip-auditwheel --out dist --interpreter={{ PYTHON }}\n\n    # Install dynamically to avoid issues with path sytax\n    - {{ PYTHON }} -m pip install sedonadb --no-index --find-links=dist --no-deps -vv\n\nrequirements:\n  build:\n    - {{ stdlib(\"c\") }}\n    - {{ compiler(\"c\") }}\n    - {{ compiler(\"cxx\") }}\n    - {{ compiler(\"rust\") }}\n    - cargo-bundle-licenses\n    - pkg-config\n    - python                              # [build_platform != target_platform]\n    - cross-python_{{ target_platform }}  # [build_platform != target_platform]\n    - maturin >=1.12,<2.0\n  host:\n    - python\n    - pip\n    - maturin >=1.12,<2.0\n    - geos\n  run:\n    - python\n    - apache-sedona\n    - geos\n\ntest:\n  requires:\n    - pip\n  imports:\n    - sedonadb\n  commands:\n    - pip check\n    - python -c \"import sedonadb; print('SedonaDB successfully initialized')\"\n\nabout:\n  home: https://github.com/apache/sedona-db\n  summary: A single-node analytical database engine with geospatial as a first-class citizen\n  license: Apache-2.0\n  license_file:\n    - LICENSE\n    - NOTICE\n    - THIRDPARTY.yml\n\nextra:\n  recipe-maintainers:\n    - p-vdp\n    - paleolimbot\n    - jiayuasu\n    \n",
+  "raw_meta_yaml": "{% set version = \"0.3.0\" %}\n{% set name = \"sedonadb\" %}\n\npackage:\n  name: {{ name }}\n  version: {{ version }}\n\nsource:\n  url: https://github.com/apache/sedona-db/archive/apache-sedona-db-{{ version }}.tar.gz\n  sha256: 808a38f955dc1dc1c68793a2a6c707abf6299d5f2371ff7dd7b4a3c267e67333\n\nbuild:\n  number: 4\n  script:\n    # Windows workaround for upstream geos pkg-config flag'-lstdc++' flag, which breaks MSVC\n    # Consider moving this to bld.bat\n    - python -c \"import os, pathlib; [f.write_text(f.read_text().replace('-lstdc++', '')) for f in pathlib.Path(os.environ['LIBRARY_PREFIX']).joinpath('lib', 'pkgconfig').glob('*.pc')]\"  # [win]\n\n    # Configure PyO3 to use the host Python environment\n    - export PYO3_PYTHON={{ PYTHON }}  # [not win]\n    - set \"PYO3_PYTHON={{ PYTHON }}\"   # [win]\n\n    # Generate Rust license inventory\n    - cd python/sedonadb\n    - cargo-bundle-licenses --format yaml --output THIRDPARTY.yml\n    - mv THIRDPARTY.yml ../../         # [not win]\n    - move THIRDPARTY.yml ..\\..        # [win]\n\n    # Build, skipping auditwheel to rely on shared libs\n    - maturin build --release --skip-auditwheel --out dist --interpreter={{ PYTHON }}\n\n    # Install dynamically to avoid issues with path sytax\n    - {{ PYTHON }} -m pip install sedonadb --no-index --find-links=dist --no-deps -vv\n\nrequirements:\n  build:\n    - {{ stdlib(\"c\") }}\n    - {{ compiler(\"c\") }}\n    - {{ compiler(\"cxx\") }}\n    - {{ compiler(\"rust\") }}\n    - cargo-bundle-licenses\n    - pkg-config\n    - python                              # [build_platform != target_platform]\n    - cross-python_{{ target_platform }}  # [build_platform != target_platform]\n    - maturin >=1.12,<2.0\n  host:\n    - python\n    - pip\n    - maturin >=1.12,<2.0\n    - geos\n  run:\n    - python\n    - apache-sedona\n\ntest:\n  requires:\n    - pip\n  imports:\n    - sedonadb\n  commands:\n    - pip check\n    - python -c \"import sedonadb; print('SedonaDB successfully initialized')\"\n\nabout:\n  home: https://github.com/apache/sedona-db\n  summary: A single-node analytical database engine with geospatial as a first-class citizen\n  license: Apache-2.0\n  license_file:\n    - LICENSE\n    - NOTICE\n    - THIRDPARTY.yml\n\nextra:\n  recipe-maintainers:\n    - p-vdp\n    - paleolimbot\n    - jiayuasu\n    \n",
   "req": {
     "__set__": true,
     "elements": [
@@ -607,7 +598,6 @@
         "c_compiler_stub",
         "c_stdlib_stub",
         "cxx_compiler_stub",
-        "geos",
         "python"
       ]
     },
@@ -645,7 +635,6 @@
       "__set__": true,
       "elements": [
         "apache-sedona",
-        "geos",
         "python"
       ]
     },
@@ -673,7 +662,7 @@
       "summary": "A single-node analytical database engine with geospatial as a first-class citizen"
     },
     "build": {
-      "number": "3",
+      "number": "4",
       "script": [
         "python -c \"import os, pathlib; [f.write_text(f.read_text().replace('-lstdc++', '')) for f in pathlib.Path(os.environ['LIBRARY_PREFIX']).joinpath('lib', 'pkgconfig').glob('*.pc')]\"",
         "set \"PYO3_PYTHON=PYTHON\"",
@@ -713,8 +702,7 @@
       ],
       "run": [
         "python",
-        "apache-sedona",
-        "geos"
+        "apache-sedona"
       ]
     },
     "schema_version": 0,
@@ -761,7 +749,6 @@
       "__set__": true,
       "elements": [
         "apache-sedona",
-        "geos",
         "python"
       ]
     },
