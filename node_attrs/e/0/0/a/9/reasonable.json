@@ -1,13 +1,10 @@
 {
   "archived": false,
   "branch": "main",
-  "ci_support_linux_64_channel_sourcesconda-forgepython3.10.____cpython.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\ncdt_name:\n- conda\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ncxx_compiler:\n- gxx\ncxx_compiler_version:\n- '14'\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\nis_abi3:\n- true\npin_run_as_build:\n  python:\n    min_pin: x.x\n    max_pin: x.x\npython:\n- 3.10.* *_cpython\npython_min:\n- '3.10'\nrust_compiler:\n- rust\ntarget_platform:\n- linux-64\nzip_keys:\n- - c_compiler_version\n  - cxx_compiler_version\n- - python\n  - channel_sources\n",
+  "ci_support_linux_64_is_abi3falsepython3.14.____cp314t.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ncxx_compiler:\n- gxx\ncxx_compiler_version:\n- '14'\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\nis_abi3:\n- false\nis_python_min:\n- false\npin_run_as_build:\n  python:\n    min_pin: x.x\n    max_pin: x.x\npython:\n- 3.14.* *_cp314t\npython_min:\n- '3.10'\nrust_compiler:\n- rust\ntarget_platform:\n- linux-64\nzip_keys:\n- - c_compiler_version\n  - cxx_compiler_version\n- - python\n  - is_python_min\n  - is_abi3\n",
   "conda-forge.yml": {
     "bot": {
       "inspection": "hint-all"
-    },
-    "build_platform": {
-      "osx_arm64": "osx_64"
     },
     "conda_build": {
       "pkg_format": "2"
@@ -18,27 +15,43 @@
       "branch_name": "main",
       "tooling_branch_name": "main"
     },
+    "provider": {
+      "linux_aarch64": "default",
+      "linux_ppc64le": "default",
+      "osx_arm64": "default"
+    },
     "shellcheck": {
       "enabled": true
-    },
-    "test": "native_and_emulated"
+    }
   },
-  "feedstock_hash": "83d898d4580c6f76f2fb8a967a3659152fb20983",
-  "feedstock_hash_ts": 1776901126,
+  "feedstock_hash": "54e44aed1fb10851b5ec7e16ae9eff5a706d50dd",
+  "feedstock_hash_ts": 1777383693,
   "feedstock_name": "reasonable",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
     "about": {
-      "home": "https://github.com/gtfierro/reasonable",
+      "dev_url": "https://github.com/gtfierro/reasonable",
+      "home": "https://pypi.org/project/reasonable",
       "license": "BSD-3-Clause",
       "license_family": "BSD-3-Clause",
-      "license_file": "LICENSE",
+      "license_file": "dist/LICENSE",
       "summary": "An OWL 2 RL reasoner with reasonable performance"
     },
     "build": {
-      "number": "3",
+      "number": "0",
       "script": {
-        "file": "build-reasonable"
+        "content": [
+          "cd dist",
+          "${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation --disable-pip-version-check",
+          "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml"
+        ],
+        "env": {
+          "CARGO_PROFILE_RELEASE_LTO": "fat",
+          "CARGO_PROFILE_RELEASE_STRIP": "symbols",
+          "MATURIN_PEP517_ARGS": "--features=abi3",
+          "PYTHONIOENCODING": "UTF-8",
+          "PYTHONUTF8": "1"
+        }
       }
     },
     "extra": {
@@ -54,21 +67,74 @@
           "build": [
             "c_compiler_stub",
             "cxx_compiler_stub",
-            "c_stdlib_stub",
             "rust_compiler_stub",
+            "c_stdlib_stub",
             "cargo-bundle-licenses",
             "python",
             "clangdev",
             "llvmdev"
           ],
           "host": [
+            "maturin >=1.8,<2.0",
             "pip",
-            "python",
-            "python-abi3",
-            "maturin >=0.14,<0.15"
+            "python"
           ],
           "run": [
-            "python"
+            "python",
+            "rdflib >=6.1.1"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "reasonable"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "src/python/tests/",
+                "src/example_models/ontologies/rdfs.ttl"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest"
+              ]
+            },
+            "script": [
+              "cd src/python",
+              "pytest -vv --tb=long --color=yes"
+            ]
+          }
+        ],
+        "version": "0.4.0"
+      },
+      {
+        "build": null,
+        "name": "reasonable",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "cxx_compiler_stub",
+            "rust_compiler_stub",
+            "c_stdlib_stub",
+            "cargo-bundle-licenses",
+            "python",
+            "clangdev",
+            "llvmdev"
+          ],
+          "host": [
+            "maturin >=1.8,<2.0",
+            "pip",
+            "python",
+            "python-abi3"
+          ],
+          "run": [
+            "python",
+            "rdflib >=6.1.1"
           ]
         },
         "tests": [
@@ -79,43 +145,65 @@
               ],
               "python_version": [
                 "3.10.*",
-                "3.13.*"
+                "3.14.*"
               ]
             }
+          },
+          {
+            "files": {
+              "source": [
+                "src/python/tests/",
+                "src/example_models/ontologies/rdfs.ttl"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest",
+                "python 3.14.*",
+                "abi3audit"
+              ]
+            },
+            "script": [
+              "cd src/python",
+              "pytest -vv --tb=long --color=yes",
+              "cd \"${{ sp_dir }}\"",
+              "abi3audit -s -v --assume-minimum-abi3 ${{ python_min }} reasonable.${{ abi3_ext }}"
+            ]
           }
         ],
-        "version": "0.2.6"
+        "version": "0.4.0"
       }
     ],
     "package": {
       "name": "reasonable",
-      "version": "0.2.6"
+      "version": "0.4.0"
     },
     "requirements": {
       "build": [
         "c_compiler_stub",
         "cxx_compiler_stub",
-        "c_stdlib_stub",
         "rust_compiler_stub",
+        "c_stdlib_stub",
         "cargo-bundle-licenses",
         "python",
         "clangdev",
         "llvmdev"
       ],
       "host": [
+        "maturin >=1.8,<2.0",
         "pip",
         "python",
-        "python-abi3",
-        "maturin >=0.14,<0.15"
+        "python-abi3"
       ],
       "run": [
-        "python"
+        "python",
+        "rdflib >=6.1.1"
       ]
     },
     "schema_version": 1,
     "source": {
-      "sha256": "5d26aeb8b6c3f566aa2ef11c308b2208ec7669a30e9113728f243024c6276205",
-      "url": "https://pypi.org/packages/source/r/reasonable/reasonable-0.2.6.tar.gz"
+      "sha256": "21dff10a8f587ecce1e5c45e684eceea45dc2484e93973ff1c5ae4545d80840c",
+      "url": "https://pypi.org/packages/source/r/reasonable/reasonable-0.4.0.tar.gz"
     }
   },
   "linux_64_requirements": {
@@ -144,28 +232,480 @@
     "run": {
       "__set__": true,
       "elements": [
-        "python"
+        "python",
+        "rdflib"
       ]
     },
     "test": {
       "__set__": true,
       "elements": [
-        "pip"
+        "abi3audit",
+        "pip",
+        "pytest",
+        "python"
+      ]
+    }
+  },
+  "linux_aarch64_meta_yaml": {
+    "about": {
+      "dev_url": "https://github.com/gtfierro/reasonable",
+      "home": "https://pypi.org/project/reasonable",
+      "license": "BSD-3-Clause",
+      "license_family": "BSD-3-Clause",
+      "license_file": "dist/LICENSE",
+      "summary": "An OWL 2 RL reasoner with reasonable performance"
+    },
+    "build": {
+      "number": "0",
+      "script": {
+        "content": [
+          "cd dist",
+          "${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation --disable-pip-version-check",
+          "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml"
+        ],
+        "env": {
+          "CARGO_PROFILE_RELEASE_LTO": "fat",
+          "CARGO_PROFILE_RELEASE_STRIP": "symbols",
+          "MATURIN_PEP517_ARGS": "--features=abi3",
+          "PYTHONIOENCODING": "UTF-8",
+          "PYTHONUTF8": "1"
+        }
+      }
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "bollwyvl"
+      ]
+    },
+    "outputs": [
+      {
+        "build": null,
+        "name": "reasonable",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "cxx_compiler_stub",
+            "rust_compiler_stub",
+            "c_stdlib_stub",
+            "cargo-bundle-licenses",
+            "python",
+            "clangdev",
+            "llvmdev"
+          ],
+          "host": [
+            "maturin >=1.8,<2.0",
+            "pip",
+            "python"
+          ],
+          "run": [
+            "python",
+            "rdflib >=6.1.1"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "reasonable"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "src/python/tests/",
+                "src/example_models/ontologies/rdfs.ttl"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest"
+              ]
+            },
+            "script": [
+              "cd src/python",
+              "pytest -vv --tb=long --color=yes"
+            ]
+          }
+        ],
+        "version": "0.4.0"
+      },
+      {
+        "build": null,
+        "name": "reasonable",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "cxx_compiler_stub",
+            "rust_compiler_stub",
+            "c_stdlib_stub",
+            "cargo-bundle-licenses",
+            "python",
+            "clangdev",
+            "llvmdev"
+          ],
+          "host": [
+            "maturin >=1.8,<2.0",
+            "pip",
+            "python",
+            "python-abi3"
+          ],
+          "run": [
+            "python",
+            "rdflib >=6.1.1"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "reasonable"
+              ],
+              "python_version": [
+                "3.10.*",
+                "3.14.*"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "src/python/tests/",
+                "src/example_models/ontologies/rdfs.ttl"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest",
+                "python 3.14.*",
+                "abi3audit"
+              ]
+            },
+            "script": [
+              "cd src/python",
+              "pytest -vv --tb=long --color=yes",
+              "cd \"${{ sp_dir }}\"",
+              "abi3audit -s -v --assume-minimum-abi3 ${{ python_min }} reasonable.${{ abi3_ext }}"
+            ]
+          }
+        ],
+        "version": "0.4.0"
+      }
+    ],
+    "package": {
+      "name": "reasonable",
+      "version": "0.4.0"
+    },
+    "requirements": {
+      "build": [
+        "c_compiler_stub",
+        "cxx_compiler_stub",
+        "rust_compiler_stub",
+        "c_stdlib_stub",
+        "cargo-bundle-licenses",
+        "python",
+        "clangdev",
+        "llvmdev"
+      ],
+      "host": [
+        "maturin >=1.8,<2.0",
+        "pip",
+        "python",
+        "python-abi3"
+      ],
+      "run": [
+        "python",
+        "rdflib >=6.1.1"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "sha256": "21dff10a8f587ecce1e5c45e684eceea45dc2484e93973ff1c5ae4545d80840c",
+      "url": "https://pypi.org/packages/source/r/reasonable/reasonable-0.4.0.tar.gz"
+    }
+  },
+  "linux_aarch64_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "cargo-bundle-licenses",
+        "clangdev",
+        "cxx_compiler_stub",
+        "llvmdev",
+        "python",
+        "rust_compiler_stub"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "maturin",
+        "pip",
+        "python",
+        "python-abi3"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "python",
+        "rdflib"
+      ]
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "abi3audit",
+        "pip",
+        "pytest",
+        "python"
+      ]
+    }
+  },
+  "linux_ppc64le_meta_yaml": {
+    "about": {
+      "dev_url": "https://github.com/gtfierro/reasonable",
+      "home": "https://pypi.org/project/reasonable",
+      "license": "BSD-3-Clause",
+      "license_family": "BSD-3-Clause",
+      "license_file": "dist/LICENSE",
+      "summary": "An OWL 2 RL reasoner with reasonable performance"
+    },
+    "build": {
+      "number": "0",
+      "script": {
+        "content": [
+          "cd dist",
+          "${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation --disable-pip-version-check",
+          "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml"
+        ],
+        "env": {
+          "CARGO_PROFILE_RELEASE_LTO": "fat",
+          "CARGO_PROFILE_RELEASE_STRIP": "symbols",
+          "MATURIN_PEP517_ARGS": "--features=abi3",
+          "PYTHONIOENCODING": "UTF-8",
+          "PYTHONUTF8": "1"
+        }
+      }
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "bollwyvl"
+      ]
+    },
+    "outputs": [
+      {
+        "build": null,
+        "name": "reasonable",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "cxx_compiler_stub",
+            "rust_compiler_stub",
+            "c_stdlib_stub",
+            "cargo-bundle-licenses",
+            "python",
+            "clangdev",
+            "llvmdev"
+          ],
+          "host": [
+            "maturin >=1.8,<2.0",
+            "pip",
+            "python"
+          ],
+          "run": [
+            "python",
+            "rdflib >=6.1.1"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "reasonable"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "src/python/tests/",
+                "src/example_models/ontologies/rdfs.ttl"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest"
+              ]
+            },
+            "script": [
+              "cd src/python",
+              "pytest -vv --tb=long --color=yes"
+            ]
+          }
+        ],
+        "version": "0.4.0"
+      },
+      {
+        "build": null,
+        "name": "reasonable",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "cxx_compiler_stub",
+            "rust_compiler_stub",
+            "c_stdlib_stub",
+            "cargo-bundle-licenses",
+            "python",
+            "clangdev",
+            "llvmdev"
+          ],
+          "host": [
+            "maturin >=1.8,<2.0",
+            "pip",
+            "python",
+            "python-abi3"
+          ],
+          "run": [
+            "python",
+            "rdflib >=6.1.1"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "reasonable"
+              ],
+              "python_version": [
+                "3.10.*",
+                "3.14.*"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "src/python/tests/",
+                "src/example_models/ontologies/rdfs.ttl"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest",
+                "python 3.14.*",
+                "abi3audit"
+              ]
+            },
+            "script": [
+              "cd src/python",
+              "pytest -vv --tb=long --color=yes",
+              "cd \"${{ sp_dir }}\"",
+              "abi3audit -s -v --assume-minimum-abi3 ${{ python_min }} reasonable.${{ abi3_ext }}"
+            ]
+          }
+        ],
+        "version": "0.4.0"
+      }
+    ],
+    "package": {
+      "name": "reasonable",
+      "version": "0.4.0"
+    },
+    "requirements": {
+      "build": [
+        "c_compiler_stub",
+        "cxx_compiler_stub",
+        "rust_compiler_stub",
+        "c_stdlib_stub",
+        "cargo-bundle-licenses",
+        "python",
+        "clangdev",
+        "llvmdev"
+      ],
+      "host": [
+        "maturin >=1.8,<2.0",
+        "pip",
+        "python",
+        "python-abi3"
+      ],
+      "run": [
+        "python",
+        "rdflib >=6.1.1"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "sha256": "21dff10a8f587ecce1e5c45e684eceea45dc2484e93973ff1c5ae4545d80840c",
+      "url": "https://pypi.org/packages/source/r/reasonable/reasonable-0.4.0.tar.gz"
+    }
+  },
+  "linux_ppc64le_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "cargo-bundle-licenses",
+        "clangdev",
+        "cxx_compiler_stub",
+        "llvmdev",
+        "python",
+        "rust_compiler_stub"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "maturin",
+        "pip",
+        "python",
+        "python-abi3"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "python",
+        "rdflib"
+      ]
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "abi3audit",
+        "pip",
+        "pytest",
+        "python"
       ]
     }
   },
   "meta_yaml": {
     "about": {
-      "home": "https://github.com/gtfierro/reasonable",
+      "dev_url": "https://github.com/gtfierro/reasonable",
+      "home": "https://pypi.org/project/reasonable",
       "license": "BSD-3-Clause",
       "license_family": "BSD-3-Clause",
-      "license_file": "LICENSE",
+      "license_file": "dist/LICENSE",
       "summary": "An OWL 2 RL reasoner with reasonable performance"
     },
     "build": {
-      "number": "3",
+      "number": "0",
       "script": {
-        "file": "build-reasonable"
+        "content": [
+          "cd dist",
+          "${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation --disable-pip-version-check",
+          "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml"
+        ],
+        "env": {
+          "CARGO_PROFILE_RELEASE_LTO": "fat",
+          "CARGO_PROFILE_RELEASE_STRIP": "symbols",
+          "MATURIN_PEP517_ARGS": "--features=abi3",
+          "PYTHONIOENCODING": "UTF-8",
+          "PYTHONUTF8": "1"
+        }
       }
     },
     "extra": {
@@ -181,21 +721,21 @@
           "build": [
             "c_compiler_stub",
             "cxx_compiler_stub",
-            "c_stdlib_stub",
             "rust_compiler_stub",
+            "c_stdlib_stub",
             "cargo-bundle-licenses",
             "python",
             "clangdev",
             "llvmdev"
           ],
           "host": [
+            "maturin >=1.8,<2.0",
             "pip",
-            "python",
-            "python-abi3",
-            "maturin >=0.14,<0.15"
+            "python"
           ],
           "run": [
-            "python"
+            "python",
+            "rdflib >=6.1.1"
           ]
         },
         "tests": [
@@ -203,15 +743,28 @@
             "python": {
               "imports": [
                 "reasonable"
-              ],
-              "python_version": [
-                "3.10.*",
-                "3.13.*"
               ]
             }
+          },
+          {
+            "files": {
+              "source": [
+                "src/python/tests/",
+                "src/example_models/ontologies/rdfs.ttl"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest"
+              ]
+            },
+            "script": [
+              "cd src/python",
+              "pytest -vv --tb=long --color=yes"
+            ]
           }
         ],
-        "version": "0.2.6"
+        "version": "0.4.0"
       },
       {
         "build": null,
@@ -220,21 +773,22 @@
           "build": [
             "c_compiler_stub",
             "cxx_compiler_stub",
-            "c_stdlib_stub",
             "rust_compiler_stub",
+            "c_stdlib_stub",
             "cargo-bundle-licenses",
             "python",
             "clangdev",
             "llvmdev"
           ],
           "host": [
+            "maturin >=1.8,<2.0",
             "pip",
             "python",
-            "python-abi3",
-            "maturin >=0.14,<0.15"
+            "python-abi3"
           ],
           "run": [
-            "python"
+            "python",
+            "rdflib >=6.1.1"
           ]
         },
         "tests": [
@@ -245,12 +799,33 @@
               ],
               "python_version": [
                 "3.10.*",
-                "3.13.*"
+                "3.14.*"
               ]
             }
+          },
+          {
+            "files": {
+              "source": [
+                "src/python/tests/",
+                "src/example_models/ontologies/rdfs.ttl"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest",
+                "python 3.14.*",
+                "abi3audit"
+              ]
+            },
+            "script": [
+              "cd src/python",
+              "pytest -vv --tb=long --color=yes",
+              "cd \"${{ sp_dir }}\"",
+              "abi3audit -s -v --assume-minimum-abi3 ${{ python_min }} reasonable.${{ abi3_ext }}"
+            ]
           }
         ],
-        "version": "0.2.6"
+        "version": "0.4.0"
       },
       {
         "build": null,
@@ -259,21 +834,21 @@
           "build": [
             "c_compiler_stub",
             "cxx_compiler_stub",
-            "c_stdlib_stub",
             "rust_compiler_stub",
+            "c_stdlib_stub",
             "cargo-bundle-licenses",
             "python",
             "clangdev",
             "llvmdev"
           ],
           "host": [
+            "maturin >=1.8,<2.0",
             "pip",
-            "python",
-            "python-abi3",
-            "maturin >=0.14,<0.15"
+            "python"
           ],
           "run": [
-            "python"
+            "python",
+            "rdflib >=6.1.1"
           ]
         },
         "tests": [
@@ -281,15 +856,28 @@
             "python": {
               "imports": [
                 "reasonable"
-              ],
-              "python_version": [
-                "3.10.*",
-                "3.13.*"
               ]
             }
+          },
+          {
+            "files": {
+              "source": [
+                "src/python/tests/",
+                "src/example_models/ontologies/rdfs.ttl"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest"
+              ]
+            },
+            "script": [
+              "cd src/python",
+              "pytest -vv --tb=long --color=yes"
+            ]
           }
         ],
-        "version": "0.2.6"
+        "version": "0.4.0"
       },
       {
         "build": null,
@@ -298,21 +886,22 @@
           "build": [
             "c_compiler_stub",
             "cxx_compiler_stub",
-            "c_stdlib_stub",
             "rust_compiler_stub",
+            "c_stdlib_stub",
             "cargo-bundle-licenses",
             "python",
             "clangdev",
             "llvmdev"
           ],
           "host": [
+            "maturin >=1.8,<2.0",
             "pip",
             "python",
-            "python-abi3",
-            "maturin >=0.14,<0.15"
+            "python-abi3"
           ],
           "run": [
-            "python"
+            "python",
+            "rdflib >=6.1.1"
           ]
         },
         "tests": [
@@ -323,58 +912,544 @@
               ],
               "python_version": [
                 "3.10.*",
-                "3.13.*"
+                "3.14.*"
               ]
             }
+          },
+          {
+            "files": {
+              "source": [
+                "src/python/tests/",
+                "src/example_models/ontologies/rdfs.ttl"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest",
+                "python 3.14.*",
+                "abi3audit"
+              ]
+            },
+            "script": [
+              "cd src/python",
+              "pytest -vv --tb=long --color=yes",
+              "cd \"${{ sp_dir }}\"",
+              "abi3audit -s -v --assume-minimum-abi3 ${{ python_min }} reasonable.${{ abi3_ext }}"
+            ]
           }
         ],
-        "version": "0.2.6"
+        "version": "0.4.0"
+      },
+      {
+        "build": null,
+        "name": "reasonable",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "cxx_compiler_stub",
+            "rust_compiler_stub",
+            "c_stdlib_stub",
+            "cargo-bundle-licenses",
+            "python",
+            "clangdev",
+            "llvmdev"
+          ],
+          "host": [
+            "maturin >=1.8,<2.0",
+            "pip",
+            "python"
+          ],
+          "run": [
+            "python",
+            "rdflib >=6.1.1"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "reasonable"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "src/python/tests/",
+                "src/example_models/ontologies/rdfs.ttl"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest"
+              ]
+            },
+            "script": [
+              "cd src/python",
+              "pytest -vv --tb=long --color=yes"
+            ]
+          }
+        ],
+        "version": "0.4.0"
+      },
+      {
+        "build": null,
+        "name": "reasonable",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "cxx_compiler_stub",
+            "rust_compiler_stub",
+            "c_stdlib_stub",
+            "cargo-bundle-licenses",
+            "python",
+            "clangdev",
+            "llvmdev"
+          ],
+          "host": [
+            "maturin >=1.8,<2.0",
+            "pip",
+            "python",
+            "python-abi3"
+          ],
+          "run": [
+            "python",
+            "rdflib >=6.1.1"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "reasonable"
+              ],
+              "python_version": [
+                "3.10.*",
+                "3.14.*"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "src/python/tests/",
+                "src/example_models/ontologies/rdfs.ttl"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest",
+                "python 3.14.*",
+                "abi3audit"
+              ]
+            },
+            "script": [
+              "cd src/python",
+              "pytest -vv --tb=long --color=yes",
+              "cd \"${{ sp_dir }}\"",
+              "abi3audit -s -v --assume-minimum-abi3 ${{ python_min }} reasonable.${{ abi3_ext }}"
+            ]
+          }
+        ],
+        "version": "0.4.0"
+      },
+      {
+        "build": null,
+        "name": "reasonable",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "cxx_compiler_stub",
+            "rust_compiler_stub",
+            "c_stdlib_stub",
+            "cargo-bundle-licenses",
+            "python",
+            "clangdev",
+            "llvmdev"
+          ],
+          "host": [
+            "maturin >=1.8,<2.0",
+            "pip",
+            "python"
+          ],
+          "run": [
+            "python",
+            "rdflib >=6.1.1"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "reasonable"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "src/python/tests/",
+                "src/example_models/ontologies/rdfs.ttl"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest"
+              ]
+            },
+            "script": [
+              "cd src/python",
+              "pytest -vv --tb=long --color=yes"
+            ]
+          }
+        ],
+        "version": "0.4.0"
+      },
+      {
+        "build": null,
+        "name": "reasonable",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "cxx_compiler_stub",
+            "rust_compiler_stub",
+            "c_stdlib_stub",
+            "cargo-bundle-licenses",
+            "python",
+            "clangdev",
+            "llvmdev"
+          ],
+          "host": [
+            "maturin >=1.8,<2.0",
+            "pip",
+            "python",
+            "python-abi3"
+          ],
+          "run": [
+            "python",
+            "rdflib >=6.1.1"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "reasonable"
+              ],
+              "python_version": [
+                "3.10.*",
+                "3.14.*"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "src/python/tests/",
+                "src/example_models/ontologies/rdfs.ttl"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest",
+                "python 3.14.*",
+                "abi3audit"
+              ]
+            },
+            "script": [
+              "cd src/python",
+              "pytest -vv --tb=long --color=yes",
+              "cd \"${{ sp_dir }}\"",
+              "abi3audit -s -v --assume-minimum-abi3 ${{ python_min }} reasonable.${{ abi3_ext }}"
+            ]
+          }
+        ],
+        "version": "0.4.0"
+      },
+      {
+        "build": null,
+        "name": "reasonable",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "cxx_compiler_stub",
+            "rust_compiler_stub",
+            "c_stdlib_stub",
+            "cargo-bundle-licenses",
+            "python",
+            "clangdev",
+            "llvmdev"
+          ],
+          "host": [
+            "maturin >=1.8,<2.0",
+            "pip",
+            "python"
+          ],
+          "run": [
+            "python",
+            "rdflib >=6.1.1"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "reasonable"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "src/python/tests/",
+                "src/example_models/ontologies/rdfs.ttl"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest"
+              ]
+            },
+            "script": [
+              "cd src/python",
+              "pytest -vv --tb=long --color=yes"
+            ]
+          }
+        ],
+        "version": "0.4.0"
+      },
+      {
+        "build": null,
+        "name": "reasonable",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "cxx_compiler_stub",
+            "rust_compiler_stub",
+            "c_stdlib_stub",
+            "cargo-bundle-licenses",
+            "python",
+            "clangdev",
+            "llvmdev"
+          ],
+          "host": [
+            "maturin >=1.8,<2.0",
+            "pip",
+            "python",
+            "python-abi3"
+          ],
+          "run": [
+            "python",
+            "rdflib >=6.1.1"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "reasonable"
+              ],
+              "python_version": [
+                "3.10.*",
+                "3.14.*"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "src/python/tests/",
+                "src/example_models/ontologies/rdfs.ttl"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest",
+                "python 3.14.*",
+                "abi3audit"
+              ]
+            },
+            "script": [
+              "cd src/python",
+              "pytest -vv --tb=long --color=yes",
+              "cd \"${{ sp_dir }}\"",
+              "abi3audit -s -v --assume-minimum-abi3 ${{ python_min }} reasonable.${{ abi3_ext }}"
+            ]
+          }
+        ],
+        "version": "0.4.0"
+      },
+      {
+        "build": null,
+        "name": "reasonable",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "cxx_compiler_stub",
+            "rust_compiler_stub",
+            "c_stdlib_stub",
+            "cargo-bundle-licenses",
+            "python",
+            "clangdev",
+            "llvmdev"
+          ],
+          "host": [
+            "maturin >=1.8,<2.0",
+            "pip",
+            "python"
+          ],
+          "run": [
+            "python",
+            "rdflib >=6.1.1"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "reasonable"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "src/python/tests/",
+                "src/example_models/ontologies/rdfs.ttl"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest"
+              ]
+            },
+            "script": [
+              "cd src/python",
+              "pytest -vv --tb=long --color=yes"
+            ]
+          }
+        ],
+        "version": "0.4.0"
+      },
+      {
+        "build": null,
+        "name": "reasonable",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "cxx_compiler_stub",
+            "rust_compiler_stub",
+            "c_stdlib_stub",
+            "cargo-bundle-licenses",
+            "python",
+            "clangdev",
+            "llvmdev"
+          ],
+          "host": [
+            "maturin >=1.8,<2.0",
+            "pip",
+            "python",
+            "python-abi3"
+          ],
+          "run": [
+            "python",
+            "rdflib >=6.1.1"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "reasonable"
+              ],
+              "python_version": [
+                "3.10.*",
+                "3.14.*"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "src/python/tests/",
+                "src/example_models/ontologies/rdfs.ttl"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest",
+                "python 3.14.*",
+                "abi3audit"
+              ]
+            },
+            "script": [
+              "cd src/python",
+              "pytest -vv --tb=long --color=yes",
+              "cd \"${{ sp_dir }}\"",
+              "abi3audit -s -v --assume-minimum-abi3 ${{ python_min }} reasonable.${{ abi3_ext }}"
+            ]
+          }
+        ],
+        "version": "0.4.0"
       }
     ],
     "package": {
       "name": "reasonable",
-      "version": "0.2.6"
+      "version": "0.4.0"
     },
     "requirements": {
       "build": [
         "c_compiler_stub",
         "cxx_compiler_stub",
-        "c_stdlib_stub",
         "rust_compiler_stub",
+        "c_stdlib_stub",
         "cargo-bundle-licenses",
         "python",
         "clangdev",
         "llvmdev"
       ],
       "host": [
+        "maturin >=1.8,<2.0",
         "pip",
         "python",
-        "python-abi3",
-        "maturin >=0.14,<0.15"
+        "python-abi3"
       ],
       "run": [
-        "python"
+        "python",
+        "rdflib >=6.1.1"
       ]
     },
     "schema_version": 1,
     "source": {
-      "sha256": "5d26aeb8b6c3f566aa2ef11c308b2208ec7669a30e9113728f243024c6276205",
-      "url": "https://pypi.org/packages/source/r/reasonable/reasonable-0.2.6.tar.gz"
+      "sha256": "21dff10a8f587ecce1e5c45e684eceea45dc2484e93973ff1c5ae4545d80840c",
+      "url": "https://pypi.org/packages/source/r/reasonable/reasonable-0.4.0.tar.gz"
     }
   },
   "name": "reasonable",
   "osx_64_meta_yaml": {
     "about": {
-      "home": "https://github.com/gtfierro/reasonable",
+      "dev_url": "https://github.com/gtfierro/reasonable",
+      "home": "https://pypi.org/project/reasonable",
       "license": "BSD-3-Clause",
       "license_family": "BSD-3-Clause",
-      "license_file": "LICENSE",
+      "license_file": "dist/LICENSE",
       "summary": "An OWL 2 RL reasoner with reasonable performance"
     },
     "build": {
-      "number": "3",
+      "number": "0",
       "script": {
-        "file": "build-reasonable"
+        "content": [
+          "cd dist",
+          "${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation --disable-pip-version-check",
+          "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml"
+        ],
+        "env": {
+          "CARGO_PROFILE_RELEASE_LTO": "fat",
+          "CARGO_PROFILE_RELEASE_STRIP": "symbols",
+          "MATURIN_PEP517_ARGS": "--features=abi3",
+          "PYTHONIOENCODING": "UTF-8",
+          "PYTHONUTF8": "1"
+        }
       }
     },
     "extra": {
@@ -390,21 +1465,74 @@
           "build": [
             "c_compiler_stub",
             "cxx_compiler_stub",
-            "c_stdlib_stub",
             "rust_compiler_stub",
+            "c_stdlib_stub",
             "cargo-bundle-licenses",
             "python",
             "clangdev",
             "llvmdev"
           ],
           "host": [
+            "maturin >=1.8,<2.0",
             "pip",
-            "python",
-            "python-abi3",
-            "maturin >=0.14,<0.15"
+            "python"
           ],
           "run": [
-            "python"
+            "python",
+            "rdflib >=6.1.1"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "reasonable"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "src/python/tests/",
+                "src/example_models/ontologies/rdfs.ttl"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest"
+              ]
+            },
+            "script": [
+              "cd src/python",
+              "pytest -vv --tb=long --color=yes"
+            ]
+          }
+        ],
+        "version": "0.4.0"
+      },
+      {
+        "build": null,
+        "name": "reasonable",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "cxx_compiler_stub",
+            "rust_compiler_stub",
+            "c_stdlib_stub",
+            "cargo-bundle-licenses",
+            "python",
+            "clangdev",
+            "llvmdev"
+          ],
+          "host": [
+            "maturin >=1.8,<2.0",
+            "pip",
+            "python",
+            "python-abi3"
+          ],
+          "run": [
+            "python",
+            "rdflib >=6.1.1"
           ]
         },
         "tests": [
@@ -415,43 +1543,65 @@
               ],
               "python_version": [
                 "3.10.*",
-                "3.13.*"
+                "3.14.*"
               ]
             }
+          },
+          {
+            "files": {
+              "source": [
+                "src/python/tests/",
+                "src/example_models/ontologies/rdfs.ttl"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest",
+                "python 3.14.*",
+                "abi3audit"
+              ]
+            },
+            "script": [
+              "cd src/python",
+              "pytest -vv --tb=long --color=yes",
+              "cd \"${{ sp_dir }}\"",
+              "abi3audit -s -v --assume-minimum-abi3 ${{ python_min }} reasonable.${{ abi3_ext }}"
+            ]
           }
         ],
-        "version": "0.2.6"
+        "version": "0.4.0"
       }
     ],
     "package": {
       "name": "reasonable",
-      "version": "0.2.6"
+      "version": "0.4.0"
     },
     "requirements": {
       "build": [
         "c_compiler_stub",
         "cxx_compiler_stub",
-        "c_stdlib_stub",
         "rust_compiler_stub",
+        "c_stdlib_stub",
         "cargo-bundle-licenses",
         "python",
         "clangdev",
         "llvmdev"
       ],
       "host": [
+        "maturin >=1.8,<2.0",
         "pip",
         "python",
-        "python-abi3",
-        "maturin >=0.14,<0.15"
+        "python-abi3"
       ],
       "run": [
-        "python"
+        "python",
+        "rdflib >=6.1.1"
       ]
     },
     "schema_version": 1,
     "source": {
-      "sha256": "5d26aeb8b6c3f566aa2ef11c308b2208ec7669a30e9113728f243024c6276205",
-      "url": "https://pypi.org/packages/source/r/reasonable/reasonable-0.2.6.tar.gz"
+      "sha256": "21dff10a8f587ecce1e5c45e684eceea45dc2484e93973ff1c5ae4545d80840c",
+      "url": "https://pypi.org/packages/source/r/reasonable/reasonable-0.4.0.tar.gz"
     }
   },
   "osx_64_requirements": {
@@ -480,28 +1630,44 @@
     "run": {
       "__set__": true,
       "elements": [
-        "python"
+        "python",
+        "rdflib"
       ]
     },
     "test": {
       "__set__": true,
       "elements": [
-        "pip"
+        "abi3audit",
+        "pip",
+        "pytest",
+        "python"
       ]
     }
   },
   "osx_arm64_meta_yaml": {
     "about": {
-      "home": "https://github.com/gtfierro/reasonable",
+      "dev_url": "https://github.com/gtfierro/reasonable",
+      "home": "https://pypi.org/project/reasonable",
       "license": "BSD-3-Clause",
       "license_family": "BSD-3-Clause",
-      "license_file": "LICENSE",
+      "license_file": "dist/LICENSE",
       "summary": "An OWL 2 RL reasoner with reasonable performance"
     },
     "build": {
-      "number": "3",
+      "number": "0",
       "script": {
-        "file": "build-reasonable"
+        "content": [
+          "cd dist",
+          "${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation --disable-pip-version-check",
+          "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml"
+        ],
+        "env": {
+          "CARGO_PROFILE_RELEASE_LTO": "fat",
+          "CARGO_PROFILE_RELEASE_STRIP": "symbols",
+          "MATURIN_PEP517_ARGS": "--features=abi3",
+          "PYTHONIOENCODING": "UTF-8",
+          "PYTHONUTF8": "1"
+        }
       }
     },
     "extra": {
@@ -517,21 +1683,74 @@
           "build": [
             "c_compiler_stub",
             "cxx_compiler_stub",
-            "c_stdlib_stub",
             "rust_compiler_stub",
+            "c_stdlib_stub",
             "cargo-bundle-licenses",
             "python",
             "clangdev",
             "llvmdev"
           ],
           "host": [
+            "maturin >=1.8,<2.0",
             "pip",
-            "python",
-            "python-abi3",
-            "maturin >=0.14,<0.15"
+            "python"
           ],
           "run": [
-            "python"
+            "python",
+            "rdflib >=6.1.1"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "reasonable"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "src/python/tests/",
+                "src/example_models/ontologies/rdfs.ttl"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest"
+              ]
+            },
+            "script": [
+              "cd src/python",
+              "pytest -vv --tb=long --color=yes"
+            ]
+          }
+        ],
+        "version": "0.4.0"
+      },
+      {
+        "build": null,
+        "name": "reasonable",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "cxx_compiler_stub",
+            "rust_compiler_stub",
+            "c_stdlib_stub",
+            "cargo-bundle-licenses",
+            "python",
+            "clangdev",
+            "llvmdev"
+          ],
+          "host": [
+            "maturin >=1.8,<2.0",
+            "pip",
+            "python",
+            "python-abi3"
+          ],
+          "run": [
+            "python",
+            "rdflib >=6.1.1"
           ]
         },
         "tests": [
@@ -542,43 +1761,65 @@
               ],
               "python_version": [
                 "3.10.*",
-                "3.13.*"
+                "3.14.*"
               ]
             }
+          },
+          {
+            "files": {
+              "source": [
+                "src/python/tests/",
+                "src/example_models/ontologies/rdfs.ttl"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest",
+                "python 3.14.*",
+                "abi3audit"
+              ]
+            },
+            "script": [
+              "cd src/python",
+              "pytest -vv --tb=long --color=yes",
+              "cd \"${{ sp_dir }}\"",
+              "abi3audit -s -v --assume-minimum-abi3 ${{ python_min }} reasonable.${{ abi3_ext }}"
+            ]
           }
         ],
-        "version": "0.2.6"
+        "version": "0.4.0"
       }
     ],
     "package": {
       "name": "reasonable",
-      "version": "0.2.6"
+      "version": "0.4.0"
     },
     "requirements": {
       "build": [
         "c_compiler_stub",
         "cxx_compiler_stub",
-        "c_stdlib_stub",
         "rust_compiler_stub",
+        "c_stdlib_stub",
         "cargo-bundle-licenses",
         "python",
         "clangdev",
         "llvmdev"
       ],
       "host": [
+        "maturin >=1.8,<2.0",
         "pip",
         "python",
-        "python-abi3",
-        "maturin >=0.14,<0.15"
+        "python-abi3"
       ],
       "run": [
-        "python"
+        "python",
+        "rdflib >=6.1.1"
       ]
     },
     "schema_version": 1,
     "source": {
-      "sha256": "5d26aeb8b6c3f566aa2ef11c308b2208ec7669a30e9113728f243024c6276205",
-      "url": "https://pypi.org/packages/source/r/reasonable/reasonable-0.2.6.tar.gz"
+      "sha256": "21dff10a8f587ecce1e5c45e684eceea45dc2484e93973ff1c5ae4545d80840c",
+      "url": "https://pypi.org/packages/source/r/reasonable/reasonable-0.4.0.tar.gz"
     }
   },
   "osx_arm64_requirements": {
@@ -607,13 +1848,17 @@
     "run": {
       "__set__": true,
       "elements": [
-        "python"
+        "python",
+        "rdflib"
       ]
     },
     "test": {
       "__set__": true,
       "elements": [
-        "pip"
+        "abi3audit",
+        "pip",
+        "pytest",
+        "python"
       ]
     }
   },
@@ -626,6 +1871,8 @@
   "parsing_error": false,
   "platforms": [
     "linux_64",
+    "linux_aarch64",
+    "linux_ppc64le",
     "osx_64",
     "osx_arm64",
     "win_64"
@@ -633,7 +1880,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/reasonable.json"
   },
-  "raw_meta_yaml": "# yaml-language-server: $schema=https://raw.githubusercontent.com/prefix-dev/recipe-format/main/schema.json\nschema_version: 1\n\ncontext:\n  version: 0.2.6\n  maturin_min: \"0.14\"\n  maturin_max: \"0.15\"\n\npackage:\n  name: reasonable\n  version: ${{ version }}\n\nsource:\n  url: https://pypi.org/packages/source/r/reasonable/reasonable-${{ version }}.tar.gz\n  sha256: 5d26aeb8b6c3f566aa2ef11c308b2208ec7669a30e9113728f243024c6276205\n\nbuild:\n  number: 3\n  skip: not (match(python, python_min ~ \".*\") and is_abi3)\n  python:\n    version_independent: true\n  script:\n    file: build-reasonable\n\nrequirements:\n  build:\n    - ${{ compiler(\"c\") }}\n    - ${{ compiler(\"cxx\") }}\n    - ${{ stdlib(\"c\") }}\n    - ${{ compiler(\"rust\") }}\n    - cargo-bundle-licenses\n    - python\n    - if: not osx\n      then:\n        - clangdev\n        - llvmdev\n    - if: build_platform != target_platform\n      then:\n        - cross-python_${{ target_platform }}\n        - maturin >=${{ maturin_min }},<${{ maturin_max }}\n        - python\n  host:\n    - pip\n    - python\n    - python-abi3\n    - maturin >=${{ maturin_min }},<${{ maturin_max }}\n  run:\n    - python\n  run_constraints:\n    - rdflib >=6.1\n  ignore_run_exports:\n    from_package:\n      - cross-python_${{ target_platform }}\n\ntests:\n  - python:\n      imports: reasonable\n      pip_check: true\n      python_version:\n        - ${{ python_min }}.*\n        - 3.13.*\n\nabout:\n  summary: An OWL 2 RL reasoner with reasonable performance\n  license: BSD-3-Clause\n  license_file:\n    - LICENSE\n    - THIRDPARTY.yml\n  homepage: https://github.com/gtfierro/reasonable\n\nextra:\n  recipe-maintainers:\n    - bollwyvl\n",
+  "raw_meta_yaml": "# yaml-language-server: $schema=https://raw.githubusercontent.com/prefix-dev/recipe-format/main/schema.json\nschema_version: 1\n\ncontext:\n  version: \"0.4.0\"\n  python_check_max: \"3.14\"\n  abi3_ext: ${{ \"pyd\" if win else \"abi3.so\" }}\n  unix_sp_dir: |-\n    $(python -c \"print(__import__('site').getsitepackages()[-1])\")/reasonable\n  win_sp_dir: |-\n    Lib\\site-packages\\reasonable\n  sp_dir: |-\n    ${{ \"%PREFIX%\\\\\" ~ win_sp_dir if win else unix_sp_dir }}\n\npackage:\n  name: reasonable\n  version: ${{ version }}\n\nsource:\n  - target_directory: dist\n    url: https://pypi.org/packages/source/r/reasonable/reasonable-${{ version }}.tar.gz\n    sha256: 21dff10a8f587ecce1e5c45e684eceea45dc2484e93973ff1c5ae4545d80840c\n  - target_directory: src\n    url: https://github.com/gtfierro/reasonable/releases/download/v${{ version }}/reasonable_v${{ version }}.tar.gz\n    sha256: 63faa8ae9ac699e0934f5becddc2b248ac48cb6dd389a605f728e4a814ec2fae\n\nbuild:\n  number: 0\n  skip: is_abi3 and not is_python_min\n  python:\n    version_independent: ${{ is_abi3 }}\n  script:\n    env:\n      CARGO_PROFILE_RELEASE_LTO: fat\n      CARGO_PROFILE_RELEASE_STRIP: symbols\n      MATURIN_PEP517_ARGS: --features=abi3\n      PYTHONIOENCODING: UTF-8\n      PYTHONUTF8: \"1\"\n    content:\n      - cd dist\n      - ${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation --disable-pip-version-check\n      - cargo-bundle-licenses --format yaml --output THIRDPARTY.yml\n\nrequirements:\n  build:\n    - ${{ compiler(\"c\") }}\n    - ${{ compiler(\"cxx\") }}\n    - ${{ compiler(\"rust\") }}\n    - ${{ stdlib(\"c\") }}\n    - cargo-bundle-licenses\n    - python\n    - if: not osx\n      then:\n        - clangdev\n        - llvmdev\n  host:\n    - maturin >=1.8,<2.0\n    - pip\n    - python\n    - if: is_abi3\n      then:\n        - python-abi3\n  run:\n    - python\n    - rdflib >=6.1.1\n  ignore_run_exports:\n    by_name:\n      - if: is_abi3\n        then:\n          - python_abi\n\ntests:\n  - if: is_abi3\n    then:\n      - python:\n          imports: reasonable\n          pip_check: true\n          python_version:\n            - ${{ python_min }}.*\n            - ${{ python_check_max }}.*\n    else:\n      - python:\n          imports: reasonable\n          pip_check: true\n  - files:\n      source:\n        - src/python/tests/\n        - src/example_models/ontologies/rdfs.ttl\n    requirements:\n      run:\n        - pytest\n        - if: is_abi3\n          then:\n            - python ${{ python_check_max }}.*\n            - abi3audit\n    script:\n      - cd src/python\n      # don't bother with coverage; one generated file with `*` import\n      - pytest -vv --tb=long --color=yes\n      - if: is_abi3\n        then:\n          - cd \"${{ sp_dir }}\"\n          - abi3audit -s -v --assume-minimum-abi3 ${{ python_min }} reasonable.${{ abi3_ext }}\n\nabout:\n  summary: An OWL 2 RL reasoner with reasonable performance\n  license: BSD-3-Clause\n  license_file:\n    - dist/LICENSE\n    - dist/THIRDPARTY.yml\n  homepage: https://pypi.org/project/reasonable\n  repository: https://github.com/gtfierro/reasonable\n\nextra:\n  recipe-maintainers:\n    - bollwyvl\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -647,6 +1894,7 @@
       "pip",
       "python",
       "python-abi3",
+      "rdflib",
       "rust_compiler_stub"
     ]
   },
@@ -682,13 +1930,17 @@
         "c_compiler_stub",
         "c_stdlib_stub",
         "cxx_compiler_stub",
-        "python"
+        "python",
+        "rdflib"
       ]
     },
     "test": {
       "__set__": true,
       "elements": [
-        "pip"
+        "abi3audit",
+        "pip",
+        "pytest",
+        "python"
       ]
     }
   },
@@ -710,7 +1962,7 @@
     "host": {
       "__set__": true,
       "elements": [
-        "maturin >=0.14,<0.15",
+        "maturin >=1.8,<2.0",
         "pip",
         "python",
         "python-abi3"
@@ -719,33 +1971,49 @@
     "run": {
       "__set__": true,
       "elements": [
-        "python"
+        "python",
+        "rdflib >=6.1.1"
       ]
     },
     "test": {
       "__set__": true,
       "elements": [
-        "pip"
+        "abi3audit",
+        "pip",
+        "pytest",
+        "python 3.14.*"
       ]
     }
   },
-  "url": "https://pypi.org/packages/source/r/reasonable/reasonable-0.2.6.tar.gz",
-  "version": "0.2.6",
+  "url": "https://pypi.org/packages/source/r/reasonable/reasonable-0.4.0.tar.gz",
+  "version": "0.4.0",
   "version_pr_info": {
     "__lazy_json__": "version_pr_info/reasonable.json"
   },
   "win_64_meta_yaml": {
     "about": {
-      "home": "https://github.com/gtfierro/reasonable",
+      "dev_url": "https://github.com/gtfierro/reasonable",
+      "home": "https://pypi.org/project/reasonable",
       "license": "BSD-3-Clause",
       "license_family": "BSD-3-Clause",
-      "license_file": "LICENSE",
+      "license_file": "dist/LICENSE",
       "summary": "An OWL 2 RL reasoner with reasonable performance"
     },
     "build": {
-      "number": "3",
+      "number": "0",
       "script": {
-        "file": "build-reasonable"
+        "content": [
+          "cd dist",
+          "${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation --disable-pip-version-check",
+          "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml"
+        ],
+        "env": {
+          "CARGO_PROFILE_RELEASE_LTO": "fat",
+          "CARGO_PROFILE_RELEASE_STRIP": "symbols",
+          "MATURIN_PEP517_ARGS": "--features=abi3",
+          "PYTHONIOENCODING": "UTF-8",
+          "PYTHONUTF8": "1"
+        }
       }
     },
     "extra": {
@@ -761,21 +2029,74 @@
           "build": [
             "c_compiler_stub",
             "cxx_compiler_stub",
-            "c_stdlib_stub",
             "rust_compiler_stub",
+            "c_stdlib_stub",
             "cargo-bundle-licenses",
             "python",
             "clangdev",
             "llvmdev"
           ],
           "host": [
+            "maturin >=1.8,<2.0",
             "pip",
-            "python",
-            "python-abi3",
-            "maturin >=0.14,<0.15"
+            "python"
           ],
           "run": [
-            "python"
+            "python",
+            "rdflib >=6.1.1"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "reasonable"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "src/python/tests/",
+                "src/example_models/ontologies/rdfs.ttl"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest"
+              ]
+            },
+            "script": [
+              "cd src/python",
+              "pytest -vv --tb=long --color=yes"
+            ]
+          }
+        ],
+        "version": "0.4.0"
+      },
+      {
+        "build": null,
+        "name": "reasonable",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "cxx_compiler_stub",
+            "rust_compiler_stub",
+            "c_stdlib_stub",
+            "cargo-bundle-licenses",
+            "python",
+            "clangdev",
+            "llvmdev"
+          ],
+          "host": [
+            "maturin >=1.8,<2.0",
+            "pip",
+            "python",
+            "python-abi3"
+          ],
+          "run": [
+            "python",
+            "rdflib >=6.1.1"
           ]
         },
         "tests": [
@@ -786,43 +2107,65 @@
               ],
               "python_version": [
                 "3.10.*",
-                "3.13.*"
+                "3.14.*"
               ]
             }
+          },
+          {
+            "files": {
+              "source": [
+                "src/python/tests/",
+                "src/example_models/ontologies/rdfs.ttl"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest",
+                "python 3.14.*",
+                "abi3audit"
+              ]
+            },
+            "script": [
+              "cd src/python",
+              "pytest -vv --tb=long --color=yes",
+              "cd \"${{ sp_dir }}\"",
+              "abi3audit -s -v --assume-minimum-abi3 ${{ python_min }} reasonable.${{ abi3_ext }}"
+            ]
           }
         ],
-        "version": "0.2.6"
+        "version": "0.4.0"
       }
     ],
     "package": {
       "name": "reasonable",
-      "version": "0.2.6"
+      "version": "0.4.0"
     },
     "requirements": {
       "build": [
         "c_compiler_stub",
         "cxx_compiler_stub",
-        "c_stdlib_stub",
         "rust_compiler_stub",
+        "c_stdlib_stub",
         "cargo-bundle-licenses",
         "python",
         "clangdev",
         "llvmdev"
       ],
       "host": [
+        "maturin >=1.8,<2.0",
         "pip",
         "python",
-        "python-abi3",
-        "maturin >=0.14,<0.15"
+        "python-abi3"
       ],
       "run": [
-        "python"
+        "python",
+        "rdflib >=6.1.1"
       ]
     },
     "schema_version": 1,
     "source": {
-      "sha256": "5d26aeb8b6c3f566aa2ef11c308b2208ec7669a30e9113728f243024c6276205",
-      "url": "https://pypi.org/packages/source/r/reasonable/reasonable-0.2.6.tar.gz"
+      "sha256": "21dff10a8f587ecce1e5c45e684eceea45dc2484e93973ff1c5ae4545d80840c",
+      "url": "https://pypi.org/packages/source/r/reasonable/reasonable-0.4.0.tar.gz"
     }
   },
   "win_64_requirements": {
@@ -851,13 +2194,17 @@
     "run": {
       "__set__": true,
       "elements": [
-        "python"
+        "python",
+        "rdflib"
       ]
     },
     "test": {
       "__set__": true,
       "elements": [
-        "pip"
+        "abi3audit",
+        "pip",
+        "pytest",
+        "python"
       ]
     }
   }
