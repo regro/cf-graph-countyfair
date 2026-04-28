@@ -1,7 +1,7 @@
 {
   "archived": false,
   "branch": "main",
-  "ci_support_linux_64_c_stdlib_version2.17python3.10.____cpythonroot_base6.36.8.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ncxx_compiler:\n- gxx\ncxx_compiler_version:\n- '14'\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\nhdf5:\n- 1.14.6\nlibboost_headers:\n- '1.88'\nlibitk_devel:\n- '5.4'\nnumpy:\n- '2'\npin_run_as_build:\n  python:\n    min_pin: x.x\n    max_pin: x.x\npython:\n- 3.10.* *_cpython\nroot_base:\n- 6.36.8\ntarget_platform:\n- linux-64\nzip_keys:\n- - c_compiler_version\n  - cxx_compiler_version\n  - c_stdlib_version\n",
+  "ci_support_linux_64_c_stdlib_version2.17python3.10.____cpythonroot_base6.36.8.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ncxx_compiler:\n- gxx\ncxx_compiler_version:\n- '14'\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\nhdf5:\n- 1.14.6\nlibboost_headers:\n- '1.90'\nlibitk_devel:\n- '5.4'\nnumpy:\n- '2'\npin_run_as_build:\n  python:\n    min_pin: x.x\n    max_pin: x.x\npython:\n- 3.10.* *_cpython\nroot_base:\n- 6.36.8\ntarget_platform:\n- linux-64\nzip_keys:\n- - c_compiler_version\n  - cxx_compiler_version\n  - c_stdlib_version\n",
   "conda-forge.yml": {
     "azure": {
       "free_disk_space": true
@@ -18,8 +18,8 @@
     },
     "test": "native_and_emulated"
   },
-  "feedstock_hash": "08f6e4f60693b97c7e91289a87a166ed2a7b116d",
-  "feedstock_hash_ts": 1777360204,
+  "feedstock_hash": "eb4e628560e381dfaf3f497519fe206f867f5049",
+  "feedstock_hash_ts": 1777403230,
   "feedstock_name": "stir",
   "linux_64_meta_yaml": {
     "about": {
@@ -33,7 +33,7 @@
       "summary": "Software for Tomographic Image Reconstruction"
     },
     "build": {
-      "number": "0",
+      "number": "1",
       "script": {
         "env": {
           "cuda_compiler_version": "None"
@@ -793,7 +793,7 @@
       "summary": "Software for Tomographic Image Reconstruction"
     },
     "build": {
-      "number": "0",
+      "number": "1",
       "script": {
         "env": {
           "cuda_compiler_version": "None"
@@ -2485,7 +2485,7 @@
       "summary": "Software for Tomographic Image Reconstruction"
     },
     "build": {
-      "number": "0",
+      "number": "1",
       "script": {
         "env": {
           "cuda_compiler_version": "None"
@@ -2920,7 +2920,7 @@
       "summary": "Software for Tomographic Image Reconstruction"
     },
     "build": {
-      "number": "0",
+      "number": "1",
       "script": {
         "env": {
           "cuda_compiler_version": "None"
@@ -3359,7 +3359,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/stir.json"
   },
-  "raw_meta_yaml": "schema_version: 1\n\ncontext:\n  name: STIR\n  version: \"6.3.1\"\n  build_number: 0\n\n  cuda_version: ${{ env.get(\"CONDA_OVERRIDE_CUDA\", default=\"None\") }}\n  with_cuda: ${{ \"true\" if cuda_version != \"None\" else \"\" }}\n  cuda_major: ${{ (cuda_version | split(\".\") | first) if with_cuda else \"0\" }}\n  cuda_build_prefix: ${{ \"cuda\" ~ (cuda_compiler_version | version_to_buildstring) if with_cuda else \"cpu\" }}\n\npackage:\n  name: ${{ name | lower }}\n  version: ${{ version }}\n\nsource:\n  git: https://github.com/UCL/STIR.git\n  tag: rel_${{ version }}\n\nbuild:\n  number: ${{ build_number + 200 if with_cuda else build_number }}\n  # Don't support ROOT 6.38.00 as it caused segfaults in\n  # https://github.com/conda-forge/stir-feedstock/pull/153\n  skip:\n    - match(root_base, \">=6.38\")\n  string: ${{ cuda_build_prefix }}_h${{ hash }}_${{ build_number + 200 if with_cuda else build_number }}\n  variant:\n    use_keys:\n      - ${{ \"cuda\" if with_cuda }}\n    down_prioritize_variant: ${{ 0 if with_cuda else 1 }}\n  script:\n    file: build\n    env:\n      cuda_compiler_version: ${{ cuda_version }}\nrequirements:\n  ignore_run_exports:\n    by_name:\n      - cudatoolkit\n  build:\n    - ${{ compiler('c') }}\n    - ${{ stdlib('c') }}\n    - ${{ compiler('cxx') }}\n    - if: with_cuda\n      then: ${{ compiler('cuda') }}\n    - if: osx\n      then: llvm-openmp\n    - if: linux\n      then: libgomp\n    - cmake\n    - ninja\n    - swig\n  host:\n    - libboost-headers\n    - if: not win and not (osx and arm64)\n      then: hdf5\n    - python\n    - numpy\n    - libitk-devel\n    - libitk\n    - nlohmann_json\n    - if: with_cuda\n      then:\n        - cuda-version ==${{ cuda_version }}\n    - if: with_cuda and (cuda_major | int) >= 12 and linux\n      then: cuda-driver-dev\n    - if: with_cuda and (cuda_major | int) >= 12\n      then: cuda-cudart-dev\n    - libparallelproj <2.0 \n    - if: not win\n      then: root_base\n    - if: win\n      then: zlib\n  run:\n    - python\n    - if: with_cuda\n      then:\n        - __cuda\n        - cuda-version ==${{ cuda_version }}\n    # Needed for developers, see https://github.com/conda-forge/stir-feedstock/issues/120\n    - libboost-headers\n    - libitk-devel\n    - libparallelproj\n\ntests:\n  - script:\n      - stir_config --config-dir\n      - cd recon_test_pack\n      - if: not win\n        then:\n          # use ugly work-around to avoid the next test to run CUDA tests\n          - env TRAVIS=disable_cuda_tests ./run_test_simulate_and_recon.sh\n          - ./run_test_listmode_recon.sh\n          - ./run_test_simulate_and_recon_with_motion.sh\n          - ./run_scatter_tests.sh\n          - ./run_tests.sh --nointbp\n          - ./run_test_zoom_image.sh\n          - ./run_root_GATE.sh\n          - cd SPECT\n          - ./run_SPECT_tests.sh\n          - cd ..\n      - if: win\n        then:\n          - run_tests\n      - cd ..\n      - pytest src/swig/test/python\n    requirements:\n      run:\n        - pytest\n        - matplotlib\n    files:\n      source:\n        - recon_test_pack\n        - examples\n        - src/swig/test/python\n\nabout:\n  homepage: https://stir.sourceforge.net/\n  license: Apache-2.0 AND LicenseRef-PARAPET-license\n  license_file: LICENSE.txt\n  summary: Software for Tomographic Image Reconstruction\n  description: |\n    STIR is Open Source software for use in tomographic imaging.\n    Its aim is to provide a Multi-Platform Object-Oriented framework for all data manipulations in tomographic imaging.\n    Check the recipe at https://github.com/conda-forge/stir-feedstock/blob/main/recipe/recipe.yaml\n    to see which dependencies are included in this conda package.\n\n    This package contains all STIR utilities and Python support. It is built with ITK on all platforms\n    and (where supported) ROOT on Linux and OSX.\n  documentation: https://stir.sourceforge.net/documentation\n  repository: https://github.com/UCL/STIR\n\nextra:\n  recipe-maintainers:\n    - KrisThielemans\n    - paskino\n    - casperdcl\n",
+  "raw_meta_yaml": "schema_version: 1\n\ncontext:\n  name: STIR\n  version: \"6.3.1\"\n  build_number: 1\n\n  cuda_version: ${{ env.get(\"CONDA_OVERRIDE_CUDA\", default=\"None\") }}\n  with_cuda: ${{ \"true\" if cuda_version != \"None\" else \"\" }}\n  cuda_major: ${{ (cuda_version | split(\".\") | first) if with_cuda else \"0\" }}\n  cuda_build_prefix: ${{ \"cuda\" ~ (cuda_compiler_version | version_to_buildstring) if with_cuda else \"cpu\" }}\n\npackage:\n  name: ${{ name | lower }}\n  version: ${{ version }}\n\nsource:\n  git: https://github.com/UCL/STIR.git\n  tag: rel_${{ version }}\n\nbuild:\n  number: ${{ build_number + 200 if with_cuda else build_number }}\n  # Don't support ROOT 6.38.00 as it caused segfaults in\n  # https://github.com/conda-forge/stir-feedstock/pull/153\n  skip:\n    - match(root_base, \">=6.38\")\n  string: ${{ cuda_build_prefix }}_h${{ hash }}_${{ build_number + 200 if with_cuda else build_number }}\n  variant:\n    use_keys:\n      - ${{ \"cuda\" if with_cuda }}\n    down_prioritize_variant: ${{ 0 if with_cuda else 1 }}\n  script:\n    file: build\n    env:\n      cuda_compiler_version: ${{ cuda_version }}\nrequirements:\n  ignore_run_exports:\n    by_name:\n      - cudatoolkit\n  build:\n    - ${{ compiler('c') }}\n    - ${{ stdlib('c') }}\n    - ${{ compiler('cxx') }}\n    - if: with_cuda\n      then: ${{ compiler('cuda') }}\n    - if: osx\n      then: llvm-openmp\n    - if: linux\n      then: libgomp\n    - cmake\n    - ninja\n    - swig\n  host:\n    - libboost-headers\n    - if: not win and not (osx and arm64)\n      then: hdf5\n    - python\n    - numpy\n    - libitk-devel\n    - libitk\n    - nlohmann_json\n    - if: with_cuda\n      then:\n        - cuda-version ==${{ cuda_version }}\n        - if: (cuda_major | int) >= 12\n          then:\n            - if: linux\n              then: cuda-driver-dev\n            - cuda-cudart-dev\n    - libparallelproj <2.0\n    - if: not win\n      then: root_base\n      else: zlib\n  run:\n    - python\n    - if: with_cuda\n      then:\n        - __cuda\n        - cuda-version ==${{ cuda_version }}\n    # Needed for developers, see https://github.com/conda-forge/stir-feedstock/issues/120\n    - libboost-headers\n    - libitk-devel\n    - libparallelproj\n\ntests:\n  - script:\n      - stir_config --config-dir\n      - cd recon_test_pack\n      - if: not win\n        then:\n          # use ugly work-around to avoid the next test to run CUDA tests\n          - env TRAVIS=disable_cuda_tests ./run_test_simulate_and_recon.sh\n          - ./run_test_listmode_recon.sh\n          - ./run_test_simulate_and_recon_with_motion.sh\n          - ./run_scatter_tests.sh\n          - ./run_tests.sh --nointbp\n          - ./run_test_zoom_image.sh\n          - ./run_root_GATE.sh\n          - cd SPECT\n          - ./run_SPECT_tests.sh\n          - cd ..\n        else:\n          - run_tests\n      - cd ..\n      - pytest src/swig/test/python\n    requirements:\n      run:\n        - pytest\n        - matplotlib\n    files:\n      source:\n        - recon_test_pack\n        - examples\n        - src/swig/test/python\n\nabout:\n  homepage: https://stir.sourceforge.net/\n  license: Apache-2.0 AND LicenseRef-PARAPET-license\n  license_file: LICENSE.txt\n  summary: Software for Tomographic Image Reconstruction\n  description: |\n    STIR is Open Source software for use in tomographic imaging.\n    Its aim is to provide a Multi-Platform Object-Oriented framework for all data manipulations in tomographic imaging.\n    Check the recipe at https://github.com/conda-forge/stir-feedstock/blob/main/recipe/recipe.yaml\n    to see which dependencies are included in this conda package.\n\n    This package contains all STIR utilities and Python support. It is built with ITK on all platforms\n    and (where supported) ROOT on Linux and OSX.\n  documentation: https://stir.sourceforge.net/documentation\n  repository: https://github.com/UCL/STIR\n\nextra:\n  recipe-maintainers:\n    - KrisThielemans\n    - paskino\n    - casperdcl\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -3495,7 +3495,7 @@
       "summary": "Software for Tomographic Image Reconstruction"
     },
     "build": {
-      "number": "0",
+      "number": "1",
       "script": {
         "env": {
           "cuda_compiler_version": "None"
