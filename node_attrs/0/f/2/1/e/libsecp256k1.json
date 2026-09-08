@@ -1,42 +1,53 @@
 {
   "archived": false,
   "branch": "main",
-  "ci_support_linux_64_.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma10\ntarget_platform:\n- linux-64\n",
+  "ci_support_linux_64_.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '15'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma10\ntarget_platform:\n- linux-64\n",
   "conda-forge.yml": {
     "bot": {
       "automerge": true
     },
     "build_platform": {
-      "linux_aarch64": "linux_64",
       "linux_ppc64le": "linux_64",
-      "osx_arm64": "osx_64"
+      "linux_riscv64": "linux_64"
     },
     "conda_build": {
       "error_overlinking": true
     },
+    "conda_build_tool": "rattler-build",
     "conda_forge_output_validation": true,
+    "conda_install_tool": "pixi",
     "github": {
       "branch_name": "main",
       "tooling_branch_name": "main"
     },
+    "provider": {
+      "linux_aarch64": "default",
+      "osx_arm64": "default",
+      "win_arm64": "default"
+    },
     "test": "native_and_emulated"
   },
-  "feedstock_hash": "82125f4aca3082362af3f1101d561ec221d93343",
-  "feedstock_hash_ts": 1785850206,
+  "feedstock_hash": "1d1650775ec1bec2832883486101dc0e6fe395b6",
+  "feedstock_hash_ts": 1788893907,
   "feedstock_name": "libsecp256k1",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
     "about": {
-      "description": "This library is intended to be the highest quality publicly available\nlibrary for cryptography on the secp256k1 curve. However, the primary\nfocus of its development has been for usage in the Bitcoin system and\nusage unlike Bitcoin's may be less well tested, verified, or suffer\nfrom a less well thought out interface. Correct usage requires some\ncare and consideration that the library is fit for your application's purpose.\n",
+      "description": "This library is intended to be the highest quality publicly available\nlibrary for cryptography on the secp256k1 curve. However, the primary\nfocus of its development has been for usage in the Bitcoin system and\nusage unlike Bitcoin's may be less well tested, verified, or suffer\nfrom a less well thought out interface. Correct usage requires some\ncare and consideration that the library is fit for your application's purpose.",
       "home": "https://github.com/bitcoin-core/secp256k1",
       "license": "MIT",
-      "license_file": [
-        "COPYING"
-      ],
+      "license_family": "MIT",
+      "license_file": "COPYING",
       "summary": "Optimized C library for ECDSA signatures and secret/public key operations on curve secp256k1."
     },
     "build": {
-      "number": "0"
+      "number": "1",
+      "run_exports": {
+        "weak": [
+          "libsecp256k1-7"
+        ]
+      },
+      "script": []
     },
     "extra": {
       "feedstock-name": "libsecp256k1",
@@ -47,21 +58,19 @@
     "outputs": [
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libsecp256k1-7"
           ]
         },
-        "files": [
-          "include/secp256k1*",
-          "lib/libsecp256k1.so",
-          "lib/pkgconfig/libsecp256k1.pc",
-          "lib/cmake/libsecp256k1"
-        ],
         "name": "libsecp256k1",
         "requirements": {
           "build": [
             "c_compiler_stub",
-            "c_stdlib_stub"
+            "c_stdlib_stub",
+            "brush",
+            "cmake >=3.26",
+            "ninja"
           ],
           "host": [
             "libsecp256k1-7"
@@ -70,84 +79,250 @@
             "libsecp256k1-7"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/secp256k1.h",
-            "test -f ${PREFIX}/include/secp256k1_preallocated.h",
-            "test -f ${PREFIX}/include/secp256k1_ecdh.h",
-            "test -f ${PREFIX}/include/secp256k1_recovery.h",
-            "test -f ${PREFIX}/include/secp256k1_extrakeys.h",
-            "test -f ${PREFIX}/include/secp256k1_schnorrsig.h",
-            "test -f ${PREFIX}/include/secp256k1_ellswift.h",
-            "test -f ${PREFIX}/include/secp256k1_musig.h",
-            "test -f ${PREFIX}/lib/libsecp256k1${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/pkgconfig/libsecp256k1.pc",
-            "pkg-config --exists libsecp256k1",
-            "test -f ${PREFIX}/lib/cmake/libsecp256k1/libsecp256k1-config.cmake",
-            "cd shared_standalone_tests",
-            "cmake -DSECP256K1_BUILD_EXHAUSTIVE_TESTS=ON -DBUILD_SHARED_LIBS=ON ${CMAKE_ARGS} -S src -B build",
-            "cd build && cmake --build .  && cmake --build . --target check && cmake --build . --target clean",
-            "cd ..",
-            "rm -rf shared_standalone_tests"
-          ],
-          "downstreams": [
-            "libsecp256k1-py-bindings",
-            "coincurve"
-          ],
-          "files": [
-            "shared_standalone_tests/"
-          ],
-          "requires": [
-            "c_compiler_stub",
-            "cmake >=3.26",
-            "make",
-            "pkg-config"
-          ]
-        }
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/libsecp256k1/libsecp256k1-config.cmake",
+                "lib/cmake/libsecp256k1/libsecp256k1-config-version.cmake",
+                "lib/cmake/libsecp256k1/libsecp256k1-targets.cmake",
+                "lib/cmake/libsecp256k1/libsecp256k1-targets-release.cmake",
+                "lib/pkgconfig/libsecp256k1.pc",
+                "etc/conda/test-files/libsecp256k1/*"
+              ],
+              "include": [
+                "secp256k1.h",
+                "secp256k1_ecdh.h",
+                "secp256k1_ellswift.h",
+                "secp256k1_extrakeys.h",
+                "secp256k1_musig.h",
+                "secp256k1_preallocated.h",
+                "secp256k1_recovery.h",
+                "secp256k1_schnorrsig.h",
+                "secp256k1_silentpayments.h"
+              ],
+              "lib": [
+                "libsecp256k1"
+              ],
+              "strict": true
+            }
+          },
+          {
+            "requirements": {
+              "build": [
+                "pkg-config"
+              ]
+            },
+            "script": "pkg-config --exists libsecp256k1"
+          },
+          {
+            "files": {
+              "recipe": [
+                "shared_standalone_tests/"
+              ],
+              "source": [
+                "src/",
+                "include/",
+                "contrib/",
+                "cmake/"
+              ]
+            },
+            "requirements": {
+              "build": [
+                "c_compiler_stub",
+                "brush",
+                "cmake >=3.26",
+                "ninja",
+                "pkg-config"
+              ]
+            },
+            "script": {
+              "content": "# Standalone build against the installed library. The upstream\n# sources needed to compile the tests are staged here at test\n# time (see `files:` below) rather than being copied into the\n# recipe directory during the build.\ncp src/tests.c src/tests_exhaustive.c src/secp256k1.c shared_standalone_tests/src/\ncp -R src/modules src/wycheproof shared_standalone_tests/src/\ncp src/*.h shared_standalone_tests/src/\ncp -R cmake shared_standalone_tests/src/\ncp -R include contrib shared_standalone_tests/\ncd shared_standalone_tests\ncmake -G Ninja -DSECP256K1_BUILD_EXHAUSTIVE_TESTS=ON -DBUILD_SHARED_LIBS=ON ${CMAKE_ARGS} -S src -B build\ncd build && cmake --build . && cmake --build . --target check && cmake --build . --target clean\n",
+              "interpreter": "brush"
+            }
+          },
+          {
+            "downstream": "coincurve"
+          }
+        ],
+        "version": "0.8.0"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libsecp256k1-7"
           ]
         },
-        "files": [
-          "lib/libsecp256k1.so.7",
-          "lib/libsecp256k1.so.7.0.0"
-        ],
         "name": "libsecp256k1-7",
         "requirements": {
           "build": [
             "c_compiler_stub",
-            "c_stdlib_stub"
+            "c_stdlib_stub",
+            "brush",
+            "cmake >=3.26",
+            "ninja"
+          ],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/libsecp256k1.so.7",
+                "lib/libsecp256k1.so.7.0.0"
+              ],
+              "strict": true
+            }
+          }
+        ],
+        "version": "0.8.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "libsecp256k1-7"
           ]
         },
-        "test": {
-          "commands": [
-            "test ! -f ${PREFIX}/include/secp256k1.h",
-            "test ! -f ${PREFIX}/lib/libsecp256k1{SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libsecp256k1.so.7",
-            "test -f ${PREFIX}/lib/libsecp256k1.so.7.0.0"
+        "name": "libsecp256k1",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "brush",
+            "cmake >=3.26",
+            "ninja"
           ],
-          "files": [
-            "load_shared_library.py"
+          "host": [
+            "libsecp256k1-7"
+          ],
+          "run": [
+            "libsecp256k1-7"
           ]
-        }
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/libsecp256k1/libsecp256k1-config.cmake",
+                "lib/cmake/libsecp256k1/libsecp256k1-config-version.cmake",
+                "lib/cmake/libsecp256k1/libsecp256k1-targets.cmake",
+                "lib/cmake/libsecp256k1/libsecp256k1-targets-release.cmake",
+                "lib/pkgconfig/libsecp256k1.pc",
+                "etc/conda/test-files/libsecp256k1/*"
+              ],
+              "include": [
+                "secp256k1.h",
+                "secp256k1_ecdh.h",
+                "secp256k1_ellswift.h",
+                "secp256k1_extrakeys.h",
+                "secp256k1_musig.h",
+                "secp256k1_preallocated.h",
+                "secp256k1_recovery.h",
+                "secp256k1_schnorrsig.h",
+                "secp256k1_silentpayments.h"
+              ],
+              "lib": [
+                "libsecp256k1"
+              ],
+              "strict": true
+            }
+          },
+          {
+            "requirements": {
+              "build": [
+                "pkg-config"
+              ]
+            },
+            "script": "pkg-config --exists libsecp256k1"
+          },
+          {
+            "files": {
+              "recipe": [
+                "shared_standalone_tests/"
+              ],
+              "source": [
+                "src/",
+                "include/",
+                "contrib/",
+                "cmake/"
+              ]
+            },
+            "requirements": {
+              "build": [
+                "c_compiler_stub",
+                "brush",
+                "cmake >=3.26",
+                "ninja",
+                "pkg-config"
+              ]
+            },
+            "script": {
+              "content": "# Standalone build against the installed library. The upstream\n# sources needed to compile the tests are staged here at test\n# time (see `files:` below) rather than being copied into the\n# recipe directory during the build.\ncp src/tests.c src/tests_exhaustive.c src/secp256k1.c shared_standalone_tests/src/\ncp -R src/modules src/wycheproof shared_standalone_tests/src/\ncp src/*.h shared_standalone_tests/src/\ncp -R cmake shared_standalone_tests/src/\ncp -R include contrib shared_standalone_tests/\ncd shared_standalone_tests\ncmake -G Ninja -DSECP256K1_BUILD_EXHAUSTIVE_TESTS=ON -DBUILD_SHARED_LIBS=ON ${CMAKE_ARGS} -S src -B build\ncd build && cmake --build . && cmake --build . --target check && cmake --build . --target clean\n",
+              "interpreter": "brush"
+            }
+          },
+          {
+            "downstream": "coincurve"
+          }
+        ],
+        "version": "0.8.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "libsecp256k1-7"
+          ]
+        },
+        "name": "libsecp256k1-7",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "brush",
+            "cmake >=3.26",
+            "ninja"
+          ],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/libsecp256k1.so.7",
+                "lib/libsecp256k1.so.7.0.0"
+              ],
+              "strict": true
+            }
+          }
+        ],
+        "version": "0.8.0"
       }
     ],
     "package": {
-      "name": "libsecp256k1-split",
+      "name": "libsecp256k1",
       "version": "0.8.0"
     },
     "requirements": {
       "build": [
         "c_compiler_stub",
         "c_stdlib_stub",
+        "brush",
         "cmake >=3.26",
-        "make"
+        "ninja"
+      ],
+      "host": [
+        "libsecp256k1-7"
+      ],
+      "run": [
+        "libsecp256k1-7"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "sha256": "eb52b0e9239dff7dc26be5f9623567141b8720ec47da29eb3c1e0a660d17c8bb",
       "url": "https://github.com/bitcoin-core/secp256k1/archive/refs/tags/v0.8.0.tar.gz"
@@ -157,10 +332,11 @@
     "build": {
       "__set__": true,
       "elements": [
+        "brush",
         "c_compiler_stub",
         "c_stdlib_stub",
         "cmake",
-        "make"
+        "ninja"
       ]
     },
     "host": {
@@ -178,25 +354,31 @@
     "test": {
       "__set__": true,
       "elements": [
+        "brush",
         "c_compiler_stub",
         "cmake",
-        "make",
+        "ninja",
         "pkg-config"
       ]
     }
   },
   "linux_aarch64_meta_yaml": {
     "about": {
-      "description": "This library is intended to be the highest quality publicly available\nlibrary for cryptography on the secp256k1 curve. However, the primary\nfocus of its development has been for usage in the Bitcoin system and\nusage unlike Bitcoin's may be less well tested, verified, or suffer\nfrom a less well thought out interface. Correct usage requires some\ncare and consideration that the library is fit for your application's purpose.\n",
+      "description": "This library is intended to be the highest quality publicly available\nlibrary for cryptography on the secp256k1 curve. However, the primary\nfocus of its development has been for usage in the Bitcoin system and\nusage unlike Bitcoin's may be less well tested, verified, or suffer\nfrom a less well thought out interface. Correct usage requires some\ncare and consideration that the library is fit for your application's purpose.",
       "home": "https://github.com/bitcoin-core/secp256k1",
       "license": "MIT",
-      "license_file": [
-        "COPYING"
-      ],
+      "license_family": "MIT",
+      "license_file": "COPYING",
       "summary": "Optimized C library for ECDSA signatures and secret/public key operations on curve secp256k1."
     },
     "build": {
-      "number": "0"
+      "number": "1",
+      "run_exports": {
+        "weak": [
+          "libsecp256k1-7"
+        ]
+      },
+      "script": []
     },
     "extra": {
       "feedstock-name": "libsecp256k1",
@@ -207,21 +389,19 @@
     "outputs": [
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libsecp256k1-7"
           ]
         },
-        "files": [
-          "include/secp256k1*",
-          "lib/libsecp256k1.so",
-          "lib/pkgconfig/libsecp256k1.pc",
-          "lib/cmake/libsecp256k1"
-        ],
         "name": "libsecp256k1",
         "requirements": {
           "build": [
             "c_compiler_stub",
-            "c_stdlib_stub"
+            "c_stdlib_stub",
+            "brush",
+            "cmake >=3.26",
+            "ninja"
           ],
           "host": [
             "libsecp256k1-7"
@@ -230,84 +410,127 @@
             "libsecp256k1-7"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/secp256k1.h",
-            "test -f ${PREFIX}/include/secp256k1_preallocated.h",
-            "test -f ${PREFIX}/include/secp256k1_ecdh.h",
-            "test -f ${PREFIX}/include/secp256k1_recovery.h",
-            "test -f ${PREFIX}/include/secp256k1_extrakeys.h",
-            "test -f ${PREFIX}/include/secp256k1_schnorrsig.h",
-            "test -f ${PREFIX}/include/secp256k1_ellswift.h",
-            "test -f ${PREFIX}/include/secp256k1_musig.h",
-            "test -f ${PREFIX}/lib/libsecp256k1${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/pkgconfig/libsecp256k1.pc",
-            "pkg-config --exists libsecp256k1",
-            "test -f ${PREFIX}/lib/cmake/libsecp256k1/libsecp256k1-config.cmake",
-            "cd shared_standalone_tests",
-            "cmake -DSECP256K1_BUILD_EXHAUSTIVE_TESTS=ON -DBUILD_SHARED_LIBS=ON ${CMAKE_ARGS} -S src -B build",
-            "cd build && cmake --build .  && cmake --build . --target check && cmake --build . --target clean",
-            "cd ..",
-            "rm -rf shared_standalone_tests"
-          ],
-          "downstreams": [
-            "libsecp256k1-py-bindings",
-            "coincurve"
-          ],
-          "files": [
-            "shared_standalone_tests/"
-          ],
-          "requires": [
-            "c_compiler_stub",
-            "cmake >=3.26",
-            "make",
-            "pkg-config"
-          ]
-        }
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/libsecp256k1/libsecp256k1-config.cmake",
+                "lib/cmake/libsecp256k1/libsecp256k1-config-version.cmake",
+                "lib/cmake/libsecp256k1/libsecp256k1-targets.cmake",
+                "lib/cmake/libsecp256k1/libsecp256k1-targets-release.cmake",
+                "lib/pkgconfig/libsecp256k1.pc",
+                "etc/conda/test-files/libsecp256k1/*"
+              ],
+              "include": [
+                "secp256k1.h",
+                "secp256k1_ecdh.h",
+                "secp256k1_ellswift.h",
+                "secp256k1_extrakeys.h",
+                "secp256k1_musig.h",
+                "secp256k1_preallocated.h",
+                "secp256k1_recovery.h",
+                "secp256k1_schnorrsig.h",
+                "secp256k1_silentpayments.h"
+              ],
+              "lib": [
+                "libsecp256k1"
+              ],
+              "strict": true
+            }
+          },
+          {
+            "requirements": {
+              "build": [
+                "pkg-config"
+              ]
+            },
+            "script": "pkg-config --exists libsecp256k1"
+          },
+          {
+            "files": {
+              "recipe": [
+                "shared_standalone_tests/"
+              ],
+              "source": [
+                "src/",
+                "include/",
+                "contrib/",
+                "cmake/"
+              ]
+            },
+            "requirements": {
+              "build": [
+                "c_compiler_stub",
+                "brush",
+                "cmake >=3.26",
+                "ninja",
+                "pkg-config"
+              ]
+            },
+            "script": {
+              "content": "# Standalone build against the installed library. The upstream\n# sources needed to compile the tests are staged here at test\n# time (see `files:` below) rather than being copied into the\n# recipe directory during the build.\ncp src/tests.c src/tests_exhaustive.c src/secp256k1.c shared_standalone_tests/src/\ncp -R src/modules src/wycheproof shared_standalone_tests/src/\ncp src/*.h shared_standalone_tests/src/\ncp -R cmake shared_standalone_tests/src/\ncp -R include contrib shared_standalone_tests/\ncd shared_standalone_tests\ncmake -G Ninja -DSECP256K1_BUILD_EXHAUSTIVE_TESTS=ON -DBUILD_SHARED_LIBS=ON ${CMAKE_ARGS} -S src -B build\ncd build && cmake --build . && cmake --build . --target check && cmake --build . --target clean\n",
+              "interpreter": "brush"
+            }
+          },
+          {
+            "downstream": "coincurve"
+          }
+        ],
+        "version": "0.8.0"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libsecp256k1-7"
           ]
         },
-        "files": [
-          "lib/libsecp256k1.so.7",
-          "lib/libsecp256k1.so.7.0.0"
-        ],
         "name": "libsecp256k1-7",
         "requirements": {
           "build": [
             "c_compiler_stub",
-            "c_stdlib_stub"
-          ]
-        },
-        "test": {
-          "commands": [
-            "test ! -f ${PREFIX}/include/secp256k1.h",
-            "test ! -f ${PREFIX}/lib/libsecp256k1{SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libsecp256k1.so.7",
-            "test -f ${PREFIX}/lib/libsecp256k1.so.7.0.0"
+            "c_stdlib_stub",
+            "brush",
+            "cmake >=3.26",
+            "ninja"
           ],
-          "files": [
-            "load_shared_library.py"
-          ]
-        }
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/libsecp256k1.so.7",
+                "lib/libsecp256k1.so.7.0.0"
+              ],
+              "strict": true
+            }
+          }
+        ],
+        "version": "0.8.0"
       }
     ],
     "package": {
-      "name": "libsecp256k1-split",
+      "name": "libsecp256k1",
       "version": "0.8.0"
     },
     "requirements": {
       "build": [
         "c_compiler_stub",
         "c_stdlib_stub",
+        "brush",
         "cmake >=3.26",
-        "make"
+        "ninja"
+      ],
+      "host": [
+        "libsecp256k1-7"
+      ],
+      "run": [
+        "libsecp256k1-7"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "sha256": "eb52b0e9239dff7dc26be5f9623567141b8720ec47da29eb3c1e0a660d17c8bb",
       "url": "https://github.com/bitcoin-core/secp256k1/archive/refs/tags/v0.8.0.tar.gz"
@@ -317,10 +540,11 @@
     "build": {
       "__set__": true,
       "elements": [
+        "brush",
         "c_compiler_stub",
         "c_stdlib_stub",
         "cmake",
-        "make"
+        "ninja"
       ]
     },
     "host": {
@@ -338,25 +562,31 @@
     "test": {
       "__set__": true,
       "elements": [
+        "brush",
         "c_compiler_stub",
         "cmake",
-        "make",
+        "ninja",
         "pkg-config"
       ]
     }
   },
   "linux_ppc64le_meta_yaml": {
     "about": {
-      "description": "This library is intended to be the highest quality publicly available\nlibrary for cryptography on the secp256k1 curve. However, the primary\nfocus of its development has been for usage in the Bitcoin system and\nusage unlike Bitcoin's may be less well tested, verified, or suffer\nfrom a less well thought out interface. Correct usage requires some\ncare and consideration that the library is fit for your application's purpose.\n",
+      "description": "This library is intended to be the highest quality publicly available\nlibrary for cryptography on the secp256k1 curve. However, the primary\nfocus of its development has been for usage in the Bitcoin system and\nusage unlike Bitcoin's may be less well tested, verified, or suffer\nfrom a less well thought out interface. Correct usage requires some\ncare and consideration that the library is fit for your application's purpose.",
       "home": "https://github.com/bitcoin-core/secp256k1",
       "license": "MIT",
-      "license_file": [
-        "COPYING"
-      ],
+      "license_family": "MIT",
+      "license_file": "COPYING",
       "summary": "Optimized C library for ECDSA signatures and secret/public key operations on curve secp256k1."
     },
     "build": {
-      "number": "0"
+      "number": "1",
+      "run_exports": {
+        "weak": [
+          "libsecp256k1-7"
+        ]
+      },
+      "script": []
     },
     "extra": {
       "feedstock-name": "libsecp256k1",
@@ -367,21 +597,19 @@
     "outputs": [
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libsecp256k1-7"
           ]
         },
-        "files": [
-          "include/secp256k1*",
-          "lib/libsecp256k1.so",
-          "lib/pkgconfig/libsecp256k1.pc",
-          "lib/cmake/libsecp256k1"
-        ],
         "name": "libsecp256k1",
         "requirements": {
           "build": [
             "c_compiler_stub",
-            "c_stdlib_stub"
+            "c_stdlib_stub",
+            "brush",
+            "cmake >=3.26",
+            "ninja"
           ],
           "host": [
             "libsecp256k1-7"
@@ -390,84 +618,127 @@
             "libsecp256k1-7"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/secp256k1.h",
-            "test -f ${PREFIX}/include/secp256k1_preallocated.h",
-            "test -f ${PREFIX}/include/secp256k1_ecdh.h",
-            "test -f ${PREFIX}/include/secp256k1_recovery.h",
-            "test -f ${PREFIX}/include/secp256k1_extrakeys.h",
-            "test -f ${PREFIX}/include/secp256k1_schnorrsig.h",
-            "test -f ${PREFIX}/include/secp256k1_ellswift.h",
-            "test -f ${PREFIX}/include/secp256k1_musig.h",
-            "test -f ${PREFIX}/lib/libsecp256k1${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/pkgconfig/libsecp256k1.pc",
-            "pkg-config --exists libsecp256k1",
-            "test -f ${PREFIX}/lib/cmake/libsecp256k1/libsecp256k1-config.cmake",
-            "cd shared_standalone_tests",
-            "cmake -DSECP256K1_BUILD_EXHAUSTIVE_TESTS=ON -DBUILD_SHARED_LIBS=ON ${CMAKE_ARGS} -S src -B build",
-            "cd build && cmake --build .  && cmake --build . --target check && cmake --build . --target clean",
-            "cd ..",
-            "rm -rf shared_standalone_tests"
-          ],
-          "downstreams": [
-            "libsecp256k1-py-bindings",
-            "coincurve"
-          ],
-          "files": [
-            "shared_standalone_tests/"
-          ],
-          "requires": [
-            "c_compiler_stub",
-            "cmake >=3.26",
-            "make",
-            "pkg-config"
-          ]
-        }
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/libsecp256k1/libsecp256k1-config.cmake",
+                "lib/cmake/libsecp256k1/libsecp256k1-config-version.cmake",
+                "lib/cmake/libsecp256k1/libsecp256k1-targets.cmake",
+                "lib/cmake/libsecp256k1/libsecp256k1-targets-release.cmake",
+                "lib/pkgconfig/libsecp256k1.pc",
+                "etc/conda/test-files/libsecp256k1/*"
+              ],
+              "include": [
+                "secp256k1.h",
+                "secp256k1_ecdh.h",
+                "secp256k1_ellswift.h",
+                "secp256k1_extrakeys.h",
+                "secp256k1_musig.h",
+                "secp256k1_preallocated.h",
+                "secp256k1_recovery.h",
+                "secp256k1_schnorrsig.h",
+                "secp256k1_silentpayments.h"
+              ],
+              "lib": [
+                "libsecp256k1"
+              ],
+              "strict": true
+            }
+          },
+          {
+            "requirements": {
+              "build": [
+                "pkg-config"
+              ]
+            },
+            "script": "pkg-config --exists libsecp256k1"
+          },
+          {
+            "files": {
+              "recipe": [
+                "shared_standalone_tests/"
+              ],
+              "source": [
+                "src/",
+                "include/",
+                "contrib/",
+                "cmake/"
+              ]
+            },
+            "requirements": {
+              "build": [
+                "c_compiler_stub",
+                "brush",
+                "cmake >=3.26",
+                "ninja",
+                "pkg-config"
+              ]
+            },
+            "script": {
+              "content": "# Standalone build against the installed library. The upstream\n# sources needed to compile the tests are staged here at test\n# time (see `files:` below) rather than being copied into the\n# recipe directory during the build.\ncp src/tests.c src/tests_exhaustive.c src/secp256k1.c shared_standalone_tests/src/\ncp -R src/modules src/wycheproof shared_standalone_tests/src/\ncp src/*.h shared_standalone_tests/src/\ncp -R cmake shared_standalone_tests/src/\ncp -R include contrib shared_standalone_tests/\ncd shared_standalone_tests\ncmake -G Ninja -DSECP256K1_BUILD_EXHAUSTIVE_TESTS=ON -DBUILD_SHARED_LIBS=ON ${CMAKE_ARGS} -S src -B build\ncd build && cmake --build . && cmake --build . --target check && cmake --build . --target clean\n",
+              "interpreter": "brush"
+            }
+          },
+          {
+            "downstream": "coincurve"
+          }
+        ],
+        "version": "0.8.0"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libsecp256k1-7"
           ]
         },
-        "files": [
-          "lib/libsecp256k1.so.7",
-          "lib/libsecp256k1.so.7.0.0"
-        ],
         "name": "libsecp256k1-7",
         "requirements": {
           "build": [
             "c_compiler_stub",
-            "c_stdlib_stub"
-          ]
-        },
-        "test": {
-          "commands": [
-            "test ! -f ${PREFIX}/include/secp256k1.h",
-            "test ! -f ${PREFIX}/lib/libsecp256k1{SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libsecp256k1.so.7",
-            "test -f ${PREFIX}/lib/libsecp256k1.so.7.0.0"
+            "c_stdlib_stub",
+            "brush",
+            "cmake >=3.26",
+            "ninja"
           ],
-          "files": [
-            "load_shared_library.py"
-          ]
-        }
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/libsecp256k1.so.7",
+                "lib/libsecp256k1.so.7.0.0"
+              ],
+              "strict": true
+            }
+          }
+        ],
+        "version": "0.8.0"
       }
     ],
     "package": {
-      "name": "libsecp256k1-split",
+      "name": "libsecp256k1",
       "version": "0.8.0"
     },
     "requirements": {
       "build": [
         "c_compiler_stub",
         "c_stdlib_stub",
+        "brush",
         "cmake >=3.26",
-        "make"
+        "ninja"
+      ],
+      "host": [
+        "libsecp256k1-7"
+      ],
+      "run": [
+        "libsecp256k1-7"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "sha256": "eb52b0e9239dff7dc26be5f9623567141b8720ec47da29eb3c1e0a660d17c8bb",
       "url": "https://github.com/bitcoin-core/secp256k1/archive/refs/tags/v0.8.0.tar.gz"
@@ -477,10 +748,11 @@
     "build": {
       "__set__": true,
       "elements": [
+        "brush",
         "c_compiler_stub",
         "c_stdlib_stub",
         "cmake",
-        "make"
+        "ninja"
       ]
     },
     "host": {
@@ -498,25 +770,31 @@
     "test": {
       "__set__": true,
       "elements": [
+        "brush",
         "c_compiler_stub",
         "cmake",
-        "make",
+        "ninja",
         "pkg-config"
       ]
     }
   },
   "meta_yaml": {
     "about": {
-      "description": "This library is intended to be the highest quality publicly available\nlibrary for cryptography on the secp256k1 curve. However, the primary\nfocus of its development has been for usage in the Bitcoin system and\nusage unlike Bitcoin's may be less well tested, verified, or suffer\nfrom a less well thought out interface. Correct usage requires some\ncare and consideration that the library is fit for your application's purpose.\n",
+      "description": "This library is intended to be the highest quality publicly available\nlibrary for cryptography on the secp256k1 curve. However, the primary\nfocus of its development has been for usage in the Bitcoin system and\nusage unlike Bitcoin's may be less well tested, verified, or suffer\nfrom a less well thought out interface. Correct usage requires some\ncare and consideration that the library is fit for your application's purpose.",
       "home": "https://github.com/bitcoin-core/secp256k1",
       "license": "MIT",
-      "license_file": [
-        "COPYING"
-      ],
+      "license_family": "MIT",
+      "license_file": "COPYING",
       "summary": "Optimized C library for ECDSA signatures and secret/public key operations on curve secp256k1."
     },
     "build": {
-      "number": "0"
+      "number": "1",
+      "run_exports": {
+        "weak": [
+          "libsecp256k1-7"
+        ]
+      },
+      "script": []
     },
     "extra": {
       "feedstock-name": "libsecp256k1",
@@ -527,21 +805,19 @@
     "outputs": [
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libsecp256k1-7"
           ]
         },
-        "files": [
-          "include/secp256k1*",
-          "lib/libsecp256k1.so",
-          "lib/pkgconfig/libsecp256k1.pc",
-          "lib/cmake/libsecp256k1"
-        ],
         "name": "libsecp256k1",
         "requirements": {
           "build": [
             "c_compiler_stub",
-            "c_stdlib_stub"
+            "c_stdlib_stub",
+            "brush",
+            "cmake >=3.26",
+            "ninja"
           ],
           "host": [
             "libsecp256k1-7"
@@ -550,87 +826,121 @@
             "libsecp256k1-7"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/secp256k1.h",
-            "test -f ${PREFIX}/include/secp256k1_preallocated.h",
-            "test -f ${PREFIX}/include/secp256k1_ecdh.h",
-            "test -f ${PREFIX}/include/secp256k1_recovery.h",
-            "test -f ${PREFIX}/include/secp256k1_extrakeys.h",
-            "test -f ${PREFIX}/include/secp256k1_schnorrsig.h",
-            "test -f ${PREFIX}/include/secp256k1_ellswift.h",
-            "test -f ${PREFIX}/include/secp256k1_musig.h",
-            "test -f ${PREFIX}/lib/libsecp256k1${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/pkgconfig/libsecp256k1.pc",
-            "pkg-config --exists libsecp256k1",
-            "test -f ${PREFIX}/lib/cmake/libsecp256k1/libsecp256k1-config.cmake",
-            "cd shared_standalone_tests",
-            "cmake -DSECP256K1_BUILD_EXHAUSTIVE_TESTS=ON -DBUILD_SHARED_LIBS=ON ${CMAKE_ARGS} -S src -B build",
-            "cd build && cmake --build .  && cmake --build . --target check && cmake --build . --target clean",
-            "cd ..",
-            "rm -rf shared_standalone_tests"
-          ],
-          "downstreams": [
-            "libsecp256k1-py-bindings",
-            "coincurve"
-          ],
-          "files": [
-            "shared_standalone_tests/"
-          ],
-          "requires": [
-            "c_compiler_stub",
-            "cmake >=3.26",
-            "make",
-            "pkg-config"
-          ]
-        }
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/libsecp256k1/libsecp256k1-config.cmake",
+                "lib/cmake/libsecp256k1/libsecp256k1-config-version.cmake",
+                "lib/cmake/libsecp256k1/libsecp256k1-targets.cmake",
+                "lib/cmake/libsecp256k1/libsecp256k1-targets-release.cmake",
+                "lib/pkgconfig/libsecp256k1.pc",
+                "etc/conda/test-files/libsecp256k1/*"
+              ],
+              "include": [
+                "secp256k1.h",
+                "secp256k1_ecdh.h",
+                "secp256k1_ellswift.h",
+                "secp256k1_extrakeys.h",
+                "secp256k1_musig.h",
+                "secp256k1_preallocated.h",
+                "secp256k1_recovery.h",
+                "secp256k1_schnorrsig.h",
+                "secp256k1_silentpayments.h"
+              ],
+              "lib": [
+                "libsecp256k1"
+              ],
+              "strict": true
+            }
+          },
+          {
+            "requirements": {
+              "build": [
+                "pkg-config"
+              ]
+            },
+            "script": "pkg-config --exists libsecp256k1"
+          },
+          {
+            "files": {
+              "recipe": [
+                "shared_standalone_tests/"
+              ],
+              "source": [
+                "src/",
+                "include/",
+                "contrib/",
+                "cmake/"
+              ]
+            },
+            "requirements": {
+              "build": [
+                "c_compiler_stub",
+                "brush",
+                "cmake >=3.26",
+                "ninja",
+                "pkg-config"
+              ]
+            },
+            "script": {
+              "content": "# Standalone build against the installed library. The upstream\n# sources needed to compile the tests are staged here at test\n# time (see `files:` below) rather than being copied into the\n# recipe directory during the build.\ncp src/tests.c src/tests_exhaustive.c src/secp256k1.c shared_standalone_tests/src/\ncp -R src/modules src/wycheproof shared_standalone_tests/src/\ncp src/*.h shared_standalone_tests/src/\ncp -R cmake shared_standalone_tests/src/\ncp -R include contrib shared_standalone_tests/\ncd shared_standalone_tests\ncmake -G Ninja -DSECP256K1_BUILD_EXHAUSTIVE_TESTS=ON -DBUILD_SHARED_LIBS=ON ${CMAKE_ARGS} -S src -B build\ncd build && cmake --build . && cmake --build . --target check && cmake --build . --target clean\n",
+              "interpreter": "brush"
+            }
+          },
+          {
+            "downstream": "coincurve"
+          }
+        ],
+        "version": "0.8.0"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libsecp256k1-7"
           ]
         },
-        "files": [
-          "lib/libsecp256k1.so.7",
-          "lib/libsecp256k1.so.7.0.0"
-        ],
         "name": "libsecp256k1-7",
         "requirements": {
           "build": [
             "c_compiler_stub",
-            "c_stdlib_stub"
-          ]
-        },
-        "test": {
-          "commands": [
-            "test ! -f ${PREFIX}/include/secp256k1.h",
-            "test ! -f ${PREFIX}/lib/libsecp256k1{SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libsecp256k1.so.7",
-            "test -f ${PREFIX}/lib/libsecp256k1.so.7.0.0"
+            "c_stdlib_stub",
+            "brush",
+            "cmake >=3.26",
+            "ninja"
           ],
-          "files": [
-            "load_shared_library.py"
-          ]
-        }
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/libsecp256k1.so.7",
+                "lib/libsecp256k1.so.7.0.0"
+              ],
+              "strict": true
+            }
+          }
+        ],
+        "version": "0.8.0"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libsecp256k1-7"
           ]
         },
-        "files": [
-          "include/secp256k1*",
-          "lib/libsecp256k1.so",
-          "lib/pkgconfig/libsecp256k1.pc",
-          "lib/cmake/libsecp256k1"
-        ],
         "name": "libsecp256k1",
         "requirements": {
           "build": [
             "c_compiler_stub",
-            "c_stdlib_stub"
+            "c_stdlib_stub",
+            "brush",
+            "cmake >=3.26",
+            "ninja"
           ],
           "host": [
             "libsecp256k1-7"
@@ -639,87 +949,121 @@
             "libsecp256k1-7"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/secp256k1.h",
-            "test -f ${PREFIX}/include/secp256k1_preallocated.h",
-            "test -f ${PREFIX}/include/secp256k1_ecdh.h",
-            "test -f ${PREFIX}/include/secp256k1_recovery.h",
-            "test -f ${PREFIX}/include/secp256k1_extrakeys.h",
-            "test -f ${PREFIX}/include/secp256k1_schnorrsig.h",
-            "test -f ${PREFIX}/include/secp256k1_ellswift.h",
-            "test -f ${PREFIX}/include/secp256k1_musig.h",
-            "test -f ${PREFIX}/lib/libsecp256k1${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/pkgconfig/libsecp256k1.pc",
-            "pkg-config --exists libsecp256k1",
-            "test -f ${PREFIX}/lib/cmake/libsecp256k1/libsecp256k1-config.cmake",
-            "cd shared_standalone_tests",
-            "cmake -DSECP256K1_BUILD_EXHAUSTIVE_TESTS=ON -DBUILD_SHARED_LIBS=ON ${CMAKE_ARGS} -S src -B build",
-            "cd build && cmake --build .  && cmake --build . --target check && cmake --build . --target clean",
-            "cd ..",
-            "rm -rf shared_standalone_tests"
-          ],
-          "downstreams": [
-            "libsecp256k1-py-bindings",
-            "coincurve"
-          ],
-          "files": [
-            "shared_standalone_tests/"
-          ],
-          "requires": [
-            "c_compiler_stub",
-            "cmake >=3.26",
-            "make",
-            "pkg-config"
-          ]
-        }
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/libsecp256k1/libsecp256k1-config.cmake",
+                "lib/cmake/libsecp256k1/libsecp256k1-config-version.cmake",
+                "lib/cmake/libsecp256k1/libsecp256k1-targets.cmake",
+                "lib/cmake/libsecp256k1/libsecp256k1-targets-release.cmake",
+                "lib/pkgconfig/libsecp256k1.pc",
+                "etc/conda/test-files/libsecp256k1/*"
+              ],
+              "include": [
+                "secp256k1.h",
+                "secp256k1_ecdh.h",
+                "secp256k1_ellswift.h",
+                "secp256k1_extrakeys.h",
+                "secp256k1_musig.h",
+                "secp256k1_preallocated.h",
+                "secp256k1_recovery.h",
+                "secp256k1_schnorrsig.h",
+                "secp256k1_silentpayments.h"
+              ],
+              "lib": [
+                "libsecp256k1"
+              ],
+              "strict": true
+            }
+          },
+          {
+            "requirements": {
+              "build": [
+                "pkg-config"
+              ]
+            },
+            "script": "pkg-config --exists libsecp256k1"
+          },
+          {
+            "files": {
+              "recipe": [
+                "shared_standalone_tests/"
+              ],
+              "source": [
+                "src/",
+                "include/",
+                "contrib/",
+                "cmake/"
+              ]
+            },
+            "requirements": {
+              "build": [
+                "c_compiler_stub",
+                "brush",
+                "cmake >=3.26",
+                "ninja",
+                "pkg-config"
+              ]
+            },
+            "script": {
+              "content": "# Standalone build against the installed library. The upstream\n# sources needed to compile the tests are staged here at test\n# time (see `files:` below) rather than being copied into the\n# recipe directory during the build.\ncp src/tests.c src/tests_exhaustive.c src/secp256k1.c shared_standalone_tests/src/\ncp -R src/modules src/wycheproof shared_standalone_tests/src/\ncp src/*.h shared_standalone_tests/src/\ncp -R cmake shared_standalone_tests/src/\ncp -R include contrib shared_standalone_tests/\ncd shared_standalone_tests\ncmake -G Ninja -DSECP256K1_BUILD_EXHAUSTIVE_TESTS=ON -DBUILD_SHARED_LIBS=ON ${CMAKE_ARGS} -S src -B build\ncd build && cmake --build . && cmake --build . --target check && cmake --build . --target clean\n",
+              "interpreter": "brush"
+            }
+          },
+          {
+            "downstream": "coincurve"
+          }
+        ],
+        "version": "0.8.0"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libsecp256k1-7"
           ]
         },
-        "files": [
-          "lib/libsecp256k1.so.7",
-          "lib/libsecp256k1.so.7.0.0"
-        ],
         "name": "libsecp256k1-7",
         "requirements": {
           "build": [
             "c_compiler_stub",
-            "c_stdlib_stub"
-          ]
-        },
-        "test": {
-          "commands": [
-            "test ! -f ${PREFIX}/include/secp256k1.h",
-            "test ! -f ${PREFIX}/lib/libsecp256k1{SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libsecp256k1.so.7",
-            "test -f ${PREFIX}/lib/libsecp256k1.so.7.0.0"
+            "c_stdlib_stub",
+            "brush",
+            "cmake >=3.26",
+            "ninja"
           ],
-          "files": [
-            "load_shared_library.py"
-          ]
-        }
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/libsecp256k1.so.7",
+                "lib/libsecp256k1.so.7.0.0"
+              ],
+              "strict": true
+            }
+          }
+        ],
+        "version": "0.8.0"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libsecp256k1-7"
           ]
         },
-        "files": [
-          "include/secp256k1*",
-          "lib/libsecp256k1.so",
-          "lib/pkgconfig/libsecp256k1.pc",
-          "lib/cmake/libsecp256k1"
-        ],
         "name": "libsecp256k1",
         "requirements": {
           "build": [
             "c_compiler_stub",
-            "c_stdlib_stub"
+            "c_stdlib_stub",
+            "brush",
+            "cmake >=3.26",
+            "ninja"
           ],
           "host": [
             "libsecp256k1-7"
@@ -728,87 +1072,121 @@
             "libsecp256k1-7"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/secp256k1.h",
-            "test -f ${PREFIX}/include/secp256k1_preallocated.h",
-            "test -f ${PREFIX}/include/secp256k1_ecdh.h",
-            "test -f ${PREFIX}/include/secp256k1_recovery.h",
-            "test -f ${PREFIX}/include/secp256k1_extrakeys.h",
-            "test -f ${PREFIX}/include/secp256k1_schnorrsig.h",
-            "test -f ${PREFIX}/include/secp256k1_ellswift.h",
-            "test -f ${PREFIX}/include/secp256k1_musig.h",
-            "test -f ${PREFIX}/lib/libsecp256k1${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/pkgconfig/libsecp256k1.pc",
-            "pkg-config --exists libsecp256k1",
-            "test -f ${PREFIX}/lib/cmake/libsecp256k1/libsecp256k1-config.cmake",
-            "cd shared_standalone_tests",
-            "cmake -DSECP256K1_BUILD_EXHAUSTIVE_TESTS=ON -DBUILD_SHARED_LIBS=ON ${CMAKE_ARGS} -S src -B build",
-            "cd build && cmake --build .  && cmake --build . --target check && cmake --build . --target clean",
-            "cd ..",
-            "rm -rf shared_standalone_tests"
-          ],
-          "downstreams": [
-            "libsecp256k1-py-bindings",
-            "coincurve"
-          ],
-          "files": [
-            "shared_standalone_tests/"
-          ],
-          "requires": [
-            "c_compiler_stub",
-            "cmake >=3.26",
-            "make",
-            "pkg-config"
-          ]
-        }
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/libsecp256k1/libsecp256k1-config.cmake",
+                "lib/cmake/libsecp256k1/libsecp256k1-config-version.cmake",
+                "lib/cmake/libsecp256k1/libsecp256k1-targets.cmake",
+                "lib/cmake/libsecp256k1/libsecp256k1-targets-release.cmake",
+                "lib/pkgconfig/libsecp256k1.pc",
+                "etc/conda/test-files/libsecp256k1/*"
+              ],
+              "include": [
+                "secp256k1.h",
+                "secp256k1_ecdh.h",
+                "secp256k1_ellswift.h",
+                "secp256k1_extrakeys.h",
+                "secp256k1_musig.h",
+                "secp256k1_preallocated.h",
+                "secp256k1_recovery.h",
+                "secp256k1_schnorrsig.h",
+                "secp256k1_silentpayments.h"
+              ],
+              "lib": [
+                "libsecp256k1"
+              ],
+              "strict": true
+            }
+          },
+          {
+            "requirements": {
+              "build": [
+                "pkg-config"
+              ]
+            },
+            "script": "pkg-config --exists libsecp256k1"
+          },
+          {
+            "files": {
+              "recipe": [
+                "shared_standalone_tests/"
+              ],
+              "source": [
+                "src/",
+                "include/",
+                "contrib/",
+                "cmake/"
+              ]
+            },
+            "requirements": {
+              "build": [
+                "c_compiler_stub",
+                "brush",
+                "cmake >=3.26",
+                "ninja",
+                "pkg-config"
+              ]
+            },
+            "script": {
+              "content": "# Standalone build against the installed library. The upstream\n# sources needed to compile the tests are staged here at test\n# time (see `files:` below) rather than being copied into the\n# recipe directory during the build.\ncp src/tests.c src/tests_exhaustive.c src/secp256k1.c shared_standalone_tests/src/\ncp -R src/modules src/wycheproof shared_standalone_tests/src/\ncp src/*.h shared_standalone_tests/src/\ncp -R cmake shared_standalone_tests/src/\ncp -R include contrib shared_standalone_tests/\ncd shared_standalone_tests\ncmake -G Ninja -DSECP256K1_BUILD_EXHAUSTIVE_TESTS=ON -DBUILD_SHARED_LIBS=ON ${CMAKE_ARGS} -S src -B build\ncd build && cmake --build . && cmake --build . --target check && cmake --build . --target clean\n",
+              "interpreter": "brush"
+            }
+          },
+          {
+            "downstream": "coincurve"
+          }
+        ],
+        "version": "0.8.0"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libsecp256k1-7"
           ]
         },
-        "files": [
-          "lib/libsecp256k1.so.7",
-          "lib/libsecp256k1.so.7.0.0"
-        ],
         "name": "libsecp256k1-7",
         "requirements": {
           "build": [
             "c_compiler_stub",
-            "c_stdlib_stub"
-          ]
-        },
-        "test": {
-          "commands": [
-            "test ! -f ${PREFIX}/include/secp256k1.h",
-            "test ! -f ${PREFIX}/lib/libsecp256k1{SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libsecp256k1.so.7",
-            "test -f ${PREFIX}/lib/libsecp256k1.so.7.0.0"
+            "c_stdlib_stub",
+            "brush",
+            "cmake >=3.26",
+            "ninja"
           ],
-          "files": [
-            "load_shared_library.py"
-          ]
-        }
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/libsecp256k1.so.7",
+                "lib/libsecp256k1.so.7.0.0"
+              ],
+              "strict": true
+            }
+          }
+        ],
+        "version": "0.8.0"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libsecp256k1-7"
           ]
         },
-        "files": [
-          "include/secp256k1*",
-          "lib/libsecp256k1.dylib",
-          "lib/pkgconfig/libsecp256k1.pc",
-          "lib/cmake/libsecp256k1"
-        ],
         "name": "libsecp256k1",
         "requirements": {
           "build": [
             "c_compiler_stub",
-            "c_stdlib_stub"
+            "c_stdlib_stub",
+            "brush",
+            "cmake >=3.26",
+            "ninja"
           ],
           "host": [
             "libsecp256k1-7"
@@ -817,85 +1195,121 @@
             "libsecp256k1-7"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/secp256k1.h",
-            "test -f ${PREFIX}/include/secp256k1_preallocated.h",
-            "test -f ${PREFIX}/include/secp256k1_ecdh.h",
-            "test -f ${PREFIX}/include/secp256k1_recovery.h",
-            "test -f ${PREFIX}/include/secp256k1_extrakeys.h",
-            "test -f ${PREFIX}/include/secp256k1_schnorrsig.h",
-            "test -f ${PREFIX}/include/secp256k1_ellswift.h",
-            "test -f ${PREFIX}/include/secp256k1_musig.h",
-            "test -f ${PREFIX}/lib/libsecp256k1${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/pkgconfig/libsecp256k1.pc",
-            "pkg-config --exists libsecp256k1",
-            "test -f ${PREFIX}/lib/cmake/libsecp256k1/libsecp256k1-config.cmake",
-            "cd shared_standalone_tests",
-            "cmake -DSECP256K1_BUILD_EXHAUSTIVE_TESTS=ON -DBUILD_SHARED_LIBS=ON ${CMAKE_ARGS} -S src -B build",
-            "cd build && cmake --build .  && cmake --build . --target check && cmake --build . --target clean",
-            "cd ..",
-            "rm -rf shared_standalone_tests"
-          ],
-          "downstreams": [
-            "libsecp256k1-py-bindings",
-            "coincurve"
-          ],
-          "files": [
-            "shared_standalone_tests/"
-          ],
-          "requires": [
-            "c_compiler_stub",
-            "cmake >=3.26",
-            "make",
-            "pkg-config"
-          ]
-        }
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/libsecp256k1/libsecp256k1-config.cmake",
+                "lib/cmake/libsecp256k1/libsecp256k1-config-version.cmake",
+                "lib/cmake/libsecp256k1/libsecp256k1-targets.cmake",
+                "lib/cmake/libsecp256k1/libsecp256k1-targets-release.cmake",
+                "lib/pkgconfig/libsecp256k1.pc",
+                "etc/conda/test-files/libsecp256k1/*"
+              ],
+              "include": [
+                "secp256k1.h",
+                "secp256k1_ecdh.h",
+                "secp256k1_ellswift.h",
+                "secp256k1_extrakeys.h",
+                "secp256k1_musig.h",
+                "secp256k1_preallocated.h",
+                "secp256k1_recovery.h",
+                "secp256k1_schnorrsig.h",
+                "secp256k1_silentpayments.h"
+              ],
+              "lib": [
+                "libsecp256k1"
+              ],
+              "strict": true
+            }
+          },
+          {
+            "requirements": {
+              "build": [
+                "pkg-config"
+              ]
+            },
+            "script": "pkg-config --exists libsecp256k1"
+          },
+          {
+            "files": {
+              "recipe": [
+                "shared_standalone_tests/"
+              ],
+              "source": [
+                "src/",
+                "include/",
+                "contrib/",
+                "cmake/"
+              ]
+            },
+            "requirements": {
+              "build": [
+                "c_compiler_stub",
+                "brush",
+                "cmake >=3.26",
+                "ninja",
+                "pkg-config"
+              ]
+            },
+            "script": {
+              "content": "# Standalone build against the installed library. The upstream\n# sources needed to compile the tests are staged here at test\n# time (see `files:` below) rather than being copied into the\n# recipe directory during the build.\ncp src/tests.c src/tests_exhaustive.c src/secp256k1.c shared_standalone_tests/src/\ncp -R src/modules src/wycheproof shared_standalone_tests/src/\ncp src/*.h shared_standalone_tests/src/\ncp -R cmake shared_standalone_tests/src/\ncp -R include contrib shared_standalone_tests/\ncd shared_standalone_tests\ncmake -G Ninja -DSECP256K1_BUILD_EXHAUSTIVE_TESTS=ON -DBUILD_SHARED_LIBS=ON ${CMAKE_ARGS} -S src -B build\ncd build && cmake --build . && cmake --build . --target check && cmake --build . --target clean\n",
+              "interpreter": "brush"
+            }
+          },
+          {
+            "downstream": "coincurve"
+          }
+        ],
+        "version": "0.8.0"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libsecp256k1-7"
           ]
         },
-        "files": [
-          "lib/libsecp256k1.7.dylib"
-        ],
         "name": "libsecp256k1-7",
         "requirements": {
           "build": [
             "c_compiler_stub",
-            "c_stdlib_stub"
-          ]
-        },
-        "test": {
-          "commands": [
-            "test ! -f ${PREFIX}/include/secp256k1.h",
-            "test ! -f ${PREFIX}/lib/libsecp256k1{SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libsecp256k1.7.dylib"
+            "c_stdlib_stub",
+            "brush",
+            "cmake >=3.26",
+            "ninja"
           ],
-          "files": [
-            "load_shared_library.py"
-          ]
-        }
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/libsecp256k1.so.7",
+                "lib/libsecp256k1.so.7.0.0"
+              ],
+              "strict": true
+            }
+          }
+        ],
+        "version": "0.8.0"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libsecp256k1-7"
           ]
         },
-        "files": [
-          "include/secp256k1*",
-          "lib/libsecp256k1.dylib",
-          "lib/pkgconfig/libsecp256k1.pc",
-          "lib/cmake/libsecp256k1"
-        ],
         "name": "libsecp256k1",
         "requirements": {
           "build": [
             "c_compiler_stub",
-            "c_stdlib_stub"
+            "c_stdlib_stub",
+            "brush",
+            "cmake >=3.26",
+            "ninja"
           ],
           "host": [
             "libsecp256k1-7"
@@ -904,86 +1318,120 @@
             "libsecp256k1-7"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/secp256k1.h",
-            "test -f ${PREFIX}/include/secp256k1_preallocated.h",
-            "test -f ${PREFIX}/include/secp256k1_ecdh.h",
-            "test -f ${PREFIX}/include/secp256k1_recovery.h",
-            "test -f ${PREFIX}/include/secp256k1_extrakeys.h",
-            "test -f ${PREFIX}/include/secp256k1_schnorrsig.h",
-            "test -f ${PREFIX}/include/secp256k1_ellswift.h",
-            "test -f ${PREFIX}/include/secp256k1_musig.h",
-            "test -f ${PREFIX}/lib/libsecp256k1${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/pkgconfig/libsecp256k1.pc",
-            "pkg-config --exists libsecp256k1",
-            "test -f ${PREFIX}/lib/cmake/libsecp256k1/libsecp256k1-config.cmake",
-            "cd shared_standalone_tests",
-            "cmake -DSECP256K1_BUILD_EXHAUSTIVE_TESTS=ON -DBUILD_SHARED_LIBS=ON ${CMAKE_ARGS} -S src -B build",
-            "cd build && cmake --build .  && cmake --build . --target check && cmake --build . --target clean",
-            "cd ..",
-            "rm -rf shared_standalone_tests"
-          ],
-          "downstreams": [
-            "libsecp256k1-py-bindings",
-            "coincurve"
-          ],
-          "files": [
-            "shared_standalone_tests/"
-          ],
-          "requires": [
-            "c_compiler_stub",
-            "cmake >=3.26",
-            "make",
-            "pkg-config"
-          ]
-        }
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/libsecp256k1/libsecp256k1-config.cmake",
+                "lib/cmake/libsecp256k1/libsecp256k1-config-version.cmake",
+                "lib/cmake/libsecp256k1/libsecp256k1-targets.cmake",
+                "lib/cmake/libsecp256k1/libsecp256k1-targets-release.cmake",
+                "lib/pkgconfig/libsecp256k1.pc",
+                "etc/conda/test-files/libsecp256k1/*"
+              ],
+              "include": [
+                "secp256k1.h",
+                "secp256k1_ecdh.h",
+                "secp256k1_ellswift.h",
+                "secp256k1_extrakeys.h",
+                "secp256k1_musig.h",
+                "secp256k1_preallocated.h",
+                "secp256k1_recovery.h",
+                "secp256k1_schnorrsig.h",
+                "secp256k1_silentpayments.h"
+              ],
+              "lib": [
+                "libsecp256k1"
+              ],
+              "strict": true
+            }
+          },
+          {
+            "requirements": {
+              "build": [
+                "pkg-config"
+              ]
+            },
+            "script": "pkg-config --exists libsecp256k1"
+          },
+          {
+            "files": {
+              "recipe": [
+                "shared_standalone_tests/"
+              ],
+              "source": [
+                "src/",
+                "include/",
+                "contrib/",
+                "cmake/"
+              ]
+            },
+            "requirements": {
+              "build": [
+                "c_compiler_stub",
+                "brush",
+                "cmake >=3.26",
+                "ninja",
+                "pkg-config"
+              ]
+            },
+            "script": {
+              "content": "# Standalone build against the installed library. The upstream\n# sources needed to compile the tests are staged here at test\n# time (see `files:` below) rather than being copied into the\n# recipe directory during the build.\ncp src/tests.c src/tests_exhaustive.c src/secp256k1.c shared_standalone_tests/src/\ncp -R src/modules src/wycheproof shared_standalone_tests/src/\ncp src/*.h shared_standalone_tests/src/\ncp -R cmake shared_standalone_tests/src/\ncp -R include contrib shared_standalone_tests/\ncd shared_standalone_tests\ncmake -G Ninja -DSECP256K1_BUILD_EXHAUSTIVE_TESTS=ON -DBUILD_SHARED_LIBS=ON ${CMAKE_ARGS} -S src -B build\ncd build && cmake --build . && cmake --build . --target check && cmake --build . --target clean\n",
+              "interpreter": "brush"
+            }
+          },
+          {
+            "downstream": "coincurve"
+          }
+        ],
+        "version": "0.8.0"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libsecp256k1-7"
           ]
         },
-        "files": [
-          "lib/libsecp256k1.7.dylib"
-        ],
         "name": "libsecp256k1-7",
         "requirements": {
           "build": [
             "c_compiler_stub",
-            "c_stdlib_stub"
-          ]
-        },
-        "test": {
-          "commands": [
-            "test ! -f ${PREFIX}/include/secp256k1.h",
-            "test ! -f ${PREFIX}/lib/libsecp256k1{SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libsecp256k1.7.dylib"
+            "c_stdlib_stub",
+            "brush",
+            "cmake >=3.26",
+            "ninja"
           ],
-          "files": [
-            "load_shared_library.py"
-          ]
-        }
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/libsecp256k1.7.dylib"
+              ],
+              "strict": true
+            }
+          }
+        ],
+        "version": "0.8.0"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libsecp256k1-7"
           ]
         },
-        "files": [
-          "Library\\\\include\\\\secp256k1*",
-          "Library\\\\lib\\\\libsecp256k1.lib",
-          "Library\\\\lib\\\\secp256k1.lib",
-          "Library\\\\lib\\\\pkgconfig\\\\libsecp256k1.pc",
-          "Library\\\\lib\\\\cmake\\\\libsecp256k1"
-        ],
         "name": "libsecp256k1",
         "requirements": {
           "build": [
             "c_compiler_stub",
-            "c_stdlib_stub"
+            "c_stdlib_stub",
+            "brush",
+            "cmake >=3.26",
+            "ninja"
           ],
           "host": [
             "libsecp256k1-7"
@@ -992,103 +1440,391 @@
             "libsecp256k1-7"
           ]
         },
-        "test": {
-          "commands": [
-            "if not exist %LIBRARY_INC%\\\\secp256k1.h exit 1",
-            "if not exist %LIBRARY_INC%\\\\secp256k1_preallocated.h exit 1",
-            "if not exist %LIBRARY_INC%\\\\secp256k1_ecdh.h exit 1",
-            "if not exist %LIBRARY_INC%\\\\secp256k1_recovery.h exit 1",
-            "if not exist %LIBRARY_INC%\\\\secp256k1_extrakeys.h exit 1",
-            "if not exist %LIBRARY_INC%\\\\secp256k1_schnorrsig.h exit 1",
-            "if not exist %LIBRARY_INC%\\\\secp256k1_ellswift.h exit 1",
-            "if not exist %LIBRARY_INC%\\\\secp256k1_musig.h exit 1",
-            "if not exist %LIBRARY_LIB%\\\\secp256k1.lib exit 1",
-            "if not exist %LIBRARY_LIB%\\\\libsecp256k1.lib exit 1",
-            "if not exist %LIBRARY_BIN%\\\\libsecp256k1-7.dll exit 1",
-            "if not exist %LIBRARY_LIB%\\\\pkgconfig\\\\libsecp256k1.pc exit 1",
-            "pkg-config --exists libsecp256k1",
-            "if not exist %LIBRARY_LIB%\\\\cmake\\\\libsecp256k1\\\\libsecp256k1-config.cmake exit 1",
-            "cd shared_standalone_tests",
-            "cmake -DSECP256K1_BUILD_EXHAUSTIVE_TESTS=ON -DBUILD_SHARED_LIBS=ON %CMAKE_ARGS% -S src -B build",
-            "cd build && cmake --build .  && cmake --build . --target check && cmake --build . --target clean",
-            "cd ..",
-            "rmdir /s /q shared_standalone_tests"
-          ],
-          "downstreams": [
-            "libsecp256k1-py-bindings",
-            "coincurve"
-          ],
-          "files": [
-            "shared_standalone_tests/"
-          ],
-          "requires": [
-            "c_compiler_stub",
-            "cmake >=3.26",
-            "make",
-            "pkg-config"
-          ]
-        }
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/libsecp256k1/libsecp256k1-config.cmake",
+                "lib/cmake/libsecp256k1/libsecp256k1-config-version.cmake",
+                "lib/cmake/libsecp256k1/libsecp256k1-targets.cmake",
+                "lib/cmake/libsecp256k1/libsecp256k1-targets-release.cmake",
+                "lib/pkgconfig/libsecp256k1.pc",
+                "etc/conda/test-files/libsecp256k1/*"
+              ],
+              "include": [
+                "secp256k1.h",
+                "secp256k1_ecdh.h",
+                "secp256k1_ellswift.h",
+                "secp256k1_extrakeys.h",
+                "secp256k1_musig.h",
+                "secp256k1_preallocated.h",
+                "secp256k1_recovery.h",
+                "secp256k1_schnorrsig.h",
+                "secp256k1_silentpayments.h"
+              ],
+              "lib": [
+                "libsecp256k1"
+              ],
+              "strict": true
+            }
+          },
+          {
+            "requirements": {
+              "build": [
+                "pkg-config"
+              ]
+            },
+            "script": "pkg-config --exists libsecp256k1"
+          },
+          {
+            "files": {
+              "recipe": [
+                "shared_standalone_tests/"
+              ],
+              "source": [
+                "src/",
+                "include/",
+                "contrib/",
+                "cmake/"
+              ]
+            },
+            "requirements": {
+              "build": [
+                "c_compiler_stub",
+                "brush",
+                "cmake >=3.26",
+                "ninja",
+                "pkg-config"
+              ]
+            },
+            "script": {
+              "content": "# Standalone build against the installed library. The upstream\n# sources needed to compile the tests are staged here at test\n# time (see `files:` below) rather than being copied into the\n# recipe directory during the build.\ncp src/tests.c src/tests_exhaustive.c src/secp256k1.c shared_standalone_tests/src/\ncp -R src/modules src/wycheproof shared_standalone_tests/src/\ncp src/*.h shared_standalone_tests/src/\ncp -R cmake shared_standalone_tests/src/\ncp -R include contrib shared_standalone_tests/\ncd shared_standalone_tests\ncmake -G Ninja -DSECP256K1_BUILD_EXHAUSTIVE_TESTS=ON -DBUILD_SHARED_LIBS=ON ${CMAKE_ARGS} -S src -B build\ncd build && cmake --build . && cmake --build . --target check && cmake --build . --target clean\n",
+              "interpreter": "brush"
+            }
+          },
+          {
+            "downstream": "coincurve"
+          }
+        ],
+        "version": "0.8.0"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libsecp256k1-7"
           ]
         },
-        "files": [
-          "Library\\\\bin\\\\libsecp256k1-7.dll"
-        ],
         "name": "libsecp256k1-7",
         "requirements": {
           "build": [
             "c_compiler_stub",
-            "c_stdlib_stub"
+            "c_stdlib_stub",
+            "brush",
+            "cmake >=3.26",
+            "ninja"
+          ],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/libsecp256k1.7.dylib"
+              ],
+              "strict": true
+            }
+          }
+        ],
+        "version": "0.8.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "libsecp256k1-7"
           ]
         },
-        "test": {
-          "commands": [
-            "if exist %LIBRARY_INC%\\\\secp256k1.h exit 1",
-            "if exist %LIBRARY_LIB%\\\\libsecp256k1.lib exit 1",
-            "if exist %LIBRARY_LIB%\\\\secp256k1.lib exit 1",
-            "if not exist %LIBRARY_BIN%\\\\libsecp256k1-7.dll exit 1"
+        "name": "libsecp256k1",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "brush",
+            "cmake >=3.26",
+            "ninja"
           ],
-          "files": [
-            "load_shared_library.py"
+          "host": [
+            "libsecp256k1-7"
+          ],
+          "run": [
+            "libsecp256k1-7"
           ]
-        }
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "Library/lib/libsecp256k1.lib",
+                "Library/lib/secp256k1.lib",
+                "Library/lib/cmake/libsecp256k1/libsecp256k1-config.cmake",
+                "Library/lib/cmake/libsecp256k1/libsecp256k1-config-version.cmake",
+                "Library/lib/cmake/libsecp256k1/libsecp256k1-targets.cmake",
+                "Library/lib/cmake/libsecp256k1/libsecp256k1-targets-release.cmake",
+                "Library/lib/pkgconfig/libsecp256k1.pc",
+                "etc/conda/test-files/libsecp256k1/*"
+              ],
+              "include": [
+                "secp256k1.h",
+                "secp256k1_ecdh.h",
+                "secp256k1_ellswift.h",
+                "secp256k1_extrakeys.h",
+                "secp256k1_musig.h",
+                "secp256k1_preallocated.h",
+                "secp256k1_recovery.h",
+                "secp256k1_schnorrsig.h",
+                "secp256k1_silentpayments.h"
+              ],
+              "strict": true
+            }
+          },
+          {
+            "requirements": {
+              "build": [
+                "pkg-config"
+              ]
+            },
+            "script": "pkg-config --exists libsecp256k1"
+          },
+          {
+            "files": {
+              "recipe": [
+                "shared_standalone_tests/"
+              ],
+              "source": [
+                "src/",
+                "include/",
+                "contrib/",
+                "cmake/"
+              ]
+            },
+            "requirements": {
+              "build": [
+                "c_compiler_stub",
+                "brush",
+                "cmake >=3.26",
+                "ninja",
+                "pkg-config"
+              ]
+            },
+            "script": {
+              "content": "# Standalone build against the installed library. The upstream\n# sources needed to compile the tests are staged here at test\n# time (see `files:` below) rather than being copied into the\n# recipe directory during the build.\ncp src/tests.c src/tests_exhaustive.c src/secp256k1.c shared_standalone_tests/src/\ncp -R src/modules src/wycheproof shared_standalone_tests/src/\ncp src/*.h shared_standalone_tests/src/\ncp -R cmake shared_standalone_tests/src/\ncp -R include contrib shared_standalone_tests/\ncd shared_standalone_tests\ncmake -G Ninja -DSECP256K1_BUILD_EXHAUSTIVE_TESTS=ON -DBUILD_SHARED_LIBS=ON ${CMAKE_ARGS} -S src -B build\ncd build && cmake --build . && cmake --build . --target check && cmake --build . --target clean\n",
+              "interpreter": "brush"
+            }
+          },
+          {
+            "downstream": "coincurve"
+          }
+        ],
+        "version": "0.8.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "libsecp256k1-7"
+          ]
+        },
+        "name": "libsecp256k1-7",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "brush",
+            "cmake >=3.26",
+            "ninja"
+          ],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "Library/bin/libsecp256k1-7.dll"
+              ],
+              "strict": true
+            }
+          }
+        ],
+        "version": "0.8.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "libsecp256k1-7"
+          ]
+        },
+        "name": "libsecp256k1",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "brush",
+            "cmake >=3.26",
+            "ninja"
+          ],
+          "host": [
+            "libsecp256k1-7"
+          ],
+          "run": [
+            "libsecp256k1-7"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "Library/lib/libsecp256k1.lib",
+                "Library/lib/secp256k1.lib",
+                "Library/lib/cmake/libsecp256k1/libsecp256k1-config.cmake",
+                "Library/lib/cmake/libsecp256k1/libsecp256k1-config-version.cmake",
+                "Library/lib/cmake/libsecp256k1/libsecp256k1-targets.cmake",
+                "Library/lib/cmake/libsecp256k1/libsecp256k1-targets-release.cmake",
+                "Library/lib/pkgconfig/libsecp256k1.pc",
+                "etc/conda/test-files/libsecp256k1/*"
+              ],
+              "include": [
+                "secp256k1.h",
+                "secp256k1_ecdh.h",
+                "secp256k1_ellswift.h",
+                "secp256k1_extrakeys.h",
+                "secp256k1_musig.h",
+                "secp256k1_preallocated.h",
+                "secp256k1_recovery.h",
+                "secp256k1_schnorrsig.h",
+                "secp256k1_silentpayments.h"
+              ],
+              "strict": true
+            }
+          },
+          {
+            "requirements": {
+              "build": [
+                "pkg-config"
+              ]
+            },
+            "script": "pkg-config --exists libsecp256k1"
+          },
+          {
+            "files": {
+              "recipe": [
+                "shared_standalone_tests/"
+              ],
+              "source": [
+                "src/",
+                "include/",
+                "contrib/",
+                "cmake/"
+              ]
+            },
+            "requirements": {
+              "build": [
+                "c_compiler_stub",
+                "brush",
+                "cmake >=3.26",
+                "ninja",
+                "pkg-config"
+              ]
+            },
+            "script": {
+              "content": "# Standalone build against the installed library. The upstream\n# sources needed to compile the tests are staged here at test\n# time (see `files:` below) rather than being copied into the\n# recipe directory during the build.\ncp src/tests.c src/tests_exhaustive.c src/secp256k1.c shared_standalone_tests/src/\ncp -R src/modules src/wycheproof shared_standalone_tests/src/\ncp src/*.h shared_standalone_tests/src/\ncp -R cmake shared_standalone_tests/src/\ncp -R include contrib shared_standalone_tests/\ncd shared_standalone_tests\ncmake -G Ninja -DSECP256K1_BUILD_EXHAUSTIVE_TESTS=ON -DBUILD_SHARED_LIBS=ON ${CMAKE_ARGS} -S src -B build\ncd build && cmake --build . && cmake --build . --target check && cmake --build . --target clean\n",
+              "interpreter": "brush"
+            }
+          },
+          {
+            "downstream": "coincurve"
+          }
+        ],
+        "version": "0.8.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "libsecp256k1-7"
+          ]
+        },
+        "name": "libsecp256k1-7",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "brush",
+            "cmake >=3.26",
+            "ninja"
+          ],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "Library/bin/libsecp256k1-7.dll"
+              ],
+              "strict": true
+            }
+          }
+        ],
+        "version": "0.8.0"
       }
     ],
     "package": {
-      "name": "libsecp256k1-split",
+      "name": "libsecp256k1",
       "version": "0.8.0"
     },
     "requirements": {
       "build": [
         "c_compiler_stub",
         "c_stdlib_stub",
+        "brush",
         "cmake >=3.26",
-        "make"
+        "ninja"
+      ],
+      "host": [
+        "libsecp256k1-7"
+      ],
+      "run": [
+        "libsecp256k1-7"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "sha256": "eb52b0e9239dff7dc26be5f9623567141b8720ec47da29eb3c1e0a660d17c8bb",
       "url": "https://github.com/bitcoin-core/secp256k1/archive/refs/tags/v0.8.0.tar.gz"
     }
   },
-  "name": "libsecp256k1-split",
+  "name": "libsecp256k1",
   "osx_64_meta_yaml": {
     "about": {
-      "description": "This library is intended to be the highest quality publicly available\nlibrary for cryptography on the secp256k1 curve. However, the primary\nfocus of its development has been for usage in the Bitcoin system and\nusage unlike Bitcoin's may be less well tested, verified, or suffer\nfrom a less well thought out interface. Correct usage requires some\ncare and consideration that the library is fit for your application's purpose.\n",
+      "description": "This library is intended to be the highest quality publicly available\nlibrary for cryptography on the secp256k1 curve. However, the primary\nfocus of its development has been for usage in the Bitcoin system and\nusage unlike Bitcoin's may be less well tested, verified, or suffer\nfrom a less well thought out interface. Correct usage requires some\ncare and consideration that the library is fit for your application's purpose.",
       "home": "https://github.com/bitcoin-core/secp256k1",
       "license": "MIT",
-      "license_file": [
-        "COPYING"
-      ],
+      "license_family": "MIT",
+      "license_file": "COPYING",
       "summary": "Optimized C library for ECDSA signatures and secret/public key operations on curve secp256k1."
     },
     "build": {
-      "number": "0"
+      "number": "1",
+      "run_exports": {
+        "weak": [
+          "libsecp256k1-7"
+        ]
+      },
+      "script": []
     },
     "extra": {
       "feedstock-name": "libsecp256k1",
@@ -1099,21 +1835,19 @@
     "outputs": [
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libsecp256k1-7"
           ]
         },
-        "files": [
-          "include/secp256k1*",
-          "lib/libsecp256k1.dylib",
-          "lib/pkgconfig/libsecp256k1.pc",
-          "lib/cmake/libsecp256k1"
-        ],
         "name": "libsecp256k1",
         "requirements": {
           "build": [
             "c_compiler_stub",
-            "c_stdlib_stub"
+            "c_stdlib_stub",
+            "brush",
+            "cmake >=3.26",
+            "ninja"
           ],
           "host": [
             "libsecp256k1-7"
@@ -1122,82 +1856,126 @@
             "libsecp256k1-7"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/secp256k1.h",
-            "test -f ${PREFIX}/include/secp256k1_preallocated.h",
-            "test -f ${PREFIX}/include/secp256k1_ecdh.h",
-            "test -f ${PREFIX}/include/secp256k1_recovery.h",
-            "test -f ${PREFIX}/include/secp256k1_extrakeys.h",
-            "test -f ${PREFIX}/include/secp256k1_schnorrsig.h",
-            "test -f ${PREFIX}/include/secp256k1_ellswift.h",
-            "test -f ${PREFIX}/include/secp256k1_musig.h",
-            "test -f ${PREFIX}/lib/libsecp256k1${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/pkgconfig/libsecp256k1.pc",
-            "pkg-config --exists libsecp256k1",
-            "test -f ${PREFIX}/lib/cmake/libsecp256k1/libsecp256k1-config.cmake",
-            "cd shared_standalone_tests",
-            "cmake -DSECP256K1_BUILD_EXHAUSTIVE_TESTS=ON -DBUILD_SHARED_LIBS=ON ${CMAKE_ARGS} -S src -B build",
-            "cd build && cmake --build .  && cmake --build . --target check && cmake --build . --target clean",
-            "cd ..",
-            "rm -rf shared_standalone_tests"
-          ],
-          "downstreams": [
-            "libsecp256k1-py-bindings",
-            "coincurve"
-          ],
-          "files": [
-            "shared_standalone_tests/"
-          ],
-          "requires": [
-            "c_compiler_stub",
-            "cmake >=3.26",
-            "make",
-            "pkg-config"
-          ]
-        }
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/libsecp256k1/libsecp256k1-config.cmake",
+                "lib/cmake/libsecp256k1/libsecp256k1-config-version.cmake",
+                "lib/cmake/libsecp256k1/libsecp256k1-targets.cmake",
+                "lib/cmake/libsecp256k1/libsecp256k1-targets-release.cmake",
+                "lib/pkgconfig/libsecp256k1.pc",
+                "etc/conda/test-files/libsecp256k1/*"
+              ],
+              "include": [
+                "secp256k1.h",
+                "secp256k1_ecdh.h",
+                "secp256k1_ellswift.h",
+                "secp256k1_extrakeys.h",
+                "secp256k1_musig.h",
+                "secp256k1_preallocated.h",
+                "secp256k1_recovery.h",
+                "secp256k1_schnorrsig.h",
+                "secp256k1_silentpayments.h"
+              ],
+              "lib": [
+                "libsecp256k1"
+              ],
+              "strict": true
+            }
+          },
+          {
+            "requirements": {
+              "build": [
+                "pkg-config"
+              ]
+            },
+            "script": "pkg-config --exists libsecp256k1"
+          },
+          {
+            "files": {
+              "recipe": [
+                "shared_standalone_tests/"
+              ],
+              "source": [
+                "src/",
+                "include/",
+                "contrib/",
+                "cmake/"
+              ]
+            },
+            "requirements": {
+              "build": [
+                "c_compiler_stub",
+                "brush",
+                "cmake >=3.26",
+                "ninja",
+                "pkg-config"
+              ]
+            },
+            "script": {
+              "content": "# Standalone build against the installed library. The upstream\n# sources needed to compile the tests are staged here at test\n# time (see `files:` below) rather than being copied into the\n# recipe directory during the build.\ncp src/tests.c src/tests_exhaustive.c src/secp256k1.c shared_standalone_tests/src/\ncp -R src/modules src/wycheproof shared_standalone_tests/src/\ncp src/*.h shared_standalone_tests/src/\ncp -R cmake shared_standalone_tests/src/\ncp -R include contrib shared_standalone_tests/\ncd shared_standalone_tests\ncmake -G Ninja -DSECP256K1_BUILD_EXHAUSTIVE_TESTS=ON -DBUILD_SHARED_LIBS=ON ${CMAKE_ARGS} -S src -B build\ncd build && cmake --build . && cmake --build . --target check && cmake --build . --target clean\n",
+              "interpreter": "brush"
+            }
+          },
+          {
+            "downstream": "coincurve"
+          }
+        ],
+        "version": "0.8.0"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libsecp256k1-7"
           ]
         },
-        "files": [
-          "lib/libsecp256k1.7.dylib"
-        ],
         "name": "libsecp256k1-7",
         "requirements": {
           "build": [
             "c_compiler_stub",
-            "c_stdlib_stub"
-          ]
-        },
-        "test": {
-          "commands": [
-            "test ! -f ${PREFIX}/include/secp256k1.h",
-            "test ! -f ${PREFIX}/lib/libsecp256k1{SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libsecp256k1.7.dylib"
+            "c_stdlib_stub",
+            "brush",
+            "cmake >=3.26",
+            "ninja"
           ],
-          "files": [
-            "load_shared_library.py"
-          ]
-        }
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/libsecp256k1.7.dylib"
+              ],
+              "strict": true
+            }
+          }
+        ],
+        "version": "0.8.0"
       }
     ],
     "package": {
-      "name": "libsecp256k1-split",
+      "name": "libsecp256k1",
       "version": "0.8.0"
     },
     "requirements": {
       "build": [
         "c_compiler_stub",
         "c_stdlib_stub",
+        "brush",
         "cmake >=3.26",
-        "make"
+        "ninja"
+      ],
+      "host": [
+        "libsecp256k1-7"
+      ],
+      "run": [
+        "libsecp256k1-7"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "sha256": "eb52b0e9239dff7dc26be5f9623567141b8720ec47da29eb3c1e0a660d17c8bb",
       "url": "https://github.com/bitcoin-core/secp256k1/archive/refs/tags/v0.8.0.tar.gz"
@@ -1207,10 +1985,11 @@
     "build": {
       "__set__": true,
       "elements": [
+        "brush",
         "c_compiler_stub",
         "c_stdlib_stub",
         "cmake",
-        "make"
+        "ninja"
       ]
     },
     "host": {
@@ -1228,25 +2007,31 @@
     "test": {
       "__set__": true,
       "elements": [
+        "brush",
         "c_compiler_stub",
         "cmake",
-        "make",
+        "ninja",
         "pkg-config"
       ]
     }
   },
   "osx_arm64_meta_yaml": {
     "about": {
-      "description": "This library is intended to be the highest quality publicly available\nlibrary for cryptography on the secp256k1 curve. However, the primary\nfocus of its development has been for usage in the Bitcoin system and\nusage unlike Bitcoin's may be less well tested, verified, or suffer\nfrom a less well thought out interface. Correct usage requires some\ncare and consideration that the library is fit for your application's purpose.\n",
+      "description": "This library is intended to be the highest quality publicly available\nlibrary for cryptography on the secp256k1 curve. However, the primary\nfocus of its development has been for usage in the Bitcoin system and\nusage unlike Bitcoin's may be less well tested, verified, or suffer\nfrom a less well thought out interface. Correct usage requires some\ncare and consideration that the library is fit for your application's purpose.",
       "home": "https://github.com/bitcoin-core/secp256k1",
       "license": "MIT",
-      "license_file": [
-        "COPYING"
-      ],
+      "license_family": "MIT",
+      "license_file": "COPYING",
       "summary": "Optimized C library for ECDSA signatures and secret/public key operations on curve secp256k1."
     },
     "build": {
-      "number": "0"
+      "number": "1",
+      "run_exports": {
+        "weak": [
+          "libsecp256k1-7"
+        ]
+      },
+      "script": []
     },
     "extra": {
       "feedstock-name": "libsecp256k1",
@@ -1257,21 +2042,19 @@
     "outputs": [
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libsecp256k1-7"
           ]
         },
-        "files": [
-          "include/secp256k1*",
-          "lib/libsecp256k1.dylib",
-          "lib/pkgconfig/libsecp256k1.pc",
-          "lib/cmake/libsecp256k1"
-        ],
         "name": "libsecp256k1",
         "requirements": {
           "build": [
             "c_compiler_stub",
-            "c_stdlib_stub"
+            "c_stdlib_stub",
+            "brush",
+            "cmake >=3.26",
+            "ninja"
           ],
           "host": [
             "libsecp256k1-7"
@@ -1280,82 +2063,126 @@
             "libsecp256k1-7"
           ]
         },
-        "test": {
-          "commands": [
-            "test -f ${PREFIX}/include/secp256k1.h",
-            "test -f ${PREFIX}/include/secp256k1_preallocated.h",
-            "test -f ${PREFIX}/include/secp256k1_ecdh.h",
-            "test -f ${PREFIX}/include/secp256k1_recovery.h",
-            "test -f ${PREFIX}/include/secp256k1_extrakeys.h",
-            "test -f ${PREFIX}/include/secp256k1_schnorrsig.h",
-            "test -f ${PREFIX}/include/secp256k1_ellswift.h",
-            "test -f ${PREFIX}/include/secp256k1_musig.h",
-            "test -f ${PREFIX}/lib/libsecp256k1${SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/pkgconfig/libsecp256k1.pc",
-            "pkg-config --exists libsecp256k1",
-            "test -f ${PREFIX}/lib/cmake/libsecp256k1/libsecp256k1-config.cmake",
-            "cd shared_standalone_tests",
-            "cmake -DSECP256K1_BUILD_EXHAUSTIVE_TESTS=ON -DBUILD_SHARED_LIBS=ON ${CMAKE_ARGS} -S src -B build",
-            "cd build && cmake --build .  && cmake --build . --target check && cmake --build . --target clean",
-            "cd ..",
-            "rm -rf shared_standalone_tests"
-          ],
-          "downstreams": [
-            "libsecp256k1-py-bindings",
-            "coincurve"
-          ],
-          "files": [
-            "shared_standalone_tests/"
-          ],
-          "requires": [
-            "c_compiler_stub",
-            "cmake >=3.26",
-            "make",
-            "pkg-config"
-          ]
-        }
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/cmake/libsecp256k1/libsecp256k1-config.cmake",
+                "lib/cmake/libsecp256k1/libsecp256k1-config-version.cmake",
+                "lib/cmake/libsecp256k1/libsecp256k1-targets.cmake",
+                "lib/cmake/libsecp256k1/libsecp256k1-targets-release.cmake",
+                "lib/pkgconfig/libsecp256k1.pc",
+                "etc/conda/test-files/libsecp256k1/*"
+              ],
+              "include": [
+                "secp256k1.h",
+                "secp256k1_ecdh.h",
+                "secp256k1_ellswift.h",
+                "secp256k1_extrakeys.h",
+                "secp256k1_musig.h",
+                "secp256k1_preallocated.h",
+                "secp256k1_recovery.h",
+                "secp256k1_schnorrsig.h",
+                "secp256k1_silentpayments.h"
+              ],
+              "lib": [
+                "libsecp256k1"
+              ],
+              "strict": true
+            }
+          },
+          {
+            "requirements": {
+              "build": [
+                "pkg-config"
+              ]
+            },
+            "script": "pkg-config --exists libsecp256k1"
+          },
+          {
+            "files": {
+              "recipe": [
+                "shared_standalone_tests/"
+              ],
+              "source": [
+                "src/",
+                "include/",
+                "contrib/",
+                "cmake/"
+              ]
+            },
+            "requirements": {
+              "build": [
+                "c_compiler_stub",
+                "brush",
+                "cmake >=3.26",
+                "ninja",
+                "pkg-config"
+              ]
+            },
+            "script": {
+              "content": "# Standalone build against the installed library. The upstream\n# sources needed to compile the tests are staged here at test\n# time (see `files:` below) rather than being copied into the\n# recipe directory during the build.\ncp src/tests.c src/tests_exhaustive.c src/secp256k1.c shared_standalone_tests/src/\ncp -R src/modules src/wycheproof shared_standalone_tests/src/\ncp src/*.h shared_standalone_tests/src/\ncp -R cmake shared_standalone_tests/src/\ncp -R include contrib shared_standalone_tests/\ncd shared_standalone_tests\ncmake -G Ninja -DSECP256K1_BUILD_EXHAUSTIVE_TESTS=ON -DBUILD_SHARED_LIBS=ON ${CMAKE_ARGS} -S src -B build\ncd build && cmake --build . && cmake --build . --target check && cmake --build . --target clean\n",
+              "interpreter": "brush"
+            }
+          },
+          {
+            "downstream": "coincurve"
+          }
+        ],
+        "version": "0.8.0"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libsecp256k1-7"
           ]
         },
-        "files": [
-          "lib/libsecp256k1.7.dylib"
-        ],
         "name": "libsecp256k1-7",
         "requirements": {
           "build": [
             "c_compiler_stub",
-            "c_stdlib_stub"
-          ]
-        },
-        "test": {
-          "commands": [
-            "test ! -f ${PREFIX}/include/secp256k1.h",
-            "test ! -f ${PREFIX}/lib/libsecp256k1{SHLIB_EXT}",
-            "test -f ${PREFIX}/lib/libsecp256k1.7.dylib"
+            "c_stdlib_stub",
+            "brush",
+            "cmake >=3.26",
+            "ninja"
           ],
-          "files": [
-            "load_shared_library.py"
-          ]
-        }
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "lib/libsecp256k1.7.dylib"
+              ],
+              "strict": true
+            }
+          }
+        ],
+        "version": "0.8.0"
       }
     ],
     "package": {
-      "name": "libsecp256k1-split",
+      "name": "libsecp256k1",
       "version": "0.8.0"
     },
     "requirements": {
       "build": [
         "c_compiler_stub",
         "c_stdlib_stub",
+        "brush",
         "cmake >=3.26",
-        "make"
+        "ninja"
+      ],
+      "host": [
+        "libsecp256k1-7"
+      ],
+      "run": [
+        "libsecp256k1-7"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "sha256": "eb52b0e9239dff7dc26be5f9623567141b8720ec47da29eb3c1e0a660d17c8bb",
       "url": "https://github.com/bitcoin-core/secp256k1/archive/refs/tags/v0.8.0.tar.gz"
@@ -1365,10 +2192,11 @@
     "build": {
       "__set__": true,
       "elements": [
+        "brush",
         "c_compiler_stub",
         "c_stdlib_stub",
         "cmake",
-        "make"
+        "ninja"
       ]
     },
     "host": {
@@ -1386,9 +2214,10 @@
     "test": {
       "__set__": true,
       "elements": [
+        "brush",
         "c_compiler_stub",
         "cmake",
-        "make",
+        "ninja",
         "pkg-config"
       ]
     }
@@ -1407,30 +2236,33 @@
     "linux_ppc64le",
     "osx_64",
     "osx_arm64",
-    "win_64"
+    "win_64",
+    "win_arm64"
   ],
   "pr_info": {
     "__lazy_json__": "pr_info/libsecp256k1.json"
   },
-  "raw_meta_yaml": "{% set name = \"libsecp256k1\" %}\n{% set headers = [\n      \"secp256k1.h\",\n      \"secp256k1_preallocated.h\",\n      \"secp256k1_ecdh.h\",\n      \"secp256k1_recovery.h\",\n      \"secp256k1_extrakeys.h\",\n      \"secp256k1_schnorrsig.h\",\n      \"secp256k1_ellswift.h\",\n      \"secp256k1_musig.h\",\n] %}\n{% set version = \"0.8.0\" %}\n# Look in the CMakeLists.txt for the updated library version (not the same as\n# the project version). Upstream does some strange math to convert lib_version\n# to so_version.\n{% set so_version = \"7.0.\" + version.split('.')[-1] %}\n{% set so_major_version = so_version.split('.')[0] %}\n\npackage:\n  name: libsecp256k1-split\n  version: {{ version }}\n\nsource:\n  url: https://github.com/bitcoin-core/secp256k1/archive/refs/tags/v{{ version }}.tar.gz\n  sha256: eb52b0e9239dff7dc26be5f9623567141b8720ec47da29eb3c1e0a660d17c8bb\n\nbuild:\n  number: 0\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ stdlib(\"c\") }}\n    - cmake >=3.26\n    - make\n\noutputs:\n  - name: libsecp256k1\n    build:\n      run_exports:\n        - {{ pin_subpackage('libsecp256k1-' ~ so_major_version) }}\n    files:\n      - include/secp256k1*  # [unix]\n      - Library\\\\include\\\\secp256k1*  # [win]\n      - lib/{{ name }}.so  # [linux]\n      - lib/{{ name }}.dylib  # [osx]\n      - Library\\\\lib\\\\{{ name }}.lib  # [win]\n      - Library\\\\lib\\\\secp256k1.lib  # [win]\n      - lib/pkgconfig/{{ name }}.pc  # [unix]\n      - Library\\\\lib\\\\pkgconfig\\\\{{ name }}.pc  # [win]\n      - lib/cmake/{{ name }}  # [unix]\n      - Library\\\\lib\\\\cmake\\\\{{ name }}  # [win]\n    requirements:\n      build:\n        - {{ compiler('c') }}\n        - {{ stdlib(\"c\") }}\n      host:\n        - {{ pin_subpackage('libsecp256k1-' ~ so_major_version, exact=True) }}\n      run:\n        - {{ pin_subpackage('libsecp256k1-' ~ so_major_version, exact=True) }}\n    test:\n      requires:\n        - {{ compiler('c') }}\n        - cmake >=3.26\n        - make\n        - pkg-config\n      files:\n        - shared_standalone_tests/\n      commands:\n        # Headers\n        {% for header in headers %}\n        - test -f ${PREFIX}/include/{{ header }}  # [unix]\n        - if not exist %LIBRARY_INC%\\\\{{ header }} exit 1  # [win]\n        {% endfor %}\n\n        # Shared libraries\n        - test -f ${PREFIX}/lib/{{ name }}${SHLIB_EXT}  # [unix]\n        - if not exist %LIBRARY_LIB%\\\\secp256k1.lib exit 1  # [win]\n        - if not exist %LIBRARY_LIB%\\\\{{ name }}.lib exit 1  # [win]\n        - if not exist %LIBRARY_BIN%\\\\{{ name }}-{{ so_major_version }}.dll exit 1  # [win]\n\n        # pkg-config files for shared libraries\n        - test -f ${PREFIX}/lib/pkgconfig/{{ name }}.pc  # [unix]\n        - if not exist %LIBRARY_LIB%\\\\pkgconfig\\\\{{ name }}.pc exit 1  # [win]\n        - pkg-config --exists {{ name }}\n\n        # cmake files for shared libraries\n        - if not exist %LIBRARY_LIB%\\\\cmake\\\\{{ name }}\\\\{{ name }}-config.cmake exit 1  # [win]\n        - test -f ${PREFIX}/lib/cmake/{{ name }}/{{ name }}-config.cmake  # [unix]\n\n        # CMake test\n        - cd shared_standalone_tests\n        - cmake -DSECP256K1_BUILD_EXHAUSTIVE_TESTS=ON -DBUILD_SHARED_LIBS=ON ${CMAKE_ARGS} -S src -B build  # [unix]\n        - cmake -DSECP256K1_BUILD_EXHAUSTIVE_TESTS=ON -DBUILD_SHARED_LIBS=ON %CMAKE_ARGS% -S src -B build  # [win]\n        - cd build && cmake --build .  && cmake --build . --target check && cmake --build . --target clean\n\n        - cd ..\n        - rm -rf shared_standalone_tests  # [unix]\n        - rmdir /s /q shared_standalone_tests  # [win]\n      downstreams:\n        - libsecp256k1-py-bindings\n        - coincurve\n\n  - name: libsecp256k1-{{ so_major_version }}\n    build:\n      run_exports:\n        - {{ pin_subpackage('libsecp256k1-' ~ so_major_version) }}\n    files:\n      - lib/{{ name }}.so.{{ so_major_version }}  # [linux]\n      - lib/{{ name }}.so.{{ so_version }}  # [linux]\n      - lib/{{ name }}.{{ so_major_version }}.dylib  # [osx]\n      - Library\\\\bin\\\\{{ name }}-{{ so_major_version }}.dll   # [win]\n    requirements:\n      build:\n        - {{ compiler('c') }}\n        - {{ stdlib(\"c\") }}\n    test:\n      files:\n        - load_shared_library.py\n      commands:\n        - test ! -f ${PREFIX}/include/secp256k1.h  # [unix]\n        - if exist %LIBRARY_INC%\\\\secp256k1.h exit 1  # [win]\n        - test ! -f ${PREFIX}/lib/{{ name }}{SHLIB_EXT}  # [unix]\n        - if exist %LIBRARY_LIB%\\\\{{ name }}.lib exit 1  # [win]\n        - if exist %LIBRARY_LIB%\\\\secp256k1.lib exit 1  # [win]\n        - test -f ${PREFIX}/lib/{{ name }}.so.{{ so_major_version }}  # [linux]\n        - test -f ${PREFIX}/lib/{{ name }}.so.{{ so_version }}  # [linux]\n        - test -f ${PREFIX}/lib/{{ name }}.{{ so_major_version }}.dylib  # [osx]\n        - if not exist %LIBRARY_BIN%\\\\{{ name }}-{{ so_major_version }}.dll exit 1  # [win]\n\nabout:\n  home: https://github.com/bitcoin-core/secp256k1\n  summary: 'Optimized C library for ECDSA signatures and secret/public key operations on curve secp256k1.'\n  description: |\n    This library is intended to be the highest quality publicly available\n    library for cryptography on the secp256k1 curve. However, the primary\n    focus of its development has been for usage in the Bitcoin system and\n    usage unlike Bitcoin's may be less well tested, verified, or suffer\n    from a less well thought out interface. Correct usage requires some\n    care and consideration that the library is fit for your application's purpose.\n  license: MIT\n  license_file:\n    - COPYING\n\nextra:\n  recipe-maintainers:\n    - MementoRC\n  feedstock-name: libsecp256k1\n",
+  "raw_meta_yaml": "# yaml-language-server: $schema=https://raw.githubusercontent.com/prefix-dev/recipe-format/main/schema.json\n\ncontext:\n  name: libsecp256k1\n  version: \"0.8.0\"\n  # Look in the upstream CMakeLists.txt for the library version -- it is NOT the\n  # same as the project version. Upstream does some arithmetic to convert\n  # lib_version into so_version. Re-check both values on every version bump.\n  so_version: \"7.0.0\"\n  so_major_version: \"7\"\n  library: ${{ \"\" if unix else \"Library/\" }}\n\nrecipe:\n  name: libsecp256k1-split\n  version: ${{ version }}\n\nsource:\n  url: https://github.com/bitcoin-core/secp256k1/archive/refs/tags/v${{ version }}.tar.gz\n  sha256: eb52b0e9239dff7dc26be5f9623567141b8720ec47da29eb3c1e0a660d17c8bb\n\nbuild:\n  number: 1\n\n# Build once, then split the installed files across the two outputs below.\noutputs:\n  - staging:\n      name: build-cache\n    build:\n      script:\n        file: build.sh\n        interpreter: brush\n    requirements:\n      build:\n      - ${{ compiler('c') }}\n      - ${{ stdlib('c') }}\n      - brush\n      - cmake >=3.26\n      - ninja\n\n  - package:\n      name: libsecp256k1\n      version: ${{ version }}\n    inherit: build-cache\n    build:\n      # This package ships only headers, cmake/pkg-config files and the\n      # unversioned .so symlink - nothing with a DT_NEEDED record - so the\n      # run dependency on libsecp256k1-N is invisible to the overdepending\n      # check even though the symlink target and the .pc file both resolve\n      # into it. Suppress here only; keep the check active for other outputs.\n      dynamic_linking:\n        overdepending_behavior: ignore\n      files:\n        - ${{ library }}include/secp256k1*\n        - ${{ library }}lib/pkgconfig/libsecp256k1.pc\n        - ${{ library }}lib/cmake/libsecp256k1/*\n        - ${{ library }}lib/libsecp256k1.${{ \"so\" if linux else \"dylib\" if osx else \"lib\" }}\n        - if: not unix\n          then:\n            - ${{ library }}lib/secp256k1.lib\n    requirements:\n      build:\n        - ${{ compiler('c') }}\n        - ${{ stdlib('c') }}\n      host:\n        - ${{ pin_subpackage('libsecp256k1-' ~ so_major_version, exact=True) }}\n      run:\n        - ${{ pin_subpackage('libsecp256k1-' ~ so_major_version, exact=True) }}\n      run_exports:\n        - ${{ pin_subpackage('libsecp256k1-' ~ so_major_version) }}\n    tests:\n      - package_contents:\n          strict: true\n          include:\n            - secp256k1.h\n            - secp256k1_ecdh.h\n            - secp256k1_ellswift.h\n            - secp256k1_extrakeys.h\n            - secp256k1_musig.h\n            - secp256k1_preallocated.h\n            - secp256k1_recovery.h\n            - secp256k1_schnorrsig.h\n            - secp256k1_silentpayments.h\n          lib:\n            - if: unix\n              then:\n                - libsecp256k1\n          files:\n            - if: not unix\n              then:\n                - ${{ library }}lib/libsecp256k1.lib\n                - ${{ library }}lib/secp256k1.lib\n            - ${{ library }}lib/cmake/libsecp256k1/libsecp256k1-config.cmake\n            - ${{ library }}lib/cmake/libsecp256k1/libsecp256k1-config-version.cmake\n            - ${{ library }}lib/cmake/libsecp256k1/libsecp256k1-targets.cmake\n            - ${{ library }}lib/cmake/libsecp256k1/libsecp256k1-targets-release.cmake\n            - ${{ library }}lib/pkgconfig/libsecp256k1.pc\n            # Test artifacts\n            - etc/conda/test-files/libsecp256k1/*\n\n      - script:\n          - pkg-config --exists libsecp256k1\n        requirements:\n          build:\n            - pkg-config\n\n      - script:\n          interpreter: brush\n          content: |\n            # Standalone build against the installed library. The upstream\n            # sources needed to compile the tests are staged here at test\n            # time (see `files:` below) rather than being copied into the\n            # recipe directory during the build.\n            cp src/tests.c src/tests_exhaustive.c src/secp256k1.c shared_standalone_tests/src/\n            cp -R src/modules src/wycheproof shared_standalone_tests/src/\n            cp src/*.h shared_standalone_tests/src/\n            cp -R cmake shared_standalone_tests/src/\n            cp -R include contrib shared_standalone_tests/\n            cd shared_standalone_tests\n            cmake -G Ninja -DSECP256K1_BUILD_EXHAUSTIVE_TESTS=ON -DBUILD_SHARED_LIBS=ON ${CMAKE_ARGS} -S src -B build\n            cd build && cmake --build . && cmake --build . --target check && cmake --build . --target clean\n        requirements:\n          build:\n            - ${{ compiler('c') }}\n            - brush\n            - cmake >=3.26\n            - ninja\n            - pkg-config\n        files:\n          recipe:\n            - shared_standalone_tests/\n          source:\n            - src/\n            - include/\n            - contrib/\n            - cmake/\n      # - downstream: libsecp256k1-py-bindings\n      - downstream: coincurve\n\n  # ---------------------------------------------------------------------------\n  # Runtime package: versioned shared library only.\n  # ---------------------------------------------------------------------------\n  - package:\n      name: libsecp256k1-${{ so_major_version }}\n      version: ${{ version }}\n    inherit: build-cache\n    build:\n      files:\n        - if: linux\n          then:\n            - lib/libsecp256k1.so.${{ so_major_version }}\n            - lib/libsecp256k1.so.${{ so_version }}\n        - if: osx\n          then:\n            - lib/libsecp256k1.${{ so_major_version }}.dylib\n        - if: not unix\n          then:\n            - ${{ library }}bin/libsecp256k1-${{ so_major_version }}.dll\n    requirements:\n      build:\n        - ${{ compiler('c') }}\n        - ${{ stdlib('c') }}\n      run_exports:\n        - ${{ pin_subpackage('libsecp256k1-' ~ so_major_version) }}\n    tests:\n      - package_contents:\n          strict: true\n          files:\n            - if: linux\n              then:\n                - lib/libsecp256k1.so.${{ so_major_version }}\n                - lib/libsecp256k1.so.${{ so_version }}\n            - if: osx\n              then:\n                - lib/libsecp256k1.${{ so_major_version }}.dylib\n            - if: not unix\n              then:\n                - ${{ library }}bin/libsecp256k1-${{ so_major_version }}.dll\n\nabout:\n  homepage: https://github.com/bitcoin-core/secp256k1\n  summary: Optimized C library for ECDSA signatures and secret/public key operations on curve secp256k1.\n  description: |\n    This library is intended to be the highest quality publicly available\n    library for cryptography on the secp256k1 curve. However, the primary\n    focus of its development has been for usage in the Bitcoin system and\n    usage unlike Bitcoin's may be less well tested, verified, or suffer\n    from a less well thought out interface. Correct usage requires some\n    care and consideration that the library is fit for your application's purpose.\n  license: MIT\n  license_file:\n    - COPYING\n\nextra:\n  recipe-maintainers:\n    - MementoRC\n  feedstock-name: libsecp256k1\n",
   "req": {
     "__set__": true,
     "elements": [
+      "brush",
       "c_compiler_stub",
       "c_stdlib_stub",
       "cmake",
       "libsecp256k1-7",
-      "make"
+      "ninja"
     ]
   },
   "requirements": {
     "build": {
       "__set__": true,
       "elements": [
+        "brush",
         "c_compiler_stub",
         "c_stdlib_stub",
         "cmake",
-        "make"
+        "ninja"
       ]
     },
     "host": {
@@ -1452,9 +2284,10 @@
     "test": {
       "__set__": true,
       "elements": [
+        "brush",
         "c_compiler_stub",
         "cmake",
-        "make",
+        "ninja",
         "pkg-config"
       ]
     }
@@ -1464,10 +2297,11 @@
     "build": {
       "__set__": true,
       "elements": [
+        "brush",
         "c_compiler_stub",
         "c_stdlib_stub",
         "cmake >=3.26",
-        "make"
+        "ninja"
       ]
     },
     "host": {
@@ -1485,9 +2319,10 @@
     "test": {
       "__set__": true,
       "elements": [
+        "brush",
         "c_compiler_stub",
         "cmake >=3.26",
-        "make",
+        "ninja",
         "pkg-config"
       ]
     }
@@ -1499,16 +2334,21 @@
   },
   "win_64_meta_yaml": {
     "about": {
-      "description": "This library is intended to be the highest quality publicly available\nlibrary for cryptography on the secp256k1 curve. However, the primary\nfocus of its development has been for usage in the Bitcoin system and\nusage unlike Bitcoin's may be less well tested, verified, or suffer\nfrom a less well thought out interface. Correct usage requires some\ncare and consideration that the library is fit for your application's purpose.\n",
+      "description": "This library is intended to be the highest quality publicly available\nlibrary for cryptography on the secp256k1 curve. However, the primary\nfocus of its development has been for usage in the Bitcoin system and\nusage unlike Bitcoin's may be less well tested, verified, or suffer\nfrom a less well thought out interface. Correct usage requires some\ncare and consideration that the library is fit for your application's purpose.",
       "home": "https://github.com/bitcoin-core/secp256k1",
       "license": "MIT",
-      "license_file": [
-        "COPYING"
-      ],
+      "license_family": "MIT",
+      "license_file": "COPYING",
       "summary": "Optimized C library for ECDSA signatures and secret/public key operations on curve secp256k1."
     },
     "build": {
-      "number": "0"
+      "number": "1",
+      "run_exports": {
+        "weak": [
+          "libsecp256k1-7"
+        ]
+      },
+      "script": []
     },
     "extra": {
       "feedstock-name": "libsecp256k1",
@@ -1519,22 +2359,19 @@
     "outputs": [
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libsecp256k1-7"
           ]
         },
-        "files": [
-          "Library\\\\include\\\\secp256k1*",
-          "Library\\\\lib\\\\libsecp256k1.lib",
-          "Library\\\\lib\\\\secp256k1.lib",
-          "Library\\\\lib\\\\pkgconfig\\\\libsecp256k1.pc",
-          "Library\\\\lib\\\\cmake\\\\libsecp256k1"
-        ],
         "name": "libsecp256k1",
         "requirements": {
           "build": [
             "c_compiler_stub",
-            "c_stdlib_stub"
+            "c_stdlib_stub",
+            "brush",
+            "cmake >=3.26",
+            "ninja"
           ],
           "host": [
             "libsecp256k1-7"
@@ -1543,85 +2380,125 @@
             "libsecp256k1-7"
           ]
         },
-        "test": {
-          "commands": [
-            "if not exist %LIBRARY_INC%\\\\secp256k1.h exit 1",
-            "if not exist %LIBRARY_INC%\\\\secp256k1_preallocated.h exit 1",
-            "if not exist %LIBRARY_INC%\\\\secp256k1_ecdh.h exit 1",
-            "if not exist %LIBRARY_INC%\\\\secp256k1_recovery.h exit 1",
-            "if not exist %LIBRARY_INC%\\\\secp256k1_extrakeys.h exit 1",
-            "if not exist %LIBRARY_INC%\\\\secp256k1_schnorrsig.h exit 1",
-            "if not exist %LIBRARY_INC%\\\\secp256k1_ellswift.h exit 1",
-            "if not exist %LIBRARY_INC%\\\\secp256k1_musig.h exit 1",
-            "if not exist %LIBRARY_LIB%\\\\secp256k1.lib exit 1",
-            "if not exist %LIBRARY_LIB%\\\\libsecp256k1.lib exit 1",
-            "if not exist %LIBRARY_BIN%\\\\libsecp256k1-7.dll exit 1",
-            "if not exist %LIBRARY_LIB%\\\\pkgconfig\\\\libsecp256k1.pc exit 1",
-            "pkg-config --exists libsecp256k1",
-            "if not exist %LIBRARY_LIB%\\\\cmake\\\\libsecp256k1\\\\libsecp256k1-config.cmake exit 1",
-            "cd shared_standalone_tests",
-            "cmake -DSECP256K1_BUILD_EXHAUSTIVE_TESTS=ON -DBUILD_SHARED_LIBS=ON %CMAKE_ARGS% -S src -B build",
-            "cd build && cmake --build .  && cmake --build . --target check && cmake --build . --target clean",
-            "cd ..",
-            "rmdir /s /q shared_standalone_tests"
-          ],
-          "downstreams": [
-            "libsecp256k1-py-bindings",
-            "coincurve"
-          ],
-          "files": [
-            "shared_standalone_tests/"
-          ],
-          "requires": [
-            "c_compiler_stub",
-            "cmake >=3.26",
-            "make",
-            "pkg-config"
-          ]
-        }
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "Library/lib/libsecp256k1.lib",
+                "Library/lib/secp256k1.lib",
+                "Library/lib/cmake/libsecp256k1/libsecp256k1-config.cmake",
+                "Library/lib/cmake/libsecp256k1/libsecp256k1-config-version.cmake",
+                "Library/lib/cmake/libsecp256k1/libsecp256k1-targets.cmake",
+                "Library/lib/cmake/libsecp256k1/libsecp256k1-targets-release.cmake",
+                "Library/lib/pkgconfig/libsecp256k1.pc",
+                "etc/conda/test-files/libsecp256k1/*"
+              ],
+              "include": [
+                "secp256k1.h",
+                "secp256k1_ecdh.h",
+                "secp256k1_ellswift.h",
+                "secp256k1_extrakeys.h",
+                "secp256k1_musig.h",
+                "secp256k1_preallocated.h",
+                "secp256k1_recovery.h",
+                "secp256k1_schnorrsig.h",
+                "secp256k1_silentpayments.h"
+              ],
+              "strict": true
+            }
+          },
+          {
+            "requirements": {
+              "build": [
+                "pkg-config"
+              ]
+            },
+            "script": "pkg-config --exists libsecp256k1"
+          },
+          {
+            "files": {
+              "recipe": [
+                "shared_standalone_tests/"
+              ],
+              "source": [
+                "src/",
+                "include/",
+                "contrib/",
+                "cmake/"
+              ]
+            },
+            "requirements": {
+              "build": [
+                "c_compiler_stub",
+                "brush",
+                "cmake >=3.26",
+                "ninja",
+                "pkg-config"
+              ]
+            },
+            "script": {
+              "content": "# Standalone build against the installed library. The upstream\n# sources needed to compile the tests are staged here at test\n# time (see `files:` below) rather than being copied into the\n# recipe directory during the build.\ncp src/tests.c src/tests_exhaustive.c src/secp256k1.c shared_standalone_tests/src/\ncp -R src/modules src/wycheproof shared_standalone_tests/src/\ncp src/*.h shared_standalone_tests/src/\ncp -R cmake shared_standalone_tests/src/\ncp -R include contrib shared_standalone_tests/\ncd shared_standalone_tests\ncmake -G Ninja -DSECP256K1_BUILD_EXHAUSTIVE_TESTS=ON -DBUILD_SHARED_LIBS=ON ${CMAKE_ARGS} -S src -B build\ncd build && cmake --build . && cmake --build . --target check && cmake --build . --target clean\n",
+              "interpreter": "brush"
+            }
+          },
+          {
+            "downstream": "coincurve"
+          }
+        ],
+        "version": "0.8.0"
       },
       {
         "build": {
-          "run_exports": [
+          "strong": [],
+          "weak": [
             "libsecp256k1-7"
           ]
         },
-        "files": [
-          "Library\\\\bin\\\\libsecp256k1-7.dll"
-        ],
         "name": "libsecp256k1-7",
         "requirements": {
           "build": [
             "c_compiler_stub",
-            "c_stdlib_stub"
-          ]
-        },
-        "test": {
-          "commands": [
-            "if exist %LIBRARY_INC%\\\\secp256k1.h exit 1",
-            "if exist %LIBRARY_LIB%\\\\libsecp256k1.lib exit 1",
-            "if exist %LIBRARY_LIB%\\\\secp256k1.lib exit 1",
-            "if not exist %LIBRARY_BIN%\\\\libsecp256k1-7.dll exit 1"
+            "c_stdlib_stub",
+            "brush",
+            "cmake >=3.26",
+            "ninja"
           ],
-          "files": [
-            "load_shared_library.py"
-          ]
-        }
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "Library/bin/libsecp256k1-7.dll"
+              ],
+              "strict": true
+            }
+          }
+        ],
+        "version": "0.8.0"
       }
     ],
     "package": {
-      "name": "libsecp256k1-split",
+      "name": "libsecp256k1",
       "version": "0.8.0"
     },
     "requirements": {
       "build": [
         "c_compiler_stub",
         "c_stdlib_stub",
+        "brush",
         "cmake >=3.26",
-        "make"
+        "ninja"
+      ],
+      "host": [
+        "libsecp256k1-7"
+      ],
+      "run": [
+        "libsecp256k1-7"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "sha256": "eb52b0e9239dff7dc26be5f9623567141b8720ec47da29eb3c1e0a660d17c8bb",
       "url": "https://github.com/bitcoin-core/secp256k1/archive/refs/tags/v0.8.0.tar.gz"
@@ -1631,10 +2508,11 @@
     "build": {
       "__set__": true,
       "elements": [
+        "brush",
         "c_compiler_stub",
         "c_stdlib_stub",
         "cmake",
-        "make"
+        "ninja"
       ]
     },
     "host": {
@@ -1652,9 +2530,216 @@
     "test": {
       "__set__": true,
       "elements": [
+        "brush",
         "c_compiler_stub",
         "cmake",
-        "make",
+        "ninja",
+        "pkg-config"
+      ]
+    }
+  },
+  "win_arm64_meta_yaml": {
+    "about": {
+      "description": "This library is intended to be the highest quality publicly available\nlibrary for cryptography on the secp256k1 curve. However, the primary\nfocus of its development has been for usage in the Bitcoin system and\nusage unlike Bitcoin's may be less well tested, verified, or suffer\nfrom a less well thought out interface. Correct usage requires some\ncare and consideration that the library is fit for your application's purpose.",
+      "home": "https://github.com/bitcoin-core/secp256k1",
+      "license": "MIT",
+      "license_family": "MIT",
+      "license_file": "COPYING",
+      "summary": "Optimized C library for ECDSA signatures and secret/public key operations on curve secp256k1."
+    },
+    "build": {
+      "number": "1",
+      "run_exports": {
+        "weak": [
+          "libsecp256k1-7"
+        ]
+      },
+      "script": []
+    },
+    "extra": {
+      "feedstock-name": "libsecp256k1",
+      "recipe-maintainers": [
+        "MementoRC"
+      ]
+    },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "libsecp256k1-7"
+          ]
+        },
+        "name": "libsecp256k1",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "brush",
+            "cmake >=3.26",
+            "ninja"
+          ],
+          "host": [
+            "libsecp256k1-7"
+          ],
+          "run": [
+            "libsecp256k1-7"
+          ]
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "Library/lib/libsecp256k1.lib",
+                "Library/lib/secp256k1.lib",
+                "Library/lib/cmake/libsecp256k1/libsecp256k1-config.cmake",
+                "Library/lib/cmake/libsecp256k1/libsecp256k1-config-version.cmake",
+                "Library/lib/cmake/libsecp256k1/libsecp256k1-targets.cmake",
+                "Library/lib/cmake/libsecp256k1/libsecp256k1-targets-release.cmake",
+                "Library/lib/pkgconfig/libsecp256k1.pc",
+                "etc/conda/test-files/libsecp256k1/*"
+              ],
+              "include": [
+                "secp256k1.h",
+                "secp256k1_ecdh.h",
+                "secp256k1_ellswift.h",
+                "secp256k1_extrakeys.h",
+                "secp256k1_musig.h",
+                "secp256k1_preallocated.h",
+                "secp256k1_recovery.h",
+                "secp256k1_schnorrsig.h",
+                "secp256k1_silentpayments.h"
+              ],
+              "strict": true
+            }
+          },
+          {
+            "requirements": {
+              "build": [
+                "pkg-config"
+              ]
+            },
+            "script": "pkg-config --exists libsecp256k1"
+          },
+          {
+            "files": {
+              "recipe": [
+                "shared_standalone_tests/"
+              ],
+              "source": [
+                "src/",
+                "include/",
+                "contrib/",
+                "cmake/"
+              ]
+            },
+            "requirements": {
+              "build": [
+                "c_compiler_stub",
+                "brush",
+                "cmake >=3.26",
+                "ninja",
+                "pkg-config"
+              ]
+            },
+            "script": {
+              "content": "# Standalone build against the installed library. The upstream\n# sources needed to compile the tests are staged here at test\n# time (see `files:` below) rather than being copied into the\n# recipe directory during the build.\ncp src/tests.c src/tests_exhaustive.c src/secp256k1.c shared_standalone_tests/src/\ncp -R src/modules src/wycheproof shared_standalone_tests/src/\ncp src/*.h shared_standalone_tests/src/\ncp -R cmake shared_standalone_tests/src/\ncp -R include contrib shared_standalone_tests/\ncd shared_standalone_tests\ncmake -G Ninja -DSECP256K1_BUILD_EXHAUSTIVE_TESTS=ON -DBUILD_SHARED_LIBS=ON ${CMAKE_ARGS} -S src -B build\ncd build && cmake --build . && cmake --build . --target check && cmake --build . --target clean\n",
+              "interpreter": "brush"
+            }
+          },
+          {
+            "downstream": "coincurve"
+          }
+        ],
+        "version": "0.8.0"
+      },
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "libsecp256k1-7"
+          ]
+        },
+        "name": "libsecp256k1-7",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "brush",
+            "cmake >=3.26",
+            "ninja"
+          ],
+          "host": [],
+          "run": []
+        },
+        "tests": [
+          {
+            "package_contents": {
+              "files": [
+                "Library/bin/libsecp256k1-7.dll"
+              ],
+              "strict": true
+            }
+          }
+        ],
+        "version": "0.8.0"
+      }
+    ],
+    "package": {
+      "name": "libsecp256k1",
+      "version": "0.8.0"
+    },
+    "requirements": {
+      "build": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "brush",
+        "cmake >=3.26",
+        "ninja"
+      ],
+      "host": [
+        "libsecp256k1-7"
+      ],
+      "run": [
+        "libsecp256k1-7"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "sha256": "eb52b0e9239dff7dc26be5f9623567141b8720ec47da29eb3c1e0a660d17c8bb",
+      "url": "https://github.com/bitcoin-core/secp256k1/archive/refs/tags/v0.8.0.tar.gz"
+    }
+  },
+  "win_arm64_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "brush",
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "cmake",
+        "ninja"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "libsecp256k1-7"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "libsecp256k1-7"
+      ]
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "brush",
+        "c_compiler_stub",
+        "cmake",
+        "ninja",
         "pkg-config"
       ]
     }
