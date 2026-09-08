@@ -13,8 +13,8 @@
       "tooling_branch_name": "main"
     }
   },
-  "feedstock_hash": "e3d24800355b3c1dbf5c9af111954614600fa6b0",
-  "feedstock_hash_ts": 1788547730,
+  "feedstock_hash": "74ca05e206d4b433139441f6345f11cc4595fa6d",
+  "feedstock_hash_ts": 1788876776,
   "feedstock_name": "puffin",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -33,6 +33,7 @@
     },
     "extra": {
       "recipe-maintainers": [
+        "mightylorenzo",
         "ken-lauer"
       ]
     },
@@ -247,6 +248,7 @@
     },
     "extra": {
       "recipe-maintainers": [
+        "mightylorenzo",
         "ken-lauer"
       ]
     },
@@ -553,6 +555,7 @@
     },
     "extra": {
       "recipe-maintainers": [
+        "mightylorenzo",
         "ken-lauer"
       ]
     },
@@ -768,7 +771,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/puffin.json"
   },
-  "raw_meta_yaml": "schema_version: 1\n\ncontext:\n  version: \"1.9.1\"\n  build: 1\n  mpi_prefix: mpi_${{ mpi }}\n\npackage:\n  name: puffin\n  version: ${{ version }}\n\nsource:\n  url: https://github.com/UKFELs/Puffin/archive/refs/tags/v${{ version }}.tar.gz\n  sha256: 0af3126db98f7064ccf5d928a4db2beb3f170dbb88893b076d527282e20fb6b2\n  patches:\n    - no-openmp-c-flags-for-fortran.patch\n    - fix-version-to-match-release-tag.patch\n\nbuild:\n  number: ${{ build }}\n  string: ${{ mpi_prefix }}_h${{ hash }}_${{ build }}\n  skip:\n    - win\n\nrequirements:\n  build:\n    - ${{ compiler('c') }}\n    - ${{ stdlib('c') }}\n    - ${{ compiler('cxx') }}\n    - ${{ compiler('fortran') }}\n    - cmake\n    - make\n    - if: mpi == \"openmpi\" and build_platform != target_platform\n      then: openmpi\n  host:\n    - ${{ mpi }}\n    - hdf5 ${{ hdf5 }}.* ${{ mpi_prefix }}_*\n    - fftw * ${{ mpi_prefix }}_*\n    # find_package(OpenMP REQUIRED) covers C/C++ too, where osx uses clang\n    - if: osx\n      then: llvm-openmp\n    - if: linux\n      then: libgomp\n  run:\n    - ${{ mpi }}\n\ntests:\n  - package_contents:\n      bin:\n        - puffin\n      files:\n        - share/puffin/examples/**/*\n  - script:\n      env:\n        OMP_NUM_THREADS: \"1\"\n        # mpich: avoid ssh-based process launch on CI\n        # ref: https://github.com/conda-forge/pyamrex-feedstock/blob/main/recipe/recipe.yaml\n        HYDRA_LAUNCHER: fork\n        # OpenMPI - docker as root\n        OMPI_ALLOW_RUN_AS_ROOT: \"1\"\n        OMPI_ALLOW_RUN_AS_ROOT_CONFIRM: \"1\"\n        OMPI_MCA_btl: self,tcp\n        PRTE_MCA_rmaps_default_mapping_policy: \":oversubscribe\"\n      content:\n        # Shortened 1D CSE example used in upstream tests\n        - cd test\n        - mpiexec -n 2 puffin inputs/f1main.in\n        - test -f inputs/f1main_aperp_0.h5\n        - test -f inputs/f1main_aperp_2.h5\n        - test -f inputs/f1main_electrons_2.h5\n        - test -f inputs/f1main_integrated_2.h5\n    files:\n      source:\n        - test/inputs/\n\nabout:\n  homepage: https://github.com/UKFELs/Puffin\n  license: BSD-3-Clause\n  license_file: LICENSE.txt\n  summary: Puffin (Parallel Unaveraged Fel INtegrator) simulates a Free Electron Laser (FEL).\n  description: |\n    Puffin is a massively parallel numerical solver for an unaveraged, 3D FEL\n    system of equations, written in Fortran 90 using MPI and OpenMP. Puffin is\n    an 'unaveraged' FEL code - meaning it is absent of the slowly varying\n    envelope approximation (SVEA) and wiggler period averaging approximations.\n    It does not utilize a 'slicing' model of the beam phase space and radiation\n    field, and instead utilizes an algorithm which is much more similar to a\n    Particle-In-Cell (PIC) code methodology.\n  documentation: https://ukfels.github.io/puffinDocs/\n  repository: https://github.com/UKFELs/Puffin\n\nextra:\n  recipe-maintainers:\n    - ken-lauer\n",
+  "raw_meta_yaml": "schema_version: 1\n\ncontext:\n  version: \"1.9.1\"\n  build: 1\n  mpi_prefix: mpi_${{ mpi }}\n\npackage:\n  name: puffin\n  version: ${{ version }}\n\nsource:\n  url: https://github.com/UKFELs/Puffin/archive/refs/tags/v${{ version }}.tar.gz\n  sha256: 0af3126db98f7064ccf5d928a4db2beb3f170dbb88893b076d527282e20fb6b2\n  patches:\n    - no-openmp-c-flags-for-fortran.patch\n    - fix-version-to-match-release-tag.patch\n\nbuild:\n  number: ${{ build }}\n  string: ${{ mpi_prefix }}_h${{ hash }}_${{ build }}\n  skip:\n    - win\n\nrequirements:\n  build:\n    - ${{ compiler('c') }}\n    - ${{ stdlib('c') }}\n    - ${{ compiler('cxx') }}\n    - ${{ compiler('fortran') }}\n    - cmake\n    - make\n    - if: mpi == \"openmpi\" and build_platform != target_platform\n      then: openmpi\n  host:\n    - ${{ mpi }}\n    - hdf5 ${{ hdf5 }}.* ${{ mpi_prefix }}_*\n    - fftw * ${{ mpi_prefix }}_*\n    # find_package(OpenMP REQUIRED) covers C/C++ too, where osx uses clang\n    - if: osx\n      then: llvm-openmp\n    - if: linux\n      then: libgomp\n  run:\n    - ${{ mpi }}\n\ntests:\n  - package_contents:\n      bin:\n        - puffin\n      files:\n        - share/puffin/examples/**/*\n  - script:\n      env:\n        OMP_NUM_THREADS: \"1\"\n        # mpich: avoid ssh-based process launch on CI\n        # ref: https://github.com/conda-forge/pyamrex-feedstock/blob/main/recipe/recipe.yaml\n        HYDRA_LAUNCHER: fork\n        # OpenMPI - docker as root\n        OMPI_ALLOW_RUN_AS_ROOT: \"1\"\n        OMPI_ALLOW_RUN_AS_ROOT_CONFIRM: \"1\"\n        OMPI_MCA_btl: self,tcp\n        PRTE_MCA_rmaps_default_mapping_policy: \":oversubscribe\"\n      content:\n        # Shortened 1D CSE example used in upstream tests\n        - cd test\n        - mpiexec -n 2 puffin inputs/f1main.in\n        - test -f inputs/f1main_aperp_0.h5\n        - test -f inputs/f1main_aperp_2.h5\n        - test -f inputs/f1main_electrons_2.h5\n        - test -f inputs/f1main_integrated_2.h5\n    files:\n      source:\n        - test/inputs/\n\nabout:\n  homepage: https://github.com/UKFELs/Puffin\n  license: BSD-3-Clause\n  license_file: LICENSE.txt\n  summary: Puffin (Parallel Unaveraged Fel INtegrator) simulates a Free Electron Laser (FEL).\n  description: |\n    Puffin is a massively parallel numerical solver for an unaveraged, 3D FEL\n    system of equations, written in Fortran 90 using MPI and OpenMP. Puffin is\n    an 'unaveraged' FEL code - meaning it is absent of the slowly varying\n    envelope approximation (SVEA) and wiggler period averaging approximations.\n    It does not utilize a 'slicing' model of the beam phase space and radiation\n    field, and instead utilizes an algorithm which is much more similar to a\n    Particle-In-Cell (PIC) code methodology.\n  documentation: https://ukfels.github.io/puffinDocs/\n  repository: https://github.com/UKFELs/Puffin\n\nextra:\n  recipe-maintainers:\n    - mightylorenzo\n    - ken-lauer\n",
   "req": {
     "__set__": true,
     "elements": [
