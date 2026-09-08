@@ -16,8 +16,8 @@
       "tooling_branch_name": "main"
     }
   },
-  "feedstock_hash": "2157d8159d19cf93955d391b4d620fe5096aa61d",
-  "feedstock_hash_ts": 1788290976,
+  "feedstock_hash": "51d0bc70916f861e31f9224359cf4bd38f812d49",
+  "feedstock_hash_ts": 1788893004,
   "feedstock_name": "intel-graphics-compiler",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -90,12 +90,12 @@
             "script": "test -f ${PREFIX}/lib/libiga64.so"
           }
         ],
-        "version": "2.41.3"
+        "version": "2.41.4"
       }
     ],
     "package": {
       "name": "intel-graphics-compiler",
-      "version": "2.41.3"
+      "version": "2.41.4"
     },
     "requirements": {
       "build": [
@@ -127,8 +127,8 @@
         "patches/0001-restore-user-cxx-flags.patch",
         "patches/0002-avoid-llvm-module-dump-in-release.patch"
       ],
-      "sha256": "d35300373464b12d3ade933a66edc8aaab0531347de57892da4e44ce9da2fd64",
-      "url": "https://github.com/intel/intel-graphics-compiler/archive/v2.41.3.tar.gz"
+      "sha256": "438669be91db3b10136646eac2e88103c8bef0bc22df25bb18dc834e4fde1213",
+      "url": "https://github.com/intel/intel-graphics-compiler/archive/v2.41.4.tar.gz"
     }
   },
   "linux_64_requirements": {
@@ -239,12 +239,12 @@
             "script": "test -f ${PREFIX}/lib/libiga64.so"
           }
         ],
-        "version": "2.41.3"
+        "version": "2.41.4"
       }
     ],
     "package": {
       "name": "intel-graphics-compiler",
-      "version": "2.41.3"
+      "version": "2.41.4"
     },
     "requirements": {
       "build": [
@@ -276,8 +276,8 @@
         "patches/0001-restore-user-cxx-flags.patch",
         "patches/0002-avoid-llvm-module-dump-in-release.patch"
       ],
-      "sha256": "d35300373464b12d3ade933a66edc8aaab0531347de57892da4e44ce9da2fd64",
-      "url": "https://github.com/intel/intel-graphics-compiler/archive/v2.41.3.tar.gz"
+      "sha256": "438669be91db3b10136646eac2e88103c8bef0bc22df25bb18dc834e4fde1213",
+      "url": "https://github.com/intel/intel-graphics-compiler/archive/v2.41.4.tar.gz"
     }
   },
   "name": "intel-graphics-compiler",
@@ -294,7 +294,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/intel-graphics-compiler.json"
   },
-  "raw_meta_yaml": "schema_version: 1\n\ncontext:\n  version: \"2.41.3\"\n  llvm_version: \"16.0\"\n  vc_intrinsics_version: \"0.25.0\"\n  opencl_clang_commit: \"07e7c931d8bdb38549a907cf04fd06a278f7cdce\"\n\npackage:\n  name: intel-graphics-compiler\n  version: ${{ version }}\n\nsource:\n  - url: https://github.com/intel/intel-graphics-compiler/archive/v${{ version }}.tar.gz\n    target_directory: igc\n    sha256: d35300373464b12d3ade933a66edc8aaab0531347de57892da4e44ce9da2fd64\n    patches:\n      # IGC clears CMAKE_CXX_FLAGS/CMAKE_C_FLAGS but never re-appends the saved\n      # USER_*_FLAGS, dropping the compiler's -isystem $PREFIX/include so the\n      # prebuilt LLVM/SPIRV headers cannot be found.  Restore them.\n      - patches/0001-restore-user-cxx-flags.patch\n      # IGC calls llvm::Module::dump() which is a debug-only symbol (guarded by\n      # LLVM_DUMP_METHOD) and is absent from the prebuilt Release LLVM, breaking\n      # the link of libigc.so.  Replace it with print().\n      - patches/0002-avoid-llvm-module-dump-in-release.patch\n  # TODO: create separate package for the vc-intrinsics\n  - url: https://github.com/intel/vc-intrinsics/archive/refs/tags/v${{ vc_intrinsics_version }}.tar.gz\n    target_directory: vc-intrinsics\n    sha256: 83d6e0528feb6a47f7818e7c1dd3305dd8a48fb1103d279571dad517a93a8d39\n  # opencl-clang (common_clang) is not published on conda-forge for LLVM 16, so\n  # we vendor and build it in-tree.  The revision is the exact commit that IGC\n  # v2.34.4 pins on branch ocl-open-160.\n  # TODO: revive the intel-opencl-clang feedstock for LLVM 16 and depend on it.\n  - url: https://github.com/intel/opencl-clang/archive/${{ opencl_clang_commit }}.tar.gz\n    target_directory: opencl-clang\n    sha256: ce29ab859c7fcf8703a6c752d0ae91d2e2ef0e9e57b0142c5f079da7f6c1d49d\n\nbuild:\n  number: 0\n  skip: not linux\n  script:\n    file: build.sh\n    env:\n      LLVM_VERSION: ${{ llvm_version }}\n\nrequirements:\n  build:\n    - ${{ compiler('cxx') }}\n    - ${{ stdlib('c') }}\n    - cmake <4\n    - ninja\n    - flex\n    - bison\n    - python *\n    - mako\n    - pyyaml\n  host:\n    - llvmdev ${{ llvm_version }}.*\n    - llvm ${{ llvm_version }}.*\n    - clangdev ${{ llvm_version }}.*\n    - libclang-cpp ${{ llvm_version }}.*\n    - libllvmspirv >=16.0.23,<16.1.0a0\n    - zlib\n    - lld\n    - spirv-tools\n    # IGC >=2.40 needs spv::CapabilityPredicatedIOINTEL (SPV_INTEL_predicated_io),\n    # first shipped in SPIRV-Headers vulkan-sdk-1.4.357.0\n    - spirv-headers >=1.4.357\n  run_exports:\n    - ${{ pin_subpackage(\"intel-graphics-compiler\", upper_bound=\"x\") }}\n\ntests:\n  - script:\n      - test -f ${PREFIX}/lib/libiga64.so\n\nabout:\n  homepage: https://github.com/intel/intel-graphics-compiler\n  license: MIT\n  license_file: igc/LICENSE.md\n  summary: The Intel(R) Graphics Compiler for OpenCL(TM) is an llvm based compiler for OpenCL(TM) targeting Intel Gen graphics hardware architecture.\n\nextra:\n  recipe-maintainers:\n    - oleksandr-pavlyk\n    - ZzEeKkAa\n    - isuruf\n    - hmaarrfk\n",
+  "raw_meta_yaml": "schema_version: 1\n\ncontext:\n  version: \"2.41.4\"\n  llvm_version: \"16.0\"\n  vc_intrinsics_version: \"0.25.0\"\n  opencl_clang_commit: \"07e7c931d8bdb38549a907cf04fd06a278f7cdce\"\n\npackage:\n  name: intel-graphics-compiler\n  version: ${{ version }}\n\nsource:\n  - url: https://github.com/intel/intel-graphics-compiler/archive/v${{ version }}.tar.gz\n    target_directory: igc\n    sha256: 438669be91db3b10136646eac2e88103c8bef0bc22df25bb18dc834e4fde1213\n    patches:\n      # IGC clears CMAKE_CXX_FLAGS/CMAKE_C_FLAGS but never re-appends the saved\n      # USER_*_FLAGS, dropping the compiler's -isystem $PREFIX/include so the\n      # prebuilt LLVM/SPIRV headers cannot be found.  Restore them.\n      - patches/0001-restore-user-cxx-flags.patch\n      # IGC calls llvm::Module::dump() which is a debug-only symbol (guarded by\n      # LLVM_DUMP_METHOD) and is absent from the prebuilt Release LLVM, breaking\n      # the link of libigc.so.  Replace it with print().\n      - patches/0002-avoid-llvm-module-dump-in-release.patch\n  # TODO: create separate package for the vc-intrinsics\n  - url: https://github.com/intel/vc-intrinsics/archive/refs/tags/v${{ vc_intrinsics_version }}.tar.gz\n    target_directory: vc-intrinsics\n    sha256: 83d6e0528feb6a47f7818e7c1dd3305dd8a48fb1103d279571dad517a93a8d39\n  # opencl-clang (common_clang) is not published on conda-forge for LLVM 16, so\n  # we vendor and build it in-tree.  The revision is the exact commit that IGC\n  # v2.34.4 pins on branch ocl-open-160.\n  # TODO: revive the intel-opencl-clang feedstock for LLVM 16 and depend on it.\n  - url: https://github.com/intel/opencl-clang/archive/${{ opencl_clang_commit }}.tar.gz\n    target_directory: opencl-clang\n    sha256: ce29ab859c7fcf8703a6c752d0ae91d2e2ef0e9e57b0142c5f079da7f6c1d49d\n\nbuild:\n  number: 0\n  skip: not linux\n  script:\n    file: build.sh\n    env:\n      LLVM_VERSION: ${{ llvm_version }}\n\nrequirements:\n  build:\n    - ${{ compiler('cxx') }}\n    - ${{ stdlib('c') }}\n    - cmake <4\n    - ninja\n    - flex\n    - bison\n    - python *\n    - mako\n    - pyyaml\n  host:\n    - llvmdev ${{ llvm_version }}.*\n    - llvm ${{ llvm_version }}.*\n    - clangdev ${{ llvm_version }}.*\n    - libclang-cpp ${{ llvm_version }}.*\n    - libllvmspirv >=16.0.23,<16.1.0a0\n    - zlib\n    - lld\n    - spirv-tools\n    # IGC >=2.40 needs spv::CapabilityPredicatedIOINTEL (SPV_INTEL_predicated_io),\n    # first shipped in SPIRV-Headers vulkan-sdk-1.4.357.0\n    - spirv-headers >=1.4.357\n  run_exports:\n    - ${{ pin_subpackage(\"intel-graphics-compiler\", upper_bound=\"x\") }}\n\ntests:\n  - script:\n      - test -f ${PREFIX}/lib/libiga64.so\n\nabout:\n  homepage: https://github.com/intel/intel-graphics-compiler\n  license: MIT\n  license_file: igc/LICENSE.md\n  summary: The Intel(R) Graphics Compiler for OpenCL(TM) is an llvm based compiler for OpenCL(TM) targeting Intel Gen graphics hardware architecture.\n\nextra:\n  recipe-maintainers:\n    - oleksandr-pavlyk\n    - ZzEeKkAa\n    - isuruf\n    - hmaarrfk\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -400,8 +400,8 @@
       "elements": []
     }
   },
-  "url": "https://github.com/intel/intel-graphics-compiler/archive/v2.41.3.tar.gz",
-  "version": "2.41.3",
+  "url": "https://github.com/intel/intel-graphics-compiler/archive/v2.41.4.tar.gz",
+  "version": "2.41.4",
   "version_pr_info": {
     "__lazy_json__": "version_pr_info/intel-graphics-compiler.json"
   }
