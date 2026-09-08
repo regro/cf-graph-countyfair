@@ -1,16 +1,11 @@
 {
   "archived": false,
   "branch": "main",
-  "ci_support_linux_64_python3.10.____cpython.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '15'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma10\npin_run_as_build:\n  python:\n    min_pin: x.x\n    max_pin: x.x\npython:\n- 3.10.* *_cpython\nrust_compiler:\n- rust\ntarget_platform:\n- linux-64\n",
+  "ci_support_linux_64_is_abi3falsepython3.14.____cp314t.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '15'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma10\nis_abi3:\n- false\nis_python_min:\n- false\npin_run_as_build:\n  python:\n    min_pin: x.x\n    max_pin: x.x\npython:\n- 3.14.* *_cp314t\npython_min:\n- '3.11'\nrust_compiler:\n- rust\ntarget_platform:\n- linux-64\nzip_keys:\n- - python\n  - is_python_min\n  - is_abi3\n",
   "conda-forge.yml": {
     "bot": {
       "automerge": true,
       "inspection": "update-grayskull"
-    },
-    "build_platform": {
-      "linux_aarch64": "linux_64",
-      "linux_ppc64le": "linux_64",
-      "osx_arm64": "osx_64"
     },
     "conda_build": {
       "error_overlinking": true,
@@ -24,27 +19,43 @@
       "tooling_branch_name": "main"
     },
     "provider": {
-      "linux_aarch64": "github_actions",
+      "linux_aarch64": "default",
       "linux_ppc64le": "default",
-      "osx_arm64": "github_actions"
+      "osx_arm64": "default"
     },
     "test": "native_and_emulated"
   },
-  "feedstock_hash": "dfc519c11b670fd8e88cb1e69ab50af6fff0bb3a",
-  "feedstock_hash_ts": 1788143176,
+  "feedstock_hash": "ad1801c3ef4cf855ebb47f2f69ee0c9703d3dde8",
+  "feedstock_hash_ts": 1788881292,
   "feedstock_name": "hypothesis",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
     "about": {
-      "home": "https://pypi.org/project/hypothesis/",
+      "dev_url": "https://github.com/HypothesisWorks/hypothesis",
+      "doc_url": "https://hypothesis.readthedocs.io/",
+      "home": "https://pypi.org/project/hypothesis",
       "license": "MPL-2.0",
       "license_family": "MPL-2.0",
       "license_file": "LICENSE.txt",
       "summary": "The property-based testing library for Python"
     },
     "build": {
-      "number": "0",
-      "script": "${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation"
+      "number": "1",
+      "script": {
+        "content": [
+          "cp \"${RECIPE_DIR}/cargo-auditable-wrapper.sh\" \"${BUILD_PREFIX}/bin/cargo-auditable-wrapper\"",
+          "chmod 755 \"${BUILD_PREFIX}/bin/cargo-auditable-wrapper\"",
+          "${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation --disable-pip-version-check",
+          "cd rust",
+          "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml"
+        ],
+        "env": {
+          "CARGO": "cargo-auditable-wrapper",
+          "CARGO_PROFILE_RELEASE_LTO": "fat",
+          "CARGO_PROFILE_RELEASE_STRIP": "symbols",
+          "MATURIN_PEP517_ARGS": "--features pyo3/abi3"
+        }
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -60,21 +71,20 @@
         "name": "hypothesis",
         "requirements": {
           "build": [
-            "cargo-bundle-licenses",
             "c_compiler_stub",
             "rust_compiler_stub",
             "c_stdlib_stub",
-            "maturin >=1.7,<2.0"
+            "cargo-auditable",
+            "cargo-bundle-licenses",
+            "maturin >=1.9.4,<2.0"
           ],
           "host": [
-            "python",
+            "maturin >=1.9.4,<2.0",
             "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
+            "python"
           ],
           "run": [
             "python",
-            "exceptiongroup >=1.0.0",
             "sortedcontainers >=2.1.0,<3.0.0"
           ]
         },
@@ -82,20 +92,22 @@
           {
             "python": {
               "imports": [
-                "hypothesis"
+                "hypothesis",
+                "hypothesis._native"
               ]
             }
           },
           {
             "requirements": {
               "run": [
-                "pip",
-                "django",
-                "pandas",
                 "click"
               ]
             },
-            "script": "hypothesis --help"
+            "script": [
+              "hypothesis --help",
+              "hypothesis --version",
+              "hypothesis --version | ${{ \"grep -iE\" if unix else \"findstr /c\" }} \"${{ version | replace('.', '\\\\.') }}$\""
+            ]
           }
         ],
         "version": "6.167.1"
@@ -105,21 +117,22 @@
         "name": "hypothesis",
         "requirements": {
           "build": [
-            "cargo-bundle-licenses",
             "c_compiler_stub",
             "rust_compiler_stub",
             "c_stdlib_stub",
-            "maturin >=1.7,<2.0"
+            "cargo-auditable",
+            "cargo-bundle-licenses",
+            "maturin >=1.9.4,<2.0"
           ],
           "host": [
-            "python",
+            "maturin >=1.9.4,<2.0",
             "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
+            "python",
+            "python-abi3",
+            "python 3.11.*"
           ],
           "run": [
             "python",
-            "exceptiongroup >=1.0.0",
             "sortedcontainers >=2.1.0,<3.0.0"
           ]
         },
@@ -127,200 +140,30 @@
           {
             "python": {
               "imports": [
-                "hypothesis"
+                "hypothesis",
+                "hypothesis._native"
+              ],
+              "python_version": [
+                "3.11.*",
+                "*"
               ]
             }
           },
           {
             "requirements": {
               "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
+                "click",
+                "python 3.11.*",
+                "abi3audit"
               ]
             },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
+            "script": [
+              "hypothesis --help",
+              "hypothesis --version",
+              "hypothesis --version | ${{ \"grep -iE\" if unix else \"findstr /c\" }} \"${{ version | replace('.', '\\\\.') }}$\"",
+              "cd \"${{ '$SP_DIR' if unix else '%SP_DIR%' }}/hypothesis\"",
+              "abi3audit -s -v --assume-minimum-abi3 ${{ python_min }} _native.${{ 'abi3.so' if unix else 'pyd' }}"
+            ]
           }
         ],
         "version": "6.167.1"
@@ -332,28 +175,29 @@
     },
     "requirements": {
       "build": [
-        "cargo-bundle-licenses",
         "c_compiler_stub",
         "rust_compiler_stub",
         "c_stdlib_stub",
-        "maturin >=1.7,<2.0"
+        "cargo-auditable",
+        "cargo-bundle-licenses",
+        "maturin >=1.9.4,<2.0"
       ],
       "host": [
-        "python",
+        "maturin >=1.9.4,<2.0",
         "pip",
-        "maturin >=1.7,<2.0",
-        "puccinialin"
+        "python",
+        "python-abi3",
+        "python 3.11.*"
       ],
       "run": [
         "python",
-        "exceptiongroup >=1.0.0",
         "sortedcontainers >=2.1.0,<3.0.0"
       ]
     },
     "schema_version": 1,
     "source": {
       "sha256": "62eefcb4d2791423626e9901c3027a6e0c5ffda2ac0b44b3c7e797ab9d2d5a4c",
-      "url": "https://pypi.org/packages/source/h/hypothesis/hypothesis-6.167.1.tar.gz"
+      "url": "https://files.pythonhosted.org/packages/source/h/hypothesis/hypothesis-6.167.1.tar.gz"
     }
   },
   "linux_64_requirements": {
@@ -362,6 +206,7 @@
       "elements": [
         "c_compiler_stub",
         "c_stdlib_stub",
+        "cargo-auditable",
         "cargo-bundle-licenses",
         "maturin",
         "rust_compiler_stub"
@@ -372,14 +217,13 @@
       "elements": [
         "maturin",
         "pip",
-        "puccinialin",
-        "python"
+        "python",
+        "python-abi3"
       ]
     },
     "run": {
       "__set__": true,
       "elements": [
-        "exceptiongroup",
         "python",
         "sortedcontainers"
       ]
@@ -387,24 +231,40 @@
     "test": {
       "__set__": true,
       "elements": [
+        "abi3audit",
         "click",
-        "django",
-        "pandas",
-        "pip"
+        "pip",
+        "python"
       ]
     }
   },
   "linux_aarch64_meta_yaml": {
     "about": {
-      "home": "https://pypi.org/project/hypothesis/",
+      "dev_url": "https://github.com/HypothesisWorks/hypothesis",
+      "doc_url": "https://hypothesis.readthedocs.io/",
+      "home": "https://pypi.org/project/hypothesis",
       "license": "MPL-2.0",
       "license_family": "MPL-2.0",
       "license_file": "LICENSE.txt",
       "summary": "The property-based testing library for Python"
     },
     "build": {
-      "number": "0",
-      "script": "${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation"
+      "number": "1",
+      "script": {
+        "content": [
+          "cp \"${RECIPE_DIR}/cargo-auditable-wrapper.sh\" \"${BUILD_PREFIX}/bin/cargo-auditable-wrapper\"",
+          "chmod 755 \"${BUILD_PREFIX}/bin/cargo-auditable-wrapper\"",
+          "${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation --disable-pip-version-check",
+          "cd rust",
+          "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml"
+        ],
+        "env": {
+          "CARGO": "cargo-auditable-wrapper",
+          "CARGO_PROFILE_RELEASE_LTO": "fat",
+          "CARGO_PROFILE_RELEASE_STRIP": "symbols",
+          "MATURIN_PEP517_ARGS": "--features pyo3/abi3"
+        }
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -420,23 +280,22 @@
         "name": "hypothesis",
         "requirements": {
           "build": [
-            "cargo-bundle-licenses",
             "c_compiler_stub",
             "rust_compiler_stub",
             "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
+            "cargo-auditable",
+            "cargo-bundle-licenses",
+            "maturin >=1.9.4,<2.0",
             "python",
             "cross-python_linux-aarch64"
           ],
           "host": [
-            "python",
+            "maturin >=1.9.4,<2.0",
             "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
+            "python"
           ],
           "run": [
             "python",
-            "exceptiongroup >=1.0.0",
             "sortedcontainers >=2.1.0,<3.0.0"
           ]
         },
@@ -444,20 +303,22 @@
           {
             "python": {
               "imports": [
-                "hypothesis"
+                "hypothesis",
+                "hypothesis._native"
               ]
             }
           },
           {
             "requirements": {
               "run": [
-                "pip",
-                "django",
-                "pandas",
                 "click"
               ]
             },
-            "script": "hypothesis --help"
+            "script": [
+              "hypothesis --help",
+              "hypothesis --version",
+              "hypothesis --version | ${{ \"grep -iE\" if unix else \"findstr /c\" }} \"${{ version | replace('.', '\\\\.') }}$\""
+            ]
           }
         ],
         "version": "6.167.1"
@@ -467,23 +328,24 @@
         "name": "hypothesis",
         "requirements": {
           "build": [
-            "cargo-bundle-licenses",
             "c_compiler_stub",
             "rust_compiler_stub",
             "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
+            "cargo-auditable",
+            "cargo-bundle-licenses",
+            "maturin >=1.9.4,<2.0",
             "python",
             "cross-python_linux-aarch64"
           ],
           "host": [
-            "python",
+            "maturin >=1.9.4,<2.0",
             "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
+            "python",
+            "python-abi3",
+            "python 3.11.*"
           ],
           "run": [
             "python",
-            "exceptiongroup >=1.0.0",
             "sortedcontainers >=2.1.0,<3.0.0"
           ]
         },
@@ -491,208 +353,30 @@
           {
             "python": {
               "imports": [
-                "hypothesis"
+                "hypothesis",
+                "hypothesis._native"
+              ],
+              "python_version": [
+                "3.11.*",
+                "*"
               ]
             }
           },
           {
             "requirements": {
               "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
+                "click",
+                "python 3.11.*",
+                "abi3audit"
               ]
             },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
-            "python",
-            "cross-python_linux-aarch64"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
-            "python",
-            "cross-python_linux-aarch64"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
-            "python",
-            "cross-python_linux-aarch64"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
-            "python",
-            "cross-python_linux-aarch64"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
+            "script": [
+              "hypothesis --help",
+              "hypothesis --version",
+              "hypothesis --version | ${{ \"grep -iE\" if unix else \"findstr /c\" }} \"${{ version | replace('.', '\\\\.') }}$\"",
+              "cd \"${{ '$SP_DIR' if unix else '%SP_DIR%' }}/hypothesis\"",
+              "abi3audit -s -v --assume-minimum-abi3 ${{ python_min }} _native.${{ 'abi3.so' if unix else 'pyd' }}"
+            ]
           }
         ],
         "version": "6.167.1"
@@ -704,30 +388,31 @@
     },
     "requirements": {
       "build": [
-        "cargo-bundle-licenses",
         "c_compiler_stub",
         "rust_compiler_stub",
         "c_stdlib_stub",
-        "maturin >=1.7,<2.0",
+        "cargo-auditable",
+        "cargo-bundle-licenses",
+        "maturin >=1.9.4,<2.0",
         "python",
         "cross-python_linux-aarch64"
       ],
       "host": [
-        "python",
+        "maturin >=1.9.4,<2.0",
         "pip",
-        "maturin >=1.7,<2.0",
-        "puccinialin"
+        "python",
+        "python-abi3",
+        "python 3.11.*"
       ],
       "run": [
         "python",
-        "exceptiongroup >=1.0.0",
         "sortedcontainers >=2.1.0,<3.0.0"
       ]
     },
     "schema_version": 1,
     "source": {
       "sha256": "62eefcb4d2791423626e9901c3027a6e0c5ffda2ac0b44b3c7e797ab9d2d5a4c",
-      "url": "https://pypi.org/packages/source/h/hypothesis/hypothesis-6.167.1.tar.gz"
+      "url": "https://files.pythonhosted.org/packages/source/h/hypothesis/hypothesis-6.167.1.tar.gz"
     }
   },
   "linux_aarch64_requirements": {
@@ -736,6 +421,7 @@
       "elements": [
         "c_compiler_stub",
         "c_stdlib_stub",
+        "cargo-auditable",
         "cargo-bundle-licenses",
         "cross-python_linux-aarch64",
         "maturin",
@@ -748,14 +434,13 @@
       "elements": [
         "maturin",
         "pip",
-        "puccinialin",
-        "python"
+        "python",
+        "python-abi3"
       ]
     },
     "run": {
       "__set__": true,
       "elements": [
-        "exceptiongroup",
         "python",
         "sortedcontainers"
       ]
@@ -763,24 +448,40 @@
     "test": {
       "__set__": true,
       "elements": [
+        "abi3audit",
         "click",
-        "django",
-        "pandas",
-        "pip"
+        "pip",
+        "python"
       ]
     }
   },
   "linux_ppc64le_meta_yaml": {
     "about": {
-      "home": "https://pypi.org/project/hypothesis/",
+      "dev_url": "https://github.com/HypothesisWorks/hypothesis",
+      "doc_url": "https://hypothesis.readthedocs.io/",
+      "home": "https://pypi.org/project/hypothesis",
       "license": "MPL-2.0",
       "license_family": "MPL-2.0",
       "license_file": "LICENSE.txt",
       "summary": "The property-based testing library for Python"
     },
     "build": {
-      "number": "0",
-      "script": "${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation"
+      "number": "1",
+      "script": {
+        "content": [
+          "cp \"${RECIPE_DIR}/cargo-auditable-wrapper.sh\" \"${BUILD_PREFIX}/bin/cargo-auditable-wrapper\"",
+          "chmod 755 \"${BUILD_PREFIX}/bin/cargo-auditable-wrapper\"",
+          "${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation --disable-pip-version-check",
+          "cd rust",
+          "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml"
+        ],
+        "env": {
+          "CARGO": "cargo-auditable-wrapper",
+          "CARGO_PROFILE_RELEASE_LTO": "fat",
+          "CARGO_PROFILE_RELEASE_STRIP": "symbols",
+          "MATURIN_PEP517_ARGS": "--features pyo3/abi3"
+        }
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -796,23 +497,22 @@
         "name": "hypothesis",
         "requirements": {
           "build": [
-            "cargo-bundle-licenses",
             "c_compiler_stub",
             "rust_compiler_stub",
             "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
+            "cargo-auditable",
+            "cargo-bundle-licenses",
+            "maturin >=1.9.4,<2.0",
             "python",
             "cross-python_linux-ppc64le"
           ],
           "host": [
-            "python",
+            "maturin >=1.9.4,<2.0",
             "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
+            "python"
           ],
           "run": [
             "python",
-            "exceptiongroup >=1.0.0",
             "sortedcontainers >=2.1.0,<3.0.0"
           ]
         },
@@ -820,20 +520,22 @@
           {
             "python": {
               "imports": [
-                "hypothesis"
+                "hypothesis",
+                "hypothesis._native"
               ]
             }
           },
           {
             "requirements": {
               "run": [
-                "pip",
-                "django",
-                "pandas",
                 "click"
               ]
             },
-            "script": "hypothesis --help"
+            "script": [
+              "hypothesis --help",
+              "hypothesis --version",
+              "hypothesis --version | ${{ \"grep -iE\" if unix else \"findstr /c\" }} \"${{ version | replace('.', '\\\\.') }}$\""
+            ]
           }
         ],
         "version": "6.167.1"
@@ -843,23 +545,24 @@
         "name": "hypothesis",
         "requirements": {
           "build": [
-            "cargo-bundle-licenses",
             "c_compiler_stub",
             "rust_compiler_stub",
             "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
+            "cargo-auditable",
+            "cargo-bundle-licenses",
+            "maturin >=1.9.4,<2.0",
             "python",
             "cross-python_linux-ppc64le"
           ],
           "host": [
-            "python",
+            "maturin >=1.9.4,<2.0",
             "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
+            "python",
+            "python-abi3",
+            "python 3.11.*"
           ],
           "run": [
             "python",
-            "exceptiongroup >=1.0.0",
             "sortedcontainers >=2.1.0,<3.0.0"
           ]
         },
@@ -867,208 +570,30 @@
           {
             "python": {
               "imports": [
-                "hypothesis"
+                "hypothesis",
+                "hypothesis._native"
+              ],
+              "python_version": [
+                "3.11.*",
+                "*"
               ]
             }
           },
           {
             "requirements": {
               "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
+                "click",
+                "python 3.11.*",
+                "abi3audit"
               ]
             },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
-            "python",
-            "cross-python_linux-ppc64le"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
-            "python",
-            "cross-python_linux-ppc64le"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
-            "python",
-            "cross-python_linux-ppc64le"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
-            "python",
-            "cross-python_linux-ppc64le"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
+            "script": [
+              "hypothesis --help",
+              "hypothesis --version",
+              "hypothesis --version | ${{ \"grep -iE\" if unix else \"findstr /c\" }} \"${{ version | replace('.', '\\\\.') }}$\"",
+              "cd \"${{ '$SP_DIR' if unix else '%SP_DIR%' }}/hypothesis\"",
+              "abi3audit -s -v --assume-minimum-abi3 ${{ python_min }} _native.${{ 'abi3.so' if unix else 'pyd' }}"
+            ]
           }
         ],
         "version": "6.167.1"
@@ -1080,30 +605,31 @@
     },
     "requirements": {
       "build": [
-        "cargo-bundle-licenses",
         "c_compiler_stub",
         "rust_compiler_stub",
         "c_stdlib_stub",
-        "maturin >=1.7,<2.0",
+        "cargo-auditable",
+        "cargo-bundle-licenses",
+        "maturin >=1.9.4,<2.0",
         "python",
         "cross-python_linux-ppc64le"
       ],
       "host": [
-        "python",
+        "maturin >=1.9.4,<2.0",
         "pip",
-        "maturin >=1.7,<2.0",
-        "puccinialin"
+        "python",
+        "python-abi3",
+        "python 3.11.*"
       ],
       "run": [
         "python",
-        "exceptiongroup >=1.0.0",
         "sortedcontainers >=2.1.0,<3.0.0"
       ]
     },
     "schema_version": 1,
     "source": {
       "sha256": "62eefcb4d2791423626e9901c3027a6e0c5ffda2ac0b44b3c7e797ab9d2d5a4c",
-      "url": "https://pypi.org/packages/source/h/hypothesis/hypothesis-6.167.1.tar.gz"
+      "url": "https://files.pythonhosted.org/packages/source/h/hypothesis/hypothesis-6.167.1.tar.gz"
     }
   },
   "linux_ppc64le_requirements": {
@@ -1112,6 +638,7 @@
       "elements": [
         "c_compiler_stub",
         "c_stdlib_stub",
+        "cargo-auditable",
         "cargo-bundle-licenses",
         "cross-python_linux-ppc64le",
         "maturin",
@@ -1124,14 +651,13 @@
       "elements": [
         "maturin",
         "pip",
-        "puccinialin",
-        "python"
+        "python",
+        "python-abi3"
       ]
     },
     "run": {
       "__set__": true,
       "elements": [
-        "exceptiongroup",
         "python",
         "sortedcontainers"
       ]
@@ -1139,24 +665,41 @@
     "test": {
       "__set__": true,
       "elements": [
+        "abi3audit",
         "click",
-        "django",
-        "pandas",
-        "pip"
+        "pip",
+        "python"
       ]
     }
   },
   "meta_yaml": {
     "about": {
-      "home": "https://pypi.org/project/hypothesis/",
+      "dev_url": "https://github.com/HypothesisWorks/hypothesis",
+      "doc_url": "https://hypothesis.readthedocs.io/",
+      "home": "https://pypi.org/project/hypothesis",
       "license": "MPL-2.0",
       "license_family": "MPL-2.0",
       "license_file": "LICENSE.txt",
       "summary": "The property-based testing library for Python"
     },
     "build": {
-      "number": "0",
-      "script": "${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation"
+      "number": "1",
+      "script": {
+        "content": [
+          "cp \"${RECIPE_DIR}/cargo-auditable-wrapper.sh\" \"${BUILD_PREFIX}/bin/cargo-auditable-wrapper\"",
+          "chmod 755 \"${BUILD_PREFIX}/bin/cargo-auditable-wrapper\"",
+          "${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation --disable-pip-version-check",
+          "cd rust",
+          "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml",
+          "copy \"%RECIPE_DIR%\\cargo-auditable-wrapper.bat\" \"%BUILD_PREFIX%\\Library\\bin\\cargo-auditable-wrapper.bat\""
+        ],
+        "env": {
+          "CARGO": "cargo-auditable-wrapper.bat",
+          "CARGO_PROFILE_RELEASE_LTO": "fat",
+          "CARGO_PROFILE_RELEASE_STRIP": "symbols",
+          "MATURIN_PEP517_ARGS": "--features pyo3/abi3"
+        }
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -1172,21 +715,20 @@
         "name": "hypothesis",
         "requirements": {
           "build": [
-            "cargo-bundle-licenses",
             "c_compiler_stub",
             "rust_compiler_stub",
             "c_stdlib_stub",
-            "maturin >=1.7,<2.0"
+            "cargo-auditable",
+            "cargo-bundle-licenses",
+            "maturin >=1.9.4,<2.0"
           ],
           "host": [
-            "python",
+            "maturin >=1.9.4,<2.0",
             "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
+            "python"
           ],
           "run": [
             "python",
-            "exceptiongroup >=1.0.0",
             "sortedcontainers >=2.1.0,<3.0.0"
           ]
         },
@@ -1194,20 +736,22 @@
           {
             "python": {
               "imports": [
-                "hypothesis"
+                "hypothesis",
+                "hypothesis._native"
               ]
             }
           },
           {
             "requirements": {
               "run": [
-                "pip",
-                "django",
-                "pandas",
                 "click"
               ]
             },
-            "script": "hypothesis --help"
+            "script": [
+              "hypothesis --help",
+              "hypothesis --version",
+              "hypothesis --version | ${{ \"grep -iE\" if unix else \"findstr /c\" }} \"${{ version | replace('.', '\\\\.') }}$\""
+            ]
           }
         ],
         "version": "6.167.1"
@@ -1217,21 +761,22 @@
         "name": "hypothesis",
         "requirements": {
           "build": [
-            "cargo-bundle-licenses",
             "c_compiler_stub",
             "rust_compiler_stub",
             "c_stdlib_stub",
-            "maturin >=1.7,<2.0"
+            "cargo-auditable",
+            "cargo-bundle-licenses",
+            "maturin >=1.9.4,<2.0"
           ],
           "host": [
-            "python",
+            "maturin >=1.9.4,<2.0",
             "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
+            "python",
+            "python-abi3",
+            "python 3.11.*"
           ],
           "run": [
             "python",
-            "exceptiongroup >=1.0.0",
             "sortedcontainers >=2.1.0,<3.0.0"
           ]
         },
@@ -1239,20 +784,30 @@
           {
             "python": {
               "imports": [
-                "hypothesis"
+                "hypothesis",
+                "hypothesis._native"
+              ],
+              "python_version": [
+                "3.11.*",
+                "*"
               ]
             }
           },
           {
             "requirements": {
               "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
+                "click",
+                "python 3.11.*",
+                "abi3audit"
               ]
             },
-            "script": "hypothesis --help"
+            "script": [
+              "hypothesis --help",
+              "hypothesis --version",
+              "hypothesis --version | ${{ \"grep -iE\" if unix else \"findstr /c\" }} \"${{ version | replace('.', '\\\\.') }}$\"",
+              "cd \"${{ '$SP_DIR' if unix else '%SP_DIR%' }}/hypothesis\"",
+              "abi3audit -s -v --assume-minimum-abi3 ${{ python_min }} _native.${{ 'abi3.so' if unix else 'pyd' }}"
+            ]
           }
         ],
         "version": "6.167.1"
@@ -1262,203 +817,22 @@
         "name": "hypothesis",
         "requirements": {
           "build": [
-            "cargo-bundle-licenses",
             "c_compiler_stub",
             "rust_compiler_stub",
             "c_stdlib_stub",
-            "maturin >=1.7,<2.0"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
+            "cargo-auditable",
             "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
+            "maturin >=1.9.4,<2.0",
             "python",
             "cross-python_linux-aarch64"
           ],
           "host": [
-            "python",
+            "maturin >=1.9.4,<2.0",
             "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
+            "python"
           ],
           "run": [
             "python",
-            "exceptiongroup >=1.0.0",
             "sortedcontainers >=2.1.0,<3.0.0"
           ]
         },
@@ -1466,20 +840,22 @@
           {
             "python": {
               "imports": [
-                "hypothesis"
+                "hypothesis",
+                "hypothesis._native"
               ]
             }
           },
           {
             "requirements": {
               "run": [
-                "pip",
-                "django",
-                "pandas",
                 "click"
               ]
             },
-            "script": "hypothesis --help"
+            "script": [
+              "hypothesis --help",
+              "hypothesis --version",
+              "hypothesis --version | ${{ \"grep -iE\" if unix else \"findstr /c\" }} \"${{ version | replace('.', '\\\\.') }}$\""
+            ]
           }
         ],
         "version": "6.167.1"
@@ -1489,23 +865,24 @@
         "name": "hypothesis",
         "requirements": {
           "build": [
-            "cargo-bundle-licenses",
             "c_compiler_stub",
             "rust_compiler_stub",
             "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
+            "cargo-auditable",
+            "cargo-bundle-licenses",
+            "maturin >=1.9.4,<2.0",
             "python",
             "cross-python_linux-aarch64"
           ],
           "host": [
-            "python",
+            "maturin >=1.9.4,<2.0",
             "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
+            "python",
+            "python-abi3",
+            "python 3.11.*"
           ],
           "run": [
             "python",
-            "exceptiongroup >=1.0.0",
             "sortedcontainers >=2.1.0,<3.0.0"
           ]
         },
@@ -1513,20 +890,30 @@
           {
             "python": {
               "imports": [
-                "hypothesis"
+                "hypothesis",
+                "hypothesis._native"
+              ],
+              "python_version": [
+                "3.11.*",
+                "*"
               ]
             }
           },
           {
             "requirements": {
               "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
+                "click",
+                "python 3.11.*",
+                "abi3audit"
               ]
             },
-            "script": "hypothesis --help"
+            "script": [
+              "hypothesis --help",
+              "hypothesis --version",
+              "hypothesis --version | ${{ \"grep -iE\" if unix else \"findstr /c\" }} \"${{ version | replace('.', '\\\\.') }}$\"",
+              "cd \"${{ '$SP_DIR' if unix else '%SP_DIR%' }}/hypothesis\"",
+              "abi3audit -s -v --assume-minimum-abi3 ${{ python_min }} _native.${{ 'abi3.so' if unix else 'pyd' }}"
+            ]
           }
         ],
         "version": "6.167.1"
@@ -1536,211 +923,22 @@
         "name": "hypothesis",
         "requirements": {
           "build": [
-            "cargo-bundle-licenses",
             "c_compiler_stub",
             "rust_compiler_stub",
             "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
-            "python",
-            "cross-python_linux-aarch64"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
+            "cargo-auditable",
             "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
-            "python",
-            "cross-python_linux-aarch64"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
-            "python",
-            "cross-python_linux-aarch64"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
-            "python",
-            "cross-python_linux-aarch64"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
+            "maturin >=1.9.4,<2.0",
             "python",
             "cross-python_linux-ppc64le"
           ],
           "host": [
-            "python",
+            "maturin >=1.9.4,<2.0",
             "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
+            "python"
           ],
           "run": [
             "python",
-            "exceptiongroup >=1.0.0",
             "sortedcontainers >=2.1.0,<3.0.0"
           ]
         },
@@ -1748,20 +946,22 @@
           {
             "python": {
               "imports": [
-                "hypothesis"
+                "hypothesis",
+                "hypothesis._native"
               ]
             }
           },
           {
             "requirements": {
               "run": [
-                "pip",
-                "django",
-                "pandas",
                 "click"
               ]
             },
-            "script": "hypothesis --help"
+            "script": [
+              "hypothesis --help",
+              "hypothesis --version",
+              "hypothesis --version | ${{ \"grep -iE\" if unix else \"findstr /c\" }} \"${{ version | replace('.', '\\\\.') }}$\""
+            ]
           }
         ],
         "version": "6.167.1"
@@ -1771,23 +971,24 @@
         "name": "hypothesis",
         "requirements": {
           "build": [
-            "cargo-bundle-licenses",
             "c_compiler_stub",
             "rust_compiler_stub",
             "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
+            "cargo-auditable",
+            "cargo-bundle-licenses",
+            "maturin >=1.9.4,<2.0",
             "python",
             "cross-python_linux-ppc64le"
           ],
           "host": [
-            "python",
+            "maturin >=1.9.4,<2.0",
             "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
+            "python",
+            "python-abi3",
+            "python 3.11.*"
           ],
           "run": [
             "python",
-            "exceptiongroup >=1.0.0",
             "sortedcontainers >=2.1.0,<3.0.0"
           ]
         },
@@ -1795,20 +996,30 @@
           {
             "python": {
               "imports": [
-                "hypothesis"
+                "hypothesis",
+                "hypothesis._native"
+              ],
+              "python_version": [
+                "3.11.*",
+                "*"
               ]
             }
           },
           {
             "requirements": {
               "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
+                "click",
+                "python 3.11.*",
+                "abi3audit"
               ]
             },
-            "script": "hypothesis --help"
+            "script": [
+              "hypothesis --help",
+              "hypothesis --version",
+              "hypothesis --version | ${{ \"grep -iE\" if unix else \"findstr /c\" }} \"${{ version | replace('.', '\\\\.') }}$\"",
+              "cd \"${{ '$SP_DIR' if unix else '%SP_DIR%' }}/hypothesis\"",
+              "abi3audit -s -v --assume-minimum-abi3 ${{ python_min }} _native.${{ 'abi3.so' if unix else 'pyd' }}"
+            ]
           }
         ],
         "version": "6.167.1"
@@ -1818,211 +1029,22 @@
         "name": "hypothesis",
         "requirements": {
           "build": [
-            "cargo-bundle-licenses",
             "c_compiler_stub",
             "rust_compiler_stub",
             "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
-            "python",
-            "cross-python_linux-ppc64le"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
+            "cargo-auditable",
             "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
-            "python",
-            "cross-python_linux-ppc64le"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
-            "python",
-            "cross-python_linux-ppc64le"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
-            "python",
-            "cross-python_linux-ppc64le"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
+            "maturin >=1.9.4,<2.0",
             "python",
             "cross-python_osx-64"
           ],
           "host": [
-            "python",
+            "maturin >=1.9.4,<2.0",
             "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
+            "python"
           ],
           "run": [
             "python",
-            "exceptiongroup >=1.0.0",
             "sortedcontainers >=2.1.0,<3.0.0"
           ]
         },
@@ -2030,20 +1052,22 @@
           {
             "python": {
               "imports": [
-                "hypothesis"
+                "hypothesis",
+                "hypothesis._native"
               ]
             }
           },
           {
             "requirements": {
               "run": [
-                "pip",
-                "django",
-                "pandas",
                 "click"
               ]
             },
-            "script": "hypothesis --help"
+            "script": [
+              "hypothesis --help",
+              "hypothesis --version",
+              "hypothesis --version | ${{ \"grep -iE\" if unix else \"findstr /c\" }} \"${{ version | replace('.', '\\\\.') }}$\""
+            ]
           }
         ],
         "version": "6.167.1"
@@ -2053,23 +1077,24 @@
         "name": "hypothesis",
         "requirements": {
           "build": [
-            "cargo-bundle-licenses",
             "c_compiler_stub",
             "rust_compiler_stub",
             "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
+            "cargo-auditable",
+            "cargo-bundle-licenses",
+            "maturin >=1.9.4,<2.0",
             "python",
             "cross-python_osx-64"
           ],
           "host": [
-            "python",
+            "maturin >=1.9.4,<2.0",
             "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
+            "python",
+            "python-abi3",
+            "python 3.11.*"
           ],
           "run": [
             "python",
-            "exceptiongroup >=1.0.0",
             "sortedcontainers >=2.1.0,<3.0.0"
           ]
         },
@@ -2077,20 +1102,30 @@
           {
             "python": {
               "imports": [
-                "hypothesis"
+                "hypothesis",
+                "hypothesis._native"
+              ],
+              "python_version": [
+                "3.11.*",
+                "*"
               ]
             }
           },
           {
             "requirements": {
               "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
+                "click",
+                "python 3.11.*",
+                "abi3audit"
               ]
             },
-            "script": "hypothesis --help"
+            "script": [
+              "hypothesis --help",
+              "hypothesis --version",
+              "hypothesis --version | ${{ \"grep -iE\" if unix else \"findstr /c\" }} \"${{ version | replace('.', '\\\\.') }}$\"",
+              "cd \"${{ '$SP_DIR' if unix else '%SP_DIR%' }}/hypothesis\"",
+              "abi3audit -s -v --assume-minimum-abi3 ${{ python_min }} _native.${{ 'abi3.so' if unix else 'pyd' }}"
+            ]
           }
         ],
         "version": "6.167.1"
@@ -2100,211 +1135,22 @@
         "name": "hypothesis",
         "requirements": {
           "build": [
-            "cargo-bundle-licenses",
             "c_compiler_stub",
             "rust_compiler_stub",
             "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
-            "python",
-            "cross-python_osx-64"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
+            "cargo-auditable",
             "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
-            "python",
-            "cross-python_osx-64"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
-            "python",
-            "cross-python_osx-64"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
-            "python",
-            "cross-python_osx-64"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
+            "maturin >=1.9.4,<2.0",
             "python",
             "cross-python_osx-arm64"
           ],
           "host": [
-            "python",
+            "maturin >=1.9.4,<2.0",
             "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
+            "python"
           ],
           "run": [
             "python",
-            "exceptiongroup >=1.0.0",
             "sortedcontainers >=2.1.0,<3.0.0"
           ]
         },
@@ -2312,20 +1158,22 @@
           {
             "python": {
               "imports": [
-                "hypothesis"
+                "hypothesis",
+                "hypothesis._native"
               ]
             }
           },
           {
             "requirements": {
               "run": [
-                "pip",
-                "django",
-                "pandas",
                 "click"
               ]
             },
-            "script": "hypothesis --help"
+            "script": [
+              "hypothesis --help",
+              "hypothesis --version",
+              "hypothesis --version | ${{ \"grep -iE\" if unix else \"findstr /c\" }} \"${{ version | replace('.', '\\\\.') }}$\""
+            ]
           }
         ],
         "version": "6.167.1"
@@ -2335,23 +1183,24 @@
         "name": "hypothesis",
         "requirements": {
           "build": [
-            "cargo-bundle-licenses",
             "c_compiler_stub",
             "rust_compiler_stub",
             "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
+            "cargo-auditable",
+            "cargo-bundle-licenses",
+            "maturin >=1.9.4,<2.0",
             "python",
             "cross-python_osx-arm64"
           ],
           "host": [
-            "python",
+            "maturin >=1.9.4,<2.0",
             "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
+            "python",
+            "python-abi3",
+            "python 3.11.*"
           ],
           "run": [
             "python",
-            "exceptiongroup >=1.0.0",
             "sortedcontainers >=2.1.0,<3.0.0"
           ]
         },
@@ -2359,20 +1208,30 @@
           {
             "python": {
               "imports": [
-                "hypothesis"
+                "hypothesis",
+                "hypothesis._native"
+              ],
+              "python_version": [
+                "3.11.*",
+                "*"
               ]
             }
           },
           {
             "requirements": {
               "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
+                "click",
+                "python 3.11.*",
+                "abi3audit"
               ]
             },
-            "script": "hypothesis --help"
+            "script": [
+              "hypothesis --help",
+              "hypothesis --version",
+              "hypothesis --version | ${{ \"grep -iE\" if unix else \"findstr /c\" }} \"${{ version | replace('.', '\\\\.') }}$\"",
+              "cd \"${{ '$SP_DIR' if unix else '%SP_DIR%' }}/hypothesis\"",
+              "abi3audit -s -v --assume-minimum-abi3 ${{ python_min }} _native.${{ 'abi3.so' if unix else 'pyd' }}"
+            ]
           }
         ],
         "version": "6.167.1"
@@ -2382,211 +1241,22 @@
         "name": "hypothesis",
         "requirements": {
           "build": [
-            "cargo-bundle-licenses",
             "c_compiler_stub",
             "rust_compiler_stub",
             "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
-            "python",
-            "cross-python_osx-arm64"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
+            "cargo-auditable",
             "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
-            "python",
-            "cross-python_osx-arm64"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
-            "python",
-            "cross-python_osx-arm64"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
-            "python",
-            "cross-python_osx-arm64"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
+            "maturin >=1.9.4,<2.0",
             "python",
             "cross-python_win-64"
           ],
           "host": [
-            "python",
+            "maturin >=1.9.4,<2.0",
             "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
+            "python"
           ],
           "run": [
             "python",
-            "exceptiongroup >=1.0.0",
             "sortedcontainers >=2.1.0,<3.0.0"
           ]
         },
@@ -2594,20 +1264,22 @@
           {
             "python": {
               "imports": [
-                "hypothesis"
+                "hypothesis",
+                "hypothesis._native"
               ]
             }
           },
           {
             "requirements": {
               "run": [
-                "pip",
-                "django",
-                "pandas",
                 "click"
               ]
             },
-            "script": "hypothesis --help"
+            "script": [
+              "hypothesis --help",
+              "hypothesis --version",
+              "hypothesis --version | ${{ \"grep -iE\" if unix else \"findstr /c\" }} \"${{ version | replace('.', '\\\\.') }}$\""
+            ]
           }
         ],
         "version": "6.167.1"
@@ -2617,23 +1289,24 @@
         "name": "hypothesis",
         "requirements": {
           "build": [
-            "cargo-bundle-licenses",
             "c_compiler_stub",
             "rust_compiler_stub",
             "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
+            "cargo-auditable",
+            "cargo-bundle-licenses",
+            "maturin >=1.9.4,<2.0",
             "python",
             "cross-python_win-64"
           ],
           "host": [
-            "python",
+            "maturin >=1.9.4,<2.0",
             "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
+            "python",
+            "python-abi3",
+            "python 3.11.*"
           ],
           "run": [
             "python",
-            "exceptiongroup >=1.0.0",
             "sortedcontainers >=2.1.0,<3.0.0"
           ]
         },
@@ -2641,208 +1314,30 @@
           {
             "python": {
               "imports": [
-                "hypothesis"
+                "hypothesis",
+                "hypothesis._native"
+              ],
+              "python_version": [
+                "3.11.*",
+                "*"
               ]
             }
           },
           {
             "requirements": {
               "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
+                "click",
+                "python 3.11.*",
+                "abi3audit"
               ]
             },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
-            "python",
-            "cross-python_win-64"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
-            "python",
-            "cross-python_win-64"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
-            "python",
-            "cross-python_win-64"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
-            "python",
-            "cross-python_win-64"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
+            "script": [
+              "hypothesis --help",
+              "hypothesis --version",
+              "hypothesis --version | ${{ \"grep -iE\" if unix else \"findstr /c\" }} \"${{ version | replace('.', '\\\\.') }}$\"",
+              "cd \"${{ '$SP_DIR' if unix else '%SP_DIR%' }}/hypothesis\"",
+              "abi3audit -s -v --assume-minimum-abi3 ${{ python_min }} _native.${{ 'abi3.so' if unix else 'pyd' }}"
+            ]
           }
         ],
         "version": "6.167.1"
@@ -2854,11 +1349,12 @@
     },
     "requirements": {
       "build": [
-        "cargo-bundle-licenses",
         "c_compiler_stub",
         "rust_compiler_stub",
         "c_stdlib_stub",
-        "maturin >=1.7,<2.0",
+        "cargo-auditable",
+        "cargo-bundle-licenses",
+        "maturin >=1.9.4,<2.0",
         "python",
         "cross-python_linux-aarch64",
         "cross-python_linux-ppc64le",
@@ -2867,35 +1363,51 @@
         "cross-python_win-64"
       ],
       "host": [
-        "python",
+        "maturin >=1.9.4,<2.0",
         "pip",
-        "maturin >=1.7,<2.0",
-        "puccinialin"
+        "python",
+        "python-abi3",
+        "python 3.11.*"
       ],
       "run": [
         "python",
-        "exceptiongroup >=1.0.0",
         "sortedcontainers >=2.1.0,<3.0.0"
       ]
     },
     "schema_version": 1,
     "source": {
       "sha256": "62eefcb4d2791423626e9901c3027a6e0c5ffda2ac0b44b3c7e797ab9d2d5a4c",
-      "url": "https://pypi.org/packages/source/h/hypothesis/hypothesis-6.167.1.tar.gz"
+      "url": "https://files.pythonhosted.org/packages/source/h/hypothesis/hypothesis-6.167.1.tar.gz"
     }
   },
   "name": "hypothesis",
   "osx_64_meta_yaml": {
     "about": {
-      "home": "https://pypi.org/project/hypothesis/",
+      "dev_url": "https://github.com/HypothesisWorks/hypothesis",
+      "doc_url": "https://hypothesis.readthedocs.io/",
+      "home": "https://pypi.org/project/hypothesis",
       "license": "MPL-2.0",
       "license_family": "MPL-2.0",
       "license_file": "LICENSE.txt",
       "summary": "The property-based testing library for Python"
     },
     "build": {
-      "number": "0",
-      "script": "${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation"
+      "number": "1",
+      "script": {
+        "content": [
+          "cp \"${RECIPE_DIR}/cargo-auditable-wrapper.sh\" \"${BUILD_PREFIX}/bin/cargo-auditable-wrapper\"",
+          "chmod 755 \"${BUILD_PREFIX}/bin/cargo-auditable-wrapper\"",
+          "${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation --disable-pip-version-check",
+          "cd rust",
+          "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml"
+        ],
+        "env": {
+          "CARGO": "cargo-auditable-wrapper",
+          "CARGO_PROFILE_RELEASE_LTO": "fat",
+          "CARGO_PROFILE_RELEASE_STRIP": "symbols",
+          "MATURIN_PEP517_ARGS": "--features pyo3/abi3"
+        }
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -2911,23 +1423,22 @@
         "name": "hypothesis",
         "requirements": {
           "build": [
-            "cargo-bundle-licenses",
             "c_compiler_stub",
             "rust_compiler_stub",
             "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
+            "cargo-auditable",
+            "cargo-bundle-licenses",
+            "maturin >=1.9.4,<2.0",
             "python",
             "cross-python_osx-64"
           ],
           "host": [
-            "python",
+            "maturin >=1.9.4,<2.0",
             "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
+            "python"
           ],
           "run": [
             "python",
-            "exceptiongroup >=1.0.0",
             "sortedcontainers >=2.1.0,<3.0.0"
           ]
         },
@@ -2935,20 +1446,22 @@
           {
             "python": {
               "imports": [
-                "hypothesis"
+                "hypothesis",
+                "hypothesis._native"
               ]
             }
           },
           {
             "requirements": {
               "run": [
-                "pip",
-                "django",
-                "pandas",
                 "click"
               ]
             },
-            "script": "hypothesis --help"
+            "script": [
+              "hypothesis --help",
+              "hypothesis --version",
+              "hypothesis --version | ${{ \"grep -iE\" if unix else \"findstr /c\" }} \"${{ version | replace('.', '\\\\.') }}$\""
+            ]
           }
         ],
         "version": "6.167.1"
@@ -2958,23 +1471,24 @@
         "name": "hypothesis",
         "requirements": {
           "build": [
-            "cargo-bundle-licenses",
             "c_compiler_stub",
             "rust_compiler_stub",
             "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
+            "cargo-auditable",
+            "cargo-bundle-licenses",
+            "maturin >=1.9.4,<2.0",
             "python",
             "cross-python_osx-64"
           ],
           "host": [
-            "python",
+            "maturin >=1.9.4,<2.0",
             "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
+            "python",
+            "python-abi3",
+            "python 3.11.*"
           ],
           "run": [
             "python",
-            "exceptiongroup >=1.0.0",
             "sortedcontainers >=2.1.0,<3.0.0"
           ]
         },
@@ -2982,208 +1496,30 @@
           {
             "python": {
               "imports": [
-                "hypothesis"
+                "hypothesis",
+                "hypothesis._native"
+              ],
+              "python_version": [
+                "3.11.*",
+                "*"
               ]
             }
           },
           {
             "requirements": {
               "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
+                "click",
+                "python 3.11.*",
+                "abi3audit"
               ]
             },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
-            "python",
-            "cross-python_osx-64"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
-            "python",
-            "cross-python_osx-64"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
-            "python",
-            "cross-python_osx-64"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
-            "python",
-            "cross-python_osx-64"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
+            "script": [
+              "hypothesis --help",
+              "hypothesis --version",
+              "hypothesis --version | ${{ \"grep -iE\" if unix else \"findstr /c\" }} \"${{ version | replace('.', '\\\\.') }}$\"",
+              "cd \"${{ '$SP_DIR' if unix else '%SP_DIR%' }}/hypothesis\"",
+              "abi3audit -s -v --assume-minimum-abi3 ${{ python_min }} _native.${{ 'abi3.so' if unix else 'pyd' }}"
+            ]
           }
         ],
         "version": "6.167.1"
@@ -3195,30 +1531,31 @@
     },
     "requirements": {
       "build": [
-        "cargo-bundle-licenses",
         "c_compiler_stub",
         "rust_compiler_stub",
         "c_stdlib_stub",
-        "maturin >=1.7,<2.0",
+        "cargo-auditable",
+        "cargo-bundle-licenses",
+        "maturin >=1.9.4,<2.0",
         "python",
         "cross-python_osx-64"
       ],
       "host": [
-        "python",
+        "maturin >=1.9.4,<2.0",
         "pip",
-        "maturin >=1.7,<2.0",
-        "puccinialin"
+        "python",
+        "python-abi3",
+        "python 3.11.*"
       ],
       "run": [
         "python",
-        "exceptiongroup >=1.0.0",
         "sortedcontainers >=2.1.0,<3.0.0"
       ]
     },
     "schema_version": 1,
     "source": {
       "sha256": "62eefcb4d2791423626e9901c3027a6e0c5ffda2ac0b44b3c7e797ab9d2d5a4c",
-      "url": "https://pypi.org/packages/source/h/hypothesis/hypothesis-6.167.1.tar.gz"
+      "url": "https://files.pythonhosted.org/packages/source/h/hypothesis/hypothesis-6.167.1.tar.gz"
     }
   },
   "osx_64_requirements": {
@@ -3227,6 +1564,7 @@
       "elements": [
         "c_compiler_stub",
         "c_stdlib_stub",
+        "cargo-auditable",
         "cargo-bundle-licenses",
         "cross-python_osx-64",
         "maturin",
@@ -3239,14 +1577,13 @@
       "elements": [
         "maturin",
         "pip",
-        "puccinialin",
-        "python"
+        "python",
+        "python-abi3"
       ]
     },
     "run": {
       "__set__": true,
       "elements": [
-        "exceptiongroup",
         "python",
         "sortedcontainers"
       ]
@@ -3254,24 +1591,40 @@
     "test": {
       "__set__": true,
       "elements": [
+        "abi3audit",
         "click",
-        "django",
-        "pandas",
-        "pip"
+        "pip",
+        "python"
       ]
     }
   },
   "osx_arm64_meta_yaml": {
     "about": {
-      "home": "https://pypi.org/project/hypothesis/",
+      "dev_url": "https://github.com/HypothesisWorks/hypothesis",
+      "doc_url": "https://hypothesis.readthedocs.io/",
+      "home": "https://pypi.org/project/hypothesis",
       "license": "MPL-2.0",
       "license_family": "MPL-2.0",
       "license_file": "LICENSE.txt",
       "summary": "The property-based testing library for Python"
     },
     "build": {
-      "number": "0",
-      "script": "${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation"
+      "number": "1",
+      "script": {
+        "content": [
+          "cp \"${RECIPE_DIR}/cargo-auditable-wrapper.sh\" \"${BUILD_PREFIX}/bin/cargo-auditable-wrapper\"",
+          "chmod 755 \"${BUILD_PREFIX}/bin/cargo-auditable-wrapper\"",
+          "${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation --disable-pip-version-check",
+          "cd rust",
+          "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml"
+        ],
+        "env": {
+          "CARGO": "cargo-auditable-wrapper",
+          "CARGO_PROFILE_RELEASE_LTO": "fat",
+          "CARGO_PROFILE_RELEASE_STRIP": "symbols",
+          "MATURIN_PEP517_ARGS": "--features pyo3/abi3"
+        }
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -3287,23 +1640,22 @@
         "name": "hypothesis",
         "requirements": {
           "build": [
-            "cargo-bundle-licenses",
             "c_compiler_stub",
             "rust_compiler_stub",
             "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
+            "cargo-auditable",
+            "cargo-bundle-licenses",
+            "maturin >=1.9.4,<2.0",
             "python",
             "cross-python_osx-arm64"
           ],
           "host": [
-            "python",
+            "maturin >=1.9.4,<2.0",
             "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
+            "python"
           ],
           "run": [
             "python",
-            "exceptiongroup >=1.0.0",
             "sortedcontainers >=2.1.0,<3.0.0"
           ]
         },
@@ -3311,20 +1663,22 @@
           {
             "python": {
               "imports": [
-                "hypothesis"
+                "hypothesis",
+                "hypothesis._native"
               ]
             }
           },
           {
             "requirements": {
               "run": [
-                "pip",
-                "django",
-                "pandas",
                 "click"
               ]
             },
-            "script": "hypothesis --help"
+            "script": [
+              "hypothesis --help",
+              "hypothesis --version",
+              "hypothesis --version | ${{ \"grep -iE\" if unix else \"findstr /c\" }} \"${{ version | replace('.', '\\\\.') }}$\""
+            ]
           }
         ],
         "version": "6.167.1"
@@ -3334,23 +1688,24 @@
         "name": "hypothesis",
         "requirements": {
           "build": [
-            "cargo-bundle-licenses",
             "c_compiler_stub",
             "rust_compiler_stub",
             "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
+            "cargo-auditable",
+            "cargo-bundle-licenses",
+            "maturin >=1.9.4,<2.0",
             "python",
             "cross-python_osx-arm64"
           ],
           "host": [
-            "python",
+            "maturin >=1.9.4,<2.0",
             "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
+            "python",
+            "python-abi3",
+            "python 3.11.*"
           ],
           "run": [
             "python",
-            "exceptiongroup >=1.0.0",
             "sortedcontainers >=2.1.0,<3.0.0"
           ]
         },
@@ -3358,208 +1713,30 @@
           {
             "python": {
               "imports": [
-                "hypothesis"
+                "hypothesis",
+                "hypothesis._native"
+              ],
+              "python_version": [
+                "3.11.*",
+                "*"
               ]
             }
           },
           {
             "requirements": {
               "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
+                "click",
+                "python 3.11.*",
+                "abi3audit"
               ]
             },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
-            "python",
-            "cross-python_osx-arm64"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
-            "python",
-            "cross-python_osx-arm64"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
-            "python",
-            "cross-python_osx-arm64"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
-            "python",
-            "cross-python_osx-arm64"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
+            "script": [
+              "hypothesis --help",
+              "hypothesis --version",
+              "hypothesis --version | ${{ \"grep -iE\" if unix else \"findstr /c\" }} \"${{ version | replace('.', '\\\\.') }}$\"",
+              "cd \"${{ '$SP_DIR' if unix else '%SP_DIR%' }}/hypothesis\"",
+              "abi3audit -s -v --assume-minimum-abi3 ${{ python_min }} _native.${{ 'abi3.so' if unix else 'pyd' }}"
+            ]
           }
         ],
         "version": "6.167.1"
@@ -3571,30 +1748,31 @@
     },
     "requirements": {
       "build": [
-        "cargo-bundle-licenses",
         "c_compiler_stub",
         "rust_compiler_stub",
         "c_stdlib_stub",
-        "maturin >=1.7,<2.0",
+        "cargo-auditable",
+        "cargo-bundle-licenses",
+        "maturin >=1.9.4,<2.0",
         "python",
         "cross-python_osx-arm64"
       ],
       "host": [
-        "python",
+        "maturin >=1.9.4,<2.0",
         "pip",
-        "maturin >=1.7,<2.0",
-        "puccinialin"
+        "python",
+        "python-abi3",
+        "python 3.11.*"
       ],
       "run": [
         "python",
-        "exceptiongroup >=1.0.0",
         "sortedcontainers >=2.1.0,<3.0.0"
       ]
     },
     "schema_version": 1,
     "source": {
       "sha256": "62eefcb4d2791423626e9901c3027a6e0c5ffda2ac0b44b3c7e797ab9d2d5a4c",
-      "url": "https://pypi.org/packages/source/h/hypothesis/hypothesis-6.167.1.tar.gz"
+      "url": "https://files.pythonhosted.org/packages/source/h/hypothesis/hypothesis-6.167.1.tar.gz"
     }
   },
   "osx_arm64_requirements": {
@@ -3603,6 +1781,7 @@
       "elements": [
         "c_compiler_stub",
         "c_stdlib_stub",
+        "cargo-auditable",
         "cargo-bundle-licenses",
         "cross-python_osx-arm64",
         "maturin",
@@ -3615,14 +1794,13 @@
       "elements": [
         "maturin",
         "pip",
-        "puccinialin",
-        "python"
+        "python",
+        "python-abi3"
       ]
     },
     "run": {
       "__set__": true,
       "elements": [
-        "exceptiongroup",
         "python",
         "sortedcontainers"
       ]
@@ -3630,10 +1808,10 @@
     "test": {
       "__set__": true,
       "elements": [
+        "abi3audit",
         "click",
-        "django",
-        "pandas",
-        "pip"
+        "pip",
+        "python"
       ]
     }
   },
@@ -3655,23 +1833,23 @@
   "pr_info": {
     "__lazy_json__": "pr_info/hypothesis.json"
   },
-  "raw_meta_yaml": "schema_version: 1\n\ncontext:\n  version: \"6.167.1\"\n\npackage:\n  name: hypothesis\n  version: ${{ version }}\n\nsource:\n  url: https://pypi.org/packages/source/h/hypothesis/hypothesis-${{ version }}.tar.gz\n  sha256: 62eefcb4d2791423626e9901c3027a6e0c5ffda2ac0b44b3c7e797ab9d2d5a4c\n\nbuild:\n  number: 0\n  skip: match(python, \"<3.10\")\n  script:\n    - ${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation\n  python:\n    entry_points:\n      - hypothesis = hypothesis.extra.cli:main\n\nrequirements:\n  build:\n    - cargo-bundle-licenses\n    - ${{ compiler(\"c\") }}\n    - ${{ compiler(\"rust\") }}\n    - ${{ stdlib(\"c\") }}\n    - maturin >=1.7,<2.0\n    - if: build_platform != target_platform\n      then:\n        - python\n        - cross-python_${{ target_platform }}\n  host:\n    - python\n    - pip\n    - maturin >=1.7,<2.0\n    # This is a maturin dep.\n    - puccinialin\n  run:\n    - python\n    - exceptiongroup >=1.0.0\n    - sortedcontainers >=2.1.0,<3.0.0\ntests:\n  - python:\n      imports:\n        - hypothesis\n      pip_check: true\n  - requirements:\n      run:\n        - pip\n        - django\n        - pandas\n        - click\n    script:\n      - hypothesis --help\n\nabout:\n  summary: The property-based testing library for Python\n  license: MPL-2.0\n  license_file: LICENSE.txt\n  homepage: https://pypi.org/project/hypothesis/\n\nextra:\n  recipe-maintainers:\n    - ericmjl\n    - jochym\n    - ocefpaf\n    - tadeu\n",
+  "raw_meta_yaml": "# yaml-language-server: $schema=https://raw.githubusercontent.com/prefix-dev/recipe-format/main/schema.json\nschema_version: 1\n\ncontext:\n  version: \"6.167.1\"\n  maturin_min: \"1.9.4\"\n  maturin_max: \"2.0\"\n\npackage:\n  name: hypothesis\n  version: ${{ version }}\n\nsource:\n  url: https://files.pythonhosted.org/packages/source/h/hypothesis/hypothesis-${{ version }}.tar.gz\n  sha256: 62eefcb4d2791423626e9901c3027a6e0c5ffda2ac0b44b3c7e797ab9d2d5a4c\n\nbuild:\n  number: 1\n  skip: is_abi3 and not is_python_min\n  script:\n    env:\n      CARGO_PROFILE_RELEASE_LTO: fat\n      CARGO_PROFILE_RELEASE_STRIP: symbols\n      CARGO: cargo-auditable-wrapper${{ \".bat\" if win }}\n      MATURIN_PEP517_ARGS: ${{ \"--features pyo3/abi3\" if is_abi3 else \"\" }}\n    content:\n      - if: win\n        then:\n          - copy \"%RECIPE_DIR%\\cargo-auditable-wrapper.bat\" \"%BUILD_PREFIX%\\Library\\bin\\cargo-auditable-wrapper.bat\"\n        else:\n          - cp \"${RECIPE_DIR}/cargo-auditable-wrapper.sh\" \"${BUILD_PREFIX}/bin/cargo-auditable-wrapper\"\n          - chmod 755 \"${BUILD_PREFIX}/bin/cargo-auditable-wrapper\"\n      - ${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation --disable-pip-version-check\n      - cd rust\n      - cargo-bundle-licenses --format yaml --output THIRDPARTY.yml\n  python:\n    version_independent: ${{ is_abi3 }}\n    entry_points:\n      - hypothesis = hypothesis.extra.cli:main\n\nrequirements:\n  build:\n    - ${{ compiler(\"c\") }}\n    - ${{ compiler(\"rust\") }}\n    - ${{ stdlib(\"c\") }}\n    - cargo-auditable\n    - cargo-bundle-licenses\n    - maturin >=${{ maturin_min }},<${{ maturin_max }}\n    - if: build_platform != target_platform\n      then:\n        - python\n        - cross-python_${{ target_platform }}\n  host:\n    - maturin >=${{ maturin_min }},<${{ maturin_max }}\n    - pip\n    - python\n    - if: is_abi3\n      then:\n        - python-abi3\n        - python ${{ python_min }}.*\n  run:\n    - python\n    - sortedcontainers >=2.1.0,<3.0.0\ntests:\n  - if: is_abi3\n    then:\n      - python:\n          imports:\n            - hypothesis\n            - hypothesis._native\n          pip_check: true\n          python_version:\n            - ${{ python_min }}.*\n            - \"*\"\n    else:\n      - python:\n          imports:\n            - hypothesis\n            - hypothesis._native\n          pip_check: true\n  - requirements:\n      run:\n        - click\n        - if: is_abi3\n          then:\n            - python ${{ python_min }}.*\n            - abi3audit\n    script:\n      - hypothesis --help\n      - hypothesis --version\n      - hypothesis --version | ${{ \"grep -iE\" if unix else \"findstr /c\" }} \"${{ version | replace('.', '\\\\.') }}$\"\n      - if: is_abi3\n        then:\n          - cd \"${{ '$SP_DIR' if unix else '%SP_DIR%' }}/hypothesis\"\n          - abi3audit -s -v --assume-minimum-abi3 ${{ python_min }} _native.${{ 'abi3.so' if unix else 'pyd' }}\n\nabout:\n  summary: The property-based testing library for Python\n  license: MPL-2.0\n  license_file:\n    - LICENSE.txt\n    - rust/THIRDPARTY.yml\n  homepage: https://pypi.org/project/hypothesis\n  repository: https://github.com/HypothesisWorks/hypothesis\n  documentation: https://hypothesis.readthedocs.io\n\nextra:\n  recipe-maintainers:\n    - ericmjl\n    - jochym\n    - ocefpaf\n    - tadeu\n",
   "req": {
     "__set__": true,
     "elements": [
       "c_compiler_stub",
       "c_stdlib_stub",
+      "cargo-auditable",
       "cargo-bundle-licenses",
       "cross-python_linux-aarch64",
       "cross-python_linux-ppc64le",
       "cross-python_osx-64",
       "cross-python_osx-arm64",
       "cross-python_win-64",
-      "exceptiongroup",
       "maturin",
       "pip",
-      "puccinialin",
       "python",
+      "python-abi3",
       "rust_compiler_stub",
       "sortedcontainers"
     ]
@@ -3682,6 +1860,7 @@
       "elements": [
         "c_compiler_stub",
         "c_stdlib_stub",
+        "cargo-auditable",
         "cargo-bundle-licenses",
         "cross-python_linux-aarch64",
         "cross-python_linux-ppc64le",
@@ -3701,8 +1880,8 @@
         "cross-python",
         "maturin",
         "pip",
-        "puccinialin",
-        "python"
+        "python",
+        "python-abi3"
       ]
     },
     "run": {
@@ -3711,7 +1890,6 @@
         "c_compiler_stub",
         "c_stdlib_stub",
         "cross-python",
-        "exceptiongroup",
         "python",
         "sortedcontainers"
       ]
@@ -3719,10 +1897,10 @@
     "test": {
       "__set__": true,
       "elements": [
+        "abi3audit",
         "click",
-        "django",
-        "pandas",
-        "pip"
+        "pip",
+        "python"
       ]
     }
   },
@@ -3733,13 +1911,14 @@
       "elements": [
         "c_compiler_stub",
         "c_stdlib_stub",
+        "cargo-auditable",
         "cargo-bundle-licenses",
         "cross-python_linux-aarch64",
         "cross-python_linux-ppc64le",
         "cross-python_osx-64",
         "cross-python_osx-arm64",
         "cross-python_win-64",
-        "maturin >=1.7,<2.0",
+        "maturin >=1.9.4,<2.0",
         "python",
         "rust_compiler_stub"
       ]
@@ -3747,16 +1926,16 @@
     "host": {
       "__set__": true,
       "elements": [
-        "maturin >=1.7,<2.0",
+        "maturin >=1.9.4,<2.0",
         "pip",
-        "puccinialin",
-        "python"
+        "python",
+        "python 3.11.*",
+        "python-abi3"
       ]
     },
     "run": {
       "__set__": true,
       "elements": [
-        "exceptiongroup >=1.0.0",
         "python",
         "sortedcontainers >=2.1.0,<3.0.0"
       ]
@@ -3764,29 +1943,44 @@
     "test": {
       "__set__": true,
       "elements": [
+        "abi3audit",
         "click",
-        "django",
-        "pandas",
-        "pip"
+        "pip",
+        "python 3.11.*"
       ]
     }
   },
-  "url": "https://pypi.org/packages/source/h/hypothesis/hypothesis-6.167.1.tar.gz",
+  "url": "https://files.pythonhosted.org/packages/source/h/hypothesis/hypothesis-6.167.1.tar.gz",
   "version": "6.167.1",
   "version_pr_info": {
     "__lazy_json__": "version_pr_info/hypothesis.json"
   },
   "win_64_meta_yaml": {
     "about": {
-      "home": "https://pypi.org/project/hypothesis/",
+      "dev_url": "https://github.com/HypothesisWorks/hypothesis",
+      "doc_url": "https://hypothesis.readthedocs.io/",
+      "home": "https://pypi.org/project/hypothesis",
       "license": "MPL-2.0",
       "license_family": "MPL-2.0",
       "license_file": "LICENSE.txt",
       "summary": "The property-based testing library for Python"
     },
     "build": {
-      "number": "0",
-      "script": "${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation"
+      "number": "1",
+      "script": {
+        "content": [
+          "copy \"%RECIPE_DIR%\\cargo-auditable-wrapper.bat\" \"%BUILD_PREFIX%\\Library\\bin\\cargo-auditable-wrapper.bat\"",
+          "${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation --disable-pip-version-check",
+          "cd rust",
+          "cargo-bundle-licenses --format yaml --output THIRDPARTY.yml"
+        ],
+        "env": {
+          "CARGO": "cargo-auditable-wrapper.bat",
+          "CARGO_PROFILE_RELEASE_LTO": "fat",
+          "CARGO_PROFILE_RELEASE_STRIP": "symbols",
+          "MATURIN_PEP517_ARGS": "--features pyo3/abi3"
+        }
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -3802,23 +1996,22 @@
         "name": "hypothesis",
         "requirements": {
           "build": [
-            "cargo-bundle-licenses",
             "c_compiler_stub",
             "rust_compiler_stub",
             "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
+            "cargo-auditable",
+            "cargo-bundle-licenses",
+            "maturin >=1.9.4,<2.0",
             "python",
             "cross-python_win-64"
           ],
           "host": [
-            "python",
+            "maturin >=1.9.4,<2.0",
             "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
+            "python"
           ],
           "run": [
             "python",
-            "exceptiongroup >=1.0.0",
             "sortedcontainers >=2.1.0,<3.0.0"
           ]
         },
@@ -3826,20 +2019,22 @@
           {
             "python": {
               "imports": [
-                "hypothesis"
+                "hypothesis",
+                "hypothesis._native"
               ]
             }
           },
           {
             "requirements": {
               "run": [
-                "pip",
-                "django",
-                "pandas",
                 "click"
               ]
             },
-            "script": "hypothesis --help"
+            "script": [
+              "hypothesis --help",
+              "hypothesis --version",
+              "hypothesis --version | ${{ \"grep -iE\" if unix else \"findstr /c\" }} \"${{ version | replace('.', '\\\\.') }}$\""
+            ]
           }
         ],
         "version": "6.167.1"
@@ -3849,23 +2044,24 @@
         "name": "hypothesis",
         "requirements": {
           "build": [
-            "cargo-bundle-licenses",
             "c_compiler_stub",
             "rust_compiler_stub",
             "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
+            "cargo-auditable",
+            "cargo-bundle-licenses",
+            "maturin >=1.9.4,<2.0",
             "python",
             "cross-python_win-64"
           ],
           "host": [
-            "python",
+            "maturin >=1.9.4,<2.0",
             "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
+            "python",
+            "python-abi3",
+            "python 3.11.*"
           ],
           "run": [
             "python",
-            "exceptiongroup >=1.0.0",
             "sortedcontainers >=2.1.0,<3.0.0"
           ]
         },
@@ -3873,208 +2069,30 @@
           {
             "python": {
               "imports": [
-                "hypothesis"
+                "hypothesis",
+                "hypothesis._native"
+              ],
+              "python_version": [
+                "3.11.*",
+                "*"
               ]
             }
           },
           {
             "requirements": {
               "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
+                "click",
+                "python 3.11.*",
+                "abi3audit"
               ]
             },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
-            "python",
-            "cross-python_win-64"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
-            "python",
-            "cross-python_win-64"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
-            "python",
-            "cross-python_win-64"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
-          }
-        ],
-        "version": "6.167.1"
-      },
-      {
-        "build": null,
-        "name": "hypothesis",
-        "requirements": {
-          "build": [
-            "cargo-bundle-licenses",
-            "c_compiler_stub",
-            "rust_compiler_stub",
-            "c_stdlib_stub",
-            "maturin >=1.7,<2.0",
-            "python",
-            "cross-python_win-64"
-          ],
-          "host": [
-            "python",
-            "pip",
-            "maturin >=1.7,<2.0",
-            "puccinialin"
-          ],
-          "run": [
-            "python",
-            "exceptiongroup >=1.0.0",
-            "sortedcontainers >=2.1.0,<3.0.0"
-          ]
-        },
-        "tests": [
-          {
-            "python": {
-              "imports": [
-                "hypothesis"
-              ]
-            }
-          },
-          {
-            "requirements": {
-              "run": [
-                "pip",
-                "django",
-                "pandas",
-                "click"
-              ]
-            },
-            "script": "hypothesis --help"
+            "script": [
+              "hypothesis --help",
+              "hypothesis --version",
+              "hypothesis --version | ${{ \"grep -iE\" if unix else \"findstr /c\" }} \"${{ version | replace('.', '\\\\.') }}$\"",
+              "cd \"${{ '$SP_DIR' if unix else '%SP_DIR%' }}/hypothesis\"",
+              "abi3audit -s -v --assume-minimum-abi3 ${{ python_min }} _native.${{ 'abi3.so' if unix else 'pyd' }}"
+            ]
           }
         ],
         "version": "6.167.1"
@@ -4086,30 +2104,31 @@
     },
     "requirements": {
       "build": [
-        "cargo-bundle-licenses",
         "c_compiler_stub",
         "rust_compiler_stub",
         "c_stdlib_stub",
-        "maturin >=1.7,<2.0",
+        "cargo-auditable",
+        "cargo-bundle-licenses",
+        "maturin >=1.9.4,<2.0",
         "python",
         "cross-python_win-64"
       ],
       "host": [
-        "python",
+        "maturin >=1.9.4,<2.0",
         "pip",
-        "maturin >=1.7,<2.0",
-        "puccinialin"
+        "python",
+        "python-abi3",
+        "python 3.11.*"
       ],
       "run": [
         "python",
-        "exceptiongroup >=1.0.0",
         "sortedcontainers >=2.1.0,<3.0.0"
       ]
     },
     "schema_version": 1,
     "source": {
       "sha256": "62eefcb4d2791423626e9901c3027a6e0c5ffda2ac0b44b3c7e797ab9d2d5a4c",
-      "url": "https://pypi.org/packages/source/h/hypothesis/hypothesis-6.167.1.tar.gz"
+      "url": "https://files.pythonhosted.org/packages/source/h/hypothesis/hypothesis-6.167.1.tar.gz"
     }
   },
   "win_64_requirements": {
@@ -4118,6 +2137,7 @@
       "elements": [
         "c_compiler_stub",
         "c_stdlib_stub",
+        "cargo-auditable",
         "cargo-bundle-licenses",
         "cross-python_win-64",
         "maturin",
@@ -4130,14 +2150,13 @@
       "elements": [
         "maturin",
         "pip",
-        "puccinialin",
-        "python"
+        "python",
+        "python-abi3"
       ]
     },
     "run": {
       "__set__": true,
       "elements": [
-        "exceptiongroup",
         "python",
         "sortedcontainers"
       ]
@@ -4145,10 +2164,10 @@
     "test": {
       "__set__": true,
       "elements": [
+        "abi3audit",
         "click",
-        "django",
-        "pandas",
-        "pip"
+        "pip",
+        "python"
       ]
     }
   }
