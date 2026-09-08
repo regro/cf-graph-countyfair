@@ -23,15 +23,15 @@
     },
     "test": "native_and_emulated"
   },
-  "feedstock_hash": "32794dd8df26e122761b9691a31b364078c85fe5",
-  "feedstock_hash_ts": 1788769632,
+  "feedstock_hash": "df27e7abdab07f0b789200b25e8d5220361f7548",
+  "feedstock_hash_ts": 1788878810,
   "feedstock_name": "tbb",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
     "about": {
       "dev_url": "https://github.com/uxlfoundation/oneTBB",
       "doc_url": "https://software.intel.com/en-us/oneapi-tbb-documentation",
-      "home": "https://github.com/oneapi-src/oneTBB",
+      "home": "https://github.com/uxlfoundation/oneTBB",
       "license": "Apache-2.0",
       "license_file": [
         "LICENSE.txt",
@@ -40,7 +40,7 @@
       "summary": "High level abstract threading library"
     },
     "build": {
-      "number": "3"
+      "number": "0"
     },
     "extra": {
       "recipe-maintainers": [
@@ -61,8 +61,13 @@
           "summary": "TBB Libraries"
         },
         "build": {
+          "ignore_run_exports": [
+            "libxml2",
+            "libxml2-16",
+            "libxml2-devel"
+          ],
           "script": [
-            "cmake $CMAKE_ARGS -DTBB_TEST=OFF -S . -B build",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DTBB_TEST=OFF -S . -B build",
             "cmake --build build --parallel",
             "cmake -DCOMPONENT=runtime -P build/cmake_install.cmake"
           ]
@@ -70,12 +75,13 @@
         "name": "tbb",
         "requirements": {
           "host": [
-            "libhwloc"
+            "libhwloc",
+            "libxml2-devel"
           ]
         },
         "test": {
           "commands": [
-            "python -c \"import ctypes, os;  assert 14000 == ctypes.cdll[r'tbb14.dll']['TBB_runtime_interface_version']()\""
+            "python -c \"import ctypes, os;  assert 14010 == ctypes.cdll[r'tbb14.dll']['TBB_runtime_interface_version']()\""
           ],
           "requires": [
             "python *"
@@ -95,10 +101,10 @@
             "libhwloc"
           ],
           "run_exports": [
-            "tbb >=2023.0.0"
+            "tbb >=2023.1.0"
           ],
           "script": [
-            "cmake $CMAKE_ARGS -DTBB_TEST=OFF -S . -B build",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DTBB_TEST=OFF -S . -B build",
             "cmake --build build --parallel",
             "cmake -DCOMPONENT=devel -P build/cmake_install.cmake"
           ]
@@ -114,7 +120,8 @@
             "pkg-config"
           ],
           "host": [
-            "libhwloc"
+            "libhwloc",
+            "libxml2-devel"
           ],
           "run": [
             "tbb"
@@ -122,7 +129,7 @@
         },
         "test": {
           "commands": [
-            "cmake $CMAKE_ARGS -DTBB_TEST=ON -DTBB_DIR=ON -DTBB_FIND_PACKAGE=ON -S . -B test_build",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DTBB_TEST=ON -DTBB_DIR=ON -DTBB_FIND_PACKAGE=ON -S . -B test_build",
             "cmake --build test_build --target test_parallel_for test_tbb_header conformance_version test_flow_graph test_arena_constraints --parallel",
             "cd test_build",
             "ctest -R \"^(test_parallel_for|test_tbb_header|conformance_version|test_flow_graph|test_arena_constraints)$\" --output-on-failure"
@@ -131,6 +138,7 @@
             "cxx_compiler_stub",
             "c_stdlib_stub",
             "make",
+            "libxml2-devel",
             "cmake",
             "pkg-config",
             "libhwloc"
@@ -155,7 +163,7 @@
         },
         "build": {
           "script": [
-            "cmake $CMAKE_ARGS -DTBB4PY_BUILD=ON -DTBB_TEST=OFF -S . -B build_%PKG_HASH%",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DPython3_EXECUTABLE=$PYTHON -DPython3_ROOT_DIR=$PREFIX -DTBB4PY_BUILD=ON -DTBB_TEST=OFF -S . -B build_%PKG_HASH%",
             "cmake --build build_%PKG_HASH% --target python_build --parallel",
             "cmake -DCOMPONENT=tbb4py -P build_%PKG_HASH%/cmake_install.cmake"
           ]
@@ -176,7 +184,7 @@
             "tbb-devel"
           ],
           "run": [
-            "tbb >=2023.0.0",
+            "tbb >=2023.1.0",
             "python"
           ]
         },
@@ -199,7 +207,7 @@
     ],
     "package": {
       "name": "tbb",
-      "version": "2023.0.0"
+      "version": "2023.1.0"
     },
     "requirements": {
       "build": [
@@ -219,8 +227,8 @@
       "patches": [
         "patches/0001-disable-windows-path-hack-that-s-wrong-for-conda.patch"
       ],
-      "sha256": "f8767b971ec6aea25dde58ae0f593e94e7aa75a739a86f67967012f69e2199b1",
-      "url": "https://github.com/oneapi-src/oneTBB/archive/refs/tags/v2023.0.0.tar.gz"
+      "sha256": "191288b52e1e6b17198000b64d77d194bb65e791be46ebc606e9b091781e2070",
+      "url": "https://github.com/uxlfoundation/oneTBB/archive/refs/tags/v2023.1.0.tar.gz"
     }
   },
   "linux_64_requirements": {
@@ -240,6 +248,7 @@
       "__set__": true,
       "elements": [
         "libhwloc",
+        "libxml2-devel",
         "pip",
         "python",
         "setuptools",
@@ -260,6 +269,7 @@
         "cmake",
         "cxx_compiler_stub",
         "libhwloc",
+        "libxml2-devel",
         "make",
         "pkg-config",
         "python",
@@ -271,7 +281,7 @@
     "about": {
       "dev_url": "https://github.com/uxlfoundation/oneTBB",
       "doc_url": "https://software.intel.com/en-us/oneapi-tbb-documentation",
-      "home": "https://github.com/oneapi-src/oneTBB",
+      "home": "https://github.com/uxlfoundation/oneTBB",
       "license": "Apache-2.0",
       "license_file": [
         "LICENSE.txt",
@@ -280,7 +290,7 @@
       "summary": "High level abstract threading library"
     },
     "build": {
-      "number": "3"
+      "number": "0"
     },
     "extra": {
       "recipe-maintainers": [
@@ -301,8 +311,13 @@
           "summary": "TBB Libraries"
         },
         "build": {
+          "ignore_run_exports": [
+            "libxml2",
+            "libxml2-16",
+            "libxml2-devel"
+          ],
           "script": [
-            "cmake $CMAKE_ARGS -DTBB_TEST=OFF -S . -B build",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DTBB_TEST=OFF -S . -B build",
             "cmake --build build --parallel",
             "cmake -DCOMPONENT=runtime -P build/cmake_install.cmake"
           ]
@@ -310,12 +325,13 @@
         "name": "tbb",
         "requirements": {
           "host": [
-            "libhwloc"
+            "libhwloc",
+            "libxml2-devel"
           ]
         },
         "test": {
           "commands": [
-            "python -c \"import ctypes, os;  assert 14000 == ctypes.cdll[r'tbb14.dll']['TBB_runtime_interface_version']()\""
+            "python -c \"import ctypes, os;  assert 14010 == ctypes.cdll[r'tbb14.dll']['TBB_runtime_interface_version']()\""
           ],
           "requires": [
             "python *"
@@ -335,10 +351,10 @@
             "libhwloc"
           ],
           "run_exports": [
-            "tbb >=2023.0.0"
+            "tbb >=2023.1.0"
           ],
           "script": [
-            "cmake $CMAKE_ARGS -DTBB_TEST=OFF -S . -B build",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DTBB_TEST=OFF -S . -B build",
             "cmake --build build --parallel",
             "cmake -DCOMPONENT=devel -P build/cmake_install.cmake"
           ]
@@ -354,7 +370,8 @@
             "pkg-config"
           ],
           "host": [
-            "libhwloc"
+            "libhwloc",
+            "libxml2-devel"
           ],
           "run": [
             "tbb"
@@ -362,7 +379,7 @@
         },
         "test": {
           "commands": [
-            "cmake $CMAKE_ARGS -DTBB_TEST=ON -DTBB_DIR=ON -DTBB_FIND_PACKAGE=ON -S . -B test_build",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DTBB_TEST=ON -DTBB_DIR=ON -DTBB_FIND_PACKAGE=ON -S . -B test_build",
             "cmake --build test_build --target test_parallel_for test_tbb_header conformance_version test_flow_graph test_arena_constraints --parallel",
             "cd test_build",
             "ctest -R \"^(test_parallel_for|test_tbb_header|conformance_version|test_flow_graph|test_arena_constraints)$\" --output-on-failure"
@@ -371,6 +388,7 @@
             "cxx_compiler_stub",
             "c_stdlib_stub",
             "make",
+            "libxml2-devel",
             "cmake",
             "pkg-config",
             "libhwloc"
@@ -395,7 +413,7 @@
         },
         "build": {
           "script": [
-            "cmake $CMAKE_ARGS -DTBB4PY_BUILD=ON -DTBB_TEST=OFF -S . -B build_%PKG_HASH%",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DPython3_EXECUTABLE=$PYTHON -DPython3_ROOT_DIR=$PREFIX -DTBB4PY_BUILD=ON -DTBB_TEST=OFF -S . -B build_%PKG_HASH%",
             "cmake --build build_%PKG_HASH% --target python_build --parallel",
             "cmake -DCOMPONENT=tbb4py -P build_%PKG_HASH%/cmake_install.cmake"
           ]
@@ -416,7 +434,7 @@
             "tbb-devel"
           ],
           "run": [
-            "tbb >=2023.0.0",
+            "tbb >=2023.1.0",
             "python"
           ]
         },
@@ -439,7 +457,7 @@
     ],
     "package": {
       "name": "tbb",
-      "version": "2023.0.0"
+      "version": "2023.1.0"
     },
     "requirements": {
       "build": [
@@ -459,8 +477,8 @@
       "patches": [
         "patches/0001-disable-windows-path-hack-that-s-wrong-for-conda.patch"
       ],
-      "sha256": "f8767b971ec6aea25dde58ae0f593e94e7aa75a739a86f67967012f69e2199b1",
-      "url": "https://github.com/oneapi-src/oneTBB/archive/refs/tags/v2023.0.0.tar.gz"
+      "sha256": "191288b52e1e6b17198000b64d77d194bb65e791be46ebc606e9b091781e2070",
+      "url": "https://github.com/uxlfoundation/oneTBB/archive/refs/tags/v2023.1.0.tar.gz"
     }
   },
   "linux_aarch64_requirements": {
@@ -480,6 +498,7 @@
       "__set__": true,
       "elements": [
         "libhwloc",
+        "libxml2-devel",
         "pip",
         "python",
         "setuptools",
@@ -500,6 +519,7 @@
         "cmake",
         "cxx_compiler_stub",
         "libhwloc",
+        "libxml2-devel",
         "make",
         "pkg-config",
         "python",
@@ -511,7 +531,7 @@
     "about": {
       "dev_url": "https://github.com/uxlfoundation/oneTBB",
       "doc_url": "https://software.intel.com/en-us/oneapi-tbb-documentation",
-      "home": "https://github.com/oneapi-src/oneTBB",
+      "home": "https://github.com/uxlfoundation/oneTBB",
       "license": "Apache-2.0",
       "license_file": [
         "LICENSE.txt",
@@ -520,7 +540,7 @@
       "summary": "High level abstract threading library"
     },
     "build": {
-      "number": "3"
+      "number": "0"
     },
     "extra": {
       "recipe-maintainers": [
@@ -541,8 +561,13 @@
           "summary": "TBB Libraries"
         },
         "build": {
+          "ignore_run_exports": [
+            "libxml2",
+            "libxml2-16",
+            "libxml2-devel"
+          ],
           "script": [
-            "cmake $CMAKE_ARGS -DTBB_TEST=OFF -S . -B build",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DTBB_TEST=OFF -S . -B build",
             "cmake --build build --parallel",
             "cmake -DCOMPONENT=runtime -P build/cmake_install.cmake"
           ]
@@ -550,12 +575,13 @@
         "name": "tbb",
         "requirements": {
           "host": [
-            "libhwloc"
+            "libhwloc",
+            "libxml2-devel"
           ]
         },
         "test": {
           "commands": [
-            "python -c \"import ctypes, os;  assert 14000 == ctypes.cdll[r'tbb14.dll']['TBB_runtime_interface_version']()\""
+            "python -c \"import ctypes, os;  assert 14010 == ctypes.cdll[r'tbb14.dll']['TBB_runtime_interface_version']()\""
           ],
           "requires": [
             "python *"
@@ -575,10 +601,10 @@
             "libhwloc"
           ],
           "run_exports": [
-            "tbb >=2023.0.0"
+            "tbb >=2023.1.0"
           ],
           "script": [
-            "cmake $CMAKE_ARGS -DTBB_TEST=OFF -S . -B build",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DTBB_TEST=OFF -S . -B build",
             "cmake --build build --parallel",
             "cmake -DCOMPONENT=devel -P build/cmake_install.cmake"
           ]
@@ -594,7 +620,8 @@
             "pkg-config"
           ],
           "host": [
-            "libhwloc"
+            "libhwloc",
+            "libxml2-devel"
           ],
           "run": [
             "tbb"
@@ -602,7 +629,7 @@
         },
         "test": {
           "commands": [
-            "cmake $CMAKE_ARGS -DTBB_TEST=ON -DTBB_DIR=ON -DTBB_FIND_PACKAGE=ON -S . -B test_build",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DTBB_TEST=ON -DTBB_DIR=ON -DTBB_FIND_PACKAGE=ON -S . -B test_build",
             "cmake --build test_build --target test_parallel_for test_tbb_header conformance_version test_flow_graph test_arena_constraints --parallel",
             "cd test_build",
             "ctest -R \"^(test_parallel_for|test_tbb_header|conformance_version|test_flow_graph|test_arena_constraints)$\" --output-on-failure"
@@ -611,6 +638,7 @@
             "cxx_compiler_stub",
             "c_stdlib_stub",
             "make",
+            "libxml2-devel",
             "cmake",
             "pkg-config",
             "libhwloc"
@@ -635,7 +663,7 @@
         },
         "build": {
           "script": [
-            "cmake $CMAKE_ARGS -DTBB4PY_BUILD=ON -DTBB_TEST=OFF -S . -B build_%PKG_HASH%",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DPython3_EXECUTABLE=$PYTHON -DPython3_ROOT_DIR=$PREFIX -DTBB4PY_BUILD=ON -DTBB_TEST=OFF -S . -B build_%PKG_HASH%",
             "cmake --build build_%PKG_HASH% --target python_build --parallel",
             "cmake -DCOMPONENT=tbb4py -P build_%PKG_HASH%/cmake_install.cmake"
           ]
@@ -656,7 +684,7 @@
             "tbb-devel"
           ],
           "run": [
-            "tbb >=2023.0.0",
+            "tbb >=2023.1.0",
             "python"
           ]
         },
@@ -679,7 +707,7 @@
     ],
     "package": {
       "name": "tbb",
-      "version": "2023.0.0"
+      "version": "2023.1.0"
     },
     "requirements": {
       "build": [
@@ -699,8 +727,8 @@
       "patches": [
         "patches/0001-disable-windows-path-hack-that-s-wrong-for-conda.patch"
       ],
-      "sha256": "f8767b971ec6aea25dde58ae0f593e94e7aa75a739a86f67967012f69e2199b1",
-      "url": "https://github.com/oneapi-src/oneTBB/archive/refs/tags/v2023.0.0.tar.gz"
+      "sha256": "191288b52e1e6b17198000b64d77d194bb65e791be46ebc606e9b091781e2070",
+      "url": "https://github.com/uxlfoundation/oneTBB/archive/refs/tags/v2023.1.0.tar.gz"
     }
   },
   "linux_ppc64le_requirements": {
@@ -720,6 +748,7 @@
       "__set__": true,
       "elements": [
         "libhwloc",
+        "libxml2-devel",
         "pip",
         "python",
         "setuptools",
@@ -740,6 +769,7 @@
         "cmake",
         "cxx_compiler_stub",
         "libhwloc",
+        "libxml2-devel",
         "make",
         "pkg-config",
         "python",
@@ -751,7 +781,7 @@
     "about": {
       "dev_url": "https://github.com/uxlfoundation/oneTBB",
       "doc_url": "https://software.intel.com/en-us/oneapi-tbb-documentation",
-      "home": "https://github.com/oneapi-src/oneTBB",
+      "home": "https://github.com/uxlfoundation/oneTBB",
       "license": "Apache-2.0",
       "license_file": [
         "LICENSE.txt",
@@ -760,7 +790,7 @@
       "summary": "High level abstract threading library"
     },
     "build": {
-      "number": "3"
+      "number": "0"
     },
     "extra": {
       "recipe-maintainers": [
@@ -781,8 +811,13 @@
           "summary": "TBB Libraries"
         },
         "build": {
+          "ignore_run_exports": [
+            "libxml2",
+            "libxml2-16",
+            "libxml2-devel"
+          ],
           "script": [
-            "cmake $CMAKE_ARGS -DTBB_TEST=OFF -S . -B build",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DTBB_TEST=OFF -S . -B build",
             "cmake --build build --parallel",
             "cmake -DCOMPONENT=runtime -P build/cmake_install.cmake"
           ]
@@ -790,12 +825,13 @@
         "name": "tbb",
         "requirements": {
           "host": [
-            "libhwloc"
+            "libhwloc",
+            "libxml2-devel"
           ]
         },
         "test": {
           "commands": [
-            "python -c \"import ctypes, os;  assert 14000 == ctypes.cdll[r'tbb14.dll']['TBB_runtime_interface_version']()\""
+            "python -c \"import ctypes, os;  assert 14010 == ctypes.cdll[r'tbb14.dll']['TBB_runtime_interface_version']()\""
           ],
           "requires": [
             "python *"
@@ -815,10 +851,10 @@
             "libhwloc"
           ],
           "run_exports": [
-            "tbb >=2023.0.0"
+            "tbb >=2023.1.0"
           ],
           "script": [
-            "cmake $CMAKE_ARGS -DTBB_TEST=OFF -S . -B build",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DTBB_TEST=OFF -S . -B build",
             "cmake --build build --parallel",
             "cmake -DCOMPONENT=devel -P build/cmake_install.cmake"
           ]
@@ -834,7 +870,8 @@
             "pkg-config"
           ],
           "host": [
-            "libhwloc"
+            "libhwloc",
+            "libxml2-devel"
           ],
           "run": [
             "tbb"
@@ -842,7 +879,7 @@
         },
         "test": {
           "commands": [
-            "cmake $CMAKE_ARGS -DTBB_TEST=ON -DTBB_DIR=ON -DTBB_FIND_PACKAGE=ON -S . -B test_build",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DTBB_TEST=ON -DTBB_DIR=ON -DTBB_FIND_PACKAGE=ON -S . -B test_build",
             "cmake --build test_build --target test_parallel_for test_tbb_header conformance_version test_flow_graph test_arena_constraints --parallel",
             "cd test_build",
             "ctest -R \"^(test_parallel_for|test_tbb_header|conformance_version|test_flow_graph|test_arena_constraints)$\" --output-on-failure"
@@ -851,6 +888,7 @@
             "cxx_compiler_stub",
             "c_stdlib_stub",
             "make",
+            "libxml2-devel",
             "cmake",
             "pkg-config",
             "libhwloc"
@@ -875,7 +913,7 @@
         },
         "build": {
           "script": [
-            "cmake $CMAKE_ARGS -DTBB4PY_BUILD=ON -DTBB_TEST=OFF -S . -B build_%PKG_HASH%",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DPython3_EXECUTABLE=$PYTHON -DPython3_ROOT_DIR=$PREFIX -DTBB4PY_BUILD=ON -DTBB_TEST=OFF -S . -B build_%PKG_HASH%",
             "cmake --build build_%PKG_HASH% --target python_build --parallel",
             "cmake -DCOMPONENT=tbb4py -P build_%PKG_HASH%/cmake_install.cmake"
           ]
@@ -896,7 +934,7 @@
             "tbb-devel"
           ],
           "run": [
-            "tbb >=2023.0.0",
+            "tbb >=2023.1.0",
             "python"
           ]
         },
@@ -925,8 +963,13 @@
           "summary": "TBB Libraries"
         },
         "build": {
+          "ignore_run_exports": [
+            "libxml2",
+            "libxml2-16",
+            "libxml2-devel"
+          ],
           "script": [
-            "cmake $CMAKE_ARGS -DTBB_TEST=OFF -S . -B build",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DTBB_TEST=OFF -S . -B build",
             "cmake --build build --parallel",
             "cmake -DCOMPONENT=runtime -P build/cmake_install.cmake"
           ]
@@ -934,12 +977,13 @@
         "name": "tbb",
         "requirements": {
           "host": [
-            "libhwloc"
+            "libhwloc",
+            "libxml2-devel"
           ]
         },
         "test": {
           "commands": [
-            "python -c \"import ctypes, os;  assert 14000 == ctypes.cdll[r'tbb14.dll']['TBB_runtime_interface_version']()\""
+            "python -c \"import ctypes, os;  assert 14010 == ctypes.cdll[r'tbb14.dll']['TBB_runtime_interface_version']()\""
           ],
           "requires": [
             "python *"
@@ -959,10 +1003,10 @@
             "libhwloc"
           ],
           "run_exports": [
-            "tbb >=2023.0.0"
+            "tbb >=2023.1.0"
           ],
           "script": [
-            "cmake $CMAKE_ARGS -DTBB_TEST=OFF -S . -B build",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DTBB_TEST=OFF -S . -B build",
             "cmake --build build --parallel",
             "cmake -DCOMPONENT=devel -P build/cmake_install.cmake"
           ]
@@ -978,7 +1022,8 @@
             "pkg-config"
           ],
           "host": [
-            "libhwloc"
+            "libhwloc",
+            "libxml2-devel"
           ],
           "run": [
             "tbb"
@@ -986,7 +1031,7 @@
         },
         "test": {
           "commands": [
-            "cmake $CMAKE_ARGS -DTBB_TEST=ON -DTBB_DIR=ON -DTBB_FIND_PACKAGE=ON -S . -B test_build",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DTBB_TEST=ON -DTBB_DIR=ON -DTBB_FIND_PACKAGE=ON -S . -B test_build",
             "cmake --build test_build --target test_parallel_for test_tbb_header conformance_version test_flow_graph test_arena_constraints --parallel",
             "cd test_build",
             "ctest -R \"^(test_parallel_for|test_tbb_header|conformance_version|test_flow_graph|test_arena_constraints)$\" --output-on-failure"
@@ -995,6 +1040,7 @@
             "cxx_compiler_stub",
             "c_stdlib_stub",
             "make",
+            "libxml2-devel",
             "cmake",
             "pkg-config",
             "libhwloc"
@@ -1019,7 +1065,7 @@
         },
         "build": {
           "script": [
-            "cmake $CMAKE_ARGS -DTBB4PY_BUILD=ON -DTBB_TEST=OFF -S . -B build_%PKG_HASH%",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DPython3_EXECUTABLE=$PYTHON -DPython3_ROOT_DIR=$PREFIX -DTBB4PY_BUILD=ON -DTBB_TEST=OFF -S . -B build_%PKG_HASH%",
             "cmake --build build_%PKG_HASH% --target python_build --parallel",
             "cmake -DCOMPONENT=tbb4py -P build_%PKG_HASH%/cmake_install.cmake"
           ]
@@ -1040,7 +1086,7 @@
             "tbb-devel"
           ],
           "run": [
-            "tbb >=2023.0.0",
+            "tbb >=2023.1.0",
             "python"
           ]
         },
@@ -1069,8 +1115,13 @@
           "summary": "TBB Libraries"
         },
         "build": {
+          "ignore_run_exports": [
+            "libxml2",
+            "libxml2-16",
+            "libxml2-devel"
+          ],
           "script": [
-            "cmake $CMAKE_ARGS -DTBB_TEST=OFF -S . -B build",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DTBB_TEST=OFF -S . -B build",
             "cmake --build build --parallel",
             "cmake -DCOMPONENT=runtime -P build/cmake_install.cmake"
           ]
@@ -1078,12 +1129,13 @@
         "name": "tbb",
         "requirements": {
           "host": [
-            "libhwloc"
+            "libhwloc",
+            "libxml2-devel"
           ]
         },
         "test": {
           "commands": [
-            "python -c \"import ctypes, os;  assert 14000 == ctypes.cdll[r'tbb14.dll']['TBB_runtime_interface_version']()\""
+            "python -c \"import ctypes, os;  assert 14010 == ctypes.cdll[r'tbb14.dll']['TBB_runtime_interface_version']()\""
           ],
           "requires": [
             "python *"
@@ -1103,10 +1155,10 @@
             "libhwloc"
           ],
           "run_exports": [
-            "tbb >=2023.0.0"
+            "tbb >=2023.1.0"
           ],
           "script": [
-            "cmake $CMAKE_ARGS -DTBB_TEST=OFF -S . -B build",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DTBB_TEST=OFF -S . -B build",
             "cmake --build build --parallel",
             "cmake -DCOMPONENT=devel -P build/cmake_install.cmake"
           ]
@@ -1122,7 +1174,8 @@
             "pkg-config"
           ],
           "host": [
-            "libhwloc"
+            "libhwloc",
+            "libxml2-devel"
           ],
           "run": [
             "tbb"
@@ -1130,7 +1183,7 @@
         },
         "test": {
           "commands": [
-            "cmake $CMAKE_ARGS -DTBB_TEST=ON -DTBB_DIR=ON -DTBB_FIND_PACKAGE=ON -S . -B test_build",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DTBB_TEST=ON -DTBB_DIR=ON -DTBB_FIND_PACKAGE=ON -S . -B test_build",
             "cmake --build test_build --target test_parallel_for test_tbb_header conformance_version test_flow_graph test_arena_constraints --parallel",
             "cd test_build",
             "ctest -R \"^(test_parallel_for|test_tbb_header|conformance_version|test_flow_graph|test_arena_constraints)$\" --output-on-failure"
@@ -1139,6 +1192,7 @@
             "cxx_compiler_stub",
             "c_stdlib_stub",
             "make",
+            "libxml2-devel",
             "cmake",
             "pkg-config",
             "libhwloc"
@@ -1163,7 +1217,7 @@
         },
         "build": {
           "script": [
-            "cmake $CMAKE_ARGS -DTBB4PY_BUILD=ON -DTBB_TEST=OFF -S . -B build_%PKG_HASH%",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DPython3_EXECUTABLE=$PYTHON -DPython3_ROOT_DIR=$PREFIX -DTBB4PY_BUILD=ON -DTBB_TEST=OFF -S . -B build_%PKG_HASH%",
             "cmake --build build_%PKG_HASH% --target python_build --parallel",
             "cmake -DCOMPONENT=tbb4py -P build_%PKG_HASH%/cmake_install.cmake"
           ]
@@ -1184,7 +1238,7 @@
             "tbb-devel"
           ],
           "run": [
-            "tbb >=2023.0.0",
+            "tbb >=2023.1.0",
             "python"
           ]
         },
@@ -1213,8 +1267,13 @@
           "summary": "TBB Libraries"
         },
         "build": {
+          "ignore_run_exports": [
+            "libxml2",
+            "libxml2-16",
+            "libxml2-devel"
+          ],
           "script": [
-            "cmake $CMAKE_ARGS -DTBB_TEST=OFF -S . -B build",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DTBB_TEST=OFF -S . -B build",
             "cmake --build build --parallel",
             "cmake -DCOMPONENT=runtime -P build/cmake_install.cmake"
           ]
@@ -1222,12 +1281,13 @@
         "name": "tbb",
         "requirements": {
           "host": [
-            "libhwloc"
+            "libhwloc",
+            "libxml2-devel"
           ]
         },
         "test": {
           "commands": [
-            "python -c \"import ctypes, os;  assert 14000 == ctypes.cdll[r'tbb14.dll']['TBB_runtime_interface_version']()\""
+            "python -c \"import ctypes, os;  assert 14010 == ctypes.cdll[r'tbb14.dll']['TBB_runtime_interface_version']()\""
           ],
           "requires": [
             "python *"
@@ -1247,10 +1307,10 @@
             "libhwloc"
           ],
           "run_exports": [
-            "tbb >=2023.0.0"
+            "tbb >=2023.1.0"
           ],
           "script": [
-            "cmake $CMAKE_ARGS -DTBB_TEST=OFF -S . -B build",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DTBB_TEST=OFF -S . -B build",
             "cmake --build build --parallel",
             "cmake -DCOMPONENT=devel -P build/cmake_install.cmake"
           ]
@@ -1266,7 +1326,8 @@
             "pkg-config"
           ],
           "host": [
-            "libhwloc"
+            "libhwloc",
+            "libxml2-devel"
           ],
           "run": [
             "tbb"
@@ -1274,7 +1335,7 @@
         },
         "test": {
           "commands": [
-            "cmake $CMAKE_ARGS -DTBB_TEST=ON -DTBB_DIR=ON -DTBB_FIND_PACKAGE=ON -S . -B test_build",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DTBB_TEST=ON -DTBB_DIR=ON -DTBB_FIND_PACKAGE=ON -S . -B test_build",
             "cmake --build test_build --target test_parallel_for test_tbb_header conformance_version test_flow_graph test_arena_constraints --parallel",
             "cd test_build",
             "ctest -R \"^(test_parallel_for|test_tbb_header|conformance_version|test_flow_graph|test_arena_constraints)$\" --output-on-failure"
@@ -1283,6 +1344,7 @@
             "cxx_compiler_stub",
             "c_stdlib_stub",
             "make",
+            "libxml2-devel",
             "cmake",
             "pkg-config",
             "libhwloc"
@@ -1307,7 +1369,7 @@
         },
         "build": {
           "script": [
-            "cmake $CMAKE_ARGS -DTBB4PY_BUILD=ON -DTBB_TEST=OFF -S . -B build_%PKG_HASH%",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DPython3_EXECUTABLE=$PYTHON -DPython3_ROOT_DIR=$PREFIX -DTBB4PY_BUILD=ON -DTBB_TEST=OFF -S . -B build_%PKG_HASH%",
             "cmake --build build_%PKG_HASH% --target python_build --parallel",
             "cmake -DCOMPONENT=tbb4py -P build_%PKG_HASH%/cmake_install.cmake"
           ]
@@ -1328,7 +1390,7 @@
             "tbb-devel"
           ],
           "run": [
-            "tbb >=2023.0.0",
+            "tbb >=2023.1.0",
             "python"
           ]
         },
@@ -1357,8 +1419,13 @@
           "summary": "TBB Libraries"
         },
         "build": {
+          "ignore_run_exports": [
+            "libxml2",
+            "libxml2-16",
+            "libxml2-devel"
+          ],
           "script": [
-            "cmake $CMAKE_ARGS -DTBB_TEST=OFF -S . -B build",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DTBB_TEST=OFF -S . -B build",
             "cmake --build build --parallel",
             "cmake -DCOMPONENT=runtime -P build/cmake_install.cmake"
           ]
@@ -1366,12 +1433,13 @@
         "name": "tbb",
         "requirements": {
           "host": [
-            "libhwloc"
+            "libhwloc",
+            "libxml2-devel"
           ]
         },
         "test": {
           "commands": [
-            "python -c \"import ctypes, os;  assert 14000 == ctypes.cdll[r'tbb14.dll']['TBB_runtime_interface_version']()\""
+            "python -c \"import ctypes, os;  assert 14010 == ctypes.cdll[r'tbb14.dll']['TBB_runtime_interface_version']()\""
           ],
           "requires": [
             "python *"
@@ -1391,10 +1459,10 @@
             "libhwloc"
           ],
           "run_exports": [
-            "tbb >=2023.0.0"
+            "tbb >=2023.1.0"
           ],
           "script": [
-            "cmake $CMAKE_ARGS -DTBB_TEST=OFF -S . -B build",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DTBB_TEST=OFF -S . -B build",
             "cmake --build build --parallel",
             "cmake -DCOMPONENT=devel -P build/cmake_install.cmake"
           ]
@@ -1410,7 +1478,8 @@
             "pkg-config"
           ],
           "host": [
-            "libhwloc"
+            "libhwloc",
+            "libxml2-devel"
           ],
           "run": [
             "tbb"
@@ -1418,7 +1487,7 @@
         },
         "test": {
           "commands": [
-            "cmake $CMAKE_ARGS -DTBB_TEST=ON -DTBB_DIR=ON -DTBB_FIND_PACKAGE=ON -S . -B test_build",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DTBB_TEST=ON -DTBB_DIR=ON -DTBB_FIND_PACKAGE=ON -S . -B test_build",
             "cmake --build test_build --target test_parallel_for test_tbb_header conformance_version test_flow_graph test_arena_constraints --parallel",
             "cd test_build",
             "ctest -R \"^(test_parallel_for|test_tbb_header|conformance_version|test_flow_graph|test_arena_constraints)$\" --output-on-failure"
@@ -1427,6 +1496,7 @@
             "cxx_compiler_stub",
             "c_stdlib_stub",
             "make",
+            "libxml2-devel",
             "cmake",
             "pkg-config",
             "libhwloc"
@@ -1451,7 +1521,7 @@
         },
         "build": {
           "script": [
-            "cmake $CMAKE_ARGS -DTBB4PY_BUILD=ON -DTBB_TEST=OFF -S . -B build_%PKG_HASH%",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DPython3_EXECUTABLE=$PYTHON -DPython3_ROOT_DIR=$PREFIX -DTBB4PY_BUILD=ON -DTBB_TEST=OFF -S . -B build_%PKG_HASH%",
             "cmake --build build_%PKG_HASH% --target python_build --parallel",
             "cmake -DCOMPONENT=tbb4py -P build_%PKG_HASH%/cmake_install.cmake"
           ]
@@ -1472,7 +1542,7 @@
             "tbb-devel"
           ],
           "run": [
-            "tbb >=2023.0.0",
+            "tbb >=2023.1.0",
             "python"
           ]
         },
@@ -1501,11 +1571,16 @@
           "summary": "TBB Libraries"
         },
         "build": {
+          "ignore_run_exports": [
+            "winpthreads-devel",
+            "winpthreads",
+            "libwinpthread"
+          ],
           "script": [
             "set CMAKE_GENERATOR=Ninja",
-            "set CMAKE_GENERATOR_TOOLSET=",
             "set CMAKE_GENERATOR_PLATFORM=",
-            "cmake $CMAKE_ARGS -DTBB_TEST=OFF -S . -B build",
+            "set CMAKE_GENERATOR_TOOLSET=",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DTBB_TEST=OFF -S . -B build",
             "cmake --build build --parallel",
             "cmake -DCOMPONENT=runtime -P build/cmake_install.cmake"
           ]
@@ -1513,12 +1588,13 @@
         "name": "tbb",
         "requirements": {
           "host": [
-            "libhwloc"
+            "libhwloc",
+            "winpthreads-devel"
           ]
         },
         "test": {
           "commands": [
-            "python -c \"import ctypes, os;  assert 14000 == ctypes.cdll[r'tbb14.dll']['TBB_runtime_interface_version']()\""
+            "python -c \"import ctypes, os;  assert 14010 == ctypes.cdll[r'tbb14.dll']['TBB_runtime_interface_version']()\""
           ],
           "requires": [
             "python *"
@@ -1538,13 +1614,13 @@
             "libhwloc"
           ],
           "run_exports": [
-            "tbb >=2023.0.0"
+            "tbb >=2023.1.0"
           ],
           "script": [
             "set CMAKE_GENERATOR=Ninja",
-            "set CMAKE_GENERATOR_TOOLSET=",
             "set CMAKE_GENERATOR_PLATFORM=",
-            "cmake $CMAKE_ARGS -DTBB_TEST=OFF -S . -B build",
+            "set CMAKE_GENERATOR_TOOLSET=",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DTBB_TEST=OFF -S . -B build",
             "cmake --build build --parallel",
             "cmake -DCOMPONENT=devel -P build/cmake_install.cmake"
           ]
@@ -1553,35 +1629,35 @@
         "requirements": {
           "build": [
             "python *",
+            "cxx_compiler_stub",
+            "c_stdlib_stub",
+            "ninja",
+            "cmake >=3.13",
+            "pkg-config"
+          ],
+          "host": [
+            "libhwloc",
+            "winpthreads-devel"
+          ],
+          "run": [
+            "tbb"
+          ]
+        },
+        "test": {
+          "commands": [
+            "set CMAKE_GENERATOR=Ninja",
+            "set CMAKE_GENERATOR_PLATFORM=",
+            "set CMAKE_GENERATOR_TOOLSET=",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DTBB_TEST=ON -DTBB_DIR=ON -DTBB_FIND_PACKAGE=ON -S . -B test_build",
+            "cmake --build test_build --target test_parallel_for test_tbb_header conformance_version test_flow_graph test_arena_constraints --parallel",
+            "cd test_build",
+            "ctest -R \"^(test_parallel_for|test_tbb_header|conformance_version|test_flow_graph|test_arena_constraints)$\" --output-on-failure"
+          ],
+          "requires": [
             "cxx_compiler_stub",
             "c_stdlib_stub",
             "ninja",
             "winpthreads-devel",
-            "cmake >=3.13",
-            "pkg-config"
-          ],
-          "host": [
-            "libhwloc"
-          ],
-          "run": [
-            "tbb"
-          ]
-        },
-        "test": {
-          "commands": [
-            "set CMAKE_GENERATOR=Ninja",
-            "set CMAKE_GENERATOR_TOOLSET=",
-            "set CMAKE_GENERATOR_PLATFORM=",
-            "cmake $CMAKE_ARGS -DTBB_TEST=ON -DTBB_DIR=ON -DTBB_FIND_PACKAGE=ON -S . -B test_build",
-            "cmake --build test_build --target test_parallel_for test_tbb_header conformance_version test_flow_graph test_arena_constraints --parallel",
-            "cd test_build",
-            "ctest -R \"^(test_parallel_for|test_tbb_header|conformance_version|test_flow_graph|test_arena_constraints)$\" --output-on-failure"
-          ],
-          "requires": [
-            "cxx_compiler_stub",
-            "c_stdlib_stub",
-            "ninja",
-            "winpthreads-devel",
             "cmake",
             "pkg-config",
             "libhwloc"
@@ -1607,9 +1683,9 @@
         "build": {
           "script": [
             "set CMAKE_GENERATOR=Ninja",
-            "set CMAKE_GENERATOR_TOOLSET=",
             "set CMAKE_GENERATOR_PLATFORM=",
-            "cmake $CMAKE_ARGS -DTBB4PY_BUILD=ON -DTBB_TEST=OFF -S . -B build_%PKG_HASH%",
+            "set CMAKE_GENERATOR_TOOLSET=",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DPython3_EXECUTABLE=%PYTHON% -DPython3_ROOT_DIR=%PREFIX% -DTBB4PY_BUILD=ON -DTBB_TEST=OFF -S . -B build_%PKG_HASH%",
             "cmake --build build_%PKG_HASH% --target python_build --parallel",
             "cmake -DCOMPONENT=tbb4py -P build_%PKG_HASH%/cmake_install.cmake"
           ]
@@ -1630,7 +1706,7 @@
             "tbb-devel"
           ],
           "run": [
-            "tbb >=2023.0.0",
+            "tbb >=2023.1.0",
             "python"
           ]
         },
@@ -1653,7 +1729,7 @@
     ],
     "package": {
       "name": "tbb",
-      "version": "2023.0.0"
+      "version": "2023.1.0"
     },
     "requirements": {
       "build": [
@@ -1663,8 +1739,7 @@
         "make",
         "cmake",
         "pkg-config",
-        "ninja",
-        "winpthreads-devel"
+        "ninja"
       ],
       "host": [
         "libhwloc"
@@ -1675,8 +1750,8 @@
       "patches": [
         "patches/0001-disable-windows-path-hack-that-s-wrong-for-conda.patch"
       ],
-      "sha256": "f8767b971ec6aea25dde58ae0f593e94e7aa75a739a86f67967012f69e2199b1",
-      "url": "https://github.com/oneapi-src/oneTBB/archive/refs/tags/v2023.0.0.tar.gz"
+      "sha256": "191288b52e1e6b17198000b64d77d194bb65e791be46ebc606e9b091781e2070",
+      "url": "https://github.com/uxlfoundation/oneTBB/archive/refs/tags/v2023.1.0.tar.gz"
     }
   },
   "name": "tbb",
@@ -1684,7 +1759,7 @@
     "about": {
       "dev_url": "https://github.com/uxlfoundation/oneTBB",
       "doc_url": "https://software.intel.com/en-us/oneapi-tbb-documentation",
-      "home": "https://github.com/oneapi-src/oneTBB",
+      "home": "https://github.com/uxlfoundation/oneTBB",
       "license": "Apache-2.0",
       "license_file": [
         "LICENSE.txt",
@@ -1693,7 +1768,7 @@
       "summary": "High level abstract threading library"
     },
     "build": {
-      "number": "3"
+      "number": "0"
     },
     "extra": {
       "recipe-maintainers": [
@@ -1714,8 +1789,13 @@
           "summary": "TBB Libraries"
         },
         "build": {
+          "ignore_run_exports": [
+            "libxml2",
+            "libxml2-16",
+            "libxml2-devel"
+          ],
           "script": [
-            "cmake $CMAKE_ARGS -DTBB_TEST=OFF -S . -B build",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DTBB_TEST=OFF -S . -B build",
             "cmake --build build --parallel",
             "cmake -DCOMPONENT=runtime -P build/cmake_install.cmake"
           ]
@@ -1723,12 +1803,13 @@
         "name": "tbb",
         "requirements": {
           "host": [
-            "libhwloc"
+            "libhwloc",
+            "libxml2-devel"
           ]
         },
         "test": {
           "commands": [
-            "python -c \"import ctypes, os;  assert 14000 == ctypes.cdll[r'tbb14.dll']['TBB_runtime_interface_version']()\""
+            "python -c \"import ctypes, os;  assert 14010 == ctypes.cdll[r'tbb14.dll']['TBB_runtime_interface_version']()\""
           ],
           "requires": [
             "python *"
@@ -1748,10 +1829,10 @@
             "libhwloc"
           ],
           "run_exports": [
-            "tbb >=2023.0.0"
+            "tbb >=2023.1.0"
           ],
           "script": [
-            "cmake $CMAKE_ARGS -DTBB_TEST=OFF -S . -B build",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DTBB_TEST=OFF -S . -B build",
             "cmake --build build --parallel",
             "cmake -DCOMPONENT=devel -P build/cmake_install.cmake"
           ]
@@ -1767,7 +1848,8 @@
             "pkg-config"
           ],
           "host": [
-            "libhwloc"
+            "libhwloc",
+            "libxml2-devel"
           ],
           "run": [
             "tbb"
@@ -1775,7 +1857,7 @@
         },
         "test": {
           "commands": [
-            "cmake $CMAKE_ARGS -DTBB_TEST=ON -DTBB_DIR=ON -DTBB_FIND_PACKAGE=ON -S . -B test_build",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DTBB_TEST=ON -DTBB_DIR=ON -DTBB_FIND_PACKAGE=ON -S . -B test_build",
             "cmake --build test_build --target test_parallel_for test_tbb_header conformance_version test_flow_graph test_arena_constraints --parallel",
             "cd test_build",
             "ctest -R \"^(test_parallel_for|test_tbb_header|conformance_version|test_flow_graph|test_arena_constraints)$\" --output-on-failure"
@@ -1784,6 +1866,7 @@
             "cxx_compiler_stub",
             "c_stdlib_stub",
             "make",
+            "libxml2-devel",
             "cmake",
             "pkg-config",
             "libhwloc"
@@ -1808,7 +1891,7 @@
         },
         "build": {
           "script": [
-            "cmake $CMAKE_ARGS -DTBB4PY_BUILD=ON -DTBB_TEST=OFF -S . -B build_%PKG_HASH%",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DPython3_EXECUTABLE=$PYTHON -DPython3_ROOT_DIR=$PREFIX -DTBB4PY_BUILD=ON -DTBB_TEST=OFF -S . -B build_%PKG_HASH%",
             "cmake --build build_%PKG_HASH% --target python_build --parallel",
             "cmake -DCOMPONENT=tbb4py -P build_%PKG_HASH%/cmake_install.cmake"
           ]
@@ -1829,7 +1912,7 @@
             "tbb-devel"
           ],
           "run": [
-            "tbb >=2023.0.0",
+            "tbb >=2023.1.0",
             "python"
           ]
         },
@@ -1852,7 +1935,7 @@
     ],
     "package": {
       "name": "tbb",
-      "version": "2023.0.0"
+      "version": "2023.1.0"
     },
     "requirements": {
       "build": [
@@ -1872,8 +1955,8 @@
       "patches": [
         "patches/0001-disable-windows-path-hack-that-s-wrong-for-conda.patch"
       ],
-      "sha256": "f8767b971ec6aea25dde58ae0f593e94e7aa75a739a86f67967012f69e2199b1",
-      "url": "https://github.com/oneapi-src/oneTBB/archive/refs/tags/v2023.0.0.tar.gz"
+      "sha256": "191288b52e1e6b17198000b64d77d194bb65e791be46ebc606e9b091781e2070",
+      "url": "https://github.com/uxlfoundation/oneTBB/archive/refs/tags/v2023.1.0.tar.gz"
     }
   },
   "osx_64_requirements": {
@@ -1893,6 +1976,7 @@
       "__set__": true,
       "elements": [
         "libhwloc",
+        "libxml2-devel",
         "pip",
         "python",
         "setuptools",
@@ -1913,6 +1997,7 @@
         "cmake",
         "cxx_compiler_stub",
         "libhwloc",
+        "libxml2-devel",
         "make",
         "pkg-config",
         "python",
@@ -1924,7 +2009,7 @@
     "about": {
       "dev_url": "https://github.com/uxlfoundation/oneTBB",
       "doc_url": "https://software.intel.com/en-us/oneapi-tbb-documentation",
-      "home": "https://github.com/oneapi-src/oneTBB",
+      "home": "https://github.com/uxlfoundation/oneTBB",
       "license": "Apache-2.0",
       "license_file": [
         "LICENSE.txt",
@@ -1933,7 +2018,7 @@
       "summary": "High level abstract threading library"
     },
     "build": {
-      "number": "3"
+      "number": "0"
     },
     "extra": {
       "recipe-maintainers": [
@@ -1954,8 +2039,13 @@
           "summary": "TBB Libraries"
         },
         "build": {
+          "ignore_run_exports": [
+            "libxml2",
+            "libxml2-16",
+            "libxml2-devel"
+          ],
           "script": [
-            "cmake $CMAKE_ARGS -DTBB_TEST=OFF -S . -B build",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DTBB_TEST=OFF -S . -B build",
             "cmake --build build --parallel",
             "cmake -DCOMPONENT=runtime -P build/cmake_install.cmake"
           ]
@@ -1963,12 +2053,13 @@
         "name": "tbb",
         "requirements": {
           "host": [
-            "libhwloc"
+            "libhwloc",
+            "libxml2-devel"
           ]
         },
         "test": {
           "commands": [
-            "python -c \"import ctypes, os;  assert 14000 == ctypes.cdll[r'tbb14.dll']['TBB_runtime_interface_version']()\""
+            "python -c \"import ctypes, os;  assert 14010 == ctypes.cdll[r'tbb14.dll']['TBB_runtime_interface_version']()\""
           ],
           "requires": [
             "python *"
@@ -1988,10 +2079,10 @@
             "libhwloc"
           ],
           "run_exports": [
-            "tbb >=2023.0.0"
+            "tbb >=2023.1.0"
           ],
           "script": [
-            "cmake $CMAKE_ARGS -DTBB_TEST=OFF -S . -B build",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DTBB_TEST=OFF -S . -B build",
             "cmake --build build --parallel",
             "cmake -DCOMPONENT=devel -P build/cmake_install.cmake"
           ]
@@ -2007,7 +2098,8 @@
             "pkg-config"
           ],
           "host": [
-            "libhwloc"
+            "libhwloc",
+            "libxml2-devel"
           ],
           "run": [
             "tbb"
@@ -2015,7 +2107,7 @@
         },
         "test": {
           "commands": [
-            "cmake $CMAKE_ARGS -DTBB_TEST=ON -DTBB_DIR=ON -DTBB_FIND_PACKAGE=ON -S . -B test_build",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DTBB_TEST=ON -DTBB_DIR=ON -DTBB_FIND_PACKAGE=ON -S . -B test_build",
             "cmake --build test_build --target test_parallel_for test_tbb_header conformance_version test_flow_graph test_arena_constraints --parallel",
             "cd test_build",
             "ctest -R \"^(test_parallel_for|test_tbb_header|conformance_version|test_flow_graph|test_arena_constraints)$\" --output-on-failure"
@@ -2024,6 +2116,7 @@
             "cxx_compiler_stub",
             "c_stdlib_stub",
             "make",
+            "libxml2-devel",
             "cmake",
             "pkg-config",
             "libhwloc"
@@ -2048,7 +2141,7 @@
         },
         "build": {
           "script": [
-            "cmake $CMAKE_ARGS -DTBB4PY_BUILD=ON -DTBB_TEST=OFF -S . -B build_%PKG_HASH%",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DPython3_EXECUTABLE=$PYTHON -DPython3_ROOT_DIR=$PREFIX -DTBB4PY_BUILD=ON -DTBB_TEST=OFF -S . -B build_%PKG_HASH%",
             "cmake --build build_%PKG_HASH% --target python_build --parallel",
             "cmake -DCOMPONENT=tbb4py -P build_%PKG_HASH%/cmake_install.cmake"
           ]
@@ -2069,7 +2162,7 @@
             "tbb-devel"
           ],
           "run": [
-            "tbb >=2023.0.0",
+            "tbb >=2023.1.0",
             "python"
           ]
         },
@@ -2092,7 +2185,7 @@
     ],
     "package": {
       "name": "tbb",
-      "version": "2023.0.0"
+      "version": "2023.1.0"
     },
     "requirements": {
       "build": [
@@ -2112,8 +2205,8 @@
       "patches": [
         "patches/0001-disable-windows-path-hack-that-s-wrong-for-conda.patch"
       ],
-      "sha256": "f8767b971ec6aea25dde58ae0f593e94e7aa75a739a86f67967012f69e2199b1",
-      "url": "https://github.com/oneapi-src/oneTBB/archive/refs/tags/v2023.0.0.tar.gz"
+      "sha256": "191288b52e1e6b17198000b64d77d194bb65e791be46ebc606e9b091781e2070",
+      "url": "https://github.com/uxlfoundation/oneTBB/archive/refs/tags/v2023.1.0.tar.gz"
     }
   },
   "osx_arm64_requirements": {
@@ -2133,6 +2226,7 @@
       "__set__": true,
       "elements": [
         "libhwloc",
+        "libxml2-devel",
         "pip",
         "python",
         "setuptools",
@@ -2153,6 +2247,7 @@
         "cmake",
         "cxx_compiler_stub",
         "libhwloc",
+        "libxml2-devel",
         "make",
         "pkg-config",
         "python",
@@ -2180,7 +2275,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/tbb.json"
   },
-  "raw_meta_yaml": "{% set version = \"2023.0.0\" %}\n\n{% set vmajor = version.split('.')[0]|int %}\n{% set vminor = version.split('.')[1]|int %}\n{% set vpatch = version.split('.')[2]|int %}\n{% set vbinary = vmajor - 2009 %}\n\n{% set vtag = \"v\" ~ version.replace(\".rc\", \"-rc\") %}\n\n# Official patch version for the first release of 2021 is 1,\n# but internal patch version is 0, handle it for interface version.\n{% set vinterface = \"%d\" % (vbinary * 1000 + vminor * 10 + (vpatch if vmajor != 2021 or vminor != 1 else 0)) %}\n\n# Libraries on Windows are expected to be installed into LIBRARY_PREFIX.\n# tbb4py files should be installed into PREFIX.\n# See https://docs.conda.io/projects/conda-build/en/latest/user-guide/environment-variables.html.\n# On non-Windows CMAKE_ARGS already contains CMAKE_INSTALL_PREFIX.\n# CMAKE_PREFIX_PATH is needed to discover libhwloc with PkgConfig.\n{% if win %}\n    {% set cmake_args = \"%CMAKE_ARGS% -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=%LIBRARY_PREFIX%\" %}\n    {% set cmake_tbb4py_args = \"%CMAKE_ARGS% -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=%PREFIX%\" %}\n{% else %}\n    {% set cmake_args = \"$CMAKE_ARGS\" %}\n    {% set cmake_tbb4py_args = \"$CMAKE_ARGS\" %}\n{% endif %}\n\n# Use specific test list agreed with TBB team to cover core functionality on high level.\n# Execution of all tests is too heavy task for packaging CI.\n# test_malloc_compliance is temporary excluded from the list since it causes failures that likely appear due to test implementation or env misconfiguration.\n# oneTBB issue: https://github.com/oneapi-src/oneTBB/issues/700\n# Agreed with oneTBB developers that it is suitable approach since the product is fully tested on oneTBB side.\n{% set tests = \"test_parallel_for test_tbb_header conformance_version test_flow_graph test_arena_constraints\" %}\n{% set ctest_regex = \"^(%s)$\" % (tests.replace(' ', '|')) %}\n\n{% set tbb4py_build_dir = \"build_$PKG_HASH\" %}  # [not win]\n{% set tbb4py_build_dir = \"build_%PKG_HASH%\" %}  # [win]\n\npackage:\n  name: tbb\n  version: {{ version }}\n\nsource:\n  url: https://github.com/oneapi-src/oneTBB/archive/refs/tags/{{ vtag }}.tar.gz\n  sha256: f8767b971ec6aea25dde58ae0f593e94e7aa75a739a86f67967012f69e2199b1\n  patches:\n    - patches/0001-disable-windows-path-hack-that-s-wrong-for-conda.patch\n\nbuild:\n  number: 3\n\nrequirements:\n  build:\n    - python *\n    - {{ compiler('cxx') }}\n    - {{ stdlib(\"c\") }}\n    - ninja                # [win]\n    - winpthreads-devel    # [win]\n    - make                 # [not win]\n    - cmake\n    - pkg-config\n  host:\n    - libhwloc\n\noutputs:\n  - name: tbb\n    about:\n      summary: TBB Libraries\n      license_file:\n        - LICENSE.txt\n        - third-party-programs.txt\n    build:\n      script:\n        - set CMAKE_GENERATOR=Ninja      # [win]\n        # unset option that ninja complains about\n        - set CMAKE_GENERATOR_TOOLSET=   # [win]\n        - set CMAKE_GENERATOR_PLATFORM=  # [win]\n        - cmake {{ cmake_args }} -DTBB_TEST=OFF -S . -B build\n        - cmake --build build --parallel\n        - cmake -DCOMPONENT=runtime -P build/cmake_install.cmake\n    requirements:\n      host:\n        - libhwloc\n    test:\n      requires:\n        # any python version is ok for sake of testing of shared libraries\n        - python *\n      commands:\n        {% set libname = \"libtbb.so.\" ~ vbinary ~ \".\" ~ vminor %}          # [linux]\n        {% set libname = \"libtbb.\" ~ vbinary ~ \".\" ~ vminor ~ \".dylib\" %}  # [osx]\n        {% set libname = \"tbb\" ~ vbinary ~ \".dll\" %}                       # [win]\n        {% set win_extra = \"os.add_dll_directory(os.environ['LIBRARY_BIN']); \" if win else \"\" %}\n        - python -c \"import ctypes, os; {{ win_extra }} assert {{ vinterface }} == ctypes.cdll[r'{{ libname }}']['TBB_runtime_interface_version']()\"\n\n  - name: tbb-devel\n    about:\n      summary: TBB Development files\n      license_file:\n        - LICENSE.txt\n        - third-party-programs.txt\n    build:\n      script:\n        - set CMAKE_GENERATOR=Ninja      # [win]\n        - set CMAKE_GENERATOR_TOOLSET=   # [win]\n        - set CMAKE_GENERATOR_PLATFORM=  # [win]\n        - cmake {{ cmake_args }} -DTBB_TEST=OFF -S . -B build\n        - cmake --build build --parallel\n        - cmake -DCOMPONENT=devel -P build/cmake_install.cmake\n      run_exports:\n        - tbb >={{ version }}\n      ignore_run_exports:\n        - libhwloc\n    requirements:\n      build:\n        - python *\n        - {{ compiler('cxx') }}\n        - {{ stdlib(\"c\") }}\n        - ninja                # [win]\n        - winpthreads-devel    # [win]\n        - make                 # [not win]\n        - cmake >=3.13\n        - pkg-config\n      host:\n        - libhwloc\n      run:\n        - {{ pin_subpackage('tbb', exact=True) }}        # development package is for specific version of tbb\n    test:\n      requires:\n        - {{ compiler('cxx') }}\n        - {{ stdlib(\"c\") }}\n        - ninja                # [win]\n        - winpthreads-devel    # [win]\n        - make                 # [not win]\n        - cmake\n        - pkg-config\n        - libhwloc\n        # When cross-compiling we need to get uname from coreutils so that\n        # CMAKE_SYSTEM_PROCESSOR is set to the correct value\n        - coreutils  # [build_platform != target_platform]\n      source_files:\n        - cmake\n        - test\n        - CMakeLists.txt\n        - include  # some tests depend on files from include\n        - integration  # same\n        - src      # some tests depend on files from src\n      commands:\n        - set CMAKE_GENERATOR=Ninja      # [win]\n        - set CMAKE_GENERATOR_TOOLSET=   # [win]\n        - set CMAKE_GENERATOR_PLATFORM=  # [win]\n        # Setting TBB_DIR=ON and TBB_FIND_PACKAGE=ON is needed to use libraries from the tested package,\n        # but do not build them from sources; real path to TBBConfig files is not required,\n        # because CMake will successfully find installed tested package.\n        - cmake {{ cmake_args }} -DTBB_TEST=ON -DTBB_DIR=ON -DTBB_FIND_PACKAGE=ON -S . -B test_build\n        - cmake --build test_build --target {{ tests }} --parallel  # build tests\n        - cd test_build\n        - ctest -R \"{{ ctest_regex }}\" --output-on-failure\n\n  - name: tbb4py\n    about:\n      summary: TBB module for Python\n      license_file:\n        - LICENSE.txt\n        - third-party-programs.txt\n    build:\n      script:\n        - set CMAKE_GENERATOR=Ninja      # [win]\n        - set CMAKE_GENERATOR_TOOLSET=   # [win]\n        - set CMAKE_GENERATOR_PLATFORM=  # [win]\n        - cmake {{ cmake_tbb4py_args }} -DTBB4PY_BUILD=ON -DTBB_TEST=OFF -S . -B {{ tbb4py_build_dir }}\n        - cmake --build {{ tbb4py_build_dir }} --target python_build --parallel\n        - cmake -DCOMPONENT=tbb4py -P {{ tbb4py_build_dir }}/cmake_install.cmake\n    requirements:\n      build:\n        - python                                 # [build_platform != target_platform]\n        - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n        - {{ compiler('cxx') }}\n        - {{ stdlib(\"c\") }}\n        - ninja  # [win]\n        - make   # [not win]\n        - cmake\n        - swig\n      host:\n        - python\n        - pip\n        - setuptools\n        - {{ pin_subpackage('tbb-devel', exact=True) }}\n      run:\n        - tbb >={{ version }}                            # while python module works with any compatible tbb...\n        - python\n    test:\n      requires:\n        - python\n        - {{ pin_subpackage('tbb', exact=True) }}        # we want to test with this specific tbb package\n      imports:\n        - tbb\n        - TBB\n      commands:\n        - python -m TBB -h\n        - python -m tbb -h\n        - python -m tbb test\n\nabout:\n  home: https://github.com/oneapi-src/oneTBB\n  license: Apache-2.0\n  license_file:\n    - LICENSE.txt\n    - third-party-programs.txt\n  summary: High level abstract threading library\n  dev_url: https://github.com/uxlfoundation/oneTBB\n  doc_url: https://software.intel.com/en-us/oneapi-tbb-documentation\n\nextra:\n  recipe-maintainers:\n    - anton-malakhov\n    - jschueller\n    - AlexVeprev\n    - isaevil\n    - ilya-lavrenov\n",
+  "raw_meta_yaml": "{% set version = \"2023.1.0\" %}\n\n{% set vmajor = version.split('.')[0]|int %}\n{% set vminor = version.split('.')[1]|int %}\n{% set vpatch = version.split('.')[2]|int %}\n{% set vbinary = vmajor - 2009 %}\n\n{% set vtag = \"v\" ~ version.replace(\".rc\", \"-rc\") %}\n\n# Official patch version for the first release of 2021 is 1,\n# but internal patch version is 0, handle it for interface version.\n{% set vinterface = \"%d\" % (vbinary * 1000 + vminor * 10 + (vpatch if vmajor != 2021 or vminor != 1 else 0)) %}\n\n# Libraries on Windows are expected to be installed into LIBRARY_PREFIX.\n# tbb4py files should be installed into PREFIX.\n# See https://docs.conda.io/projects/conda-build/en/latest/user-guide/environment-variables.html.\n# On non-Windows CMAKE_ARGS already contains CMAKE_INSTALL_PREFIX.\n# CMAKE_PREFIX_PATH is needed to discover libhwloc with PkgConfig.\n{% if win %}\n    {% set cmake_args = \"%CMAKE_ARGS% -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=%LIBRARY_PREFIX% -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF\" %}\n    {% set cmake_tbb4py_args = \"%CMAKE_ARGS% -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=%PREFIX% -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF\" %}\n{% else %}\n    {% set cmake_args = \"$CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF\" %}\n    {% set cmake_tbb4py_args = \"$CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF\" %}\n{% endif %}\n\n# Use specific test list agreed with TBB team to cover core functionality on high level.\n# Execution of all tests is too heavy task for packaging CI.\n# test_malloc_compliance is temporary excluded from the list since it causes failures that likely appear due to test implementation or env misconfiguration.\n# oneTBB issue: https://github.com/uxlfoundation/oneTBB/issues/700\n# Agreed with oneTBB developers that it is suitable approach since the product is fully tested on oneTBB side.\n{% set tests = \"test_parallel_for test_tbb_header conformance_version test_flow_graph test_arena_constraints\" %}\n{% set ctest_regex = \"^(%s)$\" % (tests.replace(' ', '|')) %}\n\n{% set tbb4py_build_dir = \"build_$PKG_HASH\" %}  # [not win]\n{% set tbb4py_build_dir = \"build_%PKG_HASH%\" %}  # [win]\n\npackage:\n  name: tbb\n  version: {{ version }}\n\nsource:\n  url: https://github.com/uxlfoundation/oneTBB/archive/refs/tags/{{ vtag }}.tar.gz\n  sha256: 191288b52e1e6b17198000b64d77d194bb65e791be46ebc606e9b091781e2070\n  patches:\n    - patches/0001-disable-windows-path-hack-that-s-wrong-for-conda.patch\n\nbuild:\n  number: 0\n\nrequirements:\n  build:\n    - python *\n    - {{ compiler('cxx') }}\n    - {{ stdlib(\"c\") }}\n    - ninja                # [win]\n    - make                 # [not win]\n    - cmake\n    - pkg-config\n  host:\n    - libhwloc\n\noutputs:\n  - name: tbb\n    about:\n      summary: TBB Libraries\n      license_file:\n        - LICENSE.txt\n        - third-party-programs.txt\n    build:\n      script:\n        - set CMAKE_GENERATOR=Ninja      # [win]\n        - set CMAKE_GENERATOR_PLATFORM=  # [win]\n        - set CMAKE_GENERATOR_TOOLSET=   # [win]\n        - cmake {{ cmake_args }} -DTBB_TEST=OFF -S . -B build\n        - cmake --build build --parallel\n        - cmake -DCOMPONENT=runtime -P build/cmake_install.cmake\n      ignore_run_exports:\n        # These libraries are only required for pkg_search_module to work correctly\n        - winpthreads-devel    # [win]\n        - winpthreads          # [win]\n        - libwinpthread        # [win]\n        - libxml2              # [not win]\n        - libxml2-16           # [not win]\n        - libxml2-devel        # [not win]\n    requirements:\n      host:\n        - libhwloc\n        - winpthreads-devel    # [win]\n        - libxml2-devel        # [not win]\n    test:\n      requires:\n        # any python version is ok for sake of testing of shared libraries\n        - python *\n      commands:\n        {% set libname = \"libtbb.so.\" ~ vbinary ~ \".\" ~ vminor %}          # [linux]\n        {% set libname = \"libtbb.\" ~ vbinary ~ \".\" ~ vminor ~ \".dylib\" %}  # [osx]\n        {% set libname = \"tbb\" ~ vbinary ~ \".dll\" %}                       # [win]\n        {% set win_extra = \"os.add_dll_directory(os.environ['LIBRARY_BIN']); \" if win else \"\" %}\n        - python -c \"import ctypes, os; {{ win_extra }} assert {{ vinterface }} == ctypes.cdll[r'{{ libname }}']['TBB_runtime_interface_version']()\"\n\n  - name: tbb-devel\n    about:\n      summary: TBB Development files\n      license_file:\n        - LICENSE.txt\n        - third-party-programs.txt\n    build:\n      script:\n        - set CMAKE_GENERATOR=Ninja      # [win]\n        - set CMAKE_GENERATOR_PLATFORM=  # [win]\n        - set CMAKE_GENERATOR_TOOLSET=   # [win]\n        - cmake {{ cmake_args }} -DTBB_TEST=OFF -S . -B build\n        - cmake --build build --parallel\n        - cmake -DCOMPONENT=devel -P build/cmake_install.cmake\n      run_exports:\n        - tbb >={{ version }}\n      ignore_run_exports:\n        - libhwloc\n    requirements:\n      build:\n        - python *\n        - {{ compiler('cxx') }}\n        - {{ stdlib(\"c\") }}\n        - ninja                # [win]\n        - make                 # [not win] \n        - cmake >=3.13\n        - pkg-config\n      host:\n        - libhwloc\n        - winpthreads-devel    # [win]\n        - libxml2-devel        # [not win]\n      run:\n        - {{ pin_subpackage('tbb', exact=True) }}        # development package is for specific version of tbb\n    test:\n      requires:\n        - {{ compiler('cxx') }}\n        - {{ stdlib(\"c\") }}\n        - ninja                # [win]\n        - winpthreads-devel    # [win]\n        - make                 # [not win]\n        - libxml2-devel        # [not win]\n        - cmake\n        - pkg-config\n        - libhwloc\n        # When cross-compiling we need to get uname from coreutils so that\n        # CMAKE_SYSTEM_PROCESSOR is set to the correct value\n        - coreutils  # [build_platform != target_platform]\n      source_files:\n        - cmake\n        - test\n        - CMakeLists.txt\n        - include  # some tests depend on files from include\n        - integration  # same\n        - src      # some tests depend on files from src\n      commands:\n        - set CMAKE_GENERATOR=Ninja  # [win]\n        - set CMAKE_GENERATOR_PLATFORM=  # [win]\n        - set CMAKE_GENERATOR_TOOLSET=   # [win]\n        # Setting TBB_DIR=ON and TBB_FIND_PACKAGE=ON is needed to use libraries from the tested package,\n        # but do not build them from sources; real path to TBBConfig files is not required,\n        # because CMake will successfully find installed tested package.\n        - cmake {{ cmake_args }} -DTBB_TEST=ON -DTBB_DIR=ON -DTBB_FIND_PACKAGE=ON -S . -B test_build\n        - cmake --build test_build --target {{ tests }} --parallel  # build tests\n        - cd test_build\n        - ctest -R \"{{ ctest_regex }}\" --output-on-failure\n\n  - name: tbb4py\n    about:\n      summary: TBB module for Python\n      license_file:\n        - LICENSE.txt\n        - third-party-programs.txt\n    build:\n      script:\n        - set CMAKE_GENERATOR=Ninja  # [win]\n        - set CMAKE_GENERATOR_PLATFORM=  # [win]\n        - set CMAKE_GENERATOR_TOOLSET=   # [win]\n        - cmake {{ cmake_tbb4py_args }} -DPython3_EXECUTABLE=$PYTHON -DPython3_ROOT_DIR=$PREFIX -DTBB4PY_BUILD=ON -DTBB_TEST=OFF -S . -B {{ tbb4py_build_dir }}  # [not win]\n        - cmake {{ cmake_tbb4py_args }} -DPython3_EXECUTABLE=%PYTHON% -DPython3_ROOT_DIR=%PREFIX% -DTBB4PY_BUILD=ON -DTBB_TEST=OFF -S . -B {{ tbb4py_build_dir }}  # [win]\n        - cmake --build {{ tbb4py_build_dir }} --target python_build --parallel\n        - cmake -DCOMPONENT=tbb4py -P {{ tbb4py_build_dir }}/cmake_install.cmake\n    requirements:\n      build:\n        - python                                 # [build_platform != target_platform]\n        - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n        - {{ compiler('cxx') }}\n        - {{ stdlib(\"c\") }}\n        - ninja  # [win]\n        - make   # [not win]\n        - cmake\n        - swig\n      host:\n        - python\n        - pip\n        - setuptools\n        - {{ pin_subpackage('tbb-devel', exact=True) }}\n      run:\n        - tbb >={{ version }}                            # while python module works with any compatible tbb...\n        - python\n    test:\n      requires:\n        - python\n        - {{ pin_subpackage('tbb', exact=True) }}        # we want to test with this specific tbb package\n      imports:\n        - tbb\n        - TBB\n      commands:\n        - python -m TBB -h\n        - python -m tbb -h\n        - python -m tbb test\n\nabout:\n  home: https://github.com/uxlfoundation/oneTBB\n  license: Apache-2.0\n  license_file:\n    - LICENSE.txt\n    - third-party-programs.txt\n  summary: High level abstract threading library\n  dev_url: https://github.com/uxlfoundation/oneTBB\n  doc_url: https://software.intel.com/en-us/oneapi-tbb-documentation\n\nextra:\n  recipe-maintainers:\n    - anton-malakhov\n    - jschueller\n    - AlexVeprev\n    - isaevil\n    - ilya-lavrenov\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -2188,6 +2283,7 @@
       "cmake",
       "cxx_compiler_stub",
       "libhwloc",
+      "libxml2-devel",
       "make",
       "ninja",
       "pip",
@@ -2211,8 +2307,7 @@
         "ninja",
         "pkg-config",
         "python",
-        "swig",
-        "winpthreads-devel"
+        "swig"
       ]
     },
     "host": {
@@ -2221,10 +2316,12 @@
         "c_stdlib_stub",
         "cxx_compiler_stub",
         "libhwloc",
+        "libxml2-devel",
         "pip",
         "python",
         "setuptools",
-        "tbb-devel"
+        "tbb-devel",
+        "winpthreads-devel"
       ]
     },
     "run": {
@@ -2243,6 +2340,7 @@
         "cmake",
         "cxx_compiler_stub",
         "libhwloc",
+        "libxml2-devel",
         "make",
         "ninja",
         "pkg-config",
@@ -2265,18 +2363,19 @@
         "ninja",
         "pkg-config",
         "python *",
-        "swig",
-        "winpthreads-devel"
+        "swig"
       ]
     },
     "host": {
       "__set__": true,
       "elements": [
         "libhwloc",
+        "libxml2-devel",
         "pip",
         "python",
         "setuptools",
-        "tbb-devel"
+        "tbb-devel",
+        "winpthreads-devel"
       ]
     },
     "run": {
@@ -2284,7 +2383,7 @@
       "elements": [
         "python",
         "tbb",
-        "tbb >=2023.0.0"
+        "tbb >=2023.1.0"
       ]
     },
     "test": {
@@ -2294,6 +2393,7 @@
         "cmake",
         "cxx_compiler_stub",
         "libhwloc",
+        "libxml2-devel",
         "make",
         "ninja",
         "pkg-config",
@@ -2304,8 +2404,8 @@
       ]
     }
   },
-  "url": "https://github.com/oneapi-src/oneTBB/archive/refs/tags/v2023.0.0.tar.gz",
-  "version": "2023.0.0",
+  "url": "https://github.com/uxlfoundation/oneTBB/archive/refs/tags/v2023.1.0.tar.gz",
+  "version": "2023.1.0",
   "version_pr_info": {
     "__lazy_json__": "version_pr_info/tbb.json"
   },
@@ -2313,7 +2413,7 @@
     "about": {
       "dev_url": "https://github.com/uxlfoundation/oneTBB",
       "doc_url": "https://software.intel.com/en-us/oneapi-tbb-documentation",
-      "home": "https://github.com/oneapi-src/oneTBB",
+      "home": "https://github.com/uxlfoundation/oneTBB",
       "license": "Apache-2.0",
       "license_file": [
         "LICENSE.txt",
@@ -2322,7 +2422,7 @@
       "summary": "High level abstract threading library"
     },
     "build": {
-      "number": "3"
+      "number": "0"
     },
     "extra": {
       "recipe-maintainers": [
@@ -2343,11 +2443,16 @@
           "summary": "TBB Libraries"
         },
         "build": {
+          "ignore_run_exports": [
+            "winpthreads-devel",
+            "winpthreads",
+            "libwinpthread"
+          ],
           "script": [
             "set CMAKE_GENERATOR=Ninja",
-            "set CMAKE_GENERATOR_TOOLSET=",
             "set CMAKE_GENERATOR_PLATFORM=",
-            "cmake $CMAKE_ARGS -DTBB_TEST=OFF -S . -B build",
+            "set CMAKE_GENERATOR_TOOLSET=",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DTBB_TEST=OFF -S . -B build",
             "cmake --build build --parallel",
             "cmake -DCOMPONENT=runtime -P build/cmake_install.cmake"
           ]
@@ -2355,12 +2460,13 @@
         "name": "tbb",
         "requirements": {
           "host": [
-            "libhwloc"
+            "libhwloc",
+            "winpthreads-devel"
           ]
         },
         "test": {
           "commands": [
-            "python -c \"import ctypes, os;  assert 14000 == ctypes.cdll[r'tbb14.dll']['TBB_runtime_interface_version']()\""
+            "python -c \"import ctypes, os;  assert 14010 == ctypes.cdll[r'tbb14.dll']['TBB_runtime_interface_version']()\""
           ],
           "requires": [
             "python *"
@@ -2380,13 +2486,13 @@
             "libhwloc"
           ],
           "run_exports": [
-            "tbb >=2023.0.0"
+            "tbb >=2023.1.0"
           ],
           "script": [
             "set CMAKE_GENERATOR=Ninja",
-            "set CMAKE_GENERATOR_TOOLSET=",
             "set CMAKE_GENERATOR_PLATFORM=",
-            "cmake $CMAKE_ARGS -DTBB_TEST=OFF -S . -B build",
+            "set CMAKE_GENERATOR_TOOLSET=",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DTBB_TEST=OFF -S . -B build",
             "cmake --build build --parallel",
             "cmake -DCOMPONENT=devel -P build/cmake_install.cmake"
           ]
@@ -2398,12 +2504,12 @@
             "cxx_compiler_stub",
             "c_stdlib_stub",
             "ninja",
-            "winpthreads-devel",
             "cmake >=3.13",
             "pkg-config"
           ],
           "host": [
-            "libhwloc"
+            "libhwloc",
+            "winpthreads-devel"
           ],
           "run": [
             "tbb"
@@ -2412,9 +2518,9 @@
         "test": {
           "commands": [
             "set CMAKE_GENERATOR=Ninja",
-            "set CMAKE_GENERATOR_TOOLSET=",
             "set CMAKE_GENERATOR_PLATFORM=",
-            "cmake $CMAKE_ARGS -DTBB_TEST=ON -DTBB_DIR=ON -DTBB_FIND_PACKAGE=ON -S . -B test_build",
+            "set CMAKE_GENERATOR_TOOLSET=",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DTBB_TEST=ON -DTBB_DIR=ON -DTBB_FIND_PACKAGE=ON -S . -B test_build",
             "cmake --build test_build --target test_parallel_for test_tbb_header conformance_version test_flow_graph test_arena_constraints --parallel",
             "cd test_build",
             "ctest -R \"^(test_parallel_for|test_tbb_header|conformance_version|test_flow_graph|test_arena_constraints)$\" --output-on-failure"
@@ -2449,9 +2555,9 @@
         "build": {
           "script": [
             "set CMAKE_GENERATOR=Ninja",
-            "set CMAKE_GENERATOR_TOOLSET=",
             "set CMAKE_GENERATOR_PLATFORM=",
-            "cmake $CMAKE_ARGS -DTBB4PY_BUILD=ON -DTBB_TEST=OFF -S . -B build_%PKG_HASH%",
+            "set CMAKE_GENERATOR_TOOLSET=",
+            "cmake $CMAKE_ARGS -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF -DPython3_EXECUTABLE=%PYTHON% -DPython3_ROOT_DIR=%PREFIX% -DTBB4PY_BUILD=ON -DTBB_TEST=OFF -S . -B build_%PKG_HASH%",
             "cmake --build build_%PKG_HASH% --target python_build --parallel",
             "cmake -DCOMPONENT=tbb4py -P build_%PKG_HASH%/cmake_install.cmake"
           ]
@@ -2472,7 +2578,7 @@
             "tbb-devel"
           ],
           "run": [
-            "tbb >=2023.0.0",
+            "tbb >=2023.1.0",
             "python"
           ]
         },
@@ -2495,7 +2601,7 @@
     ],
     "package": {
       "name": "tbb",
-      "version": "2023.0.0"
+      "version": "2023.1.0"
     },
     "requirements": {
       "build": [
@@ -2503,7 +2609,6 @@
         "cxx_compiler_stub",
         "c_stdlib_stub",
         "ninja",
-        "winpthreads-devel",
         "cmake",
         "pkg-config"
       ],
@@ -2516,8 +2621,8 @@
       "patches": [
         "patches/0001-disable-windows-path-hack-that-s-wrong-for-conda.patch"
       ],
-      "sha256": "f8767b971ec6aea25dde58ae0f593e94e7aa75a739a86f67967012f69e2199b1",
-      "url": "https://github.com/oneapi-src/oneTBB/archive/refs/tags/v2023.0.0.tar.gz"
+      "sha256": "191288b52e1e6b17198000b64d77d194bb65e791be46ebc606e9b091781e2070",
+      "url": "https://github.com/uxlfoundation/oneTBB/archive/refs/tags/v2023.1.0.tar.gz"
     }
   },
   "win_64_requirements": {
@@ -2530,8 +2635,7 @@
         "ninja",
         "pkg-config",
         "python",
-        "swig",
-        "winpthreads-devel"
+        "swig"
       ]
     },
     "host": {
@@ -2541,7 +2645,8 @@
         "pip",
         "python",
         "setuptools",
-        "tbb-devel"
+        "tbb-devel",
+        "winpthreads-devel"
       ]
     },
     "run": {
