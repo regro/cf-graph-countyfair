@@ -1,7 +1,7 @@
 {
   "archived": false,
   "branch": "main",
-  "ci_support_linux_64_.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma10\ntarget_platform:\n- linux-64\n",
+  "ci_support_linux_64_.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '15'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma10\ntarget_platform:\n- linux-64\n",
   "conda-forge.yml": {
     "build_platform": {
       "linux_riscv64": "linux_64",
@@ -18,12 +18,13 @@
     "provider": {
       "linux_aarch64": "azure",
       "linux_ppc64le": "azure",
-      "win": "azure"
+      "win": "azure",
+      "win_arm64": "default"
     },
     "test": "native_and_emulated"
   },
-  "feedstock_hash": "943da014369251eb147b977c90085970b7ea7685",
-  "feedstock_hash_ts": 1786380815,
+  "feedstock_hash": "10bc4a8118d34cf2059c4462f4d77da1ae51fb27",
+  "feedstock_hash_ts": 1788960326,
   "feedstock_name": "xorg-libxau",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -67,13 +68,16 @@
     },
     "schema_version": 0,
     "source": {
+      "patches": null,
       "sha256": "74d0e4dfa3d39ad8939e99bda37f5967aba528211076828464d2777d477fc0fb",
       "url": "https://www.x.org/releases/individual/lib/libXau-1.0.12.tar.xz"
     },
     "test": {
       "commands": [
         "test -f $PREFIX/lib/libXau.so"
-      ]
+      ],
+      "files": null,
+      "requires": null
     }
   },
   "linux_64_requirements": {
@@ -145,13 +149,16 @@
     },
     "schema_version": 0,
     "source": {
+      "patches": null,
       "sha256": "74d0e4dfa3d39ad8939e99bda37f5967aba528211076828464d2777d477fc0fb",
       "url": "https://www.x.org/releases/individual/lib/libXau-1.0.12.tar.xz"
     },
     "test": {
       "commands": [
         "test -f $PREFIX/lib/libXau.so"
-      ]
+      ],
+      "files": null,
+      "requires": null
     }
   },
   "linux_aarch64_requirements": {
@@ -223,13 +230,16 @@
     },
     "schema_version": 0,
     "source": {
+      "patches": null,
       "sha256": "74d0e4dfa3d39ad8939e99bda37f5967aba528211076828464d2777d477fc0fb",
       "url": "https://www.x.org/releases/individual/lib/libXau-1.0.12.tar.xz"
     },
     "test": {
       "commands": [
         "test -f $PREFIX/lib/libXau.so"
-      ]
+      ],
+      "files": null,
+      "requires": null
     }
   },
   "linux_ppc64le_requirements": {
@@ -274,7 +284,8 @@
       "number": "2",
       "run_exports": [
         "xorg-libxau"
-      ]
+      ],
+      "script": "call \"%RECIPE_DIR%\\build-arm64.bat\""
     },
     "extra": {
       "recipe-maintainers": [
@@ -299,7 +310,10 @@
         "m2-pkg-config",
         "m2-base",
         "m2w64_c_compiler_stub",
-        "m2w64_c_stdlib_stub"
+        "m2w64_c_stdlib_stub",
+        "meson",
+        "ninja",
+        "m2-sed"
       ],
       "host": [
         "xorg-util-macros",
@@ -308,6 +322,9 @@
     },
     "schema_version": 0,
     "source": {
+      "patches": [
+        "0001-meson-add-Windows-DLL-exports.patch"
+      ],
       "sha256": "74d0e4dfa3d39ad8939e99bda37f5967aba528211076828464d2777d477fc0fb",
       "url": "https://www.x.org/releases/individual/lib/libXau-1.0.12.tar.xz"
     },
@@ -316,7 +333,40 @@
         "test -f $PREFIX/lib/libXau.so",
         "test -f $PREFIX/lib/libXau.dylib",
         "if not exist %PREFIX%/Library/lib/libXau.dll.a exit /b 1",
-        "if not exist %PREFIX%/Library/bin/msys-Xau-*.dll exit /b 1"
+        "if not exist %PREFIX%/Library/bin/msys-Xau-*.dll exit /b 1",
+        "if not exist \"%LIBRARY_INC%\\X11\\Xauth.h\" exit /b 1",
+        "if not exist \"%LIBRARY_LIB%\\Xau.lib\" exit /b 1",
+        "if not exist \"%LIBRARY_LIB%\\pkgconfig\\xau.pc\" exit /b 1",
+        "if not exist \"%LIBRARY_BIN%\\Xau-6.dll\" exit /b 1",
+        "call %CC% /nologo /MD /W4 /I\"%LIBRARY_INC%\" test_xau.c /link /LIBPATH:\"%LIBRARY_LIB%\" Xau.lib /OUT:test_xau.exe",
+        "dumpbin /imports test_xau.exe | findstr /I /C:\"Xau-6.dll\"",
+        "test_xau.exe",
+        "dumpbin /headers test_xau.exe | findstr /I /C:\"AA64 machine (ARM64)\"",
+        "dumpbin /headers \"%LIBRARY_BIN%\\Xau-6.dll\" | findstr /I /C:\"AA64 machine (ARM64)\"",
+        "if not exist \"%LIBRARY_PREFIX%\\share\\man\\man3\\Xau.3\" exit /b 1",
+        "if not exist \"%LIBRARY_PREFIX%\\share\\man\\man3\\XauDisposeAuth.3\" exit /b 1",
+        "if not exist \"%LIBRARY_PREFIX%\\share\\man\\man3\\XauFileName.3\" exit /b 1",
+        "if not exist \"%LIBRARY_PREFIX%\\share\\man\\man3\\XauGetAuthByAddr.3\" exit /b 1",
+        "if not exist \"%LIBRARY_PREFIX%\\share\\man\\man3\\XauGetBestAuthByAddr.3\" exit /b 1",
+        "if not exist \"%LIBRARY_PREFIX%\\share\\man\\man3\\XauLockAuth.3\" exit /b 1",
+        "if not exist \"%LIBRARY_PREFIX%\\share\\man\\man3\\XauReadAuth.3\" exit /b 1",
+        "if not exist \"%LIBRARY_PREFIX%\\share\\man\\man3\\XauUnlockAuth.3\" exit /b 1",
+        "if not exist \"%LIBRARY_PREFIX%\\share\\man\\man3\\XauWriteAuth.3\" exit /b 1",
+        "dumpbin /exports \"%LIBRARY_BIN%\\Xau-6.dll\" | findstr /C:\"XauDisposeAuth\"",
+        "dumpbin /exports \"%LIBRARY_BIN%\\Xau-6.dll\" | findstr /C:\"XauFileName\"",
+        "dumpbin /exports \"%LIBRARY_BIN%\\Xau-6.dll\" | findstr /C:\"XauGetAuthByAddr\"",
+        "dumpbin /exports \"%LIBRARY_BIN%\\Xau-6.dll\" | findstr /C:\"XauGetBestAuthByAddr\"",
+        "dumpbin /exports \"%LIBRARY_BIN%\\Xau-6.dll\" | findstr /C:\"XauLockAuth\"",
+        "dumpbin /exports \"%LIBRARY_BIN%\\Xau-6.dll\" | findstr /C:\"XauReadAuth\"",
+        "dumpbin /exports \"%LIBRARY_BIN%\\Xau-6.dll\" | findstr /C:\"XauUnlockAuth\"",
+        "dumpbin /exports \"%LIBRARY_BIN%\\Xau-6.dll\" | findstr /C:\"XauWriteAuth\""
+      ],
+      "files": [
+        "test_xau.c"
+      ],
+      "requires": [
+        "c_compiler_stub",
+        "xorg-xorgproto"
       ]
     }
   },
@@ -362,13 +412,16 @@
     },
     "schema_version": 0,
     "source": {
+      "patches": null,
       "sha256": "74d0e4dfa3d39ad8939e99bda37f5967aba528211076828464d2777d477fc0fb",
       "url": "https://www.x.org/releases/individual/lib/libXau-1.0.12.tar.xz"
     },
     "test": {
       "commands": [
         "test -f $PREFIX/lib/libXau.dylib"
-      ]
+      ],
+      "files": null,
+      "requires": null
     }
   },
   "osx_64_requirements": {
@@ -440,13 +493,16 @@
     },
     "schema_version": 0,
     "source": {
+      "patches": null,
       "sha256": "74d0e4dfa3d39ad8939e99bda37f5967aba528211076828464d2777d477fc0fb",
       "url": "https://www.x.org/releases/individual/lib/libXau-1.0.12.tar.xz"
     },
     "test": {
       "commands": [
         "test -f $PREFIX/lib/libXau.dylib"
-      ]
+      ],
+      "files": null,
+      "requires": null
     }
   },
   "osx_arm64_requirements": {
@@ -490,12 +546,13 @@
     "linux_ppc64le",
     "osx_64",
     "osx_arm64",
-    "win_64"
+    "win_64",
+    "win_arm64"
   ],
   "pr_info": {
     "__lazy_json__": "pr_info/xorg-libxau.json"
   },
-  "raw_meta_yaml": "{% set xorg_name = \"libXau\" %}\n{% set xorg_category = \"lib\" %}\n{% set name = \"xorg-\" ~ xorg_name %}\n{% set version = \"1.0.12\" %}\n{% set sha256 = \"74d0e4dfa3d39ad8939e99bda37f5967aba528211076828464d2777d477fc0fb\" %}\n{% set am_version = \"1.16\" %} # keep synchronized with build.sh\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://www.x.org/releases/individual/{{ xorg_category }}/{{ xorg_name }}-{{ version }}.tar.xz\n  sha256: {{ sha256 }}\n\nbuild:\n  number: 2\n  detect_binary_files_with_prefix: true\n  run_exports:\n    - {{ pin_subpackage(name|lower) }}\n\nrequirements:\n  build:\n    - m2-autoconf                   # [win]\n    - m2-automake{{ am_version }}   # [win]\n    - m2-libtool                    # [win]\n    - m2-pkg-config                 # [win]\n    - pkg-config                    # [not win]\n    - m2-base                       # [win]\n    - gnuconfig  # [unix]\n    - {{ compiler(\"c\") }}           # [unix]\n    - {{ stdlib(\"c\") }}             # [unix]\n    - {{ compiler(\"m2w64_c\") }}     # [win]\n    - {{ stdlib(\"m2w64_c\") }}       # [win]\n    - make\n    - gettext                       # [unix]\n  host:\n    - xorg-util-macros\n    - xorg-xorgproto\n\ntest:\n  commands:\n    {% set lib_idents = [ \"Xau\" ] %}\n    {% for lib_ident in lib_idents %}\n    - test -f $PREFIX/lib/lib{{ lib_ident }}.dylib  # [osx]\n    - test -f $PREFIX/lib/lib{{ lib_ident }}.so  # [linux]\n    - if not exist %PREFIX%/Library/lib/lib{{ lib_ident }}.dll.a exit /b 1  # [win]\n    - if not exist %PREFIX%/Library/bin/msys-{{ lib_ident }}-*.dll exit /b 1  # [win]\n    {% endfor %}\n\nabout:\n  home: https://www.x.org/\n  dev_url: https://gitlab.freedesktop.org/xorg/lib/libxau\n  license: MIT\n  license_family: MIT\n  license_file: COPYING\n  summary: 'A simple X Windows authentication protocol.'\n\nextra:\n  recipe-maintainers:\n    - pkgw\n",
+  "raw_meta_yaml": "# win-arm64 uses Meson, while the other platforms still use Autotools.\n# Ideally, all platforms should migrate to the upstream Meson build.\n{% set xorg_name = \"libXau\" %}\n{% set xorg_category = \"lib\" %}\n{% set name = \"xorg-\" ~ xorg_name %}\n{% set version = \"1.0.12\" %}\n{% set sha256 = \"74d0e4dfa3d39ad8939e99bda37f5967aba528211076828464d2777d477fc0fb\" %}\n{% set am_version = \"1.16\" %} # keep synchronized with build.sh\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://www.x.org/releases/individual/{{ xorg_category }}/{{ xorg_name }}-{{ version }}.tar.xz\n  sha256: {{ sha256 }}\n  patches:\n    - 0001-meson-add-Windows-DLL-exports.patch  # [target_platform == \"win-arm64\"]\n\nbuild:\n  number: 2\n  script: call \"%RECIPE_DIR%\\build-arm64.bat\"  # [target_platform == \"win-arm64\"]\n  detect_binary_files_with_prefix: true\n  run_exports:\n    - {{ pin_subpackage(name|lower) }}\n\nrequirements:\n  build:\n    - m2-autoconf                   # [win and target_platform != \"win-arm64\"]\n    - m2-automake{{ am_version }}   # [win and target_platform != \"win-arm64\"]\n    - m2-libtool                    # [win and target_platform != \"win-arm64\"]\n    - m2-pkg-config                 # [win and target_platform != \"win-arm64\"]\n    - pkg-config                    # [not win]\n    - m2-base                       # [win and target_platform != \"win-arm64\"]\n    - gnuconfig  # [unix]\n    - {{ compiler(\"c\") }}           # [unix or target_platform == \"win-arm64\"]\n    - {{ stdlib(\"c\") }}             # [unix or target_platform == \"win-arm64\"]\n    - {{ compiler(\"m2w64_c\") }}     # [win and target_platform != \"win-arm64\"]\n    - {{ stdlib(\"m2w64_c\") }}       # [win and target_platform != \"win-arm64\"]\n    - meson                          # [target_platform == \"win-arm64\"]\n    - ninja                          # [target_platform == \"win-arm64\"]\n    - m2-sed                         # [target_platform == \"win-arm64\"]\n    - make                           # [target_platform != \"win-arm64\"]\n    - gettext                       # [unix]\n  host:\n    - xorg-util-macros              # [target_platform != \"win-arm64\"]\n    - xorg-xorgproto\n\ntest:\n  requires:\n    - {{ compiler(\"c\") }}  # [target_platform == \"win-arm64\"]\n    - xorg-xorgproto       # [target_platform == \"win-arm64\"]\n  files:\n    - test_xau.c  # [target_platform == \"win-arm64\"]\n  commands:\n    {% set lib_idents = [ \"Xau\" ] %}\n    {% for lib_ident in lib_idents %}\n    - test -f $PREFIX/lib/lib{{ lib_ident }}.dylib  # [osx]\n    - test -f $PREFIX/lib/lib{{ lib_ident }}.so  # [linux]\n    - if not exist %PREFIX%/Library/lib/lib{{ lib_ident }}.dll.a exit /b 1  # [win and target_platform != \"win-arm64\"]\n    - if not exist %PREFIX%/Library/bin/msys-{{ lib_ident }}-*.dll exit /b 1  # [win and target_platform != \"win-arm64\"]\n    {% endfor %}\n    - if not exist \"%LIBRARY_INC%\\X11\\Xauth.h\" exit /b 1  # [target_platform == \"win-arm64\"]\n    - if not exist \"%LIBRARY_LIB%\\Xau.lib\" exit /b 1  # [target_platform == \"win-arm64\"]\n    - if not exist \"%LIBRARY_LIB%\\pkgconfig\\xau.pc\" exit /b 1  # [target_platform == \"win-arm64\"]\n    - if not exist \"%LIBRARY_BIN%\\Xau-6.dll\" exit /b 1  # [target_platform == \"win-arm64\"]\n    - call %CC% /nologo /MD /W4 /I\"%LIBRARY_INC%\" test_xau.c /link /LIBPATH:\"%LIBRARY_LIB%\" Xau.lib /OUT:test_xau.exe  # [target_platform == \"win-arm64\"]\n    - dumpbin /imports test_xau.exe | findstr /I /C:\"Xau-6.dll\"  # [target_platform == \"win-arm64\"]\n    - test_xau.exe  # [target_platform == \"win-arm64\"]\n    - dumpbin /headers test_xau.exe | findstr /I /C:\"AA64 machine (ARM64)\"  # [target_platform == \"win-arm64\"]\n    - dumpbin /headers \"%LIBRARY_BIN%\\Xau-6.dll\" | findstr /I /C:\"AA64 machine (ARM64)\"  # [target_platform == \"win-arm64\"]\n    {% set manpages = [ \"Xau\", \"XauDisposeAuth\", \"XauFileName\", \"XauGetAuthByAddr\", \"XauGetBestAuthByAddr\", \"XauLockAuth\", \"XauReadAuth\", \"XauUnlockAuth\", \"XauWriteAuth\" ] %}\n    {% for manpage in manpages %}\n    - if not exist \"%LIBRARY_PREFIX%\\share\\man\\man3\\{{ manpage }}.3\" exit /b 1  # [target_platform == \"win-arm64\"]\n    {% endfor %}\n    {% set exports = [ \"XauDisposeAuth\", \"XauFileName\", \"XauGetAuthByAddr\", \"XauGetBestAuthByAddr\", \"XauLockAuth\", \"XauReadAuth\", \"XauUnlockAuth\", \"XauWriteAuth\" ] %}\n    {% for export in exports %}\n    - dumpbin /exports \"%LIBRARY_BIN%\\Xau-6.dll\" | findstr /C:\"{{ export }}\"  # [target_platform == \"win-arm64\"]\n    {% endfor %}\n\nabout:\n  home: https://www.x.org/\n  dev_url: https://gitlab.freedesktop.org/xorg/lib/libxau\n  license: MIT\n  license_family: MIT\n  license_file: COPYING\n  summary: 'A simple X Windows authentication protocol.'\n\nextra:\n  recipe-maintainers:\n    - pkgw\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -508,9 +565,12 @@
       "m2-base",
       "m2-libtool",
       "m2-pkg-config",
+      "m2-sed",
       "m2w64_c_compiler_stub",
       "m2w64_c_stdlib_stub",
       "make",
+      "meson",
+      "ninja",
       "pkg-config",
       "xorg-util-macros",
       "xorg-xorgproto"
@@ -529,9 +589,12 @@
         "m2-base",
         "m2-libtool",
         "m2-pkg-config",
+        "m2-sed",
         "m2w64_c_compiler_stub",
         "m2w64_c_stdlib_stub",
         "make",
+        "meson",
+        "ninja",
         "pkg-config"
       ]
     },
@@ -553,7 +616,10 @@
     },
     "test": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "c_compiler_stub",
+        "xorg-xorgproto"
+      ]
     }
   },
   "strong_exports": false,
@@ -570,9 +636,12 @@
         "m2-base",
         "m2-libtool",
         "m2-pkg-config",
+        "m2-sed",
         "m2w64_c_compiler_stub",
         "m2w64_c_stdlib_stub",
         "make",
+        "meson",
+        "ninja",
         "pkg-config"
       ]
     },
@@ -589,7 +658,10 @@
     },
     "test": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "c_compiler_stub",
+        "xorg-xorgproto"
+      ]
     }
   },
   "url": "https://www.x.org/releases/individual/lib/libXau-1.0.12.tar.xz",
@@ -640,6 +712,7 @@
     },
     "schema_version": 0,
     "source": {
+      "patches": null,
       "sha256": "74d0e4dfa3d39ad8939e99bda37f5967aba528211076828464d2777d477fc0fb",
       "url": "https://www.x.org/releases/individual/lib/libXau-1.0.12.tar.xz"
     },
@@ -647,7 +720,9 @@
       "commands": [
         "if not exist %PREFIX%/Library/lib/libXau.dll.a exit /b 1",
         "if not exist %PREFIX%/Library/bin/msys-Xau-*.dll exit /b 1"
-      ]
+      ],
+      "files": null,
+      "requires": null
     }
   },
   "win_64_requirements": {
@@ -678,6 +753,119 @@
     "test": {
       "__set__": true,
       "elements": []
+    }
+  },
+  "win_arm64_meta_yaml": {
+    "about": {
+      "dev_url": "https://gitlab.freedesktop.org/xorg/lib/libxau",
+      "home": "https://www.x.org/",
+      "license": "MIT",
+      "license_family": "MIT",
+      "license_file": "COPYING",
+      "summary": "A simple X Windows authentication protocol."
+    },
+    "build": {
+      "detect_binary_files_with_prefix": true,
+      "number": "2",
+      "run_exports": [
+        "xorg-libxau"
+      ],
+      "script": "call \"%RECIPE_DIR%\\build-arm64.bat\""
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "pkgw"
+      ]
+    },
+    "package": {
+      "name": "xorg-libxau",
+      "version": "1.0.12"
+    },
+    "requirements": {
+      "build": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "meson",
+        "ninja",
+        "m2-sed"
+      ],
+      "host": [
+        "xorg-xorgproto"
+      ]
+    },
+    "schema_version": 0,
+    "source": {
+      "patches": [
+        "0001-meson-add-Windows-DLL-exports.patch"
+      ],
+      "sha256": "74d0e4dfa3d39ad8939e99bda37f5967aba528211076828464d2777d477fc0fb",
+      "url": "https://www.x.org/releases/individual/lib/libXau-1.0.12.tar.xz"
+    },
+    "test": {
+      "commands": [
+        "if not exist \"%LIBRARY_INC%\\X11\\Xauth.h\" exit /b 1",
+        "if not exist \"%LIBRARY_LIB%\\Xau.lib\" exit /b 1",
+        "if not exist \"%LIBRARY_LIB%\\pkgconfig\\xau.pc\" exit /b 1",
+        "if not exist \"%LIBRARY_BIN%\\Xau-6.dll\" exit /b 1",
+        "call %CC% /nologo /MD /W4 /I\"%LIBRARY_INC%\" test_xau.c /link /LIBPATH:\"%LIBRARY_LIB%\" Xau.lib /OUT:test_xau.exe",
+        "dumpbin /imports test_xau.exe | findstr /I /C:\"Xau-6.dll\"",
+        "test_xau.exe",
+        "dumpbin /headers test_xau.exe | findstr /I /C:\"AA64 machine (ARM64)\"",
+        "dumpbin /headers \"%LIBRARY_BIN%\\Xau-6.dll\" | findstr /I /C:\"AA64 machine (ARM64)\"",
+        "if not exist \"%LIBRARY_PREFIX%\\share\\man\\man3\\Xau.3\" exit /b 1",
+        "if not exist \"%LIBRARY_PREFIX%\\share\\man\\man3\\XauDisposeAuth.3\" exit /b 1",
+        "if not exist \"%LIBRARY_PREFIX%\\share\\man\\man3\\XauFileName.3\" exit /b 1",
+        "if not exist \"%LIBRARY_PREFIX%\\share\\man\\man3\\XauGetAuthByAddr.3\" exit /b 1",
+        "if not exist \"%LIBRARY_PREFIX%\\share\\man\\man3\\XauGetBestAuthByAddr.3\" exit /b 1",
+        "if not exist \"%LIBRARY_PREFIX%\\share\\man\\man3\\XauLockAuth.3\" exit /b 1",
+        "if not exist \"%LIBRARY_PREFIX%\\share\\man\\man3\\XauReadAuth.3\" exit /b 1",
+        "if not exist \"%LIBRARY_PREFIX%\\share\\man\\man3\\XauUnlockAuth.3\" exit /b 1",
+        "if not exist \"%LIBRARY_PREFIX%\\share\\man\\man3\\XauWriteAuth.3\" exit /b 1",
+        "dumpbin /exports \"%LIBRARY_BIN%\\Xau-6.dll\" | findstr /C:\"XauDisposeAuth\"",
+        "dumpbin /exports \"%LIBRARY_BIN%\\Xau-6.dll\" | findstr /C:\"XauFileName\"",
+        "dumpbin /exports \"%LIBRARY_BIN%\\Xau-6.dll\" | findstr /C:\"XauGetAuthByAddr\"",
+        "dumpbin /exports \"%LIBRARY_BIN%\\Xau-6.dll\" | findstr /C:\"XauGetBestAuthByAddr\"",
+        "dumpbin /exports \"%LIBRARY_BIN%\\Xau-6.dll\" | findstr /C:\"XauLockAuth\"",
+        "dumpbin /exports \"%LIBRARY_BIN%\\Xau-6.dll\" | findstr /C:\"XauReadAuth\"",
+        "dumpbin /exports \"%LIBRARY_BIN%\\Xau-6.dll\" | findstr /C:\"XauUnlockAuth\"",
+        "dumpbin /exports \"%LIBRARY_BIN%\\Xau-6.dll\" | findstr /C:\"XauWriteAuth\""
+      ],
+      "files": [
+        "test_xau.c"
+      ],
+      "requires": [
+        "c_compiler_stub",
+        "xorg-xorgproto"
+      ]
+    }
+  },
+  "win_arm64_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "m2-sed",
+        "meson",
+        "ninja"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "xorg-xorgproto"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": []
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "c_compiler_stub",
+        "xorg-xorgproto"
+      ]
     }
   }
 }
