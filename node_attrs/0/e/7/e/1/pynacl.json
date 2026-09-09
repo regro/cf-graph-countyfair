@@ -1,8 +1,11 @@
 {
   "archived": false,
   "branch": "main",
-  "ci_support_linux_64_python3.10.____cpython.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '15'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma10\nlibsodium:\n- 1.0.22\npin_run_as_build:\n  python:\n    min_pin: x.x\n    max_pin: x.x\npython:\n- 3.10.* *_cpython\ntarget_platform:\n- linux-64\n",
+  "ci_support_linux_64_is_abi3falsepython3.14.____cp314t.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '15'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma10\nis_abi3:\n- false\nis_python_min:\n- false\nlibsodium:\n- 1.0.22\npin_run_as_build:\n  python:\n    min_pin: x.x\n    max_pin: x.x\npython:\n- 3.14.* *_cp314t\npython_min:\n- '3.11'\ntarget_platform:\n- linux-64\nzip_keys:\n- - python\n  - is_python_min\n  - is_abi3\n",
   "conda-forge.yml": {
+    "bot": {
+      "inspection": "hint-all"
+    },
     "build_platform": {
       "linux_ppc64le": "linux_64",
       "linux_riscv64": "linux_64"
@@ -10,7 +13,9 @@
     "conda_build": {
       "pkg_format": "2"
     },
+    "conda_build_tool": "rattler-build",
     "conda_forge_output_validation": true,
+    "conda_install_tool": "pixi",
     "github": {
       "branch_name": "main",
       "tooling_branch_name": "main"
@@ -21,23 +26,34 @@
     },
     "test": "native_and_emulated"
   },
-  "feedstock_hash": "df3b068d5fa4035a747b87b6670450671b13e956",
-  "feedstock_hash_ts": 1788043946,
+  "feedstock_hash": "4db97956ce977c39594544239cb9a9ce797fdd23",
+  "feedstock_hash_ts": 1788957094,
   "feedstock_name": "pynacl",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
     "about": {
-      "description": "PyNaCl is a Python binding to the Networking and Cryptography library, a crypto library with the stated goal of improving usability, security and speed. It supports Python 2.7 and 3.3+ as well as PyPy 2.6+.\n",
+      "description": "PyNaCl is a Python binding to the Networking and Cryptography library, a crypto library with the stated goal of improving usability, security and speed. It supports Python 2.7 and 3.3+ as well as PyPy 2.6+.",
       "dev_url": "https://github.com/pyca/pynacl",
-      "doc_url": "https://pynacl.readthedocs.io/en/latest/",
+      "doc_url": "https://pynacl.readthedocs.io/",
       "home": "https://github.com/pyca/pynacl",
       "license": "Apache-2.0",
-      "license_family": "Apache",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "PyNaCl is a Python binding to the Networking and Cryptography library, a crypto library with the stated goal of improving usability, security and speed."
     },
     "build": {
-      "number": "4"
+      "number": "5",
+      "script": {
+        "content": [
+          "cp ${BUILD_PREFIX}/share/gnuconfig/config.* ./src/libsodium/build-aux",
+          "export CPPFLAGS=\"$CPPFLAGS -I${PREFIX}/include\"",
+          "${{ PYTHON }} -m ${{ pip_args }}",
+          "${{ PYTHON }} -m ${{ pip_args }} ${{ pip_abi3_args }}"
+        ],
+        "env": {
+          "SODIUM_INSTALL": "system"
+        }
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -46,54 +62,295 @@
         "h-vetinari"
       ]
     },
+    "outputs": [
+      {
+        "build": null,
+        "name": "pynacl",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "gnuconfig"
+          ],
+          "host": [
+            "cffi >=2.0.0",
+            "libsodium",
+            "pip",
+            "python",
+            "setuptools",
+            "wheel"
+          ],
+          "run": [
+            "cffi >=2.0.0",
+            "python",
+            "six"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "nacl",
+                "nacl.bindings",
+                "nacl.pwhash"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest >=3.2.1",
+                "hypothesis >=3.27.0",
+                "python *"
+              ]
+            },
+            "script": "pytest --tb=long --color=yes"
+          }
+        ],
+        "version": "1.6.2"
+      },
+      {
+        "build": null,
+        "name": "pynacl",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "gnuconfig"
+          ],
+          "host": [
+            "cffi >=2.0.0",
+            "libsodium",
+            "pip",
+            "python",
+            "setuptools",
+            "wheel",
+            "python-abi3",
+            "python 3.11.*"
+          ],
+          "run": [
+            "cffi >=2.0.0",
+            "python",
+            "six"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "nacl",
+                "nacl.bindings",
+                "nacl.pwhash"
+              ],
+              "python_version": [
+                "3.11.*",
+                "*"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "abi3audit",
+                "hypothesis >=3.27.0",
+                "pytest >=3.2.1",
+                "python 3.11.*"
+              ]
+            },
+            "script": [
+              "pytest --tb=long --color=yes",
+              "cd \"${{ '$SP_DIR' if unix else '%SP_DIR%' }}/nacl\"",
+              "abi3audit -s -v --assume-minimum-abi3 ${{ python_min }} _sodium.${{ 'abi3.so' if unix else 'pyd' }}"
+            ]
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest >=3.2.1",
+                "hypothesis >=3.27.0",
+                "python *"
+              ]
+            },
+            "script": "pytest --tb=long --color=yes"
+          }
+        ],
+        "version": "1.6.2"
+      },
+      {
+        "build": null,
+        "name": "pynacl",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "gnuconfig"
+          ],
+          "host": [
+            "cffi >=2.0.0",
+            "libsodium",
+            "pip",
+            "python",
+            "setuptools",
+            "wheel"
+          ],
+          "run": [
+            "cffi >=2.0.0",
+            "python",
+            "six"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "nacl",
+                "nacl.bindings",
+                "nacl.pwhash"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest >=3.2.1",
+                "hypothesis >=3.27.0",
+                "python *"
+              ]
+            },
+            "script": "pytest --tb=long --color=yes"
+          }
+        ],
+        "version": "1.6.2"
+      },
+      {
+        "build": null,
+        "name": "pynacl",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "gnuconfig"
+          ],
+          "host": [
+            "cffi >=2.0.0",
+            "libsodium",
+            "pip",
+            "python",
+            "setuptools",
+            "wheel",
+            "python-abi3",
+            "python 3.14.*"
+          ],
+          "run": [
+            "cffi >=2.0.0",
+            "python",
+            "six"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "nacl",
+                "nacl.bindings",
+                "nacl.pwhash"
+              ],
+              "python_version": [
+                "3.14.*",
+                "*"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "abi3audit",
+                "hypothesis >=3.27.0",
+                "pytest >=3.2.1",
+                "python 3.14.*"
+              ]
+            },
+            "script": [
+              "pytest --tb=long --color=yes",
+              "cd \"${{ '$SP_DIR' if unix else '%SP_DIR%' }}/nacl\"",
+              "abi3audit -s -v --assume-minimum-abi3 ${{ python_min }} _sodium.${{ 'abi3.so' if unix else 'pyd' }}"
+            ]
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest >=3.2.1",
+                "hypothesis >=3.27.0",
+                "python *"
+              ]
+            },
+            "script": "pytest --tb=long --color=yes"
+          }
+        ],
+        "version": "1.6.2"
+      }
+    ],
     "package": {
       "name": "pynacl",
       "version": "1.6.2"
     },
     "requirements": {
       "build": [
-        "gnuconfig",
         "c_compiler_stub",
         "c_stdlib_stub",
-        "python",
-        "cross-python_linux-riscv64",
-        "cffi"
+        "gnuconfig"
       ],
       "host": [
-        "python",
+        "cffi >=2.0.0",
+        "libsodium",
         "pip",
+        "python",
         "setuptools",
         "wheel",
-        "cffi >=2.0.0",
-        "libsodium"
+        "python-abi3",
+        "python 3.11.*",
+        "python 3.14.*"
       ],
       "run": [
+        "cffi >=2.0.0",
         "python",
-        "six",
-        "cffi >=2.0.0"
+        "six"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "sha256": "018494d6d696ae03c7e656e5e74cdfd8ea1326962cc401bcf018f1ed8436811c",
-      "url": "https://pypi.org/packages/source/P/PyNaCl/pynacl-1.6.2.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "pytest"
-      ],
-      "imports": [
-        "nacl",
-        "nacl.bindings",
-        "nacl.pwhash"
-      ],
-      "requires": [
-        "pytest >=3.2.1",
-        "hypothesis >=3.27.0"
-      ],
-      "source_files": [
-        "tests/"
-      ]
+      "url": "https://files.pythonhosted.org/packages/source/p/pynacl/pynacl-1.6.2.tar.gz"
     }
   },
   "linux_64_requirements": {
@@ -102,8 +359,251 @@
       "elements": [
         "c_compiler_stub",
         "c_stdlib_stub",
+        "gnuconfig"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
         "cffi",
-        "cross-python_linux-riscv64",
+        "libsodium",
+        "pip",
+        "python",
+        "python-abi3",
+        "setuptools",
+        "wheel"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "cffi",
+        "python",
+        "six"
+      ]
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "abi3audit",
+        "hypothesis",
+        "pip",
+        "pytest",
+        "python"
+      ]
+    }
+  },
+  "linux_aarch64_meta_yaml": {
+    "about": {
+      "description": "PyNaCl is a Python binding to the Networking and Cryptography library, a crypto library with the stated goal of improving usability, security and speed. It supports Python 2.7 and 3.3+ as well as PyPy 2.6+.",
+      "dev_url": "https://github.com/pyca/pynacl",
+      "doc_url": "https://pynacl.readthedocs.io/",
+      "home": "https://github.com/pyca/pynacl",
+      "license": "Apache-2.0",
+      "license_family": "Apache-2.0",
+      "license_file": "LICENSE",
+      "summary": "PyNaCl is a Python binding to the Networking and Cryptography library, a crypto library with the stated goal of improving usability, security and speed."
+    },
+    "build": {
+      "number": "5",
+      "script": {
+        "content": [
+          "cp ${BUILD_PREFIX}/share/gnuconfig/config.* ./src/libsodium/build-aux",
+          "export CPPFLAGS=\"$CPPFLAGS -I${PREFIX}/include\"",
+          "${{ PYTHON }} -m ${{ pip_args }}",
+          "${{ PYTHON }} -m ${{ pip_args }} ${{ pip_abi3_args }}"
+        ],
+        "env": {
+          "SODIUM_INSTALL": "system"
+        }
+      }
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "CJ-Wright",
+        "mariusvniekerk",
+        "h-vetinari"
+      ]
+    },
+    "outputs": [
+      {
+        "build": null,
+        "name": "pynacl",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "python",
+            "cross-python_linux-aarch64",
+            "cffi >=2.0.0",
+            "gnuconfig"
+          ],
+          "host": [
+            "cffi >=2.0.0",
+            "libsodium",
+            "pip",
+            "python",
+            "setuptools",
+            "wheel"
+          ],
+          "run": [
+            "cffi >=2.0.0",
+            "python",
+            "six"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "nacl",
+                "nacl.bindings",
+                "nacl.pwhash"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest >=3.2.1",
+                "hypothesis >=3.27.0",
+                "python *"
+              ]
+            },
+            "script": "pytest --tb=long --color=yes"
+          }
+        ],
+        "version": "1.6.2"
+      },
+      {
+        "build": null,
+        "name": "pynacl",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "python",
+            "cross-python_linux-aarch64",
+            "cffi >=2.0.0",
+            "gnuconfig"
+          ],
+          "host": [
+            "cffi >=2.0.0",
+            "libsodium",
+            "pip",
+            "python",
+            "setuptools",
+            "wheel",
+            "python-abi3",
+            "python 3.11.*"
+          ],
+          "run": [
+            "cffi >=2.0.0",
+            "python",
+            "six"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "nacl",
+                "nacl.bindings",
+                "nacl.pwhash"
+              ],
+              "python_version": [
+                "3.11.*",
+                "*"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "abi3audit",
+                "hypothesis >=3.27.0",
+                "pytest >=3.2.1",
+                "python 3.11.*"
+              ]
+            },
+            "script": [
+              "pytest --tb=long --color=yes",
+              "cd \"${{ '$SP_DIR' if unix else '%SP_DIR%' }}/nacl\"",
+              "abi3audit -s -v --assume-minimum-abi3 ${{ python_min }} _sodium.${{ 'abi3.so' if unix else 'pyd' }}"
+            ]
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest >=3.2.1",
+                "hypothesis >=3.27.0",
+                "python *"
+              ]
+            },
+            "script": "pytest --tb=long --color=yes"
+          }
+        ],
+        "version": "1.6.2"
+      }
+    ],
+    "package": {
+      "name": "pynacl",
+      "version": "1.6.2"
+    },
+    "requirements": {
+      "build": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "python",
+        "cross-python_linux-aarch64",
+        "cffi >=2.0.0",
+        "gnuconfig"
+      ],
+      "host": [
+        "cffi >=2.0.0",
+        "libsodium",
+        "pip",
+        "python",
+        "setuptools",
+        "wheel",
+        "python-abi3",
+        "python 3.11.*"
+      ],
+      "run": [
+        "cffi >=2.0.0",
+        "python",
+        "six"
+      ]
+    },
+    "schema_version": 1,
+    "source": {
+      "sha256": "018494d6d696ae03c7e656e5e74cdfd8ea1326962cc401bcf018f1ed8436811c",
+      "url": "https://files.pythonhosted.org/packages/source/p/pynacl/pynacl-1.6.2.tar.gz"
+    }
+  },
+  "linux_aarch64_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "cffi",
+        "cross-python_linux-aarch64",
         "gnuconfig",
         "python"
       ]
@@ -115,6 +615,7 @@
         "libsodium",
         "pip",
         "python",
+        "python-abi3",
         "setuptools",
         "wheel"
       ]
@@ -130,128 +631,38 @@
     "test": {
       "__set__": true,
       "elements": [
+        "abi3audit",
         "hypothesis",
-        "pytest"
-      ]
-    }
-  },
-  "linux_aarch64_meta_yaml": {
-    "about": {
-      "description": "PyNaCl is a Python binding to the Networking and Cryptography library, a crypto library with the stated goal of improving usability, security and speed. It supports Python 2.7 and 3.3+ as well as PyPy 2.6+.\n",
-      "dev_url": "https://github.com/pyca/pynacl",
-      "doc_url": "https://pynacl.readthedocs.io/en/latest/",
-      "home": "https://github.com/pyca/pynacl",
-      "license": "Apache-2.0",
-      "license_family": "Apache",
-      "license_file": "LICENSE",
-      "summary": "PyNaCl is a Python binding to the Networking and Cryptography library, a crypto library with the stated goal of improving usability, security and speed."
-    },
-    "build": {
-      "number": "4"
-    },
-    "extra": {
-      "recipe-maintainers": [
-        "CJ-Wright",
-        "mariusvniekerk",
-        "h-vetinari"
-      ]
-    },
-    "package": {
-      "name": "pynacl",
-      "version": "1.6.2"
-    },
-    "requirements": {
-      "build": [
-        "gnuconfig",
-        "c_compiler_stub",
-        "c_stdlib_stub"
-      ],
-      "host": [
-        "python",
         "pip",
-        "setuptools",
-        "wheel",
-        "cffi >=2.0.0",
-        "libsodium"
-      ],
-      "run": [
-        "python",
-        "six",
-        "cffi >=2.0.0"
-      ]
-    },
-    "schema_version": 0,
-    "source": {
-      "sha256": "018494d6d696ae03c7e656e5e74cdfd8ea1326962cc401bcf018f1ed8436811c",
-      "url": "https://pypi.org/packages/source/P/PyNaCl/pynacl-1.6.2.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "pytest"
-      ],
-      "imports": [
-        "nacl",
-        "nacl.bindings",
-        "nacl.pwhash"
-      ],
-      "requires": [
-        "pytest >=3.2.1",
-        "hypothesis >=3.27.0"
-      ],
-      "source_files": [
-        "tests/"
-      ]
-    }
-  },
-  "linux_aarch64_requirements": {
-    "build": {
-      "__set__": true,
-      "elements": [
-        "c_compiler_stub",
-        "c_stdlib_stub",
-        "gnuconfig"
-      ]
-    },
-    "host": {
-      "__set__": true,
-      "elements": [
-        "cffi",
-        "libsodium",
-        "pip",
-        "python",
-        "setuptools",
-        "wheel"
-      ]
-    },
-    "run": {
-      "__set__": true,
-      "elements": [
-        "cffi",
-        "python",
-        "six"
-      ]
-    },
-    "test": {
-      "__set__": true,
-      "elements": [
-        "hypothesis",
-        "pytest"
+        "pytest",
+        "python"
       ]
     }
   },
   "linux_ppc64le_meta_yaml": {
     "about": {
-      "description": "PyNaCl is a Python binding to the Networking and Cryptography library, a crypto library with the stated goal of improving usability, security and speed. It supports Python 2.7 and 3.3+ as well as PyPy 2.6+.\n",
+      "description": "PyNaCl is a Python binding to the Networking and Cryptography library, a crypto library with the stated goal of improving usability, security and speed. It supports Python 2.7 and 3.3+ as well as PyPy 2.6+.",
       "dev_url": "https://github.com/pyca/pynacl",
-      "doc_url": "https://pynacl.readthedocs.io/en/latest/",
+      "doc_url": "https://pynacl.readthedocs.io/",
       "home": "https://github.com/pyca/pynacl",
       "license": "Apache-2.0",
-      "license_family": "Apache",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "PyNaCl is a Python binding to the Networking and Cryptography library, a crypto library with the stated goal of improving usability, security and speed."
     },
     "build": {
-      "number": "4"
+      "number": "5",
+      "script": {
+        "content": [
+          "cp ${BUILD_PREFIX}/share/gnuconfig/config.* ./src/libsodium/build-aux",
+          "export CPPFLAGS=\"$CPPFLAGS -I${PREFIX}/include\"",
+          "${{ PYTHON }} -m ${{ pip_args }}",
+          "${{ PYTHON }} -m ${{ pip_args }} ${{ pip_abi3_args }}"
+        ],
+        "env": {
+          "SODIUM_INSTALL": "system"
+        }
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -260,51 +671,175 @@
         "h-vetinari"
       ]
     },
+    "outputs": [
+      {
+        "build": null,
+        "name": "pynacl",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "python",
+            "cross-python_linux-ppc64le",
+            "cffi >=2.0.0",
+            "gnuconfig"
+          ],
+          "host": [
+            "cffi >=2.0.0",
+            "libsodium",
+            "pip",
+            "python",
+            "setuptools",
+            "wheel"
+          ],
+          "run": [
+            "cffi >=2.0.0",
+            "python",
+            "six"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "nacl",
+                "nacl.bindings",
+                "nacl.pwhash"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest >=3.2.1",
+                "hypothesis >=3.27.0",
+                "python *"
+              ]
+            },
+            "script": "pytest --tb=long --color=yes"
+          }
+        ],
+        "version": "1.6.2"
+      },
+      {
+        "build": null,
+        "name": "pynacl",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "python",
+            "cross-python_linux-ppc64le",
+            "cffi >=2.0.0",
+            "gnuconfig"
+          ],
+          "host": [
+            "cffi >=2.0.0",
+            "libsodium",
+            "pip",
+            "python",
+            "setuptools",
+            "wheel",
+            "python-abi3",
+            "python 3.11.*"
+          ],
+          "run": [
+            "cffi >=2.0.0",
+            "python",
+            "six"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "nacl",
+                "nacl.bindings",
+                "nacl.pwhash"
+              ],
+              "python_version": [
+                "3.11.*",
+                "*"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "abi3audit",
+                "hypothesis >=3.27.0",
+                "pytest >=3.2.1",
+                "python 3.11.*"
+              ]
+            },
+            "script": [
+              "pytest --tb=long --color=yes",
+              "cd \"${{ '$SP_DIR' if unix else '%SP_DIR%' }}/nacl\"",
+              "abi3audit -s -v --assume-minimum-abi3 ${{ python_min }} _sodium.${{ 'abi3.so' if unix else 'pyd' }}"
+            ]
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest >=3.2.1",
+                "hypothesis >=3.27.0",
+                "python *"
+              ]
+            },
+            "script": "pytest --tb=long --color=yes"
+          }
+        ],
+        "version": "1.6.2"
+      }
+    ],
     "package": {
       "name": "pynacl",
       "version": "1.6.2"
     },
     "requirements": {
       "build": [
-        "gnuconfig",
         "c_compiler_stub",
-        "c_stdlib_stub"
+        "c_stdlib_stub",
+        "python",
+        "cross-python_linux-ppc64le",
+        "cffi >=2.0.0",
+        "gnuconfig"
       ],
       "host": [
-        "python",
+        "cffi >=2.0.0",
+        "libsodium",
         "pip",
+        "python",
         "setuptools",
         "wheel",
-        "cffi >=2.0.0",
-        "libsodium"
+        "python-abi3",
+        "python 3.11.*"
       ],
       "run": [
+        "cffi >=2.0.0",
         "python",
-        "six",
-        "cffi >=2.0.0"
+        "six"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "sha256": "018494d6d696ae03c7e656e5e74cdfd8ea1326962cc401bcf018f1ed8436811c",
-      "url": "https://pypi.org/packages/source/P/PyNaCl/pynacl-1.6.2.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "pytest"
-      ],
-      "imports": [
-        "nacl",
-        "nacl.bindings",
-        "nacl.pwhash"
-      ],
-      "requires": [
-        "pytest >=3.2.1",
-        "hypothesis >=3.27.0"
-      ],
-      "source_files": [
-        "tests/"
-      ]
+      "url": "https://files.pythonhosted.org/packages/source/p/pynacl/pynacl-1.6.2.tar.gz"
     }
   },
   "linux_ppc64le_requirements": {
@@ -313,7 +848,10 @@
       "elements": [
         "c_compiler_stub",
         "c_stdlib_stub",
-        "gnuconfig"
+        "cffi",
+        "cross-python_linux-ppc64le",
+        "gnuconfig",
+        "python"
       ]
     },
     "host": {
@@ -323,6 +861,7 @@
         "libsodium",
         "pip",
         "python",
+        "python-abi3",
         "setuptools",
         "wheel"
       ]
@@ -338,24 +877,33 @@
     "test": {
       "__set__": true,
       "elements": [
+        "abi3audit",
         "hypothesis",
-        "pytest"
+        "pip",
+        "pytest",
+        "python"
       ]
     }
   },
   "meta_yaml": {
     "about": {
-      "description": "PyNaCl is a Python binding to the Networking and Cryptography library, a crypto library with the stated goal of improving usability, security and speed. It supports Python 2.7 and 3.3+ as well as PyPy 2.6+.\n",
+      "description": "PyNaCl is a Python binding to the Networking and Cryptography library, a crypto library with the stated goal of improving usability, security and speed. It supports Python 2.7 and 3.3+ as well as PyPy 2.6+.",
       "dev_url": "https://github.com/pyca/pynacl",
-      "doc_url": "https://pynacl.readthedocs.io/en/latest/",
+      "doc_url": "https://pynacl.readthedocs.io/",
       "home": "https://github.com/pyca/pynacl",
       "license": "Apache-2.0",
-      "license_family": "Apache",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "PyNaCl is a Python binding to the Networking and Cryptography library, a crypto library with the stated goal of improving usability, security and speed."
     },
     "build": {
-      "number": "4"
+      "number": "5",
+      "script": {
+        "content": "${{ PYTHON }} -m ${{ pip_args }} ${{ pip_abi3_args }}",
+        "env": {
+          "SODIUM_INSTALL": "system"
+        }
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -364,71 +912,1000 @@
         "h-vetinari"
       ]
     },
+    "outputs": [
+      {
+        "build": null,
+        "name": "pynacl",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "gnuconfig"
+          ],
+          "host": [
+            "cffi >=2.0.0",
+            "libsodium",
+            "pip",
+            "python",
+            "setuptools",
+            "wheel"
+          ],
+          "run": [
+            "cffi >=2.0.0",
+            "python",
+            "six"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "nacl",
+                "nacl.bindings",
+                "nacl.pwhash"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest >=3.2.1",
+                "hypothesis >=3.27.0",
+                "python *"
+              ]
+            },
+            "script": "pytest --tb=long --color=yes"
+          }
+        ],
+        "version": "1.6.2"
+      },
+      {
+        "build": null,
+        "name": "pynacl",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "gnuconfig"
+          ],
+          "host": [
+            "cffi >=2.0.0",
+            "libsodium",
+            "pip",
+            "python",
+            "setuptools",
+            "wheel",
+            "python-abi3",
+            "python 3.11.*"
+          ],
+          "run": [
+            "cffi >=2.0.0",
+            "python",
+            "six"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "nacl",
+                "nacl.bindings",
+                "nacl.pwhash"
+              ],
+              "python_version": [
+                "3.11.*",
+                "*"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "abi3audit",
+                "hypothesis >=3.27.0",
+                "pytest >=3.2.1",
+                "python 3.11.*"
+              ]
+            },
+            "script": [
+              "pytest --tb=long --color=yes",
+              "cd \"${{ '$SP_DIR' if unix else '%SP_DIR%' }}/nacl\"",
+              "abi3audit -s -v --assume-minimum-abi3 ${{ python_min }} _sodium.${{ 'abi3.so' if unix else 'pyd' }}"
+            ]
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest >=3.2.1",
+                "hypothesis >=3.27.0",
+                "python *"
+              ]
+            },
+            "script": "pytest --tb=long --color=yes"
+          }
+        ],
+        "version": "1.6.2"
+      },
+      {
+        "build": null,
+        "name": "pynacl",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "gnuconfig"
+          ],
+          "host": [
+            "cffi >=2.0.0",
+            "libsodium",
+            "pip",
+            "python",
+            "setuptools",
+            "wheel"
+          ],
+          "run": [
+            "cffi >=2.0.0",
+            "python",
+            "six"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "nacl",
+                "nacl.bindings",
+                "nacl.pwhash"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest >=3.2.1",
+                "hypothesis >=3.27.0",
+                "python *"
+              ]
+            },
+            "script": "pytest --tb=long --color=yes"
+          }
+        ],
+        "version": "1.6.2"
+      },
+      {
+        "build": null,
+        "name": "pynacl",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "gnuconfig"
+          ],
+          "host": [
+            "cffi >=2.0.0",
+            "libsodium",
+            "pip",
+            "python",
+            "setuptools",
+            "wheel",
+            "python-abi3",
+            "python 3.14.*"
+          ],
+          "run": [
+            "cffi >=2.0.0",
+            "python",
+            "six"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "nacl",
+                "nacl.bindings",
+                "nacl.pwhash"
+              ],
+              "python_version": [
+                "3.14.*",
+                "*"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "abi3audit",
+                "hypothesis >=3.27.0",
+                "pytest >=3.2.1",
+                "python 3.14.*"
+              ]
+            },
+            "script": [
+              "pytest --tb=long --color=yes",
+              "cd \"${{ '$SP_DIR' if unix else '%SP_DIR%' }}/nacl\"",
+              "abi3audit -s -v --assume-minimum-abi3 ${{ python_min }} _sodium.${{ 'abi3.so' if unix else 'pyd' }}"
+            ]
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest >=3.2.1",
+                "hypothesis >=3.27.0",
+                "python *"
+              ]
+            },
+            "script": "pytest --tb=long --color=yes"
+          }
+        ],
+        "version": "1.6.2"
+      },
+      {
+        "build": null,
+        "name": "pynacl",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "python",
+            "cross-python_linux-aarch64",
+            "cffi >=2.0.0",
+            "gnuconfig"
+          ],
+          "host": [
+            "cffi >=2.0.0",
+            "libsodium",
+            "pip",
+            "python",
+            "setuptools",
+            "wheel"
+          ],
+          "run": [
+            "cffi >=2.0.0",
+            "python",
+            "six"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "nacl",
+                "nacl.bindings",
+                "nacl.pwhash"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest >=3.2.1",
+                "hypothesis >=3.27.0",
+                "python *"
+              ]
+            },
+            "script": "pytest --tb=long --color=yes"
+          }
+        ],
+        "version": "1.6.2"
+      },
+      {
+        "build": null,
+        "name": "pynacl",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "python",
+            "cross-python_linux-aarch64",
+            "cffi >=2.0.0",
+            "gnuconfig"
+          ],
+          "host": [
+            "cffi >=2.0.0",
+            "libsodium",
+            "pip",
+            "python",
+            "setuptools",
+            "wheel",
+            "python-abi3",
+            "python 3.11.*"
+          ],
+          "run": [
+            "cffi >=2.0.0",
+            "python",
+            "six"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "nacl",
+                "nacl.bindings",
+                "nacl.pwhash"
+              ],
+              "python_version": [
+                "3.11.*",
+                "*"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "abi3audit",
+                "hypothesis >=3.27.0",
+                "pytest >=3.2.1",
+                "python 3.11.*"
+              ]
+            },
+            "script": [
+              "pytest --tb=long --color=yes",
+              "cd \"${{ '$SP_DIR' if unix else '%SP_DIR%' }}/nacl\"",
+              "abi3audit -s -v --assume-minimum-abi3 ${{ python_min }} _sodium.${{ 'abi3.so' if unix else 'pyd' }}"
+            ]
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest >=3.2.1",
+                "hypothesis >=3.27.0",
+                "python *"
+              ]
+            },
+            "script": "pytest --tb=long --color=yes"
+          }
+        ],
+        "version": "1.6.2"
+      },
+      {
+        "build": null,
+        "name": "pynacl",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "python",
+            "cross-python_linux-ppc64le",
+            "cffi >=2.0.0",
+            "gnuconfig"
+          ],
+          "host": [
+            "cffi >=2.0.0",
+            "libsodium",
+            "pip",
+            "python",
+            "setuptools",
+            "wheel"
+          ],
+          "run": [
+            "cffi >=2.0.0",
+            "python",
+            "six"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "nacl",
+                "nacl.bindings",
+                "nacl.pwhash"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest >=3.2.1",
+                "hypothesis >=3.27.0",
+                "python *"
+              ]
+            },
+            "script": "pytest --tb=long --color=yes"
+          }
+        ],
+        "version": "1.6.2"
+      },
+      {
+        "build": null,
+        "name": "pynacl",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "python",
+            "cross-python_linux-ppc64le",
+            "cffi >=2.0.0",
+            "gnuconfig"
+          ],
+          "host": [
+            "cffi >=2.0.0",
+            "libsodium",
+            "pip",
+            "python",
+            "setuptools",
+            "wheel",
+            "python-abi3",
+            "python 3.11.*"
+          ],
+          "run": [
+            "cffi >=2.0.0",
+            "python",
+            "six"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "nacl",
+                "nacl.bindings",
+                "nacl.pwhash"
+              ],
+              "python_version": [
+                "3.11.*",
+                "*"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "abi3audit",
+                "hypothesis >=3.27.0",
+                "pytest >=3.2.1",
+                "python 3.11.*"
+              ]
+            },
+            "script": [
+              "pytest --tb=long --color=yes",
+              "cd \"${{ '$SP_DIR' if unix else '%SP_DIR%' }}/nacl\"",
+              "abi3audit -s -v --assume-minimum-abi3 ${{ python_min }} _sodium.${{ 'abi3.so' if unix else 'pyd' }}"
+            ]
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest >=3.2.1",
+                "hypothesis >=3.27.0",
+                "python *"
+              ]
+            },
+            "script": "pytest --tb=long --color=yes"
+          }
+        ],
+        "version": "1.6.2"
+      },
+      {
+        "build": null,
+        "name": "pynacl",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "python",
+            "cross-python_osx-64",
+            "cffi >=2.0.0",
+            "gnuconfig"
+          ],
+          "host": [
+            "cffi >=2.0.0",
+            "libsodium",
+            "pip",
+            "python",
+            "setuptools",
+            "wheel"
+          ],
+          "run": [
+            "cffi >=2.0.0",
+            "python",
+            "six"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "nacl",
+                "nacl.bindings",
+                "nacl.pwhash"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest >=3.2.1",
+                "hypothesis >=3.27.0",
+                "python *"
+              ]
+            },
+            "script": "pytest --tb=long --color=yes"
+          }
+        ],
+        "version": "1.6.2"
+      },
+      {
+        "build": null,
+        "name": "pynacl",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "python",
+            "cross-python_osx-64",
+            "cffi >=2.0.0",
+            "gnuconfig"
+          ],
+          "host": [
+            "cffi >=2.0.0",
+            "libsodium",
+            "pip",
+            "python",
+            "setuptools",
+            "wheel",
+            "python-abi3",
+            "python 3.11.*"
+          ],
+          "run": [
+            "cffi >=2.0.0",
+            "python",
+            "six"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "nacl",
+                "nacl.bindings",
+                "nacl.pwhash"
+              ],
+              "python_version": [
+                "3.11.*",
+                "*"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "abi3audit",
+                "hypothesis >=3.27.0",
+                "pytest >=3.2.1",
+                "python 3.11.*"
+              ]
+            },
+            "script": [
+              "pytest --tb=long --color=yes",
+              "cd \"${{ '$SP_DIR' if unix else '%SP_DIR%' }}/nacl\"",
+              "abi3audit -s -v --assume-minimum-abi3 ${{ python_min }} _sodium.${{ 'abi3.so' if unix else 'pyd' }}"
+            ]
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest >=3.2.1",
+                "hypothesis >=3.27.0",
+                "python *"
+              ]
+            },
+            "script": "pytest --tb=long --color=yes"
+          }
+        ],
+        "version": "1.6.2"
+      },
+      {
+        "build": null,
+        "name": "pynacl",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "python",
+            "cross-python_osx-arm64",
+            "cffi >=2.0.0",
+            "gnuconfig"
+          ],
+          "host": [
+            "cffi >=2.0.0",
+            "libsodium",
+            "pip",
+            "python",
+            "setuptools",
+            "wheel"
+          ],
+          "run": [
+            "cffi >=2.0.0",
+            "python",
+            "six"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "nacl",
+                "nacl.bindings",
+                "nacl.pwhash"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest >=3.2.1",
+                "hypothesis >=3.27.0",
+                "python *"
+              ]
+            },
+            "script": "pytest --tb=long --color=yes"
+          }
+        ],
+        "version": "1.6.2"
+      },
+      {
+        "build": null,
+        "name": "pynacl",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "python",
+            "cross-python_osx-arm64",
+            "cffi >=2.0.0",
+            "gnuconfig"
+          ],
+          "host": [
+            "cffi >=2.0.0",
+            "libsodium",
+            "pip",
+            "python",
+            "setuptools",
+            "wheel",
+            "python-abi3",
+            "python 3.11.*"
+          ],
+          "run": [
+            "cffi >=2.0.0",
+            "python",
+            "six"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "nacl",
+                "nacl.bindings",
+                "nacl.pwhash"
+              ],
+              "python_version": [
+                "3.11.*",
+                "*"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "abi3audit",
+                "hypothesis >=3.27.0",
+                "pytest >=3.2.1",
+                "python 3.11.*"
+              ]
+            },
+            "script": [
+              "pytest --tb=long --color=yes",
+              "cd \"${{ '$SP_DIR' if unix else '%SP_DIR%' }}/nacl\"",
+              "abi3audit -s -v --assume-minimum-abi3 ${{ python_min }} _sodium.${{ 'abi3.so' if unix else 'pyd' }}"
+            ]
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest >=3.2.1",
+                "hypothesis >=3.27.0",
+                "python *"
+              ]
+            },
+            "script": "pytest --tb=long --color=yes"
+          }
+        ],
+        "version": "1.6.2"
+      },
+      {
+        "build": null,
+        "name": "pynacl",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "python",
+            "cross-python_win-64",
+            "cffi >=2.0.0",
+            "m2-patch"
+          ],
+          "host": [
+            "cffi >=2.0.0",
+            "libsodium",
+            "pip",
+            "python",
+            "setuptools",
+            "wheel"
+          ],
+          "run": [
+            "cffi >=2.0.0",
+            "python",
+            "six"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "nacl",
+                "nacl.bindings",
+                "nacl.pwhash"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest >=3.2.1",
+                "hypothesis >=3.27.0",
+                "python *"
+              ]
+            },
+            "script": "pytest --tb=long --color=yes"
+          }
+        ],
+        "version": "1.6.2"
+      },
+      {
+        "build": null,
+        "name": "pynacl",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "python",
+            "cross-python_win-64",
+            "cffi >=2.0.0",
+            "m2-patch"
+          ],
+          "host": [
+            "cffi >=2.0.0",
+            "libsodium",
+            "pip",
+            "python",
+            "setuptools",
+            "wheel",
+            "python-abi3",
+            "python 3.11.*"
+          ],
+          "run": [
+            "cffi >=2.0.0",
+            "python",
+            "six"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "nacl",
+                "nacl.bindings",
+                "nacl.pwhash"
+              ],
+              "python_version": [
+                "3.11.*",
+                "*"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "abi3audit",
+                "hypothesis >=3.27.0",
+                "pytest >=3.2.1",
+                "python 3.11.*"
+              ]
+            },
+            "script": [
+              "pytest --tb=long --color=yes",
+              "cd \"${{ '$SP_DIR' if unix else '%SP_DIR%' }}/nacl\"",
+              "abi3audit -s -v --assume-minimum-abi3 ${{ python_min }} _sodium.${{ 'abi3.so' if unix else 'pyd' }}"
+            ]
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest >=3.2.1",
+                "hypothesis >=3.27.0",
+                "python *"
+              ]
+            },
+            "script": "pytest --tb=long --color=yes"
+          }
+        ],
+        "version": "1.6.2"
+      }
+    ],
     "package": {
       "name": "pynacl",
       "version": "1.6.2"
     },
     "requirements": {
       "build": [
-        "gnuconfig",
         "c_compiler_stub",
         "c_stdlib_stub",
+        "gnuconfig",
         "python",
-        "cross-python_linux-riscv64",
-        "cffi",
+        "cross-python_linux-aarch64",
+        "cffi >=2.0.0",
+        "cross-python_linux-ppc64le",
+        "cross-python_osx-64",
+        "cross-python_osx-arm64",
+        "cross-python_win-64",
         "m2-patch"
       ],
       "host": [
-        "python",
+        "cffi >=2.0.0",
+        "libsodium",
         "pip",
+        "python",
         "setuptools",
         "wheel",
-        "cffi >=2.0.0",
-        "libsodium"
+        "python-abi3",
+        "python 3.11.*",
+        "python 3.14.*"
       ],
       "run": [
+        "cffi >=2.0.0",
         "python",
-        "six",
-        "cffi >=2.0.0"
+        "six"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "sha256": "018494d6d696ae03c7e656e5e74cdfd8ea1326962cc401bcf018f1ed8436811c",
-      "url": "https://pypi.org/packages/source/P/PyNaCl/pynacl-1.6.2.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "pytest"
-      ],
-      "imports": [
-        "nacl",
-        "nacl.bindings",
-        "nacl.pwhash"
-      ],
-      "requires": [
-        "pytest >=3.2.1",
-        "hypothesis >=3.27.0"
-      ],
-      "source_files": [
-        "tests/"
-      ]
+      "url": "https://files.pythonhosted.org/packages/source/p/pynacl/pynacl-1.6.2.tar.gz"
     }
   },
   "name": "pynacl",
   "osx_64_meta_yaml": {
     "about": {
-      "description": "PyNaCl is a Python binding to the Networking and Cryptography library, a crypto library with the stated goal of improving usability, security and speed. It supports Python 2.7 and 3.3+ as well as PyPy 2.6+.\n",
+      "description": "PyNaCl is a Python binding to the Networking and Cryptography library, a crypto library with the stated goal of improving usability, security and speed. It supports Python 2.7 and 3.3+ as well as PyPy 2.6+.",
       "dev_url": "https://github.com/pyca/pynacl",
-      "doc_url": "https://pynacl.readthedocs.io/en/latest/",
+      "doc_url": "https://pynacl.readthedocs.io/",
       "home": "https://github.com/pyca/pynacl",
       "license": "Apache-2.0",
-      "license_family": "Apache",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "PyNaCl is a Python binding to the Networking and Cryptography library, a crypto library with the stated goal of improving usability, security and speed."
     },
     "build": {
-      "number": "4"
+      "number": "5",
+      "script": {
+        "content": [
+          "cp ${BUILD_PREFIX}/share/gnuconfig/config.* ./src/libsodium/build-aux",
+          "export CPPFLAGS=\"$CPPFLAGS -I${PREFIX}/include\"",
+          "${{ PYTHON }} -m ${{ pip_args }}",
+          "${{ PYTHON }} -m ${{ pip_args }} ${{ pip_abi3_args }}"
+        ],
+        "env": {
+          "SODIUM_INSTALL": "system"
+        }
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -437,51 +1914,175 @@
         "h-vetinari"
       ]
     },
+    "outputs": [
+      {
+        "build": null,
+        "name": "pynacl",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "python",
+            "cross-python_osx-64",
+            "cffi >=2.0.0",
+            "gnuconfig"
+          ],
+          "host": [
+            "cffi >=2.0.0",
+            "libsodium",
+            "pip",
+            "python",
+            "setuptools",
+            "wheel"
+          ],
+          "run": [
+            "cffi >=2.0.0",
+            "python",
+            "six"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "nacl",
+                "nacl.bindings",
+                "nacl.pwhash"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest >=3.2.1",
+                "hypothesis >=3.27.0",
+                "python *"
+              ]
+            },
+            "script": "pytest --tb=long --color=yes"
+          }
+        ],
+        "version": "1.6.2"
+      },
+      {
+        "build": null,
+        "name": "pynacl",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "python",
+            "cross-python_osx-64",
+            "cffi >=2.0.0",
+            "gnuconfig"
+          ],
+          "host": [
+            "cffi >=2.0.0",
+            "libsodium",
+            "pip",
+            "python",
+            "setuptools",
+            "wheel",
+            "python-abi3",
+            "python 3.11.*"
+          ],
+          "run": [
+            "cffi >=2.0.0",
+            "python",
+            "six"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "nacl",
+                "nacl.bindings",
+                "nacl.pwhash"
+              ],
+              "python_version": [
+                "3.11.*",
+                "*"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "abi3audit",
+                "hypothesis >=3.27.0",
+                "pytest >=3.2.1",
+                "python 3.11.*"
+              ]
+            },
+            "script": [
+              "pytest --tb=long --color=yes",
+              "cd \"${{ '$SP_DIR' if unix else '%SP_DIR%' }}/nacl\"",
+              "abi3audit -s -v --assume-minimum-abi3 ${{ python_min }} _sodium.${{ 'abi3.so' if unix else 'pyd' }}"
+            ]
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest >=3.2.1",
+                "hypothesis >=3.27.0",
+                "python *"
+              ]
+            },
+            "script": "pytest --tb=long --color=yes"
+          }
+        ],
+        "version": "1.6.2"
+      }
+    ],
     "package": {
       "name": "pynacl",
       "version": "1.6.2"
     },
     "requirements": {
       "build": [
-        "gnuconfig",
         "c_compiler_stub",
-        "c_stdlib_stub"
+        "c_stdlib_stub",
+        "python",
+        "cross-python_osx-64",
+        "cffi >=2.0.0",
+        "gnuconfig"
       ],
       "host": [
-        "python",
+        "cffi >=2.0.0",
+        "libsodium",
         "pip",
+        "python",
         "setuptools",
         "wheel",
-        "cffi >=2.0.0",
-        "libsodium"
+        "python-abi3",
+        "python 3.11.*"
       ],
       "run": [
+        "cffi >=2.0.0",
         "python",
-        "six",
-        "cffi >=2.0.0"
+        "six"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "sha256": "018494d6d696ae03c7e656e5e74cdfd8ea1326962cc401bcf018f1ed8436811c",
-      "url": "https://pypi.org/packages/source/P/PyNaCl/pynacl-1.6.2.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "pytest"
-      ],
-      "imports": [
-        "nacl",
-        "nacl.bindings",
-        "nacl.pwhash"
-      ],
-      "requires": [
-        "pytest >=3.2.1",
-        "hypothesis >=3.27.0"
-      ],
-      "source_files": [
-        "tests/"
-      ]
+      "url": "https://files.pythonhosted.org/packages/source/p/pynacl/pynacl-1.6.2.tar.gz"
     }
   },
   "osx_64_requirements": {
@@ -490,7 +2091,10 @@
       "elements": [
         "c_compiler_stub",
         "c_stdlib_stub",
-        "gnuconfig"
+        "cffi",
+        "cross-python_osx-64",
+        "gnuconfig",
+        "python"
       ]
     },
     "host": {
@@ -500,6 +2104,7 @@
         "libsodium",
         "pip",
         "python",
+        "python-abi3",
         "setuptools",
         "wheel"
       ]
@@ -515,24 +2120,38 @@
     "test": {
       "__set__": true,
       "elements": [
+        "abi3audit",
         "hypothesis",
-        "pytest"
+        "pip",
+        "pytest",
+        "python"
       ]
     }
   },
   "osx_arm64_meta_yaml": {
     "about": {
-      "description": "PyNaCl is a Python binding to the Networking and Cryptography library, a crypto library with the stated goal of improving usability, security and speed. It supports Python 2.7 and 3.3+ as well as PyPy 2.6+.\n",
+      "description": "PyNaCl is a Python binding to the Networking and Cryptography library, a crypto library with the stated goal of improving usability, security and speed. It supports Python 2.7 and 3.3+ as well as PyPy 2.6+.",
       "dev_url": "https://github.com/pyca/pynacl",
-      "doc_url": "https://pynacl.readthedocs.io/en/latest/",
+      "doc_url": "https://pynacl.readthedocs.io/",
       "home": "https://github.com/pyca/pynacl",
       "license": "Apache-2.0",
-      "license_family": "Apache",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "PyNaCl is a Python binding to the Networking and Cryptography library, a crypto library with the stated goal of improving usability, security and speed."
     },
     "build": {
-      "number": "4"
+      "number": "5",
+      "script": {
+        "content": [
+          "cp ${BUILD_PREFIX}/share/gnuconfig/config.* ./src/libsodium/build-aux",
+          "export CPPFLAGS=\"$CPPFLAGS -I${PREFIX}/include\"",
+          "${{ PYTHON }} -m ${{ pip_args }}",
+          "${{ PYTHON }} -m ${{ pip_args }} ${{ pip_abi3_args }}"
+        ],
+        "env": {
+          "SODIUM_INSTALL": "system"
+        }
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -541,51 +2160,175 @@
         "h-vetinari"
       ]
     },
+    "outputs": [
+      {
+        "build": null,
+        "name": "pynacl",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "python",
+            "cross-python_osx-arm64",
+            "cffi >=2.0.0",
+            "gnuconfig"
+          ],
+          "host": [
+            "cffi >=2.0.0",
+            "libsodium",
+            "pip",
+            "python",
+            "setuptools",
+            "wheel"
+          ],
+          "run": [
+            "cffi >=2.0.0",
+            "python",
+            "six"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "nacl",
+                "nacl.bindings",
+                "nacl.pwhash"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest >=3.2.1",
+                "hypothesis >=3.27.0",
+                "python *"
+              ]
+            },
+            "script": "pytest --tb=long --color=yes"
+          }
+        ],
+        "version": "1.6.2"
+      },
+      {
+        "build": null,
+        "name": "pynacl",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "python",
+            "cross-python_osx-arm64",
+            "cffi >=2.0.0",
+            "gnuconfig"
+          ],
+          "host": [
+            "cffi >=2.0.0",
+            "libsodium",
+            "pip",
+            "python",
+            "setuptools",
+            "wheel",
+            "python-abi3",
+            "python 3.11.*"
+          ],
+          "run": [
+            "cffi >=2.0.0",
+            "python",
+            "six"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "nacl",
+                "nacl.bindings",
+                "nacl.pwhash"
+              ],
+              "python_version": [
+                "3.11.*",
+                "*"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "abi3audit",
+                "hypothesis >=3.27.0",
+                "pytest >=3.2.1",
+                "python 3.11.*"
+              ]
+            },
+            "script": [
+              "pytest --tb=long --color=yes",
+              "cd \"${{ '$SP_DIR' if unix else '%SP_DIR%' }}/nacl\"",
+              "abi3audit -s -v --assume-minimum-abi3 ${{ python_min }} _sodium.${{ 'abi3.so' if unix else 'pyd' }}"
+            ]
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest >=3.2.1",
+                "hypothesis >=3.27.0",
+                "python *"
+              ]
+            },
+            "script": "pytest --tb=long --color=yes"
+          }
+        ],
+        "version": "1.6.2"
+      }
+    ],
     "package": {
       "name": "pynacl",
       "version": "1.6.2"
     },
     "requirements": {
       "build": [
-        "gnuconfig",
         "c_compiler_stub",
-        "c_stdlib_stub"
+        "c_stdlib_stub",
+        "python",
+        "cross-python_osx-arm64",
+        "cffi >=2.0.0",
+        "gnuconfig"
       ],
       "host": [
-        "python",
+        "cffi >=2.0.0",
+        "libsodium",
         "pip",
+        "python",
         "setuptools",
         "wheel",
-        "cffi >=2.0.0",
-        "libsodium"
+        "python-abi3",
+        "python 3.11.*"
       ],
       "run": [
+        "cffi >=2.0.0",
         "python",
-        "six",
-        "cffi >=2.0.0"
+        "six"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "sha256": "018494d6d696ae03c7e656e5e74cdfd8ea1326962cc401bcf018f1ed8436811c",
-      "url": "https://pypi.org/packages/source/P/PyNaCl/pynacl-1.6.2.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "pytest"
-      ],
-      "imports": [
-        "nacl",
-        "nacl.bindings",
-        "nacl.pwhash"
-      ],
-      "requires": [
-        "pytest >=3.2.1",
-        "hypothesis >=3.27.0"
-      ],
-      "source_files": [
-        "tests/"
-      ]
+      "url": "https://files.pythonhosted.org/packages/source/p/pynacl/pynacl-1.6.2.tar.gz"
     }
   },
   "osx_arm64_requirements": {
@@ -594,7 +2337,10 @@
       "elements": [
         "c_compiler_stub",
         "c_stdlib_stub",
-        "gnuconfig"
+        "cffi",
+        "cross-python_osx-arm64",
+        "gnuconfig",
+        "python"
       ]
     },
     "host": {
@@ -604,6 +2350,7 @@
         "libsodium",
         "pip",
         "python",
+        "python-abi3",
         "setuptools",
         "wheel"
       ]
@@ -619,8 +2366,11 @@
     "test": {
       "__set__": true,
       "elements": [
+        "abi3audit",
         "hypothesis",
-        "pytest"
+        "pip",
+        "pytest",
+        "python"
       ]
     }
   },
@@ -642,19 +2392,24 @@
   "pr_info": {
     "__lazy_json__": "pr_info/pynacl.json"
   },
-  "raw_meta_yaml": "{% set version = \"1.6.2\" %}\n\npackage:\n  name: pynacl\n  version: {{ version }}\n\nsource:\n  url: https://pypi.org/packages/source/P/PyNaCl/pynacl-{{ version }}.tar.gz\n  sha256: 018494d6d696ae03c7e656e5e74cdfd8ea1326962cc401bcf018f1ed8436811c\n\nbuild:\n  number: 4\n\nrequirements:\n  build:\n    - python                                 # [build_platform != target_platform]\n    - cross-python_{{ target_platform }}     # [build_platform != target_platform]\n    - cffi                                   # [build_platform != target_platform]\n    - m2-patch    # [win]\n    - gnuconfig  # [unix]\n    - {{ compiler('c') }}\n    - {{ stdlib(\"c\") }}\n  host:\n    - python\n    - pip\n    - setuptools\n    - wheel\n    - cffi >=2.0.0\n    - libsodium\n  run:\n    - python\n    - six\n    - cffi >=2.0.0\n\ntest:\n  imports:\n    - nacl\n    - nacl.bindings\n    - nacl.pwhash\n  requires:\n    - pytest >=3.2.1\n    - hypothesis >=3.27.0\n  source_files:\n    - tests/\n  commands:\n    - pytest\n\nabout:\n  home: https://github.com/pyca/pynacl\n  license: Apache-2.0\n  license_family: Apache\n  license_file: LICENSE\n  summary: PyNaCl is a Python binding to the Networking and Cryptography library, a crypto library with the stated goal of improving usability, security and speed.\n  description: |\n    PyNaCl is a Python binding to the Networking and Cryptography library, a crypto library with the stated goal of improving usability, security and speed. It supports Python 2.7 and 3.3+ as well as PyPy 2.6+.\n  doc_url: https://pynacl.readthedocs.io/en/latest/\n  dev_url: https://github.com/pyca/pynacl\n\nextra:\n  recipe-maintainers:\n    - CJ-Wright\n    - mariusvniekerk\n    - h-vetinari\n",
+  "raw_meta_yaml": "# yaml-language-server: $schema=https://raw.githubusercontent.com/prefix-dev/recipe-format/main/schema.json\nschema_version: 1\n\ncontext:\n  version: \"1.6.2\"\n  cffi_min: \"2.0.0\"\n  pip_args: pip install . -vv --no-deps --no-build-isolation --disable-pip-version-check\n  # see: https://github.com/pyca/pynacl/blob/main/.github/workflows/wheel-builder.yml\n  pip_abi3_args: --config-setting=--build-option=--py-limited-api=cp${{ python_min | replace('.', '') }}\n\npackage:\n  name: pynacl\n  version: ${{ version }}\n\nsource:\n  url: https://files.pythonhosted.org/packages/source/p/pynacl/pynacl-${{ version }}.tar.gz\n  sha256: 018494d6d696ae03c7e656e5e74cdfd8ea1326962cc401bcf018f1ed8436811c\n\nbuild:\n  skip: is_abi3 and not is_python_min\n  number: 5\n  python:\n    version_independent: ${{ is_abi3 }}\n  script:\n    env:\n      SODIUM_INSTALL: system\n    content:\n      - if: unix\n        then:\n          - cp ${BUILD_PREFIX}/share/gnuconfig/config.* ./src/libsodium/build-aux\n          - export CPPFLAGS=\"$CPPFLAGS -I${PREFIX}/include\"\n      - if: is_abi3\n        then:\n          - ${{ PYTHON }} -m ${{ pip_args }} ${{ pip_abi3_args }}\n        else:\n          - ${{ PYTHON }} -m ${{ pip_args }}\n\nrequirements:\n  build:\n    - ${{ compiler(\"c\") }}\n    - ${{ stdlib(\"c\") }}\n    - if: build_platform != target_platform\n      then:\n        - python\n        - cross-python_${{ target_platform }}\n        - cffi >=${{ cffi_min }}\n    - if: win\n      then:\n        - m2-patch\n      else:\n        - gnuconfig\n  host:\n    - cffi >=${{ cffi_min }}\n    - libsodium\n    - pip\n    - python\n    - setuptools\n    - wheel\n    - if: is_abi3\n      then:\n        - python-abi3\n        - python ${{ python_min }}.*\n  run:\n    - cffi >=${{ cffi_min }}\n    - python\n    - six\n\ntests:\n  - if: is_abi3\n    then:\n      - python:\n          imports:\n            - nacl\n            - nacl.bindings\n            - nacl.pwhash\n          pip_check: true\n          python_version:\n             - ${{ python_min }}.*\n             - \"*\"\n    else:\n      - python:\n          imports:\n            - nacl\n            - nacl.bindings\n            - nacl.pwhash\n          pip_check: true\n  - if: is_abi3\n    then:\n      - files:\n          source:\n            - tests/\n        requirements:\n          run:\n            - abi3audit\n            - hypothesis >=3.27.0\n            - pytest >=3.2.1\n            - python ${{ python_min }}.*\n        script:\n          - pytest --tb=long --color=yes\n          - cd \"${{ '$SP_DIR' if unix else '%SP_DIR%' }}/nacl\"\n          - abi3audit -s -v --assume-minimum-abi3 ${{ python_min }} _sodium.${{ 'abi3.so' if unix else 'pyd' }}\n  # this is run (and tests bundled) twice for abi3\n  - files:\n      source:\n        - tests/\n    requirements:\n      run:\n        - pytest >=3.2.1\n        - hypothesis >=3.27.0\n        - python *\n    script:\n      - pytest --tb=long --color=yes\n\nabout:\n  license: Apache-2.0\n  license_file: LICENSE\n  summary: PyNaCl is a Python binding to the Networking and Cryptography library, a crypto library with the stated goal of improving usability, security and speed.\n  description: |\n    PyNaCl is a Python binding to the Networking and Cryptography library, a crypto library with the stated goal of improving usability, security and speed. It supports Python 2.7 and 3.3+ as well as PyPy 2.6+.\n  homepage: https://github.com/pyca/pynacl\n  repository: https://github.com/pyca/pynacl\n  documentation: https://pynacl.readthedocs.io\n\nextra:\n  recipe-maintainers:\n    - CJ-Wright\n    - mariusvniekerk\n    - h-vetinari\n",
   "req": {
     "__set__": true,
     "elements": [
       "c_compiler_stub",
       "c_stdlib_stub",
       "cffi",
-      "cross-python_linux-riscv64",
+      "cross-python_linux-aarch64",
+      "cross-python_linux-ppc64le",
+      "cross-python_osx-64",
+      "cross-python_osx-arm64",
+      "cross-python_win-64",
       "gnuconfig",
       "libsodium",
       "m2-patch",
       "pip",
       "python",
+      "python-abi3",
       "setuptools",
       "six",
       "wheel"
@@ -667,7 +2422,11 @@
         "c_compiler_stub",
         "c_stdlib_stub",
         "cffi",
-        "cross-python_linux-riscv64",
+        "cross-python_linux-aarch64",
+        "cross-python_linux-ppc64le",
+        "cross-python_osx-64",
+        "cross-python_osx-arm64",
+        "cross-python_win-64",
         "gnuconfig",
         "m2-patch",
         "python"
@@ -679,9 +2438,11 @@
         "c_compiler_stub",
         "c_stdlib_stub",
         "cffi",
+        "cross-python",
         "libsodium",
         "pip",
         "python",
+        "python-abi3",
         "setuptools",
         "wheel"
       ]
@@ -692,6 +2453,7 @@
         "c_compiler_stub",
         "c_stdlib_stub",
         "cffi",
+        "cross-python",
         "python",
         "six"
       ]
@@ -699,8 +2461,11 @@
     "test": {
       "__set__": true,
       "elements": [
+        "abi3audit",
         "hypothesis",
-        "pytest"
+        "pip",
+        "pytest",
+        "python"
       ]
     }
   },
@@ -711,8 +2476,12 @@
       "elements": [
         "c_compiler_stub",
         "c_stdlib_stub",
-        "cffi",
-        "cross-python_linux-riscv64",
+        "cffi >=2.0.0",
+        "cross-python_linux-aarch64",
+        "cross-python_linux-ppc64le",
+        "cross-python_osx-64",
+        "cross-python_osx-arm64",
+        "cross-python_win-64",
         "gnuconfig",
         "m2-patch",
         "python"
@@ -725,6 +2494,9 @@
         "libsodium",
         "pip",
         "python",
+        "python 3.11.*",
+        "python 3.14.*",
+        "python-abi3",
         "setuptools",
         "wheel"
       ]
@@ -740,29 +2512,40 @@
     "test": {
       "__set__": true,
       "elements": [
+        "abi3audit",
         "hypothesis >=3.27.0",
-        "pytest >=3.2.1"
+        "pip",
+        "pytest >=3.2.1",
+        "python *",
+        "python 3.11.*",
+        "python 3.14.*"
       ]
     }
   },
-  "url": "https://pypi.org/packages/source/P/PyNaCl/pynacl-1.6.2.tar.gz",
+  "url": "https://files.pythonhosted.org/packages/source/p/pynacl/pynacl-1.6.2.tar.gz",
   "version": "1.6.2",
   "version_pr_info": {
     "__lazy_json__": "version_pr_info/pynacl.json"
   },
   "win_64_meta_yaml": {
     "about": {
-      "description": "PyNaCl is a Python binding to the Networking and Cryptography library, a crypto library with the stated goal of improving usability, security and speed. It supports Python 2.7 and 3.3+ as well as PyPy 2.6+.\n",
+      "description": "PyNaCl is a Python binding to the Networking and Cryptography library, a crypto library with the stated goal of improving usability, security and speed. It supports Python 2.7 and 3.3+ as well as PyPy 2.6+.",
       "dev_url": "https://github.com/pyca/pynacl",
-      "doc_url": "https://pynacl.readthedocs.io/en/latest/",
+      "doc_url": "https://pynacl.readthedocs.io/",
       "home": "https://github.com/pyca/pynacl",
       "license": "Apache-2.0",
-      "license_family": "Apache",
+      "license_family": "Apache-2.0",
       "license_file": "LICENSE",
       "summary": "PyNaCl is a Python binding to the Networking and Cryptography library, a crypto library with the stated goal of improving usability, security and speed."
     },
     "build": {
-      "number": "4"
+      "number": "5",
+      "script": {
+        "content": "${{ PYTHON }} -m ${{ pip_args }} ${{ pip_abi3_args }}",
+        "env": {
+          "SODIUM_INSTALL": "system"
+        }
+      }
     },
     "extra": {
       "recipe-maintainers": [
@@ -771,51 +2554,175 @@
         "h-vetinari"
       ]
     },
+    "outputs": [
+      {
+        "build": null,
+        "name": "pynacl",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "python",
+            "cross-python_win-64",
+            "cffi >=2.0.0",
+            "m2-patch"
+          ],
+          "host": [
+            "cffi >=2.0.0",
+            "libsodium",
+            "pip",
+            "python",
+            "setuptools",
+            "wheel"
+          ],
+          "run": [
+            "cffi >=2.0.0",
+            "python",
+            "six"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "nacl",
+                "nacl.bindings",
+                "nacl.pwhash"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest >=3.2.1",
+                "hypothesis >=3.27.0",
+                "python *"
+              ]
+            },
+            "script": "pytest --tb=long --color=yes"
+          }
+        ],
+        "version": "1.6.2"
+      },
+      {
+        "build": null,
+        "name": "pynacl",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "python",
+            "cross-python_win-64",
+            "cffi >=2.0.0",
+            "m2-patch"
+          ],
+          "host": [
+            "cffi >=2.0.0",
+            "libsodium",
+            "pip",
+            "python",
+            "setuptools",
+            "wheel",
+            "python-abi3",
+            "python 3.11.*"
+          ],
+          "run": [
+            "cffi >=2.0.0",
+            "python",
+            "six"
+          ]
+        },
+        "tests": [
+          {
+            "python": {
+              "imports": [
+                "nacl",
+                "nacl.bindings",
+                "nacl.pwhash"
+              ],
+              "python_version": [
+                "3.11.*",
+                "*"
+              ]
+            }
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "abi3audit",
+                "hypothesis >=3.27.0",
+                "pytest >=3.2.1",
+                "python 3.11.*"
+              ]
+            },
+            "script": [
+              "pytest --tb=long --color=yes",
+              "cd \"${{ '$SP_DIR' if unix else '%SP_DIR%' }}/nacl\"",
+              "abi3audit -s -v --assume-minimum-abi3 ${{ python_min }} _sodium.${{ 'abi3.so' if unix else 'pyd' }}"
+            ]
+          },
+          {
+            "files": {
+              "source": [
+                "tests/"
+              ]
+            },
+            "requirements": {
+              "run": [
+                "pytest >=3.2.1",
+                "hypothesis >=3.27.0",
+                "python *"
+              ]
+            },
+            "script": "pytest --tb=long --color=yes"
+          }
+        ],
+        "version": "1.6.2"
+      }
+    ],
     "package": {
       "name": "pynacl",
       "version": "1.6.2"
     },
     "requirements": {
       "build": [
-        "m2-patch",
         "c_compiler_stub",
-        "c_stdlib_stub"
+        "c_stdlib_stub",
+        "python",
+        "cross-python_win-64",
+        "cffi >=2.0.0",
+        "m2-patch"
       ],
       "host": [
-        "python",
+        "cffi >=2.0.0",
+        "libsodium",
         "pip",
+        "python",
         "setuptools",
         "wheel",
-        "cffi >=2.0.0",
-        "libsodium"
+        "python-abi3",
+        "python 3.11.*"
       ],
       "run": [
+        "cffi >=2.0.0",
         "python",
-        "six",
-        "cffi >=2.0.0"
+        "six"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
       "sha256": "018494d6d696ae03c7e656e5e74cdfd8ea1326962cc401bcf018f1ed8436811c",
-      "url": "https://pypi.org/packages/source/P/PyNaCl/pynacl-1.6.2.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "pytest"
-      ],
-      "imports": [
-        "nacl",
-        "nacl.bindings",
-        "nacl.pwhash"
-      ],
-      "requires": [
-        "pytest >=3.2.1",
-        "hypothesis >=3.27.0"
-      ],
-      "source_files": [
-        "tests/"
-      ]
+      "url": "https://files.pythonhosted.org/packages/source/p/pynacl/pynacl-1.6.2.tar.gz"
     }
   },
   "win_64_requirements": {
@@ -824,7 +2731,10 @@
       "elements": [
         "c_compiler_stub",
         "c_stdlib_stub",
-        "m2-patch"
+        "cffi",
+        "cross-python_win-64",
+        "m2-patch",
+        "python"
       ]
     },
     "host": {
@@ -834,6 +2744,7 @@
         "libsodium",
         "pip",
         "python",
+        "python-abi3",
         "setuptools",
         "wheel"
       ]
@@ -849,8 +2760,11 @@
     "test": {
       "__set__": true,
       "elements": [
+        "abi3audit",
         "hypothesis",
-        "pytest"
+        "pip",
+        "pytest",
+        "python"
       ]
     }
   }
