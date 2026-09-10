@@ -6,9 +6,6 @@
     "bot": {
       "automerge": true
     },
-    "build_platform": {
-      "linux_aarch64": "linux_64"
-    },
     "conda_build": {
       "error_overlinking": true
     },
@@ -20,6 +17,7 @@
       "tooling_branch_name": "main"
     },
     "provider": {
+      "linux_aarch64": "default",
       "osx_arm64": "default"
     },
     "test": "native_and_emulated",
@@ -40,8 +38,8 @@
       ]
     }
   },
-  "feedstock_hash": "9127d62bffcbdad44fdec883e504ca086d8690a3",
-  "feedstock_hash_ts": 1788380383,
+  "feedstock_hash": "e957561b7ecbeb1258fd2ac645162ca1b8ac4042",
+  "feedstock_hash_ts": 1789046331,
   "feedstock_name": "zed",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -55,7 +53,7 @@
       "summary": "Code at the speed of thought"
     },
     "build": {
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "recipe-maintainers": [
@@ -214,7 +212,7 @@
       "summary": "Code at the speed of thought"
     },
     "build": {
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "recipe-maintainers": [
@@ -235,7 +233,8 @@
             "c_stdlib_stub",
             "cargo-bundle-licenses",
             "pkg-config",
-            "cmake"
+            "cmake",
+            "lld"
           ],
           "host": [
             "alsa-lib",
@@ -282,7 +281,8 @@
         "c_stdlib_stub",
         "cargo-bundle-licenses",
         "pkg-config",
-        "cmake"
+        "cmake",
+        "lld"
       ],
       "host": [
         "alsa-lib",
@@ -323,6 +323,7 @@
         "cargo-bundle-licenses",
         "cmake",
         "cxx_compiler_stub",
+        "lld",
         "pkg-config",
         "rust_compiler_stub"
       ]
@@ -373,7 +374,7 @@
       "summary": "Code at the speed of thought"
     },
     "build": {
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "recipe-maintainers": [
@@ -439,7 +440,8 @@
             "c_stdlib_stub",
             "cargo-bundle-licenses",
             "pkg-config",
-            "cmake"
+            "cmake",
+            "lld"
           ],
           "host": [
             "alsa-lib",
@@ -603,7 +605,7 @@
       "summary": "Code at the speed of thought"
     },
     "build": {
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "recipe-maintainers": [
@@ -695,7 +697,7 @@
       "summary": "Code at the speed of thought"
     },
     "build": {
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "recipe-maintainers": [
@@ -796,7 +798,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/zed.json"
   },
-  "raw_meta_yaml": "context:\n  name: zed\n  version: \"1.18.0\"\n\npackage:\n  name: ${{ name|lower }}\n  version: ${{ version }}\n\nsource:\n  - url: https://github.com/zed-industries/zed/archive/v${{ version }}.tar.gz\n    sha256: 939dde198f36d917e372e7a4e10b07ed7d1ae7d720652ca40f9cefc544c35bdc\n\nbuild:\n  number: 0\n\nrequirements:\n  build:\n    - ${{ compiler('rust') }}\n    - ${{ compiler('c') }}\n    - ${{ compiler('cxx') }}\n    - ${{ stdlib('c') }}\n    - cargo-bundle-licenses\n    - pkg-config\n    - cmake\n    - if: osx and arm64\n      then:\n        - lld\n    - if: win\n      then:\n        - sqlite\n        - openssl\n        - nasm\n        - libssh2\n        - libgit2\n        - ucrt\n\n  host:\n    - if: linux\n      then:\n        - alsa-lib\n        - curl\n        - expat\n        - fontconfig\n        - freetype\n        - glib\n        - libxcb\n        - openssl\n        - sqlite\n        - libvulkan-loader\n        - vulkan-tools\n        - wayland\n        - zlib\n        - zstd\n        - clang\n        - mold\n        - cmake\n        - xorg-libx11\n        - xorg-xproto\n        - xorg-kbproto\n        - libxkbcommon\n    - if: win\n      then:\n        - ninja\n        - cmake\n        - lld\n        - nasm\n        - ucrt\n\ntests:\n  - script:\n      - zed --help\nabout:\n  homepage: https://zed.dev/\n  summary: Code at the speed of thought\n  description: |\n    Zed is a high-performance, multiplayer code editor from the creators of Atom and Tree-sitter.\n  license: Apache-2.0\n  license_file:\n    - LICENSE-APACHE\n    - LICENSE-GPL\n    - THIRDPARTY.yml\n  repository: https://github.com/zed-industries/zed\n\nextra:\n  recipe-maintainers:\n    - lucascolley\n    - Hofer-Julian\n    - zelosleone\n",
+  "raw_meta_yaml": "context:\n  name: zed\n  version: \"1.18.0\"\n\npackage:\n  name: ${{ name|lower }}\n  version: ${{ version }}\n\nsource:\n  - url: https://github.com/zed-industries/zed/archive/v${{ version }}.tar.gz\n    sha256: 939dde198f36d917e372e7a4e10b07ed7d1ae7d720652ca40f9cefc544c35bdc\n\nbuild:\n  number: 1\n\nrequirements:\n  build:\n    - ${{ compiler('rust') }}\n    - ${{ compiler('c') }}\n    - ${{ compiler('cxx') }}\n    - ${{ stdlib('c') }}\n    - cargo-bundle-licenses\n    - pkg-config\n    - cmake\n    # Zed's .cargo/config.toml links aarch64-linux with lld, and the macOS\n    # arm64 binary is large enough to hit branch-island issues without it\n    - if: (linux and aarch64) or (osx and arm64)\n      then:\n        - lld\n    - if: win\n      then:\n        - sqlite\n        - openssl\n        - nasm\n        - libssh2\n        - libgit2\n        - ucrt\n\n  host:\n    - if: linux\n      then:\n        - alsa-lib\n        - curl\n        - expat\n        - fontconfig\n        - freetype\n        - glib\n        - libxcb\n        - openssl\n        - sqlite\n        - libvulkan-loader\n        - vulkan-tools\n        - wayland\n        - zlib\n        - zstd\n        - clang\n        - mold\n        - cmake\n        - xorg-libx11\n        - xorg-xproto\n        - xorg-kbproto\n        - libxkbcommon\n    - if: win\n      then:\n        - ninja\n        - cmake\n        - lld\n        - nasm\n        - ucrt\n\ntests:\n  - script:\n      - zed --help\nabout:\n  homepage: https://zed.dev/\n  summary: Code at the speed of thought\n  description: |\n    Zed is a high-performance, multiplayer code editor from the creators of Atom and Tree-sitter.\n  license: Apache-2.0\n  license_file:\n    - LICENSE-APACHE\n    - LICENSE-GPL\n    - THIRDPARTY.yml\n  repository: https://github.com/zed-industries/zed\n\nextra:\n  recipe-maintainers:\n    - lucascolley\n    - Hofer-Julian\n    - zelosleone\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -977,7 +979,7 @@
       "summary": "Code at the speed of thought"
     },
     "build": {
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "recipe-maintainers": [
