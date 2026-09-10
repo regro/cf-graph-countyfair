@@ -23,8 +23,8 @@
     },
     "test": "native_and_emulated"
   },
-  "feedstock_hash": "b763b1da39e7ca20dd1ed312bb9db4fd2f28d086",
-  "feedstock_hash_ts": 1788610745,
+  "feedstock_hash": "2cc309574108ca55947034871b5f737324421bcd",
+  "feedstock_hash_ts": 1789025674,
   "feedstock_name": "pillow",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -37,7 +37,7 @@
       "summary": "Pillow is the friendly PIL fork by Alex Clark and Contributors"
     },
     "build": {
-      "number": "2",
+      "number": "3",
       "script": "build_pillow.sh"
     },
     "extra": {
@@ -958,7 +958,7 @@
       "summary": "Pillow is the friendly PIL fork by Alex Clark and Contributors"
     },
     "build": {
-      "number": "2",
+      "number": "3",
       "script": "build_pillow.sh"
     },
     "extra": {
@@ -1625,7 +1625,7 @@
       "summary": "Pillow is the friendly PIL fork by Alex Clark and Contributors"
     },
     "build": {
-      "number": "2",
+      "number": "3",
       "script": "build_pillow.sh"
     },
     "extra": {
@@ -2292,7 +2292,7 @@
       "summary": "Pillow is the friendly PIL fork by Alex Clark and Contributors"
     },
     "build": {
-      "number": "2",
+      "number": "3",
       "script": "build_pillow.bat"
     },
     "extra": {
@@ -5321,7 +5321,6 @@
             "lcms2",
             "libtiff",
             "libwebp",
-            "libxcb",
             "tk",
             "zlib-ng"
           ],
@@ -5363,7 +5362,6 @@
             "lcms2",
             "libtiff",
             "libwebp",
-            "libxcb",
             "tk",
             "zlib-ng"
           ],
@@ -5405,7 +5403,6 @@
             "lcms2",
             "libtiff",
             "libwebp",
-            "libxcb",
             "tk",
             "zlib-ng"
           ],
@@ -5447,7 +5444,6 @@
             "lcms2",
             "libtiff",
             "libwebp",
-            "libxcb",
             "tk",
             "zlib-ng"
           ],
@@ -5489,7 +5485,6 @@
             "lcms2",
             "libtiff",
             "libwebp",
-            "libxcb",
             "tk",
             "zlib-ng"
           ],
@@ -5786,7 +5781,6 @@
             "lcms2",
             "libtiff",
             "libwebp",
-            "libxcb",
             "tk",
             "zlib-ng"
           ],
@@ -5916,7 +5910,7 @@
       "summary": "Pillow is the friendly PIL fork by Alex Clark and Contributors"
     },
     "build": {
-      "number": "2",
+      "number": "3",
       "script": "build_pillow.sh"
     },
     "extra": {
@@ -6571,7 +6565,7 @@
       "summary": "Pillow is the friendly PIL fork by Alex Clark and Contributors"
     },
     "build": {
-      "number": "2",
+      "number": "3",
       "script": "build_pillow.sh"
     },
     "extra": {
@@ -7235,7 +7229,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/pillow.json"
   },
-  "raw_meta_yaml": "schema_version: 1\n\ncontext:\n  version: \"12.3.0\"\nrecipe:\n  name: pillow-split\n  version: ${{ version }}\n\nsource:\n  url: https://github.com/python-pillow/Pillow/archive/refs/tags/${{ version }}.tar.gz\n  sha256: d7ce60fdf8b3d3b4370ea213834d7c852b1ca16396d4e75e5046be815b11b2fb\n  patches:\n    - patches/0001-Build-without-USE_WIN32_FILEIO.patch\n    # fix provided by upstream maintainer for failing test\n    - patches/0002-Added-patch-to-fix-failing-Windows-test.patch\n    # windows needs help detecting webpmux & xcb\n    - patches/0003-add-XCB_ROOT.patch\n    # zlib-ng without full conda-forge-wide deployment\n    - patches/0001-Provide-a-clear-option-to-depend-on-zlib-ng.patch\n\nbuild:\n  number: 2\n  variant:\n    # we don't want separate jobs if the newest python is in release candidate phase\n    ignore_keys:\n      - channel_sources\n\noutputs:\n  - package:\n      name: pillow\n    build:\n      script:\n        - if: unix\n          then: build_pillow.sh\n          else: build_pillow.bat\n    requirements:\n      build:\n        - if: build_platform != target_platform\n          then:\n            - python\n            - cross-python_${{ target_platform }}\n        - ${{ compiler('c') }}\n        - ${{ stdlib(\"c\") }}\n      host:\n        - python\n        - pybind11\n        - pip\n        - setuptools >=77\n        # libraries, c.f. https://github.com/python-pillow/Pillow/blob/9.0.0/setup.py#L30-L38\n        - freetype\n        # fribidi and libimagequant disabled due to\n        # GPL discussion, see #109 and #111\n        # - fribidi\n        - libjpeg-turbo\n        - openjpeg\n        - lcms2\n        # not available elsewhere\n        # currently disabled on windows due to libimagequant depending on llvm-openmp, see\n        # https://github.com/pytorch/pytorch/issues/72293\n        # - libimagequant  # [x86_64 and not win]\n        - libtiff\n        - libwebp\n        - libxcb\n        - tk\n        - zlib-ng\n      run:\n        - python\n    tests:\n      - python:\n          imports:\n            - PIL\n            - PIL.Image\n            - PIL.ImageCms\n\n  - package:\n      name: pillow-tests\n    requirements:\n      run:\n        - ${{ pin_subpackage(\"pillow\", exact=True) }}\n    tests:\n      - files:\n          source:\n            # from upstream repo\n            - Tests/\n          recipe:\n            # from recipe; some images cannot be in upstream repo, see Tests/README\n            - Tests/images\n        requirements:\n          run:\n            - pytest\n            - pytest-timeout\n            # test dependency, see Tests/test_image_access.py\n            - setuptools\n            - ${{ compiler('c') }}\n            # for run_test.py\n            - fsspec\n            - requests\n        script:\n          interpreter: python\n          content:\n            - import sys, pytest\n            - 'tests_to_skip = [\"_not_a_real_test\"]'\n            - if: win\n              then:\n                # compile smoke test failing to link python3x.lib\n                - 'tests_to_skip.append(\"test_embeddable\")'\n                # #165: hard fail with no feedback on windows\n                - 'tests_to_skip.append(\"test_save_zero\")'\n            - if: linux\n              then:\n                # the following needs a viewer which we don't have\n                - 'tests_to_skip.append(\"(test_imageshow and test_show)\")'\n            - if: not osx\n              then:\n                # this test is a known failure with libjpeg_turbo, but only marked as such for 2.0 upstream, not 2.x, see\n                # https://github.com/python-pillow/Pillow/blob/9.3.0/Tests/test_file_libtiff.py#L885-L891\n                - 'tests_to_skip.append(\"test_strip_ycbcr_jpeg_2x2_sampling\")'\n            # skip test that requires an image incorrectly flagged by AV\n            - 'tests_to_skip.append(\"(test_tiff_crashes and crash-81154a65438ba5aaeca73fd502fa4850fbde60f8.tif)\")'\n            # skip test that requires a missing image\n            - 'tests_to_skip.append(\"test_tiff_mmap\")'\n            # Freetype 2.14.* broke some tests https://github.com/python-pillow/Pillow/issues/9205\n            # some tests need updating in pillow itself\n            # FUTURE: skip for now but readd in pillow 11.4.0 or so\n            - 'tests_to_skip.append(\"test_default_font_size\")'\n            - 'tests_to_skip.append(\"test_colr\")'\n            - 'tests_to_skip.append(\"test_colr_mask\")'\n            - 'tests_to_skip.append(\"test_default_font\")'\n            - sys.exit(pytest.main([\"-v\", \"-k\", f\"not ({' or '.join(tests_to_skip)})\"]))\n\nabout:\n  license: HPND\n  license_file: LICENSE\n  summary: Pillow is the friendly PIL fork by Alex Clark and Contributors\n  homepage: https://pillow.readthedocs.io\n  repository: https://github.com/python-pillow/Pillow/\n\nextra:\n  feedstock-name: pillow\n  recipe-maintainers:\n    - jakirkham\n    - patricksnape\n    - pelson\n    - ocefpaf\n    - h-vetinari\n",
+  "raw_meta_yaml": "schema_version: 1\n\ncontext:\n  version: \"12.3.0\"\nrecipe:\n  name: pillow-split\n  version: ${{ version }}\n\nsource:\n  url: https://github.com/python-pillow/Pillow/archive/refs/tags/${{ version }}.tar.gz\n  sha256: d7ce60fdf8b3d3b4370ea213834d7c852b1ca16396d4e75e5046be815b11b2fb\n  patches:\n    - patches/0001-Build-without-USE_WIN32_FILEIO.patch\n    # fix provided by upstream maintainer for failing test\n    - patches/0002-Added-patch-to-fix-failing-Windows-test.patch\n    # windows needs help detecting webpmux & xcb\n    - patches/0003-add-XCB_ROOT.patch\n    # zlib-ng without full conda-forge-wide deployment\n    - patches/0001-Provide-a-clear-option-to-depend-on-zlib-ng.patch\n\nbuild:\n  number: 3\n\noutputs:\n  - package:\n      name: pillow\n    build:\n      script:\n        - if: unix\n          then: build_pillow.sh\n          else: build_pillow.bat\n    requirements:\n      build:\n        - if: build_platform != target_platform\n          then:\n            - python\n            - cross-python_${{ target_platform }}\n        - ${{ compiler('c') }}\n        - ${{ stdlib(\"c\") }}\n      host:\n        - python\n        - pybind11\n        - pip\n        - setuptools >=77\n        # libraries, c.f. https://github.com/python-pillow/Pillow/blob/9.0.0/setup.py#L30-L38\n        - freetype\n        # fribidi and libimagequant disabled due to\n        # GPL discussion, see #109 and #111\n        # - fribidi\n        - libjpeg-turbo\n        - openjpeg\n        - lcms2\n        # not available elsewhere\n        # currently disabled on windows due to libimagequant depending on llvm-openmp, see\n        # https://github.com/pytorch/pytorch/issues/72293\n        # - libimagequant  # [x86_64 and not win]\n        - libtiff\n        - libwebp\n        - if: unix\n          then: libxcb\n        - tk\n        - zlib-ng\n      run:\n        - python\n    tests:\n      - python:\n          imports:\n            - PIL\n            - PIL.Image\n            - PIL.ImageCms\n\n  - package:\n      name: pillow-tests\n    requirements:\n      run:\n        - ${{ pin_subpackage(\"pillow\", exact=True) }}\n    tests:\n      - files:\n          source:\n            # from upstream repo\n            - Tests/\n          recipe:\n            # from recipe; some images cannot be in upstream repo, see Tests/README\n            - Tests/images\n        requirements:\n          run:\n            - pytest\n            - pytest-timeout\n            # test dependency, see Tests/test_image_access.py\n            - setuptools\n            - ${{ compiler('c') }}\n            # for run_test.py\n            - fsspec\n            - requests\n        script:\n          interpreter: python\n          content:\n            - import sys, pytest\n            - 'tests_to_skip = [\"_not_a_real_test\"]'\n            - if: win\n              then:\n                # compile smoke test failing to link python3x.lib\n                - 'tests_to_skip.append(\"test_embeddable\")'\n                # #165: hard fail with no feedback on windows\n                - 'tests_to_skip.append(\"test_save_zero\")'\n            - if: linux\n              then:\n                # the following needs a viewer which we don't have\n                - 'tests_to_skip.append(\"(test_imageshow and test_show)\")'\n            - if: not osx\n              then:\n                # this test is a known failure with libjpeg_turbo, but only marked as such for 2.0 upstream, not 2.x, see\n                # https://github.com/python-pillow/Pillow/blob/9.3.0/Tests/test_file_libtiff.py#L885-L891\n                - 'tests_to_skip.append(\"test_strip_ycbcr_jpeg_2x2_sampling\")'\n            # skip test that requires an image incorrectly flagged by AV\n            - 'tests_to_skip.append(\"(test_tiff_crashes and crash-81154a65438ba5aaeca73fd502fa4850fbde60f8.tif)\")'\n            # skip test that requires a missing image\n            - 'tests_to_skip.append(\"test_tiff_mmap\")'\n            # Freetype 2.14.* broke some tests https://github.com/python-pillow/Pillow/issues/9205\n            # some tests need updating in pillow itself\n            # FUTURE: skip for now but readd in pillow 11.4.0 or so\n            - 'tests_to_skip.append(\"test_default_font_size\")'\n            - 'tests_to_skip.append(\"test_colr\")'\n            - 'tests_to_skip.append(\"test_colr_mask\")'\n            - 'tests_to_skip.append(\"test_default_font\")'\n            - sys.exit(pytest.main([\"-v\", \"-k\", f\"not ({' or '.join(tests_to_skip)})\"]))\n\nabout:\n  license: HPND\n  license_file: LICENSE\n  summary: Pillow is the friendly PIL fork by Alex Clark and Contributors\n  homepage: https://pillow.readthedocs.io\n  repository: https://github.com/python-pillow/Pillow/\n\nextra:\n  feedstock-name: pillow\n  recipe-maintainers:\n    - jakirkham\n    - patricksnape\n    - pelson\n    - ocefpaf\n    - h-vetinari\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -7388,7 +7382,7 @@
       "summary": "Pillow is the friendly PIL fork by Alex Clark and Contributors"
     },
     "build": {
-      "number": "2",
+      "number": "3",
       "script": "build_pillow.bat"
     },
     "extra": {
@@ -7423,7 +7417,6 @@
             "lcms2",
             "libtiff",
             "libwebp",
-            "libxcb",
             "tk",
             "zlib-ng"
           ],
@@ -7465,7 +7458,6 @@
             "lcms2",
             "libtiff",
             "libwebp",
-            "libxcb",
             "tk",
             "zlib-ng"
           ],
@@ -7507,7 +7499,6 @@
             "lcms2",
             "libtiff",
             "libwebp",
-            "libxcb",
             "tk",
             "zlib-ng"
           ],
@@ -7549,7 +7540,6 @@
             "lcms2",
             "libtiff",
             "libwebp",
-            "libxcb",
             "tk",
             "zlib-ng"
           ],
@@ -7591,7 +7581,6 @@
             "lcms2",
             "libtiff",
             "libwebp",
-            "libxcb",
             "tk",
             "zlib-ng"
           ],
@@ -7888,7 +7877,6 @@
             "lcms2",
             "libtiff",
             "libwebp",
-            "libxcb",
             "tk",
             "zlib-ng"
           ],
@@ -7983,7 +7971,6 @@
         "lcms2",
         "libtiff",
         "libwebp",
-        "libxcb",
         "tk",
         "zlib-ng"
       ],
@@ -8021,7 +8008,6 @@
         "libjpeg-turbo",
         "libtiff",
         "libwebp",
-        "libxcb",
         "openjpeg",
         "pip",
         "pybind11",
