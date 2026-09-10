@@ -2,21 +2,23 @@
   "archived": false,
   "branch": "main",
   "ci_support_linux_64_.yaml": "bzip2:\n- '1'\nc_compiler:\n- gcc\nc_compiler_version:\n- '15'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ncmocka:\n- 2.0.1\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma10\nliblzma_devel:\n- '5'\nopenssl:\n- '3.5'\ntarget_platform:\n- linux-64\nzlib:\n- '1'\nzstd:\n- '1.5'\n",
+  "ci_support_migrations": [
+    "xz_to_liblzma_devel"
+  ],
   "conda-forge.yml": {
     "bot": {
       "automerge": true
     },
-    "conda_build": {
-      "pkg_format": "2"
-    },
+    "conda_build_tool": "rattler-build",
     "conda_forge_output_validation": true,
+    "conda_install_tool": "pixi",
     "github": {
       "branch_name": "main",
       "tooling_branch_name": "main"
     }
   },
-  "feedstock_hash": "fbc0b544219664bbb69937c557c320571933f14d",
-  "feedstock_hash_ts": 1789059022,
+  "feedstock_hash": "e6072e52d1ab96a9ddd2b882634cbcc37b89815b",
+  "feedstock_hash_ts": 1789075346,
   "feedstock_name": "drpm",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -24,29 +26,90 @@
       "dev_url": "https://github.com/rpm-software-management/drpm/",
       "home": "https://github.com/rpm-software-management/drpm/",
       "license": "BSD-3-Clause AND LGPL-2.0-or-later",
-      "license_file": [
-        "LICENSE.BSD",
-        "COPYING"
-      ],
+      "license_family": "BSD-3-Clause AND LGPL-2.0-or-later",
+      "license_file": "LICENSE.BSD",
       "summary": "A small library for fetching information from deltarpm packages"
     },
     "build": {
-      "ignore_run_exports": [
-        "cmocka"
-      ],
-      "number": "2",
-      "run_exports": [
-        "drpm"
-      ]
+      "number": "0",
+      "run_exports": {
+        "weak": [
+          "drpm"
+        ]
+      }
     },
     "extra": {
       "recipe-maintainers": [
         "chrisburr"
       ]
     },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "drpm"
+          ]
+        },
+        "name": "drpm",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "make",
+            "cmake",
+            "pkg-config"
+          ],
+          "host": [
+            "bzip2",
+            "openssl",
+            "rpm-tools",
+            "liblzma-devel",
+            "zlib",
+            "zstd",
+            "cmocka"
+          ],
+          "run": [
+            "rpm-tools"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "c_compiler_stub",
+                "pkg-config"
+              ]
+            },
+            "script": [
+              "cat > test_drpm.c <<'CSRC'\n#include <stddef.h>\n\n#include <drpm.h>\n\nint main(void)\n{\n    drpm_make_options *opts = NULL;\n\n    if (drpm_make_options_init(&opts) != DRPM_ERR_OK)\n        return 1;\n    if (drpm_make_options_defaults(opts) != DRPM_ERR_OK)\n        return 1;\n    if (drpm_make_options_destroy(&opts) != DRPM_ERR_OK)\n        return 1;\n\n    return 0;\n}\nCSRC\n",
+              "$CC $(pkg-config --cflags drpm) test_drpm.c $(pkg-config --libs drpm) -Wl,-rpath,\"$PREFIX/lib\" -o test_drpm",
+              "./test_drpm"
+            ]
+          },
+          {
+            "package_contents": {
+              "files": [
+                "include/drpm.h",
+                "lib/libdrpm.*",
+                "lib/pkgconfig/drpm.pc"
+              ],
+              "include": [
+                "drpm.h"
+              ],
+              "lib": [
+                "drpm"
+              ],
+              "strict": true
+            }
+          }
+        ],
+        "version": "0.5.3"
+      }
+    ],
     "package": {
       "name": "drpm",
-      "version": "0.5.2"
+      "version": "0.5.3"
     },
     "requirements": {
       "build": [
@@ -69,18 +132,10 @@
         "rpm-tools"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
-      "patches": [
-        "patches/0001-cmake-minimum-required.patch"
-      ],
-      "sha256": "33767a4029f707ac974cbbc6cdf02d12a8574a9647eb1b7c2424195e1784f054",
-      "url": "https://github.com/rpm-software-management/drpm/archive/0.5.2/drpm-0.5.2.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "test -f $PREFIX/lib/libdrpm$SHLIB_EXT"
-      ]
+      "sha256": "33b6337a07af2874835321d802c62cca0e6bd8ae18c4534ce1fe68f7bcf762bc",
+      "url": "https://github.com/rpm-software-management/drpm/archive/0.5.3/drpm-0.5.3.tar.gz"
     }
   },
   "linux_64_requirements": {
@@ -114,7 +169,10 @@
     },
     "test": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "c_compiler_stub",
+        "pkg-config"
+      ]
     }
   },
   "meta_yaml": {
@@ -122,29 +180,90 @@
       "dev_url": "https://github.com/rpm-software-management/drpm/",
       "home": "https://github.com/rpm-software-management/drpm/",
       "license": "BSD-3-Clause AND LGPL-2.0-or-later",
-      "license_file": [
-        "LICENSE.BSD",
-        "COPYING"
-      ],
+      "license_family": "BSD-3-Clause AND LGPL-2.0-or-later",
+      "license_file": "LICENSE.BSD",
       "summary": "A small library for fetching information from deltarpm packages"
     },
     "build": {
-      "ignore_run_exports": [
-        "cmocka"
-      ],
-      "number": "2",
-      "run_exports": [
-        "drpm"
-      ]
+      "number": "0",
+      "run_exports": {
+        "weak": [
+          "drpm"
+        ]
+      }
     },
     "extra": {
       "recipe-maintainers": [
         "chrisburr"
       ]
     },
+    "outputs": [
+      {
+        "build": {
+          "strong": [],
+          "weak": [
+            "drpm"
+          ]
+        },
+        "name": "drpm",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "c_stdlib_stub",
+            "make",
+            "cmake",
+            "pkg-config"
+          ],
+          "host": [
+            "bzip2",
+            "openssl",
+            "rpm-tools",
+            "liblzma-devel",
+            "zlib",
+            "zstd",
+            "cmocka"
+          ],
+          "run": [
+            "rpm-tools"
+          ]
+        },
+        "tests": [
+          {
+            "requirements": {
+              "build": [
+                "c_compiler_stub",
+                "pkg-config"
+              ]
+            },
+            "script": [
+              "cat > test_drpm.c <<'CSRC'\n#include <stddef.h>\n\n#include <drpm.h>\n\nint main(void)\n{\n    drpm_make_options *opts = NULL;\n\n    if (drpm_make_options_init(&opts) != DRPM_ERR_OK)\n        return 1;\n    if (drpm_make_options_defaults(opts) != DRPM_ERR_OK)\n        return 1;\n    if (drpm_make_options_destroy(&opts) != DRPM_ERR_OK)\n        return 1;\n\n    return 0;\n}\nCSRC\n",
+              "$CC $(pkg-config --cflags drpm) test_drpm.c $(pkg-config --libs drpm) -Wl,-rpath,\"$PREFIX/lib\" -o test_drpm",
+              "./test_drpm"
+            ]
+          },
+          {
+            "package_contents": {
+              "files": [
+                "include/drpm.h",
+                "lib/libdrpm.*",
+                "lib/pkgconfig/drpm.pc"
+              ],
+              "include": [
+                "drpm.h"
+              ],
+              "lib": [
+                "drpm"
+              ],
+              "strict": true
+            }
+          }
+        ],
+        "version": "0.5.3"
+      }
+    ],
     "package": {
       "name": "drpm",
-      "version": "0.5.2"
+      "version": "0.5.3"
     },
     "requirements": {
       "build": [
@@ -167,18 +286,10 @@
         "rpm-tools"
       ]
     },
-    "schema_version": 0,
+    "schema_version": 1,
     "source": {
-      "patches": [
-        "patches/0001-cmake-minimum-required.patch"
-      ],
-      "sha256": "33767a4029f707ac974cbbc6cdf02d12a8574a9647eb1b7c2424195e1784f054",
-      "url": "https://github.com/rpm-software-management/drpm/archive/0.5.2/drpm-0.5.2.tar.gz"
-    },
-    "test": {
-      "commands": [
-        "test -f $PREFIX/lib/libdrpm$SHLIB_EXT"
-      ]
+      "sha256": "33b6337a07af2874835321d802c62cca0e6bd8ae18c4534ce1fe68f7bcf762bc",
+      "url": "https://github.com/rpm-software-management/drpm/archive/0.5.3/drpm-0.5.3.tar.gz"
     }
   },
   "name": "drpm",
@@ -195,7 +306,7 @@
   "pr_info": {
     "__lazy_json__": "pr_info/drpm.json"
   },
-  "raw_meta_yaml": "{% set name = \"drpm\" %}\n{% set version = \"0.5.2\" %}\n\npackage:\n  name: {{ name|lower }}\n  version: {{ version }}\n\nsource:\n  url: https://github.com/rpm-software-management/drpm/archive/{{ version }}/drpm-{{ version }}.tar.gz\n  sha256: 33767a4029f707ac974cbbc6cdf02d12a8574a9647eb1b7c2424195e1784f054\n  patches:\n    - patches/0001-cmake-minimum-required.patch\n\nbuild:\n  number: 2\n  skip: true  # [win or osx]\n  run_exports:\n    - {{ pin_subpackage('drpm', max_pin='x') }}\n  ignore_run_exports:\n    - cmocka\n\n\nrequirements:\n  build:\n    - {{ compiler('c') }}\n    - {{ stdlib(\"c\") }}\n    - make\n    - cmake\n    - pkg-config\n  host:\n    - bzip2\n    - openssl\n    - rpm-tools\n    - liblzma-devel\n    - zlib\n    - zstd\n    - cmocka\n  run:\n    # https://abi-laboratory.pro/index.php?view=timeline&l=rpm\n    - {{ pin_compatible('rpm-tools', max_pin=\"x.x\") }}\n\ntest:\n  commands:\n    - test -f $PREFIX/lib/libdrpm$SHLIB_EXT\n\nabout:\n  home: https://github.com/rpm-software-management/drpm/\n  license: BSD-3-Clause AND LGPL-2.0-or-later\n  license_file:\n    - LICENSE.BSD\n    - COPYING\n  summary: A small library for fetching information from deltarpm packages\n  dev_url: https://github.com/rpm-software-management/drpm/\n\nextra:\n  recipe-maintainers:\n    - chrisburr\n",
+  "raw_meta_yaml": "schema_version: 1\n\ncontext:\n  version: \"0.5.3\"\n\npackage:\n  name: drpm\n  version: ${{ version }}\n\nsource:\n  url: https://github.com/rpm-software-management/drpm/archive/${{ version }}/drpm-${{ version }}.tar.gz\n  sha256: 33b6337a07af2874835321d802c62cca0e6bd8ae18c4534ce1fe68f7bcf762bc\n\nbuild:\n  number: 0\n  skip: win or osx\n\nrequirements:\n  build:\n    - ${{ compiler('c') }}\n    - ${{ stdlib(\"c\") }}\n    - make\n    - cmake\n    - pkg-config\n  host:\n    - bzip2\n    - openssl\n    - rpm-tools\n    - liblzma-devel\n    - zlib\n    - zstd\n    - cmocka\n  run:\n    # https://abi-laboratory.pro/index.php?view=timeline&l=rpm\n    - ${{ pin_compatible('rpm-tools', upper_bound=\"x.x\") }}\n  run_exports:\n    - ${{ pin_subpackage('drpm', upper_bound='x') }}\n  ignore_run_exports:\n    by_name:\n      # Only linked by the unit tests, which are not installed.\n      - cmocka\n\ntests:\n  # drpm installs no executable, so the only way to exercise it is to compile\n  # and run a caller against the installed headers, pkg-config file and library.\n  # The source is inlined rather than pulled in with `files:` so that it is not\n  # staged into etc/conda/test-files and shipped to everyone installing drpm.\n  - script:\n      - |\n        cat > test_drpm.c <<'CSRC'\n        #include <stddef.h>\n\n        #include <drpm.h>\n\n        int main(void)\n        {\n            drpm_make_options *opts = NULL;\n\n            if (drpm_make_options_init(&opts) != DRPM_ERR_OK)\n                return 1;\n            if (drpm_make_options_defaults(opts) != DRPM_ERR_OK)\n                return 1;\n            if (drpm_make_options_destroy(&opts) != DRPM_ERR_OK)\n                return 1;\n\n            return 0;\n        }\n        CSRC\n      # -rpath because the test environment does not put $PREFIX/lib on the\n      # loader path, so the binary would build but not run.\n      - $CC $(pkg-config --cflags drpm) test_drpm.c $(pkg-config --libs drpm) -Wl,-rpath,\"$PREFIX/lib\" -o test_drpm\n      - ./test_drpm\n    requirements:\n      build:\n        - ${{ compiler('c') }}\n        - pkg-config\n  - package_contents:\n      strict: true\n      lib:\n        - drpm\n      include:\n        - drpm.h\n      files:\n        - include/drpm.h\n        - lib/libdrpm.*\n        - lib/pkgconfig/drpm.pc\n\nabout:\n  license: BSD-3-Clause AND LGPL-2.0-or-later\n  license_file:\n    - LICENSE.BSD\n    - COPYING\n  summary: A small library for fetching information from deltarpm packages\n  homepage: https://github.com/rpm-software-management/drpm/\n  repository: https://github.com/rpm-software-management/drpm/\n\nextra:\n  recipe-maintainers:\n    - chrisburr\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -248,7 +359,10 @@
     },
     "test": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "c_compiler_stub",
+        "pkg-config"
+      ]
     }
   },
   "strong_exports": false,
@@ -283,11 +397,14 @@
     },
     "test": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "c_compiler_stub",
+        "pkg-config"
+      ]
     }
   },
-  "url": "https://github.com/rpm-software-management/drpm/archive/0.5.2/drpm-0.5.2.tar.gz",
-  "version": "0.5.2",
+  "url": "https://github.com/rpm-software-management/drpm/archive/0.5.3/drpm-0.5.3.tar.gz",
+  "version": "0.5.3",
   "version_pr_info": {
     "__lazy_json__": "version_pr_info/drpm.json"
   }
