@@ -1,7 +1,8 @@
 {
   "archived": false,
   "branch": "main",
-  "ci_support_win_.yaml": "channel_sources:\n- conda-forge,defaults\nchannel_targets:\n- conda-forge main\n",
+  "ci_support_migrations": [],
+  "ci_support_win_64_.yaml": "channel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ntarget_platform:\n- win-64\n",
   "conda-forge.yml": {
     "conda_build": {
       "pkg_format": "2"
@@ -14,11 +15,13 @@
     "provider": {
       "linux_aarch64": "azure",
       "linux_ppc64le": "azure",
-      "win": "azure"
-    }
+      "win": "azure",
+      "win_arm64": "default"
+    },
+    "test": "native_and_emulated"
   },
-  "feedstock_hash": "41643e291c6bb3d07e5a7377584ffd6e89e7eec7",
-  "feedstock_hash_ts": 1777041976,
+  "feedstock_hash": "459f156010fb297ae4928ba74c1b51e5d42e2395",
+  "feedstock_hash_ts": 1789087841,
   "feedstock_name": "winpty",
   "hash_type": "sha256",
   "meta_yaml": {
@@ -28,10 +31,11 @@
       "doc_url": "https://github.com/rprichard/winpty",
       "home": "https://github.com/rprichard/winpty",
       "license": "MIT",
+      "license_file": "LICENSE",
       "summary": "Winpty provides an interface similar to a Unix pty-master for communicating\nwith Windows console programs.\n"
     },
     "build": {
-      "number": "4"
+      "number": "5"
     },
     "extra": {
       "recipe-maintainers": [
@@ -47,21 +51,53 @@
     "requirements": {
       "build": [
         "posix",
-        "m2w64-toolchain"
+        "m2w64-toolchain",
+        "cxx_compiler_stub",
+        "c_stdlib_stub",
+        "python >=3.9",
+        "packaging >=24",
+        "setuptools >=77.0.3"
       ]
     },
     "schema_version": 0,
-    "source": {
-      "fn": "winpty-0.4.3.tar.gz",
-      "patches": [
-        "0001-disable-msys-compiler-check.patch"
-      ],
-      "sha256": "093037c39f9c899d79b74d5e15ff74fb59a98c492c5ed621e97e1090c3442865",
-      "url": "https://github.com/rprichard/winpty/archive/0.4.3.tar.gz"
-    },
+    "source": [
+      {
+        "fn": "winpty-0.4.3.tar.gz",
+        "patches": [
+          "0001-disable-msys-compiler-check.patch"
+        ],
+        "sha256": "093037c39f9c899d79b74d5e15ff74fb59a98c492c5ed621e97e1090c3442865",
+        "url": "https://github.com/rprichard/winpty/archive/0.4.3.tar.gz"
+      },
+      {
+        "fn": "winpty-0.4.3.tar.gz",
+        "patches": [
+          "0001-disable-msys-compiler-check.patch"
+        ],
+        "sha256": "093037c39f9c899d79b74d5e15ff74fb59a98c492c5ed621e97e1090c3442865",
+        "url": "https://github.com/rprichard/winpty/archive/0.4.3.tar.gz"
+      },
+      {
+        "folder": "gyp-next",
+        "sha256": "eec4d9ca36028a28bffa6313fb7db51d664f06f49387cb734369777a55730d4d",
+        "url": "https://github.com/nodejs/gyp-next/archive/refs/tags/v0.22.2.tar.gz"
+      }
+    ],
     "test": {
       "commands": [
-        "winpty-agent --version"
+        "winpty-agent --version",
+        "call %CXX% /nologo /MD /W4 /I\"%LIBRARY_INC%\" test_winpty.c /link /LIBPATH:\"%LIBRARY_LIB%\" winpty.lib /OUT:winpty-consumer.exe",
+        "dumpbin /imports winpty-consumer.exe | findstr /I /C:\"winpty.dll\"",
+        "winpty-consumer.exe",
+        "dumpbin /headers winpty-consumer.exe | findstr /I /C:\"AA64 machine (ARM64)\"",
+        "dumpbin /headers \"%LIBRARY_BIN%\\winpty.dll\" | findstr /I /C:\"AA64 machine (ARM64)\"",
+        "dumpbin /headers \"%LIBRARY_BIN%\\winpty-agent.exe\" | findstr /I /C:\"AA64 machine (ARM64)\""
+      ],
+      "files": [
+        "test_winpty.c"
+      ],
+      "requires": [
+        "cxx_compiler_stub"
       ]
     }
   },
@@ -74,38 +110,57 @@
   },
   "parsing_error": false,
   "platforms": [
-    "win_64"
+    "win_64",
+    "win_arm64"
   ],
   "pr_info": {
     "__lazy_json__": "pr_info/winpty.json"
   },
-  "raw_meta_yaml": "{% set name = \"winpty\" %}\n{% set version = \"0.4.3\" %}\n{% set hash = \"093037c39f9c899d79b74d5e15ff74fb59a98c492c5ed621e97e1090c3442865\" %}\n\npackage:\n  name: {{ name }}\n  version: {{ version }}\n\nsource:\n  fn: {{ name }}-{{ version }}.tar.gz\n  url: https://github.com/rprichard/{{ name }}/archive/{{ version }}.tar.gz\n  sha256: {{ hash }}\n  patches:\n     - 0001-disable-msys-compiler-check.patch\n\nbuild:\n  number: 4\n  skip: True  # [not win]\n\nrequirements:\n  build:\n    - posix\n    - m2w64-toolchain\n\ntest:\n  commands:\n    - winpty-agent --version\n\nabout:\n  home: https://github.com/rprichard/winpty\n  license: MIT\n  summary: |\n    Winpty provides an interface similar to a Unix pty-master for communicating\n    with Windows console programs.\n  description: |\n    Winpty is a Windows software package providing an interface similar to a Unix\n    pty-master for communicating with Windows console programs. The package\n    consists of a library (libwinpty) and a tool for Cygwin and MSYS for running\n    Windows console programs in a Cygwin/MSYS pty.\n  doc_url: https://github.com/rprichard/winpty\n  dev_url: https://github.com/rprichard/winpty\n\nextra:\n  recipe-maintainers:\n    - blink1073\n    - ccordoba12\n    - andfoy\n",
+  "raw_meta_yaml": "{% set name = \"winpty\" %}\n{% set version = \"0.4.3\" %}\n{% set hash = \"093037c39f9c899d79b74d5e15ff74fb59a98c492c5ed621e97e1090c3442865\" %}\n\npackage:\n  name: {{ name }}\n  version: {{ version }}\n\nsource:\n  - fn: {{ name }}-{{ version }}.tar.gz\n    url: https://github.com/rprichard/{{ name }}/archive/{{ version }}.tar.gz\n    sha256: {{ hash }}\n    patches:\n      - 0001-disable-msys-compiler-check.patch\n  # Use upstream's MSVC/GYP build for ARM64. gyp-next is a build-only tool.\n  - url: https://github.com/nodejs/gyp-next/archive/refs/tags/v0.22.2.tar.gz  # [target_platform == \"win-arm64\"]\n    sha256: eec4d9ca36028a28bffa6313fb7db51d664f06f49387cb734369777a55730d4d  # [target_platform == \"win-arm64\"]\n    folder: gyp-next  # [target_platform == \"win-arm64\"]\n\nbuild:\n  number: 5\n  skip: True  # [not win]\n\nrequirements:\n  build:\n    - posix  # [target_platform != \"win-arm64\"]\n    - m2w64-toolchain  # [target_platform != \"win-arm64\"]\n    - {{ compiler('cxx') }}  # [target_platform == \"win-arm64\"]\n    - {{ stdlib('c') }}  # [target_platform == \"win-arm64\"]\n    - python >=3.9  # [target_platform == \"win-arm64\"]\n    - packaging >=24  # [target_platform == \"win-arm64\"]\n    - setuptools >=77.0.3  # [target_platform == \"win-arm64\"]\n\ntest:\n  requires:\n    - {{ compiler('cxx') }}  # [target_platform == \"win-arm64\"]\n  files:\n    - test_winpty.c  # [target_platform == \"win-arm64\"]\n  commands:\n    - winpty-agent --version\n    - call %CXX% /nologo /MD /W4 /I\"%LIBRARY_INC%\" test_winpty.c /link /LIBPATH:\"%LIBRARY_LIB%\" winpty.lib /OUT:winpty-consumer.exe  # [target_platform == \"win-arm64\"]\n    - dumpbin /imports winpty-consumer.exe | findstr /I /C:\"winpty.dll\"  # [target_platform == \"win-arm64\"]\n    - winpty-consumer.exe  # [target_platform == \"win-arm64\"]\n    - dumpbin /headers winpty-consumer.exe | findstr /I /C:\"AA64 machine (ARM64)\"  # [target_platform == \"win-arm64\"]\n    - dumpbin /headers \"%LIBRARY_BIN%\\winpty.dll\" | findstr /I /C:\"AA64 machine (ARM64)\"  # [target_platform == \"win-arm64\"]\n    - dumpbin /headers \"%LIBRARY_BIN%\\winpty-agent.exe\" | findstr /I /C:\"AA64 machine (ARM64)\"  # [target_platform == \"win-arm64\"]\n\nabout:\n  home: https://github.com/rprichard/winpty\n  license: MIT\n  license_file: LICENSE\n  summary: |\n    Winpty provides an interface similar to a Unix pty-master for communicating\n    with Windows console programs.\n  description: |\n    Winpty is a Windows software package providing an interface similar to a Unix\n    pty-master for communicating with Windows console programs. The package\n    consists of a library (libwinpty) and a tool for Cygwin and MSYS for running\n    Windows console programs in a Cygwin/MSYS pty.\n  doc_url: https://github.com/rprichard/winpty\n  dev_url: https://github.com/rprichard/winpty\n\nextra:\n  recipe-maintainers:\n    - blink1073\n    - ccordoba12\n    - andfoy\n",
   "req": {
     "__set__": true,
     "elements": [
+      "c_stdlib_stub",
+      "cxx_compiler_stub",
       "m2w64-toolchain",
-      "posix"
+      "packaging",
+      "posix",
+      "python",
+      "setuptools"
     ]
   },
   "requirements": {
     "build": {
       "__set__": true,
       "elements": [
+        "c_stdlib_stub",
+        "cxx_compiler_stub",
         "m2w64-toolchain",
-        "posix"
+        "packaging",
+        "posix",
+        "python",
+        "setuptools"
       ]
     },
     "host": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "c_stdlib_stub",
+        "cxx_compiler_stub"
+      ]
     },
     "run": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "c_stdlib_stub",
+        "cxx_compiler_stub"
+      ]
     },
     "test": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "cxx_compiler_stub"
+      ]
     }
   },
   "strong_exports": false,
@@ -113,8 +168,13 @@
     "build": {
       "__set__": true,
       "elements": [
+        "c_stdlib_stub",
+        "cxx_compiler_stub",
         "m2w64-toolchain",
-        "posix"
+        "packaging >=24",
+        "posix",
+        "python >=3.9",
+        "setuptools >=77.0.3"
       ]
     },
     "host": {
@@ -127,7 +187,9 @@
     },
     "test": {
       "__set__": true,
-      "elements": []
+      "elements": [
+        "cxx_compiler_stub"
+      ]
     }
   },
   "url": "https://github.com/rprichard/winpty/archive/0.4.3.tar.gz",
@@ -142,10 +204,11 @@
       "doc_url": "https://github.com/rprichard/winpty",
       "home": "https://github.com/rprichard/winpty",
       "license": "MIT",
+      "license_file": "LICENSE",
       "summary": "Winpty provides an interface similar to a Unix pty-master for communicating\nwith Windows console programs.\n"
     },
     "build": {
-      "number": "4"
+      "number": "5"
     },
     "extra": {
       "recipe-maintainers": [
@@ -165,18 +228,22 @@
       ]
     },
     "schema_version": 0,
-    "source": {
-      "fn": "winpty-0.4.3.tar.gz",
-      "patches": [
-        "0001-disable-msys-compiler-check.patch"
-      ],
-      "sha256": "093037c39f9c899d79b74d5e15ff74fb59a98c492c5ed621e97e1090c3442865",
-      "url": "https://github.com/rprichard/winpty/archive/0.4.3.tar.gz"
-    },
+    "source": [
+      {
+        "fn": "winpty-0.4.3.tar.gz",
+        "patches": [
+          "0001-disable-msys-compiler-check.patch"
+        ],
+        "sha256": "093037c39f9c899d79b74d5e15ff74fb59a98c492c5ed621e97e1090c3442865",
+        "url": "https://github.com/rprichard/winpty/archive/0.4.3.tar.gz"
+      }
+    ],
     "test": {
       "commands": [
         "winpty-agent --version"
-      ]
+      ],
+      "files": null,
+      "requires": null
     }
   },
   "win_64_requirements": {
@@ -198,6 +265,99 @@
     "test": {
       "__set__": true,
       "elements": []
+    }
+  },
+  "win_arm64_meta_yaml": {
+    "about": {
+      "description": "Winpty is a Windows software package providing an interface similar to a Unix\npty-master for communicating with Windows console programs. The package\nconsists of a library (libwinpty) and a tool for Cygwin and MSYS for running\nWindows console programs in a Cygwin/MSYS pty.\n",
+      "dev_url": "https://github.com/rprichard/winpty",
+      "doc_url": "https://github.com/rprichard/winpty",
+      "home": "https://github.com/rprichard/winpty",
+      "license": "MIT",
+      "license_file": "LICENSE",
+      "summary": "Winpty provides an interface similar to a Unix pty-master for communicating\nwith Windows console programs.\n"
+    },
+    "build": {
+      "number": "5"
+    },
+    "extra": {
+      "recipe-maintainers": [
+        "blink1073",
+        "ccordoba12",
+        "andfoy"
+      ]
+    },
+    "package": {
+      "name": "winpty",
+      "version": "0.4.3"
+    },
+    "requirements": {
+      "build": [
+        "cxx_compiler_stub",
+        "c_stdlib_stub",
+        "python >=3.9",
+        "packaging >=24",
+        "setuptools >=77.0.3"
+      ]
+    },
+    "schema_version": 0,
+    "source": [
+      {
+        "fn": "winpty-0.4.3.tar.gz",
+        "patches": [
+          "0001-disable-msys-compiler-check.patch"
+        ],
+        "sha256": "093037c39f9c899d79b74d5e15ff74fb59a98c492c5ed621e97e1090c3442865",
+        "url": "https://github.com/rprichard/winpty/archive/0.4.3.tar.gz"
+      },
+      {
+        "folder": "gyp-next",
+        "sha256": "eec4d9ca36028a28bffa6313fb7db51d664f06f49387cb734369777a55730d4d",
+        "url": "https://github.com/nodejs/gyp-next/archive/refs/tags/v0.22.2.tar.gz"
+      }
+    ],
+    "test": {
+      "commands": [
+        "winpty-agent --version",
+        "call %CXX% /nologo /MD /W4 /I\"%LIBRARY_INC%\" test_winpty.c /link /LIBPATH:\"%LIBRARY_LIB%\" winpty.lib /OUT:winpty-consumer.exe",
+        "dumpbin /imports winpty-consumer.exe | findstr /I /C:\"winpty.dll\"",
+        "winpty-consumer.exe",
+        "dumpbin /headers winpty-consumer.exe | findstr /I /C:\"AA64 machine (ARM64)\"",
+        "dumpbin /headers \"%LIBRARY_BIN%\\winpty.dll\" | findstr /I /C:\"AA64 machine (ARM64)\"",
+        "dumpbin /headers \"%LIBRARY_BIN%\\winpty-agent.exe\" | findstr /I /C:\"AA64 machine (ARM64)\""
+      ],
+      "files": [
+        "test_winpty.c"
+      ],
+      "requires": [
+        "cxx_compiler_stub"
+      ]
+    }
+  },
+  "win_arm64_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_stdlib_stub",
+        "cxx_compiler_stub",
+        "packaging",
+        "python",
+        "setuptools"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": []
+    },
+    "run": {
+      "__set__": true,
+      "elements": []
+    },
+    "test": {
+      "__set__": true,
+      "elements": [
+        "cxx_compiler_stub"
+      ]
     }
   }
 }
