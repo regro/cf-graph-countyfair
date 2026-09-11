@@ -1,7 +1,7 @@
 {
   "archived": false,
   "branch": "main",
-  "ci_support_linux_64_.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '14'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ncxx_compiler:\n- gxx\ncxx_compiler_version:\n- '14'\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma9\ntarget_platform:\n- linux-64\nxz:\n- '5'\nzip_keys:\n- - c_compiler_version\n  - cxx_compiler_version\n",
+  "ci_support_linux_64_.yaml": "c_compiler:\n- gcc\nc_compiler_version:\n- '15'\nc_stdlib:\n- sysroot\nc_stdlib_version:\n- '2.17'\nchannel_sources:\n- conda-forge\nchannel_targets:\n- conda-forge main\ncxx_compiler:\n- gxx\ncxx_compiler_version:\n- '15'\ndocker_image:\n- quay.io/condaforge/linux-anvil-x86_64:alma10\ntarget_platform:\n- linux-64\nxz:\n- '5'\nzip_keys:\n- - c_compiler_version\n  - cxx_compiler_version\n",
   "ci_support_migrations": [],
   "conda-forge.yml": {
     "build_platform": {
@@ -22,8 +22,8 @@
       "win_arm64": "github_actions"
     }
   },
-  "feedstock_hash": "973b11d5248843d7b623342c7c4666171e94a4ff",
-  "feedstock_hash_ts": 1789060868,
+  "feedstock_hash": "4f0211e538426cac76f1e7871ac1a84727a49861",
+  "feedstock_hash_ts": 1789096744,
   "feedstock_name": "cuda-tileiras",
   "hash_type": "sha256",
   "linux_64_meta_yaml": {
@@ -37,7 +37,7 @@
       "summary": "TileIR is a portable and language agnostic intermediate representation for CUDA kernels"
     },
     "build": {
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "feedstock-name": "cuda-tileiras",
@@ -132,7 +132,7 @@
       "summary": "TileIR is a portable and language agnostic intermediate representation for CUDA kernels"
     },
     "build": {
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "feedstock-name": "cuda-tileiras",
@@ -229,7 +229,7 @@
       "summary": "TileIR is a portable and language agnostic intermediate representation for CUDA kernels"
     },
     "build": {
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "feedstock-name": "cuda-tileiras",
@@ -328,6 +328,36 @@
             "tileiras --version"
           ]
         }
+      },
+      {
+        "build": {
+          "binary_relocation": false,
+          "script": [
+            "move bin\\* %LIBRARY_BIN%"
+          ]
+        },
+        "name": "cuda-tileiras",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [
+            "cuda-version 13.4"
+          ],
+          "run": [
+            "cuda-version",
+            "cuda-nvcc-tools",
+            "cuda-nvvm-impl"
+          ]
+        },
+        "test": {
+          "commands": [
+            "if not exist %LIBRARY_BIN%\\tileiras.exe exit 1",
+            "tileiras --version"
+          ]
+        }
       }
     ],
     "package": {
@@ -356,12 +386,13 @@
   "platforms": [
     "linux_64",
     "linux_aarch64",
-    "win_64"
+    "win_64",
+    "win_arm64"
   ],
   "pr_info": {
     "__lazy_json__": "pr_info/cuda-tileiras.json"
   },
-  "raw_meta_yaml": "{% set version = \"13.4.59\" %}\n{% set arm_variant_type = arm_variant_type | default(\"sbsa\") %}\n{% set cuda_version = \"13.4\" %}\n{% set platform = \"linux-x86_64\" %}  # [linux64]\n{% set platform = \"linux-sbsa\" %}  # [linux and aarch64]\n{% set platform = \"windows-x86_64\" %}  # [win64]\n{% set platform = \"windows-arm64\" %}  # [win and arm64]\n{% set extension = \"tar.xz\" %}  # [not win]\n{% set extension = \"zip\" %}  # [win]\n\n{% set soname = version.split(\".\")[0] %}\n\n{% set sha256 = \"50c80f63663d9ba06d1323cef9195397706db23b8e1083f54e218e93071fa673\" %}  # [linux64]\n{% set sha256 = \"60f86b368c4fa6cfc4c0f8121258242ddc8a4316d789916f943b2e5b444572dd\" %}  # [linux and aarch64]\n{% set sha256 = \"69999f94eb64361a5f1444e6a2dbd57574e645ece02a8fd4d82cea0dda7e92c1\" %}  # [win64]\n{% set sha256 = \"683c0e8dd0d7dc97c843411f0caa3ebe618f62560bf3e8f21b71a6eb8acf8422\" %}  # [win and arm64]\n\npackage:\n  name: cuda-tileiras-split\n  version: {{ version }}\n\nsource:\n  url: https://developer.download.nvidia.com/compute/cuda/redist/cuda_tileiras/{{ platform }}/cuda_tileiras-{{ platform }}-{{ version }}-archive.{{ extension }}\n  sha256: {{ sha256 }}\n\nbuild:\n  number: 0\n  skip: true  # [osx or ppc64le]\n\nrequirements:\n  build:\n    - cf-nvidia-tools 1  # [linux]\n\noutputs:\n  - name: cuda-tileiras\n    build:\n      binary_relocation: false\n      script:                        # [win]\n         - move bin\\* %LIBRARY_BIN%  # [win]\n    files:             # [linux]\n      - bin/tileiras   # [linux]\n    requirements:\n      build:\n        - {{ compiler('c') }}\n        - {{ compiler('cxx') }}\n        - {{ stdlib('c') }}\n        - arm-variant * {{ arm_variant_type }}  # [linux and aarch64]\n      host:\n        - cuda-version {{ cuda_version }}\n      run:\n        - {{ pin_compatible(\"cuda-version\", max_pin=\"x.x\") }}\n        - cuda-nvcc-tools\n        - cuda-nvvm-impl\n    test:\n      commands:\n        - test -f $PREFIX/bin/tileiras                    # [linux]\n        - if not exist %LIBRARY_BIN%\\tileiras.exe exit 1  # [win]\n        - tileiras --version\n\nabout:\n  home: https://developer.nvidia.com/cuda-toolkit\n  license_file: LICENSE\n  license: LicenseRef-NVIDIA-End-User-License-Agreement\n  license_url: https://docs.nvidia.com/cuda/eula/index.html\n  summary: TileIR is a portable and language agnostic intermediate representation for CUDA kernels\n  description: With Tile IR, we introduce a new operation set and programming model to retain CUDA’s performance across architectures while regaining portability and improving productivity for developers using matrix operations on new architectures. We virtualize tensor-cores and their associated programming model to the\n    point that we can innovate new approaches in hardware without invalidating investments in software.\n  doc_url: https://docs.nvidia.com/cuda/index.html\n\nextra:\n  feedstock-name: cuda-tileiras\n  recipe-maintainers:\n    - conda-forge/cuda\n",
+  "raw_meta_yaml": "{% set version = \"13.4.59\" %}\n{% set arm_variant_type = arm_variant_type | default(\"sbsa\") %}\n{% set cuda_version = \"13.4\" %}\n{% set platform = \"linux-x86_64\" %}  # [linux64]\n{% set platform = \"linux-sbsa\" %}  # [linux and aarch64]\n{% set platform = \"windows-x86_64\" %}  # [win64]\n{% set platform = \"windows-arm64\" %}  # [win and arm64]\n{% set extension = \"tar.xz\" %}  # [not win]\n{% set extension = \"zip\" %}  # [win]\n\n{% set soname = version.split(\".\")[0] %}\n\n{% set sha256 = \"50c80f63663d9ba06d1323cef9195397706db23b8e1083f54e218e93071fa673\" %}  # [linux64]\n{% set sha256 = \"60f86b368c4fa6cfc4c0f8121258242ddc8a4316d789916f943b2e5b444572dd\" %}  # [linux and aarch64]\n{% set sha256 = \"69999f94eb64361a5f1444e6a2dbd57574e645ece02a8fd4d82cea0dda7e92c1\" %}  # [win64]\n{% set sha256 = \"683c0e8dd0d7dc97c843411f0caa3ebe618f62560bf3e8f21b71a6eb8acf8422\" %}  # [win and arm64]\n\npackage:\n  name: cuda-tileiras-split\n  version: {{ version }}\n\nsource:\n  url: https://developer.download.nvidia.com/compute/cuda/redist/cuda_tileiras/{{ platform }}/cuda_tileiras-{{ platform }}-{{ version }}-archive.{{ extension }}\n  sha256: {{ sha256 }}\n\nbuild:\n  number: 1\n  skip: true  # [osx or ppc64le]\n\nrequirements:\n  build:\n    - cf-nvidia-tools 1  # [linux]\n\noutputs:\n  - name: cuda-tileiras\n    build:\n      binary_relocation: false\n      script:                        # [win]\n         - move bin\\* %LIBRARY_BIN%  # [win]\n    files:             # [linux]\n      - bin/tileiras   # [linux]\n    requirements:\n      build:\n        - {{ compiler('c') }}\n        - {{ compiler('cxx') }}\n        - {{ stdlib('c') }}\n        - arm-variant * {{ arm_variant_type }}  # [linux and aarch64]\n      host:\n        - cuda-version {{ cuda_version }}\n      run:\n        - {{ pin_compatible(\"cuda-version\", max_pin=\"x.x\") }}\n        - cuda-nvcc-tools\n        - cuda-nvvm-impl\n    test:\n      commands:\n        - test -f $PREFIX/bin/tileiras                    # [linux]\n        - if not exist %LIBRARY_BIN%\\tileiras.exe exit 1  # [win]\n        - tileiras --version\n\nabout:\n  home: https://developer.nvidia.com/cuda-toolkit\n  license_file: LICENSE\n  license: LicenseRef-NVIDIA-End-User-License-Agreement\n  license_url: https://docs.nvidia.com/cuda/eula/index.html\n  summary: TileIR is a portable and language agnostic intermediate representation for CUDA kernels\n  description: With Tile IR, we introduce a new operation set and programming model to retain CUDA’s performance across architectures while regaining portability and improving productivity for developers using matrix operations on new architectures. We virtualize tensor-cores and their associated programming model to the\n    point that we can innovate new approaches in hardware without invalidating investments in software.\n  doc_url: https://docs.nvidia.com/cuda/index.html\n\nextra:\n  feedstock-name: cuda-tileiras\n  recipe-maintainers:\n    - conda-forge/cuda\n",
   "req": {
     "__set__": true,
     "elements": [
@@ -460,7 +491,7 @@
       "summary": "TileIR is a portable and language agnostic intermediate representation for CUDA kernels"
     },
     "build": {
-      "number": "0"
+      "number": "1"
     },
     "extra": {
       "feedstock-name": "cuda-tileiras",
@@ -514,6 +545,98 @@
     }
   },
   "win_64_requirements": {
+    "build": {
+      "__set__": true,
+      "elements": [
+        "c_compiler_stub",
+        "c_stdlib_stub",
+        "cxx_compiler_stub"
+      ]
+    },
+    "host": {
+      "__set__": true,
+      "elements": [
+        "cuda-version"
+      ]
+    },
+    "run": {
+      "__set__": true,
+      "elements": [
+        "cuda-nvcc-tools",
+        "cuda-nvvm-impl",
+        "cuda-version"
+      ]
+    },
+    "test": {
+      "__set__": true,
+      "elements": []
+    }
+  },
+  "win_arm64_meta_yaml": {
+    "about": {
+      "description": "With Tile IR, we introduce a new operation set and programming model to retain CUDA’s performance across architectures while regaining portability and improving productivity for developers using matrix operations on new architectures. We virtualize tensor-cores and their associated programming model to the point that we can innovate new approaches in hardware without invalidating investments in software.",
+      "doc_url": "https://docs.nvidia.com/cuda/index.html",
+      "home": "https://developer.nvidia.com/cuda-toolkit",
+      "license": "LicenseRef-NVIDIA-End-User-License-Agreement",
+      "license_file": "LICENSE",
+      "license_url": "https://docs.nvidia.com/cuda/eula/index.html",
+      "summary": "TileIR is a portable and language agnostic intermediate representation for CUDA kernels"
+    },
+    "build": {
+      "number": "1"
+    },
+    "extra": {
+      "feedstock-name": "cuda-tileiras",
+      "recipe-maintainers": [
+        "conda-forge/cuda"
+      ]
+    },
+    "outputs": [
+      {
+        "build": {
+          "binary_relocation": false,
+          "script": [
+            "move bin\\* %LIBRARY_BIN%"
+          ]
+        },
+        "name": "cuda-tileiras",
+        "requirements": {
+          "build": [
+            "c_compiler_stub",
+            "cxx_compiler_stub",
+            "c_stdlib_stub"
+          ],
+          "host": [
+            "cuda-version 13.4"
+          ],
+          "run": [
+            "cuda-version",
+            "cuda-nvcc-tools",
+            "cuda-nvvm-impl"
+          ]
+        },
+        "test": {
+          "commands": [
+            "if not exist %LIBRARY_BIN%\\tileiras.exe exit 1",
+            "tileiras --version"
+          ]
+        }
+      }
+    ],
+    "package": {
+      "name": "cuda-tileiras-split",
+      "version": "13.4.59"
+    },
+    "requirements": {
+      "build": []
+    },
+    "schema_version": 0,
+    "source": {
+      "sha256": "683c0e8dd0d7dc97c843411f0caa3ebe618f62560bf3e8f21b71a6eb8acf8422",
+      "url": "https://developer.download.nvidia.com/compute/cuda/redist/cuda_tileiras/windows-arm64/cuda_tileiras-windows-arm64-13.4.59-archive.zip"
+    }
+  },
+  "win_arm64_requirements": {
     "build": {
       "__set__": true,
       "elements": [
